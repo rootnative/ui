@@ -1,6 +1,6 @@
 {
   "name": "@onlynative/icons",
-  "version": "0.0.0-alpha.7",
+  "version": "0.0.0-alpha.8",
   "description": "Icon library adapters for OnlyNative — Lucide, Phosphor, and @expo/vector-icons resolvers with MDI-name compatibility.",
   "private": false,
   "sideEffects": false,

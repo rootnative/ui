@@ -663,7 +663,7 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@only
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@onlynative/icons` adapter package (v0.0.0-alpha.7)
+### `@onlynative/icons` adapter package (v0.0.0-alpha.8)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 
