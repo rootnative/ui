@@ -23,11 +23,19 @@ function getVariantColors(
   theme: MaterialTheme,
   variant: ButtonVariant,
 ): VariantColors {
-  // Per MD3: DisabledContainerOpacity = 0.10, DisabledLabelTextOpacity = 0.38
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.1)
-  const disabledLabelColor = alphaColor(theme.colors.onSurface, 0.38)
-  const disabledOutlineColor = alphaColor(theme.colors.onSurface, 0.12)
-  const stateLayerFocus = 0.1
+  // Per MD3: DisabledContainerOpacity = 0.12, DisabledLabelTextOpacity = 0.38
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledLabelColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
+  const disabledOutlineColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
 
   if (variant === 'outlined') {
     return {
@@ -39,7 +47,10 @@ function getVariantColors(
         theme.colors.primary,
         theme.stateLayer.hoveredOpacity,
       ),
-      focusedBackgroundColor: alphaColor(theme.colors.primary, stateLayerFocus),
+      focusedBackgroundColor: alphaColor(
+        theme.colors.primary,
+        theme.stateLayer.focusedOpacity,
+      ),
       pressedBackgroundColor: alphaColor(
         theme.colors.primary,
         theme.stateLayer.pressedOpacity,
@@ -60,7 +71,10 @@ function getVariantColors(
         theme.colors.primary,
         theme.stateLayer.hoveredOpacity,
       ),
-      focusedBackgroundColor: alphaColor(theme.colors.primary, stateLayerFocus),
+      focusedBackgroundColor: alphaColor(
+        theme.colors.primary,
+        theme.stateLayer.focusedOpacity,
+      ),
       pressedBackgroundColor: alphaColor(
         theme.colors.primary,
         theme.stateLayer.pressedOpacity,
@@ -85,7 +99,7 @@ function getVariantColors(
       focusedBackgroundColor: blendColor(
         theme.colors.surfaceContainerLow,
         theme.colors.primary,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         theme.colors.surfaceContainerLow,
@@ -112,7 +126,7 @@ function getVariantColors(
       focusedBackgroundColor: blendColor(
         theme.colors.secondaryContainer,
         theme.colors.onSecondaryContainer,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         theme.colors.secondaryContainer,
@@ -139,7 +153,7 @@ function getVariantColors(
     focusedBackgroundColor: blendColor(
       theme.colors.primary,
       theme.colors.onPrimary,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       theme.colors.primary,
@@ -186,7 +200,6 @@ function applyColorOverrides(
   if (!containerColor && !contentColor) return colors
 
   const result = { ...colors }
-  const stateLayerFocus = 0.1
 
   if (contentColor) {
     result.textColor = contentColor
@@ -204,7 +217,7 @@ function applyColorOverrides(
     result.focusedBackgroundColor = blendColor(
       containerColor,
       overlay,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     )
     result.pressedBackgroundColor = blendColor(
       containerColor,
@@ -217,7 +230,10 @@ function applyColorOverrides(
         contentColor,
         theme.stateLayer.hoveredOpacity,
       )
-      result.focusedBackgroundColor = alphaColor(contentColor, stateLayerFocus)
+      result.focusedBackgroundColor = alphaColor(
+        contentColor,
+        theme.stateLayer.focusedOpacity,
+      )
       result.pressedBackgroundColor = alphaColor(
         contentColor,
         theme.stateLayer.pressedOpacity,
@@ -231,7 +247,7 @@ function applyColorOverrides(
       result.focusedBackgroundColor = blendColor(
         colors.backgroundColor,
         contentColor,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       )
       result.pressedBackgroundColor = blendColor(
         colors.backgroundColor,
@@ -281,8 +297,7 @@ export function createStyles(
   )
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
-  const baseElevation =
-    variant === 'elevated' ? elevationLevel1 : elevationLevel0
+  const elevationLevel2 = elevationStyle(theme.elevation.level2)
 
   const focusRingInset = -(BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH)
 
@@ -303,13 +318,35 @@ export function createStyles(
       borderColor: colors.borderColor,
       borderWidth: colors.borderWidth,
       cursor: 'pointer',
-      ...baseElevation,
+      ...elevationLevel0,
     },
     disabledContainer: {
       backgroundColor: colors.disabledBackgroundColor,
       borderColor: colors.disabledBorderColor,
       cursor: 'auto',
       ...elevationLevel0,
+    },
+    // Two stacked, absolutely-positioned shadow layers that cross-fade the
+    // elevated button from level 1 (rest) → level 2 (hover), per MD3.
+    elevationLayerLevel1: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: theme.shape.cornerFull,
+      backgroundColor: colors.backgroundColor,
+      ...elevationLevel1,
+    },
+    elevationLayerLevel2: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: theme.shape.cornerFull,
+      backgroundColor: colors.backgroundColor,
+      ...elevationLevel2,
     },
     focusRing: {
       position: 'absolute' as const,

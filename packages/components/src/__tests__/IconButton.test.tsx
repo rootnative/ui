@@ -1,7 +1,14 @@
+import { lightTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { IconButton } from '../icon-button/IconButton'
+
+const DISABLED_ICON_COLOR = alphaColor(
+  lightTheme.colors.onSurface,
+  lightTheme.stateLayer.disabledOpacity,
+)
 
 describe('IconButton', () => {
   it('renders with the button accessibility role', () => {
@@ -69,6 +76,32 @@ describe('IconButton', () => {
       )
       const icon = screen.getByText('heart')
       expect(icon.props.color).toBe('#00FF00')
+    })
+
+    it('ignores contentColor when disabled and uses 38% onSurface', () => {
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          accessibilityLabel="Like"
+          contentColor="#00FF00"
+          disabled
+        />,
+      )
+      const icon = screen.getByText('heart')
+      expect(icon.props.color).toBe(DISABLED_ICON_COLOR)
+    })
+
+    it('ignores iconColor when disabled and uses 38% onSurface', () => {
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          accessibilityLabel="Like"
+          iconColor="#FF0000"
+          disabled
+        />,
+      )
+      const icon = screen.getByText('heart')
+      expect(icon.props.color).toBe(DISABLED_ICON_COLOR)
     })
 
     it('applies the style prop to the container', () => {

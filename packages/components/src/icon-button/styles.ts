@@ -34,10 +34,15 @@ export function getIconButtonColors(
   isToggle: boolean,
   selected: boolean,
 ): IconButtonColors {
-  // Per MD3: DisabledContainerOpacity = 0.10
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.1)
-  const disabledOutlineColor = alphaColor(theme.colors.onSurface, 0.12)
-  const stateLayerFocus = 0.1
+  // Per MD3: DisabledContainerOpacity = 0.12
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledOutlineColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
   const toggleUnselectedBg = theme.colors.surfaceContainerHighest
 
   let baseBg: string
@@ -97,7 +102,11 @@ export function getIconButtonColors(
       overlay,
       theme.stateLayer.hoveredOpacity,
     ),
-    focusedBackgroundColor: blendStateLayer(baseBg, overlay, stateLayerFocus),
+    focusedBackgroundColor: blendStateLayer(
+      baseBg,
+      overlay,
+      theme.stateLayer.focusedOpacity,
+    ),
     pressedBackgroundColor: blendStateLayer(
       baseBg,
       overlay,
@@ -116,7 +125,6 @@ export function applyContainerColorOverride(
   containerColor: string,
   overlay: string,
 ): IconButtonColors {
-  const stateLayerFocus = 0.1
   return {
     ...colors,
     backgroundColor: containerColor,
@@ -130,7 +138,7 @@ export function applyContainerColorOverride(
     focusedBackgroundColor: blendColor(
       containerColor,
       overlay,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       containerColor,

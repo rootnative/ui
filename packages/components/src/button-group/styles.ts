@@ -13,26 +13,25 @@ interface SizeTokens {
   selectedCorner: number
   iconGap: number
   labelStyleKey:
-    | 'labelMedium'
     | 'labelLarge'
     | 'titleMedium'
-    | 'titleLarge'
     | 'headlineSmall'
+    | 'headlineLarge'
 }
 
 const SIZE_TOKENS: Record<ButtonGroupSize, SizeTokens> = {
   extraSmall: {
     height: 32,
     paddingHorizontal: 12,
-    iconSize: 16,
+    iconSize: 20,
     selectedCorner: 8,
     iconGap: 4,
-    labelStyleKey: 'labelMedium',
+    labelStyleKey: 'labelLarge',
   },
   small: {
     height: 40,
     paddingHorizontal: 16,
-    iconSize: 18,
+    iconSize: 20,
     selectedCorner: 12,
     iconGap: 8,
     labelStyleKey: 'labelLarge',
@@ -51,7 +50,7 @@ const SIZE_TOKENS: Record<ButtonGroupSize, SizeTokens> = {
     iconSize: 32,
     selectedCorner: 28,
     iconGap: 12,
-    labelStyleKey: 'titleLarge',
+    labelStyleKey: 'headlineSmall',
   },
   extraLarge: {
     height: 136,
@@ -59,7 +58,7 @@ const SIZE_TOKENS: Record<ButtonGroupSize, SizeTokens> = {
     iconSize: 40,
     selectedCorner: 32,
     iconGap: 16,
-    labelStyleKey: 'headlineSmall',
+    labelStyleKey: 'headlineLarge',
   },
 }
 
@@ -74,7 +73,7 @@ export function getItemGap(
   variant: ButtonGroupVariant,
 ): number {
   if (variant === 'connected') return 2
-  return theme.spacing.xs
+  return theme.spacing.sm
 }
 
 export interface ItemColors {
@@ -98,9 +97,14 @@ function resolveSelectedColors(
 ): ItemColors {
   const baseBackground = options.containerOverride ?? theme.colors.primary
   const baseText = options.contentOverride ?? theme.colors.onPrimary
-  const stateLayerFocus = 0.1
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.1)
-  const disabledLabelColor = alphaColor(theme.colors.onSurface, 0.38)
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledLabelColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
 
   return {
     backgroundColor: baseBackground,
@@ -113,7 +117,7 @@ function resolveSelectedColors(
     focusedBackgroundColor: blendColor(
       baseBackground,
       baseText,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       baseBackground,
@@ -129,12 +133,19 @@ function resolveUnselectedColors(
   theme: MaterialTheme,
   options: ResolveColorOptions,
 ): ItemColors {
+  // MD3 Expressive toggle-button defaults: surfaceContainer container with
+  // onSurfaceVariant content when unselected.
   const baseBackground =
-    options.containerOverride ?? theme.colors.secondaryContainer
-  const baseText = options.contentOverride ?? theme.colors.onSecondaryContainer
-  const stateLayerFocus = 0.1
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.1)
-  const disabledLabelColor = alphaColor(theme.colors.onSurface, 0.38)
+    options.containerOverride ?? theme.colors.surfaceContainer
+  const baseText = options.contentOverride ?? theme.colors.onSurfaceVariant
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledLabelColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
 
   return {
     backgroundColor: baseBackground,
@@ -147,7 +158,7 @@ function resolveUnselectedColors(
     focusedBackgroundColor: blendColor(
       baseBackground,
       baseText,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       baseBackground,

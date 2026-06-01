@@ -43,7 +43,7 @@ describe('ButtonGroup', () => {
       )
     })
 
-    it('uses tablist for multiple', () => {
+    it('uses no special role (none) for multiple', () => {
       renderWithTheme(
         <ButtonGroup
           items={ITEMS}
@@ -52,7 +52,7 @@ describe('ButtonGroup', () => {
           testID="bg"
         />,
       )
-      expect(screen.getByTestId('bg').props.accessibilityRole).toBe('tablist')
+      expect(screen.getByTestId('bg').props.accessibilityRole).toBe('none')
     })
   })
 
@@ -67,9 +67,9 @@ describe('ButtonGroup', () => {
       expect(screen.getAllByRole('radio')).toHaveLength(3)
     })
 
-    it('renders tab items in multiple mode', () => {
+    it('renders checkbox items in multiple mode', () => {
       renderWithTheme(<ButtonGroup items={ITEMS} selectionMode="multiple" />)
-      expect(screen.getAllByRole('tab')).toHaveLength(3)
+      expect(screen.getAllByRole('checkbox')).toHaveLength(3)
     })
   })
 
@@ -162,7 +162,7 @@ describe('ButtonGroup', () => {
   })
 
   describe('selection mode: multiple', () => {
-    it('reflects defaultValue (multi-selected) in accessibilityState', () => {
+    it('reflects defaultValue (multi-selected) as checked in accessibilityState', () => {
       renderWithTheme(
         <ButtonGroup
           items={ITEMS}
@@ -171,14 +171,41 @@ describe('ButtonGroup', () => {
         />,
       )
       expect(
-        screen.getByRole('tab', { name: 'One' }).props.accessibilityState,
-      ).toEqual(expect.objectContaining({ selected: true }))
+        screen.getByRole('checkbox', { name: 'One' }).props.accessibilityState,
+      ).toEqual(expect.objectContaining({ checked: true }))
       expect(
-        screen.getByRole('tab', { name: 'Two' }).props.accessibilityState,
-      ).toEqual(expect.objectContaining({ selected: false }))
+        screen.getByRole('checkbox', { name: 'Two' }).props.accessibilityState,
+      ).toEqual(expect.objectContaining({ checked: false }))
       expect(
-        screen.getByRole('tab', { name: 'Three' }).props.accessibilityState,
-      ).toEqual(expect.objectContaining({ selected: true }))
+        screen.getByRole('checkbox', { name: 'Three' }).props
+          .accessibilityState,
+      ).toEqual(expect.objectContaining({ checked: true }))
+    })
+
+    it('does not expose a selected accessibilityState on checkbox items', () => {
+      renderWithTheme(
+        <ButtonGroup
+          items={ITEMS}
+          selectionMode="multiple"
+          defaultValue={['one']}
+        />,
+      )
+      const one = screen.getByRole('checkbox', { name: 'One' })
+      expect(one.props.accessibilityState.selected).toBeUndefined()
+    })
+
+    it('toggles checked state when an item is pressed', () => {
+      renderWithTheme(
+        <ButtonGroup
+          items={ITEMS}
+          selectionMode="multiple"
+          defaultValue={[]}
+        />,
+      )
+      fireEvent.press(screen.getByRole('checkbox', { name: 'Two' }))
+      expect(
+        screen.getByRole('checkbox', { name: 'Two' }).props.accessibilityState,
+      ).toEqual(expect.objectContaining({ checked: true }))
     })
 
     it('adds a value to the selection when an unselected item is pressed', () => {
@@ -191,7 +218,7 @@ describe('ButtonGroup', () => {
           onValueChange={onValueChange}
         />,
       )
-      fireEvent.press(screen.getByRole('tab', { name: 'Two' }))
+      fireEvent.press(screen.getByRole('checkbox', { name: 'Two' }))
       expect(onValueChange).toHaveBeenCalledWith(['one', 'two'])
     })
 
@@ -205,7 +232,7 @@ describe('ButtonGroup', () => {
           onValueChange={onValueChange}
         />,
       )
-      fireEvent.press(screen.getByRole('tab', { name: 'One' }))
+      fireEvent.press(screen.getByRole('checkbox', { name: 'One' }))
       expect(onValueChange).toHaveBeenCalledWith(['two'])
     })
   })

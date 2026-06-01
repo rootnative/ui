@@ -17,10 +17,6 @@ import type { ButtonProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 export function Button({
   children,
   style,
@@ -39,6 +35,19 @@ export function Button({
   const hasTrailing = Boolean(trailingIcon)
   const theme = useTheme()
   const iconResolver = useIconResolver()
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme.motion.durationShort3],
+  )
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme.motion.durationShort2],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme.motion.durationShort4],
+  )
 
   const styles = useMemo(
     () =>
@@ -86,6 +95,17 @@ export function Button({
     opacity: focused.value,
   }))
 
+  const showElevationLayers = variant === 'elevated' && !isDisabled
+
+  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3.
+  const animatedElevationLevel1Style = useAnimatedStyle(() => ({
+    opacity: 1 - hovered.value,
+  }))
+
+  const animatedElevationLevel2Style = useAnimatedStyle(() => ({
+    opacity: hovered.value,
+  }))
+
   const resolvedIconColor = useMemo(
     () =>
       resolveColorFromStyle(
@@ -105,31 +125,31 @@ export function Button({
   )
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   const iconRenderProps = { size: iconSize, color: resolvedIconColor }
 
@@ -139,6 +159,18 @@ export function Button({
         pointerEvents="none"
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
+      {showElevationLayers ? (
+        <>
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.elevationLayerLevel1, animatedElevationLevel1Style]}
+          />
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.elevationLayerLevel2, animatedElevationLevel2Style]}
+          />
+        </>
+      ) : null}
       <AnimatedPressable
         {...props}
         accessibilityRole="button"

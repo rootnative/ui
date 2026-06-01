@@ -44,11 +44,6 @@ import type {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-const SELECTED_TIMING = { duration: 200 }
-
 export function ButtonGroup(props: ButtonGroupProps): ReactElement {
   const {
     items,
@@ -114,11 +109,13 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
   return (
     <View
       style={[groupStyles.container, style]}
+      // Multi-select gets no special container role — items announce
+      // themselves as independent checkboxes.
       accessibilityRole={
         selectionMode === 'single'
           ? 'radiogroup'
           : selectionMode === 'multiple'
-            ? 'tablist'
+            ? 'none'
             : 'toolbar'
       }
       accessibilityLabel={accessibilityLabel}
@@ -189,6 +186,23 @@ function ButtonGroupItemImpl({
   const isDisabled = Boolean(isGroupDisabled || item.disabled)
   const iconResolver = useIconResolver()
 
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme.motion.durationShort3],
+  )
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme.motion.durationShort2],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme.motion.durationShort4],
+  )
+  const selectedTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme.motion.durationShort4],
+  )
+
   const tokens = getSizeTokens(size)
   const resolvedIconSize = iconSizeOverride ?? tokens.iconSize
 
@@ -253,8 +267,8 @@ function ButtonGroupItemImpl({
   const selectedProgress = useSharedValue(isSelected ? 1 : 0)
 
   useEffect(() => {
-    selectedProgress.value = withTiming(isSelected ? 1 : 0, SELECTED_TIMING)
-  }, [isSelected, selectedProgress])
+    selectedProgress.value = withTiming(isSelected ? 1 : 0, selectedTiming)
+  }, [isSelected, selectedProgress, selectedTiming])
 
   const disabledBackgroundColor = activeColors.disabledBackgroundColor
 
@@ -402,42 +416,51 @@ function ButtonGroupItemImpl({
   )
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   const handlePress = useCallback(() => {
     if (isDisabled) return
     onPress(item.value)
   }, [isDisabled, onPress, item.value])
 
+  // Single-select items are radios; multi-select items are independent
+  // checkboxes (MD3 toggle buttons), announced with a checked state.
   const accessibilityRole =
     selectionMode === 'single'
       ? 'radio'
       : selectionMode === 'multiple'
-        ? 'tab'
+        ? 'checkbox'
         : 'button'
+
+  const accessibilityState =
+    selectionMode === 'single'
+      ? { disabled: isDisabled, selected: isSelected }
+      : selectionMode === 'multiple'
+        ? { disabled: isDisabled, checked: isSelected }
+        : { disabled: isDisabled }
 
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 
@@ -450,10 +473,7 @@ function ButtonGroupItemImpl({
       <AnimatedPressable
         accessibilityRole={accessibilityRole}
         accessibilityLabel={item.accessibilityLabel ?? item.label}
-        accessibilityState={{
-          disabled: isDisabled,
-          ...(selectionMode !== 'none' ? { selected: isSelected } : undefined),
-        }}
+        accessibilityState={accessibilityState}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={handlePress}

@@ -18,10 +18,6 @@ import type { FABProps, FABSize } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 function getFocusRingSizeStyle(
   styles: ReturnType<typeof createStyles>,
   size: FABSize,
@@ -31,6 +27,17 @@ function getFocusRingSizeStyle(
   if (size === 'small') return styles.focusRingSmall
   if (size === 'large') return styles.focusRingLarge
   return styles.focusRingMedium
+}
+
+function getElevationLayerRadiusStyle(
+  styles: ReturnType<typeof createStyles>,
+  size: FABSize,
+  isExtended: boolean,
+) {
+  if (isExtended) return styles.elevationLayerRadiusMedium
+  if (size === 'small') return styles.elevationLayerRadiusSmall
+  if (size === 'large') return styles.elevationLayerRadiusLarge
+  return styles.elevationLayerRadiusMedium
 }
 
 export function FAB({
@@ -58,6 +65,19 @@ export function FAB({
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
   const isDisabled = Boolean(disabled)
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme.motion.durationShort3],
+  )
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme.motion.durationShort2],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme.motion.durationShort4],
+  )
 
   const colors = useMemo(
     () => getResolvedFABColors(theme, variant, containerColor, contentColor),
@@ -96,32 +116,48 @@ export function FAB({
     opacity: focused.value,
   }))
 
+  const showElevationLayers = !isDisabled
+
+  // Cross-fade level 3 (rest) and level 4 (hover) shadow layers per MD3.
+  const animatedElevationLevel3Style = useAnimatedStyle(() => ({
+    opacity: 1 - hovered.value,
+  }))
+
+  const animatedElevationLevel4Style = useAnimatedStyle(() => ({
+    opacity: hovered.value,
+  }))
+
+  const elevationLayerColorStyle = useMemo(
+    () => ({ backgroundColor: colors.backgroundColor }),
+    [colors.backgroundColor],
+  )
+
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   const labelTextStyle = useMemo(
     () => [styles.label, { color: resolvedContentColor }, labelStyleOverride],
@@ -142,6 +178,28 @@ export function FAB({
           animatedFocusRingStyle,
         ]}
       />
+      {showElevationLayers ? (
+        <>
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.elevationLayerLevel3,
+              getElevationLayerRadiusStyle(styles, size, isExtended),
+              elevationLayerColorStyle,
+              animatedElevationLevel3Style,
+            ]}
+          />
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.elevationLayerLevel4,
+              getElevationLayerRadiusStyle(styles, size, isExtended),
+              elevationLayerColorStyle,
+              animatedElevationLevel4Style,
+            ]}
+          />
+        </>
+      ) : null}
       <AnimatedPressable
         {...rest}
         accessibilityRole="button"

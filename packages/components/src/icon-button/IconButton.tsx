@@ -21,21 +21,12 @@ import type {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 function getIconColor(
   variant: IconButtonVariant,
   theme: ReturnType<typeof useTheme>,
-  disabled: boolean,
   isToggle: boolean,
   selected: boolean,
 ): string {
-  if (disabled) {
-    return alphaColor(theme.colors.onSurface, 0.38)
-  }
-
   if (isToggle) {
     if (variant === 'filled') {
       return selected ? theme.colors.onPrimary : theme.colors.primary
@@ -107,13 +98,30 @@ export function IconButton({
   const theme = useTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme.motion.durationShort3],
+  )
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme.motion.durationShort2],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme.motion.durationShort4],
+  )
+
   const isDisabled = Boolean(disabled)
   const isToggle = selected !== undefined
   const isSelected = Boolean(selected)
-  const resolvedIconColor =
-    contentColor ??
-    iconColor ??
-    getIconColor(variant, theme, isDisabled, isToggle, isSelected)
+  // Disabled always renders 38% onSurface — contentColor/iconColor never
+  // override the MD3 disabled treatment.
+  const resolvedIconColor = isDisabled
+    ? alphaColor(theme.colors.onSurface, theme.stateLayer.disabledOpacity)
+    : (contentColor ??
+      iconColor ??
+      getIconColor(variant, theme, isToggle, isSelected))
   const displayIcon =
     isToggle && isSelected && selectedIcon ? selectedIcon : icon
   const iconPixelSize = getIconPixelSize(size)
@@ -160,31 +168,31 @@ export function IconButton({
   }))
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   const disabledOverride = isDisabled
     ? {

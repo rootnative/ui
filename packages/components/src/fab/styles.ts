@@ -56,7 +56,6 @@ function deriveStateLayers(
   focusedBackgroundColor: string
   pressedBackgroundColor: string
 } {
-  const stateLayerFocus = 0.1
   return {
     hoveredBackgroundColor: blendColor(
       backgroundColor,
@@ -66,7 +65,7 @@ function deriveStateLayers(
     focusedBackgroundColor: blendColor(
       backgroundColor,
       overlay,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       backgroundColor,
@@ -91,9 +90,15 @@ export function getResolvedFABColors(
     backgroundColor,
     contentColor,
     ...deriveStateLayers(theme, backgroundColor, contentColor),
-    // Per MD3: DisabledContainerOpacity = 0.10, DisabledContentOpacity = 0.38
-    disabledBackgroundColor: alphaColor(theme.colors.onSurface, 0.1),
-    disabledContentColor: alphaColor(theme.colors.onSurface, 0.38),
+    // Per MD3: DisabledContainerOpacity = 0.12, DisabledContentOpacity = 0.38
+    disabledBackgroundColor: alphaColor(
+      theme.colors.onSurface,
+      theme.stateLayer.disabledContainerOpacity,
+    ),
+    disabledContentColor: alphaColor(
+      theme.colors.onSurface,
+      theme.stateLayer.disabledOpacity,
+    ),
   }
 }
 
@@ -113,7 +118,8 @@ export function getFABIconPixelSize(size: FABSize): number {
 
 export function createStyles(theme: MaterialTheme) {
   const focusRingInset = -(FAB_FOCUS_RING_OFFSET + FAB_FOCUS_RING_WIDTH)
-  const restingElevation = elevationStyle(theme.elevation.level3)
+  const elevationLevel3 = elevationStyle(theme.elevation.level3)
+  const elevationLevel4 = elevationStyle(theme.elevation.level4)
   const labelStyle = theme.typography.labelLarge
 
   return StyleSheet.create({
@@ -124,7 +130,35 @@ export function createStyles(theme: MaterialTheme) {
       alignItems: 'center',
       justifyContent: 'center',
       cursor: 'pointer',
-      ...restingElevation,
+    },
+    // Two stacked, absolutely-positioned shadow layers that cross-fade the
+    // FAB from level 3 (rest) → level 4 (hover), per MD3. The background
+    // color is applied dynamically in the component (it depends on the
+    // resolved container color).
+    elevationLayerLevel3: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      ...elevationLevel3,
+    },
+    elevationLayerLevel4: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      ...elevationLevel4,
+    },
+    elevationLayerRadiusSmall: {
+      borderRadius: theme.shape.cornerMedium,
+    },
+    elevationLayerRadiusMedium: {
+      borderRadius: theme.shape.cornerLarge,
+    },
+    elevationLayerRadiusLarge: {
+      borderRadius: theme.shape.cornerExtraLarge,
     },
     sizeSmall: {
       width: 40,
