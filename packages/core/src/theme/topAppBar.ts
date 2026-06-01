@@ -9,6 +9,6 @@ export const defaultTopAppBarTokens: TopAppBarTokens = {
   topRowHeight: 64,
   sideSlotMinHeight: 48,
   iconFrameSize: 48,
-  mediumTitleBottomPadding: 16,
+  mediumTitleBottomPadding: 24,
   largeTitleBottomPadding: 28,
 }

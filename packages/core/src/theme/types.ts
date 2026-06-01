@@ -169,20 +169,26 @@ export interface TopAppBarTokens {
   largeTitleBottomPadding: number
 }
 
-/** Opacity values for interactive state feedback (press, hover, focus, disabled). */
+/** Opacity values for interactive state feedback (press, hover, focus, drag, disabled). */
 export interface StateLayer {
   pressedOpacity: number
   focusedOpacity: number
   hoveredOpacity: number
+  draggedOpacity: number
+  /** Opacity applied to content (text, icons) in disabled components. MD3: 38% onSurface. */
   disabledOpacity: number
+  /** Opacity applied to container fills of disabled components. MD3: 12% onSurface. */
+  disabledContainerOpacity: number
 }
 
-/** Shadow/elevation levels (0–3) for surface hierarchy. */
+/** Shadow/elevation levels (0–5) for surface hierarchy. */
 export interface Elevation {
   level0: ElevationLevel
   level1: ElevationLevel
   level2: ElevationLevel
   level3: ElevationLevel
+  level4: ElevationLevel
+  level5: ElevationLevel
 }
 
 export interface ElevationLevel {
@@ -212,6 +218,10 @@ export interface Motion {
   durationLong2: number
   durationLong3: number
   durationLong4: number
+  durationExtraLong1: number
+  durationExtraLong2: number
+  durationExtraLong3: number
+  durationExtraLong4: number
   easingLinear: string
   easingStandard: string
   easingStandardAccelerate: string
