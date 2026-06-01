@@ -1,5 +1,5 @@
 {
-  "name": "onlynative-quickstart",
+  "name": "rootnative-quickstart",
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@onlynative/components": "latest",
-    "@onlynative/core": "latest",
+    "@rootnative/components": "latest",
+    "@rootnative/core": "latest",
     "expo": "~54.0.33",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",

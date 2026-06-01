@@ -1,4 +1,4 @@
-import type { IconSource } from '@onlynative/utils'
+import type { IconSource } from '@rootnative/utils'
 import type { StyleProp, TextInputProps, TextStyle } from 'react-native'
 
 /** Visual container style for the text field. */

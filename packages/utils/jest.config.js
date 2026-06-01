@@ -4,7 +4,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFiles: ['./jest.setup.js'],
   moduleNameMapper: {
-    '^@onlynative/core$': '<rootDir>/../core/src/index.ts',
+    '^@rootnative/core$': '<rootDir>/../core/src/index.ts',
   },
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|@react-native(-community)?)/)',

@@ -1,14 +1,10 @@
 {
   "expo": {
-    "name": "onlynative/ui",
+    "name": "rootnative/ui",
     "slug": "ui",
-    "scheme": "onlynative",
+    "scheme": "rootnative",
     "version": "0.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -26,9 +22,7 @@
         "backgroundColor": "#ffffff"
       }
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": ["expo-router"],
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -47,6 +41,6 @@
         "projectId": "9bc1e6dd-2f68-433d-813a-4e4bd167298b"
       }
     },
-    "owner": "onlynative"
+    "owner": "rootnative"
   }
 }

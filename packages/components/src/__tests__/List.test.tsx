@@ -1,4 +1,4 @@
-import { renderWithTheme } from '@onlynative/utils/test'
+import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text, View } from 'react-native'
 import { List } from '../list/List'

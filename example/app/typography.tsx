@@ -1,5 +1,5 @@
-import { Typography } from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+import { Typography } from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 const variants = [

@@ -1,7 +1,7 @@
 {
-  "name": "@onlynative/core",
-  "version": "0.0.0-alpha.8",
-  "description": "Design-system agnostic theme engine for OnlyNative UI — a React Native component library. Ships with Material Design 3 out of the box.",
+  "name": "@rootnative/core",
+  "version": "0.0.0-alpha.0",
+  "description": "Design-system agnostic theme engine for RootNative UI — a React Native component library. Ships with Material Design 3 out of the box.",
   "private": false,
   "sideEffects": false,
   "main": "dist/index.mjs",
@@ -40,10 +40,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlynative/ui.git",
+    "url": "https://github.com/rootnative/ui.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/onlynative/ui",
+  "homepage": "https://github.com/rootnative/ui",
   "keywords": [
     "react-native",
     "material-design-3",

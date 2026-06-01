@@ -1,5 +1,5 @@
-import type { MaterialTheme, TextStyle } from '@onlynative/core'
-import { alphaColor, blendColor } from '@onlynative/utils'
+import type { MaterialTheme, TextStyle } from '@rootnative/core'
+import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ButtonGroupSize, ButtonGroupVariant } from './types'
 

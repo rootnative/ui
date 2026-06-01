@@ -4,7 +4,7 @@ sidebar_position: 7
 
 # Icons
 
-OnlyNative components accept icons in three forms — a string name, a pre-rendered React element, or a render function. By default, string names resolve through `@expo/vector-icons/MaterialCommunityIcons`, but you can plug in **any** icon library (Lucide, SF Symbols, custom SVGs) globally via the theme's `iconResolver`, or per-call by passing an element/function.
+RootNative components accept icons in three forms — a string name, a pre-rendered React element, or a render function. By default, string names resolve through `@expo/vector-icons/MaterialCommunityIcons`, but you can plug in **any** icon library (Lucide, SF Symbols, custom SVGs) globally via the theme's `iconResolver`, or per-call by passing an element/function.
 
 This makes the library design-system agnostic: an Apple HIG app can use SF Symbols, a brand-driven app can ship custom SVGs, and an MD3 app gets MaterialCommunityIcons out of the box without any extra setup.
 
@@ -13,7 +13,7 @@ This makes the library design-system agnostic: an Apple HIG app can use SF Symbo
 Every icon prop on every component (`leadingIcon`, `trailingIcon`, `icon`, `selectedIcon`, …) accepts an `IconSource`:
 
 ```ts
-import type { IconSource } from '@onlynative/utils'
+import type { IconSource } from '@rootnative/utils'
 
 type IconSource =
   | string                                    // resolved via iconResolver (MCI by default)
@@ -34,7 +34,7 @@ Pick the form that matches your situation:
 With no resolver configured, string names resolve to MaterialCommunityIcons. This is the zero-config path — install `@expo/vector-icons` and pass any [MCI name](https://pictogrammers.com/library/mdi/):
 
 ```tsx
-import { Button, IconButton } from '@onlynative/components'
+import { Button, IconButton } from '@rootnative/components'
 
 <Button leadingIcon="plus">Add</Button>
 <IconButton icon="heart-outline" accessibilityLabel="Favorite" />
@@ -47,7 +47,7 @@ import { Button, IconButton } from '@onlynative/components'
 You don't need to configure anything to use a different icon library — just pass the element directly:
 
 ```tsx
-import { Button } from '@onlynative/components'
+import { Button } from '@rootnative/components'
 import { Check, ArrowRight } from 'lucide-react-native'
 
 <Button leadingIcon={<Check size={18} color="#fff" />}>
@@ -66,7 +66,7 @@ You're responsible for the size and color in this form — the component won't o
 If you want the icon to receive the **component's resolved size and color** (so it picks up `iconSize`, `contentColor`, disabled state, variant defaults, etc.), pass a function:
 
 ```tsx
-import { Button } from '@onlynative/components'
+import { Button } from '@rootnative/components'
 import { Check } from 'lucide-react-native'
 
 <Button leadingIcon={({ size, color }) => <Check size={size} color={color} />}>
@@ -84,15 +84,15 @@ If you'd rather keep using string names but route them to a different library, r
 
 You have two paths:
 
-1. **Use a built-in adapter from `@onlynative/icons`.** Recommended for Lucide, Phosphor, and `@expo/vector-icons` — handles sizing, coloring, MDI-name compatibility, and missing-icon warnings for you.
+1. **Use a built-in adapter from `@rootnative/icons`.** Recommended for Lucide, Phosphor, and `@expo/vector-icons` — handles sizing, coloring, MDI-name compatibility, and missing-icon warnings for you.
 2. **Hand-roll a resolver.** A plain `(name, { size, color }) => ReactNode` function. Use this for SF Symbols, custom SVG sprites, or any other source.
 
-### Library adapters: `@onlynative/icons`
+### Library adapters: `@rootnative/icons`
 
-`@onlynative/icons` ships pre-built resolver factories so you don't have to figure out the resolver shape yourself:
+`@rootnative/icons` ships pre-built resolver factories so you don't have to figure out the resolver shape yourself:
 
 ```bash
-npm install @onlynative/icons
+npm install @rootnative/icons
 ```
 
 | Helper | For |
@@ -107,8 +107,8 @@ Each adapter accepts the icons it can render and returns an `IconResolver` you p
 #### Lucide
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createLucideResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createLucideResolver } from '@rootnative/icons'
 import { Check, Search, ArrowRight, Heart } from 'lucide-react-native'
 
 const resolver = createLucideResolver({
@@ -138,8 +138,8 @@ When a name isn't found, the resolver `console.warn`s once per missing name. Ove
 #### Phosphor
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createPhosphorResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createPhosphorResolver } from '@rootnative/icons'
 import { Check, MagnifyingGlass, ArrowRight } from 'phosphor-react-native'
 
 const resolver = createPhosphorResolver({
@@ -159,7 +159,7 @@ Use this when you want a different vector-icon set than the default `MaterialCom
 
 ```tsx
 import { Ionicons } from '@expo/vector-icons'
-import { createVectorIconsResolver } from '@onlynative/icons'
+import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
   IconSet: Ionicons,
@@ -178,7 +178,7 @@ Names you don't alias are forwarded to the icon set verbatim — the set itself 
 If you're rolling your own resolver (SF Symbols, SVG sprites, hand-rolled mappings), wrap it with `withLegacyMdiFallback` to add MDI-name compatibility without re-implementing the alias logic:
 
 ```tsx
-import { withLegacyMdiFallback } from '@onlynative/icons'
+import { withLegacyMdiFallback } from '@rootnative/icons'
 
 const baseResolver: IconResolver = (name, { size, color }) => {
   const Svg = mySvgIcons[name]
@@ -197,8 +197,8 @@ The base resolver is always tried first with the original name; the alias map is
 You can skip the adapter and write the resolver inline. The shape is just `(name, { size, color }) => ReactNode`:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { Check, Plus, ArrowRight, Heart, HeartOff } from 'lucide-react-native'
 
 const icons: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
@@ -231,8 +231,8 @@ You can return `null` from the resolver to render nothing for unknown names, or 
 For Apple HIG-style apps, pair the resolver with [`expo-symbols`](https://docs.expo.dev/versions/latest/sdk/symbols/):
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { SymbolView } from 'expo-symbols'
 
 const symbolMap: Record<string, string> = {
@@ -268,8 +268,8 @@ const sfResolver: IconResolver = (name, { size, color }) => {
 Same pattern with `react-native-svg`:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { CheckSvg, PlusSvg } from './my-icons'
 
 const svgResolver: IconResolver = (name, { size, color }) => {
@@ -316,7 +316,7 @@ You have two ways to handle this when adopting a custom resolver:
 2. **Override per-component** with an explicit `IconSource`. `Checkbox` exposes a `checkIcon?: IconSource` prop for this:
 
 ```tsx
-import { Checkbox } from '@onlynative/components'
+import { Checkbox } from '@rootnative/components'
 import { Check } from 'lucide-react-native'
 
 <Checkbox
@@ -339,14 +339,14 @@ The `color` may be `undefined` when the component lets the icon library inherit 
 
 ## TypeScript
 
-Types live in `@onlynative/core` (the resolver) and `@onlynative/utils` (`IconSource`):
+Types live in `@rootnative/core` (the resolver) and `@rootnative/utils` (`IconSource`):
 
 ```ts
-import type { IconResolver, IconRenderProps } from '@onlynative/core'
-import type { IconSource } from '@onlynative/utils'
+import type { IconResolver, IconRenderProps } from '@rootnative/core'
+import type { IconSource } from '@rootnative/utils'
 ```
 
-`@onlynative/icons` re-exports `IconResolver` and `IconRenderProps` for convenience, plus its own helper types:
+`@rootnative/icons` re-exports `IconResolver` and `IconRenderProps` for convenience, plus its own helper types:
 
 ```ts
 import type {
@@ -355,7 +355,7 @@ import type {
   PhosphorIconWeight,
   VectorIconsResolverOptions,
   WithLegacyMdiFallbackOptions,
-} from '@onlynative/icons'
+} from '@rootnative/icons'
 ```
 
 Use these when you build wrapper components or shared resolvers.

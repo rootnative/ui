@@ -4,12 +4,12 @@ sidebar_position: 2
 
 # Quick Start
 
-The fastest way to start a new project with OnlyNative UI.
+The fastest way to start a new project with RootNative UI.
 
 ## Create a new project
 
 ```bash
-npx onlynative create
+npx rootnative create
 ```
 
 The CLI walks you through a few prompts:
@@ -30,7 +30,7 @@ npx expo start
 
 ## What's in the template
 
-The generated project is a ready-to-run Expo app with OnlyNative UI wired up:
+The generated project is a ready-to-run Expo app with RootNative UI wired up:
 
 ```
 my-app/
@@ -53,7 +53,7 @@ my-app/
 // app/_layout.tsx
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function RootLayout() {
   return (
@@ -74,17 +74,17 @@ The home screen demonstrates Buttons and Cards out of the box. Edit `app/index.t
 You can also pass the project name directly:
 
 ```bash
-npx onlynative create my-app
+npx rootnative create my-app
 ```
 
 Skip all prompts with `-y` (uses defaults: npm, auto display name, auto install):
 
 ```bash
-npx onlynative create my-app -y
+npx rootnative create my-app -y
 ```
 
 ## Next steps
 
 - [Theming](./theming) — customize colors, typography, and shape tokens
-- [CLI](./cli) — add more components with `npx onlynative add`
+- [CLI](./cli) — add more components with `npx rootnative add`
 - [Components](/introduction#components) — browse all available components

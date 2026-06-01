@@ -1,4 +1,4 @@
-import { Column, IconButton, Row, Typography } from '@onlynative/components'
+import { Column, IconButton, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
 
 const variants = [

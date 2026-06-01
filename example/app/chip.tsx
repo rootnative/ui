@@ -1,5 +1,5 @@
-import { Chip, Column, Row, Typography } from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+import { Chip, Column, Row, Typography } from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 

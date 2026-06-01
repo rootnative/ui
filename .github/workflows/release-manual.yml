@@ -123,7 +123,7 @@ jobs:
             fi
           done
 
-          # Update @onlynative/core peer dep in selected packages if core was bumped
+          # Update @rootnative/core peer dep in selected packages if core was bumped
           CORE_BUMPED=false
           for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
             if [ "$PKG_DIR" = "core" ]; then CORE_BUMPED=true; break; fi
@@ -136,8 +136,8 @@ jobs:
                 const fs = require('fs');
                 const pkgPath = 'packages/$PKG_DIR/package.json';
                 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-                if (pkg.peerDependencies?.['@onlynative/core']) {
-                  pkg.peerDependencies['@onlynative/core'] = '>=$CORE_VERSION';
+                if (pkg.peerDependencies?.['@rootnative/core']) {
+                  pkg.peerDependencies['@rootnative/core'] = '>=$CORE_VERSION';
                   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
                 }
               "
@@ -173,7 +173,7 @@ jobs:
           # Publish core first if included (other packages may depend on it)
           for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
             if [ "$PKG_DIR" = "core" ]; then
-              echo "Publishing @onlynative/core..."
+              echo "Publishing @rootnative/core..."
               (cd packages/core && pnpm publish --provenance --access public --tag ${{ inputs.tag }} --no-git-checks)
               break
             fi

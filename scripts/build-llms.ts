@@ -414,13 +414,13 @@ const COMPONENT_NAMES: Record<string, string> = {
 
 const COMPONENT_EXAMPLES: Record<string, string> = {
   typography: `\`\`\`tsx
-import { Typography } from '@onlynative/components/typography'
+import { Typography } from '@rootnative/components/typography'
 
 <Typography variant="headlineMedium" color="#333">Hello</Typography>
 \`\`\``,
 
   button: `\`\`\`tsx
-import { Button } from '@onlynative/components/button'
+import { Button } from '@rootnative/components/button'
 
 <Button variant="filled" leadingIcon="plus" onPress={handlePress}>Create</Button>
 <Button variant="outlined">Cancel</Button>
@@ -428,7 +428,7 @@ import { Button } from '@onlynative/components/button'
 \`\`\``,
 
   'button-group': `\`\`\`tsx
-import { ButtonGroup } from '@onlynative/components/button-group'
+import { ButtonGroup } from '@rootnative/components/button-group'
 
 // Single-select connected group (replaces deprecated MD3 segmented button).
 <ButtonGroup
@@ -467,14 +467,14 @@ import { ButtonGroup } from '@onlynative/components/button-group'
 \`\`\``,
 
   'icon-button': `\`\`\`tsx
-import { IconButton } from '@onlynative/components/icon-button'
+import { IconButton } from '@rootnative/components/icon-button'
 
 <IconButton icon="heart" variant="filled" accessibilityLabel="Like" onPress={handleLike} />
 <IconButton icon="heart-outline" selectedIcon="heart" selected={liked} variant="tonal" accessibilityLabel="Like" onPress={toggle} />
 \`\`\``,
 
   fab: `\`\`\`tsx
-import { FAB } from '@onlynative/components/fab'
+import { FAB } from '@rootnative/components/fab'
 
 // Icon-only — accessibilityLabel required
 <FAB icon="plus" accessibilityLabel="Add" onPress={handleAdd} />
@@ -485,7 +485,7 @@ import { FAB } from '@onlynative/components/fab'
 \`\`\``,
 
   appbar: `\`\`\`tsx
-import { AppBar } from '@onlynative/components/appbar'
+import { AppBar } from '@rootnative/components/appbar'
 
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
@@ -496,14 +496,14 @@ import { AppBar } from '@onlynative/components/appbar'
 \`\`\``,
 
   card: `\`\`\`tsx
-import { Card } from '@onlynative/components/card'
+import { Card } from '@rootnative/components/card'
 
 <Card variant="elevated">{children}</Card>
 <Card variant="outlined" onPress={handlePress}>{children}</Card>
 \`\`\``,
 
   chip: `\`\`\`tsx
-import { Chip } from '@onlynative/components/chip'
+import { Chip } from '@rootnative/components/chip'
 
 <Chip variant="assist" leadingIcon="calendar">Today</Chip>
 <Chip variant="filter" selected={isSelected} onPress={toggle}>Active</Chip>
@@ -512,26 +512,26 @@ import { Chip } from '@onlynative/components/chip'
 \`\`\``,
 
   checkbox: `\`\`\`tsx
-import { Checkbox } from '@onlynative/components/checkbox'
+import { Checkbox } from '@rootnative/components/checkbox'
 
 <Checkbox value={checked} onValueChange={setChecked} />
 \`\`\``,
 
   radio: `\`\`\`tsx
-import { Radio } from '@onlynative/components/radio'
+import { Radio } from '@rootnative/components/radio'
 
 <Radio value={selected} onValueChange={setSelected} />
 \`\`\``,
 
   switch: `\`\`\`tsx
-import { Switch } from '@onlynative/components/switch'
+import { Switch } from '@rootnative/components/switch'
 
 <Switch value={on} onValueChange={setOn} />
 <Switch value={on} onValueChange={setOn} selectedIcon="check" unselectedIcon="close" />
 \`\`\``,
 
   'text-field': `\`\`\`tsx
-import { TextField } from '@onlynative/components/text-field'
+import { TextField } from '@rootnative/components/text-field'
 
 <TextField label="Email" variant="outlined" value={email} onChangeText={setEmail} />
 <TextField label="Password" variant="filled" error errorText="Required" />
@@ -539,7 +539,7 @@ import { TextField } from '@onlynative/components/text-field'
 \`\`\``,
 
   list: `\`\`\`tsx
-import { List, ListItem, ListDivider } from '@onlynative/components/list'
+import { List, ListItem, ListDivider } from '@rootnative/components/list'
 
 <List>
   <ListItem headlineText="Title" supportingText="Subtitle" onPress={handlePress} />
@@ -553,7 +553,7 @@ import { List, ListItem, ListDivider } from '@onlynative/components/list'
 \`\`\``,
 
   'keyboard-avoiding-wrapper': `\`\`\`tsx
-import { KeyboardAvoidingWrapper } from '@onlynative/components/keyboard-avoiding-wrapper'
+import { KeyboardAvoidingWrapper } from '@rootnative/components/keyboard-avoiding-wrapper'
 
 <KeyboardAvoidingWrapper>
   <TextField label="Name" />
@@ -562,7 +562,7 @@ import { KeyboardAvoidingWrapper } from '@onlynative/components/keyboard-avoidin
 \`\`\``,
 
   avatar: `\`\`\`tsx
-import { Avatar } from '@onlynative/components/avatar'
+import { Avatar } from '@rootnative/components/avatar'
 
 <Avatar imageUri="https://example.com/photo.jpg" size="large" />
 <Avatar icon="account" size="medium" containerColor="#E8DEF8" />
@@ -571,7 +571,7 @@ import { Avatar } from '@onlynative/components/avatar'
 \`\`\``,
 
   slider: `\`\`\`tsx
-import { Slider } from '@onlynative/components/slider'
+import { Slider } from '@rootnative/components/slider'
 
 // Continuous (single thumb)
 <Slider value={value} onValueChange={setValue} />
@@ -601,7 +601,7 @@ import { Slider } from '@onlynative/components/slider'
 \`\`\``,
 
   progress: `\`\`\`tsx
-import { LinearProgress, CircularProgress } from '@onlynative/components/progress'
+import { LinearProgress, CircularProgress } from '@rootnative/components/progress'
 
 // Determinate (progress 0..1)
 <LinearProgress progress={0.4} />
@@ -640,7 +640,7 @@ function generateComponentSection(dirName: string): string {
         title: '#### Layout',
         desc: 'Full-screen safe area wrapper.',
         example: `\`\`\`tsx
-import { Layout } from '@onlynative/components/layout'
+import { Layout } from '@rootnative/components/layout'
 
 <Layout>{children}</Layout>
 <Layout immersive>{/* No safe area insets */}</Layout>
@@ -652,7 +652,7 @@ import { Layout } from '@onlynative/components/layout'
         title: '#### Box',
         desc: 'Base layout primitive with spacing shorthand props.',
         example: `\`\`\`tsx
-import { Box } from '@onlynative/components/layout'
+import { Box } from '@rootnative/components/layout'
 
 <Box p="md" bg={theme.colors.surface}>{children}</Box>
 <Box px="lg" py="sm" gap="md">{children}</Box>
@@ -663,7 +663,7 @@ import { Box } from '@onlynative/components/layout'
         title: '#### Row',
         desc: 'Horizontal flex container (extends Box).',
         example: `\`\`\`tsx
-import { Row } from '@onlynative/components/layout'
+import { Row } from '@rootnative/components/layout'
 
 <Row gap="sm" align="center">{children}</Row>
 <Row wrap>{/* Wraps to next line */}</Row>
@@ -674,7 +674,7 @@ import { Row } from '@onlynative/components/layout'
         title: '#### Column',
         desc: 'Vertical flex container (extends Box).',
         example: `\`\`\`tsx
-import { Column } from '@onlynative/components/layout'
+import { Column } from '@rootnative/components/layout'
 
 <Column gap="md">{children}</Column>
 \`\`\``,
@@ -684,7 +684,7 @@ import { Column } from '@onlynative/components/layout'
         title: '#### Grid',
         desc: 'Equal-width column grid (extends Row).',
         example: `\`\`\`tsx
-import { Grid } from '@onlynative/components/layout'
+import { Grid } from '@rootnative/components/layout'
 
 <Grid columns={3} gap="sm">{children}</Grid>
 \`\`\``,
@@ -884,8 +884,8 @@ import { Grid } from '@onlynative/components/layout'
 function componentsContent(): string {
   let output = ''
 
-  output += `Import via subpath (preferred): \`import { X } from '@onlynative/components/x'\`
-Import via root: \`import { X } from '@onlynative/components'\`
+  output += `Import via subpath (preferred): \`import { X } from '@rootnative/components/x'\`
+Import via root: \`import { X } from '@rootnative/components'\`
 
 ### Component override pattern
 
@@ -923,7 +923,7 @@ function coreContent(): string {
 Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
 
 \`\`\`tsx
-import { ThemeProvider, darkTheme } from '@onlynative/core'
+import { ThemeProvider, darkTheme } from '@rootnative/core'
 
 // Light theme (default)
 <ThemeProvider>{children}</ThemeProvider>
@@ -932,8 +932,8 @@ import { ThemeProvider, darkTheme } from '@onlynative/core'
 <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
 
 // Custom theme
-import { lightTheme } from '@onlynative/core'
-import type { Theme } from '@onlynative/core'
+import { lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
 
 const custom: Theme = {
   ...lightTheme,
@@ -953,7 +953,7 @@ Returns the current theme from the nearest \`ThemeProvider\`.
 Without a type parameter, returns the Material Design 3 \`Theme\`. Pass a custom theme type for typed access to your design system's tokens.
 
 \`\`\`tsx
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 
 // Material Design 3 (default)
 const theme = useTheme()
@@ -969,8 +969,8 @@ const theme = useTheme<MyTheme>()
 Identity function that validates a custom theme object against \`BaseTheme\`. Provides type-checking and autocompletion.
 
 \`\`\`tsx
-import { defineTheme } from '@onlynative/core'
-import type { BaseTheme, TextStyle } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
+import type { BaseTheme, TextStyle } from '@rootnative/core'
 
 interface MyColors { [key: string]: string; brand: string; background: string; text: string }
 interface MyTypography { [key: string]: TextStyle; heading: TextStyle; body: TextStyle }
@@ -1009,8 +1009,8 @@ Defaults are byte-identical to the upstream MD3 \`material-color-utilities\` lib
 **Separate entry point** — keeps the ~60 kB dependency out of the main bundle:
 
 \`\`\`tsx
-import { createMaterialTheme } from '@onlynative/core/create-theme'
-import { ThemeProvider } from '@onlynative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
 
 // Pure MD3 default (TonalSpot variant)
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
@@ -1055,13 +1055,13 @@ Scales the MD3 corner radius tokens by a multiplier. Returns a complete \`Shape\
 - \`roundness: 2\` — double the rounding
 
 \`\`\`tsx
-import { applyRoundness, lightTheme } from '@onlynative/core'
+import { applyRoundness, lightTheme } from '@rootnative/core'
 
 // Use with spread to override shape on an existing theme
 const sharpTheme = { ...lightTheme, shape: applyRoundness(0) }
 
 // Or with defineTheme
-import { defineTheme } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
 const theme = defineTheme({ ...lightTheme, shape: applyRoundness(0.5) })
 \`\`\`
 
@@ -1070,7 +1070,7 @@ const theme = defineTheme({ ...lightTheme, shape: applyRoundness(0.5) })
 Grouped object containing all Material Design 3 theme values.
 
 \`\`\`tsx
-import { material } from '@onlynative/core'
+import { material } from '@rootnative/core'
 
 material.lightTheme  // MD3 light theme
 material.darkTheme   // MD3 dark theme
@@ -1111,7 +1111,7 @@ Typography variants: displayLarge, displayMedium, displaySmall, headlineLarge, h
 Returns the current MD3 window size class. Reactively updates on resize.
 
 \`\`\`tsx
-import { useBreakpoint } from '@onlynative/core'
+import { useBreakpoint } from '@rootnative/core'
 
 const bp = useBreakpoint()
 // 'compact' (0-599) | 'medium' (600-839) | 'expanded' (840-1199) | 'large' (1200-1599) | 'extraLarge' (1600+)
@@ -1122,7 +1122,7 @@ const bp = useBreakpoint()
 Returns a value based on the current breakpoint with cascade fallback.
 
 \`\`\`tsx
-import { useBreakpointValue } from '@onlynative/core'
+import { useBreakpointValue } from '@rootnative/core'
 
 const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 // compact → 1, medium → 2, expanded/large/extraLarge → 4
@@ -1139,14 +1139,14 @@ Type: \`useBreakpointValue<T>(values: Partial<Record<Breakpoint, T>> & Record<'c
 function cliContent(): string {
   return `### Commands
 
-#### \`onlynative create [name]\`
+#### \`rootnative create [name]\`
 
-Create a new project with OnlyNative UI pre-configured. Fetches the quickstart template, applies your project name to \`package.json\` and \`app.json\`, and optionally installs dependencies.
+Create a new project with RootNative UI pre-configured. Fetches the quickstart template, applies your project name to \`package.json\` and \`app.json\`, and optionally installs dependencies.
 
 \`\`\`bash
-npx onlynative create            # Interactive
-npx onlynative create my-app     # With name
-npx onlynative create my-app -y  # Non-interactive, accept defaults
+npx rootnative create            # Interactive
+npx rootnative create my-app     # With name
+npx rootnative create my-app -y  # Non-interactive, accept defaults
 \`\`\`
 
 Options:
@@ -1154,42 +1154,42 @@ Options:
 - \`-t, --template <name>\` — Template to use (\`blank\`, \`with-router\`)
 - \`--package-manager <pm>\` — Package manager to use (\`npm\`, \`yarn\`, \`pnpm\`, \`bun\`)
 
-#### \`onlynative init\`
+#### \`rootnative init\`
 
-Copy-paste workflow — copies component source files into your project. The theme system (\`@onlynative/core\`) stays as an npm dependency.
+Copy-paste workflow — copies component source files into your project. The theme system (\`@rootnative/core\`) stays as an npm dependency.
 
 Initialize project. Detects project type (Expo/RN), package manager, and tsconfig path aliases.
 
 \`\`\`bash
-npx onlynative init            # Interactive
-npx onlynative init -y         # Non-interactive, accept defaults
-npx onlynative init -y --components-alias "~/ui" --lib-alias "~/utils"
+npx rootnative init            # Interactive
+npx rootnative init -y         # Non-interactive, accept defaults
+npx rootnative init -y --components-alias "~/ui" --lib-alias "~/utils"
 \`\`\`
 
 Options:
-- \`-y, --yes\` — Skip all prompts, use detected defaults. Overwrites existing config. Auto-installs \`@onlynative/core\`.
+- \`-y, --yes\` — Skip all prompts, use detected defaults. Overwrites existing config. Auto-installs \`@rootnative/core\`.
 - \`--components-alias <alias>\` — Components install path. Default: \`@/components/ui\` (or \`~/components/ui\` if \`~/*\` alias detected in tsconfig)
 - \`--lib-alias <alias>\` — Utility files path. Default: \`@/lib\` (or \`~/lib\` if \`~/*\` alias detected)
 - \`--package-manager <pm>\` — Package manager to use (\`npm\`, \`yarn\`, \`pnpm\`, \`bun\`)
 
-Creates \`onlynative.json\`:
+Creates \`rootnative.json\`:
 \`\`\`json
 {
-  "$schema": "https://onlynative.dev/schema.json",
+  "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
-  "registryUrl": "https://raw.githubusercontent.com/onlynative/ui",
+  "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
   "registryVersion": "main"
 }
 \`\`\`
 
-#### \`onlynative add <components...>\`
+#### \`rootnative add <components...>\`
 
 Add components to your project. Resolves dependency graph, copies files with rewritten imports, installs npm deps.
 
 \`\`\`bash
-npx onlynative add button
-npx onlynative add card chip text-field
-npx onlynative add appbar      # auto-adds icon-button + typography
+npx rootnative add button
+npx rootnative add card chip text-field
+npx rootnative add appbar      # auto-adds icon-button + typography
 \`\`\`
 
 Options:
@@ -1197,7 +1197,7 @@ Options:
 - \`-d, --dry-run\` — Preview without writing files
 - \`--package-manager <pm>\` — Package manager to use (\`npm\`, \`yarn\`, \`pnpm\`, \`bun\`)
 
-#### \`onlynative update [components...]\`
+#### \`rootnative update [components...]\`
 
 Update installed components to latest registry version.
 
@@ -1205,13 +1205,13 @@ Options:
 - \`-a, --all\` — Update all installed components
 - \`-d, --dry-run\` — Show diff without applying
 
-#### \`onlynative upgrade\`
+#### \`rootnative upgrade\`
 
-Upgrade \`@onlynative/core\` to the latest published version and install any new peer dependencies.
+Upgrade \`@rootnative/core\` to the latest published version and install any new peer dependencies.
 
 \`\`\`bash
-npx onlynative upgrade         # Interactive — shows plan and prompts before installing
-npx onlynative upgrade -y      # Non-interactive — skip confirmation
+npx rootnative upgrade         # Interactive — shows plan and prompts before installing
+npx rootnative upgrade -y      # Non-interactive — skip confirmation
 \`\`\`
 
 Options:
@@ -1219,19 +1219,19 @@ Options:
 - \`--package-manager <pm>\` — Package manager to use (\`npm\`, \`yarn\`, \`pnpm\`, \`bun\`)
 
 What it does:
-1. Reads the installed \`@onlynative/core\` version from \`node_modules\`
+1. Reads the installed \`@rootnative/core\` version from \`node_modules\`
 2. Fetches the latest version from the npm registry
 3. Compares peer dependencies between the installed and latest versions
 4. Shows a plan: version bump, new required peer deps, changed version ranges, removed deps
-5. Upgrades \`@onlynative/core\` and installs any new required peer dependencies in one step
+5. Upgrades \`@rootnative/core\` and installs any new required peer dependencies in one step
 6. Reports optional peer deps that aren't installed (does not auto-install optional deps)
 7. Lists peer deps that are no longer required so you can remove them manually
 
-#### \`onlynative list\`
+#### \`rootnative list\`
 
 Show available components with install status.
 
-#### \`onlynative doctor\`
+#### \`rootnative doctor\`
 
 Check project health: config validity, core installation, RN version, file integrity, peer deps.
 `
@@ -1242,12 +1242,12 @@ Check project health: config validity, core installation, RN version, file integ
 // ============================================================
 
 function utilsContent(): string {
-  return `## @onlynative/utils
+  return `## @rootnative/utils
 
-Shared utilities used by \`@onlynative/components\` and available for custom component development.
+Shared utilities used by \`@rootnative/components\` and available for custom component development.
 
 \`\`\`tsx
-import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, transformOrigin, selectRTL } from '@onlynative/utils'
+import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, transformOrigin, selectRTL } from '@rootnative/utils'
 \`\`\`
 
 ### Color helpers
@@ -1273,7 +1273,7 @@ import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, tran
 ### Test helper (subpath export)
 
 \`\`\`tsx
-import { renderWithTheme } from '@onlynative/utils/test'
+import { renderWithTheme } from '@rootnative/utils/test'
 \`\`\`
 
 - \`renderWithTheme(ui: ReactElement, options?: RenderOptions)\` — Wraps \`@testing-library/react-native\`'s \`render\` with \`ThemeProvider\`.
@@ -1287,7 +1287,7 @@ import { renderWithTheme } from '@onlynative/utils/test'
 function iconsContent(): string {
   return `## Icons
 
-Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@onlynative/utils'\`) — one of three forms:
+Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@rootnative/utils'\`) — one of three forms:
 
 1. **String name** — resolved through the theme's \`iconResolver\`. Defaults to \`MaterialCommunityIcons\` from \`@expo/vector-icons\`. Browse names at https://pictogrammers.com/library/mdi/.
 2. **ReactElement** — a pre-rendered icon (\`leadingIcon={<Check size={18} color="#fff" />}\`). The component does not override size/color.
@@ -1295,12 +1295,12 @@ Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@o
 
 Per-call elements/functions always take precedence over the resolver. \`@expo/vector-icons\` is only required if you actually pass string icon names without a custom resolver.
 
-### \`@onlynative/icons\` adapter package (v${ICONS_VERSION})
+### \`@rootnative/icons\` adapter package (v${ICONS_VERSION})
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / \`@expo/vector-icons\` are declared as optional peer deps.
 
 \`\`\`bash
-pnpm add @onlynative/icons
+pnpm add @rootnative/icons
 \`\`\`
 
 | Helper | For |
@@ -1313,8 +1313,8 @@ pnpm add @onlynative/icons
 #### Lucide
 
 \`\`\`tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createLucideResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createLucideResolver } from '@rootnative/icons'
 import { Check, Search, ArrowRight } from 'lucide-react-native'
 
 const resolver = createLucideResolver({
@@ -1329,8 +1329,8 @@ const resolver = createLucideResolver({
 #### Phosphor
 
 \`\`\`tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createPhosphorResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createPhosphorResolver } from '@rootnative/icons'
 import { Check, MagnifyingGlass } from 'phosphor-react-native'
 
 const resolver = createPhosphorResolver({
@@ -1344,7 +1344,7 @@ const resolver = createPhosphorResolver({
 
 \`\`\`tsx
 import { Ionicons } from '@expo/vector-icons'
-import { createVectorIconsResolver } from '@onlynative/icons'
+import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
   IconSet: Ionicons,
@@ -1357,8 +1357,8 @@ const resolver = createVectorIconsResolver({
 \`withLegacyMdiFallback\` wraps any \`IconResolver\` so that legacy MaterialCommunityIcons names (\`magnify\`, \`pencil\`, \`dots-vertical\`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns \`null\`.
 
 \`\`\`tsx
-import { withLegacyMdiFallback } from '@onlynative/icons'
-import type { IconResolver } from '@onlynative/core'
+import { withLegacyMdiFallback } from '@rootnative/icons'
+import type { IconResolver } from '@rootnative/core'
 
 const baseResolver: IconResolver = (name, { size, color }) => {
   const Svg = mySvgIcons[name]
@@ -1383,11 +1383,11 @@ Lucide-specific: \`strokeWidth?: number\`. Phosphor-specific: \`weight?: 'thin' 
 
 #### Manual resolver (no adapter package)
 
-You don't need \`@onlynative/icons\` at all — \`iconResolver\` accepts any \`(name, { size, color }) => ReactNode\` function:
+You don't need \`@rootnative/icons\` at all — \`iconResolver\` accepts any \`(name, { size, color }) => ReactNode\` function:
 
 \`\`\`tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { Check, Heart } from 'lucide-react-native'
 
 const icons = { check: Check, heart: Heart }
@@ -1409,7 +1409,7 @@ function codeStyleContent(): string {
 
 - No semicolons, single quotes, trailing commas
 - TypeScript strict mode
-- Subpath imports preferred: \`@onlynative/components/button\` over \`@onlynative/components\`
+- Subpath imports preferred: \`@rootnative/components/button\` over \`@rootnative/components\`
 `
 }
 
@@ -1418,7 +1418,7 @@ function codeStyleContent(): string {
 // ============================================================
 
 function generateCoreLlms(): string {
-  return `# @onlynative/core — Theme System for React Native
+  return `# @rootnative/core — Theme System for React Native
 
 > Version: ${CORE_VERSION}
 > Peer deps: react >=18, react-native >=0.72
@@ -1427,7 +1427,7 @@ function generateCoreLlms(): string {
 ## Quick Start
 
 \`\`\`tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -1445,10 +1445,10 @@ ${coreContent()}
 }
 
 function generateComponentsLlms(): string {
-  return `# @onlynative/components — MD3 UI Components for React Native
+  return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @onlynative/core >=${CORE_VERSION}, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4
+> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage
@@ -1461,38 +1461,38 @@ ${iconsContent()}`
 }
 
 function generateCliLlms(): string {
-  return `# @onlynative/cli — CLI for OnlyNative UI
+  return `# @rootnative/cli — CLI for RootNative UI
 
 > Version: ${CLI_VERSION}
-> Binary: \`onlynative\`
+> Binary: \`rootnative\`
 > Requirements: Node >=18
 
-## CLI (\`onlynative\`)
+## CLI (\`rootnative\`)
 
 ${cliContent()}`
 }
 
 function generateIconsLlms(): string {
-  return `# @onlynative/icons — Icon Library Adapters for OnlyNative UI
+  return `# @rootnative/icons — Icon Library Adapters for RootNative UI
 
 > Version: ${ICONS_VERSION}
-> Peer deps: @onlynative/core >=${CORE_VERSION}, react >=18, react-native >=0.72
+> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72
 > Optional peer deps: lucide-react-native, phosphor-react-native, @expo/vector-icons
 
 Pre-built resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
 \`\`\`bash
-pnpm add @onlynative/icons
+pnpm add @rootnative/icons
 \`\`\`
 
 ${iconsContent()}`
 }
 
 function generateFullLlms(): string {
-  return `# OnlyNative UI — Full API Reference
+  return `# RootNative UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
-> Versions: \`@onlynative/core\` ${CORE_VERSION} · \`@onlynative/components\` ${COMPONENTS_VERSION} · \`@onlynative/icons\` ${ICONS_VERSION} · \`@onlynative/cli\` ${CLI_VERSION}
+> Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: React Native 0.81+, React 19+, Expo SDK 54+
 > Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`
 > Optional peer deps: \`@expo/vector-icons >=14\` (only needed for icon props)
@@ -1502,7 +1502,7 @@ function generateFullLlms(): string {
 ## Quick Start (new project)
 
 \`\`\`bash
-npx onlynative create my-app
+npx rootnative create my-app
 cd my-app
 npx expo start
 \`\`\`
@@ -1514,17 +1514,17 @@ Interactive prompts: project name, display name (shown on home screen), package 
 Options:
 - \`-y, --yes\` — Skip all prompts, use defaults (name: \`my-app\`, pm: \`npm\`, auto-install)
 
-Pass name directly: \`npx onlynative create my-app\`
+Pass name directly: \`npx rootnative create my-app\`
 
 ## Installation (existing project)
 
 \`\`\`bash
-pnpm add @onlynative/core @onlynative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated
+pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated
 \`\`\`
 
 ---
 
-## CLI (\`onlynative\`)
+## CLI (\`rootnative\`)
 
 ${cliContent()}
 ---
@@ -1532,12 +1532,12 @@ ${cliContent()}
 ${utilsContent()}
 ---
 
-## @onlynative/core
+## @rootnative/core
 
 ${coreContent()}
 ---
 
-## @onlynative/components
+## @rootnative/components
 
 ${componentsContent()}
 

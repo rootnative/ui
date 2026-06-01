@@ -1,4 +1,4 @@
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 import React, { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'

@@ -1,18 +1,18 @@
-# @onlynative/icons — Icon Library Adapters for OnlyNative UI
+# @rootnative/icons — Icon Library Adapters for RootNative UI
 
-> Version: 0.0.0-alpha.8
-> Peer deps: @onlynative/core >=0.0.0-alpha.8, react >=18, react-native >=0.72
+> Version: 0.0.0-alpha.0
+> Peer deps: @rootnative/core >=0.0.0-alpha.0, react >=18, react-native >=0.72
 > Optional peer deps: lucide-react-native, phosphor-react-native, @expo/vector-icons
 
 Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
 ```bash
-pnpm add @onlynative/icons
+pnpm add @rootnative/icons
 ```
 
 ## Icons
 
-Every icon prop accepts an `IconSource` (`import type { IconSource } from '@onlynative/utils'`) — one of three forms:
+Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/utils'`) — one of three forms:
 
 1. **String name** — resolved through the theme's `iconResolver`. Defaults to `MaterialCommunityIcons` from `@expo/vector-icons`. Browse names at https://pictogrammers.com/library/mdi/.
 2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
@@ -20,12 +20,12 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@only
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@onlynative/icons` adapter package (v0.0.0-alpha.8)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.0)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 
 ```bash
-pnpm add @onlynative/icons
+pnpm add @rootnative/icons
 ```
 
 | Helper | For |
@@ -38,8 +38,8 @@ pnpm add @onlynative/icons
 #### Lucide
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createLucideResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createLucideResolver } from '@rootnative/icons'
 import { Check, Search, ArrowRight } from 'lucide-react-native'
 
 const resolver = createLucideResolver({
@@ -54,8 +54,8 @@ const resolver = createLucideResolver({
 #### Phosphor
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createPhosphorResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createPhosphorResolver } from '@rootnative/icons'
 import { Check, MagnifyingGlass } from 'phosphor-react-native'
 
 const resolver = createPhosphorResolver({
@@ -69,7 +69,7 @@ const resolver = createPhosphorResolver({
 
 ```tsx
 import { Ionicons } from '@expo/vector-icons'
-import { createVectorIconsResolver } from '@onlynative/icons'
+import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
   IconSet: Ionicons,
@@ -82,8 +82,8 @@ const resolver = createVectorIconsResolver({
 `withLegacyMdiFallback` wraps any `IconResolver` so that legacy MaterialCommunityIcons names (`magnify`, `pencil`, `dots-vertical`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns `null`.
 
 ```tsx
-import { withLegacyMdiFallback } from '@onlynative/icons'
-import type { IconResolver } from '@onlynative/core'
+import { withLegacyMdiFallback } from '@rootnative/icons'
+import type { IconResolver } from '@rootnative/core'
 
 const baseResolver: IconResolver = (name, { size, color }) => {
   const Svg = mySvgIcons[name]
@@ -108,11 +108,11 @@ Lucide-specific: `strokeWidth?: number`. Phosphor-specific: `weight?: 'thin' | '
 
 #### Manual resolver (no adapter package)
 
-You don't need `@onlynative/icons` at all — `iconResolver` accepts any `(name, { size, color }) => ReactNode` function:
+You don't need `@rootnative/icons` at all — `iconResolver` accepts any `(name, { size, color }) => ReactNode` function:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { Check, Heart } from 'lucide-react-native'
 
 const icons = { check: Check, heart: Heart }

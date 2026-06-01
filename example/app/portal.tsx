@@ -7,9 +7,9 @@ import {
   PortalHost,
   Row,
   Typography,
-} from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
-import { alphaColor } from '@onlynative/utils'
+} from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 

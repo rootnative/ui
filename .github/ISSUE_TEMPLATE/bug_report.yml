@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in @onlynative components or core
+description: Report a bug in @rootnative components or core
 labels: [bug]
 body:
   - type: textarea
@@ -43,8 +43,8 @@ body:
     attributes:
       label: Package
       options:
-        - "@onlynative/core"
-        - "@onlynative/components"
+        - "@rootnative/core"
+        - "@rootnative/components"
         - Both
     validations:
       required: true

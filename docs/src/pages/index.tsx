@@ -57,7 +57,7 @@ const features = [
   {
     title: 'CLI Scaffolding',
     description:
-      'Copy components directly into your project with the onlynative CLI. Own your code, customize freely.',
+      'Copy components directly into your project with the rootnative CLI. Own your code, customize freely.',
     icon: '⚡',
   },
 ]
@@ -82,7 +82,7 @@ function Hero() {
             </Link>
             <Link
               className={styles.ctaSecondary}
-              href="https://github.com/onlynative/ui"
+              href="https://github.com/rootnative/ui"
             >
               GitHub
             </Link>
@@ -94,7 +94,7 @@ function Hero() {
             <iframe
               ref={iframeRef}
               src={demoUrl}
-              title="OnlyNative UI live demo"
+              title="RootNative UI live demo"
               className={styles.phoneScreen}
               loading="lazy"
               onLoad={() => {
@@ -121,14 +121,14 @@ const steps = [
     number: '01',
     title: 'Create',
     description: 'Scaffold a new Expo project with everything pre-configured.',
-    command: 'npx onlynative create my-app',
+    command: 'npx rootnative create my-app',
   },
   {
     number: '02',
     title: 'Add',
     description:
       'Pick the components you need. They get copied into your project.',
-    command: 'npx onlynative add button card',
+    command: 'npx rootnative add button card',
   },
   {
     number: '03',
@@ -165,7 +165,7 @@ function Features() {
   return (
     <section className={styles.features}>
       <div className={styles.featuresInner}>
-        <h2 className={styles.sectionTitle}>Why OnlyNative?</h2>
+        <h2 className={styles.sectionTitle}>Why RootNative?</h2>
         <p className={styles.sectionSubtitle}>
           Everything you need to build beautiful, accessible React Native apps.
         </p>
@@ -209,11 +209,11 @@ function CodePreview() {
               <span className={styles.codeKeyword}>import</span>
               {' { ThemeProvider } '}
               <span className={styles.codeKeyword}>from</span>
-              {" '@onlynative/core'\n"}
+              {" '@rootnative/core'\n"}
               <span className={styles.codeKeyword}>import</span>
               {' { Button } '}
               <span className={styles.codeKeyword}>from</span>
-              {" '@onlynative/components/button'\n\n"}
+              {" '@rootnative/components/button'\n\n"}
               <span className={styles.codeKeyword}>export default</span>{' '}
               <span className={styles.codeFunction}>function</span>
               {' App() {\n'}

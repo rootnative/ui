@@ -1,5 +1,5 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
-import { blendColor, renderIcon } from '@onlynative/utils'
+import { useIconResolver, useTheme } from '@rootnative/core'
+import { blendColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
 import type { ViewStyle } from 'react-native'

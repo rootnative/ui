@@ -22,5 +22,5 @@ export {
 export { mdiToLucideAliases, mdiToPhosphorAliases } from './mdi-aliases'
 
 // Re-export the resolver types from core for convenience so consumers
-// only need to depend on @onlynative/icons when wiring up an adapter.
-export type { IconResolver, IconRenderProps } from '@onlynative/core'
+// only need to depend on @rootnative/icons when wiring up an adapter.
+export type { IconResolver, IconRenderProps } from '@rootnative/core'

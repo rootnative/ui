@@ -1,5 +1,5 @@
-import { useTheme } from '@onlynative/core'
-import { isFocusVisible } from '@onlynative/utils'
+import { useTheme } from '@rootnative/core'
+import { isFocusVisible } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Platform, Pressable } from 'react-native'
 import Animated, {

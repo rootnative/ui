@@ -1,4 +1,4 @@
-import { Checkbox, Column, Row, Typography } from '@onlynative/components'
+import { Checkbox, Column, Row, Typography } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 

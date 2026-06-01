@@ -1,5 +1,5 @@
-import type { MaterialTheme } from '@onlynative/core'
-import { alphaColor, transformOrigin } from '@onlynative/utils'
+import type { MaterialTheme } from '@rootnative/core'
+import { alphaColor, transformOrigin } from '@rootnative/utils'
 import { Platform, StyleSheet } from 'react-native'
 import type { TextFieldVariant } from './types'
 

@@ -11,10 +11,10 @@ Render content into a shared overlay layer that sits above the rest of the app. 
 Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in the tree below will mount into this host's overlay layer.
 
 <SnackExample
-  name="OnlyNative Portal — Setup"
+  name="RootNative Portal — Setup"
   code={`
-  import { PortalHost, Typography } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { PortalHost, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -37,10 +37,10 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
 ## Usage
 
 <SnackExample
-  name="OnlyNative Portal — Usage"
+  name="RootNative Portal — Usage"
   code={`
-  import { Button, Portal, PortalHost, Typography } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Button, Portal, PortalHost, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { Pressable, View } from 'react-native'

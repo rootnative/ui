@@ -1,4 +1,4 @@
-import type { MaterialTheme } from '@onlynative/core'
+import type { MaterialTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
 
 // Material Design 3 (expressive) progress indicator dimensions.

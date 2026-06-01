@@ -6,11 +6,11 @@
  * scattered through the codebase.
  *
  * This is intentionally a small, hand-curated list of the icons that
- * appear in real component usage and OnlyNative's own internal icons.
+ * appear in real component usage and RootNative's own internal icons.
  * Extend it via the `aliases` option on `createLucideResolver`.
  */
 export const mdiToLucideAliases: Readonly<Record<string, string>> = {
-  // OnlyNative system icons
+  // RootNative system icons
   check: 'check',
   close: 'x',
 
@@ -80,7 +80,7 @@ export const mdiToLucideAliases: Readonly<Record<string, string>> = {
  * icon map.
  */
 export const mdiToPhosphorAliases: Readonly<Record<string, string>> = {
-  // OnlyNative system icons
+  // RootNative system icons
   check: 'Check',
   close: 'X',
 

@@ -61,13 +61,13 @@ describe('computeDiff', () => {
 
   it('handles real import rewriting diff', () => {
     const old = [
-      `import { alphaColor } from '@onlynative/utils'`,
-      `import { useTheme } from '@onlynative/core'`,
+      `import { alphaColor } from '@rootnative/utils'`,
+      `import { useTheme } from '@rootnative/core'`,
     ].join('\n')
 
     const new_ = [
-      `import { alphaColor } from '@/lib/onlynative-utils'`,
-      `import { useTheme } from '@onlynative/core'`,
+      `import { alphaColor } from '@/lib/rootnative-utils'`,
+      `import { useTheme } from '@rootnative/core'`,
     ].join('\n')
 
     const diff = computeDiff(old, new_, 'styles.ts')

@@ -1,11 +1,7 @@
 import path from 'node:path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
-import {
-  configExists,
-  readConfig,
-  resolveAliasPath,
-} from '../lib/config'
+import { configExists, readConfig, resolveAliasPath } from '../lib/config'
 import { detectProject } from '../lib/detector'
 import { logger } from '../lib/logger'
 
@@ -22,23 +18,18 @@ function logCheck(status: Status, message: string): void {
   console.log(`  ${icon} ${message}`)
 }
 
-export async function doctorCommand(
-  cwd: string,
-): Promise<void> {
+export async function doctorCommand(cwd: string): Promise<void> {
   logger.break()
-  console.log(chalk.bold('OnlyNative Doctor'))
+  console.log(chalk.bold('RootNative Doctor'))
   logger.break()
 
   let issues = 0
 
-  // 1. Check onlynative.json
+  // 1. Check rootnative.json
   if (await configExists(cwd)) {
-    logCheck('pass', 'onlynative.json found')
+    logCheck('pass', 'rootnative.json found')
   } else {
-    logCheck(
-      'fail',
-      'onlynative.json not found. Run "onlynative init" first.',
-    )
+    logCheck('fail', 'rootnative.json not found. Run "rootnative init" first.')
     issues++
     logger.break()
     logger.error(`${issues} issue(s) found.`)
@@ -56,10 +47,7 @@ export async function doctorCommand(
       `${project.type} project detected (${project.packageManager})`,
     )
   } else {
-    logCheck(
-      'fail',
-      'Not a React Native or Expo project',
-    )
+    logCheck('fail', 'Not a React Native or Expo project')
     issues++
   }
 
@@ -82,25 +70,22 @@ export async function doctorCommand(
     }
   }
 
-  // 4. Check @onlynative/core
+  // 4. Check @rootnative/core
   const corePkgPath = path.resolve(
     cwd,
     'node_modules',
-    '@onlynative',
+    '@rootnative',
     'core',
     'package.json',
   )
 
   if (await fs.pathExists(corePkgPath)) {
     const corePkg = await fs.readJSON(corePkgPath)
-    logCheck(
-      'pass',
-      `@onlynative/core@${corePkg.version} installed`,
-    )
+    logCheck('pass', `@rootnative/core@${corePkg.version} installed`)
   } else {
     logCheck(
       'fail',
-      '@onlynative/core not installed. Run "onlynative init" to install it.',
+      '@rootnative/core not installed. Run "rootnative init" to install it.',
     )
     issues++
   }
@@ -111,15 +96,12 @@ export async function doctorCommand(
   } else {
     logCheck(
       'warn',
-      'TypeScript not detected. OnlyNative components use TypeScript.',
+      'TypeScript not detected. RootNative components use TypeScript.',
     )
   }
 
   // 6. Check installed components integrity
-  const componentsDir = resolveAliasPath(
-    config.aliases.components,
-    cwd,
-  )
+  const componentsDir = resolveAliasPath(config.aliases.components, cwd)
 
   if (await fs.pathExists(componentsDir)) {
     const dirs = await fs.readdir(componentsDir)
@@ -138,16 +120,9 @@ export async function doctorCommand(
       let integrityOk = true
 
       for (const dir of componentDirs) {
-        const indexPath = path.join(
-          componentsDir,
-          dir,
-          'index.ts',
-        )
+        const indexPath = path.join(componentsDir, dir, 'index.ts')
         if (!(await fs.pathExists(indexPath))) {
-          logCheck(
-            'warn',
-            `Component ${dir} is missing index.ts`,
-          )
+          logCheck('warn', `Component ${dir} is missing index.ts`)
           integrityOk = false
         }
       }
@@ -161,7 +136,7 @@ export async function doctorCommand(
     } else {
       logCheck(
         'warn',
-        'No components installed yet. Run "onlynative add <component>".',
+        'No components installed yet. Run "rootnative add <component>".',
       )
     }
   } else {
@@ -173,20 +148,15 @@ export async function doctorCommand(
 
   // 7. Check utils barrel
   const libDir = resolveAliasPath(config.aliases.lib, cwd)
-  const barrelPath = path.join(libDir, 'onlynative-utils.ts')
+  const barrelPath = path.join(libDir, 'rootnative-utils.ts')
 
   if (await fs.pathExists(barrelPath)) {
     logCheck('pass', 'Utility barrel file present')
   } else {
-    if (
-      await fs.pathExists(componentsDir)
-    ) {
+    if (await fs.pathExists(componentsDir)) {
       const dirs = await fs.readdir(componentsDir)
       if (dirs.length > 0) {
-        logCheck(
-          'warn',
-          'Utility barrel file (onlynative-utils.ts) missing',
-        )
+        logCheck('warn', 'Utility barrel file (rootnative-utils.ts) missing')
       }
     }
   }
@@ -195,16 +165,10 @@ export async function doctorCommand(
   const nodeModules = path.resolve(cwd, 'node_modules')
 
   const safeAreaInstalled = await fs.pathExists(
-    path.join(
-      nodeModules,
-      'react-native-safe-area-context',
-    ),
+    path.join(nodeModules, 'react-native-safe-area-context'),
   )
   if (safeAreaInstalled) {
-    logCheck(
-      'pass',
-      'react-native-safe-area-context installed',
-    )
+    logCheck('pass', 'react-native-safe-area-context installed')
   } else {
     logCheck(
       'warn',

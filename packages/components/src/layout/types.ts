@@ -1,4 +1,4 @@
-import type { MaterialTheme } from '@onlynative/core'
+import type { MaterialTheme } from '@rootnative/core'
 import type { FlexAlignType, ViewProps } from 'react-native'
 
 /** A theme spacing token name or a raw numeric value in dp. */

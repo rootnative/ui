@@ -1,4 +1,4 @@
-import type { IconResolver, IconRenderProps } from '@onlynative/core'
+import type { IconResolver, IconRenderProps } from '@rootnative/core'
 import type { ReactNode } from 'react'
 import { warnOnce } from '../warn'
 
@@ -116,7 +116,7 @@ export function buildResolver<TIcon>(
     if (onMissing === 'warn') {
       warnOnce(
         `${warnPrefix}:${name}`,
-        `[@onlynative/icons] No ${libraryName} icon registered for "${name}". ` +
+        `[@rootnative/icons] No ${libraryName} icon registered for "${name}". ` +
           `Add it to the \`icons\` map passed to ${factoryName}(), ` +
           `or set \`mdiCompat: true\` if "${name}" is a legacy MaterialCommunityIcons name.`,
       )

@@ -1,9 +1,9 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
+import { useIconResolver, useTheme } from '@rootnative/core'
 import {
   isFocusVisible,
   renderIcon,
   resolveColorFromStyle,
-} from '@onlynative/utils'
+} from '@rootnative/utils'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import Animated, {

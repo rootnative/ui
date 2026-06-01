@@ -1,4 +1,4 @@
-import type { IconSource } from '@onlynative/utils'
+import type { IconSource } from '@rootnative/utils'
 import type { PressableProps, StyleProp, ViewStyle } from 'react-native'
 
 export interface SwitchProps extends Omit<

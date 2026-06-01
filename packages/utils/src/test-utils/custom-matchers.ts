@@ -17,18 +17,18 @@ interface TestElement {
 }
 
 /**
- * Custom Jest matchers for OnlyNative component testing.
+ * Custom Jest matchers for RootNative component testing.
  *
  * @example
  * // In jest.setup.js:
- * import { onlyNativeMatchers } from '@onlynative/utils/test'
- * expect.extend(onlyNativeMatchers)
+ * import { rootNativeMatchers } from '@rootnative/utils/test'
+ * expect.extend(rootNativeMatchers)
  *
  * // In tests:
  * expect(button).toHaveStyleProp('backgroundColor', '#FF0000')
  * expect(checkbox).toHaveAccessibilityState({ checked: true })
  */
-export const onlyNativeMatchers = {
+export const rootNativeMatchers = {
   /**
    * Asserts that a rendered element has a specific flattened style property value.
    *

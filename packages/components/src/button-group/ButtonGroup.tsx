@@ -1,10 +1,10 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
-import type { MaterialTheme } from '@onlynative/core'
+import { useIconResolver, useTheme } from '@rootnative/core'
+import type { MaterialTheme } from '@rootnative/core'
 import {
   isFocusVisible,
   renderIcon,
   resolveColorFromStyle,
-} from '@onlynative/utils'
+} from '@rootnative/utils'
 import {
   useCallback,
   useEffect,

@@ -4,7 +4,7 @@ import prompts from 'prompts'
 import { configExists, DEFAULT_CONFIG, writeConfig } from '../lib/config'
 import { detectProject, getInstallCommand } from '../lib/detector'
 import { createSpinner, logger } from '../lib/logger'
-import type { OnlyNativeConfig, PackageManager } from '../lib/types'
+import type { RootNativeConfig, PackageManager } from '../lib/types'
 
 export interface InitOptions {
   yes?: boolean
@@ -22,12 +22,12 @@ export async function initCommand(
   // Check if already initialized
   if (await configExists(cwd)) {
     if (options.yes) {
-      logger.info('Overwriting existing onlynative.json')
+      logger.info('Overwriting existing rootnative.json')
     } else {
       const { overwrite } = await prompts({
         type: 'confirm',
         name: 'overwrite',
-        message: 'onlynative.json already exists. Overwrite?',
+        message: 'rootnative.json already exists. Overwrite?',
         initial: false,
       })
 
@@ -58,7 +58,7 @@ export async function initCommand(
 
   if (!project.hasTypeScript) {
     logger.warn(
-      'TypeScript not detected. OnlyNative components use TypeScript.',
+      'TypeScript not detected. RootNative components use TypeScript.',
     )
   }
 
@@ -109,7 +109,7 @@ export async function initCommand(
   }
 
   // Write config
-  const config: OnlyNativeConfig = {
+  const config: RootNativeConfig = {
     ...DEFAULT_CONFIG,
     aliases: {
       components: componentsAlias,
@@ -118,16 +118,16 @@ export async function initCommand(
   }
 
   await writeConfig(cwd, config)
-  logger.success('Created onlynative.json')
+  logger.success('Created rootnative.json')
 
-  // Install @onlynative/core
+  // Install @rootnative/core
   let installCore = options.yes
 
   if (!options.yes) {
     const answer = await prompts({
       type: 'confirm',
       name: 'installCore',
-      message: 'Install @onlynative/core?',
+      message: 'Install @rootnative/core?',
       initial: true,
     })
     installCore = answer.installCore
@@ -135,20 +135,20 @@ export async function initCommand(
 
   if (installCore) {
     const pm = options.packageManager ?? project.packageManager
-    const command = getInstallCommand(pm, ['@onlynative/core'])
+    const command = getInstallCommand(pm, ['@rootnative/core'])
     const [cmd, ...args] = command.split(' ')
 
     logger.break()
-    logger.info('Installing @onlynative/core...')
+    logger.info('Installing @rootnative/core...')
     logger.break()
 
     try {
       await execa(cmd, args, { cwd, stdio: 'inherit' })
       logger.break()
-      logger.success('Installed @onlynative/core')
+      logger.success('Installed @rootnative/core')
     } catch {
       logger.break()
-      logger.error('Failed to install @onlynative/core')
+      logger.error('Failed to install @rootnative/core')
       logger.info(`Run manually: ${chalk.bold(command)}`)
     }
   }
@@ -156,7 +156,7 @@ export async function initCommand(
   logger.break()
   logger.success('Project initialized!')
   logger.info(
-    `Add components with: ${chalk.bold('npx onlynative add <component>')}`,
+    `Add components with: ${chalk.bold('npx rootnative add <component>')}`,
   )
   logger.break()
 }

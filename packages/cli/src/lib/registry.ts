@@ -1,11 +1,11 @@
 import type {
   ComponentRegistryEntry,
-  OnlyNativeConfig,
+  RootNativeConfig,
   RegistryIndex,
   UtilsRegistry,
 } from './types'
 
-function buildBaseUrl(config: OnlyNativeConfig): string {
+function buildBaseUrl(config: RootNativeConfig): string {
   return `${config.registryUrl}/${config.registryVersion}`
 }
 
@@ -22,14 +22,14 @@ async function fetchJSON<T>(url: string): Promise<T> {
 }
 
 export async function fetchRegistryIndex(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
 ): Promise<RegistryIndex> {
   const url = `${buildBaseUrl(config)}/registry/index.json`
   return fetchJSON<RegistryIndex>(url)
 }
 
 export async function fetchComponentEntry(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
   name: string,
 ): Promise<ComponentRegistryEntry> {
   const url = `${buildBaseUrl(config)}/registry/components/${name}.json`
@@ -37,14 +37,14 @@ export async function fetchComponentEntry(
 }
 
 export async function fetchUtilsRegistry(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
 ): Promise<UtilsRegistry> {
   const url = `${buildBaseUrl(config)}/registry/utils.json`
   return fetchJSON<UtilsRegistry>(url)
 }
 
 export async function fetchFileContent(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
   filePath: string,
 ): Promise<string> {
   const url = `${buildBaseUrl(config)}/${filePath}`

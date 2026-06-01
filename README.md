@@ -1,4 +1,4 @@
-# OnlyNative UI
+# RootNative UI
 
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![pnpm 9](https://img.shields.io/badge/pnpm-9.x-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
@@ -8,7 +8,7 @@
 
 **Design system agnostic component library for React Native**, built as a pnpm + Turborepo monorepo. Ships with a Material Design You theme out of the box — or bring your own design system using the pluggable theme engine.
 
-> [Documentation](https://onlynative.github.io/ui/) &nbsp;|&nbsp; [Live Demo](https://onlynative.github.io/ui/demo/) &nbsp;|&nbsp; [GitHub](https://github.com/onlynative/ui)
+> [Documentation](https://rootnative.github.io/ui/) &nbsp;|&nbsp; [Live Demo](https://rootnative.github.io/ui/demo/) &nbsp;|&nbsp; [GitHub](https://github.com/rootnative/ui)
 
 ## Try it on your device
 
@@ -28,7 +28,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 - Token-based theming (colors, typography, shape, spacing, elevation, motion, state)
 - Light and dark themes out of the box
 - Responsive breakpoint utilities (`useBreakpoint`, `useBreakpointValue`)
-- Subpath exports for tree-shaking (`@onlynative/components/button`, etc.)
+- Subpath exports for tree-shaking (`@rootnative/components/button`, etc.)
 - Accessible by default (`role`, `accessibilityLabel`, `accessibilityState`)
 - State-layer press/hover/focus feedback
 - TypeScript-first with strict mode
@@ -38,7 +38,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 The fastest way to start a new project:
 
 ```bash
-npx onlynative create my-app
+npx rootnative create my-app
 cd my-app
 npx expo start
 ```
@@ -49,10 +49,10 @@ The `create` command scaffolds a ready-to-run Expo project with `ThemeProvider` 
 
 ```bash
 # Install the core theme package
-yarn add @onlynative/core
+yarn add @rootnative/core
 
 # Install the component library
-yarn add @onlynative/components
+yarn add @rootnative/components
 ```
 
 **Peer dependencies** — make sure these are installed in your project:
@@ -70,8 +70,8 @@ npx expo install @expo/vector-icons
 Wrap your app with `ThemeProvider` and start using components:
 
 ```tsx
-import { ThemeProvider, lightTheme } from '@onlynative/core'
-import { Button, Typography } from '@onlynative/components'
+import { ThemeProvider, lightTheme } from '@rootnative/core'
+import { Button, Typography } from '@rootnative/components'
 
 export default function App() {
   return (
@@ -86,16 +86,16 @@ export default function App() {
 You can also import individual components via subpath exports:
 
 ```tsx
-import { Button } from '@onlynative/components/button'
-import { Card } from '@onlynative/components/card'
+import { Button } from '@rootnative/components/button'
+import { Card } from '@rootnative/components/card'
 ```
 
 ## CLI
 
 ```bash
-npx onlynative create         # Scaffold a new project (interactive)
-npx onlynative init           # Initialize existing project for CLI workflow
-npx onlynative add button card text-field
+npx rootnative create         # Scaffold a new project (interactive)
+npx rootnative init           # Initialize existing project for CLI workflow
+npx rootnative add button card text-field
 ```
 
 The `init` + `add` workflow copies component source files directly into your project with imports rewritten to match your aliases — full ownership of the code. See the [CLI README](packages/cli) for the full command reference.
@@ -104,11 +104,11 @@ The `init` + `add` workflow copies component source files directly into your pro
 
 | Package | Size | Description |
 | --- | --- | --- |
-| [`@onlynative/core`](packages/core) | ![install size](https://packagephobia.com/badge?p=@onlynative/core) | Theme engine, theme contracts, built-in Material Design You theme, `ThemeProvider`, `useTheme` hook, responsive utilities. |
-| [`@onlynative/components`](packages/components) | ![install size](https://packagephobia.com/badge?p=@onlynative/components) | UI components with subpath exports for tree-shaking. |
-| [`@onlynative/cli`](packages/cli) | ![install size](https://packagephobia.com/badge?p=@onlynative/cli) | CLI to scaffold components into your project (shadcn/ui-style). |
-| [`onlynative`](packages/onlynative) | — | Shorthand wrapper for `@onlynative/cli`. |
-| [`@onlynative/utils`](packages/utils) | — | Internal utilities used by components (not published). |
+| [`@rootnative/core`](packages/core) | ![install size](https://packagephobia.com/badge?p=@rootnative/core) | Theme engine, theme contracts, built-in Material Design You theme, `ThemeProvider`, `useTheme` hook, responsive utilities. |
+| [`@rootnative/components`](packages/components) | ![install size](https://packagephobia.com/badge?p=@rootnative/components) | UI components with subpath exports for tree-shaking. |
+| [`@rootnative/cli`](packages/cli) | ![install size](https://packagephobia.com/badge?p=@rootnative/cli) | CLI to scaffold components into your project (shadcn/ui-style). |
+| [`rootnative`](packages/rootnative) | — | Shorthand wrapper for `@rootnative/cli`. |
+| [`@rootnative/utils`](packages/utils) | — | Internal utilities used by components (not published). |
 | [`example`](example) | — | Expo Router showcase app for testing and previewing components. |
 | [`docs`](docs) | — | Docusaurus documentation site. |
 
@@ -122,9 +122,9 @@ The `init` + `add` workflow copies component source files directly into your pro
 │   ├── core/              # Theme + provider primitives
 │   ├── components/        # Reusable UI component library
 │   ├── cli/               # CLI for scaffolding components into projects
-│   ├── onlynative/        # Shorthand CLI wrapper
+│   ├── rootnative/        # Shorthand CLI wrapper
 │   └── utils/             # Internal utilities (not published)
-├── templates/             # Quick start templates (used by `onlynative create`)
+├── templates/             # Quick start templates (used by `rootnative create`)
 │   ├── blank/
 │   └── with-router/
 ├── registry/              # Auto-generated component metadata for the CLI

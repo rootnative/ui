@@ -1,5 +1,5 @@
-import { ThemeProvider, darkTheme } from '@onlynative/core'
-import type { IconResolver, Theme } from '@onlynative/core'
+import { ThemeProvider, darkTheme } from '@rootnative/core'
+import type { IconResolver, Theme } from '@rootnative/core'
 import { render, type RenderOptions } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
 

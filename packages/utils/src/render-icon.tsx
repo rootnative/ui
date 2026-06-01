@@ -1,4 +1,4 @@
-import type { IconRenderProps, IconResolver } from '@onlynative/core'
+import type { IconRenderProps, IconResolver } from '@rootnative/core'
 import { isValidElement } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { getMaterialCommunityIcons } from './icon'

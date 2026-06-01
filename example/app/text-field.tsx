@@ -4,7 +4,7 @@ import {
   Typography,
   Column,
   Row,
-} from '@onlynative/components'
+} from '@rootnative/components'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
 

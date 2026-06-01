@@ -1,5 +1,5 @@
-import { defaultTopAppBarTokens, useTheme } from '@onlynative/core'
-import { selectRTL } from '@onlynative/utils'
+import { defaultTopAppBarTokens, useTheme } from '@rootnative/core'
+import { selectRTL } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'

@@ -10,14 +10,14 @@ import {
   getComponentNames,
   getDependencyComponents,
 } from '../lib/resolver'
-import type { OnlyNativeConfig } from '../lib/types'
+import type { RootNativeConfig } from '../lib/types'
 
-const config: OnlyNativeConfig = {
+const config: RootNativeConfig = {
   aliases: {
     components: '@/components/ui',
     lib: '@/lib',
   },
-  registryUrl: 'https://raw.githubusercontent.com/onlynative/ui',
+  registryUrl: 'https://raw.githubusercontent.com/rootnative/ui',
   registryVersion: 'main',
 }
 
@@ -51,7 +51,7 @@ const mockComponents = {
     files: ['packages/components/src/button/Button.tsx'],
     utils: ['color', 'elevation', 'icon'],
     componentDependencies: [],
-    dependencies: { '@onlynative/core': '>=0.1.1-alpha.1' },
+    dependencies: { '@rootnative/core': '>=0.1.1-alpha.1' },
     optionalDependencies: { '@expo/vector-icons': '>=14.0.0' },
   },
   typography: {
@@ -60,7 +60,7 @@ const mockComponents = {
     files: ['packages/components/src/typography/Typography.tsx'],
     utils: [],
     componentDependencies: [],
-    dependencies: { '@onlynative/core': '>=0.1.1-alpha.1' },
+    dependencies: { '@rootnative/core': '>=0.1.1-alpha.1' },
     optionalDependencies: {},
   },
   'icon-button': {
@@ -69,7 +69,7 @@ const mockComponents = {
     files: ['packages/components/src/icon-button/IconButton.tsx'],
     utils: ['color', 'icon'],
     componentDependencies: [],
-    dependencies: { '@onlynative/core': '>=0.1.1-alpha.1' },
+    dependencies: { '@rootnative/core': '>=0.1.1-alpha.1' },
     optionalDependencies: { '@expo/vector-icons': '>=14.0.0' },
   },
   appbar: {
@@ -79,7 +79,7 @@ const mockComponents = {
     utils: ['rtl'],
     componentDependencies: ['icon-button', 'typography'],
     dependencies: {
-      '@onlynative/core': '>=0.1.1-alpha.1',
+      '@rootnative/core': '>=0.1.1-alpha.1',
       'react-native-safe-area-context': '>=4.0.0',
     },
     optionalDependencies: {},
@@ -90,7 +90,7 @@ const mockComponents = {
     files: ['packages/components/src/card/Card.tsx'],
     utils: ['color', 'elevation'],
     componentDependencies: [],
-    dependencies: { '@onlynative/core': '>=0.1.1-alpha.1' },
+    dependencies: { '@rootnative/core': '>=0.1.1-alpha.1' },
     optionalDependencies: {},
   },
 }
@@ -123,7 +123,7 @@ describe('resolveComponents', () => {
     const result = await resolveComponents(config, ['button'])
 
     expect(result.npmDependencies).toEqual({
-      '@onlynative/core': '>=0.1.1-alpha.1',
+      '@rootnative/core': '>=0.1.1-alpha.1',
     })
   })
 
@@ -174,7 +174,7 @@ describe('resolveComponents', () => {
     expect(result.npmDependencies).toHaveProperty(
       'react-native-safe-area-context',
     )
-    expect(result.npmDependencies).toHaveProperty('@onlynative/core')
+    expect(result.npmDependencies).toHaveProperty('@rootnative/core')
   })
 
   it('resolves multiple components at once', async () => {
@@ -211,7 +211,7 @@ describe('resolveComponents', () => {
     expect(result.components).toHaveLength(1)
     expect(result.utils).toEqual([])
     expect(result.npmDependencies).toEqual({
-      '@onlynative/core': '>=0.1.1-alpha.1',
+      '@rootnative/core': '>=0.1.1-alpha.1',
     })
     expect(result.optionalNpmDependencies).toEqual({})
   })

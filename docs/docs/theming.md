@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Theming
 
-OnlyNative UI ships with Material Design 3 out of the box, but the theme engine is design-system agnostic — you can customize MD3, generate branded themes from a seed color, or build an entirely custom design system.
+RootNative UI ships with Material Design 3 out of the box, but the theme engine is design-system agnostic — you can customize MD3, generate branded themes from a seed color, or build an entirely custom design system.
 
 ## Material Design 3 (default)
 
@@ -13,7 +13,7 @@ OnlyNative UI ships with Material Design 3 out of the box, but the theme engine 
 Wrap your app with `ThemeProvider` to supply the MD3 theme:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -29,7 +29,7 @@ export default function App() {
 Pass the built-in dark theme:
 
 ```tsx
-import { ThemeProvider, darkTheme } from '@onlynative/core'
+import { ThemeProvider, darkTheme } from '@rootnative/core'
 
 <ThemeProvider theme={darkTheme}>
   {/* Dark mode */}
@@ -40,7 +40,7 @@ Switch between light and dark based on system preference:
 
 ```tsx
 import { useColorScheme } from 'react-native'
-import { ThemeProvider, lightTheme, darkTheme } from '@onlynative/core'
+import { ThemeProvider, lightTheme, darkTheme } from '@rootnative/core'
 
 export default function App() {
   const colorScheme = useColorScheme()
@@ -59,8 +59,8 @@ export default function App() {
 Spread the base theme and override individual tokens:
 
 ```tsx
-import { lightTheme } from '@onlynative/core'
-import type { Theme } from '@onlynative/core'
+import { lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
 
 const brandTheme: Theme = {
   ...lightTheme,
@@ -81,8 +81,8 @@ const brandTheme: Theme = {
 `createMaterialTheme` generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 69 color roles are derived automatically:
 
 ```tsx
-import { createMaterialTheme } from '@onlynative/core/create-theme'
-import { ThemeProvider } from '@onlynative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
 
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
 
@@ -181,7 +181,7 @@ Overrides the HCT chroma of the primary and secondary palettes while keeping the
 Use the `useTheme` hook in any component:
 
 ```tsx
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 
 function MyComponent() {
   const theme = useTheme()
@@ -198,7 +198,7 @@ function MyComponent() {
 All MD3 values are also available as a grouped object:
 
 ```tsx
-import { material } from '@onlynative/core'
+import { material } from '@rootnative/core'
 
 material.lightTheme
 material.darkTheme
@@ -230,8 +230,8 @@ interface BaseTheme {
 Use `defineTheme` for type-safe theme creation:
 
 ```tsx
-import { defineTheme } from '@onlynative/core'
-import type { BaseTheme } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
+import type { BaseTheme } from '@rootnative/core'
 
 interface BrandTheme extends BaseTheme {
   colors: {
@@ -294,7 +294,7 @@ const brandTheme = defineTheme<BrandTheme>({
 Use `ThemeProvider` for custom design systems:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 <ThemeProvider theme={brandTheme}>
   {/* Your app */}
@@ -306,7 +306,7 @@ import { ThemeProvider } from '@onlynative/core'
 Pass your theme type as a generic to `useTheme`:
 
 ```tsx
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 
 function MyComponent() {
   const theme = useTheme<BrandTheme>()
@@ -345,7 +345,7 @@ function MyComponent() {
 | Use MD3 defaults | `<ThemeProvider>` |
 | Dark mode | `<ThemeProvider theme={darkTheme}>` |
 | Override a few MD3 colors | Spread `lightTheme` and override |
-| Branded MD3 theme from one color | `import { createMaterialTheme } from '@onlynative/core/create-theme'` |
+| Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
 | Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |
 | Switch MD3 variant | `createMaterialTheme('#color', { variant: 'vibrant' })` |
 | High-contrast accessibility | `createMaterialTheme('#color', { contrastLevel: 'high' })` |

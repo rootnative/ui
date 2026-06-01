@@ -7,7 +7,7 @@ sidebar_position: 4
 Progress indicators express an unspecified wait time or display the length of a process.
 Follows the [Material Design 3 Progress Indicators](https://m3.material.io/components/progress-indicators/overview) specification.
 
-OnlyNative ships two progress indicators that share the same API:
+RootNative ships two progress indicators that share the same API:
 
 - **`LinearProgress`** — a horizontal bar, used for tracking long-running processes that have a clear start and end
 - **`CircularProgress`** — a circular spinner, used for shorter waits or compact UIs where horizontal space is scarce
@@ -20,10 +20,10 @@ Both indicators have two modes:
 ## Linear
 
 <SnackExample
-  name="OnlyNative LinearProgress — Usage"
+  name="RootNative LinearProgress — Usage"
   code={`
-  import { LinearProgress } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { LinearProgress } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useEffect, useState } from 'react'
   import { View } from 'react-native'
@@ -56,10 +56,10 @@ In determinate mode the bar is split into three parts: the **active indicator** 
 ## Circular
 
 <SnackExample
-  name="OnlyNative CircularProgress — Usage"
+  name="RootNative CircularProgress — Usage"
   code={`
-  import { CircularProgress } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { CircularProgress } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useEffect, useState } from 'react'
   import { View } from 'react-native'
@@ -94,10 +94,10 @@ In determinate mode the bar is split into three parts: the **active indicator** 
 When the duration of an operation is unknown, omit `progress` to show a continuous animation. `LinearProgress` slides a single segment across the track; `CircularProgress` spins a fixed-length arc.
 
 <SnackExample
-  name="OnlyNative Progress — Indeterminate"
+  name="RootNative Progress — Indeterminate"
   code={`
-  import { CircularProgress, LinearProgress } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -125,10 +125,10 @@ The animations use React Native's built-in `Animated` API with `useNativeDriver:
 `LinearProgress` exposes `thickness` to control the track height. `CircularProgress` exposes both `size` (outer diameter) and `thickness` (stroke width) so you can place small spinners next to text or larger ones as page-level indicators.
 
 <SnackExample
-  name="OnlyNative Progress — Sizing"
+  name="RootNative Progress — Sizing"
   code={`
-  import { CircularProgress, LinearProgress } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -170,10 +170,10 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
 `containerColor` overrides the active indicator color, and `trackColor` overrides the inactive track color. Both indicators accept the same overrides.
 
 <SnackExample
-  name="OnlyNative Progress — Custom colors"
+  name="RootNative Progress — Custom colors"
   code={`
-  import { CircularProgress, LinearProgress } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 

@@ -1,6 +1,6 @@
+import { ThemeProvider } from '@rootnative/core'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import { ThemeProvider } from '@onlynative/core'
 
 export default function RootLayout() {
   return (

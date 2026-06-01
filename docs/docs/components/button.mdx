@@ -10,10 +10,10 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 ## Usage
 
 <SnackExample
-  name="OnlyNative Button — Usage"
+  name="RootNative Button — Usage"
   code={`
-  import { Button } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Button } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -44,10 +44,10 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 | `tonal` | Secondary container fill |
 
 <SnackExample
-  name="OnlyNative Button — Variants"
+  name="RootNative Button — Variants"
   code={`
-  import { Button } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Button } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -74,10 +74,10 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 `leadingIcon` and `trailingIcon` accept three forms — a string name (resolved via [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) by default), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
 
 <SnackExample
-  name="OnlyNative Button — Icons"
+  name="RootNative Button — Icons"
   code={`
-  import { Button } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Button } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -101,7 +101,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 Pass any element directly — useful for one-off icons or when you want full control over sizing and color:
 
 ```tsx
-import { Button } from '@onlynative/components'
+import { Button } from '@rootnative/components'
 import { Check, ArrowRight } from 'lucide-react-native'
 
 <Button leadingIcon={<Check size={18} color="#fff" />}>Save</Button>
@@ -123,10 +123,10 @@ Or use a render function to receive the button's resolved icon size and color:
 ## Disabled
 
 <SnackExample
-  name="OnlyNative Button — Disabled"
+  name="RootNative Button — Disabled"
   code={`
-  import { Button } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Button } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 

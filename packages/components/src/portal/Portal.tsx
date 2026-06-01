@@ -23,7 +23,7 @@ export function Portal({ children }: PortalProps) {
     if (__DEV__ && !warnedRef.current) {
       warnedRef.current = true
       console.error(
-        '[@onlynative/components] <Portal> must be rendered inside a <PortalHost>. ' +
+        '[@rootnative/components] <Portal> must be rendered inside a <PortalHost>. ' +
           'Wrap your app root with <PortalHost>. Falling back to inline rendering.',
       )
     }

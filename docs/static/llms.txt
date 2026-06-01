@@ -1,22 +1,22 @@
-# OnlyNative UI
+# RootNative UI
 
 > Design-system agnostic component library for React Native — ships with Material Design 3 out of the box
 
-OnlyNative UI (`@onlynative`) is a React Native component library with a pluggable theme engine. It ships with Material Design 3 as the default design system but supports custom design systems via `BaseTheme`, `ThemeProvider`, and `defineTheme`.
+RootNative UI (`@rootnative`) is a React Native component library with a pluggable theme engine. It ships with Material Design 3 as the default design system but supports custom design systems via `BaseTheme`, `ThemeProvider`, and `defineTheme`.
 
 ## Packages
 
-- `@onlynative/core`: Theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), MD3 preset (`material`, light/dark themes), responsive breakpoint hooks
-- `@onlynative/utils`: Shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. Test helper via `@onlynative/utils/test`.
-- `@onlynative/components`: UI components (Avatar, Button, ButtonGroup, IconButton, AppBar, Card, Chip, Checkbox, Radio, Slider, Progress, Switch, TextField, Typography, Layout, List, Portal, KeyboardAvoidingWrapper)
-- `@onlynative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide / Phosphor / `@expo/vector-icons` are optional peer deps.
+- `@rootnative/core`: Theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), MD3 preset (`material`, light/dark themes), responsive breakpoint hooks
+- `@rootnative/utils`: Shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. Test helper via `@rootnative/utils/test`.
+- `@rootnative/components`: UI components (Avatar, Button, ButtonGroup, IconButton, AppBar, Card, Chip, Checkbox, Radio, Slider, Progress, Switch, TextField, Typography, Layout, List, Portal, KeyboardAvoidingWrapper)
+- `@rootnative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide / Phosphor / `@expo/vector-icons` are optional peer deps.
 
 ## Quick start
 
 ### New project
 
 ```bash
-npx onlynative create my-app
+npx rootnative create my-app
 cd my-app
 npx expo start
 ```
@@ -26,12 +26,12 @@ The `create` command scaffolds a ready-to-run Expo project with `ThemeProvider` 
 ### Existing project
 
 ```bash
-pnpm add @onlynative/core @onlynative/utils @onlynative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated
+pnpm add @rootnative/core @rootnative/utils @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated
 ```
 
 Wrap root with provider:
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -44,13 +44,13 @@ export default function App() {
 
 Import components via subpath exports (preferred for tree-shaking):
 ```tsx
-import { Button } from '@onlynative/components/button'
-import { Card } from '@onlynative/components/card'
+import { Button } from '@rootnative/components/button'
+import { Card } from '@rootnative/components/card'
 ```
 
 Or from root:
 ```tsx
-import { Button, Card } from '@onlynative/components'
+import { Button, Card } from '@rootnative/components'
 ```
 
 ## Requirements
@@ -63,24 +63,24 @@ import { Button, Card } from '@onlynative/components'
 
 ## Docs
 
-- Full docs: https://onlynative.github.io/ui/
-- Installation: https://onlynative.github.io/ui/installation
-- Theming: https://onlynative.github.io/ui/theming
-- Components: https://onlynative.github.io/ui/components/button
+- Full docs: https://rootnative.github.io/ui/
+- Installation: https://rootnative.github.io/ui/installation
+- Theming: https://rootnative.github.io/ui/theming
+- Components: https://rootnative.github.io/ui/components/button
 
 ## CLI
 
 ```bash
-npx onlynative create                    # Scaffold a new project (interactive)
-npx onlynative create my-app             # Scaffold with name
-npx onlynative create my-app -y          # Non-interactive (defaults)
-npx onlynative create -t with-router     # Use router template
-npx onlynative init                      # Initialize existing project for CLI workflow
-npx onlynative add button card           # Copy component source into your project
-npx onlynative update                    # Update installed components
-npx onlynative upgrade                   # Upgrade @onlynative/core + install new peer deps
-npx onlynative list                      # List available components
-npx onlynative doctor                    # Check project health
+npx rootnative create                    # Scaffold a new project (interactive)
+npx rootnative create my-app             # Scaffold with name
+npx rootnative create my-app -y          # Non-interactive (defaults)
+npx rootnative create -t with-router     # Use router template
+npx rootnative init                      # Initialize existing project for CLI workflow
+npx rootnative add button card           # Copy component source into your project
+npx rootnative update                    # Update installed components
+npx rootnative upgrade                   # Upgrade @rootnative/core + install new peer deps
+npx rootnative list                      # List available components
+npx rootnative doctor                    # Check project health
 ```
 
 All commands that install packages accept `--package-manager <pm>` to override auto-detection (`npm`, `yarn`, `pnpm`, `bun`).
@@ -89,13 +89,13 @@ The `create` command is the fastest way to start a new project. The `init` + `ad
 
 ## Full API reference
 
-- [llms-full.txt](https://onlynative.github.io/ui/llms-full.txt): Complete API reference with all component props, types, and usage examples in a single file optimized for LLM consumption.
+- [llms-full.txt](https://rootnative.github.io/ui/llms-full.txt): Complete API reference with all component props, types, and usage examples in a single file optimized for LLM consumption.
 
 ## Per-package LLM docs
 
 Each published npm package ships its own `llms.txt` for AI tools to read from `node_modules`:
 
-- `@onlynative/core` → `node_modules/@onlynative/core/llms.txt` (theme system API + types)
-- `@onlynative/components` → `node_modules/@onlynative/components/llms.txt` (all component props)
-- `@onlynative/icons` → `node_modules/@onlynative/icons/llms.txt` (Lucide / Phosphor / vector-icons adapters)
-- `@onlynative/cli` → `node_modules/@onlynative/cli/llms.txt` (CLI commands)
+- `@rootnative/core` → `node_modules/@rootnative/core/llms.txt` (theme system API + types)
+- `@rootnative/components` → `node_modules/@rootnative/components/llms.txt` (all component props)
+- `@rootnative/icons` → `node_modules/@rootnative/icons/llms.txt` (Lucide / Phosphor / vector-icons adapters)
+- `@rootnative/cli` → `node_modules/@rootnative/cli/llms.txt` (CLI commands)

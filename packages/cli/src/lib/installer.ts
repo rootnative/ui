@@ -8,14 +8,14 @@ import { fetchFileContent, fetchUtilsRegistry } from './registry'
 import { getComponentNames } from './resolver'
 import { generateUtilsBarrel, transformImports } from './transform'
 import type {
-  OnlyNativeConfig,
+  RootNativeConfig,
   PackageManager,
   ResolutionResult,
   UtilsRegistry,
 } from './types'
 
 interface InstallOptions {
-  config: OnlyNativeConfig
+  config: RootNativeConfig
   cwd: string
   resolution: ResolutionResult
   packageManager: PackageManager
@@ -102,7 +102,7 @@ export async function installComponents(
 }
 
 async function copyUtilFiles(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
   resolution: ResolutionResult,
   utilsRegistry: UtilsRegistry,
   libDir: string,
@@ -145,7 +145,7 @@ async function generateBarrel(
   )
 
   await fs.writeFile(
-    path.join(libDir, 'onlynative-utils.ts'),
+    path.join(libDir, 'rootnative-utils.ts'),
     barrelContent,
     'utf-8',
   )

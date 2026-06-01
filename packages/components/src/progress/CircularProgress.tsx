@@ -1,4 +1,4 @@
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 import { useEffect, useMemo } from 'react'
 import { View } from 'react-native'
 import Animated, {

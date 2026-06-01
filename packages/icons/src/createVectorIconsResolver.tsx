@@ -1,4 +1,4 @@
-import type { IconResolver, IconRenderProps } from '@onlynative/core'
+import type { IconResolver, IconRenderProps } from '@rootnative/core'
 import * as React from 'react'
 
 /**
@@ -38,7 +38,7 @@ export interface VectorIconsResolverOptions {
  *
  * @example
  * import { Ionicons } from '@expo/vector-icons'
- * import { createVectorIconsResolver } from '@onlynative/icons'
+ * import { createVectorIconsResolver } from '@rootnative/icons'
  *
  * const resolver = createVectorIconsResolver({
  *   IconSet: Ionicons,

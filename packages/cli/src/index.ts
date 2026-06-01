@@ -12,13 +12,13 @@ import { isValidPackageManager, PACKAGE_MANAGERS } from './lib/types'
 const program = new Command()
 
 program
-  .name('onlynative')
-  .description('Add OnlyNative UI components to your React Native project')
+  .name('rootnative')
+  .description('Add RootNative UI components to your React Native project')
   .version('0.1.0')
 
 program
   .command('create')
-  .description('Create a new project with OnlyNative UI pre-configured')
+  .description('Create a new project with RootNative UI pre-configured')
   .argument('[name]', 'Project name')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('-t, --template <name>', 'Template to use (blank, with-router)')
@@ -43,7 +43,7 @@ program
 
 program
   .command('init')
-  .description('Initialize your project for OnlyNative UI')
+  .description('Initialize your project for RootNative UI')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('--components-alias <alias>', 'Components install path alias')
   .option('--lib-alias <alias>', 'Utility files path alias')
@@ -137,7 +137,7 @@ program
 
 program
   .command('upgrade')
-  .description('Upgrade @onlynative/core and install new peer dependencies')
+  .description('Upgrade @rootnative/core and install new peer dependencies')
   .option('-y, --yes', 'Skip confirmation prompt', false)
   .option('-a, --all', 'Also update all installed component files', false)
   .option(

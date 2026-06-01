@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "OnlyNative Quickstart",
-    "slug": "onlynative-quickstart",
-    "scheme": "onlynative-quickstart",
+    "name": "RootNative Quickstart",
+    "slug": "rootnative-quickstart",
+    "scheme": "rootnative-quickstart",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

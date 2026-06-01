@@ -3,7 +3,7 @@ slug: /introduction
 sidebar_position: 1
 ---
 
-# OnlyNative UI
+# RootNative UI
 
 Design-system agnostic component library for React Native. Ships with Material Design 3 out of the box.
 
@@ -21,24 +21,24 @@ Design-system agnostic component library for React Native. Ships with Material D
 
 ### New project
 
-Scaffold a new Expo project with OnlyNative UI pre-configured:
+Scaffold a new Expo project with RootNative UI pre-configured:
 
 ```bash
-npx onlynative create
+npx rootnative create
 ```
 
 See the [Quick Start](./quick-start) guide for the full walkthrough.
 
 ### Existing project
 
-Add OnlyNative UI to an existing React Native or Expo project:
+Add RootNative UI to an existing React Native or Expo project:
 
-<PackageManagerTabs cmd="npm install @onlynative/core @onlynative/components" />
+<PackageManagerTabs cmd="npm install @rootnative/core @rootnative/components" />
 
 Wrap your app with `ThemeProvider`:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -52,7 +52,7 @@ export default function App() {
 Use a component:
 
 ```tsx
-import { Button } from '@onlynative/components/button'
+import { Button } from '@rootnative/components/button'
 
 <Button variant="filled" onPress={() => {}}>
   Get Started

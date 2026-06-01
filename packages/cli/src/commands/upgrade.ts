@@ -138,12 +138,12 @@ export async function upgradeCommand(
     process.exit(1)
   }
 
-  // 2. Check installed @onlynative/core version
-  const installed = getInstalledPackageInfo(cwd, '@onlynative/core')
+  // 2. Check installed @rootnative/core version
+  const installed = getInstalledPackageInfo(cwd, '@rootnative/core')
 
   if (!installed) {
     logger.error(
-      '@onlynative/core is not installed. Run "onlynative init" first.',
+      '@rootnative/core is not installed. Run "rootnative init" first.',
     )
     process.exit(1)
   }
@@ -151,7 +151,7 @@ export async function upgradeCommand(
   // 3. Fetch latest from npm
   const fetchSpinner = createSpinner('Checking for updates...')
   fetchSpinner.start()
-  const latest = await fetchLatestFromNpm('@onlynative/core')
+  const latest = await fetchLatestFromNpm('@rootnative/core')
   fetchSpinner.succeed('Checked npm registry')
 
   // 4. Compare versions
@@ -199,7 +199,7 @@ export async function upgradeCommand(
 
   // 6. Determine what needs to be installed
   const projectDeps = getProjectDeps(cwd)
-  const toInstall: string[] = ['@onlynative/core']
+  const toInstall: string[] = ['@rootnative/core']
   const optionalMeta = latest.peerDependenciesMeta ?? {}
 
   // Add new required peer deps that aren't in the project
@@ -224,10 +224,10 @@ export async function upgradeCommand(
   console.log(chalk.bold('Upgrade plan:'))
   logger.break()
   console.log(
-    `  ${chalk.cyan('upgrade')} @onlynative/core ${chalk.dim(`v${installed.version}`)} → ${chalk.green(`v${latest.version}`)}`,
+    `  ${chalk.cyan('upgrade')} @rootnative/core ${chalk.dim(`v${installed.version}`)} → ${chalk.green(`v${latest.version}`)}`,
   )
 
-  const newDeps = toInstall.filter((p) => p !== '@onlynative/core')
+  const newDeps = toInstall.filter((p) => p !== '@rootnative/core')
   if (newDeps.length > 0) {
     for (const pkg of newDeps) {
       console.log(
@@ -275,7 +275,7 @@ export async function upgradeCommand(
   const [cmd, ...args] = command.split(' ')
 
   logger.break()
-  logger.info('Upgrading @onlynative/core...')
+  logger.info('Upgrading @rootnative/core...')
   logger.break()
 
   try {
@@ -290,12 +290,12 @@ export async function upgradeCommand(
   }
 
   // 10. Verify new version
-  const updated = getInstalledPackageInfo(cwd, '@onlynative/core')
+  const updated = getInstalledPackageInfo(cwd, '@rootnative/core')
 
   logger.break()
   if (updated) {
     logger.success(
-      `@onlynative/core upgraded to ${chalk.bold(`v${updated.version}`)}`,
+      `@rootnative/core upgraded to ${chalk.bold(`v${updated.version}`)}`,
     )
   }
 

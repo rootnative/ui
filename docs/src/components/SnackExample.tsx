@@ -3,11 +3,11 @@ import { useColorMode } from '@docusaurus/theme-common'
 import CodeBlock from '@theme/CodeBlock'
 import { useState } from 'react'
 
-const COMPONENTS_VERSION = '0.0.0-alpha.5'
+const COMPONENTS_VERSION = '0.0.0-alpha.0'
 
 const DEFAULT_DEPENDENCIES = [
-  `@onlynative/components@${COMPONENTS_VERSION}`,
-  `@onlynative/core@${COMPONENTS_VERSION}`,
+  `@rootnative/components@${COMPONENTS_VERSION}`,
+  `@rootnative/core@${COMPONENTS_VERSION}`,
   '@material/material-color-utilities@^0.4.0',
   '@expo/vector-icons@^15.0.3',
   'react-native-safe-area-context@~5.6.0',
@@ -27,7 +27,7 @@ interface SnackExampleProps {
 
 export default function SnackExample({
   code,
-  name = 'OnlyNative UI Example',
+  name = 'RootNative UI Example',
   description,
   dependencies,
   platform,

@@ -12,11 +12,11 @@ sidebar_position: 3
 
 ## Install packages
 
-<PackageManagerTabs cmd="npm install @onlynative/core @onlynative/components" />
+<PackageManagerTabs cmd="npm install @rootnative/core @rootnative/components" />
 
 ### Peer dependencies
 
-`@onlynative/components` requires these peer dependencies:
+`@rootnative/components` requires these peer dependencies:
 
 <PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-reanimated" />
 
@@ -28,16 +28,16 @@ If you pass **string icon names** (e.g. `leadingIcon="check"`) and don't registe
 
 You can skip this if you only ever pass icons as React elements (`leadingIcon={<Check />}`) or register a custom resolver for a different library. See the [Icons guide](./icons) for details.
 
-To swap in [Lucide](https://lucide.dev), [Phosphor](https://phosphoricons.com), or another vector-icon set as the default, install `@onlynative/icons` for the pre-built adapter helpers:
+To swap in [Lucide](https://lucide.dev), [Phosphor](https://phosphoricons.com), or another vector-icon set as the default, install `@rootnative/icons` for the pre-built adapter helpers:
 
-<PackageManagerTabs cmd="npm install @onlynative/icons" />
+<PackageManagerTabs cmd="npm install @rootnative/icons" />
 
 ## Setup
 
 Wrap your root component with `ThemeProvider`:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -53,7 +53,7 @@ export default function App() {
 ```tsx
 // app/_layout.tsx
 import { Slot } from 'expo-router'
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function RootLayout() {
   return (
@@ -69,13 +69,13 @@ export default function RootLayout() {
 Each component has a dedicated subpath export for optimal tree-shaking:
 
 ```tsx
-import { Button } from '@onlynative/components/button'
-import { Card } from '@onlynative/components/card'
-import { Typography } from '@onlynative/components/typography'
+import { Button } from '@rootnative/components/button'
+import { Card } from '@rootnative/components/card'
+import { Typography } from '@rootnative/components/typography'
 ```
 
 You can also import from the root entry, though subpath imports are preferred:
 
 ```tsx
-import { Button, Card, Typography } from '@onlynative/components'
+import { Button, Card, Typography } from '@rootnative/components'
 ```

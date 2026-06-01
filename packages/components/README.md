@@ -1,11 +1,11 @@
-# @onlynative/components
+# @rootnative/components
 
-Material Design 3 UI components for React Native, part of [OnlyNative UI](https://github.com/onlynative/ui).
+Material Design 3 UI components for React Native, part of [RootNative UI](https://github.com/rootnative/ui).
 
 ## Install
 
 ```bash
-pnpm add @onlynative/core @onlynative/components react-native-safe-area-context react-native-reanimated
+pnpm add @rootnative/core @rootnative/components react-native-safe-area-context react-native-reanimated
 ```
 
 **Optional** — only needed if you plan to use icons in your app:
@@ -16,21 +16,21 @@ pnpm add @expo/vector-icons
 
 > `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; static components (Typography, Layout, Avatar) work without it. With Expo SDK 54 it's also already available in Expo Go.
 
-Wrap your app with `ThemeProvider` from `@onlynative/core` (see [@onlynative/core](https://www.npmjs.com/package/@onlynative/core)).
+Wrap your app with `ThemeProvider` from `@rootnative/core` (see [@rootnative/core](https://www.npmjs.com/package/@rootnative/core)).
 
 ## Import
 
 Subpath imports (preferred for tree-shaking):
 
 ```tsx
-import { Button } from '@onlynative/components/button'
-import { Card } from '@onlynative/components/card'
+import { Button } from '@rootnative/components/button'
+import { Card } from '@rootnative/components/card'
 ```
 
 Root import:
 
 ```tsx
-import { Button, Card } from '@onlynative/components'
+import { Button, Card } from '@rootnative/components'
 ```
 
 ## Components
@@ -53,11 +53,11 @@ import { Button, Card } from '@onlynative/components'
 ## Quick examples
 
 ```tsx
-import { Button } from '@onlynative/components/button'
-import { TextField } from '@onlynative/components/text-field'
-import { Card } from '@onlynative/components/card'
-import { Typography } from '@onlynative/components/typography'
-import { Row, Column } from '@onlynative/components/layout'
+import { Button } from '@rootnative/components/button'
+import { TextField } from '@rootnative/components/text-field'
+import { Card } from '@rootnative/components/card'
+import { Typography } from '@rootnative/components/typography'
+import { Row, Column } from '@rootnative/components/layout'
 
 // Button with icon
 <Button variant="filled" leadingIcon="plus" onPress={handleCreate}>Create</Button>
@@ -98,9 +98,9 @@ All icon props accept [MaterialCommunityIcons](https://pictogrammers.com/library
 
 ## Docs
 
-Full API reference: https://onlynative.github.io/ui/
+Full API reference: https://rootnative.github.io/ui/
 
-LLM-optimized reference: https://onlynative.github.io/ui/llms-full.txt
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt
 
 ## License
 

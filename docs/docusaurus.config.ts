@@ -3,9 +3,9 @@ import type * as Preset from '@docusaurus/preset-classic'
 import type { Config } from '@docusaurus/types'
 
 const config: Config = {
-  title: 'OnlyNative UI',
+  title: 'RootNative UI',
   tagline: 'Design-system agnostic components for React Native',
-  url: 'https://onlynative.github.io',
+  url: 'https://rootnative.github.io',
   baseUrl: '/ui/',
   onBrokenLinks: 'throw',
 
@@ -28,7 +28,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
-          editUrl: 'https://github.com/onlynative/ui/edit/main/docs/',
+          editUrl: 'https://github.com/rootnative/ui/edit/main/docs/',
         },
         blog: false,
         theme: {
@@ -76,7 +76,7 @@ const config: Config = {
 
   themeConfig: {
     navbar: {
-      title: 'OnlyNative UI',
+      title: 'RootNative UI',
       items: [
         {
           type: 'docSidebar',
@@ -85,12 +85,12 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://onlynative.github.io/ui/demo/',
+          href: 'https://rootnative.github.io/ui/demo/',
           label: 'Demo',
           position: 'right',
         },
         {
-          href: 'https://github.com/onlynative/ui',
+          href: 'https://github.com/rootnative/ui',
           label: 'GitHub',
           position: 'right',
         },
@@ -98,7 +98,7 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} OnlyNative`,
+      copyright: `Copyright © ${new Date().getFullYear()} RootNative`,
     },
     prism: {
       additionalLanguages: ['bash'],

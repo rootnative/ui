@@ -1,5 +1,5 @@
-import type { MaterialTheme } from '@onlynative/core'
-import { alphaColor, blendColor, elevationStyle } from '@onlynative/utils'
+import type { MaterialTheme } from '@rootnative/core'
+import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { FABSize, FABVariant } from './types'
 

@@ -1,5 +1,5 @@
 {
-  "name": "onlynative-ui",
+  "name": "rootnative-ui",
   "version": "0.0.0",
   "private": true,
   "packageManager": "pnpm@9.0.0",
@@ -18,10 +18,10 @@
     "clean:deep": "rm -rf node_modules .turbo .expo dist build && pnpm -r exec rm -rf node_modules dist build .turbo .expo && pnpm store prune && watchman watch-del-all 2>/dev/null || true && rm -rf $TMPDIR/metro-* $TMPDIR/haste-* $TMPDIR/react-* 2>/dev/null || true",
     "example": "pnpm --filter example start",
     "format": "prettier . --write",
-    "docs:dev": "pnpm --filter @onlynative/docs dev",
-    "docs:build": "pnpm --filter @onlynative/docs build",
+    "docs:dev": "pnpm --filter @rootnative/docs dev",
+    "docs:build": "pnpm --filter @rootnative/docs build",
     "build:llms": "tsx scripts/build-llms.ts",
-    "docs:serve": "pnpm --filter @onlynative/docs serve",
+    "docs:serve": "pnpm --filter @rootnative/docs serve",
     "prepare": "husky"
   },
   "devDependencies": {

@@ -4,9 +4,9 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   setupFiles: ['./jest.setup.js'],
   moduleNameMapper: {
-    '^@onlynative/core$': '<rootDir>/../core/src/index.ts',
-    '^@onlynative/utils$': '<rootDir>/../utils/src/index.ts',
-    '^@onlynative/utils/test$': '<rootDir>/../utils/src/test-utils/index.ts',
+    '^@rootnative/core$': '<rootDir>/../core/src/index.ts',
+    '^@rootnative/utils$': '<rootDir>/../utils/src/index.ts',
+    '^@rootnative/utils/test$': '<rootDir>/../utils/src/test-utils/index.ts',
   },
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@expo/vector-icons|react-native-safe-area-context|@material/material-color-utilities)/)',

@@ -1,11 +1,11 @@
-# @onlynative/core
+# @rootnative/core
 
-Design-system agnostic theme engine for [OnlyNative UI](https://github.com/onlynative/ui) — a React Native component library. Ships with Material Design 3 out of the box.
+Design-system agnostic theme engine for [RootNative UI](https://github.com/rootnative/ui) — a React Native component library. Ships with Material Design 3 out of the box.
 
 ## Install
 
 ```bash
-pnpm add @onlynative/core
+pnpm add @rootnative/core
 ```
 
 Peer dependencies: `react >=19`, `react-native >=0.81`
@@ -15,7 +15,7 @@ Peer dependencies: `react >=19`, `react-native >=0.81`
 Wrap your app root with `ThemeProvider`:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -42,7 +42,7 @@ Provides the theme context to all child components. Works with any design system
 Returns the current theme from the nearest `ThemeProvider`.
 
 ```tsx
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 
 // MD3 (default)
 const theme = useTheme()
@@ -56,8 +56,8 @@ const theme = useTheme<MyTheme>()
 Type-safe helper for creating custom themes:
 
 ```tsx
-import { defineTheme } from '@onlynative/core'
-import type { BaseTheme } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
+import type { BaseTheme } from '@rootnative/core'
 
 const myTheme = defineTheme({
   colors: { brand: '#FF6B00', background: '#FFF', text: '#1A1A1A' },
@@ -75,8 +75,8 @@ const myTheme = defineTheme({
 Generates a complete MD3 light and dark theme from a single seed color using Google's HCT color space.
 
 ```tsx
-import { createMaterialTheme } from '@onlynative/core/create-theme'
-import { ThemeProvider } from '@onlynative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
 
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
 
@@ -90,7 +90,7 @@ Requires: `npm install @material/material-color-utilities`
 Grouped object with all MD3 theme values:
 
 ```tsx
-import { material } from '@onlynative/core'
+import { material } from '@rootnative/core'
 
 material.lightTheme
 material.darkTheme
@@ -117,8 +117,8 @@ material.defaultTopAppBarTokens
 ### Custom MD3 theme
 
 ```tsx
-import { lightTheme } from '@onlynative/core'
-import type { Theme } from '@onlynative/core'
+import { lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
 
 const custom: Theme = {
   ...lightTheme,
@@ -131,7 +131,7 @@ const custom: Theme = {
 ### Dark theme
 
 ```tsx
-import { ThemeProvider, darkTheme } from '@onlynative/core'
+import { ThemeProvider, darkTheme } from '@rootnative/core'
 
 <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
 ```
@@ -153,7 +153,7 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 - `ThemeProvider` — Theme context provider (works with any design system, defaults to MD3)
 - `useTheme` — Access current theme (generic)
 - `defineTheme` — Type-safe theme creation helper
-- `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@onlynative/core/create-theme`)
+- `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
 - `material` — MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
 - `useBreakpoint` — Current window size class
 - `useBreakpointValue` — Responsive values
@@ -162,7 +162,7 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 
 ## Docs
 
-https://onlynative.github.io/ui/
+https://rootnative.github.io/ui/
 
 ## License
 

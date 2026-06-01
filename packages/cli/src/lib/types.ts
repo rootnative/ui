@@ -16,7 +16,7 @@ export interface ProjectInfo {
   aliases: Record<string, string> | null
 }
 
-export interface OnlyNativeConfig {
+export interface RootNativeConfig {
   $schema?: string
   aliases: {
     components: string

@@ -4,15 +4,15 @@ sidebar_position: 6
 
 # Fonts
 
-OnlyNative UI uses platform-default fonts out of the box — Roboto on Android, System (San Francisco) on iOS, and the system font stack on web. You can replace these with any custom font.
+RootNative UI uses platform-default fonts out of the box — Roboto on Android, System (San Francisco) on iOS, and the system font stack on web. You can replace these with any custom font.
 
 ## Quick setup with createMaterialTheme
 
 The easiest way to use a custom font is the `fontFamily` option on `createMaterialTheme`:
 
 ```tsx
-import { createMaterialTheme } from '@onlynative/core/create-theme'
-import { ThemeProvider } from '@onlynative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
 
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
   fontFamily: 'Inter',
@@ -43,8 +43,8 @@ npx expo install expo-font
 // app/_layout.tsx
 import { useFonts } from 'expo-font'
 import { Slot } from 'expo-router'
-import { ThemeProvider } from '@onlynative/core'
-import { createMaterialTheme } from '@onlynative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
 
 const { lightTheme } = createMaterialTheme('#006A6A', {
   fontFamily: 'Inter',
@@ -77,8 +77,8 @@ npx expo install @expo-google-fonts/inter expo-font
 // app/_layout.tsx
 import { useFonts, Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter'
 import { Slot } from 'expo-router'
-import { ThemeProvider } from '@onlynative/core'
-import { createMaterialTheme } from '@onlynative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
 
 const { lightTheme } = createMaterialTheme('#006A6A', {
   fontFamily: 'Inter_400Regular',
@@ -107,8 +107,8 @@ export default function RootLayout() {
 If your font files use separate family names per weight (common with Google Fonts), you can override individual typography styles:
 
 ```tsx
-import { lightTheme } from '@onlynative/core'
-import type { Theme } from '@onlynative/core'
+import { lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
 
 const theme: Theme = {
   ...lightTheme,
@@ -138,7 +138,7 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 
 ## Platform defaults
 
-When no `fontFamily` is specified, OnlyNative UI uses:
+When no `fontFamily` is specified, RootNative UI uses:
 
 | Platform | Default font |
 |----------|-------------|

@@ -20,9 +20,9 @@ import {
   Switch,
   TextField,
   Typography,
-} from '@onlynative/components'
-import { useTheme, useBreakpointValue } from '@onlynative/core'
-import type { MaterialTheme } from '@onlynative/core'
+} from '@rootnative/components'
+import { useTheme, useBreakpointValue } from '@rootnative/core'
+import type { MaterialTheme } from '@rootnative/core'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
@@ -484,7 +484,7 @@ export default function HomeScreen() {
               Material Design 3
             </Chip>
           </Row>
-          <Typography variant={heroVariant}>OnlyNative UI</Typography>
+          <Typography variant={heroVariant}>RootNative UI</Typography>
           <Typography variant={taglineVariant} style={captionStyle}>
             Beautiful Material Design 3 components for React Native — copy,
             paste, ship.

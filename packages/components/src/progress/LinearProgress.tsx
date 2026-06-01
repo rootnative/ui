@@ -1,4 +1,4 @@
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 import { useEffect, useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'

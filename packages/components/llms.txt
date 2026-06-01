@@ -1,13 +1,13 @@
-# @onlynative/components — MD3 UI Components for React Native
+# @rootnative/components — MD3 UI Components for React Native
 
-> Version: 0.0.0-alpha.8
-> Peer deps: @onlynative/core >=0.0.0-alpha.8, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4
+> Version: 0.0.0-alpha.0
+> Peer deps: @rootnative/core >=0.0.0-alpha.0, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage
 
-Import via subpath (preferred): `import { X } from '@onlynative/components/x'`
-Import via root: `import { X } from '@onlynative/components'`
+Import via subpath (preferred): `import { X } from '@rootnative/components/x'`
+Import via root: `import { X } from '@rootnative/components'`
 
 ### Component override pattern
 
@@ -26,7 +26,7 @@ Disabled state always uses standard MD3 disabled treatment (38% onSurface) regar
 ### Typography
 
 ```tsx
-import { Typography } from '@onlynative/components/typography'
+import { Typography } from '@rootnative/components/typography'
 
 <Typography variant="headlineMedium" color="#333">Hello</Typography>
 ```
@@ -44,7 +44,7 @@ Props:
 ### Button
 
 ```tsx
-import { Button } from '@onlynative/components/button'
+import { Button } from '@rootnative/components/button'
 
 <Button variant="filled" leadingIcon="plus" onPress={handlePress}>Create</Button>
 <Button variant="outlined">Cancel</Button>
@@ -67,7 +67,7 @@ Props:
 ### ButtonGroup
 
 ```tsx
-import { ButtonGroup } from '@onlynative/components/button-group'
+import { ButtonGroup } from '@rootnative/components/button-group'
 
 // Single-select connected group (replaces deprecated MD3 segmented button).
 <ButtonGroup
@@ -111,7 +111,7 @@ import { ButtonGroup } from '@onlynative/components/button-group'
 ### IconButton
 
 ```tsx
-import { IconButton } from '@onlynative/components/icon-button'
+import { IconButton } from '@rootnative/components/icon-button'
 
 <IconButton icon="heart" variant="filled" accessibilityLabel="Like" onPress={handleLike} />
 <IconButton icon="heart-outline" selectedIcon="heart" selected={liked} variant="tonal" accessibilityLabel="Like" onPress={toggle} />
@@ -136,7 +136,7 @@ Props:
 ### FAB
 
 ```tsx
-import { FAB } from '@onlynative/components/fab'
+import { FAB } from '@rootnative/components/fab'
 
 // Icon-only — accessibilityLabel required
 <FAB icon="plus" accessibilityLabel="Add" onPress={handleAdd} />
@@ -164,7 +164,7 @@ Props:
 ### AppBar
 
 ```tsx
-import { AppBar } from '@onlynative/components/appbar'
+import { AppBar } from '@rootnative/components/appbar'
 
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
@@ -195,7 +195,7 @@ Props:
 ### Card
 
 ```tsx
-import { Card } from '@onlynative/components/card'
+import { Card } from '@rootnative/components/card'
 
 <Card variant="elevated">{children}</Card>
 <Card variant="outlined" onPress={handlePress}>{children}</Card>
@@ -214,7 +214,7 @@ Props:
 ### Chip
 
 ```tsx
-import { Chip } from '@onlynative/components/chip'
+import { Chip } from '@rootnative/components/chip'
 
 <Chip variant="assist" leadingIcon="calendar">Today</Chip>
 <Chip variant="filter" selected={isSelected} onPress={toggle}>Active</Chip>
@@ -276,7 +276,7 @@ Variant-specific props:
 ### Checkbox
 
 ```tsx
-import { Checkbox } from '@onlynative/components/checkbox'
+import { Checkbox } from '@rootnative/components/checkbox'
 
 <Checkbox value={checked} onValueChange={setChecked} />
 ```
@@ -294,7 +294,7 @@ Props:
 ### Radio
 
 ```tsx
-import { Radio } from '@onlynative/components/radio'
+import { Radio } from '@rootnative/components/radio'
 
 <Radio value={selected} onValueChange={setSelected} />
 ```
@@ -312,7 +312,7 @@ Props:
 ### Switch
 
 ```tsx
-import { Switch } from '@onlynative/components/switch'
+import { Switch } from '@rootnative/components/switch'
 
 <Switch value={on} onValueChange={setOn} />
 <Switch value={on} onValueChange={setOn} selectedIcon="check" unselectedIcon="close" />
@@ -332,7 +332,7 @@ Props:
 ### TextField
 
 ```tsx
-import { TextField } from '@onlynative/components/text-field'
+import { TextField } from '@rootnative/components/text-field'
 
 <TextField label="Email" variant="outlined" value={email} onChangeText={setEmail} />
 <TextField label="Password" variant="filled" error errorText="Required" />
@@ -362,7 +362,7 @@ Props:
 Full-screen safe area wrapper.
 
 ```tsx
-import { Layout } from '@onlynative/components/layout'
+import { Layout } from '@rootnative/components/layout'
 
 <Layout>{children}</Layout>
 <Layout immersive>{/* No safe area insets */}</Layout>
@@ -380,7 +380,7 @@ Props:
 Base layout primitive with spacing shorthand props.
 
 ```tsx
-import { Box } from '@onlynative/components/layout'
+import { Box } from '@rootnative/components/layout'
 
 <Box p="md" bg={theme.colors.surface}>{children}</Box>
 <Box px="lg" py="sm" gap="md">{children}</Box>
@@ -414,7 +414,7 @@ Props:
 Horizontal flex container (extends Box).
 
 ```tsx
-import { Row } from '@onlynative/components/layout'
+import { Row } from '@rootnative/components/layout'
 
 <Row gap="sm" align="center">{children}</Row>
 <Row wrap>{/* Wraps to next line */}</Row>
@@ -429,7 +429,7 @@ Props:
 Vertical flex container (extends Box).
 
 ```tsx
-import { Column } from '@onlynative/components/layout'
+import { Column } from '@rootnative/components/layout'
 
 <Column gap="md">{children}</Column>
 ```
@@ -442,7 +442,7 @@ Props:
 Equal-width column grid (extends Row).
 
 ```tsx
-import { Grid } from '@onlynative/components/layout'
+import { Grid } from '@rootnative/components/layout'
 
 <Grid columns={3} gap="sm">{children}</Grid>
 ```
@@ -456,7 +456,7 @@ Props:
 ### List
 
 ```tsx
-import { List, ListItem, ListDivider } from '@onlynative/components/list'
+import { List, ListItem, ListDivider } from '@rootnative/components/list'
 
 <List>
   <ListItem headlineText="Title" supportingText="Subtitle" onPress={handlePress} />
@@ -507,7 +507,7 @@ Props:
 ### KeyboardAvoidingWrapper
 
 ```tsx
-import { KeyboardAvoidingWrapper } from '@onlynative/components/keyboard-avoiding-wrapper'
+import { KeyboardAvoidingWrapper } from '@rootnative/components/keyboard-avoiding-wrapper'
 
 <KeyboardAvoidingWrapper>
   <TextField label="Name" />
@@ -531,7 +531,7 @@ Props:
 ### Avatar
 
 ```tsx
-import { Avatar } from '@onlynative/components/avatar'
+import { Avatar } from '@rootnative/components/avatar'
 
 <Avatar imageUri="https://example.com/photo.jpg" size="large" />
 <Avatar icon="account" size="medium" containerColor="#E8DEF8" />
@@ -556,7 +556,7 @@ Props:
 ### Slider
 
 ```tsx
-import { Slider } from '@onlynative/components/slider'
+import { Slider } from '@rootnative/components/slider'
 
 // Continuous (single thumb)
 <Slider value={value} onValueChange={setValue} />
@@ -611,7 +611,7 @@ Props:
 ### Progress
 
 ```tsx
-import { LinearProgress, CircularProgress } from '@onlynative/components/progress'
+import { LinearProgress, CircularProgress } from '@rootnative/components/progress'
 
 // Determinate (progress 0..1)
 <LinearProgress progress={0.4} />
@@ -655,7 +655,7 @@ Props:
 
 ## Icons
 
-Every icon prop accepts an `IconSource` (`import type { IconSource } from '@onlynative/utils'`) — one of three forms:
+Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/utils'`) — one of three forms:
 
 1. **String name** — resolved through the theme's `iconResolver`. Defaults to `MaterialCommunityIcons` from `@expo/vector-icons`. Browse names at https://pictogrammers.com/library/mdi/.
 2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
@@ -663,12 +663,12 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@only
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@onlynative/icons` adapter package (v0.0.0-alpha.8)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.0)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 
 ```bash
-pnpm add @onlynative/icons
+pnpm add @rootnative/icons
 ```
 
 | Helper | For |
@@ -681,8 +681,8 @@ pnpm add @onlynative/icons
 #### Lucide
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createLucideResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createLucideResolver } from '@rootnative/icons'
 import { Check, Search, ArrowRight } from 'lucide-react-native'
 
 const resolver = createLucideResolver({
@@ -697,8 +697,8 @@ const resolver = createLucideResolver({
 #### Phosphor
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import { createPhosphorResolver } from '@onlynative/icons'
+import { ThemeProvider } from '@rootnative/core'
+import { createPhosphorResolver } from '@rootnative/icons'
 import { Check, MagnifyingGlass } from 'phosphor-react-native'
 
 const resolver = createPhosphorResolver({
@@ -712,7 +712,7 @@ const resolver = createPhosphorResolver({
 
 ```tsx
 import { Ionicons } from '@expo/vector-icons'
-import { createVectorIconsResolver } from '@onlynative/icons'
+import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
   IconSet: Ionicons,
@@ -725,8 +725,8 @@ const resolver = createVectorIconsResolver({
 `withLegacyMdiFallback` wraps any `IconResolver` so that legacy MaterialCommunityIcons names (`magnify`, `pencil`, `dots-vertical`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns `null`.
 
 ```tsx
-import { withLegacyMdiFallback } from '@onlynative/icons'
-import type { IconResolver } from '@onlynative/core'
+import { withLegacyMdiFallback } from '@rootnative/icons'
+import type { IconResolver } from '@rootnative/core'
 
 const baseResolver: IconResolver = (name, { size, color }) => {
   const Svg = mySvgIcons[name]
@@ -751,11 +751,11 @@ Lucide-specific: `strokeWidth?: number`. Phosphor-specific: `weight?: 'thin' | '
 
 #### Manual resolver (no adapter package)
 
-You don't need `@onlynative/icons` at all — `iconResolver` accepts any `(name, { size, color }) => ReactNode` function:
+You don't need `@rootnative/icons` at all — `iconResolver` accepts any `(name, { size, color }) => ReactNode` function:
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
-import type { IconResolver } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { Check, Heart } from 'lucide-react-native'
 
 const icons = { check: Check, heart: Heart }

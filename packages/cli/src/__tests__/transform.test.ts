@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { transformImports, generateUtilsBarrel } from '../lib/transform'
-import type { OnlyNativeConfig } from '../lib/types'
+import type { RootNativeConfig } from '../lib/types'
 
-const config: OnlyNativeConfig = {
+const config: RootNativeConfig = {
   aliases: {
     components: '@/components/ui',
     lib: '@/lib',
   },
-  registryUrl: 'https://raw.githubusercontent.com/onlynative/ui',
+  registryUrl: 'https://raw.githubusercontent.com/rootnative/ui',
   registryVersion: 'main',
 }
 
@@ -22,12 +22,12 @@ function transform(source: string, componentName = 'button') {
 }
 
 describe('transformImports', () => {
-  describe('@onlynative/utils → local barrel', () => {
+  describe('@rootnative/utils → local barrel', () => {
     it('rewrites single-line import', () => {
-      const input = `import { alphaColor, blendColor } from '@onlynative/utils'`
+      const input = `import { alphaColor, blendColor } from '@rootnative/utils'`
       const output = transform(input)
       expect(output).toBe(
-        `import { alphaColor, blendColor } from '@/lib/onlynative-utils'`,
+        `import { alphaColor, blendColor } from '@/lib/rootnative-utils'`,
       )
     })
 
@@ -37,43 +37,43 @@ describe('transformImports', () => {
         '  alphaColor,',
         '  blendColor,',
         '  getMaterialCommunityIcons,',
-        `} from '@onlynative/utils'`,
+        `} from '@rootnative/utils'`,
       ].join('\n')
       const output = transform(input, 'icon-button')
-      expect(output).toContain(`from '@/lib/onlynative-utils'`)
-      expect(output).not.toContain('@onlynative/utils')
+      expect(output).toContain(`from '@/lib/rootnative-utils'`)
+      expect(output).not.toContain('@rootnative/utils')
     })
 
     it('rewrites type-only import', () => {
-      const input = `import type { ElevationLevel } from '@onlynative/utils'`
+      const input = `import type { ElevationLevel } from '@rootnative/utils'`
       const output = transform(input)
       expect(output).toBe(
-        `import type { ElevationLevel } from '@/lib/onlynative-utils'`,
+        `import type { ElevationLevel } from '@/lib/rootnative-utils'`,
       )
     })
 
     it('rewrites export from', () => {
-      const input = `export { alphaColor } from '@onlynative/utils'`
+      const input = `export { alphaColor } from '@rootnative/utils'`
       const output = transform(input)
-      expect(output).toBe(`export { alphaColor } from '@/lib/onlynative-utils'`)
+      expect(output).toBe(`export { alphaColor } from '@/lib/rootnative-utils'`)
     })
   })
 
-  describe('@onlynative/core → unchanged', () => {
-    it('keeps @onlynative/core import as-is', () => {
-      const input = `import { useTheme } from '@onlynative/core'`
+  describe('@rootnative/core → unchanged', () => {
+    it('keeps @rootnative/core import as-is', () => {
+      const input = `import { useTheme } from '@rootnative/core'`
       const output = transform(input)
       expect(output).toBe(input)
     })
 
-    it('keeps @onlynative/core subpath import as-is', () => {
-      const input = `import { createMaterialTheme } from '@onlynative/core/create-theme'`
+    it('keeps @rootnative/core subpath import as-is', () => {
+      const input = `import { createMaterialTheme } from '@rootnative/core/create-theme'`
       const output = transform(input)
       expect(output).toBe(input)
     })
 
     it('keeps type import from core as-is', () => {
-      const input = `import type { MaterialTheme } from '@onlynative/core'`
+      const input = `import type { MaterialTheme } from '@rootnative/core'`
       const output = transform(input)
       expect(output).toBe(input)
     })
@@ -147,13 +147,13 @@ describe('transformImports', () => {
         `import type { ReactNode } from 'react'`,
         `import { Platform, View } from 'react-native'`,
         `import { SafeAreaView } from 'react-native-safe-area-context'`,
-        `import { defaultTopAppBarTokens, useTheme } from '@onlynative/core'`,
+        `import { defaultTopAppBarTokens, useTheme } from '@rootnative/core'`,
         '',
         `import { IconButton } from '../icon-button'`,
         `import type { IconButtonProps } from '../icon-button'`,
         `import { Typography } from '../typography'`,
         `import type { TypographyVariant } from '../typography'`,
-        `import { selectRTL } from '@onlynative/utils'`,
+        `import { selectRTL } from '@rootnative/utils'`,
         `import { createStyles, getColorSchemeColors } from './styles'`,
         `import type { AppBarProps } from './types'`,
       ].join('\n')
@@ -165,12 +165,12 @@ describe('transformImports', () => {
       expect(output).toContain(`from 'react-native'`)
       expect(output).toContain(`from 'react-native-safe-area-context'`)
 
-      // Should keep @onlynative/core unchanged
-      expect(output).toContain(`from '@onlynative/core'`)
+      // Should keep @rootnative/core unchanged
+      expect(output).toContain(`from '@rootnative/core'`)
 
-      // Should rewrite @onlynative/utils
-      expect(output).toContain(`from '@/lib/onlynative-utils'`)
-      expect(output).not.toContain(`from '@onlynative/utils'`)
+      // Should rewrite @rootnative/utils
+      expect(output).toContain(`from '@/lib/rootnative-utils'`)
+      expect(output).not.toContain(`from '@rootnative/utils'`)
 
       // Should rewrite inter-component imports
       expect(output).toContain(`from '@/components/ui/icon-button'`)
@@ -186,25 +186,25 @@ describe('transformImports', () => {
     it('transforms button/styles.ts imports correctly', () => {
       const input = [
         `import { StyleSheet } from 'react-native'`,
-        `import type { MaterialTheme } from '@onlynative/core'`,
+        `import type { MaterialTheme } from '@rootnative/core'`,
         '',
         `import type { ButtonVariant } from './types'`,
-        `import { alphaColor, blendColor, elevationStyle } from '@onlynative/utils'`,
+        `import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'`,
       ].join('\n')
 
       const output = transform(input)
 
       expect(output).toContain(`from 'react-native'`)
-      expect(output).toContain(`from '@onlynative/core'`)
+      expect(output).toContain(`from '@rootnative/core'`)
       expect(output).toContain(`from './types'`)
-      expect(output).toContain(`from '@/lib/onlynative-utils'`)
-      expect(output).not.toContain(`from '@onlynative/utils'`)
+      expect(output).toContain(`from '@/lib/rootnative-utils'`)
+      expect(output).not.toContain(`from '@rootnative/utils'`)
     })
   })
 
   describe('custom alias config', () => {
     it('uses ~ alias when configured', () => {
-      const customConfig: OnlyNativeConfig = {
+      const customConfig: RootNativeConfig = {
         ...config,
         aliases: {
           components: '~/components/ui',
@@ -212,14 +212,14 @@ describe('transformImports', () => {
         },
       }
 
-      const input = `import { alphaColor } from '@onlynative/utils'`
+      const input = `import { alphaColor } from '@rootnative/utils'`
       const output = transformImports(input, {
         config: customConfig,
         componentName: 'button',
         installedComponents,
       })
 
-      expect(output).toBe(`import { alphaColor } from '~/lib/onlynative-utils'`)
+      expect(output).toBe(`import { alphaColor } from '~/lib/rootnative-utils'`)
     })
   })
 })
@@ -234,7 +234,7 @@ describe('generateUtilsBarrel', () => {
 
     expect(result).toBe(
       [
-        '// Auto-generated by onlynative CLI. Do not edit.',
+        '// Auto-generated by rootnative CLI. Do not edit.',
         `export { alphaColor, blendColor } from './color'`,
         `export { elevationStyle } from './elevation'`,
         `export { getMaterialCommunityIcons } from './icon'`,
@@ -248,7 +248,7 @@ describe('generateUtilsBarrel', () => {
       color: [],
     })
 
-    expect(result).toBe('// Auto-generated by onlynative CLI. Do not edit.\n')
+    expect(result).toBe('// Auto-generated by rootnative CLI. Do not edit.\n')
   })
 
   it('generates barrel for rtl utils', () => {
@@ -282,7 +282,7 @@ describe('generateUtilsBarrel', () => {
     const lines = result.trim().split('\n')
     // Value exports come before type exports per util.
     expect(lines).toEqual([
-      '// Auto-generated by onlynative CLI. Do not edit.',
+      '// Auto-generated by rootnative CLI. Do not edit.',
       `export { resolvePressableStyle, resolveColorFromStyle } from './pressable'`,
       `export type { PressableState, PressableStyleProp } from './pressable'`,
     ])

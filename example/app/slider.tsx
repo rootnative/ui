@@ -1,6 +1,6 @@
-import { Column, Slider, Typography } from '@onlynative/components'
-import type { SliderValue } from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+import { Column, Slider, Typography } from '@rootnative/components'
+import type { SliderValue } from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 

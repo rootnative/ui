@@ -15,7 +15,7 @@ import { detectProject, getInstallCommand } from '../lib/detector'
 let tmpDir: string
 
 beforeEach(async () => {
-  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'onlynative-test-'))
+  tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'rootnative-test-'))
 })
 
 afterEach(async () => {
@@ -29,7 +29,7 @@ describe('config', () => {
     })
 
     it('returns true when config file exists', async () => {
-      await fs.writeJSON(path.join(tmpDir, 'onlynative.json'), DEFAULT_CONFIG)
+      await fs.writeJSON(path.join(tmpDir, 'rootnative.json'), DEFAULT_CONFIG)
       expect(await configExists(tmpDir)).toBe(true)
     })
   })
@@ -42,13 +42,13 @@ describe('config', () => {
       expect(config.aliases.components).toBe('@/components/ui')
       expect(config.aliases.lib).toBe('@/lib')
       expect(config.registryUrl).toBe(
-        'https://raw.githubusercontent.com/onlynative/ui',
+        'https://raw.githubusercontent.com/rootnative/ui',
       )
     })
 
     it('throws when config does not exist', async () => {
       await expect(readConfig(tmpDir)).rejects.toThrow(
-        'onlynative.json not found',
+        'rootnative.json not found',
       )
     })
   })
@@ -188,36 +188,36 @@ describe('detector', () => {
 
   describe('getInstallCommand', () => {
     it('generates npm install command', () => {
-      expect(getInstallCommand('npm', ['@onlynative/core'])).toBe(
-        'npm install @onlynative/core',
+      expect(getInstallCommand('npm', ['@rootnative/core'])).toBe(
+        'npm install @rootnative/core',
       )
     })
 
     it('generates pnpm add command', () => {
-      expect(getInstallCommand('pnpm', ['@onlynative/core'])).toBe(
-        'pnpm add @onlynative/core',
+      expect(getInstallCommand('pnpm', ['@rootnative/core'])).toBe(
+        'pnpm add @rootnative/core',
       )
     })
 
     it('generates yarn add command', () => {
-      expect(getInstallCommand('yarn', ['@onlynative/core'])).toBe(
-        'yarn add @onlynative/core',
+      expect(getInstallCommand('yarn', ['@rootnative/core'])).toBe(
+        'yarn add @rootnative/core',
       )
     })
 
     it('generates bun add command', () => {
-      expect(getInstallCommand('bun', ['@onlynative/core'])).toBe(
-        'bun add @onlynative/core',
+      expect(getInstallCommand('bun', ['@rootnative/core'])).toBe(
+        'bun add @rootnative/core',
       )
     })
 
     it('joins multiple packages', () => {
       expect(
         getInstallCommand('npm', [
-          '@onlynative/core',
+          '@rootnative/core',
           'react-native-safe-area-context',
         ]),
-      ).toBe('npm install @onlynative/core react-native-safe-area-context')
+      ).toBe('npm install @rootnative/core react-native-safe-area-context')
     })
   })
 })

@@ -57,7 +57,7 @@ export async function updateCommand(
 
     if (missing.length > 0) {
       spinner.fail(
-        `Not installed: ${missing.join(', ')}. Use "onlynative add" instead.`,
+        `Not installed: ${missing.join(', ')}. Use "rootnative add" instead.`,
       )
       return
     }
@@ -153,12 +153,12 @@ export async function updateCommand(
     }
   }
   const newBarrel = generateUtilsBarrel(resolution.utils, utilExports)
-  const barrelPath = path.join(libDir, 'onlynative-utils.ts')
+  const barrelPath = path.join(libDir, 'rootnative-utils.ts')
   let oldBarrel = ''
   if (await fs.pathExists(barrelPath)) {
     oldBarrel = await fs.readFile(barrelPath, 'utf-8')
   }
-  utilDiffs.push(computeDiff(oldBarrel, newBarrel, 'lib/onlynative-utils.ts'))
+  utilDiffs.push(computeDiff(oldBarrel, newBarrel, 'lib/rootnative-utils.ts'))
 
   // Display results
   const changedComponents = componentDiffs.filter((c) => c.hasChanges)

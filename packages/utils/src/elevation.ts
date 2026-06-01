@@ -1,4 +1,4 @@
-import type { ElevationLevel } from '@onlynative/core'
+import type { ElevationLevel } from '@rootnative/core'
 import { Platform } from 'react-native'
 import type { ViewStyle } from 'react-native'
 

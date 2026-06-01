@@ -6,7 +6,7 @@ import { defaultTopAppBarTokens } from '../theme/topAppBar'
  * Material Design 3 preset — groups all MD3-specific theme values.
  *
  * @example
- * import { material } from '@onlynative/core'
+ * import { material } from '@rootnative/core'
  *
  * <ThemeProvider theme={material.darkTheme}>
  *   <App />

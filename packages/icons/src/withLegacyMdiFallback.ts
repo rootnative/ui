@@ -1,4 +1,4 @@
-import type { IconResolver, IconRenderProps } from '@onlynative/core'
+import type { IconResolver, IconRenderProps } from '@rootnative/core'
 import { mdiToLucideAliases, mdiToPhosphorAliases } from './mdi-aliases'
 import { warnOnce } from './warn'
 
@@ -45,8 +45,8 @@ const builtInTargets: Record<'lucide' | 'phosphor', Record<string, string>> = {
  * sprite sheets, etc.).
  *
  * @example
- * import { ThemeProvider } from '@onlynative/core'
- * import { withLegacyMdiFallback } from '@onlynative/icons'
+ * import { ThemeProvider } from '@rootnative/core'
+ * import { withLegacyMdiFallback } from '@rootnative/icons'
  *
  * const baseResolver = (name, { size, color }) => {
  *   const Icon = mySvgIcons[name]
@@ -79,7 +79,7 @@ export function withLegacyMdiFallback(
     if (warn) {
       warnOnce(
         `mdi-fallback:${name}`,
-        `[@onlynative/icons] Rewriting legacy MaterialCommunityIcons name "${name}" → "${aliased}". ` +
+        `[@rootnative/icons] Rewriting legacy MaterialCommunityIcons name "${name}" → "${aliased}". ` +
           `Update the call site to use "${aliased}" directly to silence this warning.`,
       )
     }

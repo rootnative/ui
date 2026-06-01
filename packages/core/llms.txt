@@ -1,13 +1,13 @@
-# @onlynative/core — Theme System for React Native
+# @rootnative/core — Theme System for React Native
 
-> Version: 0.0.0-alpha.8
+> Version: 0.0.0-alpha.0
 > Peer deps: react >=18, react-native >=0.72
 > Optional: @material/material-color-utilities >=0.4.0 (for createMaterialTheme)
 
 ## Quick Start
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 
 export default function App() {
   return (
@@ -25,7 +25,7 @@ export default function App() {
 Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
 
 ```tsx
-import { ThemeProvider, darkTheme } from '@onlynative/core'
+import { ThemeProvider, darkTheme } from '@rootnative/core'
 
 // Light theme (default)
 <ThemeProvider>{children}</ThemeProvider>
@@ -34,8 +34,8 @@ import { ThemeProvider, darkTheme } from '@onlynative/core'
 <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
 
 // Custom theme
-import { lightTheme } from '@onlynative/core'
-import type { Theme } from '@onlynative/core'
+import { lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
 
 const custom: Theme = {
   ...lightTheme,
@@ -55,7 +55,7 @@ Returns the current theme from the nearest `ThemeProvider`.
 Without a type parameter, returns the Material Design 3 `Theme`. Pass a custom theme type for typed access to your design system's tokens.
 
 ```tsx
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 
 // Material Design 3 (default)
 const theme = useTheme()
@@ -71,8 +71,8 @@ const theme = useTheme<MyTheme>()
 Identity function that validates a custom theme object against `BaseTheme`. Provides type-checking and autocompletion.
 
 ```tsx
-import { defineTheme } from '@onlynative/core'
-import type { BaseTheme, TextStyle } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
+import type { BaseTheme, TextStyle } from '@rootnative/core'
 
 interface MyColors { [key: string]: string; brand: string; background: string; text: string }
 interface MyTypography { [key: string]: TextStyle; heading: TextStyle; body: TextStyle }
@@ -111,8 +111,8 @@ Defaults are byte-identical to the upstream MD3 `material-color-utilities` libra
 **Separate entry point** — keeps the ~60 kB dependency out of the main bundle:
 
 ```tsx
-import { createMaterialTheme } from '@onlynative/core/create-theme'
-import { ThemeProvider } from '@onlynative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { ThemeProvider } from '@rootnative/core'
 
 // Pure MD3 default (TonalSpot variant)
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
@@ -157,13 +157,13 @@ Scales the MD3 corner radius tokens by a multiplier. Returns a complete `Shape` 
 - `roundness: 2` — double the rounding
 
 ```tsx
-import { applyRoundness, lightTheme } from '@onlynative/core'
+import { applyRoundness, lightTheme } from '@rootnative/core'
 
 // Use with spread to override shape on an existing theme
 const sharpTheme = { ...lightTheme, shape: applyRoundness(0) }
 
 // Or with defineTheme
-import { defineTheme } from '@onlynative/core'
+import { defineTheme } from '@rootnative/core'
 const theme = defineTheme({ ...lightTheme, shape: applyRoundness(0.5) })
 ```
 
@@ -172,7 +172,7 @@ const theme = defineTheme({ ...lightTheme, shape: applyRoundness(0.5) })
 Grouped object containing all Material Design 3 theme values.
 
 ```tsx
-import { material } from '@onlynative/core'
+import { material } from '@rootnative/core'
 
 material.lightTheme  // MD3 light theme
 material.darkTheme   // MD3 dark theme
@@ -213,7 +213,7 @@ Typography variants: displayLarge, displayMedium, displaySmall, headlineLarge, h
 Returns the current MD3 window size class. Reactively updates on resize.
 
 ```tsx
-import { useBreakpoint } from '@onlynative/core'
+import { useBreakpoint } from '@rootnative/core'
 
 const bp = useBreakpoint()
 // 'compact' (0-599) | 'medium' (600-839) | 'expanded' (840-1199) | 'large' (1200-1599) | 'extraLarge' (1600+)
@@ -224,7 +224,7 @@ const bp = useBreakpoint()
 Returns a value based on the current breakpoint with cascade fallback.
 
 ```tsx
-import { useBreakpointValue } from '@onlynative/core'
+import { useBreakpointValue } from '@rootnative/core'
 
 const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 // compact → 1, medium → 2, expanded/large/extraLarge → 4

@@ -5,8 +5,8 @@ import {
   ListDivider,
   Typography,
   Column,
-} from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+} from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 
 function Icon({ name }: { name: string }) {

@@ -4,8 +4,8 @@ import {
   LinearProgress,
   Row,
   Typography,
-} from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+} from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 

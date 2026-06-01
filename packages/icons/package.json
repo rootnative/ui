@@ -1,7 +1,7 @@
 {
-  "name": "@onlynative/icons",
-  "version": "0.0.0-alpha.8",
-  "description": "Icon library adapters for OnlyNative — Lucide, Phosphor, and @expo/vector-icons resolvers with MDI-name compatibility.",
+  "name": "@rootnative/icons",
+  "version": "0.0.0-alpha.0",
+  "description": "Icon library adapters for RootNative — Lucide, Phosphor, and @expo/vector-icons resolvers with MDI-name compatibility.",
   "private": false,
   "sideEffects": false,
   "main": "dist/index.mjs",
@@ -27,10 +27,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlynative/ui.git",
+    "url": "https://github.com/rootnative/ui.git",
     "directory": "packages/icons"
   },
-  "homepage": "https://github.com/onlynative/ui",
+  "homepage": "https://github.com/rootnative/ui",
   "keywords": [
     "react-native",
     "material-design-3",
@@ -47,7 +47,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@onlynative/core": ">=0.0.0-alpha.7",
+    "@rootnative/core": ">=0.0.0-alpha.0",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0"
   },
@@ -63,7 +63,7 @@
     }
   },
   "devDependencies": {
-    "@onlynative/core": "workspace:*",
+    "@rootnative/core": "workspace:*",
     "@react-native/babel-preset": "^0.81.5",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",

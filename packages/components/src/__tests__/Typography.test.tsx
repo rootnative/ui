@@ -1,4 +1,4 @@
-import { renderWithTheme } from '@onlynative/utils/test'
+import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import { Typography } from '../typography/Typography'

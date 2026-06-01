@@ -12,10 +12,10 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
 ## Usage
 
 <SnackExample
-  name="OnlyNative FAB — Usage"
+  name="RootNative FAB — Usage"
   code={`
-  import { FAB } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { FAB } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -49,10 +49,10 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
 ## Sizes
 
 <SnackExample
-  name="OnlyNative FAB — Sizes"
+  name="RootNative FAB — Sizes"
   code={`
-  import { FAB } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { FAB } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -83,10 +83,10 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
 Pass a `label` to render an extended FAB. Extended FABs are always 56dp tall — the `size` prop is unavailable.
 
 <SnackExample
-  name="OnlyNative FAB — Extended"
+  name="RootNative FAB — Extended"
   code={`
-  import { FAB } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { FAB } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
@@ -110,7 +110,7 @@ The label doubles as the accessible name, so `accessibilityLabel` is optional in
 ## Bring your own icon library
 
 ```tsx
-import { FAB } from '@onlynative/components'
+import { FAB } from '@rootnative/components'
 import { Plus } from 'lucide-react-native'
 
 <FAB
@@ -124,10 +124,10 @@ import { Plus } from 'lucide-react-native'
 Override `containerColor` and `contentColor` to bypass the variant defaults. State-layer colors (hover, press, focus) are derived automatically.
 
 <SnackExample
-  name="OnlyNative FAB — Custom Colors"
+  name="RootNative FAB — Custom Colors"
   code={`
-  import { FAB } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { FAB } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 

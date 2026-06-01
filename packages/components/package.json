@@ -1,7 +1,7 @@
 {
-  "name": "@onlynative/components",
-  "version": "0.0.0-alpha.8",
-  "description": "Material Design 3 UI components for React Native, part of OnlyNative UI.",
+  "name": "@rootnative/components",
+  "version": "0.0.0-alpha.0",
+  "description": "Material Design 3 UI components for React Native, part of RootNative UI.",
   "private": false,
   "sideEffects": false,
   "main": "dist/index.js",
@@ -182,10 +182,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlynative/ui.git",
+    "url": "https://github.com/rootnative/ui.git",
     "directory": "packages/components"
   },
-  "homepage": "https://github.com/onlynative/ui",
+  "homepage": "https://github.com/rootnative/ui",
   "keywords": [
     "react-native",
     "material-design-3",
@@ -201,7 +201,7 @@
   },
   "peerDependencies": {
     "@expo/vector-icons": ">=14.0.0",
-    "@onlynative/core": ">=0.0.0-alpha.8",
+    "@rootnative/core": ">=0.0.0-alpha.0",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0",
     "react-native-reanimated": ">=4.0.0",
@@ -224,8 +224,8 @@
   },
   "devDependencies": {
     "@react-native/babel-preset": "^0.81.5",
-    "@onlynative/core": "workspace:*",
-    "@onlynative/utils": "workspace:*",
+    "@rootnative/core": "workspace:*",
+    "@rootnative/utils": "workspace:*",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.0",

@@ -1,4 +1,4 @@
-import type { IconResolver } from '@onlynative/core'
+import type { IconResolver } from '@rootnative/core'
 import * as React from 'react'
 import { buildResolver } from './internal/buildResolver'
 import { mdiToPhosphorAliases } from './mdi-aliases'
@@ -77,8 +77,8 @@ export interface PhosphorResolverOptions {
  * through Phosphor.
  *
  * @example
- * import { ThemeProvider } from '@onlynative/core'
- * import { createPhosphorResolver } from '@onlynative/icons'
+ * import { ThemeProvider } from '@rootnative/core'
+ * import { createPhosphorResolver } from '@rootnative/icons'
  * import { Check, MagnifyingGlass } from 'phosphor-react-native'
  *
  * const resolver = createPhosphorResolver({

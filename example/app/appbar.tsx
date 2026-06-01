@@ -1,10 +1,10 @@
-import { AppBar, Box, Typography, Column } from '@onlynative/components'
+import { AppBar, Box, Typography, Column } from '@rootnative/components'
 import type {
   AppBarAction,
   AppBarColorScheme,
   AppBarVariant,
-} from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+} from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'

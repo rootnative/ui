@@ -1,5 +1,5 @@
-import { Box, Column, Grid, Row, Typography } from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+import { Box, Column, Grid, Row, Typography } from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet } from 'react-native'
 
 function Swatch({ label }: { label: string }) {
@@ -20,19 +20,14 @@ export default function LayoutScreen() {
   const { colors } = useTheme()
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Typography variant="headlineSmall">Layout Showcase</Typography>
 
       <Column gap="sm">
-        <Typography variant="titleSmall">Box — Spacing &amp; Background</Typography>
-        <Box
-          p="lg"
-          bg={colors.secondaryContainer}
-          style={styles.rounded}
-        >
+        <Typography variant="titleSmall">
+          Box — Spacing &amp; Background
+        </Typography>
+        <Box p="lg" bg={colors.secondaryContainer} style={styles.rounded}>
           <Typography variant="bodyMedium">
             Box with large padding and themed background.
           </Typography>
@@ -89,7 +84,12 @@ export default function LayoutScreen() {
 
       <Column gap="sm">
         <Typography variant="titleSmall">Nested Layout</Typography>
-        <Column gap="sm" p="md" bg={colors.surfaceVariant} style={styles.rounded}>
+        <Column
+          gap="sm"
+          p="md"
+          bg={colors.surfaceVariant}
+          style={styles.rounded}
+        >
           <Row gap="sm" justify="space-between" align="center">
             <Typography variant="titleMedium">Header</Typography>
             <Swatch label="Icon" />

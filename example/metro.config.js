@@ -23,7 +23,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, 'node_modules'),
 ]
 
-// Resolve workspace @onlynative/* packages to source so they go through the
+// Resolve workspace @rootnative/* packages to source so they go through the
 // example's Babel chain. Two reasons:
 //  1. `react-native-worklets/plugin` (auto-applied by babel-preset-expo) needs
 //     to process files that use Reanimated worklet hooks.
@@ -31,11 +31,11 @@ config.resolver.nodeModulesPaths = [
 //     dynamic CJS lookups, which Metro can't statically follow — so packages
 //     like `@expo/vector-icons` resolved via `__require` aren't bundled.
 const WORKSPACE_PACKAGES = {
-  '@onlynative/components': path.resolve(
+  '@rootnative/components': path.resolve(
     workspaceRoot,
     'packages/components/src',
   ),
-  '@onlynative/utils': path.resolve(workspaceRoot, 'packages/utils/src'),
+  '@rootnative/utils': path.resolve(workspaceRoot, 'packages/utils/src'),
 }
 const previousResolveRequest = config.resolver.resolveRequest
 config.resolver.resolveRequest = (context, moduleName, platform) => {

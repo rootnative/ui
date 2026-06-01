@@ -1,4 +1,4 @@
-import { useTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import type { PropsWithChildren } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'

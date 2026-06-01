@@ -6,8 +6,8 @@ import {
   Row,
   Switch,
   Box,
-} from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+} from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
 

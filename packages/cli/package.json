@@ -1,10 +1,10 @@
 {
-  "name": "@onlynative/cli",
-  "version": "0.0.0-alpha.8",
-  "description": "CLI for adding OnlyNative UI components to your React Native project",
+  "name": "@rootnative/cli",
+  "version": "0.0.0-alpha.0",
+  "description": "CLI for adding RootNative UI components to your React Native project",
   "private": false,
   "bin": {
-    "onlynative": "dist/index.mjs"
+    "rootnative": "dist/index.mjs"
   },
   "exports": "./dist/index.mjs",
   "files": [
@@ -14,17 +14,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlynative/ui.git",
+    "url": "https://github.com/rootnative/ui.git",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/onlynative/ui",
+  "homepage": "https://github.com/rootnative/ui",
   "keywords": [
     "react-native",
     "material-design-3",
     "ui",
     "cli",
     "components",
-    "onlynative"
+    "rootnative"
   ],
   "publishConfig": {
     "access": "public"

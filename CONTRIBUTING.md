@@ -1,4 +1,4 @@
-# Contributing to OnlyNative UI
+# Contributing to RootNative UI
 
 Thanks for contributing. This project is a `pnpm` monorepo with shared packages and an Expo example app, so keeping changes scoped and verifiable is important.
 
@@ -16,7 +16,7 @@ Thanks for contributing. This project is a `pnpm` monorepo with shared packages 
 ## Setup
 
 ```bash
-git clone https://github.com/onlynative/ui.git
+git clone https://github.com/rootnative/ui.git
 cd ui
 pnpm install
 pnpm run build
@@ -39,11 +39,11 @@ pnpm run build
 | `pnpm run test` | Run all tests. |
 | `pnpm run lint` | Lint all packages. |
 | `pnpm run format` | Format with Prettier. |
-| `pnpm --filter @onlynative/core build` | Build core package only. |
-| `pnpm --filter @onlynative/components build` | Build components package only. |
+| `pnpm --filter @rootnative/core build` | Build core package only. |
+| `pnpm --filter @rootnative/components build` | Build components package only. |
 
 ## Code Style
 
 - No semicolons, single quotes, trailing commas (see `.prettierrc`).
 - Components export types, styles, and component from separate files (`types.ts`, `styles.ts`, `ComponentName.tsx`).
-- Theme values accessed via `useTheme()` hook from `@onlynative/core`.
+- Theme values accessed via `useTheme()` hook from `@rootnative/core`.

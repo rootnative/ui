@@ -17,10 +17,10 @@ The component supports four MD3 configurations from a single API:
 ## Usage
 
 <SnackExample
-  name="OnlyNative Slider — Usage"
+  name="RootNative Slider — Usage"
   code={`
-  import { Slider } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -45,10 +45,10 @@ The component supports four MD3 configurations from a single API:
 Set `step` to a positive number to snap to fixed increments. Tick marks are rendered automatically.
 
 <SnackExample
-  name="OnlyNative Slider — Discrete"
+  name="RootNative Slider — Discrete"
   code={`
-  import { Slider, Typography } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -80,10 +80,10 @@ Set `step` to a positive number to snap to fixed increments. Tick marks are rend
 Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `step` when set.
 
 <SnackExample
-  name="OnlyNative Slider — Range"
+  name="RootNative Slider — Range"
   code={`
-  import { Slider, Typography } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -117,10 +117,10 @@ Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `st
 Pass `centered` for a slider where the active track fills outward from the midpoint instead of from the start. Useful for symmetric values like balance, EQ, or zoom adjustments.
 
 <SnackExample
-  name="OnlyNative Slider — Centered"
+  name="RootNative Slider — Centered"
   code={`
-  import { Slider, Typography } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -154,10 +154,10 @@ Pass `centered` for a slider where the active track fills outward from the midpo
 Decorate either side of the track with `startIcon` and `endIcon` — useful for volume, brightness, or other affordances where the bounds need a visual label.
 
 <SnackExample
-  name="OnlyNative Slider — Icons"
+  name="RootNative Slider — Icons"
   code={`
-  import { Slider } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -204,10 +204,10 @@ The value-label bubble appears above the active thumb during a drag by default. 
 `containerColor` overrides the active track, `contentColor` overrides the thumb (and the active-track tick contrast), and `inactiveTrackColor` overrides the inactive track. The MD3 disabled treatment is preserved regardless of overrides.
 
 <SnackExample
-  name="OnlyNative Slider — Custom colors"
+  name="RootNative Slider — Custom colors"
   code={`
-  import { Slider } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
   import { View } from 'react-native'
@@ -236,10 +236,10 @@ The value-label bubble appears above the active thumb during a drag by default. 
 ## Disabled
 
 <SnackExample
-  name="OnlyNative Slider — Disabled"
+  name="RootNative Slider — Disabled"
   code={`
-  import { Slider } from '@onlynative/components'
-  import { ThemeProvider } from '@onlynative/core'
+  import { Slider } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 

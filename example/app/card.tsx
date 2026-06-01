@@ -1,4 +1,4 @@
-import { Card, Typography, Column } from '@onlynative/components'
+import { Card, Typography, Column } from '@rootnative/components'
 import { Alert, ScrollView, StyleSheet } from 'react-native'
 
 const variants = ['elevated', 'filled', 'outlined'] as const

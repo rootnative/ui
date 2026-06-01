@@ -1,4 +1,4 @@
-import { renderWithTheme } from '@onlynative/utils/test'
+import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
 import { Text } from 'react-native'
 import { Portal } from '../portal/Portal'

@@ -1,5 +1,5 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
-import { alphaColor, isFocusVisible, renderIcon } from '@onlynative/utils'
+import { useIconResolver, useTheme } from '@rootnative/core'
+import { alphaColor, isFocusVisible, renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import { Pressable } from 'react-native'
 import Animated, {

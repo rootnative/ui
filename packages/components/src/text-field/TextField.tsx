@@ -1,5 +1,5 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
-import { renderIcon } from '@onlynative/utils'
+import { useIconResolver, useTheme } from '@rootnative/core'
+import { renderIcon } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'

@@ -1,16 +1,16 @@
 import path from 'node:path'
 import fs from 'fs-extra'
-import type { OnlyNativeConfig } from './types'
+import type { RootNativeConfig } from './types'
 
-const CONFIG_FILE = 'onlynative.json'
+const CONFIG_FILE = 'rootnative.json'
 
-export const DEFAULT_CONFIG: OnlyNativeConfig = {
-  $schema: 'https://onlynative.dev/schema.json',
+export const DEFAULT_CONFIG: RootNativeConfig = {
+  $schema: 'https://rootnative.github.io/ui/schema.json',
   aliases: {
     components: '@/components/ui',
     lib: '@/lib',
   },
-  registryUrl: 'https://raw.githubusercontent.com/onlynative/ui',
+  registryUrl: 'https://raw.githubusercontent.com/rootnative/ui',
   registryVersion: 'main',
 }
 
@@ -22,23 +22,21 @@ export async function configExists(cwd: string): Promise<boolean> {
   return fs.pathExists(getConfigPath(cwd))
 }
 
-export async function readConfig(cwd: string): Promise<OnlyNativeConfig> {
+export async function readConfig(cwd: string): Promise<RootNativeConfig> {
   const configPath = getConfigPath(cwd)
   const exists = await fs.pathExists(configPath)
 
   if (!exists) {
-    throw new Error(
-      'onlynative.json not found. Run "onlynative init" first.',
-    )
+    throw new Error('rootnative.json not found. Run "rootnative init" first.')
   }
 
   const raw = await fs.readJSON(configPath)
-  return raw as OnlyNativeConfig
+  return raw as RootNativeConfig
 }
 
 export async function writeConfig(
   cwd: string,
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
 ): Promise<void> {
   const configPath = getConfigPath(cwd)
   await fs.writeJSON(configPath, config, { spaces: 2 })

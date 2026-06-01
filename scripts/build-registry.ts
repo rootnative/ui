@@ -2,7 +2,7 @@
  * Registry Build Script
  *
  * Scans packages/components/src/ and packages/utils/src/ to auto-generate
- * all registry JSON files for the OnlyNative CLI.
+ * all registry JSON files for the RootNative CLI.
  *
  * Usage: npx tsx scripts/build-registry.ts
  */
@@ -116,12 +116,12 @@ function analyzeImports(componentDir: string): {
   for (const file of files) {
     const content = fs.readFileSync(path.join(fullDir, file), 'utf-8')
 
-    // Check for @onlynative/utils imports
-    const utilImportMatch = content.match(/from\s+['"]@onlynative\/utils['"]/g)
+    // Check for @rootnative/utils imports
+    const utilImportMatch = content.match(/from\s+['"]@rootnative\/utils['"]/g)
     if (utilImportMatch) {
       // Find which specific exports are used
       const importLines = content.match(
-        /import\s+(?:type\s+)?{([^}]+)}\s+from\s+['"]@onlynative\/utils['"]/g,
+        /import\s+(?:type\s+)?{([^}]+)}\s+from\s+['"]@rootnative\/utils['"]/g,
       )
       if (importLines) {
         for (const line of importLines) {
@@ -182,7 +182,7 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   const { utils, componentDeps, externalDeps } = analyzeImports(componentDir)
 
   const dependencies: Record<string, string> = {
-    '@onlynative/core': `>=${VERSION}`,
+    '@rootnative/core': `>=${VERSION}`,
   }
   const optionalDependencies: Record<string, string> = {}
 

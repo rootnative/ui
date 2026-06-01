@@ -33,8 +33,8 @@ body:
     attributes:
       label: Package
       options:
-        - "@onlynative/core"
-        - "@onlynative/components"
+        - "@rootnative/core"
+        - "@rootnative/components"
         - New package
     validations:
       required: true

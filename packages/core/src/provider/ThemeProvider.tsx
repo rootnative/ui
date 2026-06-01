@@ -41,7 +41,7 @@ export interface ThemeProviderProps {
  *
  * @example
  * // Material Design 3 (default)
- * import { ThemeProvider } from '@onlynative/core'
+ * import { ThemeProvider } from '@rootnative/core'
  *
  * <ThemeProvider>
  *   <App />
@@ -49,7 +49,7 @@ export interface ThemeProviderProps {
  *
  * @example
  * // Custom or Apple theme
- * import { ThemeProvider } from '@onlynative/core'
+ * import { ThemeProvider } from '@rootnative/core'
  *
  * <ThemeProvider theme={myTheme}>
  *   <App />

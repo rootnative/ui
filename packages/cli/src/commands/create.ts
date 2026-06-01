@@ -21,7 +21,7 @@ interface TemplateSource {
 }
 
 const NPM_REGISTRY = 'https://registry.npmjs.org'
-const ONLYNATIVE_PACKAGES = ['@onlynative/core', '@onlynative/components']
+const ROOTNATIVE_PACKAGES = ['@rootnative/core', '@rootnative/components']
 
 /**
  * Resolves the template source by checking the latest published npm version.
@@ -36,7 +36,7 @@ async function resolveTemplateSource(): Promise<TemplateSource> {
   }
 
   try {
-    const res = await fetch(`${NPM_REGISTRY}/@onlynative/core`)
+    const res = await fetch(`${NPM_REGISTRY}/@rootnative/core`)
     if (!res.ok) return fallback
 
     const data = (await res.json()) as {
@@ -294,9 +294,9 @@ export async function createCommand(
         const pkg = JSON.parse(content)
         pkg.name = projectName
 
-        // Pin @onlynative/* versions to the published version
+        // Pin @rootnative/* versions to the published version
         if (pinnedVersion) {
-          for (const pkgName of ONLYNATIVE_PACKAGES) {
+          for (const pkgName of ROOTNATIVE_PACKAGES) {
             if (pkg.dependencies?.[pkgName]) {
               pkg.dependencies[pkgName] = pinnedVersion
             }

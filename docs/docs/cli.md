@@ -4,23 +4,23 @@ sidebar_position: 4
 
 # CLI
 
-The OnlyNative CLI lets you add components directly into your project as source files — no npm package for components, full ownership of the code. Inspired by [shadcn/ui](https://ui.shadcn.com).
+The RootNative CLI lets you add components directly into your project as source files — no npm package for components, full ownership of the code. Inspired by [shadcn/ui](https://ui.shadcn.com).
 
 ```bash
-npx onlynative init
-npx onlynative add button card
+npx rootnative init
+npx rootnative add button card
 ```
 
 ## Why use the CLI?
 
-With the standard `@onlynative/components` package, components live in `node_modules` and you import them as-is. The CLI takes a different approach:
+With the standard `@rootnative/components` package, components live in `node_modules` and you import them as-is. The CLI takes a different approach:
 
 - **Full ownership** — component source files live in your project, not `node_modules`
 - **Customizable** — modify styles, adjust behavior, or remove what you don't need
 - **No version lock-in** — you decide when to pull updates
 - **Tree-shake friendly** — only the components you use exist in your codebase
 
-The theme system (`@onlynative/core`) stays as an npm dependency so theme updates propagate automatically.
+The theme system (`@rootnative/core`) stays as an npm dependency so theme updates propagate automatically.
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ The theme system (`@onlynative/core`) stays as an npm dependency so theme update
 Run `init` in your React Native or Expo project:
 
 ```bash
-npx onlynative init
+npx rootnative init
 ```
 
 The CLI will:
@@ -44,13 +44,13 @@ The CLI will:
 2. Detect your package manager (npm, yarn, pnpm, bun)
 3. Read path aliases from your `tsconfig.json`
 4. Ask where to place components and utility files
-5. Install `@onlynative/core`
-6. Create an `onlynative.json` config file
+5. Install `@rootnative/core`
+6. Create an `rootnative.json` config file
 
 ### 2. Add components
 
 ```bash
-npx onlynative add button
+npx rootnative add button
 ```
 
 This copies the Button source files into your project and installs any required dependencies.
@@ -58,7 +58,7 @@ This copies the Button source files into your project and installs any required 
 ### 3. Use them
 
 ```tsx
-import { ThemeProvider } from '@onlynative/core'
+import { ThemeProvider } from '@rootnative/core'
 import { Button } from '@/components/ui/button'
 
 export default function App() {
@@ -76,11 +76,11 @@ export default function App() {
 
 ### `create`
 
-Create a new project with OnlyNative UI pre-configured. See [Quick Start](./quick-start) for a full walkthrough.
+Create a new project with RootNative UI pre-configured. See [Quick Start](./quick-start) for a full walkthrough.
 
 ```bash
-npx onlynative create
-npx onlynative create my-app
+npx rootnative create
+npx rootnative create my-app
 ```
 
 The CLI prompts for project name, display name, and package manager, then scaffolds a ready-to-run Expo project with `ThemeProvider` and example components.
@@ -93,22 +93,22 @@ The CLI prompts for project name, display name, and package manager, then scaffo
 
 ### `init`
 
-Initialize your project for OnlyNative UI.
+Initialize your project for RootNative UI.
 
 ```bash
-npx onlynative init
+npx rootnative init
 ```
 
-If `onlynative.json` already exists, you'll be asked whether to overwrite it.
+If `rootnative.json` already exists, you'll be asked whether to overwrite it.
 
 ### `add`
 
 Add one or more components to your project.
 
 ```bash
-npx onlynative add button
-npx onlynative add card chip text-field
-npx onlynative add appbar
+npx rootnative add button
+npx rootnative add card chip text-field
+npx rootnative add appbar
 ```
 
 **Automatic dependency resolution** — if a component depends on other components, they are added automatically. For example, `appbar` depends on `icon-button` and `typography`, so all three are added together.
@@ -128,7 +128,7 @@ npx onlynative add appbar
 4. After confirmation, it fetches the source files from the registry
 5. Import paths are rewritten to match your project's alias configuration
 6. Utility files are copied to your `lib/` directory
-7. A barrel file (`onlynative-utils.ts`) is generated that re-exports only the utilities your installed components need
+7. A barrel file (`rootnative-utils.ts`) is generated that re-exports only the utilities your installed components need
 8. Any required npm packages are installed via your package manager
 
 ### `update`
@@ -136,8 +136,8 @@ npx onlynative add appbar
 Update installed components to the latest version from the registry.
 
 ```bash
-npx onlynative update button
-npx onlynative update --all
+npx rootnative update button
+npx rootnative update --all
 ```
 
 **Options:**
@@ -149,10 +149,10 @@ npx onlynative update --all
 
 ### `upgrade`
 
-Upgrade `@onlynative/core` to the latest version and install any new peer dependencies.
+Upgrade `@rootnative/core` to the latest version and install any new peer dependencies.
 
 ```bash
-npx onlynative upgrade
+npx rootnative upgrade
 ```
 
 **Options:**
@@ -168,7 +168,7 @@ npx onlynative upgrade
 Show all available components with their install status.
 
 ```bash
-npx onlynative list
+npx rootnative list
 ```
 
 Output:
@@ -188,33 +188,33 @@ Available components (v0.1.1-alpha.1):
 Diagnose common issues in your project.
 
 ```bash
-npx onlynative doctor
+npx rootnative doctor
 ```
 
 Checks performed:
 
 | Check | Description |
 |-------|-------------|
-| Config | `onlynative.json` exists and is valid |
-| Core package | `@onlynative/core` is installed |
+| Config | `rootnative.json` exists and is valid |
+| Core package | `@rootnative/core` is installed |
 | React Native | Version meets minimum requirement (>= 0.72) |
 | TypeScript | `tsconfig.json` present |
 | Component integrity | All installed component files exist on disk |
-| Utility barrel | `onlynative-utils.ts` exists |
+| Utility barrel | `rootnative-utils.ts` exists |
 | Peer dependencies | `react-native-safe-area-context` and `@expo/vector-icons` status |
 
 ## Configuration
 
-`onlynative init` creates an `onlynative.json` file in your project root:
+`rootnative init` creates an `rootnative.json` file in your project root:
 
 ```json
 {
-  "$schema": "https://onlynative.dev/schema.json",
+  "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": {
     "components": "@/components/ui",
     "lib": "@/lib"
   },
-  "registryUrl": "https://raw.githubusercontent.com/onlynative/ui",
+  "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
   "registryVersion": "main"
 }
 ```
@@ -246,7 +246,7 @@ Then `aliases.components` of `@/components/ui` maps to `src/components/ui/` on d
 
 ## Project structure
 
-After running `npx onlynative add button appbar`, your project looks like this:
+After running `npx rootnative add button appbar`, your project looks like this:
 
 ```
 src/
@@ -276,19 +276,19 @@ src/
     ├── elevation.ts            ← shadow/elevation helpers
     ├── icon.ts                 ← icon resolver
     ├── rtl.ts                  ← RTL layout helpers
-    └── onlynative-utils.ts     ← generated barrel (re-exports used utilities)
+    └── rootnative-utils.ts     ← generated barrel (re-exports used utilities)
 ```
 
 ### What gets copied
 
 **Component files** — each component is a self-contained directory with the same structure as the library source: the component file, types, styles, and an index barrel.
 
-**Utility files** — small helper functions that components depend on. These are copied from `@onlynative/utils` (which is not published to npm). Only the utilities needed by your installed components are copied.
+**Utility files** — small helper functions that components depend on. These are copied from `@rootnative/utils` (which is not published to npm). Only the utilities needed by your installed components are copied.
 
-**Barrel file** — `onlynative-utils.ts` is auto-generated and re-exports only the functions your components use:
+**Barrel file** — `rootnative-utils.ts` is auto-generated and re-exports only the functions your components use:
 
 ```ts
-// Auto-generated by onlynative CLI. Do not edit.
+// Auto-generated by rootnative CLI. Do not edit.
 export { alphaColor, blendColor } from './color'
 export { elevationStyle } from './elevation'
 export { getMaterialCommunityIcons } from './icon'
@@ -300,8 +300,8 @@ The CLI rewrites imports in copied component files so they work in your project:
 
 | Original (library source) | Rewritten to |
 |---------------------------|-------------|
-| `from '@onlynative/core'` | Unchanged — npm package |
-| `from '@onlynative/utils'` | `from '@/lib/onlynative-utils'` |
+| `from '@rootnative/core'` | Unchanged — npm package |
+| `from '@rootnative/utils'` | `from '@/lib/rootnative-utils'` |
 | `from '../icon-button'` | `from '@/components/ui/icon-button'` |
 | `from './styles'` | Unchanged — same directory |
 
@@ -326,12 +326,12 @@ The CLI rewrites imports in copied component files so they work in your project:
 
 ## Comparison with npm packages
 
-| | CLI (`npx onlynative add`) | npm (`@onlynative/components`) |
+| | CLI (`npx rootnative add`) | npm (`@rootnative/components`) |
 |---|---|---|
 | Component code lives in | Your project (`src/`) | `node_modules/` |
 | Customization | Edit source directly | Override via props/theme only |
 | Updates | Re-run `add --force` when you choose | `npm update` |
 | Bundle size | Only what you add | Tree-shaking at build time |
-| Setup | `npx onlynative init` | `pnpm add @onlynative/components` |
+| Setup | `npx rootnative init` | `pnpm add @rootnative/components` |
 
-Both approaches use `@onlynative/core` for theming — they are fully compatible and you can even mix them in the same project.
+Both approaches use `@rootnative/core` for theming — they are fully compatible and you can even mix them in the same project.

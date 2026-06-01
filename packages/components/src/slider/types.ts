@@ -1,4 +1,4 @@
-import type { IconSource } from '@onlynative/utils'
+import type { IconSource } from '@rootnative/utils'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
 /** Single number for one-thumb sliders, or `[low, high]` tuple for range sliders. */

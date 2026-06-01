@@ -1,5 +1,5 @@
-import { Box, Column, Typography, Card } from '@onlynative/components'
-import { useTheme } from '@onlynative/core'
+import { Box, Column, Typography, Card } from '@rootnative/components'
+import { useTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
 
 export default function HomeScreen() {
@@ -15,7 +15,7 @@ export default function HomeScreen() {
       <Column gap="lg" style={styles.content}>
         <Column gap="sm">
           <Typography variant="headlineMedium">
-            Welcome to OnlyNative
+            Welcome to RootNative
           </Typography>
           <Typography
             variant="bodyLarge"

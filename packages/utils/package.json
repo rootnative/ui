@@ -1,7 +1,7 @@
 {
-  "name": "@onlynative/utils",
-  "version": "0.1.0-alpha.3",
-  "description": "Shared utilities for OnlyNative — color helpers, elevation styles, RTL support, and more.",
+  "name": "@rootnative/utils",
+  "version": "0.0.0-alpha.0",
+  "description": "Shared utilities for RootNative — color helpers, elevation styles, RTL support, and more.",
   "private": true,
   "sideEffects": false,
   "main": "dist/index.mjs",
@@ -39,10 +39,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlynative/ui.git",
+    "url": "https://github.com/rootnative/ui.git",
     "directory": "packages/utils"
   },
-  "homepage": "https://github.com/onlynative/ui",
+  "homepage": "https://github.com/rootnative/ui",
   "keywords": [
     "react-native",
     "material-design-3",
@@ -56,11 +56,11 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@onlynative/core": ">=0.1.0-alpha.3",
+    "@rootnative/core": ">=0.0.0-alpha.0",
     "react-native": ">=0.72.0"
   },
   "devDependencies": {
-    "@onlynative/core": "workspace:*",
+    "@rootnative/core": "workspace:*",
     "@react-native/babel-preset": "^0.81.5",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",

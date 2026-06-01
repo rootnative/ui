@@ -102,13 +102,13 @@ importers:
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.1.1(expo-font@14.0.11(expo@54.0.34(@babel/core@7.29.0)(@expo/metro-runtime@6.1.2)(expo-router@6.0.23)(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0))(@types/react@19.1.17)(react@19.1.0))(react@19.1.0)
-      '@onlynative/components':
+      '@rootnative/components':
         specifier: workspace:*
         version: link:../packages/components
-      '@onlynative/core':
+      '@rootnative/core':
         specifier: workspace:*
         version: link:../packages/core
-      '@onlynative/utils':
+      '@rootnative/utils':
         specifier: workspace:*
         version: link:../packages/utils
       expo:
@@ -210,10 +210,10 @@ importers:
         specifier: '>=15.0.0'
         version: 15.15.4(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.1.0))(react@19.1.0)
     devDependencies:
-      '@onlynative/core':
+      '@rootnative/core':
         specifier: workspace:*
         version: link:../core
-      '@onlynative/utils':
+      '@rootnative/utils':
         specifier: workspace:*
         version: link:../utils
       '@react-native/babel-preset':
@@ -285,7 +285,7 @@ importers:
 
   packages/icons:
     devDependencies:
-      '@onlynative/core':
+      '@rootnative/core':
         specifier: workspace:*
         version: link:../core
       '@react-native/babel-preset':
@@ -319,15 +319,15 @@ importers:
         specifier: ^5.0.0
         version: 5.9.3
 
-  packages/onlynative:
+  packages/rootnative:
     dependencies:
-      '@onlynative/cli':
+      '@rootnative/cli':
         specifier: workspace:*
         version: link:../cli
 
   packages/utils:
     devDependencies:
-      '@onlynative/core':
+      '@rootnative/core':
         specifier: workspace:*
         version: link:../core
       '@react-native/babel-preset':

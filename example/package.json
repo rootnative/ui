@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@onlynative/components": "workspace:*",
-    "@onlynative/core": "workspace:*",
-    "@onlynative/utils": "workspace:*",
+    "@rootnative/components": "workspace:*",
+    "@rootnative/core": "workspace:*",
+    "@rootnative/utils": "workspace:*",
     "expo": "~54.0.34",
     "expo-router": "6.0.23",
     "expo-status-bar": "~3.0.9",

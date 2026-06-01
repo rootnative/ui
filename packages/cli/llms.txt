@@ -1,21 +1,21 @@
-# @onlynative/cli — CLI for OnlyNative UI
+# @rootnative/cli — CLI for RootNative UI
 
-> Version: 0.0.0-alpha.8
-> Binary: `onlynative`
+> Version: 0.0.0-alpha.0
+> Binary: `rootnative`
 > Requirements: Node >=18
 
-## CLI (`onlynative`)
+## CLI (`rootnative`)
 
 ### Commands
 
-#### `onlynative create [name]`
+#### `rootnative create [name]`
 
-Create a new project with OnlyNative UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
+Create a new project with RootNative UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
 
 ```bash
-npx onlynative create            # Interactive
-npx onlynative create my-app     # With name
-npx onlynative create my-app -y  # Non-interactive, accept defaults
+npx rootnative create            # Interactive
+npx rootnative create my-app     # With name
+npx rootnative create my-app -y  # Non-interactive, accept defaults
 ```
 
 Options:
@@ -23,42 +23,42 @@ Options:
 - `-t, --template <name>` — Template to use (`blank`, `with-router`)
 - `--package-manager <pm>` — Package manager to use (`npm`, `yarn`, `pnpm`, `bun`)
 
-#### `onlynative init`
+#### `rootnative init`
 
-Copy-paste workflow — copies component source files into your project. The theme system (`@onlynative/core`) stays as an npm dependency.
+Copy-paste workflow — copies component source files into your project. The theme system (`@rootnative/core`) stays as an npm dependency.
 
 Initialize project. Detects project type (Expo/RN), package manager, and tsconfig path aliases.
 
 ```bash
-npx onlynative init            # Interactive
-npx onlynative init -y         # Non-interactive, accept defaults
-npx onlynative init -y --components-alias "~/ui" --lib-alias "~/utils"
+npx rootnative init            # Interactive
+npx rootnative init -y         # Non-interactive, accept defaults
+npx rootnative init -y --components-alias "~/ui" --lib-alias "~/utils"
 ```
 
 Options:
-- `-y, --yes` — Skip all prompts, use detected defaults. Overwrites existing config. Auto-installs `@onlynative/core`.
+- `-y, --yes` — Skip all prompts, use detected defaults. Overwrites existing config. Auto-installs `@rootnative/core`.
 - `--components-alias <alias>` — Components install path. Default: `@/components/ui` (or `~/components/ui` if `~/*` alias detected in tsconfig)
 - `--lib-alias <alias>` — Utility files path. Default: `@/lib` (or `~/lib` if `~/*` alias detected)
 - `--package-manager <pm>` — Package manager to use (`npm`, `yarn`, `pnpm`, `bun`)
 
-Creates `onlynative.json`:
+Creates `rootnative.json`:
 ```json
 {
-  "$schema": "https://onlynative.dev/schema.json",
+  "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
-  "registryUrl": "https://raw.githubusercontent.com/onlynative/ui",
+  "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
   "registryVersion": "main"
 }
 ```
 
-#### `onlynative add <components...>`
+#### `rootnative add <components...>`
 
 Add components to your project. Resolves dependency graph, copies files with rewritten imports, installs npm deps.
 
 ```bash
-npx onlynative add button
-npx onlynative add card chip text-field
-npx onlynative add appbar      # auto-adds icon-button + typography
+npx rootnative add button
+npx rootnative add card chip text-field
+npx rootnative add appbar      # auto-adds icon-button + typography
 ```
 
 Options:
@@ -66,7 +66,7 @@ Options:
 - `-d, --dry-run` — Preview without writing files
 - `--package-manager <pm>` — Package manager to use (`npm`, `yarn`, `pnpm`, `bun`)
 
-#### `onlynative update [components...]`
+#### `rootnative update [components...]`
 
 Update installed components to latest registry version.
 
@@ -74,13 +74,13 @@ Options:
 - `-a, --all` — Update all installed components
 - `-d, --dry-run` — Show diff without applying
 
-#### `onlynative upgrade`
+#### `rootnative upgrade`
 
-Upgrade `@onlynative/core` to the latest published version and install any new peer dependencies.
+Upgrade `@rootnative/core` to the latest published version and install any new peer dependencies.
 
 ```bash
-npx onlynative upgrade         # Interactive — shows plan and prompts before installing
-npx onlynative upgrade -y      # Non-interactive — skip confirmation
+npx rootnative upgrade         # Interactive — shows plan and prompts before installing
+npx rootnative upgrade -y      # Non-interactive — skip confirmation
 ```
 
 Options:
@@ -88,18 +88,18 @@ Options:
 - `--package-manager <pm>` — Package manager to use (`npm`, `yarn`, `pnpm`, `bun`)
 
 What it does:
-1. Reads the installed `@onlynative/core` version from `node_modules`
+1. Reads the installed `@rootnative/core` version from `node_modules`
 2. Fetches the latest version from the npm registry
 3. Compares peer dependencies between the installed and latest versions
 4. Shows a plan: version bump, new required peer deps, changed version ranges, removed deps
-5. Upgrades `@onlynative/core` and installs any new required peer dependencies in one step
+5. Upgrades `@rootnative/core` and installs any new required peer dependencies in one step
 6. Reports optional peer deps that aren't installed (does not auto-install optional deps)
 7. Lists peer deps that are no longer required so you can remove them manually
 
-#### `onlynative list`
+#### `rootnative list`
 
 Show available components with install status.
 
-#### `onlynative doctor`
+#### `rootnative doctor`
 
 Check project health: config validity, core installation, RN version, file integrity, peer deps.

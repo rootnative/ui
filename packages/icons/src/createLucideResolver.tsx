@@ -1,4 +1,4 @@
-import type { IconResolver } from '@onlynative/core'
+import type { IconResolver } from '@rootnative/core'
 import * as React from 'react'
 import { buildResolver } from './internal/buildResolver'
 import { mdiToLucideAliases } from './mdi-aliases'
@@ -69,8 +69,8 @@ export interface LucideResolverOptions {
  * string icon name through Lucide.
  *
  * @example
- * import { ThemeProvider } from '@onlynative/core'
- * import { createLucideResolver } from '@onlynative/icons'
+ * import { ThemeProvider } from '@rootnative/core'
+ * import { createLucideResolver } from '@rootnative/icons'
  * import { Check, Search, ArrowRight } from 'lucide-react-native'
  *
  * const resolver = createLucideResolver({

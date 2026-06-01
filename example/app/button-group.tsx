@@ -1,5 +1,5 @@
-import { ButtonGroup, Column, Typography } from '@onlynative/components'
-import type { ButtonGroupItem, ButtonGroupSize } from '@onlynative/components'
+import { ButtonGroup, Column, Typography } from '@rootnative/components'
+import type { ButtonGroupItem, ButtonGroupSize } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 

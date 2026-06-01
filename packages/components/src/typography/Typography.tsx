@@ -1,5 +1,5 @@
-import { useTheme } from '@onlynative/core'
-import type { MaterialTheme } from '@onlynative/core'
+import { useTheme } from '@rootnative/core'
+import type { MaterialTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import type { StyleProp, TextProps, TextStyle } from 'react-native'

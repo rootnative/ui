@@ -250,7 +250,7 @@ function extractColors(scheme: DynamicScheme): Colors {
  * @returns Object with `lightTheme` and `darkTheme`, both typed as `Theme`
  *
  * @example
- * import { createMaterialTheme } from '@onlynative/core/create-theme'
+ * import { createMaterialTheme } from '@rootnative/core/create-theme'
  *
  * // Pure MD3 default (TonalSpot variant)
  * const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')

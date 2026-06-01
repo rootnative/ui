@@ -1,14 +1,14 @@
 import { fetchComponentEntry, fetchUtilsRegistry } from './registry'
 import type {
   ComponentRegistryEntry,
-  OnlyNativeConfig,
+  RootNativeConfig,
   ResolutionResult,
   ResolvedComponent,
   UtilsRegistry,
 } from './types'
 
 export async function resolveComponents(
-  config: OnlyNativeConfig,
+  config: RootNativeConfig,
   requestedNames: string[],
 ): Promise<ResolutionResult> {
   const resolved = new Map<string, ResolvedComponent>()

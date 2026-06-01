@@ -1,11 +1,11 @@
-import { useIconResolver, useTheme } from '@onlynative/core'
+import { useIconResolver, useTheme } from '@rootnative/core'
 import {
   alphaColor,
   isFocusVisible,
   renderIcon,
   resolveColorFromStyle,
-} from '@onlynative/utils'
-import type { IconSource } from '@onlynative/utils'
+} from '@rootnative/utils'
+import type { IconSource } from '@rootnative/utils'
 import { useCallback, useMemo, type ReactNode } from 'react'
 import {
   Platform,

@@ -1,5 +1,5 @@
-import type { MaterialTheme } from '@onlynative/core'
-import { alphaColor } from '@onlynative/utils'
+import type { MaterialTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 
 export const RADIO_OUTER_SIZE = 20

@@ -28,7 +28,7 @@ export default defineConfig({
   format: 'cjs',
   outDir: 'dist',
   clean: true,
-  noExternal: ['@onlynative/utils'],
+  noExternal: ['@rootnative/utils'],
   external: [
     '@expo/vector-icons',
     'react-native-reanimated',
@@ -37,7 +37,7 @@ export default defineConfig({
   ],
   esbuildOptions(options) {
     options.alias = {
-      '@onlynative/utils': path.resolve(__dirname, '../utils/src/index.ts'),
+      '@rootnative/utils': path.resolve(__dirname, '../utils/src/index.ts'),
     }
   },
 })

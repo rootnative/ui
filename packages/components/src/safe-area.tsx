@@ -19,7 +19,7 @@ try {
   SafeAreaViewComponent = safeArea.SafeAreaView
 } catch {
   console.warn(
-    '[@onlynative/components] "react-native-safe-area-context" is not installed. ' +
+    '[@rootnative/components] "react-native-safe-area-context" is not installed. ' +
       'Layout and AppBar will render without safe area insets. ' +
       'Run `npx expo install react-native-safe-area-context` to fix this.',
   )

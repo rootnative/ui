@@ -1,4 +1,4 @@
-import { Column, Row, Switch, Typography } from '@onlynative/components'
+import { Column, Row, Switch, Typography } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 

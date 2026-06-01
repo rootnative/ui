@@ -1,11 +1,11 @@
-import { AppBar, Layout } from '@onlynative/components'
-import type { AppBarAction } from '@onlynative/components'
+import { AppBar, Layout } from '@rootnative/components'
+import type { AppBarAction } from '@rootnative/components'
 import {
   ThemeProvider,
   darkTheme,
   lightTheme,
   useTheme,
-} from '@onlynative/core'
+} from '@rootnative/core'
 import { Slot, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
