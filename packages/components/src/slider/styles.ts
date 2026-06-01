@@ -12,7 +12,8 @@ import { StyleSheet } from 'react-native'
 // still keeps the thumb clearly grabbable.
 export const SLIDER_TRACK_HEIGHT = 16
 export const SLIDER_THUMB_WIDTH = 4
-export const SLIDER_THUMB_WIDTH_PRESSED = 16
+// Per the MD3 expressive spec the handle NARROWS from 4 to 2 dp while pressed.
+export const SLIDER_THUMB_WIDTH_PRESSED = 2
 export const SLIDER_THUMB_HEIGHT = 20
 export const SLIDER_THUMB_GAP = 6
 export const SLIDER_STOP_INDICATOR = 4
@@ -27,19 +28,22 @@ export const SLIDER_STATE_LAYER_SIZE = 40
 export const SLIDER_FOCUS_RING_OFFSET = 2
 export const SLIDER_FOCUS_RING_WIDTH = 3
 // Outside diameter of the ring — used by the JSX layer to size the absolute
-// positioned ring around the (pressed) thumb's center.
+// positioned ring around the thumb's center. Sized off the thumb's HEIGHT
+// (its larger dimension) so the ring always encircles the handle.
 export const SLIDER_FOCUS_RING_SIZE =
-  SLIDER_THUMB_WIDTH_PRESSED +
-  (SLIDER_FOCUS_RING_OFFSET + SLIDER_FOCUS_RING_WIDTH) * 2
+  SLIDER_THUMB_HEIGHT + (SLIDER_FOCUS_RING_OFFSET + SLIDER_FOCUS_RING_WIDTH) * 2
 
 interface SliderColors {
   activeTrack: string
   inactiveTrack: string
   thumb: string
-  // Per MD3, ticks/stop indicators use the OPPOSITE color of the segment
-  // they sit on for contrast.
+  // Per MD3: ticks and stop indicators on the ACTIVE segment are `onPrimary`;
+  // on the inactive segment ticks are `onSurfaceVariant` while the stop
+  // indicator is `primary` (the active-track color).
   tickOnActive: string
   tickOnInactive: string
+  stopOnActive: string
+  stopOnInactive: string
   valueLabel: string
   onValueLabel: string
   decoration: string
@@ -66,8 +70,10 @@ function getColors(
     activeTrack,
     inactiveTrack,
     thumb,
-    tickOnActive: inactiveTrack,
-    tickOnInactive: activeTrack,
+    tickOnActive: theme.colors.onPrimary,
+    tickOnInactive: theme.colors.onSurfaceVariant,
+    stopOnActive: theme.colors.onPrimary,
+    stopOnInactive: activeTrack,
     valueLabel: theme.colors.inverseSurface,
     onValueLabel: theme.colors.inverseOnSurface,
     decoration: theme.colors.onSurfaceVariant,
@@ -85,7 +91,8 @@ export function createStyles(
   inactiveTrackColor?: string,
 ) {
   const c = getColors(theme, containerColor, contentColor, inactiveTrackColor)
-  const labelTypography = theme.typography.labelMedium
+  // MD3 value-label typography token.
+  const labelTypography = theme.typography.labelLarge
 
   return StyleSheet.create({
     root: {
@@ -164,10 +171,10 @@ export function createStyles(
       backgroundColor: c.tickOnInactive,
     },
     stopOnActive: {
-      backgroundColor: c.tickOnActive,
+      backgroundColor: c.stopOnActive,
     },
     stopOnInactive: {
-      backgroundColor: c.tickOnInactive,
+      backgroundColor: c.stopOnInactive,
     },
     valueLabel: {
       position: 'absolute',

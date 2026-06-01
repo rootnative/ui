@@ -16,7 +16,9 @@ export interface SwitchProps extends Omit<
    * Icon shown on the thumb when selected. Accepts a string name (resolved
    * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.
-   * @default 'check'
+   *
+   * Opt-in: the MD3 default switch renders no icons — pass `'check'` for the
+   * spec's "switch with icon" variant.
    */
   selectedIcon?: IconSource
   /**

@@ -1,3 +1,4 @@
+import { useTheme } from '@rootnative/core'
 import type { LayoutChangeEvent, TextStyle, ViewStyle } from 'react-native'
 import { Text } from 'react-native'
 import Animated, {
@@ -21,10 +22,6 @@ import {
   SLIDER_TICK_SIZE,
 } from './styles'
 
-// MD3 state-layer opacities for the tonal halo per interaction state.
-const HOVER_OPACITY = 0.08
-const FOCUS_OPACITY = 0.1
-const PRESS_OPACITY = 0.1
 // How far the value label pops up while it fades in (in dp).
 const LABEL_POP = 8
 
@@ -217,9 +214,9 @@ interface StateLayerSlotProps {
   baseStyle: ViewStyle
 }
 
-// MD3 tonal halo around the thumb. Combines hover (8 %), focus (10 %), and
-// press (10 %) state-layer opacities and follows the same press progress as
-// the thumb's 4 → 16 dp grow.
+// MD3 tonal halo around the thumb. Combines the theme's hover, focus, and
+// press state-layer opacity tokens and stays centered on the thumb while the
+// press-state 4 → 2 dp width change runs.
 export function StateLayerSlot({
   centerX,
   hovered,
@@ -227,6 +224,13 @@ export function StateLayerSlot({
   pressed,
   baseStyle,
 }: StateLayerSlotProps) {
+  const theme = useTheme()
+  const {
+    hoveredOpacity: HOVER_OPACITY,
+    focusedOpacity: FOCUS_OPACITY,
+    pressedOpacity: PRESS_OPACITY,
+  } = theme.stateLayer
+
   const animatedStyle = useAnimatedStyle(
     () => ({
       left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
@@ -236,7 +240,7 @@ export function StateLayerSlot({
         Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
       ),
     }),
-    [centerX],
+    [centerX, HOVER_OPACITY, FOCUS_OPACITY, PRESS_OPACITY],
   )
   return (
     <Animated.View pointerEvents="none" style={[baseStyle, animatedStyle]} />

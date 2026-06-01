@@ -13,6 +13,21 @@ export interface CheckboxProps extends Omit<
   /** Callback fired when the checkbox is toggled. Receives the new value. */
   onValueChange?: (value: boolean) => void
   /**
+   * Render the MD3 indeterminate ("mixed") state — a dash mark on the
+   * selected container colors. Wins over `value` visually, and reports
+   * `checked: 'mixed'` to accessibility.
+   * @default false
+   */
+  indeterminate?: boolean
+  /**
+   * Render the MD3 error state: `error`-colored outline when unchecked, and
+   * an `error` container with `onError` mark when checked or indeterminate.
+   * State-layer (hover, focus, press) colors also use `error`. The standard
+   * disabled treatment wins over the error state.
+   * @default false
+   */
+  error?: boolean
+  /**
    * Icon shown when the checkbox is checked. Accepts a string name (resolved
    * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.

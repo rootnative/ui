@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor } from '@rootnative/utils'
+import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 
 export const SWITCH_TRACK_WIDTH = 52
@@ -17,8 +17,6 @@ export interface TrackColors {
   trackColor: string
   thumbColor: string
   iconColor: string
-  hoveredTrackColor: string
-  pressedTrackColor: string
   borderColor: string
   disabledTrackColor: string
   disabledThumbColor: string
@@ -34,16 +32,6 @@ function getColors(theme: MaterialTheme, selected: boolean): TrackColors {
       trackColor: theme.colors.primary,
       thumbColor: theme.colors.onPrimary,
       iconColor: theme.colors.onPrimaryContainer,
-      hoveredTrackColor: blendColor(
-        theme.colors.primary,
-        theme.colors.onPrimary,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      pressedTrackColor: blendColor(
-        theme.colors.primary,
-        theme.colors.onPrimary,
-        theme.stateLayer.pressedOpacity,
-      ),
       borderColor: 'transparent',
       disabledTrackColor: disabledOnSurface12,
       disabledThumbColor: theme.colors.surface,
@@ -55,16 +43,6 @@ function getColors(theme: MaterialTheme, selected: boolean): TrackColors {
     trackColor: theme.colors.surfaceContainerHighest,
     thumbColor: theme.colors.outline,
     iconColor: theme.colors.surfaceContainerHighest,
-    hoveredTrackColor: blendColor(
-      theme.colors.surfaceContainerHighest,
-      theme.colors.onSurface,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    pressedTrackColor: blendColor(
-      theme.colors.surfaceContainerHighest,
-      theme.colors.onSurface,
-      theme.stateLayer.pressedOpacity,
-    ),
     borderColor: theme.colors.outline,
     disabledTrackColor: disabledOnSurface12,
     disabledThumbColor: disabledOnSurface38,
@@ -73,7 +51,6 @@ function getColors(theme: MaterialTheme, selected: boolean): TrackColors {
 }
 
 function applyColorOverrides(
-  theme: MaterialTheme,
   colors: TrackColors,
   containerColor?: string,
   contentColor?: string,
@@ -88,19 +65,8 @@ function applyColorOverrides(
   }
 
   if (containerColor) {
-    const overlay = contentColor ?? colors.thumbColor
     result.trackColor = containerColor
     result.borderColor = containerColor
-    result.hoveredTrackColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    )
-    result.pressedTrackColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    )
     if (contentColor) {
       result.iconColor = containerColor
     }
@@ -116,7 +82,6 @@ export function getResolvedColors(
   contentColor?: string,
 ): TrackColors {
   return applyColorOverrides(
-    theme,
     getColors(theme, selected),
     containerColor,
     contentColor,
@@ -128,11 +93,18 @@ export function createStyles(
   containerColor?: string,
   contentColor?: string,
 ) {
-  // Disabled colors are derived from the unselected token set; the disabled
-  // visual is uniform across off/on per MD3.
-  const disabledColors = getResolvedColors(
+  // MD3 disabled visuals differ between states: the disabled-selected handle
+  // is `surface` while disabled-unselected keeps 38 % `onSurface`, and only
+  // the unselected track keeps its (12 % onSurface) outline.
+  const disabledOffColors = getResolvedColors(
     theme,
     false,
+    containerColor,
+    contentColor,
+  )
+  const disabledOnColors = getResolvedColors(
+    theme,
+    true,
     containerColor,
     contentColor,
   )
@@ -154,8 +126,13 @@ export function createStyles(
       cursor: 'pointer',
     },
     disabledTrack: {
-      backgroundColor: disabledColors.disabledTrackColor,
-      borderColor: disabledColors.disabledBorderColor,
+      backgroundColor: disabledOffColors.disabledTrackColor,
+      borderColor: disabledOffColors.disabledBorderColor,
+      cursor: 'auto',
+    },
+    disabledTrackSelected: {
+      backgroundColor: disabledOnColors.disabledTrackColor,
+      borderColor: disabledOnColors.disabledBorderColor,
       cursor: 'auto',
     },
     focusRing: {
@@ -185,7 +162,10 @@ export function createStyles(
       justifyContent: 'center' as const,
     },
     disabledThumb: {
-      backgroundColor: disabledColors.disabledThumbColor,
+      backgroundColor: disabledOffColors.disabledThumbColor,
+    },
+    disabledThumbSelected: {
+      backgroundColor: disabledOnColors.disabledThumbColor,
     },
     iconLayer: {
       position: 'absolute' as const,

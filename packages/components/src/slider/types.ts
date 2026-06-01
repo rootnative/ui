@@ -73,7 +73,7 @@ export interface SliderProps extends Omit<ViewProps, 'children'> {
    * unset).
    */
   containerColor?: string
-  /** Override the thumb color (and the tick-mark color over the active track). */
+  /** Override the thumb color. */
   contentColor?: string
   /** Override the inactive track color. */
   inactiveTrackColor?: string

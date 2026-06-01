@@ -1,3 +1,5 @@
+import { lightTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -69,12 +71,90 @@ describe('Checkbox', () => {
     expect(screen.queryByText('check')).toBeNull()
   })
 
+  it('uses the MD3 2dp container corner radius', () => {
+    renderWithTheme(<Checkbox />)
+    const box = screen.getByTestId('checkbox-box')
+    const flatStyle = StyleSheet.flatten(box.props.style)
+    expect(flatStyle.borderRadius).toBe(2)
+  })
+
+  describe('indeterminate', () => {
+    it('reports checked="mixed" to accessibility', () => {
+      renderWithTheme(<Checkbox indeterminate />)
+      const cb = screen.getByRole('checkbox')
+      expect(cb.props.accessibilityState).toEqual(
+        expect.objectContaining({ checked: 'mixed' }),
+      )
+    })
+
+    it('renders the dash mark instead of the check icon', () => {
+      renderWithTheme(<Checkbox indeterminate />)
+      expect(screen.getByTestId('checkbox-indeterminate-mark')).toBeTruthy()
+      expect(screen.queryByText('check')).toBeNull()
+    })
+
+    it('wins over checked visually and in accessibility', () => {
+      renderWithTheme(<Checkbox value indeterminate />)
+      expect(screen.getByTestId('checkbox-indeterminate-mark')).toBeTruthy()
+      expect(screen.queryByText('check')).toBeNull()
+      const cb = screen.getByRole('checkbox')
+      expect(cb.props.accessibilityState).toEqual(
+        expect.objectContaining({ checked: 'mixed' }),
+      )
+    })
+
+    it('fills the box with the selected container color', () => {
+      renderWithTheme(<Checkbox indeterminate />)
+      const box = screen.getByTestId('checkbox-box')
+      const flatStyle = StyleSheet.flatten(box.props.style)
+      expect(flatStyle.backgroundColor).toBe(lightTheme.colors.primary)
+    })
+  })
+
+  describe('error', () => {
+    it('uses the error color for the unchecked outline', () => {
+      renderWithTheme(<Checkbox error />)
+      const box = screen.getByTestId('checkbox-box')
+      const flatStyle = StyleSheet.flatten(box.props.style)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.error)
+    })
+
+    it('uses the error container with onError mark when checked', () => {
+      const iconResolver = jest.fn(() => <Text testID="resolved">r</Text>)
+      renderWithTheme(<Checkbox value error />, { iconResolver })
+      const box = screen.getByTestId('checkbox-box')
+      const flatStyle = StyleSheet.flatten(box.props.style)
+      expect(flatStyle.backgroundColor).toBe(lightTheme.colors.error)
+      expect(iconResolver).toHaveBeenCalledWith(
+        'check',
+        expect.objectContaining({ color: lightTheme.colors.onError }),
+      )
+    })
+
+    it('disabled treatment wins over error', () => {
+      renderWithTheme(<Checkbox value error disabled />)
+      const box = screen.getByTestId('checkbox-box')
+      const flatStyle = StyleSheet.flatten(box.props.style)
+      expect(flatStyle.backgroundColor).toBe(
+        alphaColor(lightTheme.colors.onSurface, 0.38),
+      )
+    })
+  })
+
   describe('overrides', () => {
     it('applies containerColor to the box when checked', () => {
       renderWithTheme(<Checkbox value containerColor="#FF0000" />)
       const box = screen.getByTestId('checkbox-box')
       const flatStyle = StyleSheet.flatten(box.props.style)
       expect(flatStyle.backgroundColor).toBe('#FF0000')
+    })
+
+    it('keeps the outline-only appearance when unchecked', () => {
+      renderWithTheme(<Checkbox value={false} containerColor="#FF0000" />)
+      const box = screen.getByTestId('checkbox-box')
+      const flatStyle = StyleSheet.flatten(box.props.style)
+      expect(flatStyle.backgroundColor).toBe('transparent')
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.onSurfaceVariant)
     })
   })
 

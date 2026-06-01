@@ -1,3 +1,5 @@
+import { lightTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -64,9 +66,32 @@ describe('Switch', () => {
     expect(screen.getByText('check')).toBeTruthy()
   })
 
+  it('does not render an icon by default (MD3 default switch)', () => {
+    renderWithTheme(<Switch value />)
+    expect(screen.queryByText('check')).toBeNull()
+  })
+
   it('renders unselectedIcon when value is false', () => {
     renderWithTheme(<Switch value={false} unselectedIcon="close" />)
     expect(screen.getByText('close')).toBeTruthy()
+  })
+
+  describe('disabled visuals', () => {
+    it('uses surface for the disabled selected handle', () => {
+      renderWithTheme(<Switch value disabled />)
+      const thumb = screen.getByTestId('switch-thumb')
+      const flatStyle = StyleSheet.flatten(thumb.props.style)
+      expect(flatStyle.backgroundColor).toBe(lightTheme.colors.surface)
+    })
+
+    it('keeps 38% onSurface for the disabled unselected handle', () => {
+      renderWithTheme(<Switch value={false} disabled />)
+      const thumb = screen.getByTestId('switch-thumb')
+      const flatStyle = StyleSheet.flatten(thumb.props.style)
+      expect(flatStyle.backgroundColor).toBe(
+        alphaColor(lightTheme.colors.onSurface, 0.38),
+      )
+    })
   })
 
   describe('overrides', () => {

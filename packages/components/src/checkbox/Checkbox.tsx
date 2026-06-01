@@ -1,7 +1,7 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { isFocusVisible, renderIcon } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo } from 'react'
-import { Platform, Pressable } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import Animated, {
   interpolateColor,
   useAnimatedStyle,
@@ -18,24 +18,18 @@ import type { CheckboxProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_OPACITY = 0.08
-const FOCUS_OPACITY = 0.1
-const PRESS_OPACITY = 0.1
-
 const TOGGLE_SPRING = {
   damping: 26,
   stiffness: 380,
   mass: 1,
 }
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 export function Checkbox({
   style,
   value = false,
   onValueChange,
+  indeterminate = false,
+  error = false,
   checkIcon = 'check',
   containerColor,
   contentColor,
@@ -44,28 +38,66 @@ export function Checkbox({
 }: CheckboxProps) {
   const isDisabled = Boolean(disabled)
   const isChecked = Boolean(value)
+  const isIndeterminate = Boolean(indeterminate)
+  const hasError = Boolean(error)
+  // Indeterminate wins over checked visually — both fill the box.
+  const isActive = isIndeterminate || isChecked
 
   const theme = useTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const offColors = useMemo(
-    () => getResolvedCheckboxColors(theme, false, containerColor, contentColor),
-    [theme, containerColor, contentColor],
+  // MD3 state-layer opacity tokens.
+  const {
+    hoveredOpacity: HOVER_OPACITY,
+    focusedOpacity: FOCUS_OPACITY,
+    pressedOpacity: PRESS_OPACITY,
+  } = theme.stateLayer
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme],
   )
-  const onColors = useMemo(
-    () => getResolvedCheckboxColors(theme, true, containerColor, contentColor),
-    [theme, containerColor, contentColor],
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme],
   )
 
-  const progress = useSharedValue(isChecked ? 1 : 0)
+  const offColors = useMemo(
+    () =>
+      getResolvedCheckboxColors(
+        theme,
+        false,
+        containerColor,
+        contentColor,
+        hasError,
+      ),
+    [theme, containerColor, contentColor, hasError],
+  )
+  const onColors = useMemo(
+    () =>
+      getResolvedCheckboxColors(
+        theme,
+        true,
+        containerColor,
+        contentColor,
+        hasError,
+      ),
+    [theme, containerColor, contentColor, hasError],
+  )
+
+  const progress = useSharedValue(isActive ? 1 : 0)
   const hovered = useSharedValue(0)
   const focused = useSharedValue(0)
   const pressed = useSharedValue(0)
 
   useEffect(() => {
-    progress.value = withSpring(isChecked ? 1 : 0, TOGGLE_SPRING)
-  }, [isChecked, progress])
+    progress.value = withSpring(isActive ? 1 : 0, TOGGLE_SPRING)
+  }, [isActive, progress])
 
   const animatedBoxStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(
@@ -87,7 +119,7 @@ export function Checkbox({
 
   const animatedStateLayerStyle = useAnimatedStyle(() => {
     // Solid base color, view opacity carries the alpha. Picking the strongest
-    // active interaction's intensity keeps the spec values intact (8/10/10 %).
+    // active interaction's intensity keeps the token values intact.
     const layerColor = interpolateColor(
       progress.value,
       [0, 1],
@@ -112,49 +144,54 @@ export function Checkbox({
   }, [isDisabled, isChecked, onValueChange])
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   // Only show focus state when reached via keyboard (Tab/arrows). Mouse clicks
   // technically focus the element on web but shouldn't trigger the visual
   // focus indicator — mirrors CSS `:focus-visible` semantics.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
-  const iconColor = isDisabled
-    ? isChecked
+  const markColor = isDisabled
+    ? isActive
       ? onColors.disabledIconColor
       : offColors.disabledIconColor
-    : isChecked
+    : isActive
       ? onColors.iconColor
       : offColors.iconColor
 
   const boxOverride = isDisabled
     ? {
-        backgroundColor: isChecked
+        backgroundColor: isActive
           ? onColors.disabledBackgroundColor
           : offColors.disabledBackgroundColor,
-        borderColor: isChecked
+        borderColor: isActive
           ? onColors.disabledBorderColor
           : offColors.disabledBorderColor,
       }
     : undefined
+
+  const indeterminateMarkStyle = useMemo(
+    () => [styles.indeterminateMark, { backgroundColor: markColor }],
+    [styles, markColor],
+  )
 
   return (
     <AnimatedPressable
@@ -162,7 +199,7 @@ export function Checkbox({
       accessibilityRole="checkbox"
       accessibilityState={{
         disabled: isDisabled,
-        checked: isChecked,
+        checked: isIndeterminate ? 'mixed' : isChecked,
       }}
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
@@ -191,11 +228,18 @@ export function Checkbox({
         testID="checkbox-box"
         style={[styles.box, animatedBoxStyle, boxOverride]}
       >
-        {isChecked ? (
+        {isIndeterminate ? (
+          <Animated.View pointerEvents="none" style={animatedIconStyle}>
+            <View
+              testID="checkbox-indeterminate-mark"
+              style={indeterminateMarkStyle}
+            />
+          </Animated.View>
+        ) : isChecked ? (
           <Animated.View pointerEvents="none" style={animatedIconStyle}>
             {renderIcon(
               checkIcon,
-              { size: CHECKBOX_ICON_SIZE, color: iconColor },
+              { size: CHECKBOX_ICON_SIZE, color: markColor },
               iconResolver,
             )}
           </Animated.View>

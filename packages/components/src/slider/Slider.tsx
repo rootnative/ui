@@ -56,24 +56,13 @@ declare module 'react-native' {
 
 const ICON_SIZE = 18
 
-// MD3 expressive motion tokens.
+// MD3 expressive motion.
 //   - Size/translate transitions ride an emphasized spring (slight overshoot,
 //     ~0.85 damping ratio) — matches the same TOGGLE_SPRING used by Switch.
-//   - Opacity transitions use a short4 (200 ms) duration with the emphasized
-//     cubic-bezier easing per the M3 motion spec.
+//   - Opacity transitions use `theme.motion` duration tokens (short3/short4)
+//     with the emphasized cubic-bezier easing per the M3 motion spec.
 const PRESS_SPRING = { damping: 33, stiffness: 380, mass: 1 }
-const LABEL_TIMING = {
-  duration: 200,
-  easing: Easing.bezier(0.2, 0, 0, 1),
-}
-const STATE_LAYER_TIMING = {
-  duration: 150,
-  easing: Easing.bezier(0.2, 0, 0, 1),
-}
-const FOCUS_RING_TIMING = {
-  duration: 200,
-  easing: Easing.bezier(0.2, 0, 0, 1),
-}
+const EMPHASIZED_EASING = Easing.bezier(0.2, 0, 0, 1)
 
 const ACCESSIBILITY_ACTIONS = [
   { name: 'increment' as const },
@@ -107,6 +96,28 @@ export function Slider({
   const styles = useMemo(
     () => createStyles(theme, containerColor, contentColor, inactiveTrackColor),
     [theme, containerColor, contentColor, inactiveTrackColor],
+  )
+
+  const labelTiming = useMemo(
+    () => ({
+      duration: theme.motion.durationShort4,
+      easing: EMPHASIZED_EASING,
+    }),
+    [theme],
+  )
+  const stateLayerTiming = useMemo(
+    () => ({
+      duration: theme.motion.durationShort3,
+      easing: EMPHASIZED_EASING,
+    }),
+    [theme],
+  )
+  const focusRingTiming = useMemo(
+    () => ({
+      duration: theme.motion.durationShort4,
+      easing: EMPHASIZED_EASING,
+    }),
+    [theme],
   )
 
   const isRange = Array.isArray(controlledValue) || Array.isArray(defaultValue)
@@ -158,8 +169,8 @@ export function Slider({
   // MD3: at min/max the thumb's REST shape should be flush with the track
   // edge, not overhanging it. Inset the value-to-pixel mapping by the rest
   // half-width on both sides so a thumb at min has its left edge at x=0.
-  // The press-state expansion (4 → 16 dp) still grows on-center and is
-  // allowed to extend slightly during the transient press feedback.
+  // The press-state narrowing (4 → 2 dp) shrinks on-center, so it never
+  // extends past the track edges.
   const THUMB_INSET = SLIDER_THUMB_WIDTH / 2
 
   const valueToPosition = useCallback(
@@ -282,9 +293,9 @@ export function Slider({
   const centerPos = trackWidth / 2
 
   // Press progress per thumb (0 → 1) lives on the UI thread so the thumb's
-  // 4 → 16 dp grow can run in lockstep with the surrounding segments and stop
-  // indicators that depend on the same value. Hover and focus drive the same
-  // state-layer halo at lower opacities and don't affect layout.
+  // 4 → 2 dp narrowing can run in lockstep with the surrounding segments and
+  // stop indicators that depend on the same value. Hover and focus drive the
+  // same state-layer halo at lower opacities and don't affect layout.
   const lowPressed = useSharedValue(0)
   const highPressed = useSharedValue(0)
   const lowHovered = useSharedValue(0)
@@ -419,28 +430,28 @@ export function Slider({
     (labelMode === 'always' || (labelMode === true && activeThumb === 'high'))
 
   useEffect(() => {
-    lowLabelOpacity.value = withTiming(showLowLabel ? 1 : 0, LABEL_TIMING)
-  }, [showLowLabel, lowLabelOpacity])
+    lowLabelOpacity.value = withTiming(showLowLabel ? 1 : 0, labelTiming)
+  }, [showLowLabel, lowLabelOpacity, labelTiming])
 
   useEffect(() => {
-    highLabelOpacity.value = withTiming(showHighLabel ? 1 : 0, LABEL_TIMING)
-  }, [showHighLabel, highLabelOpacity])
+    highLabelOpacity.value = withTiming(showHighLabel ? 1 : 0, labelTiming)
+  }, [showHighLabel, highLabelOpacity, labelTiming])
 
   // Hover/focus indicator routing: only the keyboardThumb shows the halo
   // (single-thumb mode → always 'low'; range mode → most-recent thumb).
   useEffect(() => {
     const lowOn = isHovered.current && keyboardThumb === 'low' && !isDisabled
     const highOn = isHovered.current && keyboardThumb === 'high' && !isDisabled
-    lowHovered.value = withTiming(lowOn ? 1 : 0, STATE_LAYER_TIMING)
-    highHovered.value = withTiming(highOn ? 1 : 0, STATE_LAYER_TIMING)
-  }, [keyboardThumb, isDisabled, lowHovered, highHovered])
+    lowHovered.value = withTiming(lowOn ? 1 : 0, stateLayerTiming)
+    highHovered.value = withTiming(highOn ? 1 : 0, stateLayerTiming)
+  }, [keyboardThumb, isDisabled, lowHovered, highHovered, stateLayerTiming])
 
   useEffect(() => {
     const lowOn = isFocused.current && keyboardThumb === 'low' && !isDisabled
     const highOn = isFocused.current && keyboardThumb === 'high' && !isDisabled
-    lowFocused.value = withTiming(lowOn ? 1 : 0, FOCUS_RING_TIMING)
-    highFocused.value = withTiming(highOn ? 1 : 0, FOCUS_RING_TIMING)
-  }, [keyboardThumb, isDisabled, lowFocused, highFocused])
+    lowFocused.value = withTiming(lowOn ? 1 : 0, focusRingTiming)
+    highFocused.value = withTiming(highOn ? 1 : 0, focusRingTiming)
+  }, [keyboardThumb, isDisabled, lowFocused, highFocused, focusRingTiming])
 
   // Keyboard / a11y action step. For continuous sliders, MD3 spec calls for
   // ~1 % of the range per arrow tap; for discrete sliders, one step.
@@ -482,33 +493,33 @@ export function Slider({
     if (isDisabled) return
     isHovered.current = true
     if (keyboardThumb === 'low') {
-      lowHovered.value = withTiming(1, STATE_LAYER_TIMING)
+      lowHovered.value = withTiming(1, stateLayerTiming)
     } else {
-      highHovered.value = withTiming(1, STATE_LAYER_TIMING)
+      highHovered.value = withTiming(1, stateLayerTiming)
     }
-  }, [isDisabled, keyboardThumb, lowHovered, highHovered])
+  }, [isDisabled, keyboardThumb, lowHovered, highHovered, stateLayerTiming])
 
   const handleHoverOut = useCallback(() => {
     isHovered.current = false
-    lowHovered.value = withTiming(0, STATE_LAYER_TIMING)
-    highHovered.value = withTiming(0, STATE_LAYER_TIMING)
-  }, [lowHovered, highHovered])
+    lowHovered.value = withTiming(0, stateLayerTiming)
+    highHovered.value = withTiming(0, stateLayerTiming)
+  }, [lowHovered, highHovered, stateLayerTiming])
 
   const handleFocus = useCallback(() => {
     if (isDisabled || !isFocusVisible()) return
     isFocused.current = true
     if (keyboardThumb === 'low') {
-      lowFocused.value = withTiming(1, FOCUS_RING_TIMING)
+      lowFocused.value = withTiming(1, focusRingTiming)
     } else {
-      highFocused.value = withTiming(1, FOCUS_RING_TIMING)
+      highFocused.value = withTiming(1, focusRingTiming)
     }
-  }, [isDisabled, keyboardThumb, lowFocused, highFocused])
+  }, [isDisabled, keyboardThumb, lowFocused, highFocused, focusRingTiming])
 
   const handleBlur = useCallback(() => {
     isFocused.current = false
-    lowFocused.value = withTiming(0, FOCUS_RING_TIMING)
-    highFocused.value = withTiming(0, FOCUS_RING_TIMING)
-  }, [lowFocused, highFocused])
+    lowFocused.value = withTiming(0, focusRingTiming)
+    highFocused.value = withTiming(0, focusRingTiming)
+  }, [lowFocused, highFocused, focusRingTiming])
 
   const handleAccessibilityAction = useCallback(
     (e: AccessibilityActionEvent) => {

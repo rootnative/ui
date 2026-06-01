@@ -32,11 +32,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const THUMB_TRANSLATE_X =
   SWITCH_TRACK_WIDTH - SWITCH_TRACK_PADDING * 2 - SWITCH_THUMB_ON_SIZE
 
-// MD3 state-layer opacity tokens.
-const HOVER_OPACITY = 0.08
-const FOCUS_OPACITY = 0.1
-const PRESS_OPACITY = 0.1
-
 // MD3 emphasized spring for the toggle (slight overshoot, ~0.85 damping ratio).
 const TOGGLE_SPRING = {
   damping: 33,
@@ -47,8 +42,6 @@ const TOGGLE_SPRING = {
 // Press in/out uses a fast, predictable timing curve — no spring oscillation,
 // so the 28 dp thumb grow is reached in full within 120 ms.
 const PRESS_TIMING = { duration: 120 }
-const HOVER_TIMING = { duration: 150 }
-const FOCUS_TIMING = { duration: 200 }
 
 const ICON_SIZE = 16
 
@@ -56,7 +49,7 @@ export function Switch({
   style,
   value = false,
   onValueChange,
-  selectedIcon = 'check',
+  selectedIcon,
   unselectedIcon,
   containerColor,
   contentColor,
@@ -75,6 +68,22 @@ export function Switch({
   const styles = useMemo(
     () => createStyles(theme, containerColor, contentColor),
     [theme, containerColor, contentColor],
+  )
+
+  // MD3 state-layer opacity tokens.
+  const {
+    hoveredOpacity: HOVER_OPACITY,
+    focusedOpacity: FOCUS_OPACITY,
+    pressedOpacity: PRESS_OPACITY,
+  } = theme.stateLayer
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme],
   )
 
   const offColors = useMemo(
@@ -219,24 +228,24 @@ export function Switch({
 
   const handleHoverIn = useCallback(() => {
     if (!isDisabled) {
-      hovered.value = withTiming(1, HOVER_TIMING)
+      hovered.value = withTiming(1, hoverTiming)
     }
-  }, [isDisabled, hovered])
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   return (
     <View style={styles.wrapper}>
@@ -263,7 +272,11 @@ export function Switch({
         style={[
           styles.track,
           animatedTrackStyle,
-          isDisabled ? styles.disabledTrack : undefined,
+          isDisabled
+            ? isSelected
+              ? styles.disabledTrackSelected
+              : styles.disabledTrack
+            : undefined,
           style,
         ]}
       >
@@ -272,10 +285,15 @@ export function Switch({
           style={[styles.stateLayer, { left: haloLeft }, animatedHaloStyle]}
         />
         <Animated.View
+          testID="switch-thumb"
           style={[
             styles.thumbBase,
             animatedThumbStyle,
-            isDisabled ? styles.disabledThumb : undefined,
+            isDisabled
+              ? isSelected
+                ? styles.disabledThumbSelected
+                : styles.disabledThumb
+              : undefined,
           ]}
         >
           {selectedIcon ? (

@@ -3,12 +3,18 @@ import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 
 export const CHECKBOX_BOX_SIZE = 18
+// MD3 checkbox container radius is 2 dp — no theme shape token equals 2
+// (`cornerExtraSmall` is 4), so it's pinned locally.
+export const CHECKBOX_CORNER_RADIUS = 2
 export const CHECKBOX_BORDER_WIDTH = 2
 export const CHECKBOX_TOUCH_TARGET = 48
 export const CHECKBOX_STATE_LAYER_SIZE = 40
 export const CHECKBOX_FOCUS_RING_OFFSET = 2
 export const CHECKBOX_FOCUS_RING_WIDTH = 3
 export const CHECKBOX_ICON_SIZE = 14
+// MD3 indeterminate dash mark dimensions inside the 18 dp box.
+export const CHECKBOX_MARK_WIDTH = 10
+export const CHECKBOX_MARK_THICKNESS = 2
 
 export interface CheckboxColors {
   backgroundColor: string
@@ -24,15 +30,19 @@ export interface CheckboxColors {
   disabledIconColor: string
 }
 
-function getColors(theme: MaterialTheme, checked: boolean): CheckboxColors {
+function getColors(
+  theme: MaterialTheme,
+  checked: boolean,
+  error: boolean,
+): CheckboxColors {
   const disabledOnSurface38 = alphaColor(theme.colors.onSurface, 0.38)
 
   if (checked) {
     return {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: error ? theme.colors.error : theme.colors.primary,
       borderColor: 'transparent',
-      iconColor: theme.colors.onPrimary,
-      stateLayerColor: theme.colors.primary,
+      iconColor: error ? theme.colors.onError : theme.colors.onPrimary,
+      stateLayerColor: error ? theme.colors.error : theme.colors.primary,
       disabledBackgroundColor: disabledOnSurface38,
       disabledBorderColor: 'transparent',
       disabledIconColor: theme.colors.surface,
@@ -41,9 +51,9 @@ function getColors(theme: MaterialTheme, checked: boolean): CheckboxColors {
 
   return {
     backgroundColor: 'transparent',
-    borderColor: theme.colors.onSurfaceVariant,
+    borderColor: error ? theme.colors.error : theme.colors.onSurfaceVariant,
     iconColor: 'transparent',
-    stateLayerColor: theme.colors.onSurface,
+    stateLayerColor: error ? theme.colors.error : theme.colors.onSurface,
     disabledBackgroundColor: 'transparent',
     disabledBorderColor: disabledOnSurface38,
     disabledIconColor: 'transparent',
@@ -52,10 +62,14 @@ function getColors(theme: MaterialTheme, checked: boolean): CheckboxColors {
 
 function applyColorOverrides(
   colors: CheckboxColors,
+  checked: boolean,
   containerColor?: string,
   contentColor?: string,
 ): CheckboxColors {
-  if (!containerColor && !contentColor) return colors
+  // Per the documented contract, `containerColor`/`contentColor` only apply
+  // to the checked (and indeterminate) box — the unchecked state keeps its
+  // outline-only appearance.
+  if (!checked || (!containerColor && !contentColor)) return colors
 
   const result = { ...colors }
 
@@ -80,9 +94,11 @@ export function getResolvedCheckboxColors(
   checked: boolean,
   containerColor?: string,
   contentColor?: string,
+  error = false,
 ): CheckboxColors {
   return applyColorOverrides(
-    getColors(theme, checked),
+    getColors(theme, checked, error),
+    checked,
     containerColor,
     contentColor,
   )
@@ -121,17 +137,22 @@ export function createStyles(theme: MaterialTheme) {
       left: focusRingInset,
       width: focusRingDiameter,
       height: focusRingDiameter,
-      borderRadius: theme.shape.cornerExtraSmall + CHECKBOX_FOCUS_RING_OFFSET,
+      borderRadius: CHECKBOX_CORNER_RADIUS + CHECKBOX_FOCUS_RING_OFFSET,
       borderWidth: CHECKBOX_FOCUS_RING_WIDTH,
       borderColor: theme.colors.secondary,
     },
     box: {
       width: CHECKBOX_BOX_SIZE,
       height: CHECKBOX_BOX_SIZE,
-      borderRadius: theme.shape.cornerExtraSmall,
+      borderRadius: CHECKBOX_CORNER_RADIUS,
       borderWidth: CHECKBOX_BORDER_WIDTH,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
+    },
+    indeterminateMark: {
+      width: CHECKBOX_MARK_WIDTH,
+      height: CHECKBOX_MARK_THICKNESS,
+      borderRadius: CHECKBOX_MARK_THICKNESS / 2,
     },
   })
 }

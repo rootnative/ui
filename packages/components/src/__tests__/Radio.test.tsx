@@ -29,18 +29,18 @@ describe('Radio', () => {
     )
   })
 
-  it('calls onValueChange with toggled value when pressed', () => {
+  it('calls onValueChange with true when an unselected radio is pressed', () => {
     const onValueChange = jest.fn()
     renderWithTheme(<Radio value={false} onValueChange={onValueChange} />)
     fireEvent.press(screen.getByRole('radio'))
     expect(onValueChange).toHaveBeenCalledWith(true)
   })
 
-  it('calls onValueChange with false when toggled off', () => {
+  it('does not call onValueChange when pressing an already-selected radio', () => {
     const onValueChange = jest.fn()
     renderWithTheme(<Radio value onValueChange={onValueChange} />)
     fireEvent.press(screen.getByRole('radio'))
-    expect(onValueChange).toHaveBeenCalledWith(false)
+    expect(onValueChange).not.toHaveBeenCalled()
   })
 
   it('does not call onValueChange when disabled', () => {

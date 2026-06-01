@@ -19,7 +19,11 @@ export default function SwitchScreen() {
           <Typography variant="bodyMedium">{basic ? 'On' : 'Off'}</Typography>
         </Row>
         <Row gap="md" align="center">
-          <Switch value={withIcon} onValueChange={setWithIcon} />
+          <Switch
+            value={withIcon}
+            onValueChange={setWithIcon}
+            selectedIcon="check"
+          />
           <Typography variant="bodyMedium">With check icon</Typography>
         </Row>
       </Column>

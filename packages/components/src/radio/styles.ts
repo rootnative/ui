@@ -45,6 +45,7 @@ function getColors(theme: MaterialTheme, selected: boolean): RadioColors {
 
 function applyColorOverrides(
   colors: RadioColors,
+  selected: boolean,
   containerColor?: string,
   contentColor?: string,
 ): RadioColors {
@@ -52,14 +53,17 @@ function applyColorOverrides(
 
   const result = { ...colors }
 
-  if (containerColor) {
-    result.borderColor = containerColor
-    result.dotColor = containerColor
-    // Halo follows the custom container color so the visual stays cohesive.
-    result.stateLayerColor = containerColor
-  }
-
-  if (contentColor) {
+  // Per the documented contract each override targets exactly one state:
+  // `containerColor` recolors the selected ring + inner dot, `contentColor`
+  // recolors the unselected outer ring. Neither leaks into the other state.
+  if (selected) {
+    if (containerColor) {
+      result.borderColor = containerColor
+      result.dotColor = containerColor
+      // Halo follows the custom container color so the visual stays cohesive.
+      result.stateLayerColor = containerColor
+    }
+  } else if (contentColor) {
     result.borderColor = contentColor
   }
 
@@ -74,6 +78,7 @@ export function getResolvedRadioColors(
 ): RadioColors {
   return applyColorOverrides(
     getColors(theme, selected),
+    selected,
     containerColor,
     contentColor,
   )

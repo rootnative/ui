@@ -14,19 +14,11 @@ import type { RadioProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_OPACITY = 0.08
-const FOCUS_OPACITY = 0.1
-const PRESS_OPACITY = 0.1
-
 const TOGGLE_SPRING = {
   damping: 26,
   stiffness: 380,
   mass: 1,
 }
-
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
 
 export function Radio({
   style,
@@ -42,6 +34,26 @@ export function Radio({
 
   const theme = useTheme()
   const styles = useMemo(() => createStyles(theme), [theme])
+
+  // MD3 state-layer opacity tokens.
+  const {
+    hoveredOpacity: HOVER_OPACITY,
+    focusedOpacity: FOCUS_OPACITY,
+    pressedOpacity: PRESS_OPACITY,
+  } = theme.stateLayer
+
+  const hoverTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort3 }),
+    [theme],
+  )
+  const pressTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort2 }),
+    [theme],
+  )
+  const focusTiming = useMemo(
+    () => ({ duration: theme.motion.durationShort4 }),
+    [theme],
+  )
 
   const offColors = useMemo(
     () => getResolvedRadioColors(theme, false, containerColor, contentColor),
@@ -76,7 +88,7 @@ export function Radio({
 
   const animatedStateLayerStyle = useAnimatedStyle(() => {
     // Solid base color, view opacity carries the alpha — produces exactly the
-    // MD3 token values (8/10/10 %) without any compounding.
+    // MD3 token values without any compounding.
     const layerColor = interpolateColor(
       progress.value,
       [0, 1],
@@ -96,38 +108,44 @@ export function Radio({
     opacity: focused.value,
   }))
 
+  // Radios are select-only: pressing an already-selected radio is a no-op —
+  // deselection only happens by selecting another radio in the group.
   const handlePress = useCallback(() => {
-    if (!isDisabled) onValueChange?.(!isSelected)
+    if (!isDisabled && !isSelected) onValueChange?.(true)
   }, [isDisabled, isSelected, onValueChange])
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
+  }, [isDisabled, hovered, hoverTiming])
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
+  }, [isDisabled, pressed, pressTiming])
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, pressTiming)
+  }, [pressed, pressTiming])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, focusTiming])
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, focusTiming)
+  }, [focused, focusTiming])
 
   // Disabled snaps to disabled colors (no animation when disabled).
   const outerOverride = isDisabled
     ? { borderColor: offColors.disabledBorderColor }
     : undefined
+  const innerOverride = useMemo(
+    () => ({ backgroundColor: onColors.disabledDotColor }),
+    [onColors],
+  )
 
   return (
     <AnimatedPressable
@@ -165,9 +183,7 @@ export function Radio({
           style={[
             styles.inner,
             animatedInnerStyle,
-            isDisabled
-              ? { backgroundColor: onColors.disabledDotColor }
-              : undefined,
+            isDisabled ? innerOverride : undefined,
           ]}
         />
       </Animated.View>
