@@ -33,12 +33,12 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/9bc1e6dd-2f68-433d-813a-4e4bd167298b"
+      "url": "https://u.expo.dev/e13d4a03-0fe8-4f7f-97bb-5092bec13c51"
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "9bc1e6dd-2f68-433d-813a-4e4bd167298b"
+        "projectId": "e13d4a03-0fe8-4f7f-97bb-5092bec13c51"
       }
     },
     "owner": "rootnative"
