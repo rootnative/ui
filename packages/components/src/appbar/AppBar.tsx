@@ -21,9 +21,6 @@ import type { AppBarProps } from './types'
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
 
-// M3 surface tonal shift on scroll uses the standard 250ms easing.
-const ELEVATED_TIMING = { duration: 250 }
-
 type AppBarSize = 'small' | 'medium' | 'large'
 function getBackIcon(): IconButtonProps['icon'] {
   if (Platform.OS === 'ios') {
@@ -259,10 +256,14 @@ export function AppBar({
     </View>
   )
 
+  // M3 surface tonal shift on scroll uses the medium1 (250 ms) duration.
+  const elevatedDuration = theme.motion.durationMedium1
   const elevatedSV = useSharedValue(elevated ? 1 : 0)
   useEffect(() => {
-    elevatedSV.value = withTiming(elevated ? 1 : 0, ELEVATED_TIMING)
-  }, [elevated, elevatedSV])
+    elevatedSV.value = withTiming(elevated ? 1 : 0, {
+      duration: elevatedDuration,
+    })
+  }, [elevated, elevatedSV, elevatedDuration])
 
   const animatedSurfaceStyle = useAnimatedStyle(() => ({
     backgroundColor: interpolateColor(

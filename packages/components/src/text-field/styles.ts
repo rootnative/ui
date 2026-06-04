@@ -41,7 +41,9 @@ interface VariantColors {
   borderColor: string
   focusedBorderColor: string
   errorBorderColor: string
+  hoveredBorderColor: string
   disabledBorderColor: string
+  disabledIndicatorColor: string
   disabledBackgroundColor: string
   labelColor: string
   focusedLabelColor: string
@@ -52,6 +54,7 @@ interface VariantColors {
   placeholderColor: string
   supportingTextColor: string
   errorSupportingTextColor: string
+  disabledSupportingTextColor: string
   iconColor: string
   errorIconColor: string
   disabledIconColor: string
@@ -66,15 +69,27 @@ function getVariantColors(
   const common = {
     focusedBorderColor: theme.colors.primary,
     errorBorderColor: theme.colors.error,
+    // MD3 hover: outline (outlined) shifts to on-surface at 1dp.
+    hoveredBorderColor: theme.colors.onSurface,
     focusedLabelColor: theme.colors.primary,
     errorLabelColor: theme.colors.error,
     textColor: theme.colors.onSurface,
     disabledTextColor: alphaColor(theme.colors.onSurface, disabledOpacity),
     disabledLabelColor: alphaColor(theme.colors.onSurface, disabledOpacity),
-    disabledBorderColor: alphaColor(theme.colors.onSurface, 0.12),
+    // Outlined disabled border: 12% on-surface per MD3.
+    disabledBorderColor: alphaColor(
+      theme.colors.onSurface,
+      theme.stateLayer.disabledContainerOpacity,
+    ),
+    // Filled disabled active indicator: 38% on-surface per MD3.
+    disabledIndicatorColor: alphaColor(theme.colors.onSurface, disabledOpacity),
     placeholderColor: theme.colors.onSurfaceVariant,
     supportingTextColor: theme.colors.onSurfaceVariant,
     errorSupportingTextColor: theme.colors.error,
+    disabledSupportingTextColor: alphaColor(
+      theme.colors.onSurface,
+      disabledOpacity,
+    ),
     iconColor: theme.colors.onSurfaceVariant,
     errorIconColor: theme.colors.error,
     disabledIconColor: alphaColor(theme.colors.onSurface, disabledOpacity),
@@ -157,7 +172,7 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
         backgroundColor: colors.borderColor,
       },
       indicatorDisabled: {
-        backgroundColor: colors.disabledBorderColor,
+        backgroundColor: colors.disabledIndicatorColor,
       },
       // MD3 filled hover state-layer overlay. Solid color, opacity is animated.
       // Matches the container's top corner radius so it doesn't bleed past
@@ -247,11 +262,14 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       trailingIconPressable: {
         alignSelf: 'center',
       },
+      // Row shared by supporting text (start) and character counter (end).
       supportingTextRow: {
+        flexDirection: 'row',
         paddingHorizontal: theme.spacing.md,
         paddingTop: theme.spacing.xs,
       },
       supportingText: {
+        flex: 1,
         fontFamily: bodySmall.fontFamily,
         fontSize: bodySmall.fontSize,
         lineHeight: bodySmall.lineHeight,
@@ -261,6 +279,19 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       },
       errorSupportingText: {
         color: colors.errorSupportingTextColor,
+      },
+      disabledSupportingText: {
+        color: colors.disabledSupportingTextColor,
+      },
+      characterCounter: {
+        marginStart: theme.spacing.md,
+        textAlign: 'right',
+        fontFamily: bodySmall.fontFamily,
+        fontSize: bodySmall.fontSize,
+        lineHeight: bodySmall.lineHeight,
+        fontWeight: bodySmall.fontWeight,
+        letterSpacing: bodySmall.letterSpacing,
+        color: colors.supportingTextColor,
       },
     }),
   }

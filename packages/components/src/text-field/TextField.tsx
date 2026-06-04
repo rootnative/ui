@@ -23,17 +23,6 @@ const ICON_WITH_GAP = 12 + 24 + 16
 // resting position and reads as polished even if iOS drops a frame mid-anim.
 const M3_STANDARD = Easing.bezier(0.2, 0, 0, 1)
 
-// 200 ms = M3 short4 duration. The previous 150 ms left only ~9 frames at
-// 60 fps; one dropped frame on iOS was enough to read as choppy. 200 ms
-// (~12 frames) gives the curve room to breathe.
-const LABEL_TIMING = { duration: 200, easing: M3_STANDARD }
-const FOCUS_TIMING = { duration: 200, easing: M3_STANDARD }
-const HOVER_TIMING = { duration: 150, easing: M3_STANDARD }
-const ERROR_TIMING = { duration: 200, easing: M3_STANDARD }
-
-// MD3: filled text-field hover state-layer opacity (on-surface 8%).
-const HOVER_OPACITY = 0.08
-
 export function TextField({
   value,
   onChangeText,
@@ -47,6 +36,8 @@ export function TextField({
   leadingIcon,
   trailingIcon,
   onTrailingIconPress,
+  trailingIconAccessibilityLabel,
+  showCharacterCounter,
   multiline = false,
   onFocus,
   onBlur,
@@ -54,6 +45,9 @@ export function TextField({
   containerColor,
   contentColor,
   inputStyle,
+  maxLength,
+  cursorColor,
+  selectionColor,
   ...textInputProps
 }: TextFieldProps) {
   const theme = useTheme()
@@ -68,14 +62,34 @@ export function TextField({
     [theme, variant],
   )
 
+  // M3 short4 (200 ms) for label/focus/error. 150 ms left only ~9 frames at
+  // 60 fps; one dropped frame on iOS was enough to read as choppy. 200 ms
+  // (~12 frames) gives the curve room to breathe. Hover uses short3 (150 ms).
+  const { labelTiming, focusTiming, hoverTiming, errorTiming } = useMemo(() => {
+    const standard = {
+      duration: theme.motion.durationShort4,
+      easing: M3_STANDARD,
+    }
+    return {
+      labelTiming: standard,
+      focusTiming: standard,
+      errorTiming: standard,
+      hoverTiming: {
+        duration: theme.motion.durationShort3,
+        easing: M3_STANDARD,
+      },
+    }
+  }, [theme])
+
   const [isFocused, setIsFocused] = useState(false)
-  const [internalHasText, setInternalHasText] = useState(
-    () => value !== undefined && value !== '',
+  const [internalValue, setInternalValue] = useState(
+    () => value ?? textInputProps.defaultValue ?? '',
   )
   const inputRef = useRef<TextInput>(null)
 
   const isControlled = value !== undefined
-  const hasValue = isControlled ? value !== '' : internalHasText
+  const currentValue = isControlled ? value : internalValue
+  const hasValue = currentValue !== ''
   const isLabelFloated = isFocused || hasValue
 
   const focused = useSharedValue(0)
@@ -92,12 +106,12 @@ export function TextField({
   )
 
   useEffect(() => {
-    hasValueShared.value = withTiming(hasValue ? 1 : 0, LABEL_TIMING)
-  }, [hasValue, hasValueShared])
+    hasValueShared.value = withTiming(hasValue ? 1 : 0, labelTiming)
+  }, [hasValue, hasValueShared, labelTiming])
 
   useEffect(() => {
-    errored.value = withTiming(isError ? 1 : 0, ERROR_TIMING)
-  }, [isError, errored])
+    errored.value = withTiming(isError ? 1 : 0, errorTiming)
+  }, [isError, errored, errorTiming])
 
   // Label is rendered at bodySmall and scaled up to bodyLarge when at rest.
   const restingScale =
@@ -118,6 +132,8 @@ export function TextField({
   const borderRestColor = colors.borderColor
   const borderFocusColor = colors.focusedBorderColor
   const borderErrorColor = colors.errorBorderColor
+  const borderHoverColor = colors.hoveredBorderColor
+  const hoverOpacity = theme.stateLayer.hoveredOpacity
 
   // Transform on the wrapper View — keeps the layer transform off of Text
   // composition so iOS doesn't have to re-rasterise glyphs while scaling.
@@ -173,11 +189,18 @@ export function TextField({
   // Outlined border drawn as an absolute overlay so its width can animate
   // 1 → 2 dp without ever moving the container's padding box. The label and
   // input keep their static positions; nothing snaps on focus/blur.
+  // Layered crossfade: rest → hover → error → focus (later states win).
+  // MD3 hover keeps the 1 dp width — only focus/error thicken to 2 dp.
   const animatedBorderLayerStyle = useAnimatedStyle(() => {
+    const hoveredBorder = interpolateColor(
+      hovered.value,
+      [0, 1],
+      [borderRestColor, borderHoverColor],
+    )
     const erroredBorder = interpolateColor(
       errored.value,
       [0, 1],
-      [borderRestColor, borderErrorColor],
+      [hoveredBorder, borderErrorColor],
     )
     const finalBorder = interpolateColor(
       focused.value,
@@ -190,7 +213,7 @@ export function TextField({
   })
 
   const animatedHoverLayerStyle = useAnimatedStyle(() => ({
-    opacity: hovered.value * HOVER_OPACITY,
+    opacity: hovered.value * hoverOpacity,
   }))
 
   // Label start: 16dp container padding + leading icon space (12dp inset + 24dp + 16dp gap)
@@ -200,7 +223,7 @@ export function TextField({
 
   const handleChangeText = useCallback(
     (text: string) => {
-      if (!isControlled) setInternalHasText(text !== '')
+      if (!isControlled) setInternalValue(text)
       onChangeText?.(text)
     },
     [isControlled, onChangeText],
@@ -210,40 +233,53 @@ export function TextField({
     (event: NativeSyntheticEvent<TargetedEvent>) => {
       if (isDisabled) return
       setIsFocused(true)
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, focusTiming)
       onFocus?.(event)
     },
-    [isDisabled, onFocus, focused],
+    [isDisabled, onFocus, focused, focusTiming],
   )
 
   const handleBlur = useCallback(
     (event: NativeSyntheticEvent<TargetedEvent>) => {
       setIsFocused(false)
-      focused.value = withTiming(0, FOCUS_TIMING)
+      focused.value = withTiming(0, focusTiming)
       onBlur?.(event)
     },
-    [onBlur, focused],
+    [onBlur, focused, focusTiming],
   )
 
+  // Filled: drives the on-surface 8% hover state layer.
+  // Outlined: drives the outline's rest → on-surface hover color shift.
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled && isFilled) {
-      hovered.value = withTiming(1, HOVER_TIMING)
+    if (!isDisabled) {
+      hovered.value = withTiming(1, hoverTiming)
     }
-  }, [isDisabled, isFilled, hovered])
+  }, [isDisabled, hovered, hoverTiming])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, hoverTiming)
+  }, [hovered, hoverTiming])
 
   const handleContainerPress = useCallback(() => {
     if (!isDisabled) inputRef.current?.focus()
   }, [isDisabled])
 
-  const iconColor = isDisabled
+  // MD3 error state only recolors the TRAILING icon — the leading icon stays
+  // onSurfaceVariant.
+  const leadingIconColor = isDisabled
+    ? colors.disabledIconColor
+    : (contentColor ?? colors.iconColor)
+  const trailingIconColor = isDisabled
     ? colors.disabledIconColor
     : isError
       ? colors.errorIconColor
       : (contentColor ?? colors.iconColor)
+
+  // MD3 caret/selection defaults to primary (error when in error state);
+  // explicit consumer values passed via TextInput props win.
+  const defaultCaretColor = isError ? theme.colors.error : theme.colors.primary
+  const resolvedCursorColor = cursorColor ?? defaultCaretColor
+  const resolvedSelectionColor = selectionColor ?? defaultCaretColor
 
   const containerColorOverride = useMemo(
     () =>
@@ -356,13 +392,26 @@ export function TextField({
     () => [
       styles.supportingText,
       isError ? styles.errorSupportingText : undefined,
+      isDisabled ? styles.disabledSupportingText : undefined,
     ],
-    [styles, isError],
+    [styles, isError, isDisabled],
+  )
+
+  const characterCounterStyleArr = useMemo(
+    () => [
+      styles.characterCounter,
+      isError ? styles.errorSupportingText : undefined,
+      isDisabled ? styles.disabledSupportingText : undefined,
+    ],
+    [styles, isError, isDisabled],
   )
 
   const rootStyle = useMemo(() => [styles.root, style], [styles, style])
 
   const displaySupportingText = isError ? errorText : supportingText
+  // Counter needs a maxLength to be meaningful; defaults to shown when one
+  // is set, hidden entirely otherwise.
+  const showCounter = maxLength !== undefined && (showCharacterCounter ?? true)
 
   return (
     <View style={rootStyle}>
@@ -384,7 +433,7 @@ export function TextField({
             <View style={styles.leadingIcon}>
               {renderIcon(
                 leadingIcon,
-                { size: ICON_SIZE, color: iconColor },
+                { size: ICON_SIZE, color: leadingIconColor },
                 iconResolver,
               )}
             </View>
@@ -396,6 +445,9 @@ export function TextField({
               {...textInputProps}
               value={value}
               onChangeText={handleChangeText}
+              maxLength={maxLength}
+              cursorColor={resolvedCursorColor}
+              selectionColor={resolvedSelectionColor}
               editable={!isDisabled}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -418,13 +470,14 @@ export function TextField({
               onPress={onTrailingIconPress}
               disabled={isDisabled || !onTrailingIconPress}
               accessibilityRole="button"
+              accessibilityLabel={trailingIconAccessibilityLabel}
               hitSlop={12}
               style={styles.trailingIconPressable}
             >
               <View style={styles.trailingIcon}>
                 {renderIcon(
                   trailingIcon,
-                  { size: ICON_SIZE, color: iconColor },
+                  { size: ICON_SIZE, color: trailingIconColor },
                   iconResolver,
                 )}
               </View>
@@ -447,9 +500,16 @@ export function TextField({
         </Animated.View>
       </Pressable>
 
-      {displaySupportingText ? (
+      {displaySupportingText || showCounter ? (
         <View style={styles.supportingTextRow}>
-          <Text style={supportingTextStyleArr}>{displaySupportingText}</Text>
+          <Text style={supportingTextStyleArr}>
+            {displaySupportingText ?? ''}
+          </Text>
+          {showCounter ? (
+            <Text style={characterCounterStyleArr}>
+              {`${currentValue.length}/${maxLength}`}
+            </Text>
+          ) : null}
         </View>
       ) : null}
     </View>

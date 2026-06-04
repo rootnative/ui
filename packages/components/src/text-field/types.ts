@@ -42,6 +42,18 @@ export interface TextFieldProps extends Omit<
   /** Called when the trailing icon is pressed. */
   onTrailingIconPress?: () => void
   /**
+   * Accessibility label announced by screen readers for the trailing icon
+   * pressable (e.g. "Show password").
+   */
+  trailingIconAccessibilityLabel?: string
+  /**
+   * Shows a `{length}/{maxLength}` character counter at the end of the
+   * supporting-text row. Only rendered when `maxLength` is set — without a
+   * `maxLength` the counter is always hidden.
+   * @default true (when `maxLength` is set)
+   */
+  showCharacterCounter?: boolean
+  /**
    * Override the container (background) color.
    * Disabled state still uses the standard disabled appearance.
    */
