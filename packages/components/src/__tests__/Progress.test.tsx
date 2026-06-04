@@ -1,5 +1,6 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import { CircularProgress } from '../progress/CircularProgress'
 import { LinearProgress } from '../progress/LinearProgress'
 
@@ -64,5 +65,14 @@ describe('CircularProgress', () => {
       <CircularProgress progress={0.5} accessibilityLabel="Saving" />,
     )
     expect(screen.getByLabelText('Saving')).toBeTruthy()
+  })
+
+  it('defaults to a 48dp container per MD3', () => {
+    renderWithTheme(<CircularProgress progress={0.5} testID="circular" />)
+    const flatStyle = StyleSheet.flatten(
+      screen.getByTestId('circular').props.style,
+    )
+    expect(flatStyle.width).toBe(48)
+    expect(flatStyle.height).toBe(48)
   })
 })

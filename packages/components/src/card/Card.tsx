@@ -13,10 +13,6 @@ import type { CardProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 export function Card({
   children,
   style,
@@ -37,6 +33,15 @@ export function Card({
   const colors = useMemo(
     () => getResolvedCardColors(theme, variant, containerColor),
     [theme, variant, containerColor],
+  )
+
+  const timings = useMemo(
+    () => ({
+      hover: { duration: theme.motion.durationShort3 },
+      press: { duration: theme.motion.durationShort2 },
+      focus: { duration: theme.motion.durationShort4 },
+    }),
+    [theme.motion],
   )
 
   const hovered = useSharedValue(0)
@@ -67,32 +72,44 @@ export function Card({
     opacity: focused.value,
   }))
 
+  const isElevated = variant === 'elevated'
+  const showElevationLayers = isInteractive && isElevated && !isDisabled
+
+  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3.
+  const animatedElevationLevel1Style = useAnimatedStyle(() => ({
+    opacity: 1 - hovered.value,
+  }))
+
+  const animatedElevationLevel2Style = useAnimatedStyle(() => ({
+    opacity: hovered.value,
+  }))
+
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
+  }, [isDisabled, hovered, timings])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, timings.hover)
+  }, [hovered, timings])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, timings.press)
+  }, [isDisabled, pressed, timings])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, timings.press)
+  }, [pressed, timings])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, timings.focus)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, timings])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, timings.focus)
+  }, [focused, timings])
 
   if (!isInteractive) {
     return (
@@ -108,6 +125,18 @@ export function Card({
         pointerEvents="none"
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
+      {showElevationLayers ? (
+        <>
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.elevationLayerLevel1, animatedElevationLevel1Style]}
+          />
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.elevationLayerLevel2, animatedElevationLevel2Style]}
+          />
+        </>
+      ) : null}
       <AnimatedPressable
         {...props}
         role="button"
@@ -125,6 +154,7 @@ export function Card({
           styles.container,
           styles.interactiveContainer,
           animatedContainerStyle,
+          showElevationLayers ? styles.elevationDelegated : undefined,
           isDisabled ? styles.disabledContainer : undefined,
           style,
         ]}

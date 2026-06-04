@@ -34,8 +34,6 @@ export function getResolvedListItemColors(
   theme: MaterialTheme,
   containerColor?: string,
 ): ListItemColors {
-  const stateLayerFocus = 0.1
-
   if (containerColor) {
     return {
       backgroundColor: containerColor,
@@ -47,7 +45,7 @@ export function getResolvedListItemColors(
       focusedBackgroundColor: blendColor(
         containerColor,
         theme.colors.onSurface,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         containerColor,
@@ -63,7 +61,10 @@ export function getResolvedListItemColors(
       theme.colors.onSurface,
       theme.stateLayer.hoveredOpacity,
     ),
-    focusedBackgroundColor: alphaColor(theme.colors.onSurface, stateLayerFocus),
+    focusedBackgroundColor: alphaColor(
+      theme.colors.onSurface,
+      theme.stateLayer.focusedOpacity,
+    ),
     pressedBackgroundColor: alphaColor(
       theme.colors.onSurface,
       theme.stateLayer.pressedOpacity,
@@ -85,7 +86,9 @@ export function createListItemStyles(
       flexDirection: 'row',
       alignItems: lines === 3 ? 'flex-start' : 'center',
       minHeight: MIN_HEIGHT[lines],
-      paddingHorizontal: theme.spacing.md,
+      // MD3 list item padding: 16dp leading / 24dp trailing.
+      paddingStart: theme.spacing.md,
+      paddingEnd: theme.spacing.lg,
       paddingVertical: ITEM_PADDING_VERTICAL,
       backgroundColor: colors.backgroundColor,
     },

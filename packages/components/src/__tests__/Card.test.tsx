@@ -1,3 +1,4 @@
+import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -61,6 +62,35 @@ describe('Card', () => {
     )
     const button = screen.getByRole('button')
     expect(button.props.accessibilityState).toEqual({ disabled: true })
+  })
+
+  describe('MD3 variant colors', () => {
+    it('elevated card uses surfaceContainerLow as its container color', () => {
+      renderWithTheme(
+        <Card testID="card" variant="elevated">
+          <Text>Elevated</Text>
+        </Card>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByTestId('card').props.style,
+      )
+      expect(flatStyle.backgroundColor).toBe(
+        lightTheme.colors.surfaceContainerLow,
+      )
+    })
+
+    it('outlined card uses outlineVariant for its border', () => {
+      renderWithTheme(
+        <Card testID="card" variant="outlined">
+          <Text>Outlined</Text>
+        </Card>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByTestId('card').props.style,
+      )
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outlineVariant)
+      expect(flatStyle.borderWidth).toBe(1)
+    })
   })
 
   describe('overrides', () => {

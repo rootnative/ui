@@ -34,10 +34,22 @@ export interface AvatarProps extends Omit<ViewProps, 'style'> {
   containerColor?: string
   /** Override the content (icon / initials) color. */
   contentColor?: string
-  /** Custom style applied to the root container. */
+  /**
+   * Custom style applied to the root container. Static form only — the
+   * function form `(state) => style` is not supported because the component
+   * drives its container background through Reanimated. Use `containerColor` /
+   * `contentColor` for state-aware styling.
+   */
   style?: StyleProp<ViewStyle>
   /** When provided, the avatar becomes interactive (Pressable). */
   onPress?: () => void
+  /**
+   * Whether the avatar is disabled. Blocks interaction, renders the content
+   * at 38% opacity, and reports `accessibilityState: { disabled: true }`.
+   * Only applies when `onPress` is set.
+   * @default false
+   */
+  disabled?: boolean
   /** Required when `onPress` is provided — labels the button for screen readers. */
   accessibilityLabel?: string
 }

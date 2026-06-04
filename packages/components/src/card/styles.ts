@@ -32,14 +32,19 @@ function getVariantColors(
   theme: MaterialTheme,
   variant: CardVariant,
 ): CardColors {
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.12)
-  const disabledOutlineColor = alphaColor(theme.colors.onSurface, 0.12)
-  const stateLayerFocus = 0.1
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledOutlineColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
 
   if (variant === 'outlined') {
     return {
       backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.outline,
+      borderColor: theme.colors.outlineVariant,
       borderWidth: 1,
       hoveredBackgroundColor: blendStateLayer(
         theme.colors.surface,
@@ -49,7 +54,7 @@ function getVariantColors(
       focusedBackgroundColor: blendStateLayer(
         theme.colors.surface,
         theme.colors.onSurface,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendStateLayer(
         theme.colors.surface,
@@ -74,7 +79,7 @@ function getVariantColors(
       focusedBackgroundColor: blendColor(
         theme.colors.surfaceContainerHighest,
         theme.colors.onSurface,
-        stateLayerFocus,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         theme.colors.surfaceContainerHighest,
@@ -88,21 +93,21 @@ function getVariantColors(
 
   // elevated (default)
   return {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceContainerLow,
     borderColor: 'transparent',
     borderWidth: 0,
     hoveredBackgroundColor: blendColor(
-      theme.colors.surface,
+      theme.colors.surfaceContainerLow,
       theme.colors.onSurface,
       theme.stateLayer.hoveredOpacity,
     ),
     focusedBackgroundColor: blendColor(
-      theme.colors.surface,
+      theme.colors.surfaceContainerLow,
       theme.colors.onSurface,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
-      theme.colors.surface,
+      theme.colors.surfaceContainerLow,
       theme.colors.onSurface,
       theme.stateLayer.pressedOpacity,
     ),
@@ -117,7 +122,6 @@ function applyContainerColorOverride(
   containerColor?: string,
 ): CardColors {
   if (!containerColor) return colors
-  const stateLayerFocus = 0.1
 
   return {
     ...colors,
@@ -132,7 +136,7 @@ function applyContainerColorOverride(
     focusedBackgroundColor: blendColor(
       containerColor,
       theme.colors.onSurface,
-      stateLayerFocus,
+      theme.stateLayer.focusedOpacity,
     ),
     pressedBackgroundColor: blendColor(
       containerColor,
@@ -162,6 +166,7 @@ export function createStyles(
   const colors = getResolvedCardColors(theme, variant, containerColor)
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
+  const elevationLevel2 = elevationStyle(theme.elevation.level2)
   const baseElevation =
     variant === 'elevated' ? elevationLevel1 : elevationLevel0
 
@@ -181,6 +186,33 @@ export function createStyles(
     },
     interactiveContainer: {
       cursor: 'pointer',
+    },
+    // Container shadow is zeroed when the cross-fading elevation layers below
+    // own the elevation (interactive elevated cards).
+    elevationDelegated: {
+      ...elevationLevel0,
+    },
+    // Two stacked, absolutely-positioned shadow layers that cross-fade the
+    // elevated card from level 1 (rest) → level 2 (hover), per MD3.
+    elevationLayerLevel1: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: theme.shape.cornerMedium,
+      backgroundColor: colors.backgroundColor,
+      ...elevationLevel1,
+    },
+    elevationLayerLevel2: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      borderRadius: theme.shape.cornerMedium,
+      backgroundColor: colors.backgroundColor,
+      ...elevationLevel2,
     },
     focusRing: {
       position: 'absolute' as const,

@@ -13,10 +13,6 @@ import type { ListItemLines, ListItemProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 function getLines(
   supportingText?: string,
   overlineText?: string,
@@ -67,6 +63,15 @@ export function ListItem({
     [theme, containerColor],
   )
 
+  const timings = useMemo(
+    () => ({
+      hover: { duration: theme.motion.durationShort3 },
+      press: { duration: theme.motion.durationShort2 },
+      focus: { duration: theme.motion.durationShort4 },
+    }),
+    [theme.motion],
+  )
+
   const hovered = useSharedValue(0)
   const focused = useSharedValue(0)
   const pressed = useSharedValue(0)
@@ -96,31 +101,31 @@ export function ListItem({
   }))
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
+  }, [isDisabled, hovered, timings])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, timings.hover)
+  }, [hovered, timings])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, timings.press)
+  }, [isDisabled, pressed, timings])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, timings.press)
+  }, [pressed, timings])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, timings.focus)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, timings])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, timings.focus)
+  }, [focused, timings])
 
   const content = (
     <>
@@ -168,8 +173,10 @@ export function ListItem({
 
   return (
     <AnimatedPressable
+      // Default role — placed before the props spread so consumer-provided
+      // `accessibilityRole` / `role` props win (e.g. "link", "menuitem").
+      accessibilityRole="button"
       {...props}
-      role="button"
       accessibilityState={{ disabled: isDisabled }}
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}

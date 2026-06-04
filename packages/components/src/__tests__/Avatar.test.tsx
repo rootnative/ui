@@ -1,7 +1,11 @@
+import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import { Avatar } from '../avatar/Avatar'
+
+type TestInstance = ReturnType<typeof screen.getByRole>
 
 describe('Avatar', () => {
   describe('content', () => {
@@ -70,6 +74,83 @@ describe('Avatar', () => {
     })
   })
 
+  describe('disabled', () => {
+    it('does not call onPress when disabled', () => {
+      const onPress = jest.fn()
+      renderWithTheme(
+        <Avatar
+          label="AB"
+          onPress={onPress}
+          disabled
+          accessibilityLabel="Open profile"
+        />,
+      )
+      fireEvent.press(screen.getByRole('button'))
+      expect(onPress).not.toHaveBeenCalled()
+    })
+
+    it('sets disabled accessibility state when disabled', () => {
+      renderWithTheme(
+        <Avatar
+          label="AB"
+          onPress={() => {}}
+          disabled
+          accessibilityLabel="Open profile"
+        />,
+      )
+      const button = screen.getByRole('button')
+      expect(button.props.accessibilityState).toEqual({ disabled: true })
+    })
+
+    it('renders content at 38% opacity when disabled', () => {
+      renderWithTheme(
+        <Avatar
+          label="AB"
+          onPress={() => {}}
+          disabled
+          accessibilityLabel="Open profile"
+        />,
+      )
+      const button = screen.getByRole('button')
+      const dimmed = button.findAll(
+        (node: TestInstance) =>
+          node.type === 'View' &&
+          (StyleSheet.flatten(node.props.style) as ViewStyle)?.opacity ===
+            lightTheme.stateLayer.disabledOpacity,
+      )
+      expect(dimmed.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('focus ring', () => {
+    const isFocusRing = (node: TestInstance) => {
+      if (node.type !== 'View') return false
+      const flat = StyleSheet.flatten(node.props.style) as ViewStyle
+      return (
+        flat?.borderWidth === 3 &&
+        flat?.borderColor === lightTheme.colors.secondary
+      )
+    }
+
+    it('renders a keyboard focus ring (hidden at rest) on pressable avatars', () => {
+      renderWithTheme(
+        <Avatar label="AB" onPress={() => {}} accessibilityLabel="Avatar" />,
+      )
+      const button = screen.getByRole('button')
+      const rings = button.findAll(isFocusRing)
+      expect(rings.length).toBe(1)
+      const flat = StyleSheet.flatten(rings[0].props.style)
+      // Hidden until keyboard focus.
+      expect(flat.opacity).toBe(0)
+    })
+
+    it('does not render a focus ring on non-interactive avatars', () => {
+      renderWithTheme(<Avatar testID="avatar" label="AB" />)
+      const avatar = screen.getByTestId('avatar')
+      expect(avatar.findAll(isFocusRing).length).toBe(0)
+    })
+  })
+
   describe('sizes', () => {
     it.each([
       ['xSmall', 24],
@@ -91,6 +172,38 @@ describe('Avatar', () => {
       const flatStyle = StyleSheet.flatten(avatar.props.style)
       expect(flatStyle.width).toBe(40)
       expect(flatStyle.height).toBe(40)
+    })
+  })
+
+  describe('accessibility role', () => {
+    it('non-interactive avatar with accessibilityLabel has the image role', () => {
+      renderWithTheme(<Avatar label="AB" accessibilityLabel="User avatar" />)
+      expect(screen.getByRole('image')).toBeTruthy()
+    })
+
+    it('non-interactive avatar without accessibilityLabel has no role', () => {
+      renderWithTheme(<Avatar testID="avatar" label="AB" />)
+      const avatar = screen.getByTestId('avatar')
+      expect(avatar.props.accessibilityRole).toBeUndefined()
+    })
+  })
+
+  describe('initials typography', () => {
+    it.each([
+      ['xSmall', 'labelSmall'],
+      ['small', 'labelMedium'],
+      ['medium', 'titleMedium'],
+      ['large', 'headlineSmall'],
+      ['xLarge', 'displaySmall'],
+    ] as const)('size "%s" uses the %s type role', (size, role) => {
+      renderWithTheme(<Avatar label="AB" size={size} />)
+      const initials = screen.getByText('AB')
+      const flatStyle = StyleSheet.flatten(initials.props.style)
+      const token = lightTheme.typography[role]
+      expect(flatStyle.fontFamily).toBe(token.fontFamily)
+      expect(flatStyle.fontSize).toBe(token.fontSize)
+      expect(flatStyle.fontWeight).toBe(token.fontWeight)
+      expect(flatStyle.lineHeight).toBe(token.lineHeight)
     })
   })
 

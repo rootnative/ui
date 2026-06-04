@@ -23,11 +23,9 @@ import type { LinearProgressProps } from './types'
 const INDETERMINATE_SEGMENT_RATIO = 0.4
 const INDETERMINATE_DURATION_MS = 1800
 
-// MD3 emphasized cubic-bezier for value transitions (short4 ~250 ms).
-const MOTION_TIMING = {
-  duration: 250,
-  easing: Easing.bezier(0.2, 0, 0, 1),
-}
+// MD3 emphasized cubic-bezier easing for value transitions; duration comes
+// from `theme.motion.durationMedium1` (250 ms).
+const MOTION_EASING = Easing.bezier(0.2, 0, 0, 1)
 // Cubic in-out for the indeterminate slide (matches the prior
 // Easing.inOut(Easing.cubic) curve from the RN-Animated implementation).
 const INDETERMINATE_TIMING = {
@@ -57,6 +55,14 @@ export function LinearProgress({
     [theme, thickness, containerColor, trackColor],
   )
 
+  const motionTiming = useMemo(
+    () => ({
+      duration: theme.motion.durationMedium1,
+      easing: MOTION_EASING,
+    }),
+    [theme.motion],
+  )
+
   const [width, setWidth] = useState(0)
   const onLayout = (e: LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width
@@ -79,8 +85,8 @@ export function LinearProgress({
   const progressShared = useSharedValue(value)
   useEffect(() => {
     if (indeterminate) return
-    progressShared.value = withTiming(value, MOTION_TIMING)
-  }, [value, indeterminate, progressShared])
+    progressShared.value = withTiming(value, motionTiming)
+  }, [value, indeterminate, progressShared, motionTiming])
 
   const segmentWidth = Math.max(width * INDETERMINATE_SEGMENT_RATIO, 0)
 

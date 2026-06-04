@@ -43,7 +43,7 @@ export interface CircularProgressProps extends Omit<ViewProps, 'children'> {
   trackColor?: string
   /**
    * Outer diameter in dp.
-   * @default 40
+   * @default 48
    */
   size?: number
   /**

@@ -1,3 +1,4 @@
+import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -102,6 +103,136 @@ describe('Chip', () => {
         </Chip>,
       )
       expect(screen.getByText('close')).toBeTruthy()
+    })
+  })
+
+  describe('container colors', () => {
+    it('flat chips have a transparent container with a 1dp outline', () => {
+      renderWithTheme(<Chip>Flat</Chip>)
+      const chip = screen.getByRole('button')
+      const flatStyle = StyleSheet.flatten(chip.props.style)
+      expect(flatStyle.backgroundColor).toBe('transparent')
+      expect(flatStyle.borderWidth).toBe(1)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outline)
+    })
+
+    it('disabled flat chips stay transparent with a 12% onSurface outline', () => {
+      renderWithTheme(<Chip disabled>Flat disabled</Chip>)
+      const chip = screen.getByRole('button')
+      const flatStyle = StyleSheet.flatten(chip.props.style)
+      expect(flatStyle.backgroundColor).toBe('transparent')
+      expect(flatStyle.borderColor).toBe('rgba(29, 27, 32, 0.12)')
+    })
+
+    it('disabled elevated chips get the 12% onSurface container fill', () => {
+      renderWithTheme(
+        <Chip elevated disabled>
+          Elevated disabled
+        </Chip>,
+      )
+      const chip = screen.getByRole('button')
+      const flatStyle = StyleSheet.flatten(chip.props.style)
+      expect(flatStyle.backgroundColor).toBe('rgba(29, 27, 32, 0.12)')
+    })
+
+    it('disabled selected filter chips get the 12% onSurface container fill', () => {
+      renderWithTheme(
+        <Chip variant="filter" selected disabled>
+          Selected disabled
+        </Chip>,
+      )
+      const chip = screen.getByRole('button')
+      const flatStyle = StyleSheet.flatten(chip.props.style)
+      expect(flatStyle.backgroundColor).toBe('rgba(29, 27, 32, 0.12)')
+    })
+  })
+
+  describe('leading icon color', () => {
+    const renderFnIcon = () =>
+      jest.fn(({ size, color }) => (
+        <Text testID="fn-icon">{`${size}:${color}`}</Text>
+      ))
+
+    it('assist chip icon is primary when enabled', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(<Chip leadingIcon={renderFn}>Assist</Chip>)
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: lightTheme.colors.primary }),
+      )
+    })
+
+    it('suggestion chip icon is primary when enabled', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip variant="suggestion" leadingIcon={renderFn}>
+          Suggest
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: lightTheme.colors.primary }),
+      )
+    })
+
+    it('input chip icon stays onSurfaceVariant', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip variant="input" leadingIcon={renderFn}>
+          Input
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: lightTheme.colors.onSurfaceVariant }),
+      )
+    })
+
+    it('unselected filter chip icon stays onSurfaceVariant', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip variant="filter" leadingIcon={renderFn}>
+          Filter
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: lightTheme.colors.onSurfaceVariant }),
+      )
+    })
+
+    it('selected filter chip icon uses onSecondaryContainer', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip variant="filter" selected leadingIcon={renderFn}>
+          Filter
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          color: lightTheme.colors.onSecondaryContainer,
+        }),
+      )
+    })
+
+    it('disabled chip icon uses 38% onSurface', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip leadingIcon={renderFn} disabled>
+          Disabled
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: 'rgba(29, 27, 32, 0.38)' }),
+      )
+    })
+
+    it('contentColor overrides the variant icon color', () => {
+      const renderFn = renderFnIcon()
+      renderWithTheme(
+        <Chip leadingIcon={renderFn} contentColor="#123456">
+          Custom
+        </Chip>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ color: '#123456' }),
+      )
     })
   })
 

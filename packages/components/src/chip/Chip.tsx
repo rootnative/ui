@@ -27,10 +27,6 @@ import type { ChipProps, ChipVariant } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
-const HOVER_TIMING = { duration: 150 }
-const PRESS_TIMING = { duration: 100 }
-const FOCUS_TIMING = { duration: 200 }
-
 type ChipImplProps = Omit<PressableProps, 'children'> & {
   children: string
   variant?: ChipVariant
@@ -114,6 +110,15 @@ export function Chip(props: ChipProps) {
     [theme, variant, elevated, isSelected, containerColor, contentColor],
   )
 
+  const timings = useMemo(
+    () => ({
+      hover: { duration: theme.motion.durationShort3 },
+      press: { duration: theme.motion.durationShort2 },
+      focus: { duration: theme.motion.durationShort4 },
+    }),
+    [theme.motion],
+  )
+
   const hovered = useSharedValue(0)
   const focused = useSharedValue(0)
   const pressed = useSharedValue(0)
@@ -181,20 +186,20 @@ export function Chip(props: ChipProps) {
   })
 
   const handleCloseHoverIn = useCallback(() => {
-    if (!isDisabled) closeHovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, closeHovered])
+    if (!isDisabled) closeHovered.value = withTiming(1, timings.hover)
+  }, [isDisabled, closeHovered, timings])
 
   const handleCloseHoverOut = useCallback(() => {
-    closeHovered.value = withTiming(0, HOVER_TIMING)
-  }, [closeHovered])
+    closeHovered.value = withTiming(0, timings.hover)
+  }, [closeHovered, timings])
 
   const handleClosePressIn = useCallback(() => {
-    if (!isDisabled) closePressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, closePressed])
+    if (!isDisabled) closePressed.value = withTiming(1, timings.press)
+  }, [isDisabled, closePressed, timings])
 
   const handleClosePressOut = useCallback(() => {
-    closePressed.value = withTiming(0, PRESS_TIMING)
-  }, [closePressed])
+    closePressed.value = withTiming(0, timings.press)
+  }, [closePressed, timings])
 
   const resolvedIconColor = useMemo(
     () =>
@@ -204,6 +209,22 @@ export function Chip(props: ChipProps) {
       ),
     [styles.label, styles.disabledLabel, isDisabled],
   )
+
+  // MD3 leading-icon color mapping:
+  //   assist / suggestion → primary
+  //   filter → onSurfaceVariant (unselected) / onSecondaryContainer (selected)
+  //   input → onSurfaceVariant
+  // Filter and input labels already use these colors, so only assist and
+  // suggestion diverge from the label-derived color. A `contentColor`
+  // override and the 38% onSurface disabled treatment always win (both are
+  // baked into the base label style that `resolvedIconColor` reads from).
+  const leadingIconColor = useMemo(() => {
+    if (isDisabled || contentColor) return resolvedIconColor
+    if (variant === 'assist' || variant === 'suggestion') {
+      return theme.colors.primary
+    }
+    return resolvedIconColor
+  }, [isDisabled, contentColor, variant, resolvedIconColor, theme.colors])
 
   const computedLabelStyle = useMemo(
     () => [
@@ -215,33 +236,34 @@ export function Chip(props: ChipProps) {
   )
 
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, HOVER_TIMING)
-  }, [isDisabled, hovered])
+    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
+  }, [isDisabled, hovered, timings])
 
   const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, HOVER_TIMING)
-  }, [hovered])
+    hovered.value = withTiming(0, timings.hover)
+  }, [hovered, timings])
 
   const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, PRESS_TIMING)
-  }, [isDisabled, pressed])
+    if (!isDisabled) pressed.value = withTiming(1, timings.press)
+  }, [isDisabled, pressed, timings])
 
   const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
+    pressed.value = withTiming(0, timings.press)
+  }, [pressed, timings])
 
   // Match :focus-visible — only show focus state from keyboard navigation.
   const handleFocus = useCallback(() => {
     if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, FOCUS_TIMING)
+      focused.value = withTiming(1, timings.focus)
     }
-  }, [isDisabled, focused])
+  }, [isDisabled, focused, timings])
 
   const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, FOCUS_TIMING)
-  }, [focused])
+    focused.value = withTiming(0, timings.focus)
+  }, [focused, timings])
 
-  const iconRenderProps = { size: iconSize, color: resolvedIconColor }
+  const leadingIconRenderProps = { size: iconSize, color: leadingIconColor }
+  const closeIconRenderProps = { size: iconSize, color: resolvedIconColor }
 
   const renderLeadingContent = () => {
     if (variant === 'input' && avatar) {
@@ -250,14 +272,14 @@ export function Chip(props: ChipProps) {
     if (leadingIcon) {
       return (
         <View style={styles.leadingIcon}>
-          {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
+          {renderIcon(leadingIcon, leadingIconRenderProps, iconResolver)}
         </View>
       )
     }
     if (variant === 'filter' && isSelected) {
       return (
         <View style={styles.leadingIcon}>
-          {renderIcon('check', iconRenderProps, iconResolver)}
+          {renderIcon('check', leadingIconRenderProps, iconResolver)}
         </View>
       )
     }
@@ -324,7 +346,7 @@ export function Chip(props: ChipProps) {
             onPressOut={handleClosePressOut}
             style={[styles.closeButton, animatedCloseStyle]}
           >
-            {renderIcon('close', iconRenderProps, iconResolver)}
+            {renderIcon('close', closeIconRenderProps, iconResolver)}
           </AnimatedPressable>
         ) : null}
       </AnimatedPressable>

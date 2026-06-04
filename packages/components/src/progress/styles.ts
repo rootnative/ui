@@ -2,11 +2,12 @@ import type { MaterialTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
 
 // Material Design 3 (expressive) progress indicator dimensions.
+// Circular: 48dp container with a 4dp stroke.
 // https://m3.material.io/components/progress-indicators/specs
 export const PROGRESS_TRACK_HEIGHT = 4
 export const PROGRESS_TRACK_GAP = 4
 export const PROGRESS_STOP_INDICATOR = 4
-export const PROGRESS_CIRCULAR_SIZE = 40
+export const PROGRESS_CIRCULAR_SIZE = 48
 export const PROGRESS_CIRCULAR_STROKE = 4
 
 interface ProgressColors {

@@ -93,6 +93,26 @@ describe('ListItem', () => {
     expect(button.props.accessibilityState).toEqual({ disabled: true })
   })
 
+  it('uses MD3 padding: 16dp leading / 24dp trailing', () => {
+    renderWithTheme(<ListItem testID="item" headlineText="Title" />)
+    const item = screen.getByTestId('item')
+    const flatStyle = StyleSheet.flatten(item.props.style)
+    expect(flatStyle.paddingStart).toBe(16)
+    expect(flatStyle.paddingEnd).toBe(24)
+  })
+
+  it('allows overriding the accessibility role', () => {
+    renderWithTheme(
+      <ListItem
+        headlineText="Title"
+        onPress={() => {}}
+        accessibilityRole="link"
+      />,
+    )
+    expect(screen.getByRole('link')).toBeTruthy()
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
   describe('overrides', () => {
     it('applies containerColor to a non-interactive item', () => {
       renderWithTheme(

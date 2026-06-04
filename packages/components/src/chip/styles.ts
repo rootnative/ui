@@ -6,8 +6,6 @@ import type { ChipVariant } from './types'
 export const CHIP_FOCUS_RING_OFFSET = 2
 export const CHIP_FOCUS_RING_WIDTH = 3
 
-const STATE_LAYER_FOCUS = 0.1
-
 export interface VariantColors {
   backgroundColor: string
   textColor: string
@@ -27,9 +25,18 @@ function getVariantColors(
   elevated: boolean,
   selected: boolean,
 ): VariantColors {
-  const disabledContainerColor = alphaColor(theme.colors.onSurface, 0.12)
-  const disabledLabelColor = alphaColor(theme.colors.onSurface, 0.38)
-  const disabledOutlineColor = alphaColor(theme.colors.onSurface, 0.12)
+  const disabledContainerColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledLabelColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
+  const disabledOutlineColor = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
 
   // Filter chip — selected state
   if (variant === 'filter' && selected) {
@@ -46,7 +53,7 @@ function getVariantColors(
       focusedBackgroundColor: blendColor(
         theme.colors.secondaryContainer,
         theme.colors.onSecondaryContainer,
-        STATE_LAYER_FOCUS,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         theme.colors.secondaryContainer,
@@ -79,7 +86,7 @@ function getVariantColors(
       focusedBackgroundColor: blendColor(
         theme.colors.surfaceContainerLow,
         textColor,
-        STATE_LAYER_FOCUS,
+        theme.stateLayer.focusedOpacity,
       ),
       pressedBackgroundColor: blendColor(
         theme.colors.surfaceContainerLow,
@@ -92,33 +99,34 @@ function getVariantColors(
     }
   }
 
-  // Flat (outlined) variants
+  // Flat (outlined) variants — MD3 specifies a transparent container with a
+  // 1dp outline, so state layers are alpha overlays instead of blends. The
+  // disabled container also stays transparent (only the outline dims to 12%
+  // onSurface); the 12% disabled container fill applies to elevated /
+  // selected chips only.
   const textColor =
     variant === 'assist'
       ? theme.colors.onSurface
       : theme.colors.onSurfaceVariant
 
   return {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'transparent',
     textColor,
     borderColor: theme.colors.outline,
     borderWidth: 1,
-    hoveredBackgroundColor: blendColor(
-      theme.colors.surface,
+    hoveredBackgroundColor: alphaColor(
       textColor,
       theme.stateLayer.hoveredOpacity,
     ),
-    focusedBackgroundColor: blendColor(
-      theme.colors.surface,
+    focusedBackgroundColor: alphaColor(
       textColor,
-      STATE_LAYER_FOCUS,
+      theme.stateLayer.focusedOpacity,
     ),
-    pressedBackgroundColor: blendColor(
-      theme.colors.surface,
+    pressedBackgroundColor: alphaColor(
       textColor,
       theme.stateLayer.pressedOpacity,
     ),
-    disabledBackgroundColor: disabledContainerColor,
+    disabledBackgroundColor: 'transparent',
     disabledTextColor: disabledLabelColor,
     disabledBorderColor: disabledOutlineColor,
   }
@@ -150,7 +158,7 @@ function applyColorOverrides(
     result.focusedBackgroundColor = blendColor(
       containerColor,
       overlay,
-      STATE_LAYER_FOCUS,
+      theme.stateLayer.focusedOpacity,
     )
     result.pressedBackgroundColor = blendColor(
       containerColor,
@@ -165,7 +173,7 @@ function applyColorOverrides(
       )
       result.focusedBackgroundColor = alphaColor(
         contentColor,
-        STATE_LAYER_FOCUS,
+        theme.stateLayer.focusedOpacity,
       )
       result.pressedBackgroundColor = alphaColor(
         contentColor,
@@ -180,7 +188,7 @@ function applyColorOverrides(
       result.focusedBackgroundColor = blendColor(
         colors.backgroundColor,
         contentColor,
-        STATE_LAYER_FOCUS,
+        theme.stateLayer.focusedOpacity,
       )
       result.pressedBackgroundColor = blendColor(
         colors.backgroundColor,
