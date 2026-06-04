@@ -566,7 +566,7 @@ Props:
 - `canGoBack?: boolean` — Default: `false`. When `true`, renders a back button in the leading slot.
 - `onBackPress?: () => void` — Called when the auto-rendered back button is pressed.
 - `insetTop?: boolean` — Default: `false`. When `true`, wraps the bar in a SafeAreaView that handles the top inset.
-- `elevated?: boolean` — Default: `false`. When `true`, adds shadow/elevation to indicate the bar is scrolled.
+- `elevated?: boolean` — Default: `false`. When `true`, applies the MD3 on-scroll tonal shift: the container color animates from its resting color to its elevated color (`surface` → `surfaceContainer` for the default `'surface'` color scheme). No shadow is added. Only the `'surface'` scheme defines a distinct elevated color; other schemes keep the same container color. Toggle this from your scroll handler when content scrolls under the bar.
 - `leading?: ReactNode` — Custom leading content. When provided, overrides `canGoBack`.
 - `trailing?: ReactNode` — Custom trailing content. When provided, overrides `actions`.
 - `actions?: AppBarAction[]` — Array of actions rendered in the trailing slot. Each entry is either an icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save").
@@ -669,6 +669,8 @@ import { Checkbox } from '@rootnative/components/checkbox'
 Props:
 - `value?: boolean` — Default: `false`. Whether the checkbox is checked.
 - `onValueChange?: (value: boolean) => void` — Callback fired when the checkbox is toggled. Receives the new value.
+- `indeterminate?: boolean` — Default: `false`. Render the MD3 indeterminate ("mixed") state — a dash mark on the selected container colors. Wins over `value` visually, and reports `checked: 'mixed'` to accessibility.
+- `error?: boolean` — Default: `false`. Render the MD3 error state: `error`-colored outline when unchecked, and an `error` container with `onError` mark when checked or indeterminate. State-layer (hover, focus, press) colors also use `error`. The standard disabled treatment wins over the error state.
 - `checkIcon?: IconSource` — Default: `'check'`. Icon shown when the checkbox is checked. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Override this when your `iconResolver` doesn't map the default `'check'` name (e.g. a Lucide-only resolver).
 - `containerColor?: string` — Override the container (box) color when checked. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the checkmark icon color.
@@ -686,7 +688,7 @@ import { Radio } from '@rootnative/components/radio'
 
 Props:
 - `value?: boolean` — Default: `false`. Whether the radio button is selected.
-- `onValueChange?: (value: boolean) => void` — Callback fired when the radio is pressed. Receives the new value.
+- `onValueChange?: (value: boolean) => void` — Callback fired when an unselected radio is pressed. Always receives `true` — radios are select-only, so pressing an already-selected radio is a no-op.
 - `containerColor?: string` — Override the outer ring and inner dot color when selected. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the outer ring color when unselected.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
@@ -706,7 +708,7 @@ import { Switch } from '@rootnative/components/switch'
 Props:
 - `value?: boolean` — Default: `false`. Whether the switch is toggled on.
 - `onValueChange?: (value: boolean) => void` — Callback fired when the switch is toggled. Receives the new value.
-- `selectedIcon?: IconSource` — Default: `'check'`. Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `selectedIcon?: IconSource` — Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Opt-in: the MD3 default switch renders no icons — pass `'check'` for the spec's "switch with icon" variant.
 - `unselectedIcon?: IconSource` — Icon shown on the thumb when unselected. When provided, the thumb renders at the larger selected size. Same accepted forms as `selectedIcon`.
 - `containerColor?: string` — Override the track color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the thumb and icon color.
@@ -734,6 +736,8 @@ Props:
 - `leadingIcon?: IconSource` — Icon rendered at the start of the field. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered at the end of the field. Same accepted forms as `leadingIcon`.
 - `onTrailingIconPress?: () => void` — Called when the trailing icon is pressed.
+- `trailingIconAccessibilityLabel?: string` — Accessibility label announced by screen readers for the trailing icon pressable (e.g. "Show password").
+- `showCharacterCounter?: boolean` — Default: `true (when `maxLength` is set)`. Shows a `{length}/{maxLength}` character counter at the end of the supporting-text row. Only rendered when `maxLength` is set — without a `maxLength` the counter is always hidden.
 - `containerColor?: string` — Override the container (background) color. Disabled state still uses the standard disabled appearance.
 - `contentColor?: string` — Override the content (input text and icon) color. Error and disabled states take precedence.
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
@@ -931,8 +935,9 @@ Props:
 - `size?: 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge'` — Default: `'medium'`. Size of the avatar.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically when `onPress` is set.
 - `contentColor?: string` — Override the content (icon / initials) color.
-- `style?: StyleProp<ViewStyle>` — Custom style applied to the root container.
+- `style?: StyleProp<ViewStyle>` — Custom style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
 - `onPress?: () => void` — When provided, the avatar becomes interactive (Pressable).
+- `disabled?: boolean` — Default: `false`. Whether the avatar is disabled. Blocks interaction, renders the content at 38% opacity, and reports `accessibilityState: { disabled: true }`. Only applies when `onPress` is set.
 - `accessibilityLabel?: string` — Required when `onPress` is provided — labels the button for screen readers.
 - Inherits `ViewProps` (except `style`)
 
@@ -985,7 +990,7 @@ Props:
 - `startIcon?: IconSource` — Optional icon decoration shown at the start (leading edge) of the track. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
 - `endIcon?: IconSource` — Optional icon decoration shown at the end (trailing edge) of the track.
 - `containerColor?: string` — Override the active track color. Hover/press state-layer colors on the thumb are derived from `contentColor` (or the active track color when unset).
-- `contentColor?: string` — Override the thumb color (and the tick-mark color over the active track).
+- `contentColor?: string` — Override the thumb color.
 - `inactiveTrackColor?: string` — Override the inactive track color.
 - `disabled?: boolean` — Default: `false`. Disable interaction. Renders the standard MD3 disabled treatment (38% `onSurface`); `containerColor`/`contentColor` are ignored.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container.
@@ -1031,7 +1036,7 @@ Props:
 - `progress?: number` — Progress value from 0 to 1. When omitted, the indicator shows the indeterminate animation.
 - `containerColor?: string` — Override the active track / indicator color.
 - `trackColor?: string` — Override the inactive track color.
-- `size?: number` — Default: `40`. Outer diameter in dp.
+- `size?: number` — Default: `48`. Outer diameter in dp.
 - `thickness?: number` — Default: `4`. Stroke thickness in dp.
 - Inherits `ViewProps` (except `children`)
 
