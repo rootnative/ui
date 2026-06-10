@@ -21,6 +21,28 @@ const config: Config = {
     locales: ['en'],
   },
 
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap',
+      },
+    },
+  ],
+
   presets: [
     [
       'classic',
@@ -75,13 +97,27 @@ const config: Config = {
   ],
 
   themeConfig: {
+    colorMode: {
+      respectPrefersColorScheme: true,
+    },
     navbar: {
       title: 'RootNative UI',
+      hideOnScroll: true,
       items: [
         {
           type: 'docSidebar',
           sidebarId: 'docs',
           label: 'Docs',
+          position: 'left',
+        },
+        {
+          to: '/theming',
+          label: 'Theming',
+          position: 'left',
+        },
+        {
+          to: '/cli',
+          label: 'CLI',
           position: 'left',
         },
         {
@@ -91,14 +127,46 @@ const config: Config = {
         },
         {
           href: 'https://github.com/rootnative/ui',
-          label: 'GitHub',
           position: 'right',
+          className: 'navbar-github-link',
+          'aria-label': 'GitHub repository',
         },
       ],
     },
     footer: {
-      style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} RootNative`,
+      style: 'light',
+      links: [
+        {
+          title: 'Docs',
+          items: [
+            { label: 'Introduction', to: '/introduction' },
+            { label: 'Quick Start', to: '/quick-start' },
+            { label: 'Installation', to: '/installation' },
+            { label: 'Theming', to: '/theming' },
+          ],
+        },
+        {
+          title: 'Components',
+          items: [
+            { label: 'Button', to: '/components/button' },
+            { label: 'Card', to: '/components/card' },
+            { label: 'TextField', to: '/components/text-field' },
+            { label: 'All components', to: '/introduction' },
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            { label: 'CLI', to: '/cli' },
+            {
+              label: 'Live Demo',
+              href: 'https://rootnative.github.io/ui/demo/',
+            },
+            { label: 'GitHub', href: 'https://github.com/rootnative/ui' },
+          ],
+        },
+      ],
+      copyright: `© ${new Date().getFullYear()} RootNative · MIT Licensed`,
     },
     prism: {
       additionalLanguages: ['bash'],

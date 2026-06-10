@@ -1,23 +1,193 @@
+/* ============================================================
+   RootNative UI — global theme (clean / minimal)
+   ============================================================ */
+
 :root {
-  --ifm-color-primary: #000;
-  --ifm-color-primary-dark: #000;
+  /* Monochrome primary — Vercel-like high contrast */
+  --ifm-color-primary: #0a0a0a;
+  --ifm-color-primary-dark: #0a0a0a;
   --ifm-color-primary-darker: #000;
   --ifm-color-primary-darkest: #000;
-  --ifm-color-primary-light: #000;
-  --ifm-color-primary-lighter: #000;
-  --ifm-color-primary-lightest: #000;
+  --ifm-color-primary-light: #262626;
+  --ifm-color-primary-lighter: #262626;
+  --ifm-color-primary-lightest: #404040;
+
+  /* Typography */
+  --ifm-font-family-base:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  --ifm-font-family-monospace:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    monospace;
+  --ifm-heading-font-weight: 700;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.65;
+
+  /* Surfaces & lines */
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-height: 60px;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.75);
+  --ifm-navbar-shadow: none;
+  --ifm-global-radius: 10px;
+  --ifm-code-font-size: 0.9em;
+
+  /* Shared brand tokens used across the homepage */
+  --rn-border: rgba(0, 0, 0, 0.09);
+  --rn-border-strong: rgba(0, 0, 0, 0.16);
+  --rn-surface: #ffffff;
+  --rn-surface-muted: #fafafa;
+  --rn-fg: #0a0a0a;
+  --rn-fg-muted: #52525b;
+  --rn-fg-subtle: #71717a;
+  --rn-accent: #2563eb;
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #fff;
-  --ifm-color-primary-dark: #fff;
-  --ifm-color-primary-darker: #fff;
-  --ifm-color-primary-darkest: #fff;
-  --ifm-color-primary-light: #fff;
-  --ifm-color-primary-lighter: #fff;
-  --ifm-color-primary-lightest: #fff;
-  --ifm-navbar-background-color: var(--ifm-background-color);
-  --ifm-navbar-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  --ifm-color-primary: #fafafa;
+  --ifm-color-primary-dark: #f5f5f5;
+  --ifm-color-primary-darker: #ededed;
+  --ifm-color-primary-darkest: #e0e0e0;
+  --ifm-color-primary-light: #ffffff;
+  --ifm-color-primary-lighter: #ffffff;
+  --ifm-color-primary-lightest: #ffffff;
+
+  --ifm-background-color: #0a0a0a;
+  --ifm-background-surface-color: #0f0f0f;
+  --ifm-navbar-background-color: rgba(10, 10, 10, 0.7);
+  --ifm-navbar-shadow: none;
+
+  --rn-border: rgba(255, 255, 255, 0.1);
+  --rn-border-strong: rgba(255, 255, 255, 0.2);
+  --rn-surface: #101012;
+  --rn-surface-muted: #0e0e10;
+  --rn-fg: #fafafa;
+  --rn-fg-muted: #a1a1aa;
+  --rn-fg-subtle: #8a8a93;
+  --rn-accent: #60a5fa;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== Navbar — translucent, hairline underline ===== */
+.navbar {
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--rn-border);
+}
+
+.navbar__title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.navbar__link {
+  font-weight: 500;
+  font-size: 0.925rem;
+}
+
+/* GitHub icon link in the navbar */
+.navbar-github-link {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem;
+}
+
+.navbar-github-link:hover {
+  opacity: 0.7;
+}
+
+.navbar-github-link::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  background: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3Z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+/* ===== Headings ===== */
+.markdown h1,
+h1 {
+  letter-spacing: -0.03em;
+}
+
+.markdown h2,
+.markdown h3 {
+  letter-spacing: -0.02em;
+}
+
+/* ===== Code blocks ===== */
+.theme-code-block,
+pre[class*='language-'] {
+  border-radius: 12px !important;
+}
+
+.prism-code {
+  font-size: 0.875rem;
+}
+
+/* Inline code */
+code {
+  border-radius: 6px;
+  border: 1px solid var(--rn-border);
+}
+
+/* ===== Sidebar ===== */
+.menu {
+  font-size: 0.9rem;
+  padding: 1rem 0.75rem !important;
+}
+
+.menu__link {
+  border-radius: 8px;
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+.theme-doc-sidebar-item-category > .menu__list-item-collapsible .menu__link {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--rn-fg-subtle);
+}
+
+/* ===== Footer ===== */
+.footer {
+  background: var(--rn-surface-muted);
+  border-top: 1px solid var(--rn-border);
+  --ifm-footer-background-color: transparent;
+  --ifm-footer-color: var(--rn-fg-muted);
+  --ifm-footer-link-color: var(--rn-fg-muted);
+  --ifm-footer-title-color: var(--rn-fg);
+}
+
+.footer__link-item:hover {
+  color: var(--rn-fg);
+  text-decoration: none;
+}
+
+.footer__title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.footer__copyright {
+  color: var(--rn-fg-subtle);
+  font-size: 0.85rem;
 }
 
 /* Hide sidebar and doc-page chrome on the custom homepage */
@@ -28,12 +198,7 @@
   display: none;
 }
 
-/* Smooth scroll for anchor links */
-html {
-  scroll-behavior: smooth;
-}
-
-/* SnackExample component */
+/* ===== SnackExample component ===== */
 .snack-example {
   margin-bottom: 1rem;
 }
