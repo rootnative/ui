@@ -8,7 +8,9 @@ Design-system agnostic theme engine for [RootNative UI](https://github.com/rootn
 pnpm add @rootnative/core
 ```
 
-Peer dependencies: `react >=19`, `react-native >=0.81`
+Peer dependencies: `react >=18`, `react-native >=0.72`
+
+Optional: `@material/material-color-utilities >=0.4` — only needed for `createMaterialTheme`.
 
 ## Quick start (Material Design 3)
 
@@ -35,6 +37,7 @@ Provides the theme context to all child components. Works with any design system
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `BaseTheme` | `lightTheme` (MD3) | Theme object |
+| `iconResolver` | `IconResolver` | MaterialCommunityIcons | Resolves string icon names (`leadingIcon="check"`) to icon nodes. Set once at the app root to use Lucide, SF Symbols, custom SVGs, etc. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons) |
 | `children` | `ReactNode` | — | App content |
 
 ### useTheme()
@@ -84,6 +87,16 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
 ```
 
 Requires: `npm install @material/material-color-utilities`
+
+### applyRoundness(roundness)
+
+Scales the MD3 corner radius tokens by a multiplier — `0` = sharp corners, `1` = default MD3, `2` = double rounding. `cornerNone` stays `0` and `cornerFull` stays `999`.
+
+```tsx
+import { lightTheme, applyRoundness } from '@rootnative/core'
+
+const sharp: Theme = { ...lightTheme, shape: applyRoundness(0.5) }
+```
 
 ### material preset
 
@@ -152,13 +165,16 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 
 - `ThemeProvider` — Theme context provider (works with any design system, defaults to MD3)
 - `useTheme` — Access current theme (generic)
+- `useIconResolver` — Access the configured icon resolver
 - `defineTheme` — Type-safe theme creation helper
 - `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
+- `applyRoundness` — Scale MD3 corner radius tokens by a multiplier
 - `material` — MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
-- `useBreakpoint` — Current window size class
+- `useBreakpoint` / `breakpoints` — Current window size class
 - `useBreakpointValue` — Responsive values
 - `lightTheme` / `darkTheme` — Built-in MD3 themes
-- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `Shape`, `Spacing`, `Elevation`, `StateLayer`, `Motion` — Types
+- `defaultTopAppBarTokens` — MD3 top app bar defaults
+- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `Shape`, `Spacing`, `Elevation`, `StateLayer`, `Motion`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `ThemeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
 
 ## Docs
 

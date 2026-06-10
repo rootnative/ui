@@ -28,6 +28,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 - Token-based theming (colors, typography, shape, spacing, elevation, motion, state)
 - Light and dark themes out of the box
 - Responsive breakpoint utilities (`useBreakpoint`, `useBreakpointValue`)
+- Pluggable icon system — MaterialCommunityIcons by default, or wire up Lucide, Phosphor, SF Symbols, or custom SVGs via the theme's `iconResolver` (adapters in `@rootnative/icons`)
 - Subpath exports for tree-shaking (`@rootnative/components/button`, etc.)
 - Accessible by default (`role`, `accessibilityLabel`, `accessibilityState`)
 - State-layer press/hover/focus feedback
@@ -66,6 +67,8 @@ npx expo install react react-native react-native-safe-area-context
 ```bash
 npx expo install @expo/vector-icons
 ```
+
+Prefer Lucide, Phosphor, SF Symbols, or your own SVGs? Add [`@rootnative/icons`](packages/icons) and pass a resolver to `ThemeProvider` — see the [icons guide](https://rootnative.github.io/ui/icons).
 
 Wrap your app with `ThemeProvider` and start using components:
 
@@ -106,6 +109,7 @@ The `init` + `add` workflow copies component source files directly into your pro
 | --- | --- | --- |
 | [`@rootnative/core`](packages/core) | ![install size](https://packagephobia.com/badge?p=@rootnative/core) | Theme engine, theme contracts, built-in Material Design You theme, `ThemeProvider`, `useTheme` hook, responsive utilities. |
 | [`@rootnative/components`](packages/components) | ![install size](https://packagephobia.com/badge?p=@rootnative/components) | UI components with subpath exports for tree-shaking. |
+| [`@rootnative/icons`](packages/icons) | ![install size](https://packagephobia.com/badge?p=@rootnative/icons) | Icon-resolver adapters for Lucide, Phosphor, and `@expo/vector-icons`, with MDI-name compatibility helpers. |
 | [`@rootnative/cli`](packages/cli) | ![install size](https://packagephobia.com/badge?p=@rootnative/cli) | CLI to scaffold components into your project (shadcn/ui-style). |
 | [`rootnative`](packages/rootnative) | — | Shorthand wrapper for `@rootnative/cli`. |
 | [`@rootnative/utils`](packages/utils) | — | Internal utilities used by components (not published). |
@@ -121,6 +125,7 @@ The `init` + `add` workflow copies component source files directly into your pro
 ├── packages/
 │   ├── core/              # Theme + provider primitives
 │   ├── components/        # Reusable UI component library
+│   ├── icons/             # Icon-library adapters for the iconResolver
 │   ├── cli/               # CLI for scaffolding components into projects
 │   ├── rootnative/        # Shorthand CLI wrapper
 │   └── utils/             # Internal utilities (not published)

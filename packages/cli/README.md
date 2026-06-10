@@ -4,6 +4,14 @@ CLI for adding [RootNative UI](https://github.com/rootnative/ui) components dire
 
 ## Quick start
 
+Start a new project:
+
+```bash
+npx rootnative create my-app
+```
+
+Or add components to an existing project:
+
 ```bash
 npx rootnative init
 npx rootnative add button card
@@ -22,6 +30,30 @@ The theme system (`@rootnative/core`) stays as an npm dependency so theme update
 - TypeScript project (recommended)
 
 ## Commands
+
+### `rootnative create [name]`
+
+Scaffold a new Expo project with RootNative UI pre-configured (`ThemeProvider` wired up, example components included).
+
+```bash
+npx rootnative create my-app
+```
+
+It prompts for project name, display name, template, and package manager.
+
+Options:
+
+| Flag | Description |
+|------|-------------|
+| `-y, --yes` | Skip prompts and use defaults |
+| `-t, --template <name>` | Template to use (`blank`, `with-router`) |
+| `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
+
+Non-interactive mode for CI/automation:
+
+```bash
+npx rootnative create my-app -y --template with-router --package-manager pnpm
+```
 
 ### `rootnative init`
 
@@ -47,6 +79,7 @@ Options:
 | `-y, --yes` | Skip all prompts and use detected defaults |
 | `--components-alias <alias>` | Components install path (default: `@/components/ui`) |
 | `--lib-alias <alias>` | Utility files path (default: `@/lib`) |
+| `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
 Non-interactive mode for CI/automation:
 
@@ -74,6 +107,7 @@ Options:
 |------|-------------|
 | `-f, --force` | Overwrite existing components |
 | `-d, --dry-run` | Preview what would be installed without writing files |
+| `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
 The `add` command:
 
@@ -82,6 +116,25 @@ The `add` command:
 3. Copies component files with import paths rewritten to match your project
 4. Generates a utility barrel file (`rootnative-utils.ts`)
 5. Installs required npm dependencies
+
+### `rootnative update [components...]`
+
+Update installed components to the latest version from the registry.
+
+```bash
+npx rootnative update button        # update specific components
+npx rootnative update --all         # update everything installed
+npx rootnative update --all --dry-run  # preview the diff first
+```
+
+Options:
+
+| Flag | Description |
+|------|-------------|
+| `-a, --all` | Update all installed components |
+| `-d, --dry-run` | Show diff without applying changes |
+
+Local modifications are detected by diffing against the registry source — review the diff with `--dry-run` before applying if you've customized component files.
 
 ### `rootnative upgrade`
 
@@ -96,6 +149,8 @@ Options:
 | Flag | Description |
 |------|-------------|
 | `-y, --yes` | Skip confirmation prompt |
+| `-a, --all` | Also update all installed component files |
+| `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
 The `upgrade` command:
 
@@ -201,16 +256,22 @@ src/
 |-----------|-------------|
 | `typography` | Text component with 15 MD3 type scale variants |
 | `button` | 5 variants (filled, elevated, outlined, text, tonal) with icon support |
+| `button-group` | Standard and connected button groups with single or multi-select toggle behavior |
 | `icon-button` | 4 variants (filled, tonal, outlined, standard) with toggle support |
+| `fab` | Floating action button with 4 color variants, 3 sizes, and optional extended label |
 | `appbar` | Top app bar with 4 variants and SafeAreaView support |
+| `avatar` | Circular avatar with image, icon, or text initials and 5 sizes |
 | `card` | 3 variants (elevated, filled, outlined) with optional press handler |
 | `chip` | 4 variants (assist, filter, input, suggestion) with icon/avatar support |
 | `checkbox` | Binary selection control |
 | `radio` | Single-choice selection control |
 | `switch` | Toggle control with optional icons |
+| `slider` | Single-thumb or range slider with continuous and discrete modes |
+| `progress` | Linear and circular progress indicators (determinate and indeterminate) |
 | `text-field` | Text input with animated floating label, 2 variants (filled, outlined) |
 | `layout` | Layout primitives: Box, Row, Column, Grid, and SafeAreaView wrapper |
 | `list` | List container with interactive items and dividers |
+| `portal` | Render children into a host elsewhere in the tree (overlays, dialogs, sheets) |
 | `keyboard-avoiding-wrapper` | Zero-config keyboard-aware wrapper for form layouts |
 
 ## Import rewriting
