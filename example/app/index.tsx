@@ -25,7 +25,13 @@ import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 
 interface ComponentEntry {
   label: string
@@ -270,7 +276,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       )
     case 'FAB':
       return (
-        <Row gap="md" align="center">
+        <Row gap="sm" wrap align="center" justify="center">
           <FAB icon="plus" accessibilityLabel="Add" />
           <FAB icon="pencil-outline" label="Edit" />
         </Row>
@@ -412,12 +418,16 @@ const previewMutedText = (theme: MaterialTheme) => ({
 export default function HomeScreen() {
   const router = useRouter()
   const theme = useTheme()
-  const columns = useBreakpointValue({
+  const { width } = useWindowDimensions()
+  const columnsForBreakpoint = useBreakpointValue({
     compact: 2,
     medium: 3,
     expanded: 4,
     large: 4,
   })
+  // Two 128px-preview cards don't fit side by side under ~400dp (e.g. the
+  // docs homepage phone-frame iframe) — fall back to a single column there.
+  const columns = width < 400 ? 1 : columnsForBreakpoint
   const padding = useBreakpointValue({
     compact: 16,
     medium: 24,
