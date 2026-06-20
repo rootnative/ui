@@ -24,7 +24,11 @@ export default defineConfig({
     'src/progress/index.ts',
     'src/fab/index.ts',
   ],
-  dts: true,
+  // `@rootnative/utils` is private/unpublished and bundled into the JS via
+  // `noExternal` below. `dts.resolve` makes the declaration bundler inline its
+  // types too, so shipped .d.ts files don't leave a bare
+  // `import ... from '@rootnative/utils'` that consumers can't resolve.
+  dts: { resolve: ['@rootnative/utils'] },
   format: 'cjs',
   outDir: 'dist',
   clean: true,
