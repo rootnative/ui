@@ -78,7 +78,9 @@ const brandTheme: Theme = {
 
 ### Generate a theme from a seed color
 
-`createMaterialTheme` generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 69 color roles are derived automatically:
+`createMaterialTheme` relies on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), a required peer of `@rootnative/core`. npm and pnpm install required peers automatically; **Yarn users must add it manually** (`yarn add @material/material-color-utilities`).
+
+It generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 69 color roles are derived automatically:
 
 ```tsx
 import { createMaterialTheme } from '@rootnative/core/create-theme'

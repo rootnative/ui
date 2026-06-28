@@ -22,7 +22,9 @@ pnpm add @expo/vector-icons
 pnpm add react-native-svg
 ```
 
-> `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; static components (Typography, Layout, Avatar) work without it. With Expo SDK 54 it's also already available in Expo Go.
+> `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; static components (Typography, Layout, Portal, KeyboardAvoidingWrapper) work without it. With Expo SDK 54 it's also already available in Expo Go.
+>
+> Note that peer dependencies are not installed automatically: these are optional peers, so npm/pnpm skip them too, and Yarn classic installs no peers at all. Install the blocks above explicitly.
 
 Wrap your app with `ThemeProvider` from `@rootnative/core` (see [@rootnative/core](https://www.npmjs.com/package/@rootnative/core)).
 
