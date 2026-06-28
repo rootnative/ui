@@ -17,47 +17,10 @@ Design-system agnostic component library for React Native. Ships with Material D
 - Tree-shakeable with subpath exports
 - Responsive layout hooks (`useBreakpoint`, `useBreakpointValue`)
 
-## Quick Start
+## Get started
 
-### New project
-
-Scaffold a new Expo project with RootNative UI pre-configured:
-
-```bash
-npx rootnative create
-```
-
-See the [Quick Start](./quick-start) guide for the full walkthrough.
-
-### Existing project
-
-Add RootNative UI to an existing React Native or Expo project:
-
-<PackageManagerTabs cmd="npm install @rootnative/core @rootnative/components" />
-
-Wrap your app with `ThemeProvider`:
-
-```tsx
-import { ThemeProvider } from '@rootnative/core'
-
-export default function App() {
-  return (
-    <ThemeProvider>
-      {/* Your app */}
-    </ThemeProvider>
-  )
-}
-```
-
-Use a component:
-
-```tsx
-import { Button } from '@rootnative/components/button'
-
-<Button variant="filled" onPress={() => {}}>
-  Get Started
-</Button>
-```
+- **New project** → [Quick Start](./quick-start) — scaffold a ready-to-run Expo app with `npx rootnative create`.
+- **Existing project** → [Installation](./installation) — add RootNative UI to your React Native or Expo app.
 
 ## Components
 

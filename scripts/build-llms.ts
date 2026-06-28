@@ -1448,7 +1448,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4
+> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage
@@ -1494,7 +1494,7 @@ function generateFullLlms(): string {
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: React Native 0.81+, React 19+, Expo SDK 54+
-> Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`
+> Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`, \`react-native-worklets >=0.5\` (Reanimated 4 runtime — also enable the \`react-native-worklets/plugin\` Babel plugin; bundled in \`babel-preset-expo\` on Expo SDK 54)
 > Optional peer deps: \`@expo/vector-icons >=14\` (only needed for icon props)
 
 ---
@@ -1519,8 +1519,10 @@ Pass name directly: \`npx rootnative create my-app\`
 ## Installation (existing project)
 
 \`\`\`bash
-pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated
+pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated react-native-worklets
 \`\`\`
+
+Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK 54 bundles its Babel plugin — nothing to configure. On bare React Native, add \`'react-native-worklets/plugin'\` last in \`babel.config.js\` plugins.
 
 ---
 

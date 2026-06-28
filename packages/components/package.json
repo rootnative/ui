@@ -206,7 +206,8 @@
     "react-native": ">=0.72.0",
     "react-native-reanimated": ">=4.0.0",
     "react-native-safe-area-context": ">=4.0.0",
-    "react-native-svg": ">=15.0.0"
+    "react-native-svg": ">=15.0.0",
+    "react-native-worklets": ">=0.5.0"
   },
   "peerDependenciesMeta": {
     "@expo/vector-icons": {
@@ -219,6 +220,9 @@
       "optional": true
     },
     "react-native-svg": {
+      "optional": true
+    },
+    "react-native-worklets": {
       "optional": true
     }
   },

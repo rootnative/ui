@@ -202,6 +202,10 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
 
   if (externalDeps.has('react-native-reanimated')) {
     dependencies['react-native-reanimated'] = '>=4.0.0'
+    // Reanimated 4 runs on react-native-worklets (its own peer dep) and needs
+    // the react-native-worklets/plugin Babel plugin. Pull it in alongside so
+    // consumers don't hit a Metro/worklet error.
+    dependencies['react-native-worklets'] = '>=0.5.0'
   }
 
   // Special case: layout uses safe-area-context only in Layout.tsx (optional)

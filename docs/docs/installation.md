@@ -18,9 +18,13 @@ sidebar_position: 3
 
 `@rootnative/components` requires these peer dependencies:
 
-<PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-reanimated" />
+<PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-reanimated react-native-worklets" />
 
 `react-native-reanimated` drives state-layer transitions and gesture-driven components (Slider, Switch). It's bundled with Expo SDK 54 and works in Expo Go — no custom dev client required. You can skip it only if you exclusively use static components (Typography, Layout, Avatar).
+
+Reanimated 4 runs on `react-native-worklets`, so it's installed alongside Reanimated above.
+
+> **Expo SDK 54 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
 
 If you pass **string icon names** (e.g. `leadingIcon="check"`) and don't register a custom `iconResolver`, the library resolves them through [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/). Install:
 

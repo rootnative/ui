@@ -5,8 +5,10 @@ Material Design 3 UI components for React Native, part of [RootNative UI](https:
 ## Install
 
 ```bash
-pnpm add @rootnative/core @rootnative/components react-native-safe-area-context react-native-reanimated
+pnpm add @rootnative/core @rootnative/components react-native-safe-area-context react-native-reanimated react-native-worklets
 ```
+
+Reanimated 4 runs on `react-native-worklets` (installed above). **Expo SDK 54 bundles its Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` last in your `babel.config.js` `plugins`.
 
 **Optional** — only needed if you plan to use icons in your app:
 
