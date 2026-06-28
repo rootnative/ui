@@ -10,6 +10,7 @@
   "react-native": "dist/index.js",
   "source": "src/index.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
       "react-native": "./dist/index.js",
