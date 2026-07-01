@@ -178,7 +178,9 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 
 ## Docs
 
-https://rootnative.github.io/ui/
+Full docs: https://rootnative.github.io/ui/
+
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/core/llms.txt` for the exact installed version.
 
 ## License
 

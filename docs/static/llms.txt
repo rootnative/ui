@@ -68,6 +68,7 @@ Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 54 bund
 ## Docs
 
 - Full docs: https://rootnative.github.io/ui/
+- For AI agents (all LLM-doc locations + CLAUDE.md snippet): https://rootnative.github.io/ui/llms
 - Installation: https://rootnative.github.io/ui/installation
 - Theming: https://rootnative.github.io/ui/theming
 - Components: https://rootnative.github.io/ui/components/button

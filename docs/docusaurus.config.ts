@@ -158,6 +158,7 @@ const config: Config = {
           title: 'More',
           items: [
             { label: 'CLI', to: '/cli' },
+            { label: 'For AI Agents', to: '/llms' },
             {
               label: 'Live Demo',
               href: 'https://rootnative.github.io/ui/demo/',

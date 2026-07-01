@@ -305,6 +305,12 @@ export default function App() {
 }
 ```
 
+## Docs
+
+Full docs: https://rootnative.github.io/ui/cli
+
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/cli/llms.txt` for the exact installed version.
+
 ## License
 
 MIT

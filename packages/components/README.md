@@ -123,7 +123,7 @@ To route string names to a different library app-wide (Lucide, Phosphor, SF Symb
 
 Full API reference: https://rootnative.github.io/ui/
 
-LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/components/llms.txt` for the exact installed version.
 
 ## License
 

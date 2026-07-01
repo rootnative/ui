@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
     { type: 'doc', id: 'theming', label: 'Theming' },
     { type: 'doc', id: 'fonts', label: 'Fonts' },
     { type: 'doc', id: 'icons', label: 'Icons' },
+    { type: 'doc', id: 'llms', label: 'For AI Agents' },
     {
       type: 'category',
       label: 'Layout',

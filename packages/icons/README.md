@@ -123,6 +123,8 @@ Note: some components render system icons of their own (`Checkbox` uses `check`;
 
 Full guide (per-call icons, SF Symbols, custom SVGs): https://rootnative.github.io/ui/icons
 
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/icons/llms.txt` for the exact installed version.
+
 ## License
 
 MIT

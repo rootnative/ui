@@ -3,6 +3,7 @@ import { execa } from 'execa'
 import prompts from 'prompts'
 import { configExists, DEFAULT_CONFIG, writeConfig } from '../lib/config'
 import { detectProject, getInstallCommand } from '../lib/detector'
+import { ensureLlmDocsPointer } from '../lib/llm-docs'
 import { createSpinner, logger } from '../lib/logger'
 import type { RootNativeConfig, PackageManager } from '../lib/types'
 
@@ -119,6 +120,30 @@ export async function initCommand(
 
   await writeConfig(cwd, config)
   logger.success('Created rootnative.json')
+
+  // Point AI agents at the LLM docs via CLAUDE.md
+  let addLlmDocs = options.yes
+
+  if (!options.yes) {
+    const answer = await prompts({
+      type: 'confirm',
+      name: 'addLlmDocs',
+      message: 'Add RootNative LLM docs pointer to CLAUDE.md (for AI agents)?',
+      initial: true,
+    })
+    addLlmDocs = answer.addLlmDocs
+  }
+
+  if (addLlmDocs) {
+    const result = await ensureLlmDocsPointer(cwd)
+    if (result === 'created') {
+      logger.success('Created CLAUDE.md with LLM docs pointer')
+    } else if (result === 'appended') {
+      logger.success('Added LLM docs pointer to CLAUDE.md')
+    } else {
+      logger.info('CLAUDE.md already points to the RootNative LLM docs')
+    }
+  }
 
   // Install @rootnative/core
   let installCore = options.yes

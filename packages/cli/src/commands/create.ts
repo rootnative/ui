@@ -97,6 +97,9 @@ const TEMPLATE_BINARY_FILES = [
   'assets/favicon.png',
 ]
 
+// Fetched with graceful skip — older release tags don't include these yet
+const TEMPLATE_OPTIONAL_TEXT_FILES = ['CLAUDE.md']
+
 function isValidTemplate(value: string): value is TemplateName {
   return value in TEMPLATE_CONFIGS
 }
@@ -133,6 +136,12 @@ async function fetchText(url: string): Promise<string> {
   if (!res.ok) {
     throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`)
   }
+  return res.text()
+}
+
+async function fetchTextOptional(url: string): Promise<string | null> {
+  const res = await fetch(url)
+  if (!res.ok) return null
   return res.text()
 }
 
@@ -317,6 +326,14 @@ export async function createCommand(
       }
 
       await fs.outputFile(path.join(targetDir, file), content)
+    }
+
+    // Optional text files — skip when the template source doesn't have them
+    for (const file of TEMPLATE_OPTIONAL_TEXT_FILES) {
+      const content = await fetchTextOptional(`${templateBaseUrl}/${file}`)
+      if (content !== null) {
+        await fs.outputFile(path.join(targetDir, file), content)
+      }
     }
 
     // Binary files (assets) — optional, skip on failure

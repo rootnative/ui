@@ -8,7 +8,7 @@
 
 **Design system agnostic component library for React Native**, built as a pnpm + Turborepo monorepo. Ships with a Material Design You theme out of the box — or bring your own design system using the pluggable theme engine.
 
-> [Documentation](https://rootnative.github.io/ui/) &nbsp;|&nbsp; [Live Demo](https://rootnative.github.io/ui/demo/) &nbsp;|&nbsp; [GitHub](https://github.com/rootnative/ui)
+> [Documentation](https://rootnative.github.io/ui/) &nbsp;|&nbsp; [Live Demo](https://rootnative.github.io/ui/demo/) &nbsp;|&nbsp; [LLM Docs](https://rootnative.github.io/ui/llms-full.txt) &nbsp;|&nbsp; [GitHub](https://github.com/rootnative/ui)
 
 ## Try it on your device
 
@@ -102,6 +102,10 @@ npx rootnative add button card text-field
 ```
 
 The `init` + `add` workflow copies component source files directly into your project with imports rewritten to match your aliases — full ownership of the code. See the [CLI README](packages/cli) for the full command reference.
+
+## Docs for AI agents
+
+RootNative UI ships [llms.txt](https://llmstxt.org/) documentation for AI coding agents: [llms.txt](https://rootnative.github.io/ui/llms.txt) (overview) and [llms-full.txt](https://rootnative.github.io/ui/llms-full.txt) (complete API reference) are hosted on the docs site, and every published package ships its own `llms.txt` readable from `node_modules` (e.g. `node_modules/@rootnative/components/llms.txt`). See the [For AI Agents](https://rootnative.github.io/ui/llms) guide for a copy-paste `CLAUDE.md` snippet — projects scaffolded with `rootnative create` include it automatically.
 
 ## Packages
 
