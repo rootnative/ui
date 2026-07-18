@@ -1,6 +1,6 @@
 {
   "name": "@rootnative/components",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "Material Design 3 UI components for React Native, part of RootNative UI.",
   "private": false,
   "sideEffects": false,
@@ -202,7 +202,7 @@
   },
   "peerDependencies": {
     "@expo/vector-icons": ">=14.0.0",
-    "@rootnative/core": ">=0.0.0-alpha.0",
+    "@rootnative/core": ">=0.0.0-alpha.1",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0",
     "react-native-reanimated": ">=4.0.0",

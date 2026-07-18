@@ -1,6 +1,6 @@
 {
   "name": "@rootnative/cli",
-  "version": "0.0.0-alpha.0",
+  "version": "0.0.0-alpha.1",
   "description": "CLI for adding RootNative UI components to your React Native project",
   "private": false,
   "bin": {
