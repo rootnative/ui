@@ -5,14 +5,16 @@
     "packages/components/src/chip/Chip.tsx",
     "packages/components/src/chip/index.ts",
     "packages/components/src/chip/styles.ts",
-    "packages/components/src/chip/types.ts"
+    "packages/components/src/chip/types.ts",
+    "packages/components/src/internal/useStateLayer.ts"
   ],
-  "utils": ["color", "elevation", "focus-visible", "pressable", "render-icon"],
+  "utils": ["color", "elevation", "pressable", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",
     "react-native-reanimated": ">=4.0.0",
-    "react-native-worklets": ">=0.5.0"
+    "react-native-worklets": ">=0.5.0",
+    "@rootnative/inertia": ">=0.0.0-alpha.3"
   },
   "optionalDependencies": {}
 }

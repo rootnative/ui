@@ -1,12 +1,12 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
 import {
   alphaColor,
-  isFocusVisible,
   renderIcon,
   resolveColorFromStyle,
 } from '@rootnative/utils'
 import type { IconSource } from '@rootnative/utils'
-import { useCallback, useMemo, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import {
   Platform,
   Pressable,
@@ -16,12 +16,8 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles, getResolvedChipColors } from './styles'
 import type { ChipProps, ChipVariant } from './types'
 
@@ -110,96 +106,75 @@ export function Chip(props: ChipProps) {
     [theme, variant, elevated, isSelected, containerColor, contentColor],
   )
 
-  const timings = useMemo(
-    () => ({
-      hover: { duration: theme.motion.durationShort3 },
-      press: { duration: theme.motion.durationShort2 },
-      focus: { duration: theme.motion.durationShort4 },
-    }),
-    [theme.motion],
-  )
-
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-
-  // Layered crossfade: rest → focus → hover → press (priority: press > hover > focus > rest).
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    const focusedBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [colors.backgroundColor, colors.focusedBackgroundColor],
-    )
-    const hoveredBg = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [focusedBg, colors.hoveredBackgroundColor],
-    )
-    const pressedBg = interpolateColor(
-      pressed.value,
-      [0, 1],
-      [hoveredBg, colors.pressedBackgroundColor],
-    )
-    return { backgroundColor: pressedBg }
+  // State-layer crossfade (rest → focus → hover → press, press wins) with
+  // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
+  // `colors` already folds in the containerColor/contentColor overrides, and
+  // in every variant/override path the layer overlay equals the resolved
+  // text color. While disabled the hook's style/handlers are not applied at
+  // all — the static disabled treatment below owns the container.
+  const {
+    style: stateLayerStyle,
+    handlers,
+    states,
+  } = useStateLayer({
+    rest: colors.backgroundColor,
+    content: colors.textColor,
+    disabled: isDisabled,
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
 
   const isElevated = elevated && variant !== 'input'
   const showElevationLayers = isElevated && !isDisabled
 
-  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3.
+  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
+  // driven by the gesture layer's hover progress (two-layer opacity swap —
+  // platform-portable, see Card.tsx for why useShadow can't replace it).
   const animatedElevationLevel1Style = useAnimatedStyle(() => ({
-    opacity: 1 - hovered.value,
+    opacity: 1 - states.hovered.value,
   }))
 
   const animatedElevationLevel2Style = useAnimatedStyle(() => ({
-    opacity: hovered.value,
+    opacity: states.hovered.value,
   }))
 
-  const closeHovered = useSharedValue(0)
-  const closePressed = useSharedValue(0)
-
-  const closeStateLayerHovered = useMemo(
-    () => alphaColor(colors.textColor, theme.stateLayer.hoveredOpacity),
-    [colors.textColor, theme.stateLayer.hoveredOpacity],
+  // The close button is its own gesture surface with hover/press layers only
+  // (no focus layer, matching MD3's trailing-icon treatment) — it drops to
+  // the generic gesture-layer primitive instead of useStateLayer.
+  const closeLayers = useMemo(
+    () => ({
+      rest: { backgroundColor: 'transparent' },
+      hovered: {
+        backgroundColor: alphaColor(
+          colors.textColor,
+          theme.stateLayer.hoveredOpacity,
+        ),
+      },
+      pressed: {
+        backgroundColor: alphaColor(
+          colors.textColor,
+          theme.stateLayer.pressedOpacity,
+        ),
+      },
+    }),
+    [colors.textColor, theme.stateLayer],
   )
-  const closeStateLayerPressed = useMemo(
-    () => alphaColor(colors.textColor, theme.stateLayer.pressedOpacity),
-    [colors.textColor, theme.stateLayer.pressedOpacity],
+  const closeOptions = useMemo(
+    () => ({
+      disabled: isDisabled,
+      transition: {
+        hovered: 'state-hover',
+        pressed: 'state-press',
+      } as const,
+    }),
+    [isDisabled],
   )
-
-  const animatedCloseStyle = useAnimatedStyle(() => {
-    const hoveredBg = interpolateColor(
-      closeHovered.value,
-      [0, 1],
-      ['transparent', closeStateLayerHovered],
-    )
-    const pressedBg = interpolateColor(
-      closePressed.value,
-      [0, 1],
-      [hoveredBg, closeStateLayerPressed],
-    )
-    return { backgroundColor: pressedBg }
-  })
-
-  const handleCloseHoverIn = useCallback(() => {
-    if (!isDisabled) closeHovered.value = withTiming(1, timings.hover)
-  }, [isDisabled, closeHovered, timings])
-
-  const handleCloseHoverOut = useCallback(() => {
-    closeHovered.value = withTiming(0, timings.hover)
-  }, [closeHovered, timings])
-
-  const handleClosePressIn = useCallback(() => {
-    if (!isDisabled) closePressed.value = withTiming(1, timings.press)
-  }, [isDisabled, closePressed, timings])
-
-  const handleClosePressOut = useCallback(() => {
-    closePressed.value = withTiming(0, timings.press)
-  }, [closePressed, timings])
+  const { style: animatedCloseStyle, handlers: closeHandlers } =
+    useGestureLayer(closeLayers, closeOptions)
 
   const resolvedIconColor = useMemo(
     () =>
@@ -234,33 +209,6 @@ export function Chip(props: ChipProps) {
     ],
     [isDisabled, styles.disabledLabel, styles.label, labelStyleOverride],
   )
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
-  }, [isDisabled, hovered, timings])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, timings.hover)
-  }, [hovered, timings])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, timings.press)
-  }, [isDisabled, pressed, timings])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, timings.press)
-  }, [pressed, timings])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, timings.focus)
-    }
-  }, [isDisabled, focused, timings])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, timings.focus)
-  }, [focused, timings])
 
   const leadingIconRenderProps = { size: iconSize, color: leadingIconColor }
   const closeIconRenderProps = { size: iconSize, color: resolvedIconColor }
@@ -314,15 +262,13 @@ export function Chip(props: ChipProps) {
         // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
         hitSlop={Platform.OS === 'web' ? undefined : 8}
         disabled={isDisabled}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        {...(isDisabled ? undefined : handlers)}
         style={[
           styles.container,
-          animatedContainerStyle,
+          // The gesture-layer style owns backgroundColor while enabled; when
+          // disabled it is dropped entirely so the static disabled background
+          // applies instantly (no animated layer to fight it).
+          isDisabled ? undefined : stateLayerStyle,
           isDisabled ? styles.disabledContainer : undefined,
           // Function-form `style` is intentionally dropped on animated
           // components — wrapping the whole `style` array in a function would
@@ -340,10 +286,7 @@ export function Chip(props: ChipProps) {
             accessibilityRole="button"
             accessibilityLabel="Remove"
             hitSlop={12}
-            onHoverIn={handleCloseHoverIn}
-            onHoverOut={handleCloseHoverOut}
-            onPressIn={handleClosePressIn}
-            onPressOut={handleClosePressOut}
+            {...closeHandlers}
             style={[styles.closeButton, animatedCloseStyle]}
           >
             {renderIcon('close', closeIconRenderProps, iconResolver)}
