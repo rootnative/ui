@@ -9,6 +9,11 @@
     "exports": ["elevationStyle"],
     "dependencies": {}
   },
+  "focus-visible": {
+    "file": "packages/utils/src/focus-visible.ts",
+    "exports": ["useFocusVisible", "isFocusVisible"],
+    "dependencies": {}
+  },
   "icon": {
     "file": "packages/utils/src/icon.ts",
     "exports": ["getMaterialCommunityIcons"],

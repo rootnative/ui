@@ -7,7 +7,7 @@
     "packages/components/src/card/styles.ts",
     "packages/components/src/card/types.ts"
   ],
-  "utils": ["color", "elevation"],
+  "utils": ["color", "elevation", "focus-visible"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",

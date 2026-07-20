@@ -7,7 +7,7 @@
     "packages/components/src/chip/styles.ts",
     "packages/components/src/chip/types.ts"
   ],
-  "utils": ["color", "elevation", "pressable", "render-icon"],
+  "utils": ["color", "elevation", "focus-visible", "pressable", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",

@@ -7,7 +7,7 @@
     "packages/components/src/fab/styles.ts",
     "packages/components/src/fab/types.ts"
   ],
-  "utils": ["color", "elevation", "render-icon"],
+  "utils": ["color", "elevation", "focus-visible", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",

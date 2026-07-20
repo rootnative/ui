@@ -27,6 +27,7 @@ const VERSION = componentsPkg.version as string
 const UTIL_EXPORTS: Record<string, string[]> = {
   color: ['alphaColor', 'blendColor'],
   elevation: ['elevationStyle'],
+  'focus-visible': ['useFocusVisible', 'isFocusVisible'],
   icon: ['getMaterialCommunityIcons'],
   pressable: ['resolvePressableStyle', 'resolveColorFromStyle'],
   'render-icon': ['renderIcon'],
@@ -48,6 +49,7 @@ const UTIL_EXTENSIONS: Record<string, string> = {
 const UTIL_DEPS: Record<string, Record<string, string>> = {
   color: {},
   elevation: {},
+  'focus-visible': {},
   icon: { '@expo/vector-icons': '>=14.0.0' },
   pressable: {},
   'render-icon': { '@expo/vector-icons': '>=14.0.0' },

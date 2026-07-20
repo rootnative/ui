@@ -7,7 +7,7 @@
     "packages/components/src/checkbox/styles.ts",
     "packages/components/src/checkbox/types.ts"
   ],
-  "utils": ["color", "render-icon"],
+  "utils": ["color", "focus-visible", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",

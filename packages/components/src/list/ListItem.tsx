@@ -1,14 +1,9 @@
 import { useTheme } from '@rootnative/core'
-import { isFocusVisible } from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
-import { createListItemStyles, getResolvedListItemColors } from './styles'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import { useStateLayer } from '../internal/useStateLayer'
+import { createListItemStyles } from './styles'
 import type { ListItemLines, ListItemProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -58,74 +53,26 @@ export function ListItem({
     [theme, lines, containerColor, contentColor],
   )
 
-  const colors = useMemo(
-    () => getResolvedListItemColors(theme, containerColor),
-    [theme, containerColor],
-  )
-
-  const timings = useMemo(
-    () => ({
-      hover: { duration: theme.motion.durationShort3 },
-      press: { duration: theme.motion.durationShort2 },
-      focus: { duration: theme.motion.durationShort4 },
-    }),
-    [theme.motion],
-  )
-
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-
-  // Layered crossfade: rest → focus → hover → press (priority: press > hover > focus > rest).
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    const focusedBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [colors.backgroundColor, colors.focusedBackgroundColor],
-    )
-    const hoveredBg = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [focusedBg, colors.hoveredBackgroundColor],
-    )
-    const pressedBg = interpolateColor(
-      pressed.value,
-      [0, 1],
-      [hoveredBg, colors.pressedBackgroundColor],
-    )
-    return { backgroundColor: pressedBg }
+  // State-layer crossfade (rest → focus → hover → press, press wins) with
+  // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
+  // Layers always derive from onSurface — contentColor only recolors the
+  // headline, never the state layers.
+  const {
+    style: stateLayerStyle,
+    handlers,
+    states,
+  } = useStateLayer({
+    rest: 'transparent',
+    content: theme.colors.onSurface,
+    containerColor,
+    disabled: isDisabled,
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
-  }, [isDisabled, hovered, timings])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, timings.hover)
-  }, [hovered, timings])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, timings.press)
-  }, [isDisabled, pressed, timings])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, timings.press)
-  }, [pressed, timings])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, timings.focus)
-    }
-  }, [isDisabled, focused, timings])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, timings.focus)
-  }, [focused, timings])
 
   const content = (
     <>
@@ -181,16 +128,14 @@ export function ListItem({
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
       onPress={onPress}
-      onHoverIn={handleHoverIn}
-      onHoverOut={handleHoverOut}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      {...handlers}
       style={[
         styles.container,
         styles.interactiveContainer,
-        animatedContainerStyle,
+        // The gesture-layer style owns backgroundColor (rest included) and
+        // must come after the static container background so Reanimated's
+        // prop diff sees it.
+        stateLayerStyle,
         isDisabled ? styles.disabledContainer : undefined,
         style,
       ]}

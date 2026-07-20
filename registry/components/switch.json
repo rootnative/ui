@@ -7,7 +7,7 @@
     "packages/components/src/switch/styles.ts",
     "packages/components/src/switch/types.ts"
   ],
-  "utils": ["color", "pressable", "render-icon"],
+  "utils": ["color", "focus-visible", "pressable", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",
