@@ -1,13 +1,9 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { alphaColor, isFocusVisible, renderIcon } from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { alphaColor, renderIcon } from '@rootnative/utils'
+import { useMemo } from 'react'
 import { Pressable } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import { useStateLayer } from '../internal/useStateLayer'
 import {
   applyContainerColorOverride,
   createStyles,
@@ -99,19 +95,6 @@ export function IconButton({
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme.motion.durationShort3],
-  )
-  const pressTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort2 }),
-    [theme.motion.durationShort2],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme.motion.durationShort4],
-  )
-
   const isDisabled = Boolean(disabled)
   const isToggle = selected !== undefined
   const isSelected = Boolean(selected)
@@ -140,59 +123,31 @@ export function IconButton({
     )
   }, [theme, variant, isToggle, isSelected, containerColor, resolvedIconColor])
 
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    const focusedBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [colors.backgroundColor, colors.focusedBackgroundColor],
-    )
-    const hoveredBg = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [focusedBg, colors.hoveredBackgroundColor],
-    )
-    const pressedBg = interpolateColor(
-      pressed.value,
-      [0, 1],
-      [hoveredBg, colors.pressedBackgroundColor],
-    )
-    return { backgroundColor: pressedBg }
+  // State-layer crossfade (rest → focus → hover → press, press wins) with
+  // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
+  // The overlay color the layers derive from matches styles.ts: the
+  // variant/toggle default icon color — or the resolved icon color when a
+  // containerColor override re-derives the layers (per the override
+  // contract). While disabled the hook's style/handlers are not applied at
+  // all — the static disabled treatment below owns the container.
+  const layerContent = containerColor
+    ? resolvedIconColor
+    : getIconColor(variant, theme, isToggle, isSelected)
+  const {
+    style: stateLayerStyle,
+    handlers,
+    states,
+  } = useStateLayer({
+    rest: colors.backgroundColor,
+    content: layerContent,
+    disabled: isDisabled,
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
-  }, [isDisabled, hovered, hoverTiming])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
-  }, [isDisabled, pressed, pressTiming])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, pressTiming)
-  }, [pressed, pressTiming])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
 
   const disabledOverride = isDisabled
     ? {
@@ -215,17 +170,15 @@ export function IconButton({
         disabled={isDisabled}
         hitSlop={hitSlop ?? getDefaultHitSlop(size)}
         onPress={onPress}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        {...(isDisabled ? undefined : handlers)}
         style={[
           styles.container,
           getSizeStyle(styles, size),
           { borderColor: colors.borderColor, borderWidth: colors.borderWidth },
-          animatedContainerStyle,
+          // The gesture-layer style owns backgroundColor while enabled; when
+          // disabled it is dropped entirely so the static disabled override
+          // applies instantly (no animated layer to fight it).
+          isDisabled ? undefined : stateLayerStyle,
           disabledOverride,
           isDisabled ? styles.disabled : undefined,
           // Function-form `style` is intentionally dropped on animated

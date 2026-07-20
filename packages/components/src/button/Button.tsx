@@ -1,17 +1,9 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import {
-  isFocusVisible,
-  renderIcon,
-  resolveColorFromStyle,
-} from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles, getResolvedButtonColors } from './styles'
 import type { ButtonProps } from './types'
 
@@ -36,19 +28,6 @@ export function Button({
   const theme = useTheme()
   const iconResolver = useIconResolver()
 
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme.motion.durationShort3],
-  )
-  const pressTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort2 }),
-    [theme.motion.durationShort2],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme.motion.durationShort4],
-  )
-
   const styles = useMemo(
     () =>
       createStyles(
@@ -67,43 +46,40 @@ export function Button({
     [theme, variant, containerColor, contentColor],
   )
 
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-
-  // Layered crossfade: rest → focus → hover → press (priority: press > hover > focus > rest).
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    const focusedBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [colors.backgroundColor, colors.focusedBackgroundColor],
-    )
-    const hoveredBg = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [focusedBg, colors.hoveredBackgroundColor],
-    )
-    const pressedBg = interpolateColor(
-      pressed.value,
-      [0, 1],
-      [hoveredBg, colors.pressedBackgroundColor],
-    )
-    return { backgroundColor: pressedBg }
+  // State-layer crossfade (rest → focus → hover → press, press wins) with
+  // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
+  // `colors` already folds in the containerColor/contentColor overrides, and
+  // in every variant the layer overlay equals the resolved text color — so
+  // rest + textColor reproduce getResolvedButtonColors' layer set exactly.
+  // While disabled the hook's style/handlers are not applied at all — the
+  // static disabled treatment below owns the container.
+  const {
+    style: stateLayerStyle,
+    handlers,
+    states,
+  } = useStateLayer({
+    rest: colors.backgroundColor,
+    content: colors.textColor,
+    disabled: isDisabled,
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
 
   const showElevationLayers = variant === 'elevated' && !isDisabled
 
-  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3.
+  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
+  // driven by the gesture layer's hover progress (two-layer opacity swap —
+  // platform-portable, see Card.tsx for why useShadow can't replace it).
   const animatedElevationLevel1Style = useAnimatedStyle(() => ({
-    opacity: 1 - hovered.value,
+    opacity: 1 - states.hovered.value,
   }))
 
   const animatedElevationLevel2Style = useAnimatedStyle(() => ({
-    opacity: hovered.value,
+    opacity: states.hovered.value,
   }))
 
   const resolvedIconColor = useMemo(
@@ -123,33 +99,6 @@ export function Button({
     ],
     [isDisabled, styles.disabledLabel, styles.label, labelStyleOverride],
   )
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
-  }, [isDisabled, hovered, hoverTiming])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
-  }, [isDisabled, pressed, pressTiming])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, pressTiming)
-  }, [pressed, pressTiming])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
 
   const iconRenderProps = { size: iconSize, color: resolvedIconColor }
 
@@ -177,15 +126,13 @@ export function Button({
         accessibilityState={{ disabled: isDisabled }}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        {...(isDisabled ? undefined : handlers)}
         style={[
           styles.container,
-          animatedContainerStyle,
+          // The gesture-layer style owns backgroundColor while enabled; when
+          // disabled it is dropped entirely so the static disabled background
+          // applies instantly (no animated layer to fight it).
+          isDisabled ? undefined : stateLayerStyle,
           isDisabled ? styles.disabledContainer : undefined,
           style,
         ]}
