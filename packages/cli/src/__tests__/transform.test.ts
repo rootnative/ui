@@ -112,6 +112,23 @@ describe('transformImports', () => {
     })
   })
 
+  describe('shared internal files → same directory', () => {
+    it('rewrites ../internal/useStateLayer to ./useStateLayer', () => {
+      const input = `import { useStateLayer } from '../internal/useStateLayer'`
+      const output = transform(input, 'avatar')
+      expect(output).toBe(`import { useStateLayer } from './useStateLayer'`)
+    })
+
+    it('rewrites multi-line internal import', () => {
+      const input = `import {
+  useStateLayer,
+  type UseStateLayerOptions,
+} from '../internal/useStateLayer'`
+      const output = transform(input, 'avatar')
+      expect(output).toContain(`from './useStateLayer'`)
+    })
+  })
+
   describe('same-directory imports → unchanged', () => {
     it('keeps ./styles as-is', () => {
       const input = `import { createStyles } from './styles'`

@@ -105,6 +105,7 @@ function analyzeImports(componentDir: string): {
   utils: Set<string>
   componentDeps: Set<string>
   externalDeps: Set<string>
+  internalFiles: Set<string>
 } {
   const fullDir = path.join(COMPONENTS_SRC, componentDir)
   const files = fs
@@ -114,10 +115,47 @@ function analyzeImports(componentDir: string): {
   const utils = new Set<string>()
   const componentDeps = new Set<string>()
   const externalDeps = new Set<string>()
+  // Shared files under src/internal/ pulled in via `../internal/<name>`
+  // imports. They ship inside each consuming component's registry entry (the
+  // CLI flattens them into the component's directory and rewrites the
+  // import), and their own imports count toward the component's deps.
+  const internalFiles = new Set<string>()
+  const pendingInternal: string[] = []
 
+  const collectInternalImports = (content: string) => {
+    const internalImports = content.matchAll(
+      /from\s+['"]\.\.\/internal\/([^'"]+)['"]/g,
+    )
+    for (const match of internalImports) {
+      const name = match[1]
+      const fileName = ['.ts', '.tsx'].some((ext) => name.endsWith(ext))
+        ? name
+        : fs.existsSync(path.join(COMPONENTS_SRC, 'internal', `${name}.tsx`))
+          ? `${name}.tsx`
+          : `${name}.ts`
+      if (!internalFiles.has(fileName)) {
+        internalFiles.add(fileName)
+        pendingInternal.push(fileName)
+      }
+    }
+  }
+
+  const contents: string[] = []
   for (const file of files) {
-    const content = fs.readFileSync(path.join(fullDir, file), 'utf-8')
+    contents.push(fs.readFileSync(path.join(fullDir, file), 'utf-8'))
+  }
+  for (const content of contents) collectInternalImports(content)
+  while (pendingInternal.length > 0) {
+    const fileName = pendingInternal.pop() as string
+    const content = fs.readFileSync(
+      path.join(COMPONENTS_SRC, 'internal', fileName),
+      'utf-8',
+    )
+    contents.push(content)
+    collectInternalImports(content)
+  }
 
+  for (const content of contents) {
     // Check for @rootnative/utils imports
     const utilImportMatch = content.match(/from\s+['"]@rootnative\/utils['"]/g)
     if (utilImportMatch) {
@@ -174,14 +212,23 @@ function analyzeImports(componentDir: string): {
     if (content.includes('react-native-reanimated')) {
       externalDeps.add('react-native-reanimated')
     }
+    if (content.includes('@rootnative/inertia')) {
+      externalDeps.add('@rootnative/inertia')
+    }
   }
 
-  return { utils, componentDeps, externalDeps }
+  return { utils, componentDeps, externalDeps, internalFiles }
 }
 
 function buildComponentEntry(componentDir: string): ComponentEntry {
-  const files = getComponentFiles(componentDir)
-  const { utils, componentDeps, externalDeps } = analyzeImports(componentDir)
+  const { utils, componentDeps, externalDeps, internalFiles } =
+    analyzeImports(componentDir)
+  const files = [
+    ...getComponentFiles(componentDir),
+    ...Array.from(internalFiles)
+      .sort()
+      .map((f) => `packages/components/src/internal/${f}`),
+  ]
 
   const dependencies: Record<string, string> = {
     '@rootnative/core': `>=${VERSION}`,
@@ -207,6 +254,15 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
     // Reanimated 4 runs on react-native-worklets (its own peer dep) and needs
     // the react-native-worklets/plugin Babel plugin. Pull it in alongside so
     // consumers don't hit a Metro/worklet error.
+    dependencies['react-native-worklets'] = '>=0.5.0'
+  }
+
+  if (externalDeps.has('@rootnative/inertia')) {
+    dependencies['@rootnative/inertia'] = '>=0.0.0-alpha.2'
+    // Inertia is a thin wrapper over Reanimated 4 — its peers must be present
+    // for the scaffolded component to run, even when the component itself no
+    // longer imports Reanimated directly.
+    dependencies['react-native-reanimated'] = '>=4.0.0'
     dependencies['react-native-worklets'] = '>=0.5.0'
   }
 

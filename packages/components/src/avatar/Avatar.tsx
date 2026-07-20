@@ -1,13 +1,9 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { blendColor, isFocusVisible, renderIcon } from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { renderIcon } from '@rootnative/utils'
+import { useMemo } from 'react'
 import { Image, Platform, Pressable, Text, View } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
 import type { AvatarProps, AvatarSize } from './types'
 
@@ -96,79 +92,24 @@ export function Avatar({
     [bgColor],
   )
 
-  const colors = useMemo(
-    () => ({
-      background: bgColor,
-      hovered: blendColor(bgColor, fgColor, theme.stateLayer.hoveredOpacity),
-      focused: blendColor(bgColor, fgColor, theme.stateLayer.focusedOpacity),
-      pressed: blendColor(bgColor, fgColor, theme.stateLayer.pressedOpacity),
-    }),
-    [bgColor, fgColor, theme.stateLayer],
-  )
-
-  const timings = useMemo(
-    () => ({
-      hover: { duration: theme.motion.durationShort3 },
-      press: { duration: theme.motion.durationShort2 },
-      focus: { duration: theme.motion.durationShort4 },
-    }),
-    [theme.motion],
-  )
-
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-
-  // Layered crossfade: rest → focus → hover → press (priority: press > hover > focus > rest).
-  const animatedContainerStyle = useAnimatedStyle(() => {
-    const focusedBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [colors.background, colors.focused],
-    )
-    const hoveredBg = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [focusedBg, colors.hovered],
-    )
-    const pressedBg = interpolateColor(
-      pressed.value,
-      [0, 1],
-      [hoveredBg, colors.pressed],
-    )
-    return { backgroundColor: pressedBg }
+  // State-layer crossfade (rest → focus → hover → press, press wins) with
+  // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
+  const {
+    style: stateLayerStyle,
+    handlers,
+    states,
+  } = useStateLayer({
+    rest: theme.colors.primaryContainer,
+    content: fgColor,
+    containerColor,
+    disabled: isDisabled,
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, timings.hover)
-  }, [isDisabled, hovered, timings])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, timings.hover)
-  }, [hovered, timings])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, timings.press)
-  }, [isDisabled, pressed, timings])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, timings.press)
-  }, [pressed, timings])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, timings.focus)
-    }
-  }, [isDisabled, focused, timings])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, timings.focus)
-  }, [focused, timings])
 
   const content = imageUri ? (
     <Image source={{ uri: imageUri }} style={styles.image} accessible={false} />
@@ -213,17 +154,14 @@ export function Avatar({
       hitSlop={hitSlop}
       disabled={isDisabled}
       onPress={onPress}
-      onHoverIn={handleHoverIn}
-      onHoverOut={handleHoverOut}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      {...handlers}
       style={[
         styles.container,
         sizeStyle,
-        containerBaseStyle,
-        animatedContainerStyle,
+        // The gesture-layer style owns backgroundColor (rest included) — a
+        // trailing static background here would hide it from Reanimated's
+        // prop diff and freeze the crossfade.
+        stateLayerStyle,
         isDisabled ? styles.disabledContainer : styles.interactive,
         style,
       ]}

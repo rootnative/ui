@@ -38,6 +38,13 @@ export function transformImports(
       return match
     }
 
+    // Shared internal files (e.g. ../internal/useStateLayer) — the installer
+    // flattens them into the component's own directory
+    if (importPath.startsWith('../internal/')) {
+      const restOfPath = importPath.replace(/^\.\.\/internal\//, '')
+      return `${prefix}${quote}./${restOfPath}${quote}`
+    }
+
     // Relative inter-component imports (e.g. ../icon-button, ../typography)
     if (importPath.startsWith('../')) {
       const targetComponent = extractComponentName(importPath)
