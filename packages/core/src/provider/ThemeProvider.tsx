@@ -1,5 +1,7 @@
+import { MotionConfig } from '@rootnative/inertia'
 import * as React from 'react'
 import { lightTheme } from '../theme/light'
+import { motionTransitions } from '../theme/motionAdapter'
 import type { BaseTheme } from '../theme/types'
 import { IconResolverContext } from './IconResolverContext'
 import type { IconResolver } from './IconResolverContext'
@@ -60,10 +62,21 @@ export function ThemeProvider({
   iconResolver,
   children,
 }: ThemeProviderProps) {
+  const resolvedTheme = theme ?? lightTheme
+  // Register the theme's motion tokens as inertia named transitions so any
+  // descendant can reference them by name ('state-hover', 'spring-fast-
+  // spatial', ...). MotionConfig defaults reducedMotion to 'user', so the OS
+  // accessibility setting is respected app-wide for free. Consumers can nest
+  // their own <MotionConfig> to add names or scope reduced motion — nested
+  // providers merge, child wins.
+  const transitions = React.useMemo(
+    () => motionTransitions(resolvedTheme.motion),
+    [resolvedTheme.motion],
+  )
   return (
-    <ThemeContext.Provider value={theme ?? lightTheme}>
+    <ThemeContext.Provider value={resolvedTheme}>
       <IconResolverContext.Provider value={iconResolver ?? null}>
-        {children}
+        <MotionConfig transitions={transitions}>{children}</MotionConfig>
       </IconResolverContext.Provider>
     </ThemeContext.Provider>
   )

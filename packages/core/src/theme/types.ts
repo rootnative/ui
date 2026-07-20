@@ -204,6 +204,18 @@ export interface ShadowOffset {
   height: number
 }
 
+/**
+ * Physics config for spring-driven transitions. Uses the react-spring
+ * vocabulary (`tension`/`friction`/`mass`) — the same surface
+ * `@rootnative/inertia` springs accept, mapped 1:1 onto Reanimated's
+ * `stiffness`/`damping`/`mass`.
+ */
+export interface MotionSpring {
+  tension: number
+  friction: number
+  mass: number
+}
+
 /** Duration (in ms) and easing tokens for animations following MD3 motion guidelines. */
 export interface Motion {
   durationShort1: number
@@ -229,4 +241,16 @@ export interface Motion {
   easingEmphasized: string
   easingEmphasizedAccelerate: string
   easingEmphasizedDecelerate: string
+  /**
+   * Spring for fast spatial transitions — selection morphs that track user
+   * input snappily (Switch thumb, Slider press-grow). Slight overshoot,
+   * ~0.85 damping ratio. Named after the MD3 Expressive motion-physics token
+   * scheme (fast/default/slow × spatial/effects).
+   */
+  springFastSpatial: MotionSpring
+  /**
+   * Spring for default spatial transitions — selection morphs with a softer,
+   * bouncier settle (Checkbox and Radio marks).
+   */
+  springDefaultSpatial: MotionSpring
 }

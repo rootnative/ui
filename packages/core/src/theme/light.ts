@@ -167,5 +167,7 @@ export const lightTheme: Theme = {
     easingEmphasized: 'cubic-bezier(0.2, 0, 0, 1)',
     easingEmphasizedAccelerate: 'cubic-bezier(0.3, 0, 0.8, 0.15)',
     easingEmphasizedDecelerate: 'cubic-bezier(0.05, 0.7, 0.1, 1)',
+    springFastSpatial: { tension: 380, friction: 33, mass: 1 },
+    springDefaultSpatial: { tension: 380, friction: 26, mass: 1 },
   },
 }

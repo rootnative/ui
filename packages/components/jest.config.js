@@ -9,6 +9,6 @@ module.exports = {
     '^@rootnative/utils/test$': '<rootDir>/../utils/src/test-utils/index.ts',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@expo/vector-icons|react-native-safe-area-context|@material/material-color-utilities)/)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@expo/vector-icons|react-native-safe-area-context|@material/material-color-utilities|@rootnative/inertia|react-native-worklets)/)',
   ],
 }

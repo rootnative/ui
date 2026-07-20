@@ -68,7 +68,9 @@ for (const [util, exports] of Object.entries(UTIL_TYPE_EXPORTS)) {
 }
 
 // Directories to skip
-const SKIP_DIRS = new Set(['__tests__'])
+// 'internal' holds shared hooks (useStateLayer) that ship as util-style
+// files, not as standalone registry components.
+const SKIP_DIRS = new Set(['__tests__', 'internal'])
 
 interface ComponentEntry {
   name: string

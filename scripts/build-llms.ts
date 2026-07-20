@@ -1092,7 +1092,7 @@ BaseTheme {
   spacing: Spacing       — xs, sm, md, lg, xl
   elevation: Elevation   — level0..level3 (shadow properties)
   stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, disabledOpacity
-  motion: Motion         — duration and easing tokens
+  motion: Motion         — duration, easing, and spring tokens
 }
 
 Theme extends BaseTheme {
