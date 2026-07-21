@@ -1,6 +1,6 @@
 # @rootnative/cli — CLI for RootNative UI
 
-> Version: 0.0.0-alpha.1
+> Version: 0.0.0-alpha.2
 > Binary: `rootnative`
 > Requirements: Node >=18
 

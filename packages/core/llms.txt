@@ -1,6 +1,6 @@
 # @rootnative/core — Theme System for React Native
 
-> Version: 0.0.0-alpha.1
+> Version: 0.0.0-alpha.2
 > Peer deps: react >=18, react-native >=0.72
 > Optional: @material/material-color-utilities >=0.4.0 (for createMaterialTheme)
 

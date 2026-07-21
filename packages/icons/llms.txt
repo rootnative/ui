@@ -1,7 +1,7 @@
 # @rootnative/icons — Icon Library Adapters for RootNative UI
 
-> Version: 0.0.0-alpha.1
-> Peer deps: @rootnative/core >=0.0.0-alpha.1, react >=18, react-native >=0.72
+> Version: 0.0.0-alpha.2
+> Peer deps: @rootnative/core >=0.0.0-alpha.2, react >=18, react-native >=0.72
 > Optional peer deps: lucide-react-native, phosphor-react-native, @expo/vector-icons
 
 Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
@@ -20,7 +20,7 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.1)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.2)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 

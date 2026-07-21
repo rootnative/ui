@@ -1,7 +1,7 @@
 # RootNative UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
-> Versions: `@rootnative/core` 0.0.0-alpha.1 · `@rootnative/components` 0.0.0-alpha.1 · `@rootnative/icons` 0.0.0-alpha.1 · `@rootnative/cli` 0.0.0-alpha.1
+> Versions: `@rootnative/core` 0.0.0-alpha.2 · `@rootnative/components` 0.0.0-alpha.2 · `@rootnative/icons` 0.0.0-alpha.2 · `@rootnative/cli` 0.0.0-alpha.2
 > Requirements: React Native 0.81+, React 19+, Expo SDK 54+
 > Peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5` (Reanimated 4 runtime — also enable the `react-native-worklets/plugin` Babel plugin; bundled in `babel-preset-expo` on Expo SDK 54)
 > Optional peer deps: `@expo/vector-icons >=14` (only needed for icon props)
@@ -1056,7 +1056,7 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.1)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.2)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 

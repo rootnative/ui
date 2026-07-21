@@ -1,6 +1,6 @@
 {
   "name": "@rootnative/icons",
-  "version": "0.0.0-alpha.1",
+  "version": "0.0.0-alpha.2",
   "description": "Icon library adapters for RootNative — Lucide, Phosphor, and @expo/vector-icons resolvers with MDI-name compatibility.",
   "private": false,
   "sideEffects": false,
@@ -48,7 +48,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.1",
+    "@rootnative/core": ">=0.0.0-alpha.2",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0"
   },

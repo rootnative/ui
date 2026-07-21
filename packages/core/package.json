@@ -1,6 +1,6 @@
 {
   "name": "@rootnative/core",
-  "version": "0.0.0-alpha.1",
+  "version": "0.0.0-alpha.2",
   "description": "Design-system agnostic theme engine for RootNative UI — a React Native component library. Ships with Material Design 3 out of the box.",
   "private": false,
   "sideEffects": false,
