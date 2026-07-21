@@ -318,13 +318,31 @@ export function createStyles(
       overflow: 'hidden' as const,
     },
     // 24dp circular tap target with state layer (MD3 chip close affordance).
+    // Rendered as a SIBLING of the chip's Pressable, absolutely positioned
+    // over the space `closeSpacer` reserves in the row — nesting it inside
+    // the chip would render <button> inside <button> on web (invalid DOM).
+    // Position mirrors the flex layout: trailing padding is 8 when a close
+    // target is shown, and the 24dp circle centers in the 32dp chip height.
     closeButton: {
-      marginStart: theme.spacing.sm,
+      position: 'absolute' as const,
+      end: 8,
+      top: 4,
       width: 24,
       height: 24,
       borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
+      cursor: 'pointer',
+    },
+    disabledCloseButton: {
+      cursor: 'auto',
+    },
+    // In-flow placeholder that keeps the chip's width identical to the old
+    // nested layout (close icon width + its 8dp leading margin).
+    closeSpacer: {
+      marginStart: theme.spacing.sm,
+      width: 24,
+      height: 24,
     },
   })
 }

@@ -280,19 +280,32 @@ export function Chip(props: ChipProps) {
       >
         {renderLeadingContent()}
         <Text style={computedLabelStyle}>{children}</Text>
-        {showCloseIcon ? (
-          <AnimatedPressable
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel="Remove"
-            hitSlop={12}
-            {...closeHandlers}
-            style={[styles.closeButton, animatedCloseStyle]}
-          >
-            {renderIcon('close', closeIconRenderProps, iconResolver)}
-          </AnimatedPressable>
-        ) : null}
+        {showCloseIcon ? <View style={styles.closeSpacer} /> : null}
       </AnimatedPressable>
+      {showCloseIcon ? (
+        // Sibling of the chip's Pressable (overlaying `closeSpacer`), not a
+        // child — a nested Pressable renders <button> inside <button> on
+        // web, which is invalid DOM nesting. Sibling buttons also match the
+        // reference Material Web chip structure: hovering the close target
+        // drives only its own state layer, and Tab reaches chip → close in
+        // order.
+        <AnimatedPressable
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel="Remove"
+          accessibilityState={{ disabled: isDisabled }}
+          disabled={isDisabled}
+          hitSlop={12}
+          {...(isDisabled ? undefined : closeHandlers)}
+          style={[
+            styles.closeButton,
+            isDisabled ? styles.disabledCloseButton : undefined,
+            animatedCloseStyle,
+          ]}
+        >
+          {renderIcon('close', closeIconRenderProps, iconResolver)}
+        </AnimatedPressable>
+      ) : null}
     </View>
   )
 }

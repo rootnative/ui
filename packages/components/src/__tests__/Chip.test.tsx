@@ -89,6 +89,40 @@ describe('Chip', () => {
       expect(onClose).toHaveBeenCalledTimes(1)
     })
 
+    it('does not call onClose while the chip is disabled', () => {
+      const onClose = jest.fn()
+      renderWithTheme(
+        <Chip variant="input" onClose={onClose} disabled>
+          Tag
+        </Chip>,
+      )
+      fireEvent.press(screen.getByLabelText('Remove'))
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('exposes the close target as a sibling of the chip pressable, not a child', () => {
+      // Nesting would render <button> inside <button> on web (invalid DOM).
+      renderWithTheme(
+        <Chip variant="input" onClose={jest.fn()}>
+          Tag
+        </Chip>,
+      )
+      const chip = screen.getByRole('button', { name: 'Tag' })
+      const close = screen.getByLabelText('Remove')
+      const isDescendant = (
+        node: { parent: unknown } | null,
+        ancestor: unknown,
+      ): boolean => {
+        let current = node?.parent as { parent: unknown } | null | undefined
+        while (current) {
+          if (current === ancestor) return true
+          current = current.parent as { parent: unknown } | null | undefined
+        }
+        return false
+      }
+      expect(isDescendant(close, chip)).toBe(false)
+    })
+
     it('renders close icon for filter variant only when selected', () => {
       const { rerender } = renderWithTheme(
         <Chip variant="filter" onClose={jest.fn()}>
