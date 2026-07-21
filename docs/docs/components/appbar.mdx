@@ -98,6 +98,63 @@ Follows the [Material Design 3 Top App Bar](https://m3.material.io/components/to
 `}
 />
 
+## Collapse on Scroll
+
+The `medium` and `large` variants collapse to the small (64dp) form as the
+content scrolls, per the MD3 spec: the container height shrinks, the title
+transitions to `titleLarge` typography, and the on-scroll tonal shift is
+applied automatically — no `elevated` toggling needed.
+
+Wire it up with `useScroll` from `@rootnative/inertia`: pass `scrollY` to the
+bar's `scrollOffset` prop and the matching `onScroll` to a
+`Motion.ScrollView`. Everything runs on the UI thread — there is no JS-side
+scroll listener.
+
+<SnackExample
+  name="RootNative AppBar — Collapse on Scroll"
+  code={`
+  import { AppBar, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { Motion, useScroll } from '@rootnative/inertia'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const { scrollY, onScroll } = useScroll()
+
+    return (
+      <View style={{ flex: 1 }}>
+        <AppBar title="Large App Bar" variant="large" scrollOffset={scrollY} />
+        <Motion.ScrollView
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ padding: 16, rowGap: 16 }}
+        >
+          {Array.from({ length: 30 }, (_, i) => (
+            <Typography key={i}>Scroll content row {i + 1}</Typography>
+          ))}
+        </Motion.ScrollView>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Screen />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The bar collapses over a scroll distance equal to the height it loses
+(48px for `medium`, 88px for `large`), so the motion tracks the finger 1:1.
+`scrollOffset` is ignored by the `small` and `center-aligned` variants —
+keep using `elevated` for those.
+
 ## Props
 
 <PropTable name="AppBar" />

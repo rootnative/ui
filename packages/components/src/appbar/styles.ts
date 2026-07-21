@@ -131,6 +131,14 @@ export function createStyles(
       minWidth: 0,
       pointerEvents: 'none',
     },
+    // Collapse-on-scroll title host: top/height/end are animated from the
+    // collapse progress in AppBar.tsx.
+    collapsibleTitleContainer: {
+      position: 'absolute',
+      justifyContent: 'center',
+      minWidth: 0,
+      pointerEvents: 'none',
+    },
     centeredTitle: {
       textAlign: 'center',
     },

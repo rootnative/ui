@@ -5,6 +5,7 @@ import type {
   AppBarVariant,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { Motion, useScroll } from '@rootnative/inertia'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
@@ -66,6 +67,35 @@ const actions: AppBarAction[] = [
     accessibilityLabel: 'More options',
   },
 ]
+
+function CollapseDemo({ variant }: { variant: 'medium' | 'large' }) {
+  const { scrollY, onScroll } = useScroll()
+
+  return (
+    <>
+      <AppBar
+        title={variant === 'large' ? 'Large App Bar' : 'Medium App Bar'}
+        variant={variant}
+        canGoBack
+        actions={actions}
+        scrollOffset={scrollY}
+      />
+      <Motion.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        nestedScrollEnabled
+        style={styles.collapseScroll}
+        contentContainerStyle={styles.collapseScrollContent}
+      >
+        {Array.from({ length: 16 }, (_, index) => (
+          <Typography key={index} variant="bodyMedium">
+            Scroll content row {index + 1}
+          </Typography>
+        ))}
+      </Motion.ScrollView>
+    </>
+  )
+}
 
 export default function AppBarScreen() {
   const router = useRouter()
@@ -144,6 +174,26 @@ export default function AppBarScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">Collapse on Scroll</Typography>
+        <Typography variant="bodySmall">
+          Medium and large bars collapse to the small form as the content
+          scrolls, driven by `scrollOffset` from inertia&apos;s useScroll().
+        </Typography>
+        <Column gap="md">
+          {(['medium', 'large'] as const).map((variant) => (
+            <Column key={`collapse-${variant}`} gap="sm">
+              <Typography variant="labelMedium">
+                {variant === 'large' ? 'Large' : 'Medium'}
+              </Typography>
+              <Box style={[previewStyle, styles.collapseFrame]}>
+                <CollapseDemo variant={variant} />
+              </Box>
+            </Column>
+          ))}
+        </Column>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Color Schemes</Typography>
         <Column gap="md">
           {colorSchemes.map((scheme) => (
@@ -193,5 +243,15 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
     rowGap: 20,
+  },
+  collapseFrame: {
+    height: 320,
+  },
+  collapseScroll: {
+    flex: 1,
+  },
+  collapseScrollContent: {
+    padding: 16,
+    rowGap: 16,
   },
 })

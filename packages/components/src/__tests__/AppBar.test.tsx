@@ -1,7 +1,33 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
+import type { TextStyle, ViewStyle } from 'react-native'
+import type { SharedValue } from 'react-native-reanimated'
 import { AppBar } from '../appbar/AppBar'
+
+// The Jest mock evaluates worklets once per render, so a plain `{ value }`
+// stub is all a scroll offset needs to drive the collapse interpolation.
+function scrollOffsetAt(value: number): SharedValue<number> {
+  return { value } as SharedValue<number>
+}
+
+type RenderedNode = {
+  props?: { style?: ViewStyle | TextStyle }
+  children?: RenderedNode[] | null
+}
+
+function collectFlattenedStyles(
+  node: RenderedNode | RenderedNode[] | null,
+): Array<ViewStyle & TextStyle> {
+  if (!node) return []
+  if (Array.isArray(node)) {
+    return node.flatMap((child) => collectFlattenedStyles(child))
+  }
+  const own = node.props?.style
+    ? [StyleSheet.flatten(node.props.style) as ViewStyle & TextStyle]
+    : []
+  return [...own, ...collectFlattenedStyles(node.children ?? null)]
+}
 
 describe('AppBar', () => {
   it('renders the title text', () => {
@@ -152,6 +178,121 @@ describe('AppBar', () => {
     it('renders large variant', () => {
       renderWithTheme(<AppBar title="Large" variant="large" />)
       expect(screen.getByText('Large')).toBeTruthy()
+    })
+  })
+
+  describe('collapse on scroll', () => {
+    it('renders the expanded geometry at rest', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Medium"
+          variant="medium"
+          scrollOffset={scrollOffsetAt(0)}
+        />,
+      )
+      const styles = collectFlattenedStyles(toJSON() as RenderedNode)
+      expect(styles.some((s) => s.height === 112)).toBe(true)
+
+      const title = StyleSheet.flatten(
+        screen.getByText('Medium').props.style,
+      ) as TextStyle
+      expect(title.fontSize).toBe(24)
+      expect(title.lineHeight).toBe(32)
+    })
+
+    it('collapses the medium bar to the small type scale when scrolled', () => {
+      // The Jest mock's `interpolate` is a step function (intermediate
+      // frames are not observable), so this asserts the collapsed endpoint;
+      // the continuous interpolation is example-app-verified.
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Medium"
+          variant="medium"
+          scrollOffset={scrollOffsetAt(48)}
+        />,
+      )
+      const styles = collectFlattenedStyles(toJSON() as RenderedNode)
+      expect(styles.some((s) => s.height === 64)).toBe(true)
+
+      const title = StyleSheet.flatten(
+        screen.getByText('Medium').props.style,
+      ) as TextStyle
+      expect(title.fontSize).toBe(22)
+      expect(title.lineHeight).toBe(28)
+    })
+
+    it('matches the small form when fully collapsed (clamped past the range)', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Large"
+          variant="large"
+          scrollOffset={scrollOffsetAt(500)}
+        />,
+      )
+      const styles = collectFlattenedStyles(toJSON() as RenderedNode)
+      expect(styles.some((s) => s.height === 64)).toBe(true)
+
+      const title = StyleSheet.flatten(
+        screen.getByText('Large').props.style,
+      ) as TextStyle
+      expect(title.fontSize).toBe(22)
+      expect(title.lineHeight).toBe(28)
+    })
+
+    it('starts the large variant from its expanded type scale', () => {
+      renderWithTheme(
+        <AppBar
+          title="Large"
+          variant="large"
+          scrollOffset={scrollOffsetAt(0)}
+        />,
+      )
+      const title = StyleSheet.flatten(
+        screen.getByText('Large').props.style,
+      ) as TextStyle
+      expect(title.fontSize).toBe(28)
+      expect(title.lineHeight).toBe(36)
+    })
+
+    it('keeps the title accessible as a header', () => {
+      renderWithTheme(
+        <AppBar
+          title="Medium"
+          variant="medium"
+          scrollOffset={scrollOffsetAt(0)}
+        />,
+      )
+      expect(screen.getByRole('header')).toBeTruthy()
+    })
+
+    it('applies contentColor and titleStyle to the collapsible title', () => {
+      renderWithTheme(
+        <AppBar
+          title="Styled"
+          variant="medium"
+          scrollOffset={scrollOffsetAt(0)}
+          contentColor="#00FF00"
+          titleStyle={{ fontWeight: '900' }}
+        />,
+      )
+      const title = StyleSheet.flatten(
+        screen.getByText('Styled').props.style,
+      ) as TextStyle
+      expect(title.color).toBe('#00FF00')
+      expect(title.fontWeight).toBe('900')
+    })
+
+    it('ignores scrollOffset on the small variant', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar title="Small" scrollOffset={scrollOffsetAt(500)} />,
+      )
+      const styles = collectFlattenedStyles(toJSON() as RenderedNode)
+      expect(styles.some((s) => s.height === 64)).toBe(true)
+
+      const title = StyleSheet.flatten(
+        screen.getByText('Small').props.style,
+      ) as TextStyle
+      expect(title.fontSize).toBe(22)
     })
   })
 

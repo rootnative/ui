@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { SharedValue } from 'react-native-reanimated'
 import type { IconButtonProps } from '../icon-button'
 
 /** Size/layout variant of the AppBar. */
@@ -95,10 +96,32 @@ export interface AppBarProps {
    * `surfaceContainer` for the default `'surface'` color scheme). No shadow
    * is added. Only the `'surface'` scheme defines a distinct elevated color;
    * other schemes keep the same container color. Toggle this from your
-   * scroll handler when content scrolls under the bar.
+   * scroll handler when content scrolls under the bar. When `scrollOffset`
+   * is provided on a `'medium'`/`'large'` bar, the tonal shift is driven
+   * from the scroll position automatically and this prop only forces the
+   * elevated color on.
    * @default false
    */
   elevated?: boolean
+  /**
+   * Vertical scroll offset (in px) of the content scrolling under the bar,
+   * as a Reanimated shared value. Pass `scrollY` from
+   * `@rootnative/inertia`'s `useScroll()` and give the matching `onScroll`
+   * to your scroll view:
+   *
+   * ```tsx
+   * const { scrollY, onScroll } = useScroll()
+   * <AppBar variant="large" title="Title" scrollOffset={scrollY} />
+   * <Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+   * ```
+   *
+   * Drives the MD3 collapse-on-scroll behavior of the `'medium'` and
+   * `'large'` variants: the container collapses to the small (64dp) form
+   * and the title interpolates to `titleLarge` as the user scrolls, with
+   * the on-scroll tonal shift riding the same progress. Ignored by the
+   * `'small'` and `'center-aligned'` variants.
+   */
+  scrollOffset?: SharedValue<number>
   /** Custom leading content. When provided, overrides `canGoBack`. */
   leading?: ReactNode
   /** Custom trailing content. When provided, overrides `actions`. */

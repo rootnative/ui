@@ -3,13 +3,18 @@ import {
   cubicBezier,
   useAnimation,
   useColorTransition,
+  useMotionValue,
+  useTransform,
 } from '@rootnative/inertia'
 import { selectRTL } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
 import { Platform, View } from 'react-native'
-import Animated from 'react-native-reanimated'
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+} from 'react-native-reanimated'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
@@ -94,6 +99,7 @@ export function AppBar({
   containerColor,
   contentColor,
   titleStyle,
+  scrollOffset,
   style,
 }: AppBarProps) {
   const theme = useTheme()
@@ -133,6 +139,86 @@ export function AppBar({
         ? { start: centeredSideInset, end: centeredSideInset }
         : { start: titleStartInset, end: compactTitleEndInset },
     [centeredSideInset, compactTitleEndInset, isCenterAligned, titleStartInset],
+  )
+
+  // MD3 collapse-on-scroll (medium/large only): the bar collapses to the
+  // small (64dp) form over a scroll distance equal to the height it loses,
+  // while the title interpolates position and type scale
+  // (headlineSmall/headlineMedium → titleLarge). Everything is derived from
+  // `scrollOffset` on the UI thread — no JS-side scroll listener needed.
+  const collapsible = isExpanded && scrollOffset != null
+  const expandedHeight =
+    size === 'large'
+      ? topAppBar.largeContainerHeight
+      : topAppBar.mediumContainerHeight
+  const collapseRange = Math.max(
+    1,
+    expandedHeight - topAppBar.smallContainerHeight,
+  )
+  const restOffset = useMotionValue(0)
+  // Gate on `collapsible` so a scrollOffset passed to a small/center-aligned
+  // bar stays inert (no collapse, no scroll-driven tonal shift).
+  const collapseSource = collapsible && scrollOffset ? scrollOffset : restOffset
+  const collapseProgress = useTransform(
+    collapseSource,
+    [0, collapseRange],
+    [0, 1],
+  )
+
+  const expandedTitleType = theme.typography[titleVariant]
+  const collapsedTitleType = theme.typography.titleLarge
+  // Rest geometry of the expanded title (bottom-aligned with the variant's
+  // bottom padding) and the collapsed target (centered in the 64dp top row,
+  // matching the small variant's overlay title exactly).
+  const titleBottomPadding =
+    size === 'large'
+      ? topAppBar.largeTitleBottomPadding
+      : topAppBar.mediumTitleBottomPadding
+  const expandedTitleTop =
+    expandedHeight - titleBottomPadding - expandedTitleType.lineHeight
+  const collapsedTitleTop =
+    (topAppBar.topRowHeight - collapsedTitleType.lineHeight) / 2
+  const expandedTitleEndInset = theme.spacing.md
+
+  const containerCollapseStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedHeight, topAppBar.smallContainerHeight],
+    ),
+  }))
+  const titleContainerCollapseStyle = useAnimatedStyle(() => ({
+    top: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleTop, collapsedTitleTop],
+    ),
+    height: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
+    ),
+    end: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleEndInset, compactTitleEndInset],
+    ),
+  }))
+  const titleTextCollapseStyle = useAnimatedStyle(() => ({
+    fontSize: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleType.fontSize, collapsedTitleType.fontSize],
+    ),
+    lineHeight: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
+    ),
+  }))
+  const collapsibleTitleInsetStyle = useMemo<ViewStyle>(
+    () => ({ start: titleStartInset }),
+    [titleStartInset],
   )
 
   const leadingContent = useMemo(() => {
@@ -257,9 +343,7 @@ export function AppBar({
   )
 
   // M3 surface tonal shift on scroll uses the medium1 (250 ms) duration on
-  // the standard curve. This is also the seam for the collapse-on-scroll
-  // follow-up (`useScroll` + `useTransform` interpolating height + title
-  // typography) — see the tech-debt note in CLAUDE.md.
+  // the standard curve.
   const elevatedTransition = useMemo(
     () => ({
       type: 'timing' as const,
@@ -269,10 +353,21 @@ export function AppBar({
     [theme.motion],
   )
   const elevatedProgress = useAnimation(elevated ? 1 : 0, elevatedTransition)
-  const animatedSurfaceStyle = useColorTransition(elevatedProgress, [
-    schemeColors.containerColor,
-    schemeColors.elevatedContainerColor,
-  ])
+  // A collapsible bar drives the tonal shift from the scroll position (the
+  // shift completes with the collapse); `elevated` still forces it on.
+  const surfaceProgress = useTransform(() => {
+    'worklet'
+    return Math.max(elevatedProgress.value, collapseProgress.value)
+  })
+  // A `containerColor` override applies to both the resting and elevated
+  // states, so the transition endpoints collapse to the override — the
+  // animated layer can then never stomp it mid-transition.
+  const animatedSurfaceStyle = useColorTransition(
+    surfaceProgress,
+    containerColor
+      ? [containerColor, containerColor]
+      : [schemeColors.containerColor, schemeColors.elevatedContainerColor],
+  )
 
   const containerOverride = containerColor
     ? ({ backgroundColor: containerColor } as ViewStyle)
@@ -290,7 +385,45 @@ export function AppBar({
   ]
 
   if (isExpanded) {
-    const content = (
+    // Collapsible: the container height and the title's position/type scale
+    // are scroll-driven, so the title lives in an absolutely-positioned
+    // animated container instead of the static flex layout. Fully collapsed
+    // it matches the small variant's overlay title geometry exactly.
+    // Note: like every animated component in the library, the animated
+    // fontSize/lineHeight win over a static override in `titleStyle` once
+    // the animation updates.
+    const content = collapsible ? (
+      <Animated.View
+        style={[
+          styles.expandedContainer,
+          getSizeStyle(styles, size),
+          containerCollapseStyle,
+        ]}
+      >
+        {topRow}
+        <Animated.View
+          style={[
+            styles.collapsibleTitleContainer,
+            collapsibleTitleInsetStyle,
+            titleContainerCollapseStyle,
+          ]}
+        >
+          <Animated.Text
+            {...APP_BAR_TITLE_TEXT_PROPS}
+            style={[
+              expandedTitleType,
+              styles.title,
+              titleColorStyle,
+              styles.startAlignedTitle,
+              titleTextCollapseStyle,
+              titleStyle,
+            ]}
+          >
+            {title}
+          </Animated.Text>
+        </Animated.View>
+      </Animated.View>
+    ) : (
       <View style={[styles.expandedContainer, getSizeStyle(styles, size)]}>
         {topRow}
         <View
