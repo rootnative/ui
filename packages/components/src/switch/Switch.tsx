@@ -1,18 +1,19 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import {
-  isFocusVisible,
-  renderIcon,
-  resolveColorFromStyle,
-} from '@rootnative/utils'
-import { useCallback, useEffect, useMemo } from 'react'
+  cubicBezier,
+  useBooleanSpring,
+  useColorTransition,
+} from '@rootnative/inertia'
+import {
+  useGestureLayer,
+  type GestureLayerStates,
+} from '@rootnative/inertia/gesture-layer'
+import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import { useCallback, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import Animated, {
   interpolate,
-  interpolateColor,
   useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
 } from 'react-native-reanimated'
 import {
   SWITCH_STATE_LAYER_SIZE,
@@ -32,16 +33,9 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 const THUMB_TRANSLATE_X =
   SWITCH_TRACK_WIDTH - SWITCH_TRACK_PADDING * 2 - SWITCH_THUMB_ON_SIZE
 
-// MD3 emphasized spring for the toggle (slight overshoot, ~0.85 damping ratio).
-const TOGGLE_SPRING = {
-  damping: 33,
-  stiffness: 380,
-  mass: 1,
-}
-
 // Press in/out uses a fast, predictable timing curve — no spring oscillation,
 // so the 28 dp thumb grow is reached in full within 120 ms.
-const PRESS_TIMING = { duration: 120 }
+const PRESS_DURATION = 120
 
 const ICON_SIZE = 16
 
@@ -70,22 +64,6 @@ export function Switch({
     [theme, containerColor, contentColor],
   )
 
-  // MD3 state-layer opacity tokens.
-  const {
-    hoveredOpacity: HOVER_OPACITY,
-    focusedOpacity: FOCUS_OPACITY,
-    pressedOpacity: PRESS_OPACITY,
-  } = theme.stateLayer
-
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme],
-  )
-
   const offColors = useMemo(
     () => getResolvedColors(theme, false, containerColor, contentColor),
     [theme, containerColor, contentColor],
@@ -95,28 +73,71 @@ export function Switch({
     [theme, containerColor, contentColor],
   )
 
-  const progress = useSharedValue(isSelected ? 1 : 0)
-  const pressed = useSharedValue(0)
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
+  // Toggle progress — the theme's fast-spatial spring (MD3 emphasized feel,
+  // slight overshoot, ~0.85 damping ratio).
+  const progress = useBooleanSpring(isSelected, 'spring-fast-spatial')
 
-  useEffect(() => {
-    progress.value = withSpring(isSelected ? 1 : 0, TOGGLE_SPRING)
-  }, [isSelected, progress])
+  const pressTransition = useMemo(
+    () => ({
+      type: 'timing' as const,
+      duration: PRESS_DURATION,
+      easing: cubicBezier(theme.motion.easingStandard),
+    }),
+    [theme.motion.easingStandard],
+  )
 
-  const animatedTrackStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.trackColor, onColors.trackColor],
-    ),
-    borderColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.borderColor, onColors.borderColor],
-    ),
-  }))
+  // State-layer halo opacity: solid base color, view opacity carries the
+  // alpha. The gesture layer composes the strongest active interaction via
+  // clamped-max; the `disabled` layer pins the halo off while disabled.
+  // Focus feedback rides `focusVisible` (keyboard focus only). The pressed
+  // progress doubles as the thumb-grow driver below.
+  const haloLayers = useMemo<GestureLayerStates>(
+    () => ({
+      rest: { opacity: 0 },
+      hovered: { opacity: theme.stateLayer.hoveredOpacity },
+      focusVisible: { opacity: theme.stateLayer.focusedOpacity },
+      pressed: { opacity: theme.stateLayer.pressedOpacity },
+      disabled: { opacity: 0 },
+    }),
+    [theme.stateLayer],
+  )
+  const gestureOptions = useMemo(
+    () => ({
+      disabled: isDisabled,
+      transition: {
+        hovered: 'state-hover' as const,
+        focused: 'state-focus' as const,
+        focusVisible: 'state-focus' as const,
+        pressed: pressTransition,
+      },
+    }),
+    [isDisabled, pressTransition],
+  )
+  const {
+    style: haloOpacityStyle,
+    handlers,
+    states,
+  } = useGestureLayer(haloLayers, gestureOptions)
+  const pressed = states.pressed
 
+  const trackColorStyle = useColorTransition(progress, [
+    offColors.trackColor,
+    onColors.trackColor,
+  ])
+  const trackBorderStyle = useColorTransition(
+    progress,
+    [offColors.borderColor, onColors.borderColor],
+    { key: 'borderColor' },
+  )
+
+  const thumbColorStyle = useColorTransition(progress, [
+    offColors.thumbColor,
+    onColors.thumbColor,
+  ])
+
+  // Interop escape hatch: the thumb morph reads the toggle spring and the
+  // pressed timing together — position, size, and radius in one progress-
+  // driven worklet.
   const animatedThumbStyle = useAnimatedStyle(() => {
     const baseSize = interpolate(
       progress.value,
@@ -132,11 +153,6 @@ export function Switch({
       width: size,
       height: size,
       borderRadius: size / 2,
-      backgroundColor: interpolateColor(
-        progress.value,
-        [0, 1],
-        [offColors.thumbColor, onColors.thumbColor],
-      ),
       transform: [
         {
           translateX: interpolate(
@@ -153,11 +169,22 @@ export function Switch({
   // for the off position; `translateX` adds (a) the toggle progress shift and
   // (b) any thumb-grow shift on press (since the thumb's left edge is fixed,
   // its center moves right by half the size delta).
-  const haloLeft =
-    SWITCH_TRACK_PADDING -
-    SWITCH_TRACK_BORDER_WIDTH +
-    offThumbSize / 2 -
-    SWITCH_STATE_LAYER_SIZE / 2
+  const haloPositionStyle = useMemo(
+    () => ({
+      left:
+        SWITCH_TRACK_PADDING -
+        SWITCH_TRACK_BORDER_WIDTH +
+        offThumbSize / 2 -
+        SWITCH_STATE_LAYER_SIZE / 2,
+    }),
+    [offThumbSize],
+  )
+
+  // The halo color crossfades with the toggle progress (same as the thumb).
+  const haloColorStyle = useColorTransition(progress, [
+    offColors.thumbColor,
+    onColors.thumbColor,
+  ])
 
   const animatedHaloStyle = useAnimatedStyle(() => {
     const baseSize = interpolate(
@@ -171,16 +198,6 @@ export function Switch({
       [baseSize, SWITCH_THUMB_PRESSED_SIZE],
     )
     return {
-      opacity: Math.max(
-        hovered.value * HOVER_OPACITY,
-        focused.value * FOCUS_OPACITY,
-        pressed.value * PRESS_OPACITY,
-      ),
-      backgroundColor: interpolateColor(
-        progress.value,
-        [0, 1],
-        [offColors.thumbColor, onColors.thumbColor],
-      ),
       transform: [
         {
           translateX:
@@ -190,8 +207,10 @@ export function Switch({
     }
   })
 
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
 
   const animatedSelectedIconStyle = useAnimatedStyle(() => ({
@@ -216,37 +235,6 @@ export function Switch({
     }
   }, [isDisabled, isSelected, onValueChange])
 
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) {
-      pressed.value = withTiming(1, PRESS_TIMING)
-    }
-  }, [isDisabled, pressed])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, PRESS_TIMING)
-  }, [pressed])
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) {
-      hovered.value = withTiming(1, hoverTiming)
-    }
-  }, [isDisabled, hovered, hoverTiming])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
-
   return (
     <View style={styles.wrapper}>
       <Animated.View
@@ -263,15 +251,11 @@ export function Switch({
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        {...handlers}
         style={[
           styles.track,
-          animatedTrackStyle,
+          trackColorStyle,
+          trackBorderStyle,
           isDisabled
             ? isSelected
               ? styles.disabledTrackSelected
@@ -282,12 +266,19 @@ export function Switch({
       >
         <Animated.View
           pointerEvents="none"
-          style={[styles.stateLayer, { left: haloLeft }, animatedHaloStyle]}
+          style={[
+            styles.stateLayer,
+            haloPositionStyle,
+            haloOpacityStyle,
+            haloColorStyle,
+            animatedHaloStyle,
+          ]}
         />
         <Animated.View
           testID="switch-thumb"
           style={[
             styles.thumbBase,
+            thumbColorStyle,
             animatedThumbStyle,
             isDisabled
               ? isSelected

@@ -1,24 +1,16 @@
 import { useTheme } from '@rootnative/core'
-import { isFocusVisible } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useBooleanSpring, useColorTransition } from '@rootnative/inertia'
+import {
+  useGestureLayer,
+  type GestureLayerStates,
+} from '@rootnative/inertia/gesture-layer'
+import { useCallback, useMemo } from 'react'
 import { Platform, Pressable } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
-const TOGGLE_SPRING = {
-  damping: 26,
-  stiffness: 380,
-  mass: 1,
-}
 
 export function Radio({
   style,
@@ -35,26 +27,6 @@ export function Radio({
   const theme = useTheme()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  // MD3 state-layer opacity tokens.
-  const {
-    hoveredOpacity: HOVER_OPACITY,
-    focusedOpacity: FOCUS_OPACITY,
-    pressedOpacity: PRESS_OPACITY,
-  } = theme.stateLayer
-
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme],
-  )
-  const pressTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort2 }),
-    [theme],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme],
-  )
-
   const offColors = useMemo(
     () => getResolvedRadioColors(theme, false, containerColor, contentColor),
     [theme, containerColor, contentColor],
@@ -64,48 +36,64 @@ export function Radio({
     [theme, containerColor, contentColor],
   )
 
-  const progress = useSharedValue(isSelected ? 1 : 0)
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
+  // Selection progress — the theme's default-spatial spring (soft toggle).
+  const progress = useBooleanSpring(isSelected, 'spring-default-spatial')
 
-  useEffect(() => {
-    progress.value = withSpring(isSelected ? 1 : 0, TOGGLE_SPRING)
-  }, [isSelected, progress])
+  // State-layer halo opacity: solid base color, view opacity carries the
+  // alpha — produces exactly the MD3 token values without any compounding.
+  // The gesture layer composes the strongest active interaction via
+  // clamped-max; the `disabled` layer pins the halo off while disabled.
+  // Focus feedback rides `focusVisible` (keyboard focus only).
+  const haloLayers = useMemo<GestureLayerStates>(
+    () => ({
+      rest: { opacity: 0 },
+      hovered: { opacity: theme.stateLayer.hoveredOpacity },
+      focusVisible: { opacity: theme.stateLayer.focusedOpacity },
+      pressed: { opacity: theme.stateLayer.pressedOpacity },
+      disabled: { opacity: 0 },
+    }),
+    [theme.stateLayer],
+  )
+  const gestureOptions = useMemo(
+    () => ({
+      disabled: isDisabled,
+      transition: {
+        hovered: 'state-hover',
+        pressed: 'state-press',
+        focused: 'state-focus',
+        focusVisible: 'state-focus',
+      } as const,
+    }),
+    [isDisabled],
+  )
+  const {
+    style: haloOpacityStyle,
+    handlers,
+    states,
+  } = useGestureLayer(haloLayers, gestureOptions)
 
-  const animatedOuterStyle = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.borderColor, onColors.borderColor],
-    ),
-  }))
+  // The halo color crossfades with the selection progress.
+  const haloColorStyle = useColorTransition(progress, [
+    offColors.stateLayerColor,
+    onColors.stateLayerColor,
+  ])
 
+  const outerBorderStyle = useColorTransition(
+    progress,
+    [offColors.borderColor, onColors.borderColor],
+    { key: 'borderColor' },
+  )
+
+  // Interop escape hatch: the dot pop follows the same selection spring that
+  // drives the outline color.
   const animatedInnerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: progress.value }],
-    backgroundColor: onColors.dotColor,
   }))
 
-  const animatedStateLayerStyle = useAnimatedStyle(() => {
-    // Solid base color, view opacity carries the alpha — produces exactly the
-    // MD3 token values without any compounding.
-    const layerColor = interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.stateLayerColor, onColors.stateLayerColor],
-    )
-    return {
-      opacity: Math.max(
-        hovered.value * HOVER_OPACITY,
-        focused.value * FOCUS_OPACITY,
-        pressed.value * PRESS_OPACITY,
-      ),
-      backgroundColor: layerColor,
-    }
-  })
-
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
 
   // Radios are select-only: pressing an already-selected radio is a no-op —
@@ -114,34 +102,14 @@ export function Radio({
     if (!isDisabled && !isSelected) onValueChange?.(true)
   }, [isDisabled, isSelected, onValueChange])
 
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
-  }, [isDisabled, hovered, hoverTiming])
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
-  }, [isDisabled, pressed, pressTiming])
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, pressTiming)
-  }, [pressed, pressTiming])
-
-  // Match :focus-visible — only show focus state from keyboard navigation.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
-
   // Disabled snaps to disabled colors (no animation when disabled).
   const outerOverride = isDisabled
     ? { borderColor: offColors.disabledBorderColor }
     : undefined
+  const innerColor = useMemo(
+    () => ({ backgroundColor: onColors.dotColor }),
+    [onColors],
+  )
   const innerOverride = useMemo(
     () => ({ backgroundColor: onColors.disabledDotColor }),
     [onColors],
@@ -158,12 +126,7 @@ export function Radio({
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
       onPress={handlePress}
-      onHoverIn={handleHoverIn}
-      onHoverOut={handleHoverOut}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      {...handlers}
       style={[
         styles.container,
         isDisabled ? styles.disabledContainer : undefined,
@@ -176,14 +139,14 @@ export function Radio({
       />
       <Animated.View
         pointerEvents="none"
-        style={[styles.stateLayer, animatedStateLayerStyle]}
+        style={[styles.stateLayer, haloOpacityStyle, haloColorStyle]}
       />
-      <Animated.View style={[styles.outer, animatedOuterStyle, outerOverride]}>
+      <Animated.View style={[styles.outer, outerBorderStyle, outerOverride]}>
         <Animated.View
           style={[
             styles.inner,
+            isDisabled ? innerOverride : innerColor,
             animatedInnerStyle,
-            isDisabled ? innerOverride : undefined,
           ]}
         />
       </Animated.View>

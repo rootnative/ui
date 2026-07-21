@@ -1,17 +1,8 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
-import {
-  isFocusVisible,
-  renderIcon,
-  resolveColorFromStyle,
-} from '@rootnative/utils'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactElement,
-} from 'react'
+import { cubicBezier, useAnimation, useGesture } from '@rootnative/inertia'
+import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import { useCallback, useMemo, useState, type ReactElement } from 'react'
 import {
   Platform,
   Pressable,
@@ -24,8 +15,6 @@ import Animated, {
   interpolate,
   interpolateColor,
   useAnimatedStyle,
-  useSharedValue,
-  withTiming,
 } from 'react-native-reanimated'
 import {
   createGroupStyles,
@@ -186,21 +175,16 @@ function ButtonGroupItemImpl({
   const isDisabled = Boolean(isGroupDisabled || item.disabled)
   const iconResolver = useIconResolver()
 
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme.motion.durationShort3],
-  )
-  const pressTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort2 }),
-    [theme.motion.durationShort2],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme.motion.durationShort4],
-  )
-  const selectedTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme.motion.durationShort4],
+  // Selection morph (colors + corner radii) — durationShort4 on the MD3
+  // standard curve. Component-specific tween, so the config stays local
+  // rather than in the named-transition registry.
+  const selectedTransition = useMemo(
+    () => ({
+      type: 'timing' as const,
+      duration: theme.motion.durationShort4,
+      easing: cubicBezier(theme.motion.easingStandard),
+    }),
+    [theme.motion.durationShort4, theme.motion.easingStandard],
   )
 
   const tokens = getSizeTokens(size)
@@ -261,14 +245,19 @@ function ButtonGroupItemImpl({
     [theme, variant, size, index, total],
   )
 
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
-  const selectedProgress = useSharedValue(isSelected ? 1 : 0)
+  const selectedProgress = useAnimation(isSelected ? 1 : 0, selectedTransition)
 
-  useEffect(() => {
-    selectedProgress.value = withTiming(isSelected ? 1 : 0, selectedTiming)
-  }, [isSelected, selectedProgress, selectedTiming])
+  // Gesture progress + handlers from inertia. The cascade worklet below
+  // consumes the raw sub-states because the per-state target colors
+  // themselves interpolate with the selection progress — a shape the static
+  // layer maps of `useGestureLayer` can't express, so this stays hook-level.
+  // Focus feedback rides `focusVisible` (keyboard focus only).
+  const { hovered, focusVisible, pressed, handlers } = useGesture({
+    hovered: 'state-hover',
+    pressed: 'state-press',
+    focused: 'state-focus',
+    focusVisible: 'state-focus',
+  } as const)
 
   const disabledBackgroundColor = activeColors.disabledBackgroundColor
 
@@ -340,7 +329,7 @@ function ButtonGroupItemImpl({
     )
 
     const focusedBg = interpolateColor(
-      focused.value,
+      focusVisible.value,
       [0, 1],
       [restBg, focusedTarget],
     )
@@ -365,7 +354,7 @@ function ButtonGroupItemImpl({
   })
 
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: focusVisible.value,
     borderTopLeftRadius:
       interpolate(
         selectedProgress.value,
@@ -415,32 +404,6 @@ function ButtonGroupItemImpl({
     ],
   )
 
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
-  }, [isDisabled, hovered, hoverTiming])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
-  }, [isDisabled, pressed, pressTiming])
-
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, pressTiming)
-  }, [pressed, pressTiming])
-
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
-
   const handlePress = useCallback(() => {
     if (isDisabled) return
     onPress(item.value)
@@ -477,12 +440,7 @@ function ButtonGroupItemImpl({
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={handlePress}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        {...handlers}
         style={[
           itemStyles.container,
           animatedContainerStyle,

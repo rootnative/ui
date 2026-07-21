@@ -7,12 +7,13 @@
     "packages/components/src/button-group/styles.ts",
     "packages/components/src/button-group/types.ts"
   ],
-  "utils": ["color", "focus-visible", "pressable", "render-icon"],
+  "utils": ["color", "pressable", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.1",
     "react-native-reanimated": ">=4.0.0",
-    "react-native-worklets": ">=0.5.0"
+    "react-native-worklets": ">=0.5.0",
+    "@rootnative/inertia": ">=0.0.0-alpha.4"
   },
   "optionalDependencies": {}
 }

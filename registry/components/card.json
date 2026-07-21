@@ -14,7 +14,7 @@
     "@rootnative/core": ">=0.0.0-alpha.1",
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0",
-    "@rootnative/inertia": ">=0.0.0-alpha.3"
+    "@rootnative/inertia": ">=0.0.0-alpha.4"
   },
   "optionalDependencies": {}
 }

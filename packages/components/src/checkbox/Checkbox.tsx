@@ -1,14 +1,13 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { isFocusVisible, renderIcon } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useBooleanSpring, useColorTransition } from '@rootnative/inertia'
+import {
+  useGestureLayer,
+  type GestureLayerStates,
+} from '@rootnative/inertia/gesture-layer'
+import { renderIcon } from '@rootnative/utils'
+import { useCallback, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import {
   CHECKBOX_ICON_SIZE,
   createStyles,
@@ -17,12 +16,6 @@ import {
 import type { CheckboxProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
-
-const TOGGLE_SPRING = {
-  damping: 26,
-  stiffness: 380,
-  mass: 1,
-}
 
 export function Checkbox({
   style,
@@ -47,26 +40,6 @@ export function Checkbox({
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
 
-  // MD3 state-layer opacity tokens.
-  const {
-    hoveredOpacity: HOVER_OPACITY,
-    focusedOpacity: FOCUS_OPACITY,
-    pressedOpacity: PRESS_OPACITY,
-  } = theme.stateLayer
-
-  const hoverTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort3 }),
-    [theme],
-  )
-  const pressTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort2 }),
-    [theme],
-  )
-  const focusTiming = useMemo(
-    () => ({ duration: theme.motion.durationShort4 }),
-    [theme],
-  )
-
   const offColors = useMemo(
     () =>
       getResolvedCheckboxColors(
@@ -90,84 +63,74 @@ export function Checkbox({
     [theme, containerColor, contentColor, hasError],
   )
 
-  const progress = useSharedValue(isActive ? 1 : 0)
-  const hovered = useSharedValue(0)
-  const focused = useSharedValue(0)
-  const pressed = useSharedValue(0)
+  // Selection progress — the theme's default-spatial spring (soft toggle).
+  const progress = useBooleanSpring(isActive, 'spring-default-spatial')
 
-  useEffect(() => {
-    progress.value = withSpring(isActive ? 1 : 0, TOGGLE_SPRING)
-  }, [isActive, progress])
+  // State-layer halo opacity: solid base color, view opacity carries the
+  // alpha. The gesture layer composes the strongest active interaction via
+  // clamped-max, which keeps the token values intact; the `disabled` layer
+  // pins the halo off while disabled regardless of gesture state. Focus
+  // feedback rides `focusVisible`, so it appears for keyboard focus only.
+  const haloLayers = useMemo<GestureLayerStates>(
+    () => ({
+      rest: { opacity: 0 },
+      hovered: { opacity: theme.stateLayer.hoveredOpacity },
+      focusVisible: { opacity: theme.stateLayer.focusedOpacity },
+      pressed: { opacity: theme.stateLayer.pressedOpacity },
+      disabled: { opacity: 0 },
+    }),
+    [theme.stateLayer],
+  )
+  const gestureOptions = useMemo(
+    () => ({
+      disabled: isDisabled,
+      transition: {
+        hovered: 'state-hover',
+        pressed: 'state-press',
+        focused: 'state-focus',
+        focusVisible: 'state-focus',
+      } as const,
+    }),
+    [isDisabled],
+  )
+  const {
+    style: haloOpacityStyle,
+    handlers,
+    states,
+  } = useGestureLayer(haloLayers, gestureOptions)
 
-  const animatedBoxStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.backgroundColor, onColors.backgroundColor],
-    ),
-    borderColor: interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.borderColor, onColors.borderColor],
-    ),
-  }))
+  // The halo color crossfades with the selection progress.
+  const haloColorStyle = useColorTransition(progress, [
+    offColors.stateLayerColor,
+    onColors.stateLayerColor,
+  ])
 
+  const boxBackgroundStyle = useColorTransition(progress, [
+    offColors.backgroundColor,
+    onColors.backgroundColor,
+  ])
+  const boxBorderStyle = useColorTransition(
+    progress,
+    [offColors.borderColor, onColors.borderColor],
+    { key: 'borderColor' },
+  )
+
+  // Interop escape hatch: the mark pop follows the same selection spring
+  // that drives the box colors.
   const animatedIconStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
     transform: [{ scale: progress.value }],
   }))
 
-  const animatedStateLayerStyle = useAnimatedStyle(() => {
-    // Solid base color, view opacity carries the alpha. Picking the strongest
-    // active interaction's intensity keeps the token values intact.
-    const layerColor = interpolateColor(
-      progress.value,
-      [0, 1],
-      [offColors.stateLayerColor, onColors.stateLayerColor],
-    )
-    return {
-      opacity: Math.max(
-        hovered.value * HOVER_OPACITY,
-        focused.value * FOCUS_OPACITY,
-        pressed.value * PRESS_OPACITY,
-      ),
-      backgroundColor: layerColor,
-    }
-  })
-
+  // Interop escape hatch: the focus ring derives its opacity from the same
+  // keyboard-focus progress the state layer runs on.
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focused.value,
+    opacity: states.focusVisible.value,
   }))
 
   const handlePress = useCallback(() => {
     if (!isDisabled) onValueChange?.(!isChecked)
   }, [isDisabled, isChecked, onValueChange])
-
-  const handleHoverIn = useCallback(() => {
-    if (!isDisabled) hovered.value = withTiming(1, hoverTiming)
-  }, [isDisabled, hovered, hoverTiming])
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
-
-  const handlePressIn = useCallback(() => {
-    if (!isDisabled) pressed.value = withTiming(1, pressTiming)
-  }, [isDisabled, pressed, pressTiming])
-  const handlePressOut = useCallback(() => {
-    pressed.value = withTiming(0, pressTiming)
-  }, [pressed, pressTiming])
-
-  // Only show focus state when reached via keyboard (Tab/arrows). Mouse clicks
-  // technically focus the element on web but shouldn't trigger the visual
-  // focus indicator — mirrors CSS `:focus-visible` semantics.
-  const handleFocus = useCallback(() => {
-    if (!isDisabled && isFocusVisible()) {
-      focused.value = withTiming(1, focusTiming)
-    }
-  }, [isDisabled, focused, focusTiming])
-  const handleBlur = useCallback(() => {
-    focused.value = withTiming(0, focusTiming)
-  }, [focused, focusTiming])
 
   const markColor = isDisabled
     ? isActive
@@ -204,12 +167,7 @@ export function Checkbox({
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
       onPress={handlePress}
-      onHoverIn={handleHoverIn}
-      onHoverOut={handleHoverOut}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      {...handlers}
       style={[
         styles.container,
         isDisabled ? styles.disabledContainer : undefined,
@@ -222,11 +180,11 @@ export function Checkbox({
       />
       <Animated.View
         pointerEvents="none"
-        style={[styles.stateLayer, animatedStateLayerStyle]}
+        style={[styles.stateLayer, haloOpacityStyle, haloColorStyle]}
       />
       <Animated.View
         testID="checkbox-box"
-        style={[styles.box, animatedBoxStyle, boxOverride]}
+        style={[styles.box, boxBackgroundStyle, boxBorderStyle, boxOverride]}
       >
         {isIndeterminate ? (
           <Animated.View pointerEvents="none" style={animatedIconStyle}>
