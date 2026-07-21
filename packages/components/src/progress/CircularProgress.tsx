@@ -1,15 +1,8 @@
 import { useTheme } from '@rootnative/core'
-import { useEffect, useMemo } from 'react'
+import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import { useMemo } from 'react'
 import { View } from 'react-native'
-import Animated, {
-  Easing,
-  cancelAnimation,
-  useAnimatedProps,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedProps } from 'react-native-reanimated'
 import Svg, { Circle } from 'react-native-svg'
 import {
   PROGRESS_CIRCULAR_SIZE,
@@ -20,21 +13,17 @@ import {
 } from './styles'
 import type { CircularProgressProps } from './types'
 
+// Interop escape hatch (sanctioned): the arc props are per-frame branching
+// dasharray strings derived from the value tween — a shape `MotionCircle`'s
+// declarative props can't express (dasharray is shape-locked at mount there).
+// The `useAnimatedProps` worklets below consume inertia-driven values.
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
 
+// Loop duration/arc ratio are MD3 spec values for progress indicators, not
+// theme tokens — they stay component constants. The arc occupies ~25% of the
+// circumference, matching the MD3 classic spinner cadence.
 const INDETERMINATE_DURATION_MS = 1400
-// Indeterminate arc occupies ~25% of the circumference — matches the MD3
-// classic spinner cadence.
 const INDETERMINATE_ARC_RATIO = 0.25
-
-// MD3 emphasized cubic-bezier easing for value transitions; duration comes
-// from `theme.motion.durationMedium1` (250 ms).
-const MOTION_EASING = Easing.bezier(0.2, 0, 0, 1)
-// Linear-equivalent bezier for the constant-speed indeterminate rotation.
-const ROTATION_TIMING = {
-  duration: INDETERMINATE_DURATION_MS,
-  easing: Easing.bezier(0, 0, 1, 1),
-}
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max)
@@ -59,10 +48,13 @@ export function CircularProgress({
   )
   const styles = useMemo(() => createCircularStyles(size), [size])
 
-  const motionTiming = useMemo(
+  // MD3 standard curve for value transitions; duration comes from
+  // `theme.motion.durationMedium1` (250 ms).
+  const motionTransition = useMemo(
     () => ({
+      type: 'timing' as const,
       duration: theme.motion.durationMedium1,
-      easing: MOTION_EASING,
+      easing: cubicBezier(theme.motion.easingStandard),
     }),
     [theme.motion],
   )
@@ -75,28 +67,27 @@ export function CircularProgress({
   // size / thickness.
   const gapLength = Math.min(PROGRESS_TRACK_GAP, circumference / 4)
 
-  // Indeterminate rotation (0 → 1 mapped to 0 → 360°, looped).
-  const rotation = useSharedValue(0)
-  useEffect(() => {
-    if (!indeterminate) {
-      cancelAnimation(rotation)
-      return
-    }
-    rotation.value = 0
-    rotation.value = withRepeat(withTiming(1, ROTATION_TIMING), -1, false)
-    return () => cancelAnimation(rotation)
-  }, [indeterminate, rotation])
-
-  const spinStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value * 360}deg` }],
-  }))
+  // Indeterminate rotation: snap to 0° (0 ms step), sweep to 360° at constant
+  // speed, repeat forever. Declared on a Motion primitive so the loop is
+  // cancelled by unmount (mode switches swap the subtree below).
+  const spinAnimate = useMemo(
+    () => ({
+      rotate: [{ to: 0, type: 'timing' as const, duration: 0 }, { to: 360 }],
+    }),
+    [],
+  )
+  const spinTransition = useMemo(
+    () => ({
+      type: 'timing' as const,
+      duration: INDETERMINATE_DURATION_MS,
+      easing: cubicBezier('linear'),
+      repeat: { count: 'infinite' as const, alternate: false },
+    }),
+    [],
+  )
 
   // Determinate progress, smoothly tweened to the latest prop.
-  const progressShared = useSharedValue(value)
-  useEffect(() => {
-    if (indeterminate) return
-    progressShared.value = withTiming(value, motionTiming)
-  }, [value, indeterminate, progressShared, motionTiming])
+  const progressShared = useAnimation(value, motionTransition)
 
   // SVG circles are rotated -90° so that the 0° start position is at 12
   // o'clock instead of 3 o'clock (default SVG behavior).
@@ -184,7 +175,9 @@ export function CircularProgress({
       style={[styles.root, style]}
     >
       {indeterminate ? (
-        <Animated.View style={spinStyle}>{renderSvg()}</Animated.View>
+        <Motion.View animate={spinAnimate} transition={spinTransition}>
+          {renderSvg()}
+        </Motion.View>
       ) : (
         renderSvg()
       )}

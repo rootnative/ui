@@ -1,15 +1,15 @@
 import { defaultTopAppBarTokens, useTheme } from '@rootnative/core'
+import {
+  cubicBezier,
+  useAnimation,
+  useColorTransition,
+} from '@rootnative/inertia'
 import { selectRTL } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
 import { Platform, View } from 'react-native'
-import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
@@ -256,22 +256,23 @@ export function AppBar({
     </View>
   )
 
-  // M3 surface tonal shift on scroll uses the medium1 (250 ms) duration.
-  const elevatedDuration = theme.motion.durationMedium1
-  const elevatedSV = useSharedValue(elevated ? 1 : 0)
-  useEffect(() => {
-    elevatedSV.value = withTiming(elevated ? 1 : 0, {
-      duration: elevatedDuration,
-    })
-  }, [elevated, elevatedSV, elevatedDuration])
-
-  const animatedSurfaceStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      elevatedSV.value,
-      [0, 1],
-      [schemeColors.containerColor, schemeColors.elevatedContainerColor],
-    ),
-  }))
+  // M3 surface tonal shift on scroll uses the medium1 (250 ms) duration on
+  // the standard curve. This is also the seam for the collapse-on-scroll
+  // follow-up (`useScroll` + `useTransform` interpolating height + title
+  // typography) — see the tech-debt note in CLAUDE.md.
+  const elevatedTransition = useMemo(
+    () => ({
+      type: 'timing' as const,
+      duration: theme.motion.durationMedium1,
+      easing: cubicBezier(theme.motion.easingStandard),
+    }),
+    [theme.motion],
+  )
+  const elevatedProgress = useAnimation(elevated ? 1 : 0, elevatedTransition)
+  const animatedSurfaceStyle = useColorTransition(elevatedProgress, [
+    schemeColors.containerColor,
+    schemeColors.elevatedContainerColor,
+  ])
 
   const containerOverride = containerColor
     ? ({ backgroundColor: containerColor } as ViewStyle)

@@ -1,16 +1,13 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useAnimation, useGesture, useTransform } from '@rootnative/inertia'
 import { renderIcon } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
 import Animated, {
-  Easing,
   interpolate,
   interpolateColor,
   useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-  withTiming,
 } from 'react-native-reanimated'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
@@ -18,10 +15,6 @@ import type { TextFieldProps } from './types'
 const ICON_SIZE = 24
 // 12dp icon inset + 24dp icon + 16dp gap
 const ICON_WITH_GAP = 12 + 24 + 16
-
-// M3 standard easing — `cubic-bezier(0.2, 0, 0, 1)`. Decelerates into the
-// resting position and reads as polished even if iOS drops a frame mid-anim.
-const M3_STANDARD = Easing.bezier(0.2, 0, 0, 1)
 
 export function TextField({
   value,
@@ -62,25 +55,6 @@ export function TextField({
     [theme, variant],
   )
 
-  // M3 short4 (200 ms) for label/focus/error. 150 ms left only ~9 frames at
-  // 60 fps; one dropped frame on iOS was enough to read as choppy. 200 ms
-  // (~12 frames) gives the curve room to breathe. Hover uses short3 (150 ms).
-  const { labelTiming, focusTiming, hoverTiming, errorTiming } = useMemo(() => {
-    const standard = {
-      duration: theme.motion.durationShort4,
-      easing: M3_STANDARD,
-    }
-    return {
-      labelTiming: standard,
-      focusTiming: standard,
-      errorTiming: standard,
-      hoverTiming: {
-        duration: theme.motion.durationShort3,
-        easing: M3_STANDARD,
-      },
-    }
-  }, [theme])
-
   const [isFocused, setIsFocused] = useState(false)
   const [internalValue, setInternalValue] = useState(
     () => value ?? textInputProps.defaultValue ?? '',
@@ -92,26 +66,37 @@ export function TextField({
   const hasValue = currentValue !== ''
   const isLabelFloated = isFocused || hasValue
 
-  const focused = useSharedValue(0)
-  const hovered = useSharedValue(0)
-  const errored = useSharedValue(isError ? 1 : 0)
+  // Label/focus/error ride 'state-focus' (M3 short4, 200 ms, standard
+  // curve); hover rides 'state-hover' (short3, 150 ms). The 200 ms choice is
+  // deliberate: 150 ms left only ~9 frames at 60 fps and one dropped frame
+  // on iOS was enough to read as choppy — 200 ms (~12 frames) gives the
+  // curve room to breathe.
+  //
+  // `focused` raises for ANY focus modality (tapping into a text field must
+  // show the focus indicator — no focus-visible gating here). The gesture
+  // handlers are split across two hosts: hover goes to the outer Pressable,
+  // focus/blur are invoked from the TextInput's own events below.
+  const { focused, hovered, handlers } = useGesture({
+    hovered: 'state-hover',
+    focused: 'state-focus',
+    focusVisible: 'state-focus',
+    pressed: 'state-press',
+  } as const)
+  const errored = useAnimation(isError ? 1 : 0, 'state-focus')
   // Mirror of hasValue on the UI thread so labelProgress can be derived
   // entirely without waiting on a JS-thread effect to fire.
-  const hasValueShared = useSharedValue(hasValue ? 1 : 0)
+  const hasValueProgress = useAnimation(hasValue ? 1 : 0, 'state-focus')
   // 0 = resting (label large, centered), 1 = floated (label small, top).
   // Derived on the UI thread so it starts moving the same frame `focused`
   // does — no one-frame skew between the color/border and position animations.
-  const labelProgress = useDerivedValue(() =>
-    Math.max(focused.value, hasValueShared.value),
-  )
-
-  useEffect(() => {
-    hasValueShared.value = withTiming(hasValue ? 1 : 0, labelTiming)
-  }, [hasValue, hasValueShared, labelTiming])
-
-  useEffect(() => {
-    errored.value = withTiming(isError ? 1 : 0, errorTiming)
-  }, [isError, errored, errorTiming])
+  // The 'worklet' directive is load-bearing (and inertia's documented
+  // contract): without it the transformer's closure hides
+  // `focused`/`hasValueProgress` from Reanimated's dependency tracking and
+  // the float only refreshes on re-render.
+  const labelProgress = useTransform(() => {
+    'worklet'
+    return Math.max(focused.value, hasValueProgress.value)
+  })
 
   // Label is rendered at bodySmall and scaled up to bodyLarge when at rest.
   const restingScale =
@@ -233,32 +218,26 @@ export function TextField({
     (event: NativeSyntheticEvent<TargetedEvent>) => {
       if (isDisabled) return
       setIsFocused(true)
-      focused.value = withTiming(1, focusTiming)
+      handlers.onFocus()
       onFocus?.(event)
     },
-    [isDisabled, onFocus, focused, focusTiming],
+    [isDisabled, onFocus, handlers],
   )
 
   const handleBlur = useCallback(
     (event: NativeSyntheticEvent<TargetedEvent>) => {
       setIsFocused(false)
-      focused.value = withTiming(0, focusTiming)
+      handlers.onBlur()
       onBlur?.(event)
     },
-    [onBlur, focused, focusTiming],
+    [onBlur, handlers],
   )
 
   // Filled: drives the on-surface 8% hover state layer.
   // Outlined: drives the outline's rest → on-surface hover color shift.
   const handleHoverIn = useCallback(() => {
-    if (!isDisabled) {
-      hovered.value = withTiming(1, hoverTiming)
-    }
-  }, [isDisabled, hovered, hoverTiming])
-
-  const handleHoverOut = useCallback(() => {
-    hovered.value = withTiming(0, hoverTiming)
-  }, [hovered, hoverTiming])
+    if (!isDisabled) handlers.onHoverIn()
+  }, [isDisabled, handlers])
 
   const handleContainerPress = useCallback(() => {
     if (!isDisabled) inputRef.current?.focus()
@@ -418,7 +397,7 @@ export function TextField({
       <Pressable
         onPress={handleContainerPress}
         onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
+        onHoverOut={handlers.onHoverOut}
         disabled={isDisabled}
         accessible={false}
         focusable={false}

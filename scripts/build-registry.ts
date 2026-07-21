@@ -260,7 +260,7 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   }
 
   if (externalDeps.has('@rootnative/inertia')) {
-    dependencies['@rootnative/inertia'] = '>=0.0.0-alpha.4'
+    dependencies['@rootnative/inertia'] = '>=0.0.0-alpha.5'
     // Inertia is a thin wrapper over Reanimated 4 — its peers must be present
     // for the scaffolded component to run, even when the component itself no
     // longer imports Reanimated directly.

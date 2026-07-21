@@ -1,15 +1,9 @@
 import { useTheme } from '@rootnative/core'
-import { useEffect, useMemo, useState } from 'react'
+import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'
-import Animated, {
-  Easing,
-  cancelAnimation,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import {
   PROGRESS_STOP_INDICATOR,
   PROGRESS_TRACK_GAP,
@@ -20,18 +14,13 @@ import type { LinearProgressProps } from './types'
 
 // Indeterminate segment is 40% of the track width and slides across once per
 // loop iteration. Matches the visual cadence of the MD3 single-segment variant.
+// Loop duration/easing are MD3 spec values for progress indicators, not theme
+// tokens — they stay component constants.
 const INDETERMINATE_SEGMENT_RATIO = 0.4
 const INDETERMINATE_DURATION_MS = 1800
-
-// MD3 emphasized cubic-bezier easing for value transitions; duration comes
-// from `theme.motion.durationMedium1` (250 ms).
-const MOTION_EASING = Easing.bezier(0.2, 0, 0, 1)
 // Cubic in-out for the indeterminate slide (matches the prior
 // Easing.inOut(Easing.cubic) curve from the RN-Animated implementation).
-const INDETERMINATE_TIMING = {
-  duration: INDETERMINATE_DURATION_MS,
-  easing: Easing.bezier(0.42, 0, 0.58, 1),
-}
+const INDETERMINATE_EASING = cubicBezier(0.42, 0, 0.58, 1)
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max)
@@ -55,10 +44,13 @@ export function LinearProgress({
     [theme, thickness, containerColor, trackColor],
   )
 
-  const motionTiming = useMemo(
+  // MD3 standard curve for value transitions; duration comes from
+  // `theme.motion.durationMedium1` (250 ms).
+  const motionTransition = useMemo(
     () => ({
+      type: 'timing' as const,
       duration: theme.motion.durationMedium1,
-      easing: MOTION_EASING,
+      easing: cubicBezier(theme.motion.easingStandard),
     }),
     [theme.motion],
   )
@@ -69,36 +61,35 @@ export function LinearProgress({
     setWidth((prev) => (prev === w ? prev : w))
   }
 
-  // Indeterminate slide progress (0 → 1, looped).
-  const slide = useSharedValue(0)
-  useEffect(() => {
-    if (!indeterminate) {
-      cancelAnimation(slide)
-      return
-    }
-    slide.value = 0
-    slide.value = withRepeat(withTiming(1, INDETERMINATE_TIMING), -1, false)
-    return () => cancelAnimation(slide)
-  }, [indeterminate, slide])
-
   // Determinate value, smoothly tweened to the latest prop.
-  const progressShared = useSharedValue(value)
-  useEffect(() => {
-    if (indeterminate) return
-    progressShared.value = withTiming(value, motionTiming)
-  }, [value, indeterminate, progressShared, motionTiming])
+  const progressShared = useAnimation(value, motionTransition)
 
   const segmentWidth = Math.max(width * INDETERMINATE_SEGMENT_RATIO, 0)
 
-  const indeterminateStyle = useAnimatedStyle(
+  // Indeterminate slide: snap the segment back off-track (0 ms step), tween
+  // it across, repeat forever. Declared on a Motion primitive so the loop is
+  // cancelled by unmount (mode switches swap the subtree below).
+  const indeterminateSegmentStyle = useMemo(
+    () => ({ left: 0, width: segmentWidth }),
+    [segmentWidth],
+  )
+  const indeterminateAnimate = useMemo(
     () => ({
-      left: 0,
-      width: segmentWidth,
-      transform: [
-        { translateX: -segmentWidth + slide.value * (width + segmentWidth) },
+      translateX: [
+        { to: -segmentWidth, type: 'timing' as const, duration: 0 },
+        { to: width },
       ],
     }),
     [segmentWidth, width],
+  )
+  const indeterminateTransition = useMemo(
+    () => ({
+      type: 'timing' as const,
+      duration: INDETERMINATE_DURATION_MS,
+      easing: INDETERMINATE_EASING,
+      repeat: { count: 'infinite' as const, alternate: false },
+    }),
+    [],
   )
 
   // Determinate layout. The bar is split into:
@@ -112,6 +103,9 @@ export function LinearProgress({
     : 0
   const progressArea = Math.max(0, width - trailingReserved)
 
+  // Interop escape hatches: the segment widths derive from the same inertia
+  // value tween, with per-frame branching (mid gap) no declarative prop can
+  // express.
   const activeStyle = useAnimatedStyle(() => {
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
@@ -153,7 +147,11 @@ export function LinearProgress({
       {indeterminate ? (
         <>
           <View style={styles.inactiveTrackFull} />
-          <Animated.View style={[styles.activeIndicator, indeterminateStyle]} />
+          <Motion.View
+            style={[styles.activeIndicator, indeterminateSegmentStyle]}
+            animate={indeterminateAnimate}
+            transition={indeterminateTransition}
+          />
         </>
       ) : (
         <>
