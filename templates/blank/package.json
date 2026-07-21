@@ -13,6 +13,7 @@
     "@expo/vector-icons": "^15.0.3",
     "@rootnative/components": "latest",
     "@rootnative/core": "latest",
+    "@rootnative/inertia": "latest",
     "expo": "~54.0.33",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",

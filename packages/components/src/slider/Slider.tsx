@@ -1,4 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { cubicBezier, useSpring } from '@rootnative/inertia'
 import { isFocusVisible, renderIcon } from '@rootnative/utils'
 import {
   Fragment,
@@ -14,11 +15,14 @@ import type {
   LayoutChangeEvent,
 } from 'react-native'
 import { I18nManager, PanResponder, Pressable, View } from 'react-native'
+// Sanctioned escape hatch: the slider's hover/focus/label progress is routed
+// imperatively between two thumbs from one Pressable (`keyboardThumb`), a
+// shape inertia's gesture hooks don't express — the raw shared values and
+// `withTiming` writes stay, consuming theme-sourced configs below. The slot
+// worklets (`./slots`) hand these values to `useAnimatedStyle` directly.
 import {
-  Easing,
   cancelAnimation,
   useSharedValue,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated'
 import {
@@ -57,12 +61,11 @@ declare module 'react-native' {
 const ICON_SIZE = 18
 
 // MD3 expressive motion.
-//   - Size/translate transitions ride an emphasized spring (slight overshoot,
-//     ~0.85 damping ratio) — matches the same TOGGLE_SPRING used by Switch.
+//   - Size/translate transitions ride the theme's fast-spatial spring
+//     (slight overshoot, ~0.85 damping ratio) — the same token Switch uses
+//     for its thumb morph.
 //   - Opacity transitions use `theme.motion` duration tokens (short3/short4)
-//     with the emphasized cubic-bezier easing per the M3 motion spec.
-const PRESS_SPRING = { damping: 33, stiffness: 380, mass: 1 }
-const EMPHASIZED_EASING = Easing.bezier(0.2, 0, 0, 1)
+//     on the standard cubic-bezier curve per the M3 motion spec.
 
 const ACCESSIBILITY_ACTIONS = [
   { name: 'increment' as const },
@@ -98,26 +101,30 @@ export function Slider({
     [theme, containerColor, contentColor, inactiveTrackColor],
   )
 
+  const standardEasing = useMemo(
+    () => cubicBezier(theme.motion.easingStandard),
+    [theme.motion.easingStandard],
+  )
   const labelTiming = useMemo(
     () => ({
       duration: theme.motion.durationShort4,
-      easing: EMPHASIZED_EASING,
+      easing: standardEasing,
     }),
-    [theme],
+    [theme, standardEasing],
   )
   const stateLayerTiming = useMemo(
     () => ({
       duration: theme.motion.durationShort3,
-      easing: EMPHASIZED_EASING,
+      easing: standardEasing,
     }),
-    [theme],
+    [theme, standardEasing],
   )
   const focusRingTiming = useMemo(
     () => ({
       duration: theme.motion.durationShort4,
-      easing: EMPHASIZED_EASING,
+      easing: standardEasing,
     }),
-    [theme],
+    [theme, standardEasing],
   )
 
   const isRange = Array.isArray(controlledValue) || Array.isArray(defaultValue)
@@ -296,8 +303,14 @@ export function Slider({
   // 4 → 2 dp narrowing can run in lockstep with the surrounding segments and
   // stop indicators that depend on the same value. Hover and focus drive the
   // same state-layer halo at lower opacities and don't affect layout.
-  const lowPressed = useSharedValue(0)
-  const highPressed = useSharedValue(0)
+  const lowPressed = useSpring(
+    activeThumb === 'low' ? 1 : 0,
+    'spring-fast-spatial',
+  )
+  const highPressed = useSpring(
+    activeThumb === 'high' ? 1 : 0,
+    'spring-fast-spatial',
+  )
   const lowHovered = useSharedValue(0)
   const highHovered = useSharedValue(0)
   const lowFocused = useSharedValue(0)
@@ -343,14 +356,6 @@ export function Slider({
   useEffect(() => {
     if (activeThumb) setKeyboardThumb(activeThumb)
   }, [activeThumb])
-
-  useEffect(() => {
-    lowPressed.value = withSpring(activeThumb === 'low' ? 1 : 0, PRESS_SPRING)
-  }, [activeThumb, lowPressed])
-
-  useEffect(() => {
-    highPressed.value = withSpring(activeThumb === 'high' ? 1 : 0, PRESS_SPRING)
-  }, [activeThumb, highPressed])
 
   // Tick marks (discrete only). `showTickMarks` defaults to true when step>0.
   const ticksEnabled = showTickMarks ?? (Boolean(step) && step > 0)

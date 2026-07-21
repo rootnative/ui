@@ -161,9 +161,30 @@ export async function doctorCommand(cwd: string): Promise<void> {
     }
   }
 
-  // 8. Check optional peer deps
+  // 8. Check required animation peer deps. `@rootnative/inertia` is the
+  // animation layer every interactive component imports; it in turn requires
+  // reanimated + worklets, so a missing install breaks all animated
+  // components at require time.
   const nodeModules = path.resolve(cwd, 'node_modules')
 
+  const inertiaPkgPath = path.join(
+    nodeModules,
+    '@rootnative',
+    'inertia',
+    'package.json',
+  )
+  if (await fs.pathExists(inertiaPkgPath)) {
+    const inertiaPkg = await fs.readJSON(inertiaPkgPath)
+    logCheck('pass', `@rootnative/inertia@${inertiaPkg.version} installed`)
+  } else {
+    logCheck(
+      'fail',
+      '@rootnative/inertia not installed (required by all animated components). Run "rootnative upgrade" or install it with react-native-reanimated and react-native-worklets.',
+    )
+    issues++
+  }
+
+  // 9. Check optional peer deps
   const safeAreaInstalled = await fs.pathExists(
     path.join(nodeModules, 'react-native-safe-area-context'),
   )
