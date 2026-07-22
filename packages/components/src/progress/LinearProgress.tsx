@@ -1,9 +1,9 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import {
   PROGRESS_STOP_INDICATOR,
   PROGRESS_TRACK_GAP,

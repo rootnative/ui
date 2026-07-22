@@ -1,8 +1,8 @@
+import type { SharedValue } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import type { TextStyle, ViewStyle } from 'react-native'
-import type { SharedValue } from 'react-native-reanimated'
 import { AppBar } from '../appbar/AppBar'
 
 // The Jest mock evaluates worklets once per render, so a plain `{ value }`

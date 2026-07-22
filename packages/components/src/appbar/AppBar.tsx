@@ -6,15 +6,16 @@ import {
   useMotionValue,
   useTransform,
 } from '@rootnative/inertia'
+import {
+  Animated,
+  interpolate,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { selectRTL } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
 import { Platform, View } from 'react-native'
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'

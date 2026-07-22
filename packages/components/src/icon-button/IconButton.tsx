@@ -1,8 +1,8 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   applyContainerColorOverride,

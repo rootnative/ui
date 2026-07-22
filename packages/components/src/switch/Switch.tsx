@@ -8,13 +8,14 @@ import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
+import {
+  Animated,
+  interpolate,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
 import {
   SWITCH_STATE_LAYER_SIZE,
   SWITCH_THUMB_OFF_SIZE,

@@ -1,6 +1,12 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { cubicBezier, useAnimation, useGesture } from '@rootnative/inertia'
+import {
+  Animated,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useMemo, useState, type ReactElement } from 'react'
 import {
@@ -11,11 +17,6 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
 import {
   createGroupStyles,
   createItemStyles,

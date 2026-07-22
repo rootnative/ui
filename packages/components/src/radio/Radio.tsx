@@ -4,9 +4,9 @@ import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo } from 'react'
 import { Platform, Pressable } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
 

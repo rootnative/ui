@@ -1,10 +1,11 @@
 import { useTheme } from '@rootnative/core'
-import type { LayoutChangeEvent, TextStyle, ViewStyle } from 'react-native'
-import { Text } from 'react-native'
-import Animated, {
+import {
+  Animated,
   type SharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated'
+} from '@rootnative/inertia/reanimated'
+import type { LayoutChangeEvent, TextStyle, ViewStyle } from 'react-native'
+import { Text } from 'react-native'
 import {
   PRESSED_HALF,
   REST_HALF,

@@ -1,6 +1,6 @@
+import type { SharedValue } from '@rootnative/inertia'
 import type { ReactNode } from 'react'
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
-import type { SharedValue } from 'react-native-reanimated'
 import type { IconButtonProps } from '../icon-button'
 
 /** Size/layout variant of the AppBar. */

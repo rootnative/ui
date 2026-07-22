@@ -1,14 +1,15 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useAnimation, useGesture, useTransform } from '@rootnative/inertia'
+import {
+  Animated,
+  interpolate,
+  interpolateColor,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
 

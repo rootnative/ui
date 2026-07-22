@@ -11,10 +11,10 @@
   "utils": ["color", "elevation"],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.1",
+    "@rootnative/core": ">=0.0.0-alpha.2",
+    "@rootnative/inertia": ">=0.0.0-alpha.7",
     "react-native-reanimated": ">=4.0.0",
-    "react-native-worklets": ">=0.5.0",
-    "@rootnative/inertia": ">=0.0.0-alpha.6"
+    "react-native-worklets": ">=0.5.0"
   },
   "optionalDependencies": {}
 }

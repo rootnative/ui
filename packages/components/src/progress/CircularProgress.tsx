@@ -1,8 +1,8 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { View } from 'react-native'
-import Animated, { useAnimatedProps } from 'react-native-reanimated'
 import Svg, { Circle } from 'react-native-svg'
 import {
   PROGRESS_CIRCULAR_SIZE,

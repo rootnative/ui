@@ -1,5 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import {
   alphaColor,
   renderIcon,
@@ -16,7 +17,6 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles, getResolvedChipColors } from './styles'
 import type { ChipProps, ChipVariant } from './types'

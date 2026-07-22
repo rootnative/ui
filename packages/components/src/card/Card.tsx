@@ -1,7 +1,7 @@
 import { useTheme } from '@rootnative/core'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles, getResolvedCardColors } from './styles'
 import type { CardProps } from './types'
