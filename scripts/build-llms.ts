@@ -1080,7 +1080,7 @@ material.defaultTopAppBarTokens
 ### Theme type hierarchy
 
 - \`BaseTheme\` — Generic base interface. All design systems extend this. Has \`colors: Record<string, string>\`, \`typography: Record<string, TextStyle>\`, plus shape, spacing, stateLayer, elevation, motion.
-- \`Theme\` — Material Design 3 theme. Extends \`BaseTheme\` with 69 MD3 color roles, 15 typography variants, and optional \`topAppBar\` tokens. \`MaterialTheme\` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
+- \`Theme\` — Material Design 3 theme. Extends \`BaseTheme\` with 69 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional \`topAppBar\` tokens. \`MaterialTheme\` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
 
@@ -1092,19 +1092,19 @@ BaseTheme {
   spacing: Spacing       — xs, sm, md, lg, xl
   elevation: Elevation   — level0..level3 (shadow properties)
   stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, disabledOpacity
-  motion: Motion         — duration, easing, and spring tokens
+  motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
 }
 
 Theme extends BaseTheme {
   colors: Colors         — 69 MD3 color roles
-  typography: Typography — 15 type scale variants (displayLarge..labelSmall)
+  typography: Typography — 30 type scale variants: 15 base (displayLarge..labelSmall) + 15 MD3 Expressive emphasized (displayLargeEmphasized..labelSmallEmphasized)
   topAppBar?: TopAppBarTokens
 }
 \`\`\`
 
 Colors: primary, onPrimary, primaryContainer, onPrimaryContainer, primaryFixed, onPrimaryFixed, primaryFixedDim, onPrimaryFixedVariant, secondary (same pattern), tertiary (same pattern), error, onError, errorContainer, onErrorContainer, background, onBackground, surface, surfaceDim, surfaceBright, surfaceContainerLowest, surfaceContainerLow, surfaceContainer, surfaceContainerHigh, surfaceContainerHighest, onSurface, surfaceVariant, onSurfaceVariant, outline, outlineVariant, surfaceTint, shadow, scrim, inverseSurface, inverseOnSurface, inversePrimary
 
-Typography variants: displayLarge, displayMedium, displaySmall, headlineLarge, headlineMedium, headlineSmall, titleLarge, titleMedium, titleSmall, bodyLarge, bodyMedium, bodySmall, labelLarge, labelMedium, labelSmall — each with fontFamily, fontSize, fontWeight, lineHeight, letterSpacing
+Typography variants: displayLarge, displayMedium, displaySmall, headlineLarge, headlineMedium, headlineSmall, titleLarge, titleMedium, titleSmall, bodyLarge, bodyMedium, bodySmall, labelLarge, labelMedium, labelSmall — each with fontFamily, fontSize, fontWeight, lineHeight, letterSpacing. Each also has an MD3 Expressive \`<name>Emphasized\` variant (same size/line height, weight one step heavier: 400→500, 500→700).
 
 ### useBreakpoint()
 

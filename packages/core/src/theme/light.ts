@@ -167,7 +167,13 @@ export const lightTheme: Theme = {
     easingEmphasized: 'cubic-bezier(0.2, 0, 0, 1)',
     easingEmphasizedAccelerate: 'cubic-bezier(0.3, 0, 0.8, 0.15)',
     easingEmphasizedDecelerate: 'cubic-bezier(0.05, 0.7, 0.1, 1)',
-    springFastSpatial: { tension: 380, friction: 33, mass: 1 },
-    springDefaultSpatial: { tension: 380, friction: 26, mass: 1 },
+    // MD3 Expressive scheme, androidx ExpressiveMotionTokens.kt v0_14_0.
+    // tension = Compose stiffness; friction = dampingRatio * 2 * sqrt(tension).
+    springFastSpatial: { tension: 800, friction: 33.94, mass: 1 },
+    springDefaultSpatial: { tension: 380, friction: 31.19, mass: 1 },
+    springSlowSpatial: { tension: 200, friction: 22.63, mass: 1 },
+    springFastEffects: { tension: 3800, friction: 123.29, mass: 1 },
+    springDefaultEffects: { tension: 1600, friction: 80, mass: 1 },
+    springSlowEffects: { tension: 800, friction: 56.57, mass: 1 },
   },
 }

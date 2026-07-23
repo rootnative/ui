@@ -15,6 +15,10 @@ declare module '@rootnative/inertia' {
     'state-focus': TransitionConfig
     'spring-fast-spatial': TransitionConfig
     'spring-default-spatial': TransitionConfig
+    'spring-slow-spatial': TransitionConfig
+    'spring-fast-effects': TransitionConfig
+    'spring-default-effects': TransitionConfig
+    'spring-slow-effects': TransitionConfig
   }
 }
 
@@ -53,5 +57,12 @@ export function motionTransitions(motion: Motion): NamedTransitions {
       type: 'spring',
       ...motion.springDefaultSpatial,
     },
+    'spring-slow-spatial': { type: 'spring', ...motion.springSlowSpatial },
+    'spring-fast-effects': { type: 'spring', ...motion.springFastEffects },
+    'spring-default-effects': {
+      type: 'spring',
+      ...motion.springDefaultEffects,
+    },
+    'spring-slow-effects': { type: 'spring', ...motion.springSlowEffects },
   }
 }

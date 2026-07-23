@@ -93,7 +93,14 @@ export interface Colors {
   inversePrimary: string
 }
 
-/** Material Design 3 type scale with 15 roles across 5 categories (display, headline, title, body, label). */
+/**
+ * Material Design 3 type scale with 15 roles across 5 categories (display,
+ * headline, title, body, label), plus the 15 MD3 Expressive emphasized
+ * variants. Emphasized styles keep the base size/line-height and step the
+ * weight up (regular→medium, medium→bold); a few also adjust tracking. The
+ * spec additionally varies width/grade on variable fonts, which React Native
+ * cannot express — weight (+tracking) is the documented approximation.
+ */
 export interface Typography {
   [key: string]: TextStyle
   displayLarge: TextStyle
@@ -111,6 +118,21 @@ export interface Typography {
   labelLarge: TextStyle
   labelMedium: TextStyle
   labelSmall: TextStyle
+  displayLargeEmphasized: TextStyle
+  displayMediumEmphasized: TextStyle
+  displaySmallEmphasized: TextStyle
+  headlineLargeEmphasized: TextStyle
+  headlineMediumEmphasized: TextStyle
+  headlineSmallEmphasized: TextStyle
+  titleLargeEmphasized: TextStyle
+  titleMediumEmphasized: TextStyle
+  titleSmallEmphasized: TextStyle
+  bodyLargeEmphasized: TextStyle
+  bodyMediumEmphasized: TextStyle
+  bodySmallEmphasized: TextStyle
+  labelLargeEmphasized: TextStyle
+  labelMediumEmphasized: TextStyle
+  labelSmallEmphasized: TextStyle
 }
 
 export type FontWeight =
@@ -242,15 +264,39 @@ export interface Motion {
   easingEmphasizedAccelerate: string
   easingEmphasizedDecelerate: string
   /**
-   * Spring for fast spatial transitions — selection morphs that track user
-   * input snappily (Switch thumb, Slider press-grow). Slight overshoot,
-   * ~0.85 damping ratio. Named after the MD3 Expressive motion-physics token
-   * scheme (fast/default/slow × spatial/effects).
+   * Spring for fast spatial transitions — small-element position/size/corner
+   * morphs that track user input snappily (Switch thumb, Slider press-grow,
+   * press shape-morphs). Pronounced overshoot (damping ratio 0.6). Named
+   * after the MD3 Expressive motion-physics token scheme
+   * (fast/default/slow × spatial/effects).
    */
   springFastSpatial: MotionSpring
   /**
-   * Spring for default spatial transitions — selection morphs with a softer,
-   * bouncier settle (Checkbox and Radio marks).
+   * Spring for default spatial transitions — standard-size element morphs
+   * with a softer, bouncier settle (Checkbox and Radio marks). Damping
+   * ratio 0.8.
    */
   springDefaultSpatial: MotionSpring
+  /**
+   * Spring for slow spatial transitions — large-element position/size/corner
+   * morphs (full-screen or container-scale movement). Damping ratio 0.8 at
+   * low stiffness.
+   */
+  springSlowSpatial: MotionSpring
+  /**
+   * Spring for fast effects transitions — small-element color/opacity
+   * feedback (state layers). Critically damped (damping ratio 1.0) — effects
+   * springs never overshoot.
+   */
+  springFastEffects: MotionSpring
+  /**
+   * Spring for default effects transitions — standard color/opacity changes.
+   * Critically damped.
+   */
+  springDefaultEffects: MotionSpring
+  /**
+   * Spring for slow effects transitions — large-surface color/opacity
+   * changes. Critically damped.
+   */
+  springSlowEffects: MotionSpring
 }
