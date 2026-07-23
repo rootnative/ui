@@ -1,8 +1,4 @@
-import {
-  cubicBezier,
-  type NamedTransitions,
-  type TransitionConfig,
-} from '@rootnative/inertia'
+import type { NamedTransitions, TransitionConfig } from '@rootnative/inertia'
 import type { Motion } from './types'
 
 // Registered so the names autocomplete (and typos are compile errors)
@@ -29,29 +25,16 @@ declare module '@rootnative/inertia' {
  * reference by name instead of hand-rolling `withTiming`/`withSpring`
  * configs.
  *
- * The state-layer names encode the library's interaction timing policy —
- * hover `durationShort3` (150ms), press `durationShort2` (100ms), focus
- * `durationShort4` (200ms), all on the standard easing curve. The spring
- * names expose the theme's `MotionSpring` tokens verbatim.
+ * The state-layer names encode the library's interaction motion policy —
+ * per MD3 Expressive, state-layer color/opacity feedback rides the
+ * fast-effects spring (small-element effects, critically damped). The
+ * spring names expose the theme's `MotionSpring` tokens verbatim.
  */
 export function motionTransitions(motion: Motion): NamedTransitions {
-  const standard = cubicBezier(motion.easingStandard)
   return {
-    'state-hover': {
-      type: 'timing',
-      duration: motion.durationShort3,
-      easing: standard,
-    },
-    'state-press': {
-      type: 'timing',
-      duration: motion.durationShort2,
-      easing: standard,
-    },
-    'state-focus': {
-      type: 'timing',
-      duration: motion.durationShort4,
-      easing: standard,
-    },
+    'state-hover': { type: 'spring', ...motion.springFastEffects },
+    'state-press': { type: 'spring', ...motion.springFastEffects },
+    'state-focus': { type: 'spring', ...motion.springFastEffects },
     'spring-fast-spatial': { type: 'spring', ...motion.springFastSpatial },
     'spring-default-spatial': {
       type: 'spring',
