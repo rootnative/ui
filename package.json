@@ -20,7 +20,7 @@
     "format": "prettier . --write",
     "docs:dev": "pnpm --filter @rootnative/docs dev",
     "docs:build": "pnpm --filter @rootnative/docs build",
-    "build:llms": "tsx scripts/build-llms.ts",
+    "build:llms": "npx tsx scripts/build-llms.ts",
     "docs:serve": "pnpm --filter @rootnative/docs serve",
     "prepare": "husky"
   },
