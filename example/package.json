@@ -16,7 +16,7 @@
     "@expo/vector-icons": "^15.0.3",
     "@rootnative/components": "workspace:*",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "^0.0.0-alpha.7",
+    "@rootnative/inertia": "0.0.2",
     "@rootnative/utils": "workspace:*",
     "expo": "~54.0.34",
     "expo-router": "6.0.23",

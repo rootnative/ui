@@ -60,7 +60,7 @@
   },
   "peerDependencies": {
     "@material/material-color-utilities": ">=0.4.0",
-    "@rootnative/inertia": ">=0.0.0-alpha.7",
+    "@rootnative/inertia": "0.0.2",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0"
   },
@@ -72,7 +72,7 @@
   "devDependencies": {
     "@material/material-color-utilities": "^0.4.0",
     "@react-native/babel-preset": "^0.81.5",
-    "@rootnative/inertia": "^0.0.0-alpha.7",
+    "@rootnative/inertia": "0.0.2",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.0",
