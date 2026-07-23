@@ -1,9 +1,13 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useAnimation, useGesture, useTransform } from '@rootnative/inertia'
+import {
+  useAnimation,
+  useColorCascade,
+  useGesture,
+  useTransform,
+} from '@rootnative/inertia'
 import {
   Animated,
   interpolate,
-  interpolateColor,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
@@ -136,66 +140,51 @@ export function TextField({
     ],
   }))
 
-  // Color on the inner Animated.Text. Layered crossfade: rest → error → focus.
-  // Focus wins when both are active, matching the prior style-array precedence.
-  const animatedLabelColorStyle = useAnimatedStyle(() => {
-    const erroredColor = interpolateColor(
-      errored.value,
-      [0, 1],
-      [labelRestColor, labelErrorColor],
-    )
-    const finalColor = interpolateColor(
-      focused.value,
-      [0, 1],
-      [erroredColor, labelFocusColor],
-    )
-    return { color: finalColor }
-  })
+  // Color on the inner Animated.Text. Priority cascade rest → error → focus
+  // (later layers win at equal progress) — focus wins when both are active,
+  // matching the prior style-array precedence.
+  const animatedLabelColorStyle = useColorCascade(
+    labelRestColor,
+    [
+      { progress: errored, color: labelErrorColor },
+      { progress: focused, color: labelFocusColor },
+    ],
+    { key: 'color' },
+  )
 
-  // Filled active indicator: 1 dp resting → 2 dp focus or error, color crossfade.
-  const animatedIndicatorStyle = useAnimatedStyle(() => {
-    const erroredBg = interpolateColor(
-      errored.value,
-      [0, 1],
-      [borderRestColor, borderErrorColor],
-    )
-    const finalBg = interpolateColor(
-      focused.value,
-      [0, 1],
-      [erroredBg, borderFocusColor],
-    )
+  // Filled active indicator: 1 dp resting → 2 dp focus or error, color
+  // crossfade. Colour is a rest → error → focus cascade; the 1 → 2 dp height
+  // is a plain numeric interpolate kept in its own worklet (a mixed
+  // numeric+colour cascade doesn't collapse into `useColorCascade`).
+  const animatedIndicatorColorStyle = useColorCascade(borderRestColor, [
+    { progress: errored, color: borderErrorColor },
+    { progress: focused, color: borderFocusColor },
+  ])
+  const animatedIndicatorHeightStyle = useAnimatedStyle(() => {
     const focusedHeight = interpolate(focused.value, [0, 1], [1, 2])
-    const finalHeight = interpolate(errored.value, [0, 1], [focusedHeight, 2])
-    return {
-      backgroundColor: finalBg,
-      height: finalHeight,
-    }
+    return { height: interpolate(errored.value, [0, 1], [focusedHeight, 2]) }
   })
 
   // Outlined border drawn as an absolute overlay so its width can animate
   // 1 → 2 dp without ever moving the container's padding box. The label and
   // input keep their static positions; nothing snaps on focus/blur.
-  // Layered crossfade: rest → hover → error → focus (later states win).
+  // Colour is a rest → hover → error → focus cascade (later states win); the
+  // 1 → 2 dp width is a plain numeric interpolate in its own worklet.
   // MD3 hover keeps the 1 dp width — only focus/error thicken to 2 dp.
-  const animatedBorderLayerStyle = useAnimatedStyle(() => {
-    const hoveredBorder = interpolateColor(
-      hovered.value,
-      [0, 1],
-      [borderRestColor, borderHoverColor],
-    )
-    const erroredBorder = interpolateColor(
-      errored.value,
-      [0, 1],
-      [hoveredBorder, borderErrorColor],
-    )
-    const finalBorder = interpolateColor(
-      focused.value,
-      [0, 1],
-      [erroredBorder, borderFocusColor],
-    )
+  const animatedBorderColorStyle = useColorCascade(
+    borderRestColor,
+    [
+      { progress: hovered, color: borderHoverColor },
+      { progress: errored, color: borderErrorColor },
+      { progress: focused, color: borderFocusColor },
+    ],
+    { key: 'borderColor' },
+  )
+  const animatedBorderWidthStyle = useAnimatedStyle(() => {
     const focusedWidth = interpolate(focused.value, [0, 1], [1, 2])
-    const finalWidth = interpolate(errored.value, [0, 1], [focusedWidth, 2])
-    return { borderWidth: finalWidth, borderColor: finalBorder }
+    return {
+      borderWidth: interpolate(errored.value, [0, 1], [focusedWidth, 2]),
+    }
   })
 
   const animatedHoverLayerStyle = useAnimatedStyle(() => ({
@@ -289,19 +278,31 @@ export function TextField({
   const borderLayerStyleArr = useMemo(
     () => [
       styles.borderLayer,
-      animatedBorderLayerStyle,
+      animatedBorderColorStyle,
+      animatedBorderWidthStyle,
       borderLayerDisabledOverride,
     ],
-    [styles, animatedBorderLayerStyle, borderLayerDisabledOverride],
+    [
+      styles,
+      animatedBorderColorStyle,
+      animatedBorderWidthStyle,
+      borderLayerDisabledOverride,
+    ],
   )
 
   const indicatorStyleArr = useMemo(
     () => [
       styles.indicator,
-      animatedIndicatorStyle,
+      animatedIndicatorColorStyle,
+      animatedIndicatorHeightStyle,
       isDisabled ? styles.indicatorDisabled : undefined,
     ],
-    [styles, animatedIndicatorStyle, isDisabled],
+    [
+      styles,
+      animatedIndicatorColorStyle,
+      animatedIndicatorHeightStyle,
+      isDisabled,
+    ],
   )
 
   const hoverLayerStyleArr = useMemo(

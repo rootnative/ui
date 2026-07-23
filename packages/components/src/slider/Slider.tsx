@@ -1,11 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import {
-  cubicBezier,
-  resolveTransition,
-  useMotionValue,
-  useSpring,
-} from '@rootnative/inertia'
-import { cancelAnimation } from '@rootnative/inertia/reanimated'
+import { useAnimator, useMotionValue, useSpring } from '@rootnative/inertia'
 import { isFocusVisible, renderIcon } from '@rootnative/utils'
 import {
   Fragment,
@@ -23,9 +17,10 @@ import type {
 import { I18nManager, PanResponder, Pressable, View } from 'react-native'
 // Sanctioned escape hatch: the slider's hover/focus/label progress is routed
 // imperatively between two thumbs from one Pressable (`keyboardThumb`), a
-// shape inertia's gesture hooks don't express — raw motion values with
-// `resolveTransition` writes stay, consuming theme-sourced timing configs
-// below. The slot worklets (`./slots`) hand these values to
+// shape inertia's gesture hooks don't express. `useAnimator` drives the raw
+// motion values with the theme's registered named transitions ('state-hover'
+// / 'state-focus'), resolving them through `<MotionConfig>` and honouring
+// reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
 import {
   clamp,
@@ -103,34 +98,13 @@ export function Slider({
     [theme, containerColor, contentColor, inactiveTrackColor],
   )
 
-  const standardEasing = useMemo(
-    () => cubicBezier(theme.motion.easingStandard),
-    [theme.motion.easingStandard],
-  )
-  const labelTiming = useMemo(
-    () => ({
-      type: 'timing' as const,
-      duration: theme.motion.durationShort4,
-      easing: standardEasing,
-    }),
-    [theme, standardEasing],
-  )
-  const stateLayerTiming = useMemo(
-    () => ({
-      type: 'timing' as const,
-      duration: theme.motion.durationShort3,
-      easing: standardEasing,
-    }),
-    [theme, standardEasing],
-  )
-  const focusRingTiming = useMemo(
-    () => ({
-      type: 'timing' as const,
-      duration: theme.motion.durationShort4,
-      easing: standardEasing,
-    }),
-    [theme, standardEasing],
-  )
+  // Imperative writer for the hover/focus/label progress values. Resolves the
+  // registered names below through the nearest `<MotionConfig>` and applies
+  // the reduced-motion downgrade — the two things a bare `resolveTransition`
+  // write in an event handler silently gets wrong. The timing policy lives in
+  // the theme (label/focus → 'state-focus' short4, hover → 'state-hover'
+  // short3), so there are no per-component motion configs to keep in sync.
+  const animate = useAnimator()
 
   const isRange = Array.isArray(controlledValue) || Array.isArray(defaultValue)
   const isDisabled = Boolean(disabled)
@@ -323,32 +297,11 @@ export function Slider({
   const lowLabelOpacity = useMotionValue(0)
   const highLabelOpacity = useMotionValue(0)
 
-  // Cancel any in-flight springs/timings on unmount. Reanimated GCs the
-  // shared values themselves, but a mid-flight animation outliving the
-  // component can keep the worklet running for a frame or two — relevant
-  // when the slider unmounts mid-drag (route transition, orientation change).
-  useEffect(
-    () => () => {
-      cancelAnimation(lowPressed)
-      cancelAnimation(highPressed)
-      cancelAnimation(lowHovered)
-      cancelAnimation(highHovered)
-      cancelAnimation(lowFocused)
-      cancelAnimation(highFocused)
-      cancelAnimation(lowLabelOpacity)
-      cancelAnimation(highLabelOpacity)
-    },
-    [
-      lowPressed,
-      highPressed,
-      lowHovered,
-      highHovered,
-      lowFocused,
-      highFocused,
-      lowLabelOpacity,
-      highLabelOpacity,
-    ],
-  )
+  // In-flight springs/timings are cancelled automatically when the component
+  // unmounts — `useSpring`/`useMotionValue` own their shared values and
+  // register the `cancelAnimation` teardown themselves (inertia 0.0.2), so no
+  // hand-written unmount effect is needed even when the slider unmounts
+  // mid-drag (route transition, orientation change).
 
   // The single Pressable wrapper has one focus target. For range sliders we
   // route keyboard adjustments and focus indication to the thumb the user is
@@ -440,46 +393,28 @@ export function Slider({
     (labelMode === 'always' || (labelMode === true && activeThumb === 'high'))
 
   useEffect(() => {
-    lowLabelOpacity.value = resolveTransition(
-      labelTiming,
-      showLowLabel ? 1 : 0,
-    ) as number
-  }, [showLowLabel, lowLabelOpacity, labelTiming])
+    animate(lowLabelOpacity, showLowLabel ? 1 : 0, 'state-focus')
+  }, [showLowLabel, lowLabelOpacity, animate])
 
   useEffect(() => {
-    highLabelOpacity.value = resolveTransition(
-      labelTiming,
-      showHighLabel ? 1 : 0,
-    ) as number
-  }, [showHighLabel, highLabelOpacity, labelTiming])
+    animate(highLabelOpacity, showHighLabel ? 1 : 0, 'state-focus')
+  }, [showHighLabel, highLabelOpacity, animate])
 
   // Hover/focus indicator routing: only the keyboardThumb shows the halo
   // (single-thumb mode → always 'low'; range mode → most-recent thumb).
   useEffect(() => {
     const lowOn = isHovered.current && keyboardThumb === 'low' && !isDisabled
     const highOn = isHovered.current && keyboardThumb === 'high' && !isDisabled
-    lowHovered.value = resolveTransition(
-      stateLayerTiming,
-      lowOn ? 1 : 0,
-    ) as number
-    highHovered.value = resolveTransition(
-      stateLayerTiming,
-      highOn ? 1 : 0,
-    ) as number
-  }, [keyboardThumb, isDisabled, lowHovered, highHovered, stateLayerTiming])
+    animate(lowHovered, lowOn ? 1 : 0, 'state-hover')
+    animate(highHovered, highOn ? 1 : 0, 'state-hover')
+  }, [keyboardThumb, isDisabled, lowHovered, highHovered, animate])
 
   useEffect(() => {
     const lowOn = isFocused.current && keyboardThumb === 'low' && !isDisabled
     const highOn = isFocused.current && keyboardThumb === 'high' && !isDisabled
-    lowFocused.value = resolveTransition(
-      focusRingTiming,
-      lowOn ? 1 : 0,
-    ) as number
-    highFocused.value = resolveTransition(
-      focusRingTiming,
-      highOn ? 1 : 0,
-    ) as number
-  }, [keyboardThumb, isDisabled, lowFocused, highFocused, focusRingTiming])
+    animate(lowFocused, lowOn ? 1 : 0, 'state-focus')
+    animate(highFocused, highOn ? 1 : 0, 'state-focus')
+  }, [keyboardThumb, isDisabled, lowFocused, highFocused, animate])
 
   // Keyboard / a11y action step. For continuous sliders, MD3 spec calls for
   // ~1 % of the range per arrow tap; for discrete sliders, one step.
@@ -521,33 +456,33 @@ export function Slider({
     if (isDisabled) return
     isHovered.current = true
     if (keyboardThumb === 'low') {
-      lowHovered.value = resolveTransition(stateLayerTiming, 1) as number
+      animate(lowHovered, 1, 'state-hover')
     } else {
-      highHovered.value = resolveTransition(stateLayerTiming, 1) as number
+      animate(highHovered, 1, 'state-hover')
     }
-  }, [isDisabled, keyboardThumb, lowHovered, highHovered, stateLayerTiming])
+  }, [isDisabled, keyboardThumb, lowHovered, highHovered, animate])
 
   const handleHoverOut = useCallback(() => {
     isHovered.current = false
-    lowHovered.value = resolveTransition(stateLayerTiming, 0) as number
-    highHovered.value = resolveTransition(stateLayerTiming, 0) as number
-  }, [lowHovered, highHovered, stateLayerTiming])
+    animate(lowHovered, 0, 'state-hover')
+    animate(highHovered, 0, 'state-hover')
+  }, [lowHovered, highHovered, animate])
 
   const handleFocus = useCallback(() => {
     if (isDisabled || !isFocusVisible()) return
     isFocused.current = true
     if (keyboardThumb === 'low') {
-      lowFocused.value = resolveTransition(focusRingTiming, 1) as number
+      animate(lowFocused, 1, 'state-focus')
     } else {
-      highFocused.value = resolveTransition(focusRingTiming, 1) as number
+      animate(highFocused, 1, 'state-focus')
     }
-  }, [isDisabled, keyboardThumb, lowFocused, highFocused, focusRingTiming])
+  }, [isDisabled, keyboardThumb, lowFocused, highFocused, animate])
 
   const handleBlur = useCallback(() => {
     isFocused.current = false
-    lowFocused.value = resolveTransition(focusRingTiming, 0) as number
-    highFocused.value = resolveTransition(focusRingTiming, 0) as number
-  }, [lowFocused, highFocused, focusRingTiming])
+    animate(lowFocused, 0, 'state-focus')
+    animate(highFocused, 0, 'state-focus')
+  }, [lowFocused, highFocused, animate])
 
   const handleAccessibilityAction = useCallback(
     (e: AccessibilityActionEvent) => {
