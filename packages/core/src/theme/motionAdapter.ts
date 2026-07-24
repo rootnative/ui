@@ -3,7 +3,7 @@ import type { Motion } from './types'
 
 // Registered so the names autocomplete (and typos are compile errors)
 // anywhere inertia accepts a `TransitionName` — the `transition` prop,
-// `useBooleanSpring`, `useGestureLayer`, etc.
+// `useAnimation`, `useGestureLayer`, etc.
 declare module '@rootnative/inertia' {
   interface RegisteredTransitions {
     'state-hover': TransitionConfig

@@ -3,6 +3,7 @@ import {
   cubicBezier,
   useAnimation,
   useColorTransition,
+  useInterpolatedStyle,
   useMotionValue,
   useTransform,
 } from '@rootnative/inertia'
@@ -181,13 +182,11 @@ export function AppBar({
     (topAppBar.topRowHeight - collapsedTitleType.lineHeight) / 2
   const expandedTitleEndInset = theme.spacing.md
 
-  const containerCollapseStyle = useAnimatedStyle(() => ({
-    height: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedHeight, topAppBar.smallContainerHeight],
-    ),
-  }))
+  const containerCollapseStyle = useInterpolatedStyle(collapseProgress, {
+    height: [expandedHeight, topAppBar.smallContainerHeight],
+  })
+  // Stays hand-rolled: `end` is a logical (RTL-aware) inset, which isn't one
+  // of `useInterpolatedStyle`'s numeric keys.
   const titleContainerCollapseStyle = useAnimatedStyle(() => ({
     top: interpolate(
       collapseProgress.value,
@@ -205,18 +204,10 @@ export function AppBar({
       [expandedTitleEndInset, compactTitleEndInset],
     ),
   }))
-  const titleTextCollapseStyle = useAnimatedStyle(() => ({
-    fontSize: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleType.fontSize, collapsedTitleType.fontSize],
-    ),
-    lineHeight: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
-    ),
-  }))
+  const titleTextCollapseStyle = useInterpolatedStyle(collapseProgress, {
+    fontSize: [expandedTitleType.fontSize, collapsedTitleType.fontSize],
+    lineHeight: [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
+  })
   const collapsibleTitleInsetStyle = useMemo<ViewStyle>(
     () => ({ start: titleStartInset }),
     [titleStartInset],

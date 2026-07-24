@@ -1,5 +1,4 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useBooleanSpring } from '@rootnative/inertia'
 import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
 import {
   Animated,
@@ -22,6 +21,7 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -149,7 +149,7 @@ export function Chip(props: ChipProps) {
     disabled: isDisabled || !isSelectable,
   })
   const morphProgress = morph.progress
-  const selectedProgress = useBooleanSpring(isSelected, 'spring-fast-spatial')
+  const selectedProgress = useBooleanProgress(isSelected, 'spring-fast-spatial')
 
   const composedHandlers = useMemo(
     () => composePressHandlers(handlers, morph.handlers),

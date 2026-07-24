@@ -1,5 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useAnimator, useMotionValue, useSpring } from '@rootnative/inertia'
+import { useAnimator, useMotionValue } from '@rootnative/inertia'
 import { isFocusVisible, renderIcon } from '@rootnative/utils'
 import {
   Fragment,
@@ -22,6 +22,7 @@ import { I18nManager, PanResponder, Pressable, View } from 'react-native'
 // / 'state-focus'), resolving them through `<MotionConfig>` and honouring
 // reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
   clamp,
   computeSegments,
@@ -282,12 +283,12 @@ export function Slider({
   // 4 → 2 dp narrowing can run in lockstep with the surrounding segments and
   // stop indicators that depend on the same value. Hover and focus drive the
   // same state-layer halo at lower opacities and don't affect layout.
-  const lowPressed = useSpring(
-    activeThumb === 'low' ? 1 : 0,
+  const lowPressed = useBooleanProgress(
+    activeThumb === 'low',
     'spring-fast-spatial',
   )
-  const highPressed = useSpring(
-    activeThumb === 'high' ? 1 : 0,
+  const highPressed = useBooleanProgress(
+    activeThumb === 'high',
     'spring-fast-spatial',
   )
   const lowHovered = useMotionValue(0)

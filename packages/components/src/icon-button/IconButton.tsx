@@ -1,5 +1,4 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useBooleanSpring } from '@rootnative/inertia'
 import {
   Animated,
   interpolate,
@@ -8,6 +7,7 @@ import {
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable } from 'react-native'
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -155,7 +155,7 @@ export function IconButton({
     disabled: isDisabled,
   })
   const morphProgress = morph.progress
-  const selectedProgress = useBooleanSpring(
+  const selectedProgress = useBooleanProgress(
     isToggle && isSelected,
     'spring-default-effects',
   )

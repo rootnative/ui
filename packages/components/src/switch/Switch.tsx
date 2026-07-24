@@ -1,7 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import {
   resolveTransition,
-  useBooleanSpring,
   useColorTransition,
   useMotionValue,
   useNamedTransitions,
@@ -19,6 +18,7 @@ import {
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers } from '../internal/usePressMorph'
 import {
   SWITCH_STATE_LAYER_SIZE,
@@ -76,7 +76,7 @@ export function Switch({
 
   // Toggle progress — the theme's fast-spatial spring (Expressive bounce,
   // 0.6 damping ratio), driving thumb travel and size per Compose's Switch.
-  const progress = useBooleanSpring(isSelected, 'spring-fast-spatial')
+  const progress = useBooleanProgress(isSelected, 'spring-fast-spatial')
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha. The gesture layer composes the strongest active interaction via

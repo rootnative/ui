@@ -1,5 +1,5 @@
 import { useTheme } from '@rootnative/core'
-import { useBooleanSpring, useColorTransition } from '@rootnative/inertia'
+import { useColorTransition } from '@rootnative/inertia'
 import {
   useGestureLayer,
   type GestureLayerStates,
@@ -7,6 +7,7 @@ import {
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo } from 'react'
 import { Platform, Pressable } from 'react-native'
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
 
@@ -40,8 +41,8 @@ export function Radio({
   // critically damped default-effects spring (no overshoot on colors), the
   // dot pop rides fast-spatial (bouncy — the dot overshoots and settles),
   // mirroring Compose's RadioButton DefaultEffects/FastSpatial split.
-  const progress = useBooleanSpring(isSelected, 'spring-default-effects')
-  const dotProgress = useBooleanSpring(isSelected, 'spring-fast-spatial')
+  const progress = useBooleanProgress(isSelected, 'spring-default-effects')
+  const dotProgress = useBooleanProgress(isSelected, 'spring-fast-spatial')
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha — produces exactly the MD3 token values without any compounding.

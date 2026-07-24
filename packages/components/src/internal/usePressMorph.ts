@@ -1,13 +1,10 @@
 import {
   useGesture,
+  useInterpolatedStyle,
+  type SharedValue,
   type TransitionName,
   type UseGestureHandlers,
 } from '@rootnative/inertia'
-import {
-  interpolate,
-  useAnimatedStyle,
-  type SharedValue,
-} from '@rootnative/inertia/reanimated'
 import { useEffect, useMemo } from 'react'
 
 export interface UsePressMorphOptions {
@@ -32,7 +29,7 @@ export interface UsePressMorphOptions {
 
 export interface UsePressMorphResult {
   /** Animated `borderRadius` style for the pressed shape morph. */
-  style: ReturnType<typeof useAnimatedStyle>
+  style: ReturnType<typeof useInterpolatedStyle>
   /**
    * Press handlers driving the morph. Attach alongside the state-layer
    * handlers via `composePressHandlers` — spreading both bags directly would
@@ -73,9 +70,9 @@ export function usePressMorph(
     if (disabled) progress.value = 0
   }, [disabled, progress])
 
-  const style = useAnimatedStyle(() => ({
-    borderRadius: interpolate(progress.value, [0, 1], [rest, pressed]),
-  }))
+  const style = useInterpolatedStyle(progress, {
+    borderRadius: [rest, pressed],
+  })
 
   const handlers = useMemo(
     () =>

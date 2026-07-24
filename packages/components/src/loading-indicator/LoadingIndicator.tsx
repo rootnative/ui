@@ -1,5 +1,5 @@
 import { useTheme } from '@rootnative/core'
-import { cubicBezier, useAnimation, useSpring } from '@rootnative/inertia'
+import { cubicBezier, useAnimation } from '@rootnative/inertia'
 import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
 import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
@@ -28,7 +28,12 @@ const QUARTER_ROTATION = 90
 // The morph spring: spring(dampingRatio 0.6, stiffness 200). Not one of the
 // theme's named tokens (fast-spatial is 800/0.6, slow-spatial 200/0.8), so
 // it's expressed inline. friction = 0.6 * 2 * sqrt(200) ≈ 16.97.
-const MORPH_SPRING = { tension: 200, friction: 16.97, mass: 1 } as const
+const MORPH_SPRING = {
+  type: 'spring',
+  tension: 200,
+  friction: 16.97,
+  mass: 1,
+} as const
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max)
@@ -70,14 +75,15 @@ export function LoadingIndicator({
 
   // --- Morph position -------------------------------------------------------
   // Indeterminate: `morphStep` steps 0,1,2,… every MORPH_INTERVAL_MS (JS
-  // state, so `useSpring` takes its clean plain-number path) and a spring
-  // chases it, easing the polygon from shape to shape. Determinate: the
-  // position is progress * (shapeCount - 1), driven directly.
+  // state) and a spring chases it, easing the polygon from shape to shape.
+  // Determinate: the position is progress * (shapeCount - 1), driven
+  // directly. `useAnimation` rather than `useSpring` so the morph collapses
+  // to a hard cut under reduced motion, like the spin below.
   const [morphStep, setMorphStep] = useState(0)
   const determinateValue = indeterminate
     ? 0
     : clamp(progress as number, 0, 1) * (shapeCount - 1)
-  const morphSpring = useSpring(morphStep, MORPH_SPRING)
+  const morphSpring = useAnimation(morphStep, MORPH_SPRING)
 
   useEffect(() => {
     if (!indeterminate) return

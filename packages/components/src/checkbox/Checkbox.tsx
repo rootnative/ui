@@ -1,5 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useBooleanSpring, useColorTransition } from '@rootnative/inertia'
+import { useColorTransition } from '@rootnative/inertia'
 import {
   useGestureLayer,
   type GestureLayerStates,
@@ -8,6 +8,7 @@ import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
   CHECKBOX_ICON_SIZE,
   createStyles,
@@ -70,8 +71,8 @@ export function Checkbox({
   // to-off color fade and snaps the mark out after a 100ms delay — we keep
   // one effects spring and a symmetric mark animation as the documented
   // approximation.)
-  const progress = useBooleanSpring(isActive, 'spring-default-spatial')
-  const colorProgress = useBooleanSpring(isActive, 'spring-default-effects')
+  const progress = useBooleanProgress(isActive, 'spring-default-spatial')
+  const colorProgress = useBooleanProgress(isActive, 'spring-default-effects')
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha. The gesture layer composes the strongest active interaction via

@@ -3,6 +3,7 @@ import {
   useAnimation,
   useColorCascade,
   useGesture,
+  useInterpolatedStyle,
   useTransform,
 } from '@rootnative/inertia'
 import {
@@ -127,18 +128,10 @@ export function TextField({
 
   // Transform on the wrapper View — keeps the layer transform off of Text
   // composition so iOS doesn't have to re-rasterise glyphs while scaling.
-  const animatedLabelTransformStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: interpolate(
-          labelProgress.value,
-          [0, 1],
-          [restingOffset, 0],
-        ),
-      },
-      { scale: interpolate(labelProgress.value, [0, 1], [restingScale, 1]) },
-    ],
-  }))
+  const animatedLabelTransformStyle = useInterpolatedStyle(labelProgress, {
+    translateY: [restingOffset, 0],
+    scale: [restingScale, 1],
+  })
 
   // Color on the inner Animated.Text. Priority cascade rest → error → focus
   // (later layers win at equal progress) — focus wins when both are active,
