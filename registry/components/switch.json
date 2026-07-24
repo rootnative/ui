@@ -6,12 +6,13 @@
     "packages/components/src/switch/index.ts",
     "packages/components/src/switch/styles.ts",
     "packages/components/src/switch/types.ts",
+    "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/usePressMorph.ts"
   ],
   "utils": ["color", "pressable", "render-icon"],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.2",
+    "@rootnative/core": ">=0.0.0-alpha.3",
     "@rootnative/inertia": ">=0.0.2",
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0"

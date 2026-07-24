@@ -5,12 +5,13 @@
     "packages/components/src/radio/Radio.tsx",
     "packages/components/src/radio/index.ts",
     "packages/components/src/radio/styles.ts",
-    "packages/components/src/radio/types.ts"
+    "packages/components/src/radio/types.ts",
+    "packages/components/src/internal/useBooleanProgress.ts"
   ],
   "utils": ["color"],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.2",
+    "@rootnative/core": ">=0.0.0-alpha.3",
     "@rootnative/inertia": ">=0.0.2",
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0"
