@@ -167,6 +167,12 @@ const sections: ComponentSection[] = [
           'Linear and circular progress (determinate, indeterminate)',
       },
       {
+        label: 'Loading Indicator',
+        route: '/loading-indicator',
+        description:
+          'Expressive shape-morphing loading spinner (contained + uncontained)',
+      },
+      {
         label: 'Portal',
         route: '/portal',
         description:

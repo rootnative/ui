@@ -22,6 +22,7 @@ export default defineConfig({
     'src/portal/index.ts',
     'src/slider/index.ts',
     'src/progress/index.ts',
+    'src/loading-indicator/index.ts',
     'src/fab/index.ts',
   ],
   // `@rootnative/utils` is private/unpublished and bundled into the JS via

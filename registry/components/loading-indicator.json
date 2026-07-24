@@ -1,0 +1,21 @@
+{
+  "name": "loading-indicator",
+  "description": "MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate)",
+  "files": [
+    "packages/components/src/loading-indicator/LoadingIndicator.tsx",
+    "packages/components/src/loading-indicator/index.ts",
+    "packages/components/src/loading-indicator/shapes.ts",
+    "packages/components/src/loading-indicator/styles.ts",
+    "packages/components/src/loading-indicator/types.ts"
+  ],
+  "utils": [],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.2",
+    "react-native-svg": ">=15.0.0",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {}
+}

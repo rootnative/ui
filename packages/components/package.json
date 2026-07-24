@@ -106,6 +106,11 @@
       "react-native": "./dist/progress/index.js",
       "default": "./dist/progress/index.js"
     },
+    "./loading-indicator": {
+      "types": "./dist/loading-indicator/index.d.ts",
+      "react-native": "./dist/loading-indicator/index.js",
+      "default": "./dist/loading-indicator/index.js"
+    },
     "./fab": {
       "types": "./dist/fab/index.d.ts",
       "react-native": "./dist/fab/index.js",
@@ -167,6 +172,9 @@
       ],
       "progress": [
         "dist/progress/index.d.ts"
+      ],
+      "loading-indicator": [
+        "dist/loading-indicator/index.d.ts"
       ],
       "fab": [
         "dist/fab/index.d.ts"

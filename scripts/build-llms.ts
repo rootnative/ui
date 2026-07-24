@@ -389,6 +389,7 @@ const COMPONENT_ORDER = [
   'avatar',
   'slider',
   'progress',
+  'loading-indicator',
 ]
 
 const COMPONENT_NAMES: Record<string, string> = {
@@ -410,6 +411,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
+  'loading-indicator': 'LoadingIndicator',
 }
 
 const COMPONENT_EXAMPLES: Record<string, string> = {
@@ -614,6 +616,22 @@ import { LinearProgress, CircularProgress } from '@rootnative/components/progres
 // Custom sizing / colors
 <LinearProgress progress={value} thickness={8} containerColor="#2E7D32" trackColor="#C8E6C9" />
 <CircularProgress progress={value} size={56} thickness={5} />
+\`\`\``,
+
+  'loading-indicator': `\`\`\`tsx
+import { LoadingIndicator } from '@rootnative/components/loading-indicator'
+
+// Indeterminate shape-morph spinner (default)
+<LoadingIndicator accessibilityLabel="Loading" />
+
+// Contained (filled circular background)
+<LoadingIndicator contained accessibilityLabel="Loading" />
+
+// Determinate (circle -> soft-burst morph as progress advances)
+<LoadingIndicator progress={0.6} accessibilityLabel="Loading" />
+
+// Custom size / colors
+<LoadingIndicator size={72} indicatorColor="#00796B" accessibilityLabel="Loading" />
 \`\`\``,
 }
 
