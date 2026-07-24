@@ -135,6 +135,30 @@ export default function ChipScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">
+          Icon Size &amp; Label Style
+        </Typography>
+        <Row wrap gap="sm" align="center">
+          <Chip variant="assist" leadingIcon="calendar" iconSize={14}>
+            iconSize 14
+          </Chip>
+          <Chip variant="assist" leadingIcon="calendar">
+            Default 18
+          </Chip>
+          <Chip variant="assist" leadingIcon="calendar" iconSize={24}>
+            iconSize 24
+          </Chip>
+          <Chip
+            variant="suggestion"
+            leadingIcon="lightbulb-outline"
+            labelStyle={styles.brandLabel}
+          >
+            labelStyle
+          </Chip>
+        </Row>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Custom Colors</Typography>
         <Row wrap gap="sm">
           <Chip containerColor="#B00020" contentColor="#FFFFFF">
@@ -164,5 +188,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  brandLabel: {
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 })

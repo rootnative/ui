@@ -15,6 +15,9 @@ export default function SliderScreen() {
   ])
   const [rangeDiscrete, setRangeDiscrete] = useState<[number, number]>([2, 6])
   const [custom, setCustom] = useState(0.5)
+  const [noTicks, setNoTicks] = useState(50)
+  const [temperature, setTemperature] = useState(21)
+  const [committedTemperature, setCommittedTemperature] = useState(21)
 
   const setSingle = (setter: (n: number) => void) => (v: SliderValue) => {
     if (typeof v === 'number') setter(v)
@@ -25,6 +28,7 @@ export default function SliderScreen() {
     }
 
   const captionStyle = { color: theme.colors.onSurfaceVariant }
+  const formatTemperature = (value: number) => `${Math.round(value)}°C`
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -49,6 +53,47 @@ export default function SliderScreen() {
         />
         <Typography variant="bodySmall" style={captionStyle}>
           Value: {discrete}
+        </Typography>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">
+          Discrete without tick marks (step = 25)
+        </Typography>
+        <Slider
+          value={noTicks}
+          onValueChange={setSingle(setNoTicks)}
+          minimumValue={0}
+          maximumValue={100}
+          step={25}
+          showTickMarks={false}
+        />
+        <Typography variant="bodySmall" style={captionStyle}>
+          Value: {noTicks} — still snaps to the step, tick marks suppressed with
+          showTickMarks
+        </Typography>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">
+          Formatted label + commit on release
+        </Typography>
+        <Slider
+          value={temperature}
+          onValueChange={setSingle(setTemperature)}
+          onSlidingComplete={setSingle(setCommittedTemperature)}
+          minimumValue={16}
+          maximumValue={30}
+          step={1}
+          showValueLabel="always"
+          formatValueLabel={formatTemperature}
+          startIcon="snowflake"
+          endIcon="white-balance-sunny"
+        />
+        <Typography variant="bodySmall" style={captionStyle}>
+          Dragging: {formatTemperature(temperature)} · committed:{' '}
+          {formatTemperature(committedTemperature)} — the second value only
+          updates on release via onSlidingComplete
         </Typography>
       </Column>
 

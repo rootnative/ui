@@ -9,6 +9,10 @@ import {
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 
+const longSupporting =
+  'Ali Connors — I will be in your neighborhood doing errands this weekend, ' +
+  'so let me know if you want to grab brunch somewhere near the park.'
+
 function Icon({ name }: { name: string }) {
   const theme = useTheme()
   return (
@@ -118,6 +122,31 @@ export default function ListScreen() {
             supportingText="Sounds great, see you then!"
             leadingContent={<Avatar label="B" />}
             trailingSupportingText="20 min"
+          />
+        </List>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Supporting text line clamp</Typography>
+        <List>
+          <ListItem
+            headlineText="One line (default)"
+            supportingText={longSupporting}
+            leadingContent={<Icon name="email-outline" />}
+          />
+          <ListDivider inset />
+          <ListItem
+            headlineText="Two lines"
+            supportingText={longSupporting}
+            supportingTextNumberOfLines={2}
+            leadingContent={<Icon name="email-outline" />}
+          />
+          <ListDivider inset />
+          <ListItem
+            headlineText="Three lines"
+            supportingText={longSupporting}
+            supportingTextNumberOfLines={3}
+            leadingContent={<Icon name="email-outline" />}
           />
         </List>
       </Column>

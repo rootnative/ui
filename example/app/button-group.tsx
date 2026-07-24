@@ -180,6 +180,24 @@ export default function ButtonGroupScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">
+          Icon size &amp; label style
+        </Typography>
+        <Typography variant="bodySmall" style={styles.muted}>
+          iconSize overrides the size-derived icon size for every item;
+          labelStyle applies to every item label.
+        </Typography>
+        <ButtonGroup
+          variant="standard"
+          selectionMode="single"
+          defaultValue="center"
+          iconSize={28}
+          labelStyle={styles.brandLabel}
+          items={alignmentItems}
+        />
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Custom colors</Typography>
         <ButtonGroup
           variant="connected"
@@ -210,6 +228,11 @@ const styles = StyleSheet.create({
   },
   muted: {
     opacity: 0.7,
+  },
+  brandLabel: {
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   sizeScrollContent: {
     paddingEnd: 24,

@@ -214,6 +214,35 @@ export default function AppBarScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">Custom Title Style</Typography>
+        <Typography variant="bodySmall">
+          titleStyle merges over the variant&apos;s type scale — the back button
+          and actions are unaffected.
+        </Typography>
+        <Column gap="md">
+          <Box style={previewStyle}>
+            <AppBar
+              title="Rootnative"
+              canGoBack
+              actions={actions}
+              onBackPress={() => router.back()}
+              titleStyle={styles.brandTitle}
+            />
+          </Box>
+          <Box style={previewStyle}>
+            <AppBar
+              title="Rootnative"
+              variant="large"
+              canGoBack
+              actions={actions}
+              onBackPress={() => router.back()}
+              titleStyle={styles.brandTitle}
+            />
+          </Box>
+        </Column>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Long Title</Typography>
         <Column gap="md">
           {variants.map((item) => (
@@ -243,6 +272,11 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
     rowGap: 20,
+  },
+  brandTitle: {
+    fontWeight: '700',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   collapseFrame: {
     height: 320,

@@ -73,6 +73,42 @@ export default function ButtonScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">Icon Size</Typography>
+        <Typography variant="bodySmall" style={styles.muted}>
+          iconSize overrides the size-derived icon size (20 dp at size s).
+        </Typography>
+        <Row wrap gap="sm" align="center">
+          <Button leadingIcon="plus" iconSize={14}>
+            14 dp
+          </Button>
+          <Button leadingIcon="plus">Default</Button>
+          <Button leadingIcon="plus" iconSize={28}>
+            28 dp
+          </Button>
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Label Style</Typography>
+        <Typography variant="bodySmall" style={styles.muted}>
+          labelStyle affects the text only — icons keep the size and color
+          derived from the variant.
+        </Typography>
+        <Row wrap gap="sm" align="center">
+          <Button
+            variant="tonal"
+            leadingIcon="rocket-launch-outline"
+            labelStyle={styles.brandLabel}
+          >
+            Launch
+          </Button>
+          <Button variant="outlined" labelStyle={styles.italicLabel}>
+            Read more
+          </Button>
+        </Row>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Custom Colors</Typography>
         <Row wrap gap="sm">
           <Button containerColor="#B00020" contentColor="#FFFFFF">
@@ -101,5 +137,16 @@ const styles = StyleSheet.create({
   content: {
     padding: 24,
     rowGap: 20,
+  },
+  muted: {
+    opacity: 0.7,
+  },
+  brandLabel: {
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  italicLabel: {
+    fontStyle: 'italic',
   },
 })

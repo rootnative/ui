@@ -99,6 +99,42 @@ export default function IconButtonScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">iconColor vs contentColor</Typography>
+        <Typography variant="labelSmall">
+          Both tint the icon; contentColor wins when they disagree.
+        </Typography>
+        <Row gap="lg" align="center" wrap>
+          <Column align="center" gap="xs">
+            <IconButton
+              icon="bell-outline"
+              variant="tonal"
+              accessibilityLabel="Alerts, default color"
+            />
+            <Typography variant="labelSmall">Default</Typography>
+          </Column>
+          <Column align="center" gap="xs">
+            <IconButton
+              icon="bell-outline"
+              variant="tonal"
+              iconColor="#C62828"
+              accessibilityLabel="Alerts, iconColor red"
+            />
+            <Typography variant="labelSmall">iconColor</Typography>
+          </Column>
+          <Column align="center" gap="xs">
+            <IconButton
+              icon="bell-outline"
+              variant="tonal"
+              iconColor="#C62828"
+              contentColor="#1565C0"
+              accessibilityLabel="Alerts, contentColor takes precedence"
+            />
+            <Typography variant="labelSmall">Both</Typography>
+          </Column>
+        </Row>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Custom Colors</Typography>
         <Row gap="sm">
           <IconButton

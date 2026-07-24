@@ -15,6 +15,8 @@ export default function TextFieldScreen() {
   const [passwordValue, setPasswordValue] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [multilineValue, setMultilineValue] = useState('')
+  const [bioValue, setBioValue] = useState('')
+  const [couponValue, setCouponValue] = useState('')
 
   return (
     <KeyboardAvoidingWrapper
@@ -98,6 +100,51 @@ export default function TextFieldScreen() {
           secureTextEntry={!showPassword}
           trailingIcon={showPassword ? 'eye-off' : 'eye'}
           onTrailingIconPress={() => setShowPassword((prev) => !prev)}
+          trailingIconAccessibilityLabel={
+            showPassword ? 'Hide password' : 'Show password'
+          }
+        />
+      </Column>
+
+      <Column gap="lg">
+        <Typography variant="titleSmall">Character Counter</Typography>
+        <TextField
+          label="Bio"
+          value={bioValue}
+          onChangeText={setBioValue}
+          maxLength={80}
+          supportingText="Counter shows automatically once maxLength is set"
+        />
+        <TextField
+          variant="outlined"
+          label="Bio (counter hidden)"
+          value={bioValue}
+          onChangeText={setBioValue}
+          maxLength={80}
+          showCharacterCounter={false}
+          supportingText="Same maxLength, showCharacterCounter turned off"
+        />
+        <TextField
+          label="Bio (error)"
+          value={bioValue}
+          onChangeText={setBioValue}
+          maxLength={80}
+          error
+          errorText="Counter keeps its place next to the error message"
+        />
+      </Column>
+
+      <Column gap="lg">
+        <Typography variant="titleSmall">Custom Input Style</Typography>
+        <TextField
+          variant="outlined"
+          label="Coupon code"
+          value={couponValue}
+          onChangeText={setCouponValue}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          inputStyle={styles.codeInput}
+          supportingText="inputStyle targets the input text only — the label keeps its own type"
         />
       </Column>
 
@@ -138,5 +185,9 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  codeInput: {
+    letterSpacing: 4,
+    fontWeight: '600',
   },
 })

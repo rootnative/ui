@@ -2,14 +2,18 @@ import { Box, Column, Grid, Row, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet } from 'react-native'
 
-function Swatch({ label }: { label: string }) {
+function Swatch({ label, wide }: { label: string; wide?: boolean }) {
   const { colors } = useTheme()
   return (
     <Box
       p="sm"
       align="center"
       justify="center"
-      style={[styles.swatch, { backgroundColor: colors.primaryContainer }]}
+      style={[
+        styles.swatch,
+        wide ? styles.swatchWide : null,
+        { backgroundColor: colors.primaryContainer },
+      ]}
     >
       <Typography variant="labelSmall">{label}</Typography>
     </Box>
@@ -35,8 +39,86 @@ export default function LayoutScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">
+          Box — Directional Padding (pt / pb / ps / pe)
+        </Typography>
+        <Box
+          pt="xs"
+          pb="lg"
+          ps="xl"
+          pe="xs"
+          bg={colors.tertiaryContainer}
+          style={styles.rounded}
+        >
+          <Box p="sm" bg={colors.surface} style={styles.rounded}>
+            <Typography variant="bodySmall">
+              pt=xs · pb=lg · ps=xl · pe=xs — start/end are logical, so they
+              flip when you toggle RTL from the app bar.
+            </Typography>
+          </Box>
+        </Box>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">
+          Box — Margins (mx / my / mt / mb / ms / me)
+        </Typography>
+        <Box bg={colors.surfaceVariant} style={styles.rounded}>
+          <Box
+            mx="lg"
+            my="sm"
+            p="sm"
+            bg={colors.primaryContainer}
+            style={styles.rounded}
+          >
+            <Typography variant="labelSmall">mx=lg · my=sm</Typography>
+          </Box>
+          <Box
+            mt="xs"
+            mb="lg"
+            ms="xl"
+            me="sm"
+            p="sm"
+            bg={colors.secondaryContainer}
+            style={styles.rounded}
+          >
+            <Typography variant="labelSmall">
+              mt=xs · mb=lg · ms=xl · me=sm
+            </Typography>
+          </Box>
+        </Box>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Row</Typography>
         <Row gap="sm">
+          <Swatch label="A" />
+          <Swatch label="B" />
+          <Swatch label="C" />
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Row — rowGap vs columnGap</Typography>
+        <Typography variant="bodySmall">
+          Tight columnGap, generous rowGap — visible once the items wrap.
+        </Typography>
+        <Row wrap rowGap="lg" columnGap="xs">
+          <Swatch wide label="1" />
+          <Swatch wide label="2" />
+          <Swatch wide label="3" />
+          <Swatch wide label="4" />
+          <Swatch wide label="5" />
+          <Swatch wide label="6" />
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Row — Inverted</Typography>
+        <Typography variant="bodySmall">
+          Source order is A, B, C — inverted renders it C, B, A.
+        </Typography>
+        <Row gap="sm" inverted>
           <Swatch label="A" />
           <Swatch label="B" />
           <Swatch label="C" />
@@ -54,6 +136,18 @@ export default function LayoutScreen() {
       <Column gap="sm">
         <Typography variant="titleSmall">Column</Typography>
         <Column gap="sm">
+          <Swatch label="1" />
+          <Swatch label="2" />
+          <Swatch label="3" />
+        </Column>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Column — Inverted</Typography>
+        <Typography variant="bodySmall">
+          Source order is 1, 2, 3 — inverted stacks it bottom-up.
+        </Typography>
+        <Column gap="sm" inverted>
           <Swatch label="1" />
           <Swatch label="2" />
           <Swatch label="3" />
@@ -116,6 +210,9 @@ const styles = StyleSheet.create({
   swatch: {
     borderRadius: 8,
     minHeight: 48,
+  },
+  swatchWide: {
+    minWidth: 96,
   },
   rounded: {
     borderRadius: 12,
