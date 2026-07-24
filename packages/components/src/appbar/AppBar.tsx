@@ -235,7 +235,7 @@ export function AppBar({
       <View style={styles.iconFrame}>
         <IconButton
           icon={getBackIcon()}
-          size="medium"
+          size="s"
           variant="standard"
           iconColor={resolvedContentColor}
           accessibilityLabel="Go back"
@@ -279,7 +279,7 @@ export function AppBar({
             >
               <IconButton
                 icon={action.icon}
-                size="medium"
+                size="s"
                 variant="standard"
                 iconColor={resolvedContentColor}
                 accessibilityLabel={action.accessibilityLabel}

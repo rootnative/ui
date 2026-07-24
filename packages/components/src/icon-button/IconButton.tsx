@@ -16,12 +16,11 @@ import {
   applyContainerColorOverride,
   createStyles,
   getIconButtonColors,
+  getIconButtonMorphRadii,
+  getIconButtonSizeTokens,
+  getIconButtonWidth,
 } from './styles'
-import type {
-  IconButtonProps,
-  IconButtonSize,
-  IconButtonVariant,
-} from './types'
+import type { IconButtonProps, IconButtonVariant } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
@@ -62,34 +61,10 @@ function getIconColor(
   return theme.colors.onSurfaceVariant
 }
 
-function getSizeStyle(
-  styles: ReturnType<typeof createStyles>,
-  size: IconButtonSize,
-) {
-  if (size === 'small') return styles.sizeSmall
-  if (size === 'large') return styles.sizeLarge
-  return styles.sizeMedium
-}
-
-function getIconPixelSize(size: IconButtonSize): number {
-  if (size === 'small') return 18
-  if (size === 'large') return 28
-  return 24
-}
-
-function getDefaultHitSlop(size: IconButtonSize): number {
-  if (size === 'small') return 8
-  if (size === 'large') return 0
-  return 4
-}
-
-// Effective rest radius of the pill container (half the container size) —
-// the press/selected shape morphs interpolate from this, not from the
-// `cornerFull` sentinel (999).
-function getRestRadius(size: IconButtonSize): number {
-  if (size === 'small') return 16
-  if (size === 'large') return 24
-  return 20
+// Extra touch-target padding (via hitSlop) to reach the WCAG/MD3 48dp
+// minimum on the smaller sizes, per side.
+function getDefaultHitSlop(height: number): number {
+  return Math.max(0, Math.round((48 - height) / 2))
 }
 
 export function IconButton({
@@ -103,7 +78,9 @@ export function IconButton({
   disabled = false,
   variant = 'filled',
   selected,
-  size = 'medium',
+  size = 's',
+  width = 'uniform',
+  shape = 'round',
   hitSlop,
   accessibilityLabel,
   ...props
@@ -111,6 +88,7 @@ export function IconButton({
   const theme = useTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const sizeTokens = getIconButtonSizeTokens(size)
 
   const isDisabled = Boolean(disabled)
   const isToggle = selected !== undefined
@@ -124,7 +102,8 @@ export function IconButton({
       getIconColor(variant, theme, isToggle, isSelected))
   const displayIcon =
     isToggle && isSelected && selectedIcon ? selectedIcon : icon
-  const iconPixelSize = getIconPixelSize(size)
+  const iconPixelSize = sizeTokens.iconSize
+  const containerWidth = getIconButtonWidth(size, width)
   const accessibilityState = isToggle
     ? { disabled: isDisabled, selected: isSelected }
     : { disabled: isDisabled }
@@ -162,12 +141,15 @@ export function IconButton({
 
   // Expressive shape morphs, both on the bounce-free effects spring Compose
   // uses for icon buttons: press squashes toward cornerSmall (pressed wins),
-  // and a selected toggle rests squarer at cornerMedium to signal its state.
-  const restRadius = getRestRadius(size)
-  const pressedRadius = theme.shape.cornerSmall
-  const selectedRadius = theme.shape.cornerMedium
+  // and a selected toggle inverts the shape (round → squarer, square → pill)
+  // to signal its state. Rest radii come from the size/width/shape tokens
+  // for both the unselected and selected states; the selected progress
+  // interpolates between them and the press morph squashes on top.
+  const unselectedRest = getIconButtonMorphRadii(size, shape, width, false).rest
+  const { rest: selectedRest, pressed: pressedRadius } =
+    getIconButtonMorphRadii(size, shape, width, true)
   const morph = usePressMorph({
-    rest: restRadius,
+    rest: unselectedRest,
     pressed: pressedRadius,
     transition: 'spring-default-effects',
     disabled: isDisabled,
@@ -187,7 +169,7 @@ export function IconButton({
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
-      [restRadius, selectedRadius],
+      [unselectedRest, selectedRest],
     )
     return {
       borderRadius: interpolate(
@@ -207,7 +189,7 @@ export function IconButton({
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
-      [restRadius, selectedRadius],
+      [unselectedRest, selectedRest],
     )
     return {
       opacity: states.focusVisible.value,
@@ -224,6 +206,17 @@ export function IconButton({
       }
     : undefined
 
+  // Container dimensions from the size/width tokens, plus the outlined-variant
+  // border (size-specific width: 1/1/1/2/3 dp). Dynamic, so it can't live in
+  // createStyles.
+  const sizeStyle = {
+    width: containerWidth,
+    height: sizeTokens.height,
+    borderColor: colors.borderColor,
+    borderWidth:
+      variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth,
+  }
+
   return (
     <Animated.View style={styles.wrapper}>
       <Animated.View
@@ -236,13 +229,12 @@ export function IconButton({
         accessibilityLabel={accessibilityLabel}
         accessibilityState={accessibilityState}
         disabled={isDisabled}
-        hitSlop={hitSlop ?? getDefaultHitSlop(size)}
+        hitSlop={hitSlop ?? getDefaultHitSlop(sizeTokens.height)}
         onPress={onPress}
         {...(isDisabled ? undefined : composedHandlers)}
         style={[
           styles.container,
-          getSizeStyle(styles, size),
-          { borderColor: colors.borderColor, borderWidth: colors.borderWidth },
+          sizeStyle,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled override
           // applies instantly (no animated layer to fight it). The radius

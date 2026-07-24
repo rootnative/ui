@@ -441,9 +441,11 @@ import { Button } from '@rootnative/components/button'
 Props:
 - `children: string` — Text label rendered inside the button.
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
+- `size?: 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'s'`. MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets container height, padding, icon size, and label typography.
+- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
 - `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
-- `iconSize?: number` — Default: `18`. Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized.
+- `iconSize?: number` — Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized. Defaults to the icon size for the current `size` (20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`).
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
@@ -515,7 +517,9 @@ Props:
 - `disabled?: boolean` — Default: `false`. Disables the button.
 - `variant?: 'filled' | 'tonal' | 'outlined' | 'standard'` — Default: `'filled'`. Visual style variant.
 - `selected?: boolean` — Enables toggle mode. The button changes appearance based on selected/unselected state.
-- `size?: 'small' | 'medium' | 'large'` — Default: `'medium'`. Physical size of the touch target and icon container.
+- `size?: 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'s'`. MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets container height and icon size.
+- `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
+- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
 - `accessibilityLabel: string` — Required — icon-only buttons must have a label for screen readers.
 
 ---

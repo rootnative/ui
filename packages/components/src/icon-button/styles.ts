@@ -1,10 +1,131 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
-import type { IconButtonVariant } from './types'
+import type {
+  IconButtonShape,
+  IconButtonSize,
+  IconButtonVariant,
+  IconButtonWidth,
+} from './types'
 
 export const ICON_BUTTON_FOCUS_RING_OFFSET = 2
 export const ICON_BUTTON_FOCUS_RING_WIDTH = 3
+
+/**
+ * Per-size Expressive geometry (androidx `*IconButtonTokens.kt`). `height`
+ * is the container height (and the `uniform` width); `narrow`/`wide` are the
+ * alternate container widths; `iconSize` is the glyph size; `outlineWidth`
+ * is the outlined-variant border. `squareCorner` is the resting corner of
+ * the `'square'` shape, `pressedCorner` the press morph target, and
+ * `selectedCorner` the resting corner a *round* toggle adopts when selected
+ * (the square selected state inverts to a pill — handled in the component).
+ */
+export interface IconButtonSizeTokens {
+  height: number
+  narrow: number
+  uniform: number
+  wide: number
+  iconSize: number
+  outlineWidth: number
+  squareCorner: number
+  pressedCorner: number
+  selectedCorner: number
+}
+
+const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
+  xs: {
+    height: 32,
+    narrow: 28,
+    uniform: 32,
+    wide: 40,
+    iconSize: 20,
+    outlineWidth: 1,
+    squareCorner: 12,
+    pressedCorner: 8,
+    selectedCorner: 12,
+  },
+  s: {
+    height: 40,
+    narrow: 32,
+    uniform: 40,
+    wide: 52,
+    iconSize: 24,
+    outlineWidth: 1,
+    squareCorner: 12,
+    pressedCorner: 8,
+    selectedCorner: 12,
+  },
+  m: {
+    height: 56,
+    narrow: 48,
+    uniform: 56,
+    wide: 72,
+    iconSize: 24,
+    outlineWidth: 1,
+    squareCorner: 16,
+    pressedCorner: 12,
+    selectedCorner: 16,
+  },
+  l: {
+    height: 96,
+    narrow: 64,
+    uniform: 96,
+    wide: 128,
+    iconSize: 32,
+    outlineWidth: 2,
+    squareCorner: 28,
+    pressedCorner: 16,
+    selectedCorner: 28,
+  },
+  xl: {
+    height: 136,
+    narrow: 104,
+    uniform: 136,
+    wide: 184,
+    iconSize: 40,
+    outlineWidth: 3,
+    squareCorner: 28,
+    pressedCorner: 16,
+    selectedCorner: 28,
+  },
+}
+
+export function getIconButtonSizeTokens(
+  size: IconButtonSize,
+): IconButtonSizeTokens {
+  return ICON_BUTTON_SIZE_TOKENS[size]
+}
+
+export function getIconButtonWidth(
+  size: IconButtonSize,
+  width: IconButtonWidth,
+): number {
+  return ICON_BUTTON_SIZE_TOKENS[size][width]
+}
+
+/**
+ * Resting and pressed corner radii for the shape morph, in dp, accounting
+ * for the toggle-selected shape inversion. `'round'` rests as a pill
+ * (min(height,width)/2) unless selected, when it adopts the size's
+ * `selectedCorner` (squarer). `'square'` rests at `squareCorner` unless
+ * selected, when it inverts to a pill. Both morph toward `pressedCorner`.
+ */
+export function getIconButtonMorphRadii(
+  size: IconButtonSize,
+  shape: IconButtonShape,
+  width: IconButtonWidth,
+  selected: boolean,
+): { rest: number; pressed: number } {
+  const tokens = ICON_BUTTON_SIZE_TOKENS[size]
+  const pill = Math.min(tokens.height, tokens[width]) / 2
+  let rest: number
+  if (shape === 'round') {
+    rest = selected ? tokens.selectedCorner : pill
+  } else {
+    rest = selected ? pill : tokens.squareCorner
+  }
+  return { rest, pressed: tokens.pressedCorner }
+}
 
 export interface IconButtonColors {
   backgroundColor: string
@@ -158,22 +279,11 @@ export function createStyles(theme: MaterialTheme) {
       alignSelf: 'flex-start' as const,
     },
     container: {
-      borderRadius: theme.shape.cornerFull,
+      // width/height/borderRadius are applied per size/width/shape in the
+      // component (the morph and the width prop both need runtime values).
       alignItems: 'center',
       justifyContent: 'center',
       cursor: 'pointer',
-    },
-    sizeSmall: {
-      width: 32,
-      height: 32,
-    },
-    sizeMedium: {
-      width: 40,
-      height: 40,
-    },
-    sizeLarge: {
-      width: 48,
-      height: 48,
     },
     disabled: {
       cursor: 'auto',
@@ -184,7 +294,7 @@ export function createStyles(theme: MaterialTheme) {
       left: focusRingInset,
       right: focusRingInset,
       bottom: focusRingInset,
-      borderRadius: theme.shape.cornerFull,
+      // borderRadius applied per size in the component.
       borderWidth: ICON_BUTTON_FOCUS_RING_WIDTH,
       borderColor: theme.colors.secondary,
     },

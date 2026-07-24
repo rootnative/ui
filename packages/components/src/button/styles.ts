@@ -1,15 +1,106 @@
-import type { MaterialTheme } from '@rootnative/core'
+import type { MaterialTheme, TextStyle } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
-import type { ButtonVariant } from './types'
+import type { ButtonShape, ButtonSize, ButtonVariant } from './types'
 
 export const BUTTON_FOCUS_RING_OFFSET = 2
 export const BUTTON_FOCUS_RING_WIDTH = 3
 
-// Effective rest radius of the pill container (half the 40dp min height) —
-// the press shape morph interpolates from this, not from the `cornerFull`
-// sentinel (999), which would keep the whole animation in the clamped range.
-export const BUTTON_PRESS_MORPH_REST_RADIUS = 20
+/**
+ * Per-size Expressive geometry (androidx `Button<Size>Tokens.kt`). `height`,
+ * `iconSize`, and `paddingVertical` are absolute dp; `padding` is the base
+ * horizontal inset; `labelRole`/`iconLabelRole` name the typography variant
+ * (icon-bearing sizes step down to the icon-adjacent role where the spec
+ * uses the emphasized/label form — here we keep one role per size, matching
+ * Compose's `textStyleFor(height)`); `outlineWidth` is the outlined-variant
+ * border. `squareCorner` is the resting corner of the `'square'` shape;
+ * `pressedCorner` is the morph target both shapes squash toward on press.
+ * `'round'` always rests as a pill (radius = height / 2).
+ */
+export interface ButtonSizeTokens {
+  height: number
+  iconSize: number
+  padding: number
+  paddingVertical: number
+  labelRole: keyof MaterialTheme['typography']
+  outlineWidth: number
+  squareCorner: number
+  pressedCorner: number
+}
+
+const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
+  xs: {
+    height: 32,
+    iconSize: 20,
+    padding: 12,
+    paddingVertical: 6,
+    labelRole: 'labelLarge',
+    outlineWidth: 1,
+    squareCorner: 12,
+    pressedCorner: 8,
+  },
+  s: {
+    height: 40,
+    iconSize: 20,
+    padding: 16,
+    paddingVertical: 10,
+    labelRole: 'labelLarge',
+    outlineWidth: 1,
+    squareCorner: 12,
+    pressedCorner: 8,
+  },
+  m: {
+    height: 56,
+    iconSize: 24,
+    padding: 24,
+    paddingVertical: 16,
+    labelRole: 'titleMedium',
+    outlineWidth: 1,
+    squareCorner: 16,
+    pressedCorner: 12,
+  },
+  l: {
+    height: 96,
+    iconSize: 32,
+    padding: 48,
+    paddingVertical: 32,
+    labelRole: 'headlineSmall',
+    outlineWidth: 2,
+    squareCorner: 28,
+    pressedCorner: 16,
+  },
+  xl: {
+    height: 136,
+    iconSize: 40,
+    padding: 64,
+    paddingVertical: 48,
+    labelRole: 'headlineLarge',
+    outlineWidth: 3,
+    squareCorner: 28,
+    pressedCorner: 16,
+  },
+}
+
+export function getButtonSizeTokens(size: ButtonSize): ButtonSizeTokens {
+  return BUTTON_SIZE_TOKENS[size]
+}
+
+/**
+ * Resting and pressed corner radii for the shape morph, in dp. `'round'`
+ * rests as a pill (half the container height — never the `cornerFull`
+ * sentinel 999, which would park the morph in the clamped range); `'square'`
+ * rests at the size's `squareCorner`. Both morph toward `pressedCorner`.
+ */
+export function getButtonMorphRadii(
+  size: ButtonSize,
+  shape: ButtonShape,
+): { rest: number; pressed: number } {
+  const tokens = BUTTON_SIZE_TOKENS[size]
+  return {
+    rest: shape === 'round' ? tokens.height / 2 : tokens.squareCorner,
+    pressed: tokens.pressedCorner,
+  }
+}
 
 export interface VariantColors {
   backgroundColor: string
@@ -174,6 +265,7 @@ function getVariantColors(
 function getHorizontalPadding(
   theme: MaterialTheme,
   variant: ButtonVariant,
+  size: ButtonSize,
   hasLeadingIcon: boolean,
   hasTrailingIcon: boolean,
 ): { paddingStart: number; paddingEnd: number } {
@@ -189,10 +281,17 @@ function getHorizontalPadding(
     }
   }
 
-  // M3: filled/elevated/tonal/outlined use 24dp base, icon side gets 16dp
+  // Filled/elevated/tonal/outlined: base horizontal padding is the size
+  // token, and the icon side tightens by one step. `s` keeps the
+  // pre-Expressive 24/16 values (base 24, icon side 16) for back-compat; the
+  // Expressive size tokens (12/16/24/48/64) drive the rest, with the icon
+  // side tightened proportionally (never below spacing.sm).
+  const base =
+    size === 's' ? theme.spacing.lg : getButtonSizeTokens(size).padding
+  const iconSide = Math.max(theme.spacing.sm, base - theme.spacing.sm)
   return {
-    paddingStart: hasLeadingIcon ? theme.spacing.md : theme.spacing.lg,
-    paddingEnd: hasTrailingIcon ? theme.spacing.md : theme.spacing.lg,
+    paddingStart: hasLeadingIcon ? iconSide : base,
+    paddingEnd: hasTrailingIcon ? iconSide : base,
   }
 }
 
@@ -282,6 +381,8 @@ export function getResolvedButtonColors(
 export function createStyles(
   theme: MaterialTheme,
   variant: ButtonVariant,
+  size: ButtonSize,
+  shape: ButtonShape,
   hasLeadingIcon: boolean,
   hasTrailingIcon: boolean,
   containerColor?: string,
@@ -293,13 +394,20 @@ export function createStyles(
     containerColor,
     contentColor,
   )
-  const labelStyle = theme.typography.labelLarge
+  const sizeTokens = getButtonSizeTokens(size)
+  const labelStyle: TextStyle = theme.typography[sizeTokens.labelRole]
+  const restCorner = getButtonMorphRadii(size, shape).rest
   const padding = getHorizontalPadding(
     theme,
     variant,
+    size,
     hasLeadingIcon,
     hasTrailingIcon,
   )
+  // Outlined variant overrides the color-derived border width with the
+  // size-specific outline (1/1/1/2/3 dp); other variants keep 0.
+  const borderWidth =
+    variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
   const elevationLevel2 = elevationStyle(theme.elevation.level2)
@@ -315,13 +423,13 @@ export function createStyles(
       flexDirection: 'row',
       justifyContent: 'center',
       minWidth: 58,
-      minHeight: 40,
+      minHeight: sizeTokens.height,
       paddingStart: padding.paddingStart,
       paddingEnd: padding.paddingEnd,
-      paddingVertical: 10,
-      borderRadius: theme.shape.cornerFull,
+      paddingVertical: sizeTokens.paddingVertical,
+      borderRadius: restCorner,
       borderColor: colors.borderColor,
-      borderWidth: colors.borderWidth,
+      borderWidth,
       cursor: 'pointer',
       ...elevationLevel0,
     },
@@ -339,7 +447,7 @@ export function createStyles(
       left: 0,
       right: 0,
       bottom: 0,
-      borderRadius: theme.shape.cornerFull,
+      borderRadius: restCorner,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel1,
     },
@@ -349,7 +457,7 @@ export function createStyles(
       left: 0,
       right: 0,
       bottom: 0,
-      borderRadius: theme.shape.cornerFull,
+      borderRadius: restCorner,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel2,
     },
@@ -359,7 +467,8 @@ export function createStyles(
       left: focusRingInset,
       right: focusRingInset,
       bottom: focusRingInset,
-      borderRadius: theme.shape.cornerFull,
+      borderRadius:
+        restCorner + BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH,
       borderWidth: BUTTON_FOCUS_RING_WIDTH,
       borderColor: theme.colors.secondary,
     },

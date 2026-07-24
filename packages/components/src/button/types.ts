@@ -14,6 +14,20 @@ export type ButtonVariant =
   | 'text'
   | 'tonal'
 
+/**
+ * MD3 Expressive button size. Drives container height, horizontal padding,
+ * icon size, and label typography. `'s'` (40 dp) is the default and matches
+ * the pre-Expressive button.
+ */
+export type ButtonSize = 'xs' | 's' | 'm' | 'l' | 'xl'
+
+/**
+ * MD3 Expressive container shape. `'round'` rests as a full pill; `'square'`
+ * rests at a size-dependent rounded-rectangle corner. Both morph one step
+ * squarer on press.
+ */
+export type ButtonShape = 'round' | 'square'
+
 export interface ButtonProps extends Omit<
   PressableProps,
   'children' | 'style'
@@ -25,6 +39,18 @@ export interface ButtonProps extends Omit<
    * @default 'filled'
    */
   variant?: ButtonVariant
+  /**
+   * MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets
+   * container height, padding, icon size, and label typography.
+   * @default 's'
+   */
+  size?: ButtonSize
+  /**
+   * Container shape. `'round'` is a full pill; `'square'` rests at a
+   * size-dependent rounded corner. Both morph squarer on press.
+   * @default 'round'
+   */
+  shape?: ButtonShape
   /**
    * Icon rendered before the label. Accepts a string name (resolved via the
    * theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a
@@ -40,8 +66,8 @@ export interface ButtonProps extends Omit<
   /**
    * Size of leading and trailing icons in dp. Used when resolving string
    * icon names or invoking the render-function form. Pre-rendered elements
-   * are not resized.
-   * @default 18
+   * are not resized. Defaults to the icon size for the current `size`
+   * (20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`).
    */
   iconSize?: number
   /**

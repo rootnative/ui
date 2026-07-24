@@ -9,9 +9,17 @@ const variants = [
 ] as const
 
 const sizes = [
-  { label: 'Small', value: 'small' },
-  { label: 'Medium', value: 'medium' },
-  { label: 'Large', value: 'large' },
+  { label: 'XS', value: 'xs' },
+  { label: 'S', value: 's' },
+  { label: 'M', value: 'm' },
+  { label: 'L', value: 'l' },
+  { label: 'XL', value: 'xl' },
+] as const
+
+const widths = [
+  { label: 'Narrow', value: 'narrow' },
+  { label: 'Uniform', value: 'uniform' },
+  { label: 'Wide', value: 'wide' },
 ] as const
 
 export default function IconButtonScreen() {
@@ -36,15 +44,53 @@ export default function IconButtonScreen() {
       </Column>
 
       <Column gap="sm">
-        <Typography variant="titleSmall">Sizes</Typography>
-        <Row gap="lg" align="center">
+        <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
+        <Row gap="lg" align="center" wrap>
           {sizes.map((option) => (
             <Column key={option.value} align="center" gap="xs">
               <IconButton
                 icon="heart-outline"
                 size={option.value}
-                variant="standard"
+                variant="filled"
                 accessibilityLabel={`${option.label} heart`}
+              />
+              <Typography variant="labelSmall">{option.label}</Typography>
+            </Column>
+          ))}
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Width (size M)</Typography>
+        <Row gap="lg" align="center" wrap>
+          {widths.map((option) => (
+            <Column key={option.value} align="center" gap="xs">
+              <IconButton
+                icon="heart-outline"
+                size="m"
+                width={option.value}
+                variant="tonal"
+                accessibilityLabel={`${option.label} heart`}
+              />
+              <Typography variant="labelSmall">{option.label}</Typography>
+            </Column>
+          ))}
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Square Shape + Toggle</Typography>
+        <Row gap="lg" align="center" wrap>
+          {sizes.map((option) => (
+            <Column key={option.value} align="center" gap="xs">
+              <IconButton
+                icon="heart-outline"
+                selectedIcon="heart"
+                size={option.value}
+                shape="square"
+                selected
+                variant="filled"
+                accessibilityLabel={`${option.label} square`}
               />
               <Typography variant="labelSmall">{option.label}</Typography>
             </Column>

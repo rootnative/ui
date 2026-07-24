@@ -12,8 +12,9 @@ import { useStateLayer } from '../internal/useStateLayer'
 import {
   BUTTON_FOCUS_RING_OFFSET,
   BUTTON_FOCUS_RING_WIDTH,
-  BUTTON_PRESS_MORPH_REST_RADIUS,
   createStyles,
+  getButtonMorphRadii,
+  getButtonSizeTokens,
   getResolvedButtonColors,
 } from './styles'
 import type { ButtonProps } from './types'
@@ -24,9 +25,11 @@ export function Button({
   children,
   style,
   variant = 'filled',
+  size = 's',
+  shape = 'round',
   leadingIcon,
   trailingIcon,
-  iconSize = 18,
+  iconSize,
   containerColor,
   contentColor,
   labelStyle: labelStyleOverride,
@@ -38,18 +41,30 @@ export function Button({
   const hasTrailing = Boolean(trailingIcon)
   const theme = useTheme()
   const iconResolver = useIconResolver()
+  const resolvedIconSize = iconSize ?? getButtonSizeTokens(size).iconSize
 
   const styles = useMemo(
     () =>
       createStyles(
         theme,
         variant,
+        size,
+        shape,
         hasLeading,
         hasTrailing,
         containerColor,
         contentColor,
       ),
-    [theme, variant, hasLeading, hasTrailing, containerColor, contentColor],
+    [
+      theme,
+      variant,
+      size,
+      shape,
+      hasLeading,
+      hasTrailing,
+      containerColor,
+      contentColor,
+    ],
   )
 
   const colors = useMemo(
@@ -74,12 +89,16 @@ export function Button({
     disabled: isDisabled,
   })
 
-  // Expressive press shape morph: pill → cornerSmall while pressed. Rides
-  // its own bounce-free effects spring, separate from the state-layer color
-  // progress (which stays on 'state-press').
-  const pressedRadius = theme.shape.cornerSmall
+  // Expressive press shape morph: rest shape (pill for `round`, size corner
+  // for `square`) → the size's pressed corner. Rides its own bounce-free
+  // effects spring, separate from the state-layer color progress (which
+  // stays on 'state-press').
+  const { rest: restRadius, pressed: pressedRadius } = getButtonMorphRadii(
+    size,
+    shape,
+  )
   const morph = usePressMorph({
-    rest: BUTTON_PRESS_MORPH_REST_RADIUS,
+    rest: restRadius,
     pressed: pressedRadius,
     transition: 'spring-default-effects',
     disabled: isDisabled,
@@ -101,10 +120,7 @@ export function Button({
     borderRadius: interpolate(
       morphProgress.value,
       [0, 1],
-      [
-        BUTTON_PRESS_MORPH_REST_RADIUS + focusRingOutset,
-        pressedRadius + focusRingOutset,
-      ],
+      [restRadius + focusRingOutset, pressedRadius + focusRingOutset],
     ),
   }))
 
@@ -119,7 +135,7 @@ export function Button({
     borderRadius: interpolate(
       morphProgress.value,
       [0, 1],
-      [BUTTON_PRESS_MORPH_REST_RADIUS, pressedRadius],
+      [restRadius, pressedRadius],
     ),
   }))
 
@@ -128,7 +144,7 @@ export function Button({
     borderRadius: interpolate(
       morphProgress.value,
       [0, 1],
-      [BUTTON_PRESS_MORPH_REST_RADIUS, pressedRadius],
+      [restRadius, pressedRadius],
     ),
   }))
 
@@ -150,7 +166,7 @@ export function Button({
     [isDisabled, styles.disabledLabel, styles.label, labelStyleOverride],
   )
 
-  const iconRenderProps = { size: iconSize, color: resolvedIconColor }
+  const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 
   return (
     <View style={styles.wrapper}>

@@ -173,4 +173,79 @@ describe('IconButton', () => {
       expect(screen.queryByTestId('off-icon')).toBeNull()
     })
   })
+
+  describe('size', () => {
+    const sizes: Array<{
+      size: 'xs' | 's' | 'm' | 'l' | 'xl'
+      height: number
+      icon: number
+    }> = [
+      { size: 'xs', height: 32, icon: 20 },
+      { size: 's', height: 40, icon: 24 },
+      { size: 'm', height: 56, icon: 24 },
+      { size: 'l', height: 96, icon: 32 },
+      { size: 'xl', height: 136, icon: 40 },
+    ]
+
+    it.each(sizes)(
+      'size $size sets the container height and icon size',
+      ({ size, height, icon }) => {
+        const renderFn = jest.fn(() => <Text testID="i">x</Text>)
+        renderWithTheme(
+          <IconButton icon={renderFn} accessibilityLabel="X" size={size} />,
+        )
+        const flat = StyleSheet.flatten(screen.getByRole('button').props.style)
+        expect(flat.height).toBe(height)
+        expect(flat.width).toBe(height) // uniform width == height
+        expect(renderFn).toHaveBeenCalledWith(
+          expect.objectContaining({ size: icon }),
+        )
+      },
+    )
+
+    it('defaults to size s (40dp)', () => {
+      renderWithTheme(<IconButton icon="heart" accessibilityLabel="X" />)
+      const flat = StyleSheet.flatten(screen.getByRole('button').props.style)
+      expect(flat.height).toBe(40)
+    })
+  })
+
+  describe('width variant', () => {
+    it('narrow / uniform / wide set distinct widths at a fixed height', () => {
+      const widths: Record<'narrow' | 'uniform' | 'wide', number> = {
+        narrow: 48,
+        uniform: 56,
+        wide: 72,
+      }
+      for (const [width, expected] of Object.entries(widths)) {
+        const { unmount } = renderWithTheme(
+          <IconButton
+            icon="heart"
+            accessibilityLabel="X"
+            size="m"
+            width={width as 'narrow' | 'uniform' | 'wide'}
+          />,
+        )
+        const flat = StyleSheet.flatten(screen.getByRole('button').props.style)
+        expect(flat.width).toBe(expected)
+        expect(flat.height).toBe(56)
+        unmount()
+      }
+    })
+  })
+
+  describe('outline width by size', () => {
+    it('outlined l uses a 2dp border', () => {
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          accessibilityLabel="X"
+          variant="outlined"
+          size="l"
+        />,
+      )
+      const flat = StyleSheet.flatten(screen.getByRole('button').props.style)
+      expect(flat.borderWidth).toBe(2)
+    })
+  })
 })

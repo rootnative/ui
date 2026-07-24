@@ -2,6 +2,7 @@ import { Button, Column, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
 
 const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
+const sizes = ['xs', 's', 'm', 'l', 'xl'] as const
 
 export default function ButtonScreen() {
   return (
@@ -46,6 +47,28 @@ export default function ButtonScreen() {
           >
             Favorite
           </Button>
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
+        <Row wrap gap="sm" align="center">
+          {sizes.map((size) => (
+            <Button key={size} size={size} leadingIcon="plus">
+              {size.toUpperCase()}
+            </Button>
+          ))}
+        </Row>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Square Shape</Typography>
+        <Row wrap gap="sm" align="center">
+          {sizes.map((size) => (
+            <Button key={size} size={size} shape="square">
+              {size.toUpperCase()}
+            </Button>
+          ))}
         </Row>
       </Column>
 

@@ -72,7 +72,7 @@ describe('Button', () => {
       })
       expect(iconResolver).toHaveBeenCalledWith(
         'check',
-        expect.objectContaining({ size: 18 }),
+        expect.objectContaining({ size: 20 }),
       )
       expect(screen.getByTestId('resolved').props.children).toBe(
         'resolved:check',
@@ -114,6 +114,114 @@ describe('Button', () => {
       const flatStyle = StyleSheet.flatten(label.props.style)
       expect(flatStyle.color).toBe('#00FF00')
       expect(flatStyle.fontSize).toBe(20)
+    })
+  })
+
+  describe('size', () => {
+    const heights: Record<string, number> = {
+      xs: 32,
+      s: 40,
+      m: 56,
+      l: 96,
+      xl: 136,
+    }
+
+    it.each(Object.entries(heights))(
+      'size %s sets container minHeight %d',
+      (size, height) => {
+        renderWithTheme(
+          <Button size={size as 'xs' | 's' | 'm' | 'l' | 'xl'}>Sized</Button>,
+        )
+        const flatStyle = StyleSheet.flatten(
+          screen.getByRole('button').props.style,
+        )
+        expect(flatStyle.minHeight).toBe(height)
+      },
+    )
+
+    it('defaults to size s (40dp) when no size is given', () => {
+      renderWithTheme(<Button>Default</Button>)
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.minHeight).toBe(40)
+    })
+
+    it('derives icon size from the button size', () => {
+      const renderFn = jest.fn(() => <Text testID="i">x</Text>)
+      renderWithTheme(
+        <Button size="l" leadingIcon={renderFn}>
+          Big
+        </Button>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ size: 32 }),
+      )
+    })
+
+    it('explicit iconSize overrides the size default', () => {
+      const renderFn = jest.fn(() => <Text testID="i">x</Text>)
+      renderWithTheme(
+        <Button size="l" iconSize={10} leadingIcon={renderFn}>
+          Big
+        </Button>,
+      )
+      expect(renderFn).toHaveBeenCalledWith(
+        expect.objectContaining({ size: 10 }),
+      )
+    })
+
+    it('uses the size-specific label typography role', () => {
+      renderWithTheme(<Button size="xl">Huge</Button>)
+      const flatStyle = StyleSheet.flatten(screen.getByText('Huge').props.style)
+      // headlineLarge = 32sp
+      expect(flatStyle.fontSize).toBe(32)
+    })
+  })
+
+  describe('shape', () => {
+    it('round (default) rests as a pill (radius = height / 2)', () => {
+      renderWithTheme(<Button size="s">Round</Button>)
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.borderRadius).toBe(20)
+    })
+
+    it('square rests at the size corner (s = 12dp)', () => {
+      renderWithTheme(
+        <Button size="s" shape="square">
+          Square
+        </Button>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.borderRadius).toBe(12)
+    })
+
+    it('square medium rests at 16dp', () => {
+      renderWithTheme(
+        <Button size="m" shape="square">
+          Square
+        </Button>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.borderRadius).toBe(16)
+    })
+  })
+
+  describe('outline width by size', () => {
+    it('outlined l uses a 2dp border, xl 3dp', () => {
+      renderWithTheme(
+        <Button variant="outlined" size="l">
+          L
+        </Button>,
+      )
+      const l = StyleSheet.flatten(screen.getByRole('button').props.style)
+      expect(l.borderWidth).toBe(2)
     })
   })
 })
