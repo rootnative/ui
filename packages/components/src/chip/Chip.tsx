@@ -1,6 +1,11 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useBooleanSpring } from '@rootnative/inertia'
 import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import {
+  Animated,
+  interpolate,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import {
   alphaColor,
   renderIcon,
@@ -17,8 +22,15 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
-import { createStyles, getResolvedChipColors } from './styles'
+import {
+  CHIP_FOCUS_RING_OFFSET,
+  CHIP_SELECTED_REST_RADIUS,
+  createStyles,
+  getChipRestRadius,
+  getResolvedChipColors,
+} from './styles'
 import type { ChipProps, ChipVariant } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -122,11 +134,59 @@ export function Chip(props: ChipProps) {
     disabled: isDisabled,
   })
 
+  // Expressive shape morphs for the selectable chips (filter/input), on the
+  // fast-spatial spring Compose uses for chips: rest at cornerMedium, morph
+  // to a pill while a filter chip is selected, squash toward cornerSmall
+  // while pressed (pressed wins). Assist/suggestion chips keep their static
+  // baseline shape — the morph is pinned to rest for them.
+  const isSelectable = variant === 'filter' || variant === 'input'
+  const restRadius = getChipRestRadius(theme, variant)
+  const pressedRadius = theme.shape.cornerSmall
+  const morph = usePressMorph({
+    rest: restRadius,
+    pressed: pressedRadius,
+    transition: 'spring-fast-spatial',
+    disabled: isDisabled || !isSelectable,
+  })
+  const morphProgress = morph.progress
+  const selectedProgress = useBooleanSpring(isSelected, 'spring-fast-spatial')
+
+  const composedHandlers = useMemo(
+    () => composePressHandlers(handlers, morph.handlers),
+    [handlers, morph.handlers],
+  )
+
+  const animatedRadiusStyle = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, CHIP_SELECTED_REST_RADIUS],
+    )
+    return {
+      borderRadius: interpolate(
+        morphProgress.value,
+        [0, 1],
+        [rest, pressedRadius],
+      ),
+    }
+  })
+
   // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  // keyboard-focus progress the state layer runs on, and its radius follows
+  // the shape morphs (offset outward) so it keeps hugging the container.
+  const animatedFocusRingStyle = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, CHIP_SELECTED_REST_RADIUS],
+    )
+    return {
+      opacity: states.focusVisible.value,
+      borderRadius:
+        interpolate(morphProgress.value, [0, 1], [rest, pressedRadius]) +
+        CHIP_FOCUS_RING_OFFSET,
+    }
+  })
 
   const isElevated = elevated && variant !== 'input'
   const showElevationLayers = isElevated && !isDisabled
@@ -134,13 +194,38 @@ export function Chip(props: ChipProps) {
   // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
   // driven by the gesture layer's hover progress (two-layer opacity swap —
   // platform-portable, see Card.tsx for why useShadow can't replace it).
-  const animatedElevationLevel1Style = useAnimatedStyle(() => ({
-    opacity: 1 - states.hovered.value,
-  }))
+  // Both follow the shape morphs so the shadow shape matches the container.
+  const animatedElevationLevel1Style = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, CHIP_SELECTED_REST_RADIUS],
+    )
+    return {
+      opacity: 1 - states.hovered.value,
+      borderRadius: interpolate(
+        morphProgress.value,
+        [0, 1],
+        [rest, pressedRadius],
+      ),
+    }
+  })
 
-  const animatedElevationLevel2Style = useAnimatedStyle(() => ({
-    opacity: states.hovered.value,
-  }))
+  const animatedElevationLevel2Style = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, CHIP_SELECTED_REST_RADIUS],
+    )
+    return {
+      opacity: states.hovered.value,
+      borderRadius: interpolate(
+        morphProgress.value,
+        [0, 1],
+        [rest, pressedRadius],
+      ),
+    }
+  })
 
   // The close button is its own gesture surface with hover/press layers only
   // (no focus layer, matching MD3's trailing-icon treatment) — it drops to
@@ -262,12 +347,15 @@ export function Chip(props: ChipProps) {
         // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
         hitSlop={Platform.OS === 'web' ? undefined : 8}
         disabled={isDisabled}
-        {...(isDisabled ? undefined : handlers)}
+        {...(isDisabled ? undefined : composedHandlers)}
         style={[
           styles.container,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it).
+          // applies instantly (no animated layer to fight it). The radius
+          // morph stays applied while disabled — a selected filter chip
+          // keeps its pill resting shape (the press progress is pinned).
+          animatedRadiusStyle,
           isDisabled ? undefined : stateLayerStyle,
           isDisabled ? styles.disabledContainer : undefined,
           // Function-form `style` is intentionally dropped on animated

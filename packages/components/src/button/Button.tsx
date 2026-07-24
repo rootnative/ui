@@ -1,10 +1,21 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import {
+  Animated,
+  interpolate,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
+import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
-import { createStyles, getResolvedButtonColors } from './styles'
+import {
+  BUTTON_FOCUS_RING_OFFSET,
+  BUTTON_FOCUS_RING_WIDTH,
+  BUTTON_PRESS_MORPH_REST_RADIUS,
+  createStyles,
+  getResolvedButtonColors,
+} from './styles'
 import type { ButtonProps } from './types'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -63,10 +74,38 @@ export function Button({
     disabled: isDisabled,
   })
 
+  // Expressive press shape morph: pill → cornerSmall while pressed. Rides
+  // its own bounce-free effects spring, separate from the state-layer color
+  // progress (which stays on 'state-press').
+  const pressedRadius = theme.shape.cornerSmall
+  const morph = usePressMorph({
+    rest: BUTTON_PRESS_MORPH_REST_RADIUS,
+    pressed: pressedRadius,
+    transition: 'spring-default-effects',
+    disabled: isDisabled,
+  })
+  const morphProgress = morph.progress
+
+  const composedHandlers = useMemo(
+    () => composePressHandlers(handlers, morph.handlers),
+    [handlers, morph.handlers],
+  )
+
   // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
+  // keyboard-focus progress the state layer runs on, and its radius follows
+  // the press morph (offset outward) so a keyboard-activated press keeps the
+  // ring hugging the container.
+  const focusRingOutset = BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
     opacity: states.focusVisible.value,
+    borderRadius: interpolate(
+      morphProgress.value,
+      [0, 1],
+      [
+        BUTTON_PRESS_MORPH_REST_RADIUS + focusRingOutset,
+        pressedRadius + focusRingOutset,
+      ],
+    ),
   }))
 
   const showElevationLayers = variant === 'elevated' && !isDisabled
@@ -74,12 +113,23 @@ export function Button({
   // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
   // driven by the gesture layer's hover progress (two-layer opacity swap —
   // platform-portable, see Card.tsx for why useShadow can't replace it).
+  // Both follow the press morph so the shadow shape matches the container.
   const animatedElevationLevel1Style = useAnimatedStyle(() => ({
     opacity: 1 - states.hovered.value,
+    borderRadius: interpolate(
+      morphProgress.value,
+      [0, 1],
+      [BUTTON_PRESS_MORPH_REST_RADIUS, pressedRadius],
+    ),
   }))
 
   const animatedElevationLevel2Style = useAnimatedStyle(() => ({
     opacity: states.hovered.value,
+    borderRadius: interpolate(
+      morphProgress.value,
+      [0, 1],
+      [BUTTON_PRESS_MORPH_REST_RADIUS, pressedRadius],
+    ),
   }))
 
   const resolvedIconColor = useMemo(
@@ -126,13 +176,16 @@ export function Button({
         accessibilityState={{ disabled: isDisabled }}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
-        {...(isDisabled ? undefined : handlers)}
+        {...(isDisabled ? undefined : composedHandlers)}
         style={[
           styles.container,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it).
+          // applies instantly (no animated layer to fight it). The press
+          // morph sits before the consumer `style` so an explicit
+          // borderRadius override still wins.
           isDisabled ? undefined : stateLayerStyle,
+          isDisabled ? undefined : morph.style,
           isDisabled ? styles.disabledContainer : undefined,
           style,
         ]}

@@ -6,6 +6,11 @@ import type { ButtonVariant } from './types'
 export const BUTTON_FOCUS_RING_OFFSET = 2
 export const BUTTON_FOCUS_RING_WIDTH = 3
 
+// Effective rest radius of the pill container (half the 40dp min height) —
+// the press shape morph interpolates from this, not from the `cornerFull`
+// sentinel (999), which would keep the whole animation in the clamped range.
+export const BUTTON_PRESS_MORPH_REST_RADIUS = 20
+
 export interface VariantColors {
   backgroundColor: string
   textColor: string

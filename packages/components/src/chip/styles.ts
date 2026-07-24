@@ -6,6 +6,26 @@ import type { ChipVariant } from './types'
 export const CHIP_FOCUS_RING_OFFSET = 2
 export const CHIP_FOCUS_RING_WIDTH = 3
 
+export const CHIP_HEIGHT = 32
+// Selected filter chips rest as a pill (MD3 Expressive) — the effective
+// radius is half the chip height, not the `cornerFull` sentinel.
+export const CHIP_SELECTED_REST_RADIUS = CHIP_HEIGHT / 2
+
+/**
+ * Resting corner radius per MD3 Expressive: selectable chips (filter/input)
+ * sit at `cornerMedium` and morph from there (pill when selected, squarer
+ * while pressed); assist/suggestion chips keep the static `cornerSmall`
+ * baseline shape.
+ */
+export function getChipRestRadius(
+  theme: MaterialTheme,
+  variant: ChipVariant,
+): number {
+  return variant === 'filter' || variant === 'input'
+    ? theme.shape.cornerMedium
+    : theme.shape.cornerSmall
+}
+
 export interface VariantColors {
   backgroundColor: string
   textColor: string
@@ -240,7 +260,8 @@ export function createStyles(
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
   const elevationLevel2 = elevationStyle(theme.elevation.level2)
   const focusRingInset = -(CHIP_FOCUS_RING_OFFSET + CHIP_FOCUS_RING_WIDTH)
-  const focusRingRadius = theme.shape.cornerSmall + CHIP_FOCUS_RING_OFFSET
+  const restRadius = getChipRestRadius(theme, variant)
+  const focusRingRadius = restRadius + CHIP_FOCUS_RING_OFFSET
 
   return StyleSheet.create({
     wrapper: {
@@ -249,10 +270,10 @@ export function createStyles(
     container: {
       alignItems: 'center',
       flexDirection: 'row',
-      height: 32,
+      height: CHIP_HEIGHT,
       paddingStart: hasLeadingContent ? 8 : 16,
       paddingEnd: hasTrailingContent ? 8 : 16,
-      borderRadius: theme.shape.cornerSmall,
+      borderRadius: restRadius,
       borderColor: colors.borderColor,
       borderWidth: colors.borderWidth,
       cursor: 'pointer',
@@ -272,7 +293,7 @@ export function createStyles(
       left: 0,
       right: 0,
       bottom: 0,
-      borderRadius: theme.shape.cornerSmall,
+      borderRadius: restRadius,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel1,
     },
@@ -282,7 +303,7 @@ export function createStyles(
       left: 0,
       right: 0,
       bottom: 0,
-      borderRadius: theme.shape.cornerSmall,
+      borderRadius: restRadius,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel2,
     },

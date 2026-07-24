@@ -1,10 +1,18 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { useBooleanSpring } from '@rootnative/inertia'
+import {
+  Animated,
+  interpolate,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable } from 'react-native'
+import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
+  ICON_BUTTON_FOCUS_RING_OFFSET,
+  ICON_BUTTON_FOCUS_RING_WIDTH,
   applyContainerColorOverride,
   createStyles,
   getIconButtonColors,
@@ -75,6 +83,15 @@ function getDefaultHitSlop(size: IconButtonSize): number {
   return 4
 }
 
+// Effective rest radius of the pill container (half the container size) —
+// the press/selected shape morphs interpolate from this, not from the
+// `cornerFull` sentinel (999).
+function getRestRadius(size: IconButtonSize): number {
+  if (size === 'small') return 16
+  if (size === 'large') return 24
+  return 20
+}
+
 export function IconButton({
   icon,
   selectedIcon,
@@ -143,11 +160,62 @@ export function IconButton({
     disabled: isDisabled,
   })
 
+  // Expressive shape morphs, both on the bounce-free effects spring Compose
+  // uses for icon buttons: press squashes toward cornerSmall (pressed wins),
+  // and a selected toggle rests squarer at cornerMedium to signal its state.
+  const restRadius = getRestRadius(size)
+  const pressedRadius = theme.shape.cornerSmall
+  const selectedRadius = theme.shape.cornerMedium
+  const morph = usePressMorph({
+    rest: restRadius,
+    pressed: pressedRadius,
+    transition: 'spring-default-effects',
+    disabled: isDisabled,
+  })
+  const morphProgress = morph.progress
+  const selectedProgress = useBooleanSpring(
+    isToggle && isSelected,
+    'spring-default-effects',
+  )
+
+  const composedHandlers = useMemo(
+    () => composePressHandlers(handlers, morph.handlers),
+    [handlers, morph.handlers],
+  )
+
+  const animatedRadiusStyle = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, selectedRadius],
+    )
+    return {
+      borderRadius: interpolate(
+        morphProgress.value,
+        [0, 1],
+        [rest, pressedRadius],
+      ),
+    }
+  })
+
   // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  // keyboard-focus progress the state layer runs on, and its radius follows
+  // the shape morphs (offset outward) so it keeps hugging the container.
+  const focusRingOutset =
+    ICON_BUTTON_FOCUS_RING_OFFSET + ICON_BUTTON_FOCUS_RING_WIDTH
+  const animatedFocusRingStyle = useAnimatedStyle(() => {
+    const rest = interpolate(
+      selectedProgress.value,
+      [0, 1],
+      [restRadius, selectedRadius],
+    )
+    return {
+      opacity: states.focusVisible.value,
+      borderRadius:
+        interpolate(morphProgress.value, [0, 1], [rest, pressedRadius]) +
+        focusRingOutset,
+    }
+  })
 
   const disabledOverride = isDisabled
     ? {
@@ -170,14 +238,17 @@ export function IconButton({
         disabled={isDisabled}
         hitSlop={hitSlop ?? getDefaultHitSlop(size)}
         onPress={onPress}
-        {...(isDisabled ? undefined : handlers)}
+        {...(isDisabled ? undefined : composedHandlers)}
         style={[
           styles.container,
           getSizeStyle(styles, size),
           { borderColor: colors.borderColor, borderWidth: colors.borderWidth },
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled override
-          // applies instantly (no animated layer to fight it).
+          // applies instantly (no animated layer to fight it). The radius
+          // morph stays applied while disabled — a selected toggle keeps its
+          // squarer resting shape (the press progress is pinned to rest).
+          animatedRadiusStyle,
           isDisabled ? undefined : stateLayerStyle,
           disabledOverride,
           isDisabled ? styles.disabled : undefined,

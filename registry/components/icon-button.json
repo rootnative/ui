@@ -6,6 +6,7 @@
     "packages/components/src/icon-button/index.ts",
     "packages/components/src/icon-button/styles.ts",
     "packages/components/src/icon-button/types.ts",
+    "packages/components/src/internal/usePressMorph.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color", "render-icon"],

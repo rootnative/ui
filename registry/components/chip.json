@@ -6,6 +6,7 @@
     "packages/components/src/chip/index.ts",
     "packages/components/src/chip/styles.ts",
     "packages/components/src/chip/types.ts",
+    "packages/components/src/internal/usePressMorph.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color", "elevation", "pressable", "render-icon"],
