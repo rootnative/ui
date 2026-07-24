@@ -16,7 +16,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 
 
 <img
-  src="https://qr.expo.dev/eas-update?projectId=9bc1e6dd-2f68-433d-813a-4e4bd167298b&runtimeVersion=0.0.0&channel=main"
+  src="https://qr.expo.dev/eas-update?projectId=e13d4a03-0fe8-4f7f-97bb-5092bec13c51&runtimeVersion=0.0.0&channel=main"
   alt="Expo Preview QR Code"
   width="200"
   height="200"
@@ -26,6 +26,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 
 - Pluggable theme engine — use the built-in Material Design You theme or create your own design system
 - Token-based theming (colors, typography, shape, spacing, elevation, motion, state)
+- Material Design 3 Expressive motion — spring-physics transitions and shape-morph-on-press interactions, expressive by default
 - Light and dark themes out of the box
 - Responsive breakpoint utilities (`useBreakpoint`, `useBreakpointValue`)
 - Pluggable icon system — MaterialCommunityIcons by default, or wire up Lucide, Phosphor, SF Symbols, or custom SVGs via the theme's `iconResolver` (adapters in `@rootnative/icons`)
