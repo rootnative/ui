@@ -5,7 +5,8 @@
     "packages/components/src/switch/Switch.tsx",
     "packages/components/src/switch/index.ts",
     "packages/components/src/switch/styles.ts",
-    "packages/components/src/switch/types.ts"
+    "packages/components/src/switch/types.ts",
+    "packages/components/src/internal/usePressMorph.ts"
   ],
   "utils": ["color", "pressable", "render-icon"],
   "componentDependencies": [],

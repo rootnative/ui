@@ -36,8 +36,12 @@ export function Radio({
     [theme, containerColor, contentColor],
   )
 
-  // Selection progress — the theme's default-spatial spring (soft toggle).
-  const progress = useBooleanSpring(isSelected, 'spring-default-spatial')
+  // Two selection progresses per Expressive: color transitions ride the
+  // critically damped default-effects spring (no overshoot on colors), the
+  // dot pop rides fast-spatial (bouncy — the dot overshoots and settles),
+  // mirroring Compose's RadioButton DefaultEffects/FastSpatial split.
+  const progress = useBooleanSpring(isSelected, 'spring-default-effects')
+  const dotProgress = useBooleanSpring(isSelected, 'spring-fast-spatial')
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha — produces exactly the MD3 token values without any compounding.
@@ -84,10 +88,12 @@ export function Radio({
     { key: 'borderColor' },
   )
 
-  // Interop escape hatch: the dot pop follows the same selection spring that
-  // drives the outline color.
+  // Interop escape hatch: the dot pop rides its own fast-spatial spring
+  // (colors stay on the effects spring above). The underdamped spring
+  // undershoots below 0 on deselect — clamp so scale never goes negative
+  // (a negative scale renders a mirrored dot flash).
   const animatedInnerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: progress.value }],
+    transform: [{ scale: Math.max(0, dotProgress.value) }],
   }))
 
   // Interop escape hatch: the focus ring derives its opacity from the same

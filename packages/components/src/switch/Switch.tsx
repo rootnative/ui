@@ -1,8 +1,11 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import {
-  cubicBezier,
+  resolveTransition,
   useBooleanSpring,
   useColorTransition,
+  useMotionValue,
+  useNamedTransitions,
+  useShouldReduceMotion,
 } from '@rootnative/inertia'
 import {
   useGestureLayer,
@@ -14,8 +17,9 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { composePressHandlers } from '../internal/usePressMorph'
 import {
   SWITCH_STATE_LAYER_SIZE,
   SWITCH_THUMB_OFF_SIZE,
@@ -33,10 +37,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const THUMB_TRANSLATE_X =
   SWITCH_TRACK_WIDTH - SWITCH_TRACK_PADDING * 2 - SWITCH_THUMB_ON_SIZE
-
-// Press in/out uses a fast, predictable timing curve — no spring oscillation,
-// so the 28 dp thumb grow is reached in full within 120 ms.
-const PRESS_DURATION = 120
 
 const ICON_SIZE = 16
 
@@ -74,24 +74,14 @@ export function Switch({
     [theme, containerColor, contentColor],
   )
 
-  // Toggle progress — the theme's fast-spatial spring (MD3 emphasized feel,
-  // slight overshoot, ~0.85 damping ratio).
+  // Toggle progress — the theme's fast-spatial spring (Expressive bounce,
+  // 0.6 damping ratio), driving thumb travel and size per Compose's Switch.
   const progress = useBooleanSpring(isSelected, 'spring-fast-spatial')
-
-  const pressTransition = useMemo(
-    () => ({
-      type: 'timing' as const,
-      duration: PRESS_DURATION,
-      easing: cubicBezier(theme.motion.easingStandard),
-    }),
-    [theme.motion.easingStandard],
-  )
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha. The gesture layer composes the strongest active interaction via
   // clamped-max; the `disabled` layer pins the halo off while disabled.
-  // Focus feedback rides `focusVisible` (keyboard focus only). The pressed
-  // progress doubles as the thumb-grow driver below.
+  // Focus feedback rides `focusVisible` (keyboard focus only).
   const haloLayers = useMemo<GestureLayerStates>(
     () => ({
       rest: { opacity: 0 },
@@ -109,17 +99,50 @@ export function Switch({
         hovered: 'state-hover' as const,
         focused: 'state-focus' as const,
         focusVisible: 'state-focus' as const,
-        pressed: pressTransition,
+        pressed: 'state-press' as const,
       },
     }),
-    [isDisabled, pressTransition],
+    [isDisabled],
   )
   const {
     style: haloOpacityStyle,
-    handlers,
+    handlers: layerHandlers,
     states,
   } = useGestureLayer(haloLayers, gestureOptions)
-  const pressed = states.pressed
+
+  // Thumb press-grow per Expressive Switch: the grow to 28dp is a *snap*
+  // (Compose uses SnapSpec while pressed) and the release springs back on
+  // fast-spatial. Direction-dependent, so it can't ride the gesture layer's
+  // single pressed transition — a dedicated progress with hand-rolled
+  // handlers instead. Reduced motion already snaps by construction.
+  const pressed = useMotionValue(0)
+  const namedTransitions = useNamedTransitions()
+  const shouldReduceMotion = useShouldReduceMotion()
+  const pressGrowHandlers = useMemo(
+    () => ({
+      onPressIn: () => {
+        pressed.value = 1
+      },
+      onPressOut: () => {
+        const spring = namedTransitions['spring-fast-spatial']
+        pressed.value =
+          shouldReduceMotion || !spring
+            ? 0
+            : (resolveTransition(spring, 0) as never)
+      },
+    }),
+    [pressed, namedTransitions, shouldReduceMotion],
+  )
+  const handlers = useMemo(
+    () => composePressHandlers(layerHandlers, pressGrowHandlers),
+    [layerHandlers, pressGrowHandlers],
+  )
+
+  // A press has no matching release once the component disables mid-press —
+  // pin the grow back to rest so re-enabling doesn't resume mid-grow.
+  useEffect(() => {
+    if (isDisabled) pressed.value = 0
+  }, [isDisabled, pressed])
 
   const trackColorStyle = useColorTransition(progress, [
     offColors.trackColor,
@@ -137,8 +160,8 @@ export function Switch({
   ])
 
   // Interop escape hatch: the thumb morph reads the toggle spring and the
-  // pressed timing together — position, size, and radius in one progress-
-  // driven worklet.
+  // press-grow progress together — position, size, and radius in one
+  // progress-driven worklet.
   const animatedThumbStyle = useAnimatedStyle(() => {
     const baseSize = interpolate(
       progress.value,

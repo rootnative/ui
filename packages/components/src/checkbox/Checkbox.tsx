@@ -63,8 +63,15 @@ export function Checkbox({
     [theme, containerColor, contentColor, hasError],
   )
 
-  // Selection progress — the theme's default-spatial spring (soft toggle).
+  // Two selection progresses per Expressive: the mark draw rides the
+  // default-spatial spring (Compose's DefaultSpatial for checkDrawFraction),
+  // while box/halo colors ride the critically damped default-effects spring
+  // so they never overshoot. (Compose additionally uses FastEffects for the
+  // to-off color fade and snaps the mark out after a 100ms delay — we keep
+  // one effects spring and a symmetric mark animation as the documented
+  // approximation.)
   const progress = useBooleanSpring(isActive, 'spring-default-spatial')
+  const colorProgress = useBooleanSpring(isActive, 'spring-default-effects')
 
   // State-layer halo opacity: solid base color, view opacity carries the
   // alpha. The gesture layer composes the strongest active interaction via
@@ -99,27 +106,28 @@ export function Checkbox({
     states,
   } = useGestureLayer(haloLayers, gestureOptions)
 
-  // The halo color crossfades with the selection progress.
-  const haloColorStyle = useColorTransition(progress, [
+  // The halo color crossfades with the selection color progress.
+  const haloColorStyle = useColorTransition(colorProgress, [
     offColors.stateLayerColor,
     onColors.stateLayerColor,
   ])
 
-  const boxBackgroundStyle = useColorTransition(progress, [
+  const boxBackgroundStyle = useColorTransition(colorProgress, [
     offColors.backgroundColor,
     onColors.backgroundColor,
   ])
   const boxBorderStyle = useColorTransition(
-    progress,
+    colorProgress,
     [offColors.borderColor, onColors.borderColor],
     { key: 'borderColor' },
   )
 
-  // Interop escape hatch: the mark pop follows the same selection spring
-  // that drives the box colors.
+  // Interop escape hatch: the mark pop rides the spatial selection spring
+  // (box colors ride the effects spring above). Clamp the underdamped
+  // spring's undershoot so scale never goes negative on the way out.
   const animatedIconStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
-    transform: [{ scale: progress.value }],
+    transform: [{ scale: Math.max(0, progress.value) }],
   }))
 
   // Interop escape hatch: the focus ring derives its opacity from the same
