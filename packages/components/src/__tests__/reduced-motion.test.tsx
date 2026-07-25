@@ -14,6 +14,7 @@ import { Radio } from '../radio'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
 import { Switch } from '../switch'
+import { Tooltip } from '../tooltip'
 
 /** Shows a snackbar on mount so the enter transition is under test. */
 function SnackbarOnMount() {
@@ -96,6 +97,26 @@ const CASES: ReadonlyArray<readonly [string, () => ReactElement]> = [
         <Menu visible anchor={null} onDismiss={() => {}}>
           <Menu.Item label="Edit" />
         </Menu>
+      </PortalHost>
+    ),
+  ],
+  [
+    'Tooltip',
+    () => (
+      <PortalHost>
+        <Tooltip visible anchor={null} onDismiss={() => {}}>
+          Save changes
+        </Tooltip>
+      </PortalHost>
+    ),
+  ],
+  [
+    'Tooltip (rich)',
+    () => (
+      <PortalHost>
+        <Tooltip visible variant="rich" anchor={null} onDismiss={() => {}}>
+          Save changes
+        </Tooltip>
       </PortalHost>
     ),
   ],

@@ -1,0 +1,231 @@
+---
+sidebar_position: 7
+---
+
+# Tooltip
+
+Tooltips describe the control they are attached to, on a temporary surface anchored to it.
+Follows the [Material Design 3 Tooltip](https://m3.material.io/components/tooltips/overview) specification.
+
+Tooltip renders through [Portal](./portal.mdx), so your app must be wrapped in a `PortalHost` once
+at the root. It claims the `PORTAL_LAYERS.tooltip` layer — the topmost one, because a tooltip can
+describe a control in any layer below it.
+
+There are two variants. **Plain** is a line of text that appears while the control is hovered or
+long-pressed and takes itself down after 1.5s. **Rich** adds a subhead and actions, and stays up
+until it is dismissed.
+
+## Usage
+
+Pass the control as `anchor` and the text as children.
+
+<SnackExample
+  name="RootNative Tooltip — Usage"
+  code={`
+  import { IconButton, PortalHost, Tooltip } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  function Screen() {
+    return (
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
+          Add to favourites
+        </Tooltip>
+        <Tooltip anchor={<IconButton icon="share-variant" accessibilityLabel="Share" />}>
+          Share
+        </Tooltip>
+        <Tooltip
+          side="bottom"
+          anchor={<IconButton icon="archive-outline" accessibilityLabel="Archive" />}
+        >
+          Move to archive
+        </Tooltip>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The anchor renders where the `<Tooltip>` sits in your tree, wrapped in a measuring view that
+watches for hover. Strings and numbers passed as children are wrapped in the variant's
+supporting-text styling; anything else renders as given.
+
+## Triggers
+
+| Input | Behaviour |
+|-------|-----------|
+| Hover in | Shows the tooltip. Hover out hides it |
+| Long press | Shows the tooltip. This is how touch devices reach it |
+| Press | Hides the tooltip — a tap is the control doing its job, not a request for help text |
+| Timeout | Hides a plain tooltip after `duration` (1500ms). Rich tooltips never time out |
+| Outside press / Android back | Hides a rich tooltip. A plain one has no dismiss region to press |
+
+The long press has to be injected into the anchor itself, so the anchor must accept
+`onLongPress` — every RootNative pressable does, and its own `onLongPress` still fires. Hover is
+caught on the wrapper instead, because every RootNative pressable drives its state layer from
+`onHoverIn`/`onHoverOut` and would overwrite an injected pair.
+
+MD3 takes a plain tooltip down 1.5s after it appears, whether or not the pointer is still on the
+anchor. Pass `duration={0}` to keep it up until a hover out or a press instead.
+
+## Rich
+
+`variant="rich"` adds a `subhead` above the text and an `actions` row below it, and makes the
+tooltip persistent — it waits for an outside press, an action, or the Android back button. Its
+surface takes touches, unlike a plain tooltip.
+
+<SnackExample
+  name="RootNative Tooltip — Rich"
+  code={`
+  import { Button, IconButton, PortalHost, Tooltip } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <Tooltip
+          variant="rich"
+          subhead="Rich tooltip"
+          actions={<Button variant="text">Learn more</Button>}
+          anchor={<IconButton icon="information-outline" accessibilityLabel="About sync" />}
+        >
+          Rich tooltips bring attention to a feature that warrants a sentence of explanation.
+        </Tooltip>
+
+        <Tooltip
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          variant="rich"
+          subhead="Controlled"
+          actions={<Button variant="text" onPress={() => setOpen(false)}>Got it</Button>}
+          anchor={<Button variant="tonal" onPress={() => setOpen(true)}>Show help</Button>}
+        >
+          visible + onDismiss put you in charge — the anchor stops opening it by itself.
+        </Tooltip>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+`subhead` and `actions` are rich-only. Passing them to a plain tooltip logs a development error
+and renders nothing — a plain tooltip is a single line of text.
+
+## Controlled
+
+Pass `visible` and `onDismiss` to drive visibility yourself. The anchor then stops opening the
+tooltip: hover and long press are yours to wire, which is how a tooltip gets attached to
+something that isn't a press at all — a form error, a first-run hint.
+
+Dismissals that don't come from the anchor still report themselves, so a controlled tooltip
+behaves like every other overlay in the library:
+
+- A rich tooltip's outside press and Android back call `onDismiss`.
+- A plain tooltip's timeout calls `onDismiss` after `duration`. Pass `duration={0}` if you want
+  the tooltip to stay up until you take it down.
+
+## Placement
+
+`side` and `align` are preferences, not commands.
+
+| Prop | Values | Default | Meaning |
+|------|--------|---------|---------|
+| `side` | `'top' \| 'bottom'` | `'top'` | Which side of the anchor the tooltip prefers |
+| `align` | `'start' \| 'center' \| 'end'` | `'center'` | Cross-axis alignment against the anchor |
+| `offset` | `number` | `4` | Gap between the anchor edge and the tooltip, in dp |
+| `screenMargin` | `number` | `8` | Minimum distance the tooltip keeps from every screen edge |
+
+`align` is **logical**: `'start'` is the anchor's left edge in LTR and its right edge in RTL.
+
+A tooltip that would not fit on its preferred side flips to the other side — but only when that
+side is genuinely roomier. Horizontally it shifts back inside the margin rather than flipping.
+It is measured from the anchor's window coordinates when it opens, and does not follow the anchor
+while a scroll view moves underneath it.
+
+Like a menu, a tooltip is confined to the overlay layer it renders into, which is why the root of
+your app is the right place for `PortalHost` — see
+[the note on menu placement](./menu.mdx#the-menu-is-confined-to-its-portalhost). Keep tooltips
+short: one caps at 200dp wide, the other at 320dp, and neither exceeds the space available on the
+side it resolved to.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The tooltip surface background |
+| `contentColor` | The supporting text, plus the subhead on a rich tooltip |
+| `style` | The tooltip surface |
+| `textStyle` | The supporting-text `Text` only |
+| `anchorStyle` | The view wrapping the anchor |
+
+A tooltip is not interactive, so there are no state layers to re-derive from `containerColor` —
+it just recolors the surface. Nodes you pass as `children` or `actions` are yours to color.
+
+## Tokens
+
+| Token | Plain | Rich |
+|-------|-------|------|
+| Container | `inverseSurface`, corner 4dp (`cornerExtraSmall`) | `surfaceContainer`, corner 12dp (`cornerMedium`), elevation level 2 |
+| Subhead | — | `titleSmall` / `onSurfaceVariant` |
+| Supporting text | `bodySmall` / `inverseOnSurface` | `bodyMedium` / `onSurfaceVariant` |
+| Padding | 8dp horizontal, 4dp vertical | 16dp horizontal, 12dp vertical |
+| Size | min 40×24dp, max 200dp wide | min 40×24dp, max 320dp wide |
+| Gap to anchor | 4dp | 4dp |
+| Duration | 1500ms | Persistent |
+
+Plain tooltips carry no elevation in MD3 — the inverse surface is what separates them from the
+content behind. Actions are start-aligned, the opposite of a [dialog](./dialog.mdx)'s.
+
+## Motion
+
+The tooltip fades in and out on `springFastEffects` — no scale, unlike a menu. It collapses to a
+hard cut under reduced motion; see [Motion](../motion.md).
+
+The surface stays invisible for the frame between mounting and being measured: its own size is
+what decides which side it lands on, so it has to be laid out before it can be placed.
+
+## Accessibility
+
+- The surface reports `role="tooltip"` and announces itself as a polite live region when it appears.
+- A plain tooltip's surface never takes touches, so it cannot stand between the user and the
+  control it describes. A rich tooltip's does, and the region that catches outside presses is
+  announced as a button labelled "Close tooltip" — override with `dismissAccessibilityLabel`.
+- The wrapper around the anchor stays out of the accessibility tree, so the anchor's own role and
+  label are the only thing a screen reader sees. A tooltip is supplementary: an icon-only button
+  still needs its `accessibilityLabel`, and the tooltip text should add to it rather than repeat it.
+- Hover and long press are both pointer gestures. Anything a user must read to operate the control
+  belongs in the UI or in the anchor's label, not only in a tooltip.
+
+## Props
+
+<PropTable name="Tooltip" />

@@ -65,6 +65,7 @@ const sidebars: SidebarsConfig = {
         'components/menu',
         'components/portal',
         'components/snackbar',
+        'components/tooltip',
       ],
     },
   ],

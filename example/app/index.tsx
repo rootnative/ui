@@ -201,6 +201,11 @@ const sections: ComponentSection[] = [
         description:
           'Anchored dropdown menus that flip and shift to stay on screen',
       },
+      {
+        label: 'Tooltip',
+        route: '/tooltip',
+        description: 'Plain and rich tooltips on hover or a long press',
+      },
     ],
   },
 ]
@@ -503,6 +508,24 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
               style={previewStyles.menuItemLine}
             />
           </Box>
+        </View>
+      )
+    case 'Tooltip':
+      return (
+        <View style={previewStyles.tooltipWrapper}>
+          <Box
+            bg={theme.colors.inverseSurface}
+            style={previewStyles.tooltipSurface}
+          >
+            <Box
+              bg={theme.colors.inverseOnSurface}
+              style={previewStyles.tooltipLabel}
+            />
+          </Box>
+          <Box
+            bg={theme.colors.onSurface}
+            style={previewStyles.tooltipAnchor}
+          />
         </View>
       )
     case 'Portal':
@@ -867,6 +890,33 @@ const previewStyles = StyleSheet.create({
   menuRule: {
     width: '100%',
     height: 1,
+  },
+  tooltipWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  tooltipSurface: {
+    width: '60%',
+    height: 22,
+    borderRadius: 4,
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  tooltipLabel: {
+    width: '70%',
+    height: 5,
+    borderRadius: 3,
+    opacity: 0.8,
+  },
+  tooltipAnchor: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    opacity: 0.7,
   },
   portalWrapper: {
     width: '100%',

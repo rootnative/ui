@@ -94,6 +94,10 @@
       "description": "Text input with animated floating label, 2 variants (filled, outlined), and icon support."
     },
     {
+      "name": "tooltip",
+      "description": "Plain and rich tooltips anchored to a control, shown on hover or a long press"
+    },
+    {
       "name": "typography",
       "description": "Text component using MD3 type scale with 15 variants (displayLarge to labelSmall)."
     }

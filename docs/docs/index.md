@@ -71,3 +71,4 @@ Design-system agnostic component library for React Native. Ships with Material D
 | [Menu](./components/menu) | Anchored dropdown menus that flip and shift to stay on screen |
 | [Portal](./components/portal) | Render content above the rest of the tree |
 | [Snackbar](./components/snackbar) | Queued transient messages with an optional action |
+| [Tooltip](./components/tooltip) | Plain and rich tooltips on hover or a long press |

@@ -69,6 +69,8 @@ import { Button, Card } from '@rootnative/components'
 | List | `./list` | List, ListItem, ListDivider (alias of Divider) |
 | Portal | `./portal` | Portal, PortalHost |
 | Snackbar | `./snackbar` | SnackbarProvider + useSnackbar() — imperative queue |
+| Menu | `./menu` | Menu, Menu.Item · self-managing or controlled · anchored with collision flipping |
+| Tooltip | `./tooltip` | plain, rich · hover or long press · anchored with collision flipping |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
 ## Quick examples

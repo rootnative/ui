@@ -391,6 +391,7 @@ const COMPONENT_ORDER = [
   'dialog',
   'snackbar',
   'menu',
+  'tooltip',
   'avatar',
   'slider',
   'progress',
@@ -418,6 +419,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   dialog: 'Dialog',
   snackbar: 'Snackbar',
   menu: 'Menu',
+  tooltip: 'Tooltip',
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
@@ -708,6 +710,40 @@ import { Divider } from '@rootnative/components/divider'
 <Menu.Item label="New window" leadingIcon="window-maximize" trailingText="⌘N" />
 <Menu.Item label="Open recent" leadingIcon="history" trailingIcon="chevron-right" />
 <Menu.Item label="Paste" disabled />
+\`\`\``,
+
+  tooltip: `\`\`\`tsx
+import { Tooltip } from '@rootnative/components/tooltip'
+
+// Plain: hover on web, long press on touch, down again after 1.5s. The anchor
+// must accept \`onLongPress\` (every RootNative pressable does); its own
+// onLongPress still fires. A press on the anchor hides the tooltip.
+<Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
+  Add to favourites
+</Tooltip>
+
+// Placement is a preference: a tooltip that doesn't fit flips to the roomier
+// side and shifts back inside the screen margin. \`align\` is logical —
+// 'start' is the left edge in LTR, the right edge in RTL.
+<Tooltip side="bottom" align="start" offset={8} anchor={anchor}>Move to archive</Tooltip>
+
+// duration={0} keeps a plain tooltip up until a hover out or a press.
+<Tooltip duration={0} anchor={anchor}>Stays up</Tooltip>
+
+// Rich: subhead + actions, persistent until an outside press, an action, or
+// Android back. \`subhead\`/\`actions\` are ignored by the plain variant.
+<Tooltip
+  variant="rich"
+  subhead="Rich tooltip"
+  actions={<Button variant="text" onPress={learnMore}>Learn more</Button>}
+  anchor={<IconButton icon="information-outline" accessibilityLabel="About sync" />}
+>
+  Rich tooltips bring attention to a feature that warrants a sentence.
+</Tooltip>
+
+// Controlled: the anchor stops opening it, but the timeout, an outside press,
+// and Android back still report through onDismiss.
+<Tooltip visible={open} onDismiss={() => setOpen(false)} anchor={anchor}>Saved</Tooltip>
 \`\`\``,
 
   avatar: `\`\`\`tsx

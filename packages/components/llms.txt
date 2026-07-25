@@ -843,6 +843,66 @@ Props:
 
 ---
 
+### Tooltip
+
+```tsx
+import { Tooltip } from '@rootnative/components/tooltip'
+
+// Plain: hover on web, long press on touch, down again after 1.5s. The anchor
+// must accept `onLongPress` (every RootNative pressable does); its own
+// onLongPress still fires. A press on the anchor hides the tooltip.
+<Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
+  Add to favourites
+</Tooltip>
+
+// Placement is a preference: a tooltip that doesn't fit flips to the roomier
+// side and shifts back inside the screen margin. `align` is logical —
+// 'start' is the left edge in LTR, the right edge in RTL.
+<Tooltip side="bottom" align="start" offset={8} anchor={anchor}>Move to archive</Tooltip>
+
+// duration={0} keeps a plain tooltip up until a hover out or a press.
+<Tooltip duration={0} anchor={anchor}>Stays up</Tooltip>
+
+// Rich: subhead + actions, persistent until an outside press, an action, or
+// Android back. `subhead`/`actions` are ignored by the plain variant.
+<Tooltip
+  variant="rich"
+  subhead="Rich tooltip"
+  actions={<Button variant="text" onPress={learnMore}>Learn more</Button>}
+  anchor={<IconButton icon="information-outline" accessibilityLabel="About sync" />}
+>
+  Rich tooltips bring attention to a feature that warrants a sentence.
+</Tooltip>
+
+// Controlled: the anchor stops opening it, but the timeout, an outside press,
+// and Android back still report through onDismiss.
+<Tooltip visible={open} onDismiss={() => setOpen(false)} anchor={anchor}>Saved</Tooltip>
+```
+
+Props:
+- `anchor: ReactNode` — The control the tooltip describes. Rendered where the `<Tooltip>` sits in the tree, wrapped in a measuring view that watches for hover. Touch devices open the tooltip on a long press, which needs the anchor to accept `onLongPress` — every RootNative pressable does. Its own `onLongPress` still fires.
+- `children?: ReactNode` — Supporting text, or arbitrary nodes when a plain string isn't enough. Strings and numbers are wrapped in the variant's supporting-text styling.
+- `variant?: 'plain' | 'rich'` — Default: `'plain'`. Tooltip anatomy.
+- `subhead?: string` — Subhead above the supporting text. Rich tooltips only.
+- `actions?: ReactNode` — Action buttons below the supporting text — text `Button`s per MD3. Rich tooltips only.
+- `visible?: boolean` — Controlled visibility. Omit to let the tooltip show itself on hover or a long press, and hide itself on hover out, on an anchor press, after `duration` (plain), or on an outside press / Android back (rich).
+- `onDismiss?: () => void` — Called when the tooltip hides — hover out, anchor press, the plain variant's timeout, or a rich tooltip's outside press / Android back. Required to close a controlled tooltip; optional otherwise.
+- `side?: 'top' | 'bottom'` — Default: `'top'`. Side of the anchor the tooltip prefers. It flips to the other side when it does not fit and that side is roomier.
+- `align?: 'start' | 'center' | 'end'` — Default: `'center'`. Cross-axis alignment against the anchor.
+- `offset?: number` — Default: `4`. Gap between the anchor edge and the tooltip, in dp.
+- `screenMargin?: number` — Default: `8`. Minimum distance the tooltip keeps from every screen edge, in dp.
+- `duration?: number` — Default: `1500`. How long a plain tooltip stays up, in milliseconds. `0` keeps it up until something else hides it. Ignored by the rich variant, which is persistent by definition.
+- `containerColor?: string` — Default: `inverseSurface (plain) / surfaceContainer (rich)`. Override the container (surface) color.
+- `contentColor?: string` — Default: `inverseOnSurface (plain) / onSurfaceVariant (rich)`. Override the text color — the supporting text, plus the subhead on a rich tooltip. Nodes passed as `children` or `actions` are yours to color.
+- `hostName?: string` — Name of the `PortalHost` to render into. Defaults to the root host, which is what puts the tooltip above every other layer.
+- `style?: StyleProp<ViewStyle>` — Style applied to the tooltip surface.
+- `textStyle?: StyleProp<TextStyle>` — Style applied to the supporting-text `Text` only.
+- `anchorStyle?: StyleProp<ViewStyle>` — Style applied to the view wrapping the anchor.
+- `dismissAccessibilityLabel?: string` — Default: `'Close tooltip'`. Screen-reader label for the region that closes a rich tooltip on an outside press. Plain tooltips never render one.
+- `testID?: string` — Test id applied to the tooltip surface.
+
+---
+
 ### Avatar
 
 ```tsx

@@ -72,6 +72,14 @@ export type { DividerProps, DividerOrientation } from './divider'
 export { Menu, MenuItem } from './menu'
 export type { MenuProps, MenuItemProps, MenuAlign, MenuSide } from './menu'
 
+export { Tooltip } from './tooltip'
+export type {
+  TooltipProps,
+  TooltipAlign,
+  TooltipSide,
+  TooltipVariant,
+} from './tooltip'
+
 export { List, ListItem, ListDivider } from './list'
 export type {
   ListProps,

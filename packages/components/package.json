@@ -91,6 +91,11 @@
       "react-native": "./dist/menu/index.js",
       "default": "./dist/menu/index.js"
     },
+    "./tooltip": {
+      "types": "./dist/tooltip/index.d.ts",
+      "react-native": "./dist/tooltip/index.js",
+      "default": "./dist/tooltip/index.js"
+    },
     "./list": {
       "types": "./dist/list/index.d.ts",
       "react-native": "./dist/list/index.js",
@@ -183,6 +188,9 @@
       ],
       "menu": [
         "dist/menu/index.d.ts"
+      ],
+      "tooltip": [
+        "dist/tooltip/index.d.ts"
       ],
       "list": [
         "dist/list/index.d.ts"

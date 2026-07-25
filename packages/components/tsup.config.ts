@@ -19,6 +19,7 @@ export default defineConfig({
     'src/dialog/index.ts',
     'src/divider/index.ts',
     'src/menu/index.ts',
+    'src/tooltip/index.ts',
     'src/list/index.ts',
     'src/keyboard-avoiding-wrapper/index.ts',
     'src/avatar/index.ts',

@@ -8,7 +8,7 @@ RootNative UI (`@rootnative`) is a React Native component library with a pluggab
 
 - `@rootnative/core`: Theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), MD3 preset (`material`, light/dark themes), responsive breakpoint hooks
 - `@rootnative/utils`: Internal shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. **Not published to npm** — it is bundled into `@rootnative/components`, and the CLI copies the needed files into your project when you `rootnative add`. Do not tell users to install it.
-- `@rootnative/components`: UI components (AppBar, Avatar, Button, ButtonGroup, Card, Checkbox, Chip, Dialog, Divider, FAB, IconButton, KeyboardAvoidingWrapper, Layout, List, LoadingIndicator, Menu, Portal, Progress, Radio, Slider, Snackbar, Switch, TextField, Typography)
+- `@rootnative/components`: UI components (AppBar, Avatar, Button, ButtonGroup, Card, Checkbox, Chip, Dialog, Divider, FAB, IconButton, KeyboardAvoidingWrapper, Layout, List, LoadingIndicator, Menu, Portal, Progress, Radio, Slider, Snackbar, Switch, TextField, Tooltip, Typography)
 - `@rootnative/inertia`: Animation engine. Required peer of `core` and `components` — every animation in the library routes through it, and it honors the OS reduce-motion setting by default. Docs: https://rootnative.github.io/inertia/
 - `@rootnative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide / Phosphor / `@expo/vector-icons` are optional peer deps.
 
