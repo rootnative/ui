@@ -80,6 +80,9 @@ export type {
   TooltipVariant,
 } from './tooltip'
 
+export { Tabs } from './tabs'
+export type { TabsProps, TabItem, TabsVariant } from './tabs'
+
 export { List, ListItem, ListDivider } from './list'
 export type {
   ListProps,

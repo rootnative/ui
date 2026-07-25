@@ -71,6 +71,7 @@ import { Button, Card } from '@rootnative/components'
 | Snackbar | `./snackbar` | SnackbarProvider + useSnackbar() — imperative queue |
 | Menu | `./menu` | Menu, Menu.Item · self-managing or controlled · anchored with collision flipping |
 | Tooltip | `./tooltip` | plain, rich · hover or long press · anchored with collision flipping |
+| Tabs | `./tabs` | primary, secondary · fixed or scrollable · sliding active indicator |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
 ## Quick examples

@@ -72,3 +72,9 @@ Design-system agnostic component library for React Native. Ships with Material D
 | [Portal](./components/portal) | Render content above the rest of the tree |
 | [Snackbar](./components/snackbar) | Queued transient messages with an optional action |
 | [Tooltip](./components/tooltip) | Plain and rich tooltips on hover or a long press |
+
+### Navigation
+
+| Component | Description |
+|-----------|-------------|
+| [Tabs](./components/tabs) | Primary and secondary tab rows, fixed or scrollable |

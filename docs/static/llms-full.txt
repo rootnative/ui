@@ -1290,6 +1290,70 @@ Props:
 
 ---
 
+### Tabs
+
+```tsx
+import { Tabs } from '@rootnative/components/tabs'
+
+// A bar, not a navigator: Tabs reports the press, you own the panels/routes.
+// Controlled…
+<Tabs
+  items={[
+    { value: 'flights', label: 'Flights' },
+    { value: 'trips', label: 'Trips' },
+    { value: 'explore', label: 'Explore' },
+  ]}
+  value={section}
+  onValueChange={setSection}
+/>
+
+// …or uncontrolled, starting on `defaultValue` (falls back to the first item).
+<Tabs items={items} defaultValue="trips" onValueChange={load} />
+
+// Primary stacks an icon above the label (64dp) and matches the indicator to
+// the label; secondary keeps the icon inline (48dp) with a full-width 2dp one.
+<Tabs variant="secondary" items={[{ value: 'a', label: 'Albums', icon: 'album' }]} />
+
+// Scrollable: natural tab widths (min 90dp) instead of an equal split, with the
+// active tab scrolled into view. `edgePadding` pads before/after the row.
+<Tabs scrollable items={manyItems} edgePadding={16} />
+
+// Overrides: containerColor (row), contentColor (inactive), selectedContentColor
+// (active), indicatorColor, labelStyle. Disabled items stay at the MD3 38%.
+<Tabs items={[{ value: 'x', label: 'Deleted', disabled: true }]} showDivider={false} />
+```
+
+Props:
+- `items: TabItem[]` — The tabs to render.
+- `value?: string` — Value of the active tab (controlled).
+- `defaultValue?: string` — Value of the initially active tab (uncontrolled). Defaults to the first item — a tab row with nothing active reads as broken.
+- `onValueChange?: (value: string) => void` — Called with the value of the tab that was pressed.
+- `variant?: 'primary' | 'secondary'` — Default: `'primary'`. Tab anatomy.
+- `scrollable?: boolean` — Default: `false`. Lay the tabs out at their natural width and scroll horizontally, instead of dividing the row equally between them. Reach for it past four tabs, or when the labels are long enough to truncate.
+- `edgePadding?: number` — Default: `52`. Padding before the first and after the last tab, in dp. Scrollable rows only — a fixed row divides the full width between its tabs.
+- `showDivider?: boolean` — Default: `true`. Whether the 1dp divider is drawn along the bottom of the row.
+- `containerColor?: string` — Default: `surface`. Override the row background.
+- `contentColor?: string` — Default: `onSurfaceVariant`. Override the label and icon color of inactive tabs.
+- `selectedContentColor?: string` — Default: `primary (primary variant) / onSurface (secondary variant)`. Override the label and icon color of the active tab. State-layer colors are derived from it automatically.
+- `indicatorColor?: string` — Default: `primary`. Override the active indicator color.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to every tab's label `Text` — does not affect the icons.
+- `style?: StyleProp<ViewStyle>` — Style applied to the row container.
+- `accessibilityLabel?: string` — Screen-reader label for the tab row itself.
+- `testID?: string` — Test id applied to the row container.
+
+#### TabItem
+
+One tab. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.
+
+Props:
+- `value: string` — Stable identifier used for selection state and the change callback.
+- `label?: string` — Text label. One line — a label that doesn't fit is truncated.
+- `icon?: IconSource` — Icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function. A primary tab stacks the icon above the label and grows to 64dp; a secondary tab puts it before the label and stays 48dp.
+- `disabled?: boolean` — Greys the tab out at 38% and stops it responding.
+- `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
+
+---
+
 ### Avatar
 
 ```tsx

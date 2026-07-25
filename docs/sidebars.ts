@@ -68,6 +68,12 @@ const sidebars: SidebarsConfig = {
         'components/tooltip',
       ],
     },
+    {
+      type: 'category',
+      label: 'Navigation',
+      collapsed: false,
+      items: ['components/tabs'],
+    },
   ],
 }
 

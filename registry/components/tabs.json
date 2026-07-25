@@ -1,0 +1,21 @@
+{
+  "name": "tabs",
+  "description": "Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator",
+  "files": [
+    "packages/components/src/tabs/Tab.tsx",
+    "packages/components/src/tabs/Tabs.tsx",
+    "packages/components/src/tabs/index.ts",
+    "packages/components/src/tabs/styles.ts",
+    "packages/components/src/tabs/types.ts",
+    "packages/components/src/internal/useStateLayer.ts"
+  ],
+  "utils": ["color", "render-icon"],
+  "componentDependencies": ["divider"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {}
+}

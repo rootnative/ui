@@ -90,6 +90,10 @@
       "description": "Toggle control with optional icons and customizable thumb/track colors."
     },
     {
+      "name": "tabs",
+      "description": "Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator"
+    },
+    {
       "name": "text-field",
       "description": "Text input with animated floating label, 2 variants (filled, outlined), and icon support."
     },

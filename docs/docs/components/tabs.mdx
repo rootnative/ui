@@ -1,0 +1,232 @@
+---
+sidebar_position: 1
+---
+
+# Tabs
+
+Tabs organize content into groups the user switches between without leaving the screen.
+Follows the [Material Design 3 Tabs](https://m3.material.io/components/tabs/overview) specification.
+
+There are two variants. **Primary** tabs sit directly under an app bar and mark the active tab
+with a short indicator matched to its label. **Secondary** tabs sit inside content — often under a
+primary row — and mark the active tab with a full-width indicator.
+
+:::info Tabs is a bar, not a navigator
+`Tabs` renders the row and tells you which tab was pressed. It does not own screens, mount panels,
+or integrate with a navigator. Point it at whatever you already use — `useState` for a panel on one
+screen, or your router's state for real routes. See [Wiring it to a navigator](#wiring-it-to-a-navigator).
+:::
+
+## Usage
+
+Pass the tabs as `items` and read the selection from `onValueChange`. With no `value` prop, Tabs
+tracks the active tab itself and starts on the first item.
+
+<SnackExample
+  name="RootNative Tabs — Usage"
+  code={`
+  import { Tabs } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  const SECTIONS = [
+    { value: 'flights', label: 'Flights' },
+    { value: 'trips', label: 'Trips' },
+    { value: 'explore', label: 'Explore' },
+  ]
+
+  const PANELS = {
+    flights: 'Two seats left at this price.',
+    trips: 'Nothing booked yet.',
+    explore: 'Places you might like.',
+  }
+
+  function Screen() {
+    const [section, setSection] = useState('flights')
+    return (
+      <View style={{ flex: 1 }}>
+        <Tabs items={SECTIONS} value={section} onValueChange={setSection} />
+        <View style={{ padding: 24 }}>
+          <Text>{PANELS[section]}</Text>
+        </View>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Screen />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Variants
+
+<SnackExample
+  name="RootNative Tabs — Variants"
+  code={`
+  import { Tabs } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  const TRAVEL = [
+    { value: 'flights', label: 'Flights', icon: 'airplane' },
+    { value: 'hotels', label: 'Hotels', icon: 'bed-outline' },
+    { value: 'cars', label: 'Cars', icon: 'car-outline' },
+  ]
+
+  const MANY = [
+    { value: 'overview', label: 'Overview' },
+    { value: 'specifications', label: 'Specifications' },
+    { value: 'reviews', label: 'Reviews' },
+    { value: 'questions', label: 'Questions' },
+    { value: 'shipping', label: 'Shipping' },
+  ]
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, gap: 24, paddingTop: 24 }}>
+            {/* Primary: icon above the label, 64dp tall */}
+            <Tabs items={TRAVEL} />
+            {/* Secondary: icon inline, 48dp, full-width indicator */}
+            <Tabs variant="secondary" items={TRAVEL} />
+            {/* Scrollable: natural widths, active tab scrolled into view */}
+            <Tabs scrollable items={MANY} defaultValue="reviews" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+| Prop | Values | Default | Meaning |
+|------|--------|---------|---------|
+| `variant` | `'primary' \| 'secondary'` | `'primary'` | Which anatomy the row uses |
+| `scrollable` | `boolean` | `false` | Natural tab widths with horizontal scroll, instead of an equal split |
+| `edgePadding` | `number` | `52` | Padding before the first and after the last tab. Scrollable rows only |
+| `showDivider` | `boolean` | `true` | The 1dp divider along the bottom of the row |
+
+A **fixed** row divides its width equally between the tabs, so a long label truncates to one line.
+Reach for `scrollable` past four tabs, or when the labels are long enough to truncate — scrollable
+tabs take their natural width, floored at 90dp.
+
+An **icon** changes the anatomy per variant: a primary tab stacks it above the label and grows to
+64dp, a secondary tab puts it before the label and stays 48dp.
+
+## Selection
+
+`value` + `onValueChange` is the controlled form; leave `value` off and the row tracks the
+selection itself, starting on `defaultValue` or the first item. A tab row with nothing active reads
+as broken, which is why there is no "no selection" state.
+
+```tsx
+{/* Controlled — the row shows what your state says */}
+<Tabs items={items} value={section} onValueChange={setSection} />
+
+{/* Uncontrolled — the row remembers, and tells you */}
+<Tabs items={items} defaultValue="trips" onValueChange={load} />
+```
+
+`onValueChange` fires on every press, controlled or not.
+
+### Wiring it to a navigator
+
+Tabs deliberately stops at the bar. With `expo-router`, drive it from the current route:
+
+```tsx
+import { Tabs } from '@rootnative/components'
+import { usePathname, useRouter } from 'expo-router'
+
+const SECTIONS = [
+  { value: '/library/albums', label: 'Albums' },
+  { value: '/library/artists', label: 'Artists' },
+]
+
+function LibraryTabs() {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  return (
+    <Tabs
+      items={SECTIONS}
+      value={SECTIONS.find((s) => pathname.startsWith(s.value))?.value}
+      onValueChange={(value) => router.replace(value)}
+    />
+  )
+}
+```
+
+The same shape works for react-navigation (`useNavigationState` + `navigation.navigate`) or for
+nothing at all — a `useState` and a conditional render.
+
+## The indicator
+
+The indicator is placed from measured geometry, not from a flex rule, because a **primary**
+indicator matches the width of the label rather than the width of the tab (floored at 24dp so a
+one-character label still gets something to see). A **secondary** indicator spans the whole tab.
+
+It stays unmounted until the active tab reports a layout, so it appears in place instead of sliding
+in from the row's leading edge on first render. After that, both its offset and its width ride
+`springDefaultSpatial` and collapse to a snap under reduced motion — see [Motion](../motion.md).
+
+On a scrollable row, selecting a tab that is partly off screen scrolls it into view, centred where
+there is room to centre it.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The row background |
+| `contentColor` | Label and icon color of inactive tabs |
+| `selectedContentColor` | Label and icon color of the active tab; the state layers re-derive from it |
+| `indicatorColor` | The active indicator |
+| `labelStyle` | Every tab's label `Text` — does not affect the icons |
+| `style` | The row container |
+
+Disabled tabs always use the MD3 disabled treatment (38% content); no override changes that.
+
+When you pass `testID`, the indicator and the divider carry `<testID>-indicator` and
+`<testID>-divider` so a test can assert on them.
+
+## Tokens
+
+| Token | Primary | Secondary |
+|-------|---------|-----------|
+| Container | `surface`, elevation 0, square corners | `surface`, elevation 0, square corners |
+| Height | 48dp, 64dp with an icon above the label | 48dp |
+| Label | `titleSmall` — active `primary`, inactive `onSurfaceVariant` | `titleSmall` — active `onSurface`, inactive `onSurfaceVariant` |
+| Icon | 24dp, same colors as the label | 24dp, same colors as the label |
+| Indicator | `primary`, 3dp, matched to the label | `primary`, 2dp, full tab width |
+| Padding | 16dp horizontal per tab | 16dp horizontal per tab |
+| Divider | 1dp `outlineVariant` along the bottom | 1dp `outlineVariant` along the bottom |
+
+Two values differ from androidx: the secondary indicator is 2dp per the spec, where compose falls
+back to the primary token's 3dp because `SecondaryNavigationTabTokens` declares no indicator; and an
+icon-and-label tab is 64dp per `IconAndLabelTextContainerHeight`, where compose's `Tab` still uses a
+legacy 72dp.
+
+## Accessibility
+
+- The row reports `role="tablist"` and each tab `role="tab"` with `accessibilityState.selected`.
+  Pass `accessibilityLabel` to name the row itself ("Sections", "Library").
+- A tab's screen-reader name falls back to its label; set `accessibilityLabel` on the item for an
+  icon-only tab.
+- Disabled tabs expose `accessibilityState.disabled` and stop responding.
+- On web, tabs show a keyboard focus ring (`secondary`, 3dp) driven by the same focus-visible state
+  as the rest of the library.
+- Because Tabs owns no panels, `aria-controls` is yours to add if you render panels that need it.
+
+## Props
+
+<PropTable name="Tabs" />

@@ -206,6 +206,12 @@ const sections: ComponentSection[] = [
         route: '/tooltip',
         description: 'Plain and rich tooltips on hover or a long press',
       },
+      {
+        label: 'Tabs',
+        route: '/tabs',
+        description:
+          'Primary and secondary tab rows, fixed or scrollable, with a sliding indicator',
+      },
     ],
   },
 ]
@@ -509,6 +515,27 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
             />
           </Box>
         </View>
+      )
+    case 'Tabs':
+      return (
+        <Column gap="xs" style={previewStyles.tabsWrapper}>
+          <Row gap="lg" justify="center">
+            <Box bg={theme.colors.primary} style={previewStyles.tabsLabel} />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.tabsLabelMuted}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.tabsLabelMuted}
+            />
+          </Row>
+          <Box bg={theme.colors.primary} style={previewStyles.tabsIndicator} />
+          <Box
+            bg={theme.colors.outlineVariant}
+            style={previewStyles.tabsDivider}
+          />
+        </Column>
       )
     case 'Tooltip':
       return (
@@ -888,6 +915,32 @@ const previewStyles = StyleSheet.create({
     opacity: 0.7,
   },
   menuRule: {
+    width: '100%',
+    height: 1,
+  },
+  tabsWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    justifyContent: 'center',
+  },
+  tabsLabel: {
+    width: 34,
+    height: 6,
+    borderRadius: 3,
+  },
+  tabsLabelMuted: {
+    width: 34,
+    height: 6,
+    borderRadius: 3,
+    opacity: 0.6,
+  },
+  tabsIndicator: {
+    width: 34,
+    height: 3,
+    borderRadius: 3,
+    marginStart: 12,
+  },
+  tabsDivider: {
     width: '100%',
     height: 1,
   },

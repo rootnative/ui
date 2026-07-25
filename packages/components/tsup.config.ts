@@ -20,6 +20,7 @@ export default defineConfig({
     'src/divider/index.ts',
     'src/menu/index.ts',
     'src/tooltip/index.ts',
+    'src/tabs/index.ts',
     'src/list/index.ts',
     'src/keyboard-avoiding-wrapper/index.ts',
     'src/avatar/index.ts',

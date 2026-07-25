@@ -392,6 +392,7 @@ const COMPONENT_ORDER = [
   'snackbar',
   'menu',
   'tooltip',
+  'tabs',
   'avatar',
   'slider',
   'progress',
@@ -420,6 +421,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   snackbar: 'Snackbar',
   menu: 'Menu',
   tooltip: 'Tooltip',
+  tabs: 'Tabs',
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
@@ -744,6 +746,37 @@ import { Tooltip } from '@rootnative/components/tooltip'
 // Controlled: the anchor stops opening it, but the timeout, an outside press,
 // and Android back still report through onDismiss.
 <Tooltip visible={open} onDismiss={() => setOpen(false)} anchor={anchor}>Saved</Tooltip>
+\`\`\``,
+
+  tabs: `\`\`\`tsx
+import { Tabs } from '@rootnative/components/tabs'
+
+// A bar, not a navigator: Tabs reports the press, you own the panels/routes.
+// Controlled…
+<Tabs
+  items={[
+    { value: 'flights', label: 'Flights' },
+    { value: 'trips', label: 'Trips' },
+    { value: 'explore', label: 'Explore' },
+  ]}
+  value={section}
+  onValueChange={setSection}
+/>
+
+// …or uncontrolled, starting on \`defaultValue\` (falls back to the first item).
+<Tabs items={items} defaultValue="trips" onValueChange={load} />
+
+// Primary stacks an icon above the label (64dp) and matches the indicator to
+// the label; secondary keeps the icon inline (48dp) with a full-width 2dp one.
+<Tabs variant="secondary" items={[{ value: 'a', label: 'Albums', icon: 'album' }]} />
+
+// Scrollable: natural tab widths (min 90dp) instead of an equal split, with the
+// active tab scrolled into view. \`edgePadding\` pads before/after the row.
+<Tabs scrollable items={manyItems} edgePadding={16} />
+
+// Overrides: containerColor (row), contentColor (inactive), selectedContentColor
+// (active), indicatorColor, labelStyle. Disabled items stay at the MD3 38%.
+<Tabs items={[{ value: 'x', label: 'Deleted', disabled: true }]} showDivider={false} />
 \`\`\``,
 
   avatar: `\`\`\`tsx
@@ -1087,6 +1120,29 @@ import { Grid } from '@rootnative/components/layout'
         typeAliases,
         '#### useSnackbar().show(options)',
         'Enqueues a snackbar and returns its id. `hide(id?)` dismisses one (visible or queued); `clear()` drops everything.',
+      )
+    }
+
+    return output
+  }
+
+  // --- Tabs: row props + the shape of one item ---
+  if (dirName === 'tabs') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'TabsProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    const itemIface = interfaces.find((i) => i.name === 'TabItem')
+    if (itemIface) {
+      output += formatSubInterface(
+        itemIface,
+        typeAliases,
+        '#### TabItem',
+        'One tab. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.',
       )
     }
 

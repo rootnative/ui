@@ -1,5 +1,6 @@
 import { MotionConfig } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
+import { fireEvent, screen } from '@testing-library/react-native'
 import { useEffect } from 'react'
 import type { ReactElement } from 'react'
 import * as Reanimated from 'react-native-reanimated'
@@ -14,6 +15,7 @@ import { Radio } from '../radio'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
 import { Switch } from '../switch'
+import { Tabs } from '../tabs'
 import { Tooltip } from '../tooltip'
 
 /** Shows a snackbar on mount so the enter transition is under test. */
@@ -44,82 +46,119 @@ function SnackbarOnMount() {
 // `ThemeProvider`'s own `<MotionConfig transitions>`, so the theme's named
 // spring tokens still resolve while `reducedMotion` is overridden.
 
-/**
- * Components whose primary state transition rides a spring. Elements are
- * produced per case rather than held in the array so each `it` mounts a fresh
- * tree.
- */
-const CASES: ReadonlyArray<readonly [string, () => ReactElement]> = [
-  ['Checkbox', () => <Checkbox value />],
-  ['Radio', () => <Radio value />],
-  ['Switch', () => <Switch value />],
-  ['Chip', () => <Chip selected>Tag</Chip>],
-  [
-    'IconButton',
-    () => <IconButton icon="heart" accessibilityLabel="Like" selected />,
-  ],
-  ['Slider', () => <Slider defaultValue={0.5} />],
-  ['LoadingIndicator', () => <LoadingIndicator accessibilityLabel="Loading" />],
-  [
-    'Dialog',
-    () => (
+interface ReducedMotionCase {
+  name: string
+  /**
+   * Produced per case rather than held in the array, so each `it` mounts a
+   * fresh tree.
+   */
+  render: () => ReactElement
+  /**
+   * Runs after the render, for a component whose animation does not start
+   * until something has been measured.
+   */
+  settle?: () => void
+}
+
+/** Components whose primary state transition rides a spring. */
+const CASES: readonly ReducedMotionCase[] = [
+  { name: 'Checkbox', render: () => <Checkbox value /> },
+  { name: 'Radio', render: () => <Radio value /> },
+  { name: 'Switch', render: () => <Switch value /> },
+  { name: 'Chip', render: () => <Chip selected>Tag</Chip> },
+  {
+    name: 'IconButton',
+    render: () => (
+      <IconButton icon="heart" accessibilityLabel="Like" selected />
+    ),
+  },
+  { name: 'Slider', render: () => <Slider defaultValue={0.5} /> },
+  {
+    name: 'LoadingIndicator',
+    render: () => <LoadingIndicator accessibilityLabel="Loading" />,
+  },
+  {
+    name: 'Dialog',
+    render: () => (
       <PortalHost>
         <Dialog visible onDismiss={() => {}}>
           <Dialog.Title>Title</Dialog.Title>
         </Dialog>
       </PortalHost>
     ),
-  ],
-  [
-    'Dialog (fullscreen)',
-    () => (
+  },
+  {
+    name: 'Dialog (fullscreen)',
+    render: () => (
       <PortalHost>
         <Dialog visible variant="fullscreen" onDismiss={() => {}}>
           <Dialog.Title>Title</Dialog.Title>
         </Dialog>
       </PortalHost>
     ),
-  ],
-  [
-    'Snackbar',
-    () => (
+  },
+  {
+    name: 'Snackbar',
+    render: () => (
       <PortalHost>
         <SnackbarProvider>
           <SnackbarOnMount />
         </SnackbarProvider>
       </PortalHost>
     ),
-  ],
-  [
-    'Menu',
-    () => (
+  },
+  {
+    name: 'Menu',
+    render: () => (
       <PortalHost>
         <Menu visible anchor={null} onDismiss={() => {}}>
           <Menu.Item label="Edit" />
         </Menu>
       </PortalHost>
     ),
-  ],
-  [
-    'Tooltip',
-    () => (
+  },
+  {
+    name: 'Tabs',
+    render: () => (
+      <Tabs
+        items={[
+          { value: 'a', label: 'Alpha' },
+          { value: 'b', label: 'Beta' },
+        ]}
+      />
+    ),
+    // The indicator carries the animation, and it only mounts once the active
+    // tab has reported a layout — which never happens on its own in a test
+    // renderer. Feed one in, or this case would assert nothing.
+    settle: () => {
+      fireEvent(screen.getByRole('tab', { name: 'Alpha' }), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 100, height: 48 } },
+      })
+      fireEvent(screen.getByText('Alpha'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 60, height: 20 } },
+      })
+    },
+  },
+  {
+    name: 'Tooltip',
+    render: () => (
       <PortalHost>
         <Tooltip visible anchor={null} onDismiss={() => {}}>
           Save changes
         </Tooltip>
       </PortalHost>
     ),
-  ],
-  [
-    'Tooltip (rich)',
-    () => (
+  },
+  {
+    name: 'Tooltip (rich)',
+    render: () => (
       <PortalHost>
         <Tooltip visible variant="rich" anchor={null} onDismiss={() => {}}>
           Save changes
         </Tooltip>
       </PortalHost>
     ),
-  ],
+  },
 ]
 
 describe('reduced motion', () => {
@@ -137,11 +176,12 @@ describe('reduced motion', () => {
     jest.restoreAllMocks()
   })
 
-  describe.each(CASES)('%s', (_name, ui) => {
+  describe.each(CASES)('$name', ({ render, settle }) => {
     it('runs no animation primitive when reducedMotion="always"', () => {
       renderWithTheme(
-        <MotionConfig reducedMotion="always">{ui()}</MotionConfig>,
+        <MotionConfig reducedMotion="always">{render()}</MotionConfig>,
       )
+      settle?.()
 
       expect(withSpring).not.toHaveBeenCalled()
       expect(withTiming).not.toHaveBeenCalled()
