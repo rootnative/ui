@@ -1,0 +1,220 @@
+---
+sidebar_position: 5
+---
+
+# Loading Indicator
+
+The loading indicator is the MD3 Expressive spinner — a shape that morphs
+through a sequence of soft, rounded polygons instead of spinning a plain arc.
+Follows the [Material Design 3 Loading Indicator](https://m3.material.io/components/loading-indicator/overview) specification.
+
+Reach for it when a wait has no meaningful progress to report and you want the
+expressive treatment. `CircularProgress` from [Progress](./progress) is still
+the right choice when you need a conventional arc spinner, a determinate ring,
+or a smaller footprint next to text.
+
+Two variants:
+
+- **Uncontained** (default) — the morphing shape alone, drawn in `primary`
+- **Contained** — the shape centered on a filled `primaryContainer` circle
+
+And two modes, matching the rest of the library:
+
+- **Indeterminate** — omit `progress` to run the continuous morph cycle
+- **Determinate** — pass `progress` between `0` and `1` to morph from a circle
+  toward the soft-burst shape as the operation completes
+
+## Usage
+
+<SnackExample
+  name="RootNative LoadingIndicator — Usage"
+  code={`
+  import { LoadingIndicator } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <LoadingIndicator accessibilityLabel="Loading" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+`LoadingIndicator` is built on `react-native-svg` — make sure it's installed in
+your app (`npx expo install react-native-svg`).
+
+## Contained
+
+The contained variant places the shape on a filled circle, so it reads clearly
+against busy or image-backed surfaces. Colors default to
+`onPrimaryContainer` on `primaryContainer`.
+
+<SnackExample
+  name="RootNative LoadingIndicator — Contained"
+  code={`
+  import { LoadingIndicator } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+            <LoadingIndicator accessibilityLabel="Loading" />
+            <LoadingIndicator contained accessibilityLabel="Loading" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Determinate
+
+Pass `progress` to switch modes. The indicator stops cycling and instead maps
+the value onto a single morph — a circle at `0`, the soft-burst shape at `1` —
+with a slow counter-rotation as it advances. There's no global spin in
+determinate mode.
+
+<SnackExample
+  name="RootNative LoadingIndicator — Determinate"
+  code={`
+  import { LoadingIndicator } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useEffect, useState } from 'react'
+  import { View } from 'react-native'
+
+  export default function App() {
+    const [value, setValue] = useState(0)
+
+    useEffect(() => {
+      const id = setInterval(() => {
+        setValue((v) => (v >= 1 ? 0 : Math.min(1, v + 0.05)))
+      }, 300)
+      return () => clearInterval(id)
+    }, [])
+
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+            <LoadingIndicator progress={value} accessibilityLabel="Loading" />
+            <LoadingIndicator contained progress={value} accessibilityLabel="Loading" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+Values outside `0`–`1` are clamped.
+
+## Size
+
+`size` sets the container diameter in dp and defaults to `48`, the MD3 value.
+The morphing shape scales with it, always filling about 79% of the container
+(the spec's 38dp-in-48dp ratio).
+
+<SnackExample
+  name="RootNative LoadingIndicator — Size"
+  code={`
+  import { LoadingIndicator } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
+            <LoadingIndicator size={24} accessibilityLabel="Loading" />
+            <LoadingIndicator accessibilityLabel="Loading" />
+            <LoadingIndicator size={72} accessibilityLabel="Loading" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Custom colors
+
+`indicatorColor` overrides the morphing shape's fill. `containerColor`
+overrides the circle behind it and only applies to the contained variant — the
+uncontained container is always transparent.
+
+<SnackExample
+  name="RootNative LoadingIndicator — Custom colors"
+  code={`
+  import { LoadingIndicator } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+            <LoadingIndicator
+              indicatorColor="#00796B"
+              accessibilityLabel="Loading"
+            />
+            <LoadingIndicator
+              contained
+              indicatorColor="#FFFFFF"
+              containerColor="#B00020"
+              accessibilityLabel="Loading"
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Reduced motion
+
+When the OS reduce-motion setting is on, the smooth morph and the continuous
+rotation both collapse. In indeterminate mode the indicator still advances
+through the shape cycle, but as discrete cuts rather than a fluid morph — so it
+keeps conveying "still working" without the sweeping motion. Determinate mode is
+unaffected apart from losing the tween between values.
+
+Nothing to configure; see [Motion](../motion) for how the gate works and how to
+scope it.
+
+## Accessibility
+
+The indicator sets `accessibilityRole="progressbar"`. In determinate mode it
+exposes `accessibilityValue` as `{ min: 0, max: 100, now }` (rounded to
+integers — native accessibility APIs require them). In indeterminate mode
+`accessibilityValue` is omitted, which signals to assistive technologies that
+the duration is unknown.
+
+Pass `accessibilityLabel` to describe what's loading.
+
+```tsx
+<LoadingIndicator accessibilityLabel="Loading your library" />
+<LoadingIndicator progress={syncProgress} accessibilityLabel="Syncing" />
+```
+
+## Props
+
+<PropTable name="LoadingIndicator" />

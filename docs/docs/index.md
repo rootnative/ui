@@ -13,7 +13,7 @@ Design-system agnostic component library for React Native. Ships with Material D
 - [Material Design 3](https://m3.material.io/) built-in with light and dark themes
 - Generate branded MD3 themes from a single seed color
 - Full TypeScript support with strict types
-- Accessible by default — proper roles, labels, and states
+- Accessible by default — proper roles, labels, and states, and the OS [reduce-motion setting](./motion#reduced-motion) is respected out of the box
 - Tree-shakeable with subpath exports
 - Responsive layout hooks (`useBreakpoint`, `useBreakpointValue`)
 
@@ -39,10 +39,13 @@ Design-system agnostic component library for React Native. Ships with Material D
 | Component | Description |
 |-----------|-------------|
 | [Button](./components/button) | Actions and choices with a single tap |
+| [ButtonGroup](./components/button-group) | Connected buttons with single or multi selection |
 | [Checkbox](./components/checkbox) | Selection controls for multiple choices |
 | [Chip](./components/chip) | Compact elements for filters and selections |
+| [FAB](./components/fab) | Floating action button for the screen's primary action |
 | [IconButton](./components/icon-button) | Icon-only actions |
 | [Radio](./components/radio) | Selection controls for single choice options |
+| [Slider](./components/slider) | Select a value or range from a continuous track |
 | [Switch](./components/switch) | Toggle controls for on/off settings |
 | [TextField](./components/text-field) | Text input with labels and validation |
 
@@ -50,8 +53,10 @@ Design-system agnostic component library for React Native. Ships with Material D
 
 | Component | Description |
 |-----------|-------------|
+| [Avatar](./components/avatar) | Image, initials, or icon representation of a person |
 | [Card](./components/card) | Contained surfaces for related content |
 | [List](./components/list) | Vertically arranged items with text and icons |
+| [LoadingIndicator](./components/loading-indicator) | MD3 Expressive shape-morphing loading indicator |
 | [Progress](./components/progress) | Linear and circular progress indicators (determinate / indeterminate) |
 | [Typography](./components/typography) | MD3 type scale text rendering |
 
@@ -60,3 +65,5 @@ Design-system agnostic component library for React Native. Ships with Material D
 | Component | Description |
 |-----------|-------------|
 | [AppBar](./components/appbar) | Top navigation with title and actions |
+| [KeyboardAvoidingWrapper](./components/keyboard-avoiding-wrapper) | Keeps inputs visible when the keyboard opens |
+| [Portal](./components/portal) | Render content above the rest of the tree |

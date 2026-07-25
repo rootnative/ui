@@ -118,7 +118,9 @@ When the duration of an operation is unknown, omit `progress` to show a continuo
 `}
 />
 
-The animations use React Native's built-in `Animated` API with `useNativeDriver: true`, so they continue to run smoothly even while the JS thread is busy.
+The animations run on the UI thread through [`@rootnative/inertia`](../motion), so they stay smooth even while the JS thread is busy.
+
+They also stop entirely when the OS reduce-motion setting is on — that's the point of the setting, but it means an indeterminate indicator no longer conveys "still working". Prefer a determinate `progress` value wherever you have one, and pair indeterminate indicators with a text label so the state survives without the animation.
 
 ## Size and thickness
 

@@ -7,8 +7,9 @@ RootNative UI (`@rootnative`) is a React Native component library with a pluggab
 ## Packages
 
 - `@rootnative/core`: Theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), MD3 preset (`material`, light/dark themes), responsive breakpoint hooks
-- `@rootnative/utils`: Shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. Test helper via `@rootnative/utils/test`.
-- `@rootnative/components`: UI components (Avatar, Button, ButtonGroup, IconButton, AppBar, Card, Chip, Checkbox, Radio, Slider, Progress, Switch, TextField, Typography, Layout, List, Portal, KeyboardAvoidingWrapper)
+- `@rootnative/utils`: Internal shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. **Not published to npm** — it is bundled into `@rootnative/components`, and the CLI copies the needed files into your project when you `rootnative add`. Do not tell users to install it.
+- `@rootnative/components`: UI components (AppBar, Avatar, Button, ButtonGroup, Card, Checkbox, Chip, FAB, IconButton, KeyboardAvoidingWrapper, Layout, List, LoadingIndicator, Portal, Progress, Radio, Slider, Switch, TextField, Typography)
+- `@rootnative/inertia`: Animation engine. Required peer of `core` and `components` — every animation in the library routes through it, and it honors the OS reduce-motion setting by default. Docs: https://rootnative.github.io/inertia/
 - `@rootnative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide / Phosphor / `@expo/vector-icons` are optional peer deps.
 
 ## Quick start
@@ -26,7 +27,7 @@ The `create` command scaffolds a ready-to-run Expo project with `ThemeProvider` 
 ### Existing project
 
 ```bash
-pnpm add @rootnative/core @rootnative/utils @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets
+pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets
 ```
 
 Wrap root with provider:
@@ -56,12 +57,13 @@ import { Button, Card } from '@rootnative/components'
 ## Requirements
 
 - React Native 0.81+, React 19+, Expo SDK 54+
-- Peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5`, `react-native-svg >=15` (CircularProgress)
-- Optional peer dep: `@expo/vector-icons >=14` (only needed if you plan to use icons)
-- `@material/material-color-utilities >=0.4` (required peer of `@rootnative/core`, used by `createMaterialTheme`)
-- All component peers are declared optional, so NO package manager auto-installs them (npm/pnpm only auto-install required peers; Yarn classic installs none). Install the full list above explicitly.
+- Optional peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5`, `react-native-svg >=15` (CircularProgress, LoadingIndicator), `@expo/vector-icons >=14` (only needed if you plan to use icons)
+- Required peers (npm/pnpm install these for you; Yarn classic users add them by hand): `@rootnative/inertia` (animation engine, peer of both `core` and `components`), `@material/material-color-utilities >=0.4` (peer of `@rootnative/core`, used by `createMaterialTheme`)
+- The *optional* peers are never auto-installed (npm/pnpm only auto-install required peers; Yarn classic installs none). Install the full list above explicitly.
 
 `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; safe to skip only if you use Typography/Layout/Portal/KeyboardAvoidingWrapper exclusively. Bundled with Expo SDK 54 and works in Expo Go.
+
+Components never import `react-native-reanimated` directly — they animate through `@rootnative/inertia`, which resolves the theme's motion tokens by name and collapses every transition to a hard cut when the OS reduce-motion setting is on. `ThemeProvider` wires this up; nothing to configure. Override per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
 
 Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 54 bundles its Babel plugin — nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` last in `babel.config.js` plugins.
 
@@ -71,6 +73,7 @@ Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 54 bund
 - For AI agents (all LLM-doc locations + CLAUDE.md snippet): https://rootnative.github.io/ui/llms
 - Installation: https://rootnative.github.io/ui/installation
 - Theming: https://rootnative.github.io/ui/theming
+- Motion & reduced motion: https://rootnative.github.io/ui/motion
 - Components: https://rootnative.github.io/ui/components/button
 
 ## CLI

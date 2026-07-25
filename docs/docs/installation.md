@@ -32,10 +32,11 @@ If you'd rather install only what you use:
 | `react-native-svg` | CircularProgress | You never import Progress |
 | `@expo/vector-icons` | Default resolver for string icon names (`leadingIcon="check"`) | You pass icons as React elements or register a custom `iconResolver` — see the [Icons guide](./icons) |
 | `@material/material-color-utilities` | [`createMaterialTheme`](./theming#generate-a-theme-from-a-seed-color) seed-color theme generation | You define themes manually. This one is a *required* peer of `@rootnative/core`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
+| `@rootnative/inertia` | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a *required* peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
 
 > **Importing from the root entry?** `import { Button } from '@rootnative/components'` loads every component, so all the component peers above must be installed. The skip rules apply only if you use subpath imports (`@rootnative/components/button`) exclusively.
 
-`react-native-reanimated` is bundled with Expo SDK 54 and works in Expo Go — no custom dev client required. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together.
+`react-native-reanimated` is bundled with Expo SDK 54 and works in Expo Go — no custom dev client required. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 
 > **Expo SDK 54 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
 
