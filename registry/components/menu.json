@@ -1,0 +1,23 @@
+{
+  "name": "menu",
+  "description": "Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility.",
+  "files": [
+    "packages/components/src/menu/Menu.tsx",
+    "packages/components/src/menu/MenuItem.tsx",
+    "packages/components/src/menu/context.ts",
+    "packages/components/src/menu/index.ts",
+    "packages/components/src/menu/styles.ts",
+    "packages/components/src/menu/types.ts",
+    "packages/components/src/internal/useAnchorPosition.ts",
+    "packages/components/src/internal/useStateLayer.ts"
+  ],
+  "utils": ["color", "elevation", "render-icon", "rtl"],
+  "componentDependencies": ["portal"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {}
+}

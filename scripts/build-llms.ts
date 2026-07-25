@@ -390,6 +390,7 @@ const COMPONENT_ORDER = [
   'portal',
   'dialog',
   'snackbar',
+  'menu',
   'avatar',
   'slider',
   'progress',
@@ -416,6 +417,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   portal: 'Portal',
   dialog: 'Dialog',
   snackbar: 'Snackbar',
+  menu: 'Menu',
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
@@ -670,6 +672,42 @@ snackbar.show({ message: 'Urgent', replace: true })
 snackbar.hide(id)   // specific, visible or queued
 snackbar.hide()     // whatever is visible
 snackbar.clear()    // visible + queue
+\`\`\``,
+
+  menu: `\`\`\`tsx
+import { Menu } from '@rootnative/components/menu'
+import { Divider } from '@rootnative/components/divider'
+
+// Self-managing: no \`visible\` prop. Menu hooks the anchor's press to open and
+// closes on an outside press, an item press, or Android back. The anchor must
+// be a single element that accepts \`onPress\`; its own onPress still fires.
+<Menu align="end" anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>
+  <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={edit} />
+  <Menu.Item label="Duplicate" leadingIcon="content-copy" onPress={duplicate} />
+  <Divider />
+  <Menu.Item label="Delete" leadingIcon="trash-can-outline" contentColor={theme.colors.error} onPress={del} />
+</Menu>
+
+// Controlled: you own visibility, and Menu never toggles itself.
+<Menu
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={<Button onPress={() => setOpen(true)}>Sort</Button>}
+>
+  {/* closeOnPress={false} keeps the menu open for a toggle-style item */}
+  <Menu.Item label="Name" leadingIcon={sort === 'name' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('name')} />
+  <Menu.Item label="Size" leadingIcon={sort === 'size' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('size')} />
+</Menu>
+
+// Placement is a preference: a menu that doesn't fit flips to the roomier side,
+// shifts back inside the screen margin horizontally, and scrolls when capped.
+// \`align\` is logical — 'start' is the left edge in LTR, the right edge in RTL.
+<Menu side="top" align="center" offset={8} anchor={anchor}>…</Menu>
+
+// Item anatomy
+<Menu.Item label="New window" leadingIcon="window-maximize" trailingText="⌘N" />
+<Menu.Item label="Open recent" leadingIcon="history" trailingIcon="chevron-right" />
+<Menu.Item label="Paste" disabled />
 \`\`\``,
 
   avatar: `\`\`\`tsx
@@ -1013,6 +1051,29 @@ import { Grid } from '@rootnative/components/layout'
         typeAliases,
         '#### useSnackbar().show(options)',
         'Enqueues a snackbar and returns its id. `hide(id?)` dismisses one (visible or queued); `clear()` drops everything.',
+      )
+    }
+
+    return output
+  }
+
+  // --- Menu: surface props + Menu.Item ---
+  if (dirName === 'menu') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'MenuProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    const itemIface = interfaces.find((i) => i.name === 'MenuItemProps')
+    if (itemIface) {
+      output += formatSubInterface(
+        itemIface,
+        typeAliases,
+        '#### Menu.Item',
+        'One choice. Pressing it closes the menu unless `closeOnPress` is `false`.',
       )
     }
 

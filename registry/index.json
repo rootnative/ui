@@ -62,6 +62,10 @@
       "description": "MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate)"
     },
     {
+      "name": "menu",
+      "description": "Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility."
+    },
+    {
       "name": "portal",
       "description": "Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips."
     },
@@ -79,7 +83,7 @@
     },
     {
       "name": "snackbar",
-      "description": ""
+      "description": "Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement."
     },
     {
       "name": "switch",

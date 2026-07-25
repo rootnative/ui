@@ -768,6 +768,80 @@ Props:
 
 ---
 
+### Menu
+
+```tsx
+import { Menu } from '@rootnative/components/menu'
+import { Divider } from '@rootnative/components/divider'
+
+// Self-managing: no `visible` prop. Menu hooks the anchor's press to open and
+// closes on an outside press, an item press, or Android back. The anchor must
+// be a single element that accepts `onPress`; its own onPress still fires.
+<Menu align="end" anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>
+  <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={edit} />
+  <Menu.Item label="Duplicate" leadingIcon="content-copy" onPress={duplicate} />
+  <Divider />
+  <Menu.Item label="Delete" leadingIcon="trash-can-outline" contentColor={theme.colors.error} onPress={del} />
+</Menu>
+
+// Controlled: you own visibility, and Menu never toggles itself.
+<Menu
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={<Button onPress={() => setOpen(true)}>Sort</Button>}
+>
+  {/* closeOnPress={false} keeps the menu open for a toggle-style item */}
+  <Menu.Item label="Name" leadingIcon={sort === 'name' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('name')} />
+  <Menu.Item label="Size" leadingIcon={sort === 'size' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('size')} />
+</Menu>
+
+// Placement is a preference: a menu that doesn't fit flips to the roomier side,
+// shifts back inside the screen margin horizontally, and scrolls when capped.
+// `align` is logical — 'start' is the left edge in LTR, the right edge in RTL.
+<Menu side="top" align="center" offset={8} anchor={anchor}>…</Menu>
+
+// Item anatomy
+<Menu.Item label="New window" leadingIcon="window-maximize" trailingText="⌘N" />
+<Menu.Item label="Open recent" leadingIcon="history" trailingIcon="chevron-right" />
+<Menu.Item label="Paste" disabled />
+```
+
+Props:
+- `anchor: ReactNode` — The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a measuring `View`. When `visible` is omitted the menu manages its own open state, and it needs to hook the trigger's press: pass a single element that accepts `onPress` (any RootNative pressable does). The element's own `onPress` still fires.
+- `children?: ReactNode` — `Menu.Item`s, `Divider`s, or arbitrary content.
+- `visible?: boolean` — Controlled visibility. Omit to let the menu open itself on an anchor press and close itself on an outside press, an item press, or Android back.
+- `onDismiss?: () => void` — Called when the menu closes — outside press, item press, or Android back. Required to close a controlled menu; optional otherwise.
+- `side?: 'top' | 'bottom'` — Default: `'bottom'`. Side of the anchor the menu prefers. It flips to the other side when it does not fit and that side is roomier.
+- `align?: 'start' | 'center' | 'end'` — Default: `'start'`. Cross-axis alignment against the anchor.
+- `offset?: number` — Default: `0`. Gap between the anchor edge and the menu, in dp.
+- `screenMargin?: number` — Default: `8`. Minimum distance the menu keeps from every screen edge, in dp.
+- `containerColor?: string` — Default: `surfaceContainer`. Override the container (surface) color.
+- `hostName?: string` — Name of the `PortalHost` to render into. Defaults to the root host, which is what puts the menu above every other layer.
+- `style?: StyleProp<ViewStyle>` — Style applied to the menu surface.
+- `anchorStyle?: StyleProp<ViewStyle>` — Style applied to the `View` wrapping the anchor.
+- `dismissAccessibilityLabel?: string` — Default: `'Close menu'`. Screen-reader label for the full-screen region that closes the menu on an outside press.
+- `testID?: string` — Test id applied to the menu surface.
+
+#### Menu.Item
+
+One choice. Pressing it closes the menu unless `closeOnPress` is `false`.
+
+Props:
+- `label: string` — Item text.
+- `leadingIcon?: IconSource` — Leading icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
+- `trailingIcon?: IconSource` — Trailing icon at 24dp. Mutually exclusive with `trailingText` in practice.
+- `trailingText?: string` — Trailing text — a keyboard shortcut or a short status.
+- `onPress?: () => void` — Called when the item is pressed.
+- `closeOnPress?: boolean` — Default: `true`. Whether pressing the item closes the menu. Set `false` for an item that toggles something and should stay open.
+- `disabled?: boolean` — Greys the item out at 38% and stops it responding.
+- `containerColor?: string` — Override the item's container background. Hover/press/focus state-layer colors are derived from it automatically.
+- `contentColor?: string` — Override every piece of content the item renders — label, both icons, and trailing text — and the state-layer colors derived from it. Defaults are `onSurface` for the label and `onSurfaceVariant` for the rest.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to the label `Text` only — does not affect the icons.
+- `style?: StyleProp<ViewStyle>` — Style applied to the item container. Static form only — the function form `(state) => style` is not supported because the item drives its background through Reanimated. Use `containerColor` / `contentColor` instead.
+- `testID?: string` — Test id applied to the item container.
+
+---
+
 ### Avatar
 
 ```tsx

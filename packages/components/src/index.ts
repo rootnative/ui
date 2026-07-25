@@ -69,6 +69,9 @@ export type {
 export { Divider } from './divider'
 export type { DividerProps, DividerOrientation } from './divider'
 
+export { Menu, MenuItem } from './menu'
+export type { MenuProps, MenuItemProps, MenuAlign, MenuSide } from './menu'
+
 export { List, ListItem, ListDivider } from './list'
 export type {
   ListProps,

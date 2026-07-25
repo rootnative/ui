@@ -68,5 +68,6 @@ Design-system agnostic component library for React Native. Ships with Material D
 | [AppBar](./components/appbar) | Top navigation with title and actions |
 | [Dialog](./components/dialog) | Basic and full-screen modal dialogs |
 | [KeyboardAvoidingWrapper](./components/keyboard-avoiding-wrapper) | Keeps inputs visible when the keyboard opens |
+| [Menu](./components/menu) | Anchored dropdown menus that flip and shift to stay on screen |
 | [Portal](./components/portal) | Render content above the rest of the tree |
 | [Snackbar](./components/snackbar) | Queued transient messages with an optional action |

@@ -195,6 +195,12 @@ const sections: ComponentSection[] = [
         route: '/snackbar',
         description: 'Queued transient messages via SnackbarProvider',
       },
+      {
+        label: 'Menu',
+        route: '/menu',
+        description:
+          'Anchored dropdown menus that flip and shift to stay on screen',
+      },
     ],
   },
 ]
@@ -468,6 +474,33 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
             <Box
               bg={theme.colors.inversePrimary}
               style={previewStyles.snackbarAction}
+            />
+          </Box>
+        </View>
+      )
+    case 'Menu':
+      return (
+        <View style={previewStyles.menuWrapper}>
+          <Box bg={theme.colors.onSurface} style={previewStyles.menuHandle} />
+          <Box
+            bg={theme.colors.surfaceContainer}
+            style={previewStyles.menuSurface}
+          >
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.menuItemLine}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.menuItemLineShort}
+            />
+            <Box
+              bg={theme.colors.outlineVariant}
+              style={previewStyles.menuRule}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.menuItemLine}
             />
           </Box>
         </View>
@@ -797,6 +830,43 @@ const previewStyles = StyleSheet.create({
     width: 26,
     height: 6,
     borderRadius: 3,
+  },
+  menuWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 80,
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  menuHandle: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    opacity: 0.7,
+    marginEnd: 12,
+  },
+  menuSurface: {
+    width: '70%',
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    gap: 7,
+  },
+  menuItemLine: {
+    width: '80%',
+    height: 5,
+    borderRadius: 3,
+    opacity: 0.7,
+  },
+  menuItemLineShort: {
+    width: '55%',
+    height: 5,
+    borderRadius: 3,
+    opacity: 0.7,
+  },
+  menuRule: {
+    width: '100%',
+    height: 1,
   },
   portalWrapper: {
     width: '100%',

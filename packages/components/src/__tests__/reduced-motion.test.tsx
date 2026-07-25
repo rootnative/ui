@@ -8,6 +8,7 @@ import { Chip } from '../chip'
 import { Dialog } from '../dialog'
 import { IconButton } from '../icon-button'
 import { LoadingIndicator } from '../loading-indicator'
+import { Menu } from '../menu'
 import { PortalHost } from '../portal/PortalHost'
 import { Radio } from '../radio'
 import { Slider } from '../slider'
@@ -85,6 +86,16 @@ const CASES: ReadonlyArray<readonly [string, () => ReactElement]> = [
         <SnackbarProvider>
           <SnackbarOnMount />
         </SnackbarProvider>
+      </PortalHost>
+    ),
+  ],
+  [
+    'Menu',
+    () => (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}}>
+          <Menu.Item label="Edit" />
+        </Menu>
       </PortalHost>
     ),
   ],

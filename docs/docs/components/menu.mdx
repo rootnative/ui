@@ -1,0 +1,218 @@
+---
+sidebar_position: 4
+---
+
+# Menu
+
+Menus show a list of choices on a temporary surface, anchored to the control that opened them.
+Follows the [Material Design 3 Menu](https://m3.material.io/components/menus/overview) specification.
+
+Menu renders through [Portal](./portal.mdx), so your app must be wrapped in a `PortalHost` once
+at the root. It claims the `PORTAL_LAYERS.menu` layer, which puts it above bottom sheets,
+dialogs, and snackbars — a menu can be opened from any of them.
+
+## Usage
+
+Pass the trigger as `anchor` and the choices as children. With no `visible` prop, Menu manages
+its own open state: it hooks the anchor's press to open, and closes on an outside press, an item
+press, or the Android back button.
+
+<SnackExample
+  name="RootNative Menu — Usage"
+  code={`
+  import { IconButton, Menu, PortalHost } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  function Screen() {
+    const [last, setLast] = useState('nothing yet')
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <Text>Last action: {last}</Text>
+        <Menu
+          align="end"
+          anchor={<IconButton icon="dots-vertical" accessibilityLabel="More actions" />}
+        >
+          <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={() => setLast('Edit')} />
+          <Menu.Item label="Duplicate" leadingIcon="content-copy" onPress={() => setLast('Duplicate')} />
+          <Menu.Item label="Delete" leadingIcon="trash-can-outline" onPress={() => setLast('Delete')} />
+        </Menu>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The anchor renders where the `<Menu>` sits in your tree, wrapped in a measuring `View`. In
+self-managing mode it has to be a single element that accepts `onPress` — every RootNative
+pressable does. Its own `onPress` still fires.
+
+## Controlled
+
+Pass `visible` and `onDismiss` to drive visibility yourself. Menu then never toggles itself:
+the anchor's press is yours to wire, and `onDismiss` fires for outside presses, item presses,
+and Android back.
+
+<SnackExample
+  name="RootNative Menu — Controlled"
+  code={`
+  import { Button, Divider, Menu, PortalHost } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  const SORTS = ['Name', 'Date modified', 'Size']
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    const [sort, setSort] = useState('Name')
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Menu
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          anchor={
+            <Button variant="outlined" trailingIcon="chevron-down" onPress={() => setOpen(true)}>
+              {\`Sort: \${sort}\`}
+            </Button>
+          }
+        >
+          {SORTS.map((option) => (
+            <Menu.Item
+              key={option}
+              label={option}
+              leadingIcon={option === sort ? 'check' : undefined}
+              closeOnPress={false}
+              onPress={() => setSort(option)}
+            />
+          ))}
+          <Divider />
+          <Menu.Item label="Done" onPress={() => setOpen(false)} />
+        </Menu>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Items
+
+`Menu.Item` renders a leading icon, a label, trailing text, and a trailing icon — all optional
+except the label. Anything else you put in a Menu renders as given, which is how a
+[`Divider`](./divider.mdx) groups items.
+
+| Prop | Renders |
+|------|---------|
+| `label` | `labelLarge` / `onSurface`, truncated to one line |
+| `leadingIcon` | 24dp / `onSurfaceVariant` |
+| `trailingText` | `labelLarge` / `onSurfaceVariant` — a keyboard shortcut or short status |
+| `trailingIcon` | 24dp / `onSurfaceVariant` |
+| `disabled` | Label and both icons at 38% `onSurface`; the item stops responding |
+
+**An item press closes the menu.** Set `closeOnPress={false}` on an item that toggles something
+and should stay open — a sort choice or a "show hidden files" switch.
+
+## Placement
+
+`side` and `align` are preferences, not commands.
+
+| Prop | Values | Default | Meaning |
+|------|--------|---------|---------|
+| `side` | `'bottom' \| 'top'` | `'bottom'` | Which side of the anchor the menu prefers |
+| `align` | `'start' \| 'center' \| 'end'` | `'start'` | Cross-axis alignment against the anchor |
+| `offset` | `number` | `0` | Gap between the anchor edge and the menu, in dp |
+| `screenMargin` | `number` | `8` | Minimum distance the menu keeps from every screen edge |
+
+`align` is **logical**: `'start'` is the anchor's left edge in LTR and its right edge in RTL.
+
+A menu that would not fit on its preferred side flips to the other side — but only when that
+side is genuinely roomier, since flipping into an equally cramped side just moves the clipping
+around. Horizontally, the menu shifts back inside the screen margin rather than flipping. When
+neither side has room for the whole menu, it caps at the available height and scrolls.
+
+The menu positions itself from the anchor's window coordinates, measured when it opens. It does
+not follow the anchor while a scroll view moves underneath it — closing and reopening
+re-measures.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The menu surface background |
+| `style` | The menu surface |
+| `anchorStyle` | The `View` wrapping the anchor |
+| `Menu.Item` `containerColor` | The item background; hover/press/focus layers re-derive from it |
+| `Menu.Item` `contentColor` | The item's label, both icons, and trailing text |
+| `Menu.Item` `labelStyle` | The label `Text` only — does not affect the icons |
+
+`contentColor` on an item is how a destructive choice gets `error` coloring:
+
+```tsx
+<Menu.Item label="Delete" leadingIcon="trash-can-outline" contentColor={theme.colors.error} />
+```
+
+Disabled items always use the MD3 disabled treatment; neither override changes that.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Container | `surfaceContainer`, corner 4dp (`cornerExtraSmall`), elevation level 2 |
+| Width | min 112dp, max 280dp |
+| Block padding | 8dp, inside the scroll area |
+| Item height | 48dp minimum |
+| Item padding | 12dp horizontal, 12dp between icon, label, and trailing content |
+| Item label | `labelLarge` / `onSurface` |
+| Leading / trailing icon | 24dp / `onSurfaceVariant` |
+| Scrim | None — MD3 menus do not dim what is behind them |
+
+## Motion
+
+The menu scales in from 80% and fades on `springFastSpatial`, growing out of the corner nearest
+the anchor via `transformOrigin`. Both collapse to a hard cut under reduced motion — see
+[Motion](../motion.md).
+
+The surface stays invisible for the frame between mounting and being measured: its own size is
+what decides which side it lands on, so it has to be laid out before it can be placed.
+
+## Accessibility
+
+- The surface reports `role="menu"` and items report `role="menuitem"`. The surface is deliberately not an accessibility element itself — marking it one would collapse the items beneath it into a single node for screen readers.
+- Items expose `accessibilityState.disabled`.
+- The region that catches outside presses is announced as a button labelled "Close menu" — override with `dismissAccessibilityLabel`. MD3 menus have no scrim, so this region is transparent; it exists to catch outside presses and to give screen readers a way out.
+- On web, items show a keyboard focus ring (`secondary`, 3dp) driven by the same focus-visible state as the rest of the library.
+
+## Props
+
+<PropTable name="Menu" />
+
+### Menu.Item
+
+<PropTable name="MenuItem" />

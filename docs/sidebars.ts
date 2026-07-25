@@ -62,6 +62,7 @@ const sidebars: SidebarsConfig = {
         'components/appbar',
         'components/dialog',
         'components/keyboard-avoiding-wrapper',
+        'components/menu',
         'components/portal',
         'components/snackbar',
       ],
