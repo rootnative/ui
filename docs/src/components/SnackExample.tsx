@@ -1,17 +1,50 @@
 import Link from '@docusaurus/Link'
 import { useColorMode } from '@docusaurus/theme-common'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import CodeBlock from '@theme/CodeBlock'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
-const COMPONENTS_VERSION = '0.0.0-alpha.0'
+/**
+ * RootNative package versions injected by `docusaurus.config.ts`, read from
+ * the workspace at build time. Never hardcode them here — a pin in this file
+ * boots every live preview on an old release the moment one ships.
+ */
+interface SnackVersions {
+  components: string
+  core: string
+  inertia: string
+}
 
-const DEFAULT_DEPENDENCIES = [
-  `@rootnative/components@${COMPONENTS_VERSION}`,
-  `@rootnative/core@${COMPONENTS_VERSION}`,
+/** Versioned outside the RootNative release cycle, so pinned by hand. */
+const EXTERNAL_DEPENDENCIES = [
   '@material/material-color-utilities@^0.4.0',
   '@expo/vector-icons@^15.0.3',
   'react-native-safe-area-context@~5.6.0',
-].join(',')
+]
+
+function useDefaultDependencies(): string {
+  const { siteConfig } = useDocusaurusContext()
+  const versions = siteConfig.customFields?.snackVersions as
+    | SnackVersions
+    | undefined
+
+  return useMemo(() => {
+    if (!versions) {
+      throw new Error(
+        'customFields.snackVersions is missing from docusaurus.config.ts — ' +
+          'Snack previews cannot resolve @rootnative packages without it.',
+      )
+    }
+    return [
+      `@rootnative/components@${versions.components}`,
+      `@rootnative/core@${versions.core}`,
+      // Required peer of both packages above — Snack resolves from npm and
+      // will not pull it in on its own.
+      `@rootnative/inertia@${versions.inertia}`,
+      ...EXTERNAL_DEPENDENCIES,
+    ].join(',')
+  }, [versions])
+}
 
 type SnackPlatform = 'ios' | 'android' | 'web' | 'mydevice'
 
@@ -36,11 +69,12 @@ export default function SnackExample({
 }: SnackExampleProps) {
   const [showPreview, setShowPreview] = useState(false)
   const { colorMode } = useColorMode()
+  const defaultDependencies = useDefaultDependencies()
 
   const trimmed = code.replace(/^\n+|\n+$/g, '')
   const mergedDeps = dependencies
-    ? `${DEFAULT_DEPENDENCIES},${dependencies}`
-    : DEFAULT_DEPENDENCIES
+    ? `${defaultDependencies},${dependencies}`
+    : defaultDependencies
 
   const baseParams = new URLSearchParams({
     code: trimmed,
