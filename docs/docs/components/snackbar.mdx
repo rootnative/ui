@@ -1,0 +1,210 @@
+---
+sidebar_position: 5
+---
+
+# Snackbar
+
+Snackbars report the outcome of an action in a brief message at the bottom of the screen.
+Follows the [Material Design 3 Snackbar](https://m3.material.io/components/snackbar/overview) specification.
+
+Snackbar is **imperative only**. There is no `<Snackbar visible>` component, because the
+hard part of a snackbar is the queue — one message at a time, in order, each with its own
+timer — and a declarative API pushes that onto you. `SnackbarProvider` owns the queue;
+`useSnackbar()` gives you `show`, `hide`, and `clear`.
+
+## Setup
+
+Mount `SnackbarProvider` once, inside `ThemeProvider` and inside your app's [`PortalHost`](./portal.mdx).
+Snackbars render into the `PORTAL_LAYERS.snackbar` layer, which puts them above dialogs and bottom sheets.
+
+<SnackExample
+  name="RootNative Snackbar — Usage"
+  code={`
+  import { Button, PortalHost, SnackbarProvider, useSnackbar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const snackbar = useSnackbar()
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button onPress={() => snackbar.show({ message: 'Photo saved' })}>
+          Save photo
+        </Button>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <SnackbarProvider>
+              <Screen />
+            </SnackbarProvider>
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+`useSnackbar()` throws if there is no provider above it — a silent no-op would look like a bug in your own code.
+
+## Actions
+
+A snackbar takes a single action. Pressing it runs `onAction` and then dismisses with reason `'action'`.
+
+<SnackExample
+  name="RootNative Snackbar — Action"
+  code={`
+  import { Button, PortalHost, SnackbarProvider, useSnackbar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const snackbar = useSnackbar()
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button
+          variant="tonal"
+          onPress={() =>
+            snackbar.show({
+              message: 'Message deleted',
+              actionLabel: 'Undo',
+              onAction: () => console.log('undo'),
+            })
+          }
+        >
+          Delete message
+        </Button>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <SnackbarProvider>
+              <Screen />
+            </SnackbarProvider>
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Duration
+
+| `duration` | Meaning |
+|------------|---------|
+| `'short'` | 4s — the MD3 default |
+| `'long'` | 10s |
+| `'indefinite'` | Stays until the action, the close button, or `hide()` |
+| `number` | Milliseconds |
+
+**A snackbar with an `actionLabel` defaults to `'indefinite'`**, not `'short'`. An undo the
+user never sees is worse than one that waits. A snackbar without an action defaults to `'short'`.
+
+Set `showCloseIcon` to add a trailing close button. RootNative warns in development if an
+indefinite snackbar has neither an action nor a close button — that combination is
+undismissable and stalls everything queued behind it.
+
+## Queueing
+
+One snackbar is visible at a time. `show()` while one is up queues the new message behind it
+and returns an id; the queue drains in FIFO order as each snackbar's timer expires.
+
+```tsx
+const first = snackbar.show({ message: 'First' })
+snackbar.show({ message: 'Second' })   // waits its turn
+
+snackbar.hide(first)   // dismiss a specific one, visible or queued
+snackbar.hide()        // dismiss whatever is visible
+snackbar.clear()       // dismiss the visible one and drop the queue
+```
+
+Pass `replace: true` to jump ahead of the visible snackbar instead of queueing. The one it
+replaces dismisses with reason `'replaced'`.
+
+`onDismiss` receives why the snackbar went away: `'timeout'`, `'action'`, `'close'`,
+`'replaced'`, or `'manual'`.
+
+## Positioning
+
+The snackbar anchors to the bottom of the screen with 16dp margins and respects the
+safe-area bottom inset. Set `bottomOffset` on the provider to clear a FAB or bottom
+navigation:
+
+```tsx
+<SnackbarProvider bottomOffset={80}>{children}</SnackbarProvider>
+```
+
+The layer is `pointerEvents="box-none"`, so a visible snackbar never blocks the UI behind it.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Container | `inverseSurface`, corner 4dp (`cornerExtraSmall`), elevation level 3 |
+| Message | `bodyMedium` / `inverseOnSurface` |
+| Action label | `labelLarge` / `inversePrimary` |
+| Close icon | 24dp / `inverseOnSurface` |
+| Height | 48dp single-line, 68dp two-line |
+| Width | Full width minus 16dp margins, capped at 600dp |
+
+Per-snackbar `containerColor`, `contentColor`, and `actionColor` override the defaults —
+useful for an error-styled message.
+
+## Motion
+
+Snackbars rise 24dp and fade in on `springDefaultSpatial`, and reverse on the way out.
+Both collapse to a hard cut under reduced motion — see [Motion](../motion.md).
+
+## Accessibility
+
+The surface reports `role="alert"` with `accessibilityLiveRegion="polite"`, so screen
+readers announce the message without stealing focus. The close button is labelled
+"Dismiss" — override with `closeAccessibilityLabel`.
+
+## SnackbarProvider Props
+
+<PropTable name="SnackbarProvider" />
+
+## show() options
+
+`SnackbarOptions` is a plain object, not a component, so it is documented here rather than
+generated from the source.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `message` | `string` | — | The message. Required. |
+| `actionLabel` | `string` | — | Label for the single trailing action. |
+| `onAction` | `() => void` | — | Runs when the action is pressed; the snackbar then dismisses. |
+| `duration` | `'short' \| 'long' \| 'indefinite' \| number` | `'short'`, or `'indefinite'` with an `actionLabel` | Visible duration. |
+| `showCloseIcon` | `boolean` | `false` | Show a trailing close button. |
+| `closeIcon` | `IconSource` | `'close'` | Icon for the close button. |
+| `closeAccessibilityLabel` | `string` | `'Dismiss'` | Screen-reader label for the close button. |
+| `onDismiss` | `(reason) => void` | — | Called with `'timeout'`, `'action'`, `'close'`, `'replaced'`, or `'manual'`. |
+| `containerColor` | `string` | `inverseSurface` | Override the container color. |
+| `contentColor` | `string` | `inverseOnSurface` | Override the message color. |
+| `actionColor` | `string` | `inversePrimary` | Override the action label color. |
+| `replace` | `boolean` | `false` | Replace the visible snackbar instead of queueing. |
+
+## useSnackbar()
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `show` | `(options: SnackbarOptions) => SnackbarId` | Enqueue a snackbar; returns its id. |
+| `hide` | `(id?: SnackbarId) => void` | Dismiss the visible snackbar, or a specific one — visible or queued. |
+| `clear` | `() => void` | Dismiss the visible snackbar and drop the queue. |
+
+The returned object is referentially stable, so it is safe in dependency arrays.

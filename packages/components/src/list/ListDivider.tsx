@@ -1,19 +1,10 @@
-import { useTheme } from '@rootnative/core'
-import { useMemo } from 'react'
-import { View } from 'react-native'
-import { createDividerStyles } from './styles'
+import { Divider } from '../divider'
 import type { ListDividerProps } from './types'
 
-export function ListDivider({
-  inset = false,
-  style,
-  ...props
-}: ListDividerProps) {
-  const theme = useTheme()
-  const styles = useMemo(
-    () => createDividerStyles(theme, inset),
-    [theme, inset],
-  )
-
-  return <View {...props} style={[styles.divider, style]} />
+/**
+ * Alias of the standalone `Divider`, kept so existing list code keeps working.
+ * New code should import `Divider` from `@rootnative/components/divider`.
+ */
+export function ListDivider(props: ListDividerProps) {
+  return <Divider {...props} />
 }

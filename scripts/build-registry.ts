@@ -103,11 +103,24 @@ function getComponentFiles(componentDir: string): string[] {
     .map((f) => `packages/components/src/${componentDir}/${f}`)
 }
 
+/**
+ * Shared modules that live directly under `src/` rather than in `src/internal/`
+ * and are pulled in via `../<name>`. Same shipping rule as internal files: the
+ * CLI flattens them into the consuming component's directory and rewrites the
+ * import, and their own imports count toward that component's deps.
+ */
+const SHARED_ROOT_MODULES: Record<string, string> = {
+  'safe-area': 'safe-area.tsx',
+}
+
 function analyzeImports(componentDir: string): {
   utils: Set<string>
   componentDeps: Set<string>
   externalDeps: Set<string>
+  /** External packages the component's own code imports, not just shared modules. */
+  directExternals: Set<string>
   internalFiles: Set<string>
+  sharedRootFiles: Set<string>
 } {
   const fullDir = path.join(COMPONENTS_SRC, componentDir)
   const files = fs
@@ -122,9 +135,11 @@ function analyzeImports(componentDir: string): {
   // CLI flattens them into the component's directory and rewrites the
   // import), and their own imports count toward the component's deps.
   const internalFiles = new Set<string>()
+  const sharedRootFiles = new Set<string>()
   const pendingInternal: string[] = []
+  const pendingShared: string[] = []
 
-  const collectInternalImports = (content: string) => {
+  const collectSharedImports = (content: string) => {
     const internalImports = content.matchAll(
       /from\s+['"]\.\.\/internal\/([^'"]+)['"]/g,
     )
@@ -140,22 +155,56 @@ function analyzeImports(componentDir: string): {
         pendingInternal.push(fileName)
       }
     }
+
+    const rootImports = content.matchAll(/from\s+['"]\.\.\/([^/'"]+)['"]/g)
+    for (const match of rootImports) {
+      const fileName = SHARED_ROOT_MODULES[match[1]]
+      if (!fileName || sharedRootFiles.has(fileName)) continue
+      sharedRootFiles.add(fileName)
+      pendingShared.push(fileName)
+    }
   }
 
-  const contents: string[] = []
+  // Code the component (or an internal file it pulls in) imports directly.
+  const ownContents: string[] = []
+  // Shared root modules, tracked apart because they can soften a dependency:
+  // `safe-area.tsx` require()s its package in a try/catch and degrades, so a
+  // component that only reaches the package through it does not require it.
+  const sharedContents: string[] = []
+
   for (const file of files) {
-    contents.push(fs.readFileSync(path.join(fullDir, file), 'utf-8'))
+    ownContents.push(fs.readFileSync(path.join(fullDir, file), 'utf-8'))
   }
-  for (const content of contents) collectInternalImports(content)
-  while (pendingInternal.length > 0) {
-    const fileName = pendingInternal.pop() as string
+  for (const content of ownContents.slice()) collectSharedImports(content)
+  while (pendingInternal.length > 0 || pendingShared.length > 0) {
+    const internalName = pendingInternal.pop()
+    if (internalName !== undefined) {
+      const content = fs.readFileSync(
+        path.join(COMPONENTS_SRC, 'internal', internalName),
+        'utf-8',
+      )
+      ownContents.push(content)
+      collectSharedImports(content)
+      continue
+    }
+
+    const sharedName = pendingShared.pop() as string
     const content = fs.readFileSync(
-      path.join(COMPONENTS_SRC, 'internal', fileName),
+      path.join(COMPONENTS_SRC, sharedName),
       'utf-8',
     )
-    contents.push(content)
-    collectInternalImports(content)
+    sharedContents.push(content)
+    collectSharedImports(content)
   }
+
+  const directExternals = new Set<string>()
+  for (const content of ownContents) {
+    if (content.includes('react-native-safe-area-context')) {
+      directExternals.add('react-native-safe-area-context')
+    }
+  }
+
+  const contents = [...ownContents, ...sharedContents]
 
   for (const content of contents) {
     // Check for @rootnative/utils imports
@@ -219,17 +268,33 @@ function analyzeImports(componentDir: string): {
     }
   }
 
-  return { utils, componentDeps, externalDeps, internalFiles }
+  return {
+    utils,
+    componentDeps,
+    externalDeps,
+    directExternals,
+    internalFiles,
+    sharedRootFiles,
+  }
 }
 
 function buildComponentEntry(componentDir: string): ComponentEntry {
-  const { utils, componentDeps, externalDeps, internalFiles } =
-    analyzeImports(componentDir)
+  const {
+    utils,
+    componentDeps,
+    externalDeps,
+    directExternals,
+    internalFiles,
+    sharedRootFiles,
+  } = analyzeImports(componentDir)
   const files = [
     ...getComponentFiles(componentDir),
     ...Array.from(internalFiles)
       .sort()
       .map((f) => `packages/components/src/internal/${f}`),
+    ...Array.from(sharedRootFiles)
+      .sort()
+      .map((f) => `packages/components/src/${f}`),
   ]
 
   const dependencies: Record<string, string> = {
@@ -238,9 +303,14 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   const optionalDependencies: Record<string, string> = {}
 
   if (externalDeps.has('react-native-safe-area-context')) {
-    // If SafeAreaView is used directly, it's a required dep
-    // Check if it's used in a core component file (not just a sub-component)
-    dependencies['react-native-safe-area-context'] = '>=4.0.0'
+    // Direct import → required. Reached only through the shared `safe-area`
+    // module → optional, because that module require()s the package in a
+    // try/catch and falls back to a plain View.
+    if (directExternals.has('react-native-safe-area-context')) {
+      dependencies['react-native-safe-area-context'] = '>=4.0.0'
+    } else {
+      optionalDependencies['react-native-safe-area-context'] = '>=4.0.0'
+    }
   }
 
   if (externalDeps.has('@expo/vector-icons')) {
@@ -266,15 +336,6 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
     // longer imports Reanimated directly.
     dependencies['react-native-reanimated'] = '>=4.0.0'
     dependencies['react-native-worklets'] = '>=0.5.0'
-  }
-
-  // Special case: layout uses safe-area-context only in Layout.tsx (optional)
-  if (
-    componentDir === 'layout' &&
-    dependencies['react-native-safe-area-context']
-  ) {
-    delete dependencies['react-native-safe-area-context']
-    optionalDependencies['react-native-safe-area-context'] = '>=4.0.0'
   }
 
   return {

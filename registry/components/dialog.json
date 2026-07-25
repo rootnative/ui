@@ -1,0 +1,21 @@
+{
+  "name": "dialog",
+  "description": "Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling.",
+  "files": [
+    "packages/components/src/dialog/Dialog.tsx",
+    "packages/components/src/dialog/context.ts",
+    "packages/components/src/dialog/index.ts",
+    "packages/components/src/dialog/slots.tsx",
+    "packages/components/src/dialog/styles.ts",
+    "packages/components/src/dialog/types.ts"
+  ],
+  "utils": ["color", "elevation", "render-icon"],
+  "componentDependencies": ["icon-button", "portal"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {}
+}

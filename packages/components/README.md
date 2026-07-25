@@ -61,10 +61,14 @@ import { Button, Card } from '@rootnative/components'
 | Switch | `./switch` | — |
 | Slider | `./slider` | continuous, discrete (stepped), range, centered origin |
 | Progress | `./progress` | linear, circular · determinate, indeterminate |
+| LoadingIndicator | `./loading-indicator` | contained, uncontained · determinate, indeterminate |
 | TextField | `./text-field` | filled, outlined |
 | Layout | `./layout` | Layout, Box, Row, Column, Grid |
-| List | `./list` | List, ListItem, ListDivider |
+| Dialog | `./dialog` | basic, fullscreen · Icon / Title / Content / Actions slots |
+| Divider | `./divider` | horizontal, vertical · optional leading/trailing insets |
+| List | `./list` | List, ListItem, ListDivider (alias of Divider) |
 | Portal | `./portal` | Portal, PortalHost |
+| Snackbar | `./snackbar` | SnackbarProvider + useSnackbar() — imperative queue |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
 ## Quick examples

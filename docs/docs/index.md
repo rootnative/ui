@@ -55,6 +55,7 @@ Design-system agnostic component library for React Native. Ships with Material D
 |-----------|-------------|
 | [Avatar](./components/avatar) | Image, initials, or icon representation of a person |
 | [Card](./components/card) | Contained surfaces for related content |
+| [Divider](./components/divider) | Thin horizontal or vertical rule that groups content |
 | [List](./components/list) | Vertically arranged items with text and icons |
 | [LoadingIndicator](./components/loading-indicator) | MD3 Expressive shape-morphing loading indicator |
 | [Progress](./components/progress) | Linear and circular progress indicators (determinate / indeterminate) |
@@ -65,5 +66,7 @@ Design-system agnostic component library for React Native. Ships with Material D
 | Component | Description |
 |-----------|-------------|
 | [AppBar](./components/appbar) | Top navigation with title and actions |
+| [Dialog](./components/dialog) | Basic and full-screen modal dialogs |
 | [KeyboardAvoidingWrapper](./components/keyboard-avoiding-wrapper) | Keeps inputs visible when the keyboard opens |
 | [Portal](./components/portal) | Render content above the rest of the tree |
+| [Snackbar](./components/snackbar) | Queued transient messages with an optional action |

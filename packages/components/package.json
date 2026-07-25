@@ -76,6 +76,16 @@
       "react-native": "./dist/text-field/index.js",
       "default": "./dist/text-field/index.js"
     },
+    "./dialog": {
+      "types": "./dist/dialog/index.d.ts",
+      "react-native": "./dist/dialog/index.js",
+      "default": "./dist/dialog/index.js"
+    },
+    "./divider": {
+      "types": "./dist/divider/index.d.ts",
+      "react-native": "./dist/divider/index.js",
+      "default": "./dist/divider/index.js"
+    },
     "./list": {
       "types": "./dist/list/index.d.ts",
       "react-native": "./dist/list/index.js",
@@ -95,6 +105,11 @@
       "types": "./dist/portal/index.d.ts",
       "react-native": "./dist/portal/index.js",
       "default": "./dist/portal/index.js"
+    },
+    "./snackbar": {
+      "types": "./dist/snackbar/index.d.ts",
+      "react-native": "./dist/snackbar/index.js",
+      "default": "./dist/snackbar/index.js"
     },
     "./slider": {
       "types": "./dist/slider/index.d.ts",
@@ -155,6 +170,12 @@
       "text-field": [
         "dist/text-field/index.d.ts"
       ],
+      "dialog": [
+        "dist/dialog/index.d.ts"
+      ],
+      "divider": [
+        "dist/divider/index.d.ts"
+      ],
       "list": [
         "dist/list/index.d.ts"
       ],
@@ -166,6 +187,9 @@
       ],
       "portal": [
         "dist/portal/index.d.ts"
+      ],
+      "snackbar": [
+        "dist/snackbar/index.d.ts"
       ],
       "slider": [
         "dist/slider/index.d.ts"

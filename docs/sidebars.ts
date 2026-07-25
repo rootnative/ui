@@ -47,6 +47,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'components/avatar',
         'components/card',
+        'components/divider',
         'components/list',
         'components/loading-indicator',
         'components/progress',
@@ -59,8 +60,10 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'components/appbar',
+        'components/dialog',
         'components/keyboard-avoiding-wrapper',
         'components/portal',
+        'components/snackbar',
       ],
     },
   ],

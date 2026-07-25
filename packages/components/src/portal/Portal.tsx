@@ -1,25 +1,30 @@
 import { useContext, useEffect, useId, useRef } from 'react'
 import { PortalContext } from './context'
+import { DEFAULT_PORTAL_HOST } from './layers'
 import type { PortalProps } from './types'
 
-export function Portal({ children }: PortalProps) {
-  const ctx = useContext(PortalContext)
+export function Portal({
+  children,
+  hostName = DEFAULT_PORTAL_HOST,
+  priority = 0,
+}: PortalProps) {
+  const store = useContext(PortalContext)
   const id = useId()
   const warnedRef = useRef(false)
 
   useEffect(() => {
-    if (!ctx) return
-    ctx.set(id, children)
-  }, [ctx, id, children])
+    if (!store) return
+    store.set(id, children, hostName, priority)
+  }, [store, id, children, hostName, priority])
 
   useEffect(() => {
-    if (!ctx) return
+    if (!store) return
     return () => {
-      ctx.remove(id)
+      store.remove(id)
     }
-  }, [ctx, id])
+  }, [store, id])
 
-  if (!ctx) {
+  if (!store) {
     if (__DEV__ && !warnedRef.current) {
       warnedRef.current = true
       console.error(

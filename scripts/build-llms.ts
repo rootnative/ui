@@ -384,8 +384,12 @@ const COMPONENT_ORDER = [
   'switch',
   'text-field',
   'layout',
+  'divider',
   'list',
   'keyboard-avoiding-wrapper',
+  'portal',
+  'dialog',
+  'snackbar',
   'avatar',
   'slider',
   'progress',
@@ -406,8 +410,12 @@ const COMPONENT_NAMES: Record<string, string> = {
   switch: 'Switch',
   'text-field': 'TextField',
   layout: 'Layout Components',
+  divider: 'Divider',
   list: 'List',
   'keyboard-avoiding-wrapper': 'KeyboardAvoidingWrapper',
+  portal: 'Portal',
+  dialog: 'Dialog',
+  snackbar: 'Snackbar',
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
@@ -540,6 +548,27 @@ import { TextField } from '@rootnative/components/text-field'
 <TextField label="Search" leadingIcon="magnify" trailingIcon="close" onTrailingIconPress={clear} />
 \`\`\``,
 
+  divider: `\`\`\`tsx
+import { Divider } from '@rootnative/components/divider'
+
+// Full-bleed 1dp rule
+<Divider />
+
+// Leading inset — \`true\` is the MD3 list inset (56dp), or pass dp
+<Divider inset />
+<Divider inset={16} insetEnd={16} />
+
+// Vertical — stretches to the height of its row
+<Row>
+  <Text>Left</Text>
+  <Divider orientation="vertical" />
+  <Text>Right</Text>
+</Row>
+
+// Thickness / color overrides
+<Divider thickness={2} containerColor="#B00020" />
+\`\`\``,
+
   list: `\`\`\`tsx
 import { List, ListItem, ListDivider } from '@rootnative/components/list'
 
@@ -561,6 +590,86 @@ import { KeyboardAvoidingWrapper } from '@rootnative/components/keyboard-avoidin
   <TextField label="Name" />
   <TextField label="Email" />
 </KeyboardAvoidingWrapper>
+\`\`\``,
+
+  portal: `\`\`\`tsx
+import { Portal, PortalHost, PORTAL_LAYERS } from '@rootnative/components/portal'
+
+// Mount once at the app root, inside ThemeProvider
+<PortalHost>
+  <App />
+</PortalHost>
+
+// Anywhere below it — renders into the host's overlay layer
+{open ? (
+  <Portal priority={PORTAL_LAYERS.dialog}>
+    <MyDialog onDismiss={close} />
+  </Portal>
+) : null}
+
+// Scope overlays to part of the tree with a named host
+<PortalHost name="sheet-area" />
+<Portal hostName="sheet-area">
+  <MySheet />
+</Portal>
+\`\`\``,
+
+  dialog: `\`\`\`tsx
+import { Dialog } from '@rootnative/components/dialog'
+import { Button } from '@rootnative/components/button'
+
+// Requires a <PortalHost> at the app root. Slots may be written in any order —
+// Dialog places them in MD3 order itself.
+<Dialog visible={open} onDismiss={close}>
+  <Dialog.Icon icon="alert-circle-outline" />
+  <Dialog.Title>Delete file?</Dialog.Title>
+  <Dialog.Content>This cannot be undone.</Dialog.Content>
+  <Dialog.Actions>
+    <Button variant="text" onPress={close}>Cancel</Button>
+    <Button variant="text" onPress={confirm}>Delete</Button>
+  </Dialog.Actions>
+</Dialog>
+
+// Must be resolved by an action — scrim + Android back stop dismissing
+<Dialog visible={open} onDismiss={close} dismissable={false}>…</Dialog>
+
+// Full-screen: Dialog builds the header (close button + title + actions)
+<Dialog visible={open} variant="fullscreen" onDismiss={close}>
+  <Dialog.Title>Edit profile</Dialog.Title>
+  <Dialog.Actions><Button variant="text" onPress={save}>Save</Button></Dialog.Actions>
+  <Dialog.Content><ProfileForm /></Dialog.Content>
+</Dialog>
+\`\`\``,
+
+  snackbar: `\`\`\`tsx
+import { SnackbarProvider, useSnackbar } from '@rootnative/components/snackbar'
+
+// Mount once, inside <ThemeProvider> and inside <PortalHost>.
+// \`bottomOffset\` clears a FAB or bottom navigation.
+<PortalHost>
+  <SnackbarProvider bottomOffset={80}>
+    <App />
+  </SnackbarProvider>
+</PortalHost>
+
+// Imperative only — there is no <Snackbar visible> component.
+const snackbar = useSnackbar()
+
+snackbar.show({ message: 'Photo saved' })                      // 4s
+snackbar.show({ message: 'Saved', duration: 'long' })          // 10s
+
+// An action makes it indefinite by default
+snackbar.show({ message: 'Message deleted', actionLabel: 'Undo', onAction: undo })
+
+// Indefinite with no action needs a way out
+snackbar.show({ message: 'Offline', duration: 'indefinite', showCloseIcon: true })
+
+// One at a time, FIFO. \`replace\` jumps the visible one.
+const id = snackbar.show({ message: 'First' })
+snackbar.show({ message: 'Urgent', replace: true })
+snackbar.hide(id)   // specific, visible or queued
+snackbar.hide()     // whatever is visible
+snackbar.clear()    // visible + queue
 \`\`\``,
 
   avatar: `\`\`\`tsx
@@ -742,14 +851,10 @@ import { Grid } from '@rootnative/components/layout'
       output += '\n'
     }
 
-    const dividerIface = interfaces.find((i) => i.name === 'ListDividerProps')
-    if (dividerIface) {
-      output += formatSubInterface(
-        dividerIface,
-        typeAliases,
-        '#### ListDivider',
-      )
-    }
+    output +=
+      '#### ListDivider\n\n' +
+      'Alias of the standalone `Divider` component — same props. See the ' +
+      'Divider section above.\n'
 
     return output
   }
@@ -880,6 +985,118 @@ import { Grid } from '@rootnative/components/layout'
         'Circular progress indicator. Omit `progress` for indeterminate mode.',
       )
     }
+
+    return output
+  }
+
+  // --- Snackbar: provider props + show() options ---
+  if (dirName === 'snackbar') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const providerIface = interfaces.find(
+      (i) => i.name === 'SnackbarProviderProps',
+    )
+    if (providerIface) {
+      output += formatSubInterface(
+        providerIface,
+        typeAliases,
+        '#### SnackbarProvider',
+        'Owns the queue. Mount once, inside `ThemeProvider` and inside `PortalHost`.',
+      )
+      output += '\n'
+    }
+
+    const optionsIface = interfaces.find((i) => i.name === 'SnackbarOptions')
+    if (optionsIface) {
+      output += formatSubInterface(
+        optionsIface,
+        typeAliases,
+        '#### useSnackbar().show(options)',
+        'Enqueues a snackbar and returns its id. `hide(id?)` dismisses one (visible or queued); `clear()` drops everything.',
+      )
+    }
+
+    return output
+  }
+
+  // --- Dialog: main props + the four compound slots ---
+  if (dirName === 'dialog') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'DialogProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    const slots: [string, string, string][] = [
+      [
+        'DialogIconProps',
+        '#### Dialog.Icon',
+        'Optional 24dp hero icon in `secondary`. Its presence centers the headline.',
+      ],
+      [
+        'DialogTitleProps',
+        '#### Dialog.Title',
+        'Headline — `headlineSmall` in the basic variant, `titleLarge` in the fullscreen header.',
+      ],
+      [
+        'DialogContentProps',
+        '#### Dialog.Content',
+        'Supporting text (strings get `bodyMedium` / `onSurfaceVariant`) or arbitrary content.',
+      ],
+      [
+        'DialogActionsProps',
+        '#### Dialog.Actions',
+        'End-aligned row of text buttons, 8dp gap. Moves into the header in the fullscreen variant.',
+      ],
+    ]
+
+    for (const [ifaceName, heading, description] of slots) {
+      const iface = interfaces.find((i) => i.name === ifaceName)
+      if (!iface) continue
+      output += formatSubInterface(iface, typeAliases, heading, description)
+      output += '\n'
+    }
+
+    return output
+  }
+
+  // --- Portal: Portal + PortalHost + the z-order contract ---
+  if (dirName === 'portal') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const portalIface = interfaces.find((i) => i.name === 'PortalProps')
+    if (portalIface) {
+      output += formatSubInterface(
+        portalIface,
+        typeAliases,
+        '#### Portal',
+        'Teleports its children into a host overlay layer. Renders nothing inline.',
+      )
+      output += '\n'
+    }
+
+    const hostIface = interfaces.find((i) => i.name === 'PortalHostProps')
+    if (hostIface) {
+      output += formatSubInterface(
+        hostIface,
+        typeAliases,
+        '#### PortalHost',
+        'Mount once at the app root. A `name` makes it a scoped slot that `<Portal hostName>` can target.',
+      )
+      output += '\n'
+    }
+
+    output +=
+      '#### PORTAL_LAYERS\n\n' +
+      'Z-order contract for overlays in the same host — portals stack by ascending `priority`, ties broken by mount order. Default `priority` is `0`.\n\n' +
+      '- `sheet: 100` — bottom/side sheets and their scrim\n' +
+      '- `dialog: 200` — dialogs and their scrim\n' +
+      '- `snackbar: 300` — snackbars, above an open dialog\n' +
+      '- `menu: 400` — menus and dropdowns\n' +
+      '- `tooltip: 500` — tooltips, topmost\n\n' +
+      'The 100-point gaps let you slot custom overlays between layers (`PORTAL_LAYERS.dialog + 1`). `priority` orders portals within one host only — stacking between hosts follows tree position.\n'
 
     return output
   }

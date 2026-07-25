@@ -849,6 +849,40 @@ Props:
 
 ---
 
+### Divider
+
+```tsx
+import { Divider } from '@rootnative/components/divider'
+
+// Full-bleed 1dp rule
+<Divider />
+
+// Leading inset — `true` is the MD3 list inset (56dp), or pass dp
+<Divider inset />
+<Divider inset={16} insetEnd={16} />
+
+// Vertical — stretches to the height of its row
+<Row>
+  <Text>Left</Text>
+  <Divider orientation="vertical" />
+  <Text>Right</Text>
+</Row>
+
+// Thickness / color overrides
+<Divider thickness={2} containerColor="#B00020" />
+```
+
+Props:
+- `orientation?: 'horizontal' | 'vertical'` — Default: `'horizontal'`. Axis the divider is drawn along. A vertical divider stretches to the height of its parent, so it must sit inside a row-direction container.
+- `inset?: boolean | number` — Default: `false`. Inset from the leading edge (start for horizontal, top for vertical). `true` applies the MD3 list inset (56dp), which aligns the divider with list text that follows a leading icon. A number sets the inset in dp.
+- `insetEnd?: boolean | number` — Default: `false`. Inset from the trailing edge (end for horizontal, bottom for vertical). Same units as `inset`.
+- `thickness?: number` — Default: `1`. Line thickness in dp.
+- `containerColor?: string` — Default: `theme.colors.outlineVariant`. Override the line color.
+- `style?: StyleProp<ViewStyle>`
+- Inherits `ViewProps`
+
+---
+
 ### List
 
 ```tsx
@@ -893,10 +927,7 @@ Props:
 
 #### ListDivider
 
-Props:
-- `inset?: boolean` — Default: `false`. When true, adds a leading inset so the divider aligns with text that follows a leading icon (56dp from the start edge).
-- `style?: StyleProp<ViewStyle>`
-- Inherits `ViewProps`
+Alias of the standalone `Divider` component — same props. See the Divider section above.
 
 ---
 
@@ -921,6 +952,206 @@ Props:
 - `style?: StyleProp<ViewStyle>` — Style applied to the outer `KeyboardAvoidingView`.
 - `contentContainerStyle?: StyleProp<ViewStyle>` — Style applied to the inner `ScrollView` contentContainerStyle.
 - Inherits `PropsWithChildren`
+
+---
+
+### Portal
+
+```tsx
+import { Portal, PortalHost, PORTAL_LAYERS } from '@rootnative/components/portal'
+
+// Mount once at the app root, inside ThemeProvider
+<PortalHost>
+  <App />
+</PortalHost>
+
+// Anywhere below it — renders into the host's overlay layer
+{open ? (
+  <Portal priority={PORTAL_LAYERS.dialog}>
+    <MyDialog onDismiss={close} />
+  </Portal>
+) : null}
+
+// Scope overlays to part of the tree with a named host
+<PortalHost name="sheet-area" />
+<Portal hostName="sheet-area">
+  <MySheet />
+</Portal>
+```
+
+#### Portal
+
+Teleports its children into a host overlay layer. Renders nothing inline.
+
+Props:
+- `children: ReactNode` — Content teleported into the host's overlay layer.
+- `hostName?: string` — Default: `'default'`. Name of the host to render into. Falls back to the default host when no host with this name is mounted.
+- `priority?: number` — Default: `0`. Stack order within the host — higher renders above lower, ties broken by mount order. Use the `PORTAL_LAYERS` constants for the layers RootNative itself defines.
+
+#### PortalHost
+
+Mount once at the app root. A `name` makes it a scoped slot that `<Portal hostName>` can target.
+
+Props:
+- `children?: ReactNode` — Content rendered inside the host. Optional on a named (slot) host.
+- `name?: string` — Registers this host under a name that `<Portal hostName="…">` can target. A named host must sit inside a root `<PortalHost>` — it renders its portals where it appears in the tree instead of in the root overlay, which is the point of naming one (scoping overlays to a screen or a nested navigator). Cross-host stacking therefore follows tree position, not `priority`; `priority` only orders portals inside the same host. Anything that has to participate in the app-wide z-order belongs in the default host with a `priority` from `PORTAL_LAYERS`.
+- `style?: StyleProp<ViewStyle>` — Style applied to the root container on a root host, or to the overlay container on a named host (which absolute-fills its parent by default).
+
+#### PORTAL_LAYERS
+
+Z-order contract for overlays in the same host — portals stack by ascending `priority`, ties broken by mount order. Default `priority` is `0`.
+
+- `sheet: 100` — bottom/side sheets and their scrim
+- `dialog: 200` — dialogs and their scrim
+- `snackbar: 300` — snackbars, above an open dialog
+- `menu: 400` — menus and dropdowns
+- `tooltip: 500` — tooltips, topmost
+
+The 100-point gaps let you slot custom overlays between layers (`PORTAL_LAYERS.dialog + 1`). `priority` orders portals within one host only — stacking between hosts follows tree position.
+
+---
+
+### Dialog
+
+```tsx
+import { Dialog } from '@rootnative/components/dialog'
+import { Button } from '@rootnative/components/button'
+
+// Requires a <PortalHost> at the app root. Slots may be written in any order —
+// Dialog places them in MD3 order itself.
+<Dialog visible={open} onDismiss={close}>
+  <Dialog.Icon icon="alert-circle-outline" />
+  <Dialog.Title>Delete file?</Dialog.Title>
+  <Dialog.Content>This cannot be undone.</Dialog.Content>
+  <Dialog.Actions>
+    <Button variant="text" onPress={close}>Cancel</Button>
+    <Button variant="text" onPress={confirm}>Delete</Button>
+  </Dialog.Actions>
+</Dialog>
+
+// Must be resolved by an action — scrim + Android back stop dismissing
+<Dialog visible={open} onDismiss={close} dismissable={false}>…</Dialog>
+
+// Full-screen: Dialog builds the header (close button + title + actions)
+<Dialog visible={open} variant="fullscreen" onDismiss={close}>
+  <Dialog.Title>Edit profile</Dialog.Title>
+  <Dialog.Actions><Button variant="text" onPress={save}>Save</Button></Dialog.Actions>
+  <Dialog.Content><ProfileForm /></Dialog.Content>
+</Dialog>
+```
+
+Props:
+- `visible: boolean` — Whether the dialog is shown. Exit animations run before it unmounts.
+- `onDismiss: () => void` — Called when the user dismisses the dialog — scrim tap, Android back button, or the fullscreen close button. Actions inside `Dialog.Actions` are wired up by the consumer, not by this callback.
+- `children?: ReactNode` — `Dialog.Icon`, `Dialog.Title`, `Dialog.Content`, `Dialog.Actions`.
+- `variant?: 'basic' | 'fullscreen'` — Default: `'basic'`. Dialog anatomy.
+- `dismissable?: boolean` — Default: `true`. Whether a scrim tap and the Android back button dismiss the dialog. Set `false` for a dialog the user must resolve with one of its actions.
+- `containerColor?: string` — Default: `surfaceContainerHigh (basic) / surface (fullscreen)`. Override the container (surface) color.
+- `closeIcon?: IconSource` — Default: `'close'`. Icon for the fullscreen variant's leading close button.
+- `closeAccessibilityLabel?: string` — Screen-reader label for the fullscreen close button. @default 'Close'
+- `scrimAccessibilityLabel?: string` — Screen-reader label for the scrim's dismiss action. @default 'Close dialog'
+- `style?: StyleProp<ViewStyle>` — Style applied to the dialog surface.
+- `scrimStyle?: StyleProp<ViewStyle>` — Style applied to the scrim. Ignored by the fullscreen variant.
+- `testID?: string` — Test id applied to the dialog surface.
+
+#### Dialog.Icon
+
+Optional 24dp hero icon in `secondary`. Its presence centers the headline.
+
+Props:
+- `icon: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
+- `color?: string` — Override the icon color. @default theme.colors.secondary
+- `size?: number` — Override the icon size in dp. @default 24
+- `style?: StyleProp<ViewStyle>`
+
+#### Dialog.Title
+
+Headline — `headlineSmall` in the basic variant, `titleLarge` in the fullscreen header.
+
+Props:
+- `children: ReactNode` — Headline text, or arbitrary nodes when a plain string isn't enough.
+- `color?: string` — Override the headline color. @default theme.colors.onSurface
+- `style?: StyleProp<TextStyle>`
+
+#### Dialog.Content
+
+Supporting text (strings get `bodyMedium` / `onSurfaceVariant`) or arbitrary content.
+
+Props:
+- `children: ReactNode` — Supporting text or arbitrary content. Strings and numbers are wrapped in MD3 supporting-text styling; anything else renders as given.
+- `color?: string` — Override the supporting-text color. @default theme.colors.onSurfaceVariant
+- `style?: StyleProp<ViewStyle>`
+
+#### Dialog.Actions
+
+End-aligned row of text buttons, 8dp gap. Moves into the header in the fullscreen variant.
+
+Props:
+- `children: ReactNode` — Action buttons — text `Button`s per MD3.
+- `style?: StyleProp<ViewStyle>`
+
+
+---
+
+### Snackbar
+
+```tsx
+import { SnackbarProvider, useSnackbar } from '@rootnative/components/snackbar'
+
+// Mount once, inside <ThemeProvider> and inside <PortalHost>.
+// `bottomOffset` clears a FAB or bottom navigation.
+<PortalHost>
+  <SnackbarProvider bottomOffset={80}>
+    <App />
+  </SnackbarProvider>
+</PortalHost>
+
+// Imperative only — there is no <Snackbar visible> component.
+const snackbar = useSnackbar()
+
+snackbar.show({ message: 'Photo saved' })                      // 4s
+snackbar.show({ message: 'Saved', duration: 'long' })          // 10s
+
+// An action makes it indefinite by default
+snackbar.show({ message: 'Message deleted', actionLabel: 'Undo', onAction: undo })
+
+// Indefinite with no action needs a way out
+snackbar.show({ message: 'Offline', duration: 'indefinite', showCloseIcon: true })
+
+// One at a time, FIFO. `replace` jumps the visible one.
+const id = snackbar.show({ message: 'First' })
+snackbar.show({ message: 'Urgent', replace: true })
+snackbar.hide(id)   // specific, visible or queued
+snackbar.hide()     // whatever is visible
+snackbar.clear()    // visible + queue
+```
+
+#### SnackbarProvider
+
+Owns the queue. Mount once, inside `ThemeProvider` and inside `PortalHost`.
+
+Props:
+- `children: ReactNode`
+- `bottomOffset?: number` — Default: `0`. Extra space below the snackbar, on top of the safe-area bottom inset. Set this to clear a FAB or a bottom navigation bar.
+- `style?: StyleProp<ViewStyle>` — Style applied to the snackbar surface.
+
+#### useSnackbar().show(options)
+
+Enqueues a snackbar and returns its id. `hide(id?)` dismisses one (visible or queued); `clear()` drops everything.
+
+Props:
+- `message: string` — The message. One line where possible, two at most per MD3.
+- `actionLabel?: string` — Label for the single trailing action.
+- `onAction?: () => void` — Called when the action is pressed. The snackbar dismisses afterwards.
+- `duration?: 'short' | 'long' | 'indefinite' | number` — Default: `'short' — or `'indefinite'` when `actionLabel` is set, since an`. Visible duration. action the user never sees is worse than one that waits.
+- `showCloseIcon?: boolean` — Default: `false`. Show a trailing close button. Required reading for an `'indefinite'` snackbar with no action — otherwise there is no way out.
+- `closeIcon?: IconSource` — Icon for the close button. @default 'close'
+- `closeAccessibilityLabel?: string` — Screen-reader label for the close button. @default 'Dismiss'
+- `onDismiss?: (reason: SnackbarDismissReason) => void` — Called once the snackbar leaves, with the reason it left.
+- `containerColor?: string` — Override the container color. @default theme.colors.inverseSurface
+- `contentColor?: string` — Override the message color. @default theme.colors.inverseOnSurface
+- `actionColor?: string` — Override the action label color. @default theme.colors.inversePrimary
+- `replace?: boolean` — Default: `false`. Replace the visible snackbar instead of queueing behind it. The replaced one dismisses with reason `'replaced'`.
 
 ---
 

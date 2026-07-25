@@ -11,7 +11,7 @@
     "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color"],
-  "componentDependencies": [],
+  "componentDependencies": ["divider"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.3",
     "@rootnative/inertia": ">=0.0.2",

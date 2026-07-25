@@ -1,3 +1,5 @@
 export { Portal } from './Portal'
 export { PortalHost } from './PortalHost'
+export { PORTAL_LAYERS, DEFAULT_PORTAL_HOST } from './layers'
+export type { PortalLayerName } from './layers'
 export type { PortalProps, PortalHostProps } from './types'

@@ -1,0 +1,26 @@
+{
+  "name": "snackbar",
+  "description": "Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement.",
+  "files": [
+    "packages/components/src/snackbar/SnackbarProvider.tsx",
+    "packages/components/src/snackbar/SnackbarSurface.tsx",
+    "packages/components/src/snackbar/context.ts",
+    "packages/components/src/snackbar/index.ts",
+    "packages/components/src/snackbar/store.ts",
+    "packages/components/src/snackbar/styles.ts",
+    "packages/components/src/snackbar/types.ts",
+    "packages/components/src/snackbar/useSnackbar.ts",
+    "packages/components/src/safe-area.tsx"
+  ],
+  "utils": ["elevation", "render-icon"],
+  "componentDependencies": ["button", "icon-button", "portal"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {
+    "react-native-safe-area-context": ">=4.0.0"
+  }
+}

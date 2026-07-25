@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 # Portal
@@ -85,13 +85,55 @@ The `Portal` component itself renders nothing inline — its children appear ins
 
 ## How it works
 
-`PortalHost` wraps its children in a root `View` and adds an absolutely-positioned overlay layer on top. Each `<Portal>` registers its children with the host via context; the host renders them in mount order, so the most recently mounted Portal appears on top.
+`PortalHost` wraps its children in a root `View` and adds an absolutely-positioned overlay layer on top. Each `<Portal>` registers its children with the host via context; the host renders them into that layer, sorted by `priority`.
 
 The overlay layer uses `pointerEvents="box-none"`, so empty regions of the overlay pass touches through to the content below. Each Portal entry is responsible for its own positioning and scrim — typically with `position: 'absolute'` and a full-bleed touch-capturing `View`.
 
+Portal entries are held outside React state, and each host subscribes only to its own entries. Opening or closing an overlay therefore re-renders the overlay layer, not the app tree underneath the host.
+
 ## Stacking order
 
-Portals render in mount order. If you open Dialog A then Dialog B, Dialog B sits above Dialog A. Closing B brings A back to the top.
+Portals in the same host stack by ascending `priority`. Ties fall back to mount order — open Dialog A then Dialog B at the same priority and B sits above A.
+
+`PORTAL_LAYERS` is the z-order contract RootNative's own overlay components use:
+
+| Layer | Value | Used by |
+|-------|-------|---------|
+| `sheet` | 100 | Bottom sheets and side sheets, plus their scrim |
+| `dialog` | 200 | Dialogs and their scrim |
+| `snackbar` | 300 | Snackbars — stay visible over an open dialog |
+| `menu` | 400 | Menus and dropdowns, which can open from any surface below |
+| `tooltip` | 500 | Tooltips — topmost, they can describe a control in any layer |
+
+The 100-point gaps are deliberate: slot a custom overlay between two layers with `PORTAL_LAYERS.dialog + 1` without renumbering anything.
+
+```tsx
+import { Portal, PORTAL_LAYERS } from '@rootnative/components'
+
+<Portal priority={PORTAL_LAYERS.dialog}>
+  <MyDialog />
+</Portal>
+```
+
+A `<Portal>` with no `priority` defaults to `0`, below every named layer.
+
+## Named hosts
+
+`<Portal hostName="…">` targets a `<PortalHost name="…">` elsewhere in the tree instead of the root overlay. Use this to scope overlays to a screen or a nested navigator — the named host renders its portals where it sits, so they are clipped and positioned by that subtree rather than by the app root.
+
+```tsx
+<PortalHost>
+  <App />
+  <View style={styles.sheetArea}>
+    <PortalHost name="sheet-area" />
+  </View>
+</PortalHost>
+```
+
+Two rules follow from that:
+
+- **`priority` orders portals within one host only.** Stacking *between* hosts follows tree position. Anything that must participate in the app-wide z-order belongs in the default host with a `PORTAL_LAYERS` priority — that is what RootNative's own Dialog, Snackbar, Menu, Tooltip, and BottomSheet do.
+- **An unmatched `hostName` falls back to the default host** rather than dropping the content. If the named host mounts later, the portal moves to it; if it unmounts, the portal moves back.
 
 ## Without a host
 

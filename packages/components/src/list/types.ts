@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
+import type { DividerProps } from '../divider'
 
 export interface ListProps extends ViewProps {
   /** Content rendered inside the list container. */
@@ -49,12 +50,8 @@ export interface ListItemProps extends ViewProps {
   style?: StyleProp<ViewStyle>
 }
 
-export interface ListDividerProps extends ViewProps {
-  /**
-   * When true, adds a leading inset so the divider aligns with text
-   * that follows a leading icon (56dp from the start edge).
-   * @default false
-   */
-  inset?: boolean
-  style?: StyleProp<ViewStyle>
-}
+/**
+ * Alias of `DividerProps`. `ListDivider` is a thin wrapper around the
+ * standalone `Divider` component.
+ */
+export type ListDividerProps = DividerProps

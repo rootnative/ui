@@ -127,6 +127,21 @@ describe('transformImports', () => {
       const output = transform(input, 'avatar')
       expect(output).toContain(`from './useStateLayer'`)
     })
+
+    // `safe-area` lives directly under src/ rather than src/internal/, but the
+    // registry ships it inside each consumer the same way. Without this rule
+    // AppBar, Layout, and Snackbar install with a dangling `../safe-area`.
+    it('rewrites ../safe-area to ./safe-area', () => {
+      const input = `import { SafeAreaView } from '../safe-area'`
+      const output = transform(input, 'appbar')
+      expect(output).toBe(`import { SafeAreaView } from './safe-area'`)
+    })
+
+    it('rewrites a type-only ../safe-area import', () => {
+      const input = `import type { Edge } from '../safe-area'`
+      const output = transform(input, 'layout')
+      expect(output).toBe(`import type { Edge } from './safe-area'`)
+    })
   })
 
   describe('same-directory imports → unchanged', () => {

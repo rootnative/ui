@@ -14,6 +14,11 @@ const SINGLE_LINE_IMPORT_REGEX =
 const MULTI_LINE_IMPORT_REGEX =
   /((?:import|export)\s+(?:type\s+)?\{[\s\S]*?\}\s+from\s+)(['"])([^'"]+)\2/g
 
+// Shared modules under `packages/components/src/` (not `src/internal/`) that
+// the registry ships inside each consuming component. Keep in sync with
+// SHARED_ROOT_MODULES in scripts/build-registry.ts.
+const SHARED_ROOT_MODULES = new Set(['safe-area'])
+
 export function transformImports(
   source: string,
   options: TransformOptions,
@@ -42,6 +47,14 @@ export function transformImports(
     // flattens them into the component's own directory
     if (importPath.startsWith('../internal/')) {
       const restOfPath = importPath.replace(/^\.\.\/internal\//, '')
+      return `${prefix}${quote}./${restOfPath}${quote}`
+    }
+
+    // Shared modules that sit directly under src/ rather than in src/internal/
+    // (e.g. ../safe-area). The registry ships them inside each consuming
+    // component and the installer flattens them the same way.
+    if (SHARED_ROOT_MODULES.has(importPath.replace(/^\.\.\//, ''))) {
+      const restOfPath = importPath.replace(/^\.\.\//, '')
       return `${prefix}${quote}./${restOfPath}${quote}`
     }
 

@@ -5,7 +5,8 @@
     "packages/components/src/appbar/AppBar.tsx",
     "packages/components/src/appbar/index.ts",
     "packages/components/src/appbar/styles.ts",
-    "packages/components/src/appbar/types.ts"
+    "packages/components/src/appbar/types.ts",
+    "packages/components/src/safe-area.tsx"
   ],
   "utils": ["rtl"],
   "componentDependencies": ["button", "icon-button", "typography"],
@@ -15,5 +16,7 @@
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0"
   },
-  "optionalDependencies": {}
+  "optionalDependencies": {
+    "react-native-safe-area-context": ">=4.0.0"
+  }
 }

@@ -1,0 +1,232 @@
+---
+sidebar_position: 2
+---
+
+# Dialog
+
+Dialogs interrupt the user with an important prompt or a focused task.
+Follows the [Material Design 3 Dialog](https://m3.material.io/components/dialogs/overview) specification.
+
+Dialog renders through [Portal](./portal.mdx), so your app must be wrapped in a `PortalHost` once at the root. It claims the `PORTAL_LAYERS.dialog` layer, which puts it above bottom sheets and below snackbars, menus, and tooltips.
+
+## Usage
+
+<SnackExample
+  name="RootNative Dialog — Usage"
+  code={`
+  import { Button, Dialog, PortalHost } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button onPress={() => setOpen(true)}>Delete file</Button>
+        <Dialog visible={open} onDismiss={() => setOpen(false)}>
+          <Dialog.Title>Delete file?</Dialog.Title>
+          <Dialog.Content>
+            This permanently removes report.pdf. You cannot undo this action.
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button variant="text" onPress={() => setOpen(false)}>Cancel</Button>
+            <Button variant="text" onPress={() => setOpen(false)}>Delete</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Slots
+
+Dialog composes from four slots. **Write them in any order** — Dialog places them
+in MD3 order (icon → headline → content → actions) itself, which is what lets the
+fullscreen variant move the title and actions into its header.
+
+| Slot | Renders | MD3 role |
+|------|---------|----------|
+| `Dialog.Icon` | An `IconSource` at 24dp, centered | Optional hero icon. Its presence centers the headline. |
+| `Dialog.Title` | `headlineSmall` / `onSurface` | Headline |
+| `Dialog.Content` | Strings get `bodyMedium` / `onSurfaceVariant`; anything else renders as-is | Supporting text or arbitrary content |
+| `Dialog.Actions` | An end-aligned row with an 8dp gap | Action buttons — text `Button`s per MD3 |
+
+Any child that isn't one of these is treated as content, so `<Dialog><MyForm /></Dialog>` works without ceremony.
+
+## With an icon
+
+An icon makes the dialog a hero dialog: the icon sits centered above the headline
+in `secondary`, and the headline centers with it.
+
+<SnackExample
+  name="RootNative Dialog — Icon"
+  code={`
+  import { Button, Dialog, PortalHost } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button variant="tonal" onPress={() => setOpen(true)}>Reset settings</Button>
+        <Dialog visible={open} onDismiss={() => setOpen(false)}>
+          <Dialog.Icon icon="alert-circle-outline" />
+          <Dialog.Title>Reset settings?</Dialog.Title>
+          <Dialog.Content>
+            Every preference returns to its default. Your data is untouched.
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button variant="text" onPress={() => setOpen(false)}>Cancel</Button>
+            <Button variant="text" onPress={() => setOpen(false)}>Reset</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Full-screen
+
+`variant="fullscreen"` fills the screen instead of centering a card. Dialog builds
+the MD3 header for you: a leading close button wired to `onDismiss`, the
+`Dialog.Title` as a `titleLarge` headline, and `Dialog.Actions` as the trailing
+confirming action. `Dialog.Content` scrolls below it. There is no scrim.
+
+<SnackExample
+  name="RootNative Dialog — Full-screen"
+  code={`
+  import { Button, Column, Dialog, PortalHost, TextField } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Button variant="tonal" onPress={() => setOpen(true)}>Edit profile</Button>
+        <Dialog visible={open} variant="fullscreen" onDismiss={() => setOpen(false)}>
+          <Dialog.Title>Edit profile</Dialog.Title>
+          <Dialog.Actions>
+            <Button variant="text" onPress={() => setOpen(false)}>Save</Button>
+          </Dialog.Actions>
+          <Dialog.Content>
+            <Column gap="lg">
+              <TextField label="Display name" value="Ada Lovelace" />
+              <TextField label="Email" value="ada@example.com" />
+            </Column>
+          </Dialog.Content>
+        </Dialog>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Dismissal
+
+`onDismiss` fires for the *user-initiated* ways out — a scrim tap, the Android
+hardware back button, and the fullscreen close button. Buttons inside
+`Dialog.Actions` are yours to wire; Dialog never closes itself on an action press.
+
+Set `dismissable={false}` when the user has to resolve the dialog with one of its
+actions. The scrim stops responding and stops being announced as an accessibility
+affordance, and the back button falls through to navigation.
+
+## Motion
+
+Basic dialogs scale up from 80% and fade in on `springDefaultSpatial`; the scrim
+fades on `springFastEffects`. The fullscreen variant rises 48dp instead of scaling.
+
+Every one of these collapses to a hard cut under reduced motion — see [Motion](../motion.md).
+
+> **Intentional deviation.** MD3 slides a full-screen dialog up from the bottom
+> edge of the screen. That needs the measured surface height, which fights the
+> safe-area layout, so RootNative uses a 48dp rise. At spring speed the two read
+> the same.
+
+## Tokens
+
+| Token | Basic | Full-screen |
+|-------|-------|-------------|
+| Container | `surfaceContainerHigh` | `surface` |
+| Corner | 28dp (`cornerExtraLarge`) | — |
+| Elevation | Level 3 | — |
+| Width | min 280dp, max 560dp | Fills the screen |
+| Padding | 24dp | 24dp body, 56dp header |
+| Icon | 24dp, `secondary` | 24dp, `secondary` |
+| Headline | `headlineSmall` / `onSurface` | `titleLarge` / `onSurface` |
+| Supporting text | `bodyMedium` / `onSurfaceVariant` | `bodyMedium` / `onSurfaceVariant` |
+| Actions | Text buttons, end-aligned, 8dp gap | Trailing text button in the header |
+| Scrim | `scrim` @ 32% | None |
+
+## Accessibility
+
+- The basic surface reports `role="alertdialog"`; the fullscreen surface reports `role="dialog"`. Both set `aria-modal` and `accessibilityViewIsModal`, so assistive tech treats the content beneath as inert.
+- `Dialog.Title` reports `role="heading"`.
+- The scrim is announced as a button labelled "Close dialog" — override with `scrimAccessibilityLabel`. It disappears from the accessibility tree when `dismissable={false}`.
+- The fullscreen close button is labelled "Close" — override with `closeAccessibilityLabel`.
+
+## Props
+
+<PropTable name="Dialog" />
+
+### Dialog.Icon
+
+<PropTable name="DialogIcon" />
+
+### Dialog.Title
+
+<PropTable name="DialogTitle" />
+
+### Dialog.Content
+
+<PropTable name="DialogContent" />
+
+### Dialog.Actions
+
+<PropTable name="DialogActions" />

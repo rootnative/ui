@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native'
 import type { ListItemLines } from './types'
 
 const ITEM_PADDING_VERTICAL = 12
-const INSET_START = 56
 
 export const LIST_ITEM_FOCUS_RING_INSET = 2
 export const LIST_ITEM_FOCUS_RING_WIDTH = 3
@@ -138,16 +137,6 @@ export function createListItemStyles(
     trailingSupportingText: {
       ...theme.typography.labelSmall,
       color: theme.colors.onSurfaceVariant,
-    },
-  })
-}
-
-export function createDividerStyles(theme: MaterialTheme, inset: boolean) {
-  return StyleSheet.create({
-    divider: {
-      height: 1,
-      backgroundColor: theme.colors.outlineVariant,
-      ...(inset ? { marginStart: INSET_START } : undefined),
     },
   })
 }

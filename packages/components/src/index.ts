@@ -56,6 +56,19 @@ export type { SwitchProps } from './switch'
 export { TextField } from './text-field'
 export type { TextFieldProps, TextFieldVariant } from './text-field'
 
+export { Dialog } from './dialog'
+export type {
+  DialogProps,
+  DialogVariant,
+  DialogIconProps,
+  DialogTitleProps,
+  DialogContentProps,
+  DialogActionsProps,
+} from './dialog'
+
+export { Divider } from './divider'
+export type { DividerProps, DividerOrientation } from './divider'
+
 export { List, ListItem, ListDivider } from './list'
 export type {
   ListProps,
@@ -70,8 +83,23 @@ export type { KeyboardAvoidingWrapperProps } from './keyboard-avoiding-wrapper'
 export { Avatar } from './avatar'
 export type { AvatarProps, AvatarSize } from './avatar'
 
-export { Portal, PortalHost } from './portal'
-export type { PortalProps, PortalHostProps } from './portal'
+export {
+  Portal,
+  PortalHost,
+  PORTAL_LAYERS,
+  DEFAULT_PORTAL_HOST,
+} from './portal'
+export type { PortalProps, PortalHostProps, PortalLayerName } from './portal'
+
+export { SnackbarProvider, useSnackbar } from './snackbar'
+export type {
+  SnackbarApi,
+  SnackbarDismissReason,
+  SnackbarDuration,
+  SnackbarId,
+  SnackbarOptions,
+  SnackbarProviderProps,
+} from './snackbar'
 
 export { Slider } from './slider'
 export type { SliderProps, SliderValue } from './slider'

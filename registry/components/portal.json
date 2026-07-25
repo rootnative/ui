@@ -6,6 +6,8 @@
     "packages/components/src/portal/PortalHost.tsx",
     "packages/components/src/portal/context.ts",
     "packages/components/src/portal/index.ts",
+    "packages/components/src/portal/layers.ts",
+    "packages/components/src/portal/store.ts",
     "packages/components/src/portal/styles.ts",
     "packages/components/src/portal/types.ts"
   ],

@@ -9,6 +9,7 @@ import {
   Chip,
   CircularProgress,
   Column,
+  Divider,
   FAB,
   Grid,
   IconButton,
@@ -156,6 +157,12 @@ const sections: ComponentSection[] = [
         description: 'Vertically arranged items with text and icons',
       },
       {
+        label: 'Divider',
+        route: '/divider',
+        description:
+          'Horizontal and vertical 1dp rules with optional edge insets',
+      },
+      {
         label: 'Avatar',
         route: '/avatar',
         description: 'Circular user representations — image, icon, or initials',
@@ -177,6 +184,16 @@ const sections: ComponentSection[] = [
         route: '/portal',
         description:
           'Render overlays above the rest of the tree — toasts, dialogs, scrims',
+      },
+      {
+        label: 'Dialog',
+        route: '/dialog',
+        description: 'Basic and full-screen modal dialogs with compound slots',
+      },
+      {
+        label: 'Snackbar',
+        route: '/snackbar',
+        description: 'Queued transient messages via SnackbarProvider',
       },
     ],
   },
@@ -384,6 +401,24 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           />
         </Column>
       )
+    case 'Divider':
+      return (
+        <Column style={previewStyles.dividerWrapper} gap="sm">
+          <Divider />
+          <Divider inset={24} insetEnd={24} />
+          <Row align="center" style={previewStyles.dividerRow}>
+            <Box
+              bg={theme.colors.surfaceContainerHighest}
+              style={previewStyles.dividerBlock}
+            />
+            <Divider orientation="vertical" />
+            <Box
+              bg={theme.colors.surfaceContainerHighest}
+              style={previewStyles.dividerBlock}
+            />
+          </Row>
+        </Column>
+      )
     case 'Avatar':
       return (
         <Row gap="sm" align="center">
@@ -398,6 +433,44 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           <LinearProgress progress={0.65} />
           <CircularProgress progress={0.5} size={36} />
         </Column>
+      )
+    case 'Dialog':
+      return (
+        <View style={previewStyles.dialogWrapper}>
+          <Box bg={theme.colors.scrim} style={previewStyles.dialogScrim} />
+          <Box
+            bg={theme.colors.surfaceContainerHigh}
+            style={previewStyles.dialogSurface}
+          >
+            <Box
+              bg={theme.colors.onSurface}
+              style={previewStyles.dialogHeadline}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.dialogLine}
+            />
+            <Box bg={theme.colors.primary} style={previewStyles.dialogAction} />
+          </Box>
+        </View>
+      )
+    case 'Snackbar':
+      return (
+        <View style={previewStyles.snackbarWrapper}>
+          <Box
+            bg={theme.colors.inverseSurface}
+            style={previewStyles.snackbarSurface}
+          >
+            <Box
+              bg={theme.colors.inverseOnSurface}
+              style={previewStyles.snackbarLabel}
+            />
+            <Box
+              bg={theme.colors.inversePrimary}
+              style={previewStyles.snackbarAction}
+            />
+          </Box>
+        </View>
       )
     case 'Portal':
       return (
@@ -653,6 +726,77 @@ const previewStyles = StyleSheet.create({
   progressWrapper: {
     width: '100%',
     maxWidth: 180,
+  },
+  dividerWrapper: {
+    width: '100%',
+    maxWidth: 180,
+  },
+  dividerRow: {
+    height: 28,
+  },
+  dividerBlock: {
+    flex: 1,
+    height: 28,
+    borderRadius: 6,
+  },
+  dialogWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dialogScrim: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.32,
+    borderRadius: 8,
+  },
+  dialogSurface: {
+    width: '80%',
+    borderRadius: 12,
+    padding: 10,
+    gap: 6,
+  },
+  dialogHeadline: {
+    width: '70%',
+    height: 8,
+    borderRadius: 4,
+  },
+  dialogLine: {
+    width: '100%',
+    height: 5,
+    borderRadius: 3,
+    opacity: 0.6,
+  },
+  dialogAction: {
+    alignSelf: 'flex-end',
+    width: 34,
+    height: 6,
+    borderRadius: 3,
+  },
+  snackbarWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 80,
+    justifyContent: 'flex-end',
+  },
+  snackbarSurface: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    height: 30,
+  },
+  snackbarLabel: {
+    width: 70,
+    height: 6,
+    borderRadius: 3,
+  },
+  snackbarAction: {
+    width: 26,
+    height: 6,
+    borderRadius: 3,
   },
   portalWrapper: {
     width: '100%',

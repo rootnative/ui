@@ -1,0 +1,150 @@
+---
+sidebar_position: 3
+---
+
+# Divider
+
+Dividers are thin lines that group content in lists and containers.
+Follows the [Material Design 3 Divider](https://m3.material.io/components/divider/overview) specification — 1dp, drawn in `outlineVariant`.
+
+## Usage
+
+<SnackExample
+  name="RootNative Divider — Usage"
+  code={`
+  import { Column, Divider, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Column gap="md" style={{ padding: 24 }}>
+            <Typography variant="bodyLarge">Above</Typography>
+            <Divider />
+            <Typography variant="bodyLarge">Below</Typography>
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Insets
+
+`inset` insets the leading edge, `insetEnd` the trailing edge. Both take a number in dp.
+`inset` also accepts `true`, which applies the MD3 list inset of 56dp — the offset that
+aligns a divider with list text that follows a 24dp leading icon.
+
+| Prop value | Result |
+|------------|--------|
+| `<Divider />` | Full-bleed |
+| `<Divider inset />` | 56dp leading inset (MD3 list inset) |
+| `<Divider inset={16} />` | 16dp leading inset |
+| `<Divider inset={16} insetEnd={16} />` | Inset on both ends |
+
+<SnackExample
+  name="RootNative Divider — Insets"
+  code={`
+  import { Column, Divider, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Column gap="lg" style={{ padding: 24 }}>
+            <Typography variant="labelSmall">Full-bleed</Typography>
+            <Divider />
+            <Typography variant="labelSmall">inset</Typography>
+            <Divider inset />
+            <Typography variant="labelSmall">inset + insetEnd</Typography>
+            <Divider inset={16} insetEnd={16} />
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Vertical
+
+Set `orientation="vertical"` to separate content side by side. A vertical divider
+stretches to the height of its parent, so it must sit inside a row-direction
+container that has a height. In this orientation `inset` and `insetEnd` apply to
+the top and bottom edges.
+
+<SnackExample
+  name="RootNative Divider — Vertical"
+  code={`
+  import { Divider, Row, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Row gap="md" align="center" style={{ padding: 24, height: 80 }}>
+            <Typography variant="bodyLarge">Drafts</Typography>
+            <Divider orientation="vertical" />
+            <Typography variant="bodyLarge">Sent</Typography>
+            <Divider orientation="vertical" />
+            <Typography variant="bodyLarge">Spam</Typography>
+          </Row>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Thickness and color
+
+`thickness` sets the line weight in dp and `containerColor` overrides the line color.
+Both default to the MD3 values (1dp, `outlineVariant`) — reach for them for emphasis
+rules, not for ordinary content separation.
+
+<SnackExample
+  name="RootNative Divider — Thickness & Color"
+  code={`
+  import { Column, Divider } from '@rootnative/components'
+  import { ThemeProvider, useTheme } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  function Demo() {
+    const theme = useTheme()
+    return (
+      <Column gap="lg" style={{ padding: 24 }}>
+        <Divider />
+        <Divider thickness={2} />
+        <Divider thickness={4} containerColor={theme.colors.primary} />
+      </Column>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Demo />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Relationship to `ListDivider`
+
+`ListDivider` — exported from `@rootnative/components/list` — is an alias of `Divider`
+with the same props. It stays exported so existing list code keeps working; new code
+should import `Divider` directly.
+
+## Props
+
+<PropTable name="Divider" />

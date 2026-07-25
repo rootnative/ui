@@ -1,0 +1,16 @@
+{
+  "name": "divider",
+  "description": "Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides.",
+  "files": [
+    "packages/components/src/divider/Divider.tsx",
+    "packages/components/src/divider/index.ts",
+    "packages/components/src/divider/styles.ts",
+    "packages/components/src/divider/types.ts"
+  ],
+  "utils": [],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3"
+  },
+  "optionalDependencies": {}
+}

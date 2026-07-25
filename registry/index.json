@@ -30,6 +30,14 @@
       "description": "Input chip with 4 variants (assist, filter, input, suggestion) and icon/avatar support."
     },
     {
+      "name": "dialog",
+      "description": "Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling."
+    },
+    {
+      "name": "divider",
+      "description": "Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides."
+    },
+    {
       "name": "fab",
       "description": "Floating action button with 4 color variants (primary, secondary, tertiary, surface), 3 sizes (small, medium, large), and optional extended label."
     },
@@ -68,6 +76,10 @@
     {
       "name": "slider",
       "description": "Single-thumb or range slider with continuous and discrete (stepped) modes and optional centered origin."
+    },
+    {
+      "name": "snackbar",
+      "description": ""
     },
     {
       "name": "switch",
