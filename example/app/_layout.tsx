@@ -6,7 +6,7 @@ import {
   lightTheme,
   useTheme,
 } from '@rootnative/core'
-import { Slot, useRouter, useSegments } from 'expo-router'
+import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
 import { useCallback, useMemo, useState } from 'react'
@@ -43,9 +43,6 @@ function resolveTitle(routeName: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-const stackScreenOptions = {
-  headerShown: false,
-} as const
 type ThemePreference = 'system' | 'light' | 'dark'
 
 function isDarkColor(color: string): boolean {
@@ -108,6 +105,15 @@ function RootLayoutContent({
   const title = useMemo(() => resolveTitle(routeName), [routeName])
   const canGoBack = routeName !== 'index'
   const statusBarStyle = isDarkColor(theme.colors.surface) ? 'light' : 'dark'
+  // Native screens render an opaque background of their own, so the themed
+  // one from <Layout> can't show through — push it onto the screen instead.
+  const stackScreenOptions = useMemo(
+    () => ({
+      headerShown: false,
+      contentStyle: { backgroundColor: theme.colors.background },
+    }),
+    [theme.colors.background],
+  )
   const appBarActions = useMemo<AppBarAction[]>(
     () => [
       {
@@ -149,7 +155,7 @@ function RootLayoutContent({
           actions={appBarActions}
           insetTop
         />
-        <Slot screenOptions={stackScreenOptions} />
+        <Stack screenOptions={stackScreenOptions} />
       </Layout>
     </>
   )
