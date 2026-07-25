@@ -149,17 +149,51 @@ and should stay open — a sort choice or a "show hidden files" switch.
 | `align` | `'start' \| 'center' \| 'end'` | `'start'` | Cross-axis alignment against the anchor |
 | `offset` | `number` | `0` | Gap between the anchor edge and the menu, in dp |
 | `screenMargin` | `number` | `8` | Minimum distance the menu keeps from every screen edge |
+| `maxHeight` | `number` | — | Cap the menu's height in dp, scrolling past it |
 
 `align` is **logical**: `'start'` is the anchor's left edge in LTR and its right edge in RTL.
 
 A menu that would not fit on its preferred side flips to the other side — but only when that
 side is genuinely roomier, since flipping into an equally cramped side just moves the clipping
-around. Horizontally, the menu shifts back inside the screen margin rather than flipping. When
-neither side has room for the whole menu, it caps at the available height and scrolls.
+around. Horizontally, the menu shifts back inside the margin rather than flipping. When neither
+side has room for the whole menu, it caps at the available height and scrolls.
 
 The menu positions itself from the anchor's window coordinates, measured when it opens. It does
 not follow the anchor while a scroll view moves underneath it — closing and reopening
 re-measures.
+
+### Height
+
+A menu never exceeds the space available on the side it resolved to — anything past that would
+put items where they cannot be seen. When the items do not fit, the menu caps at that space and
+scrolls.
+
+`maxHeight` caps it sooner. It is a cap, not an override: it only ever makes the menu shorter,
+and a value larger than the available space is ignored.
+
+```tsx
+{/* 30 items with room for all of them is a wall of text; 280dp reads better */}
+<Menu maxHeight={280} anchor={anchor}>
+  {options.map((option) => (
+    <Menu.Item key={option} label={option} onPress={() => select(option)} />
+  ))}
+</Menu>
+```
+
+The cap is folded into the placement decision rather than applied after it, so a menu that fits
+below the anchor *once capped* stays below it instead of flipping above on account of its
+uncapped height.
+
+### The menu is confined to its PortalHost
+
+A menu can only be seen inside the overlay layer it renders into, so that layer — not the window
+— is what it fits itself to. A `PortalHost` mounted *inside* a screen, below an app bar or above
+a bottom navigation, gives a layer shorter than the window, and a tall menu caps at the layer's
+edge instead of reaching past it into a region that would be clipped.
+
+That is why the root of your app is the right place for `PortalHost`: it gives menus the whole
+window to work with. Mount one per screen and menus near the bottom of a long list will have
+noticeably less room to open into.
 
 ## Overrides
 

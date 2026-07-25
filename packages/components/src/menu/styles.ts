@@ -50,6 +50,21 @@ export function createMenuStyles(
       backgroundColor: containerColor ?? theme.colors.surfaceContainer,
       ...elevationStyle(theme.elevation.level2),
     },
+    // `flexShrink` is what makes the height cap work. The cap sits on the
+    // surface, not here: a ScrollView reports its content height to its parent,
+    // so a cap applied only to the ScrollView leaves the surface free to grow to
+    // the full content height and run off screen. With the surface bounded, the
+    // ScrollView shrinks into it and its content overflows into a real scroll.
+    //
+    // The rounding is repeated here, and the clip lives here rather than on the
+    // surface: a first/last item's state layer would otherwise paint square over
+    // the surface's corners, and `overflow: 'hidden'` on the surface would clip
+    // the iOS elevation shadow that sits on the same view.
+    list: {
+      flexShrink: 1,
+      borderRadius: theme.shape.cornerExtraSmall,
+      overflow: 'hidden',
+    },
     // MD3's 8dp block padding scrolls with the items, so the surface carries
     // none of it and the list's maxHeight is the whole vertical budget.
     listContent: {

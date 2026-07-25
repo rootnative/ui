@@ -5,7 +5,6 @@ import {
   Divider,
   IconButton,
   Menu,
-  PortalHost,
   Row,
   Typography,
 } from '@rootnative/components'
@@ -208,10 +207,19 @@ function MenuScreenContent() {
             <Column p="md" gap="sm">
               <Typography variant="bodySmall" style={mutedText}>
                 A menu taller than the space on its side caps at the available
-                height and scrolls.
+                height and scrolls. `maxHeight` caps it sooner — it only ever
+                makes the menu shorter, never taller than what fits.
               </Typography>
-              <Row gap="sm">
+              <Row gap="sm" wrap>
                 <Menu anchor={<Button variant="outlined">30 items</Button>}>
+                  {Array.from({ length: 30 }, (_, index) => (
+                    <Menu.Item key={index} label={`Item ${index + 1}`} />
+                  ))}
+                </Menu>
+                <Menu
+                  maxHeight={240}
+                  anchor={<Button variant="outlined">Capped to 240</Button>}
+                >
                   {Array.from({ length: 30 }, (_, index) => (
                     <Menu.Item key={index} label={`Item ${index + 1}`} />
                   ))}
@@ -254,12 +262,10 @@ function MenuScreenContent() {
   )
 }
 
+// No PortalHost here on purpose — the root layout mounts one above the AppBar,
+// which is what gives the tall "Scrolling" menu the whole window to open into.
 export default function MenuScreen() {
-  return (
-    <PortalHost>
-      <MenuScreenContent />
-    </PortalHost>
-  )
+  return <MenuScreenContent />
 }
 
 const styles = StyleSheet.create({

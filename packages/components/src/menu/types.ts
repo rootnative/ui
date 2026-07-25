@@ -55,6 +55,14 @@ export interface MenuProps {
    */
   screenMargin?: number
   /**
+   * Cap the menu's height in dp, scrolling past it. Only ever makes the menu
+   * shorter: the space available on the resolved side still wins, since a menu
+   * taller than that would put items where they cannot be seen. Reach for it
+   * when a long menu *could* fill the screen but shouldn't — 30 items with room
+   * for all of them is a wall of text, and `maxHeight={280}` reads better.
+   */
+  maxHeight?: number
+  /**
    * Override the container (surface) color.
    * @default surfaceContainer
    */

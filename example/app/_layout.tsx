@@ -1,4 +1,4 @@
-import { AppBar, Layout } from '@rootnative/components'
+import { AppBar, Layout, PortalHost } from '@rootnative/components'
 import type { AppBarAction } from '@rootnative/components'
 import {
   ThemeProvider,
@@ -145,17 +145,26 @@ function RootLayoutContent({
         translucent={false}
       />
       <Layout edges={['bottom']}>
-        <AppBar
-          elevated
-          title={title}
-          canGoBack={canGoBack}
-          onBackPress={() =>
-            router.canGoBack() ? router.back() : router.replace('/')
-          }
-          actions={appBarActions}
-          insetTop
-        />
-        <Stack screenOptions={stackScreenOptions} />
+        {/*
+          One host at the root, above the AppBar, so overlays get the whole
+          window. A per-screen host would sit below the AppBar and give anchored
+          overlays (Menu, Tooltip) a shorter layer to open into. Screens that
+          demonstrate Portal itself still mount their own — an unnamed host
+          inside another one shadows it with a store of its own.
+        */}
+        <PortalHost>
+          <AppBar
+            elevated
+            title={title}
+            canGoBack={canGoBack}
+            onBackPress={() =>
+              router.canGoBack() ? router.back() : router.replace('/')
+            }
+            actions={appBarActions}
+            insetTop
+          />
+          <Stack screenOptions={stackScreenOptions} />
+        </PortalHost>
       </Layout>
     </>
   )

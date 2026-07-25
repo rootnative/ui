@@ -815,6 +815,7 @@ Props:
 - `align?: 'start' | 'center' | 'end'` — Default: `'start'`. Cross-axis alignment against the anchor.
 - `offset?: number` — Default: `0`. Gap between the anchor edge and the menu, in dp.
 - `screenMargin?: number` — Default: `8`. Minimum distance the menu keeps from every screen edge, in dp.
+- `maxHeight?: number` — Cap the menu's height in dp, scrolling past it. Only ever makes the menu shorter: the space available on the resolved side still wins, since a menu taller than that would put items where they cannot be seen. Reach for it when a long menu *could* fill the screen but shouldn't — 30 items with room for all of them is a wall of text, and `maxHeight={280}` reads better.
 - `containerColor?: string` — Default: `surfaceContainer`. Override the container (surface) color.
 - `hostName?: string` — Name of the `PortalHost` to render into. Defaults to the root host, which is what puts the menu above every other layer.
 - `style?: StyleProp<ViewStyle>` — Style applied to the menu surface.

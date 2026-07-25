@@ -49,6 +49,7 @@ export function Menu({
   align = 'start',
   offset = 0,
   screenMargin,
+  maxHeight,
   containerColor,
   hostName,
   style,
@@ -78,6 +79,7 @@ export function Menu({
       align,
       offset,
       screenMargin,
+      maxHeight,
     })
 
   const contextValue = useMemo<MenuContextValue>(() => ({ dismiss }), [dismiss])
@@ -123,6 +125,9 @@ export function Menu({
     return () => subscription.remove()
   }, [open, dismiss])
 
+  // The height cap lands on the surface, which is the view being positioned —
+  // see the note on `styles.list` for why capping the ScrollView alone lets the
+  // surface run off screen.
   const positionStyle = useMemo(
     () =>
       position === null
@@ -130,13 +135,9 @@ export function Menu({
         : {
             top: position.top,
             left: position.left,
+            maxHeight: position.maxHeight,
             transformOrigin: position.transformOrigin,
           },
-    [position],
-  )
-
-  const listStyle = useMemo(
-    () => (position === null ? null : { maxHeight: position.maxHeight }),
     [position],
   )
 
@@ -189,7 +190,7 @@ export function Menu({
                   onLayout={onOverlayLayout}
                 >
                   <ScrollView
-                    style={listStyle}
+                    style={styles.list}
                     contentContainerStyle={styles.listContent}
                     bounces={false}
                   >

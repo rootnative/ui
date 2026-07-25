@@ -19,11 +19,6 @@ export interface AnchorRect {
   height: number
 }
 
-export interface AnchorPoint {
-  x: number
-  y: number
-}
-
 export interface AnchorSize {
   width: number
   height: number
@@ -72,19 +67,31 @@ export interface UseAnchorPositionOptions {
    * @default 8
    */
   screenMargin?: number
+  /**
+   * Consumer cap on the overlay's height, in dp. Only ever makes the overlay
+   * shorter — the space available on the resolved side still wins, because
+   * anything past it cannot be seen. Folded into the side decision rather than
+   * applied afterwards, so a capped overlay that fits on its preferred side is
+   * not flipped away from it by its uncapped height.
+   */
+  maxHeight?: number
 }
 
 export interface UseAnchorPositionResult {
   /** Attach to the view the overlay is anchored to. */
   anchorRef: React.RefObject<View | null>
   /**
-   * Attach to the overlay layer — the absolute-fill view the positioned
-   * overlay sits in. Its window origin is subtracted from the result, so the
-   * position stays correct inside a named `PortalHost` that is not at the
-   * window origin.
+   * Attach to the overlay layer — the absolute-fill view the positioned overlay
+   * sits in. Its measured rect is what the overlay is fitted into: a
+   * `PortalHost` mounted below an app bar or above a tab bar gives a layer
+   * shorter than the window, and anything placed past its edge is clipped with
+   * no way to reach it. Its origin is also subtracted from the result, so the
+   * position is in layer coordinates.
    */
   layerRef: React.RefObject<View | null>
-  /** Re-measure the anchor and the layer. Cheap; safe to call from `onLayout`. */
+  /**
+   * Re-measure the anchor and the layer. Cheap; safe to call from `onLayout`.
+   */
   measure: () => void
   /** Pass as the overlay's `onLayout` — its natural size drives the collision math. */
   onOverlayLayout: (event: LayoutChangeEvent) => void
@@ -97,7 +104,6 @@ export interface UseAnchorPositionResult {
 }
 
 const DEFAULT_SCREEN_MARGIN = 8
-const ORIGIN: AnchorPoint = { x: 0, y: 0 }
 
 function sameRect(a: AnchorRect | null, b: AnchorRect): boolean {
   return (
@@ -121,8 +127,13 @@ function sameRect(a: AnchorRect | null, b: AnchorRect): boolean {
  * 2. The overlay reports its **natural** size through `onOverlayLayout`. It
  *    must therefore already be mounted, which is why `position` starts `null`
  *    instead of the overlay waiting for a position before it renders.
- * 3. The overlay layer is measured too, and its origin subtracted, so window
- *    coordinates survive a layer that is not at the window origin.
+ * 3. The overlay **layer** is measured too, and the overlay is fitted into
+ *    `layer ∩ window` rather than the window. A `PortalHost` mounted below an
+ *    app bar or above a tab bar gives a layer shorter than the window, and the
+ *    layer is what clips — fitting to the window would hand a scrollable
+ *    overlay a viewport taller than the region it can be seen in, stranding its
+ *    last items where no scroll reaches them. The layer's origin is subtracted
+ *    last, so the result is in layer coordinates.
  *
  * Flipping is deliberately conservative: the overlay only moves to the other
  * side when it does not fit *and* that side is roomier. Flipping into an
@@ -139,12 +150,13 @@ export function useAnchorPosition(
     align = 'start',
     offset = 0,
     screenMargin = DEFAULT_SCREEN_MARGIN,
+    maxHeight: maxOverlayHeight = Infinity,
   } = options
 
   const anchorRef = useRef<View | null>(null)
   const layerRef = useRef<View | null>(null)
   const [anchor, setAnchor] = useState<AnchorRect | null>(null)
-  const [layerOrigin, setLayerOrigin] = useState<AnchorPoint>(ORIGIN)
+  const [layer, setLayer] = useState<AnchorRect | null>(null)
   const [overlay, setOverlay] = useState<AnchorSize | null>(null)
   const { width: windowWidth, height: windowHeight } = useWindowDimensions()
 
@@ -156,9 +168,10 @@ export function useAnchorPosition(
       const next = { x, y, width, height }
       setAnchor((prev) => (sameRect(prev, next) ? prev : next))
     })
-    layerRef.current?.measureInWindow((x, y) => {
+    layerRef.current?.measureInWindow((x, y, width, height) => {
       if (Number.isNaN(x) || Number.isNaN(y)) return
-      setLayerOrigin((prev) => (prev.x === x && prev.y === y ? prev : { x, y }))
+      const next = { x, y, width, height }
+      setLayer((prev) => (sameRect(prev, next) ? prev : next))
     })
   }, [])
 
@@ -191,13 +204,21 @@ export function useAnchorPosition(
         ? resolveAnchorPosition({
             anchor,
             overlay,
-            layerOrigin,
+            // Until the layer reports its own bounds, the window is the best
+            // guess — and the right one for a root host that fills it.
+            layer: layer ?? {
+              x: 0,
+              y: 0,
+              width: windowWidth,
+              height: windowHeight,
+            },
             windowWidth,
             windowHeight,
             preferredSide,
             align,
             offset,
             screenMargin,
+            maxOverlayHeight,
           })
         : null
 
@@ -206,13 +227,14 @@ export function useAnchorPosition(
     active,
     anchor,
     overlay,
-    layerOrigin,
+    layer,
     windowWidth,
     windowHeight,
     preferredSide,
     align,
     offset,
     screenMargin,
+    maxOverlayHeight,
     measure,
     onOverlayLayout,
   ])
@@ -221,13 +243,16 @@ export function useAnchorPosition(
 export interface ResolveAnchorPositionArgs {
   anchor: AnchorRect
   overlay: AnchorSize
-  layerOrigin: AnchorPoint
+  /** The overlay layer's rect, in window coordinates. */
+  layer: AnchorRect
   windowWidth: number
   windowHeight: number
   preferredSide: AnchorSide
   align: AnchorAlign
   offset: number
   screenMargin: number
+  /** Consumer height cap in dp, or `Infinity` for none. */
+  maxOverlayHeight: number
 }
 
 /**
@@ -238,30 +263,50 @@ export interface ResolveAnchorPositionArgs {
 export function resolveAnchorPosition({
   anchor,
   overlay,
-  layerOrigin,
+  layer,
   windowWidth,
   windowHeight,
   preferredSide,
   align,
   offset,
   screenMargin,
+  maxOverlayHeight,
 }: ResolveAnchorPositionArgs): AnchorPosition {
-  const spaceBelow =
-    windowHeight - screenMargin - (anchor.y + anchor.height + offset)
-  const spaceAbove = anchor.y - offset - screenMargin
+  // The overlay is fitted into the layer ∩ window, not the window. The window
+  // alone is wrong in both directions: a layer that starts below an app bar or
+  // stops above a tab bar clips anything placed past its edge — and a capped,
+  // scrollable overlay would then be taller than the region it can be seen in,
+  // stranding its last items where nothing can scroll to them. A layer wider or
+  // taller than the window (a host inside a scrolled container) is clamped the
+  // other way, since offscreen is offscreen.
+  const boundsTop = Math.max(0, layer.y) + screenMargin
+  const boundsBottom =
+    Math.min(windowHeight, layer.y + layer.height) - screenMargin
+  const boundsLeft = Math.max(0, layer.x) + screenMargin
+  const boundsRight =
+    Math.min(windowWidth, layer.x + layer.width) - screenMargin
+
+  const spaceBelow = boundsBottom - (anchor.y + anchor.height + offset)
+  const spaceAbove = anchor.y - offset - boundsTop
+
+  // The height the overlay wants, already respecting a consumer cap — deciding
+  // the side from the uncapped height would flip a short capped overlay away
+  // from a side it fits on perfectly well.
+  const desiredHeight = Math.min(overlay.height, maxOverlayHeight)
 
   const preferredSpace = preferredSide === 'bottom' ? spaceBelow : spaceAbove
   const otherSpace = preferredSide === 'bottom' ? spaceAbove : spaceBelow
   const oppositeSide: AnchorSide = preferredSide === 'bottom' ? 'top' : 'bottom'
   const side: AnchorSide =
-    overlay.height <= preferredSpace || otherSpace <= preferredSpace
+    desiredHeight <= preferredSpace || otherSpace <= preferredSpace
       ? preferredSide
       : oppositeSide
 
-  // Independent of the measured overlay height, so capping the overlay with it
+  // Independent of the *measured* overlay height, so capping the overlay with it
   // cannot feed back into the side decision on the next layout pass.
-  const maxHeight = Math.max(0, side === 'bottom' ? spaceBelow : spaceAbove)
-  const height = Math.min(overlay.height, maxHeight)
+  const available = Math.max(0, side === 'bottom' ? spaceBelow : spaceAbove)
+  const maxHeight = Math.min(available, maxOverlayHeight)
+  const height = Math.min(desiredHeight, maxHeight)
 
   const top =
     side === 'bottom'
@@ -284,17 +329,14 @@ export function resolveAnchorPosition({
         ? anchor.x + anchor.width - overlay.width
         : anchor.x + (anchor.width - overlay.width) / 2
 
-  // An overlay wider than the window pins to the start margin rather than
+  // An overlay wider than its bounds pins to the leading margin rather than
   // centering its overflow across both edges.
-  const maxLeft = Math.max(
-    screenMargin,
-    windowWidth - screenMargin - overlay.width,
-  )
-  const left = Math.min(Math.max(unclampedLeft, screenMargin), maxLeft)
+  const maxLeft = Math.max(boundsLeft, boundsRight - overlay.width)
+  const left = Math.min(Math.max(unclampedLeft, boundsLeft), maxLeft)
 
   return {
-    top: top - layerOrigin.y,
-    left: left - layerOrigin.x,
+    top: top - layer.y,
+    left: left - layer.x,
     side,
     maxHeight,
     transformOrigin: `${edge} ${side === 'bottom' ? 'top' : 'bottom'}`,
