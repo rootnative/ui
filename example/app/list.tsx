@@ -8,6 +8,8 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const longSupporting =
   'Ali Connors — I will be in your neighborhood doing errands this weekend, ' +
@@ -43,8 +45,7 @@ function Avatar({ label }: { label: string }) {
 export default function ListScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">List Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">One-line items</Typography>
         <List>
@@ -195,6 +196,7 @@ export default function ListScreen() {
           />
         </List>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

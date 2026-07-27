@@ -1,5 +1,7 @@
 import { Button, Column, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
 const sizes = ['xs', 's', 'm', 'l', 'xl'] as const
@@ -7,8 +9,7 @@ const sizes = ['xs', 's', 'm', 'l', 'xl'] as const
 export default function ButtonScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Button Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Row wrap gap="sm">
@@ -126,6 +127,7 @@ export default function ButtonScreen() {
           </Button>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

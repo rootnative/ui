@@ -2,6 +2,8 @@ import { Chip, Column, Row, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function ChipScreen() {
   const theme = useTheme()
@@ -16,8 +18,7 @@ export default function ChipScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Chip Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Row wrap gap="sm">
@@ -170,6 +171,7 @@ export default function ChipScreen() {
           <Chip contentColor="#00796B">Teal</Chip>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

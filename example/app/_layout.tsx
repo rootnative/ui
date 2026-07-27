@@ -1,5 +1,4 @@
-import { AppBar, Layout, PortalHost } from '@rootnative/components'
-import type { AppBarAction } from '@rootnative/components'
+import { AppBar, IconButton, Layout, PortalHost } from '@rootnative/components'
 import {
   ThemeProvider,
   darkTheme,
@@ -10,7 +9,16 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, I18nManager, Platform, useColorScheme } from 'react-native'
+import {
+  Alert,
+  I18nManager,
+  Platform,
+  StyleSheet,
+  View,
+  useColorScheme,
+} from 'react-native'
+import { findEntry } from '../src/catalog'
+import { JumpMenu } from '../src/JumpMenu'
 
 // Restore persisted RTL preference on web before first render
 if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
@@ -32,9 +40,20 @@ function resolveRouteName(segments: string[]): string {
   return currentSegment ?? 'index'
 }
 
+/**
+ * Prefer the catalog's label so the bar reads "TextField" / "FAB" rather than
+ * the title-cased slug ("Text Field" / "Fab"), and matches what `ScreenIntro`
+ * prints. Falls back to the slug for routes outside the catalog.
+ */
 function resolveTitle(routeName: string): string {
   if (routeName === 'index') {
     return 'Home'
+  }
+
+  const entry = findEntry(`/${routeName}`)
+
+  if (entry) {
+    return entry.label
   }
 
   return routeName
@@ -114,25 +133,45 @@ function RootLayoutContent({
     }),
     [theme.colors.background],
   )
-  const appBarActions = useMemo<AppBarAction[]>(
-    () => [
-      {
-        icon: I18nManager.isRTL
-          ? 'format-pilcrow-arrow-left'
-          : 'format-pilcrow-arrow-right',
-        accessibilityLabel: I18nManager.isRTL
-          ? 'Switch to LTR layout'
-          : 'Switch to RTL layout',
-        onPress: toggleRTL,
-      },
-      {
-        icon: isDarkTheme ? 'white-balance-sunny' : 'weather-night',
-        accessibilityLabel: isDarkTheme
-          ? 'Switch to light theme'
-          : 'Switch to dark theme',
-        onPress: onToggleTheme,
-      },
-    ],
+  // Built as `trailing` rather than `actions` because the jump menu is a
+  // <Menu> anchored on its own IconButton, which the AppBarAction shape can't
+  // express. The 48dp frames match what AppBar wraps its own actions in.
+  const appBarTrailing = useMemo(
+    () => (
+      <View style={styles.actionsRow}>
+        <View style={styles.iconFrame}>
+          <JumpMenu />
+        </View>
+        <View style={styles.iconFrame}>
+          <IconButton
+            icon={
+              I18nManager.isRTL
+                ? 'format-pilcrow-arrow-left'
+                : 'format-pilcrow-arrow-right'
+            }
+            size="s"
+            variant="standard"
+            accessibilityLabel={
+              I18nManager.isRTL
+                ? 'Switch to LTR layout'
+                : 'Switch to RTL layout'
+            }
+            onPress={toggleRTL}
+          />
+        </View>
+        <View style={styles.iconFrame}>
+          <IconButton
+            icon={isDarkTheme ? 'white-balance-sunny' : 'weather-night'}
+            size="s"
+            variant="standard"
+            accessibilityLabel={
+              isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'
+            }
+            onPress={onToggleTheme}
+          />
+        </View>
+      </View>
+    ),
     [isDarkTheme, onToggleTheme],
   )
 
@@ -160,7 +199,7 @@ function RootLayoutContent({
             onBackPress={() =>
               router.canGoBack() ? router.back() : router.replace('/')
             }
-            actions={appBarActions}
+            trailing={appBarTrailing}
             insetTop
           />
           <Stack screenOptions={stackScreenOptions} />
@@ -169,6 +208,19 @@ function RootLayoutContent({
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconFrame: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+})
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()

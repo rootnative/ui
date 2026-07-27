@@ -10,6 +10,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 function TooltipScreenContent() {
   const theme = useTheme()
@@ -27,6 +29,7 @@ function TooltipScreenContent() {
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
       <Column gap="xl" style={styles.container}>
+        <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Plain</Typography>
           <Card variant="outlined">
@@ -194,6 +197,7 @@ function TooltipScreenContent() {
             </Column>
           </Card>
         </Column>
+        <ScreenNavFooter />
       </Column>
     </ScrollView>
   )

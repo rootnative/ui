@@ -1,6 +1,8 @@
 import { Avatar, Column, Row, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function AvatarScreen() {
   const theme = useTheme()
@@ -13,6 +15,7 @@ export default function AvatarScreen() {
       ]}
     >
       <Column gap="xl" style={styles.container}>
+        <ScreenIntro />
         {/* Sizes */}
         <Column gap="sm">
           <Typography variant="titleMedium">Sizes</Typography>
@@ -156,6 +159,7 @@ export default function AvatarScreen() {
             ))}
           </Column>
         </Column>
+        <ScreenNavFooter />
       </Column>
     </ScrollView>
   )

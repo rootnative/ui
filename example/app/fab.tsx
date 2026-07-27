@@ -1,5 +1,7 @@
 import { Column, FAB, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = [
   { label: 'Primary', value: 'primary' },
@@ -17,8 +19,7 @@ const sizes = [
 export default function FABScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">FAB Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Row gap="lg" wrap>
@@ -89,6 +90,7 @@ export default function FABScreen() {
           <FAB icon="plus" label="Compose" disabled />
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

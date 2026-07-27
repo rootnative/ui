@@ -1,6 +1,8 @@
 import { Box, Column, Grid, Row, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 function Swatch({ label, wide }: { label: string; wide?: boolean }) {
   const { colors } = useTheme()
@@ -25,8 +27,7 @@ export default function LayoutScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Layout Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">
           Box — Spacing &amp; Background
@@ -195,6 +196,7 @@ export default function LayoutScreen() {
           </Grid>
         </Column>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

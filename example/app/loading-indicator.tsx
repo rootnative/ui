@@ -7,6 +7,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function LoadingIndicatorScreen() {
   const theme = useTheme()
@@ -24,8 +26,7 @@ export default function LoadingIndicatorScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Loading Indicator</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Indeterminate</Typography>
         <Row gap="lg" align="center">
@@ -90,6 +91,7 @@ export default function LoadingIndicatorScreen() {
           />
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

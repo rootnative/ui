@@ -11,6 +11,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const SORTS = ['Name', 'Date modified', 'Size'] as const
 
@@ -33,6 +35,7 @@ function MenuScreenContent() {
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
       <Column gap="xl" style={styles.container}>
+        <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Self-managing</Typography>
           <Card variant="outlined">
@@ -257,6 +260,7 @@ function MenuScreenContent() {
             </Column>
           </Card>
         </Column>
+        <ScreenNavFooter />
       </Column>
     </ScrollView>
   )

@@ -25,7 +25,7 @@ import {
 import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { useRouter } from 'expo-router'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Pressable,
   ScrollView,
@@ -33,190 +33,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native'
-
-interface ComponentEntry {
-  label: string
-  route: string
-  description: string
-}
-
-interface ComponentSection {
-  title: string
-  description: string
-  items: ComponentEntry[]
-}
-
-const sections: ComponentSection[] = [
-  {
-    title: 'Foundations',
-    description: 'Type, layout, and direction primitives',
-    items: [
-      {
-        label: 'Typography',
-        route: '/typography',
-        description: 'Display, headline, body, and label text styles',
-      },
-      {
-        label: 'Layout',
-        route: '/layout',
-        description: 'Flexbox primitives for building page structure',
-      },
-      {
-        label: 'RTL',
-        route: '/rtl',
-        description: 'Right-to-left layout — toggle from the AppBar',
-      },
-    ],
-  },
-  {
-    title: 'Actions & Inputs',
-    description: 'Buttons, chips, and text fields',
-    items: [
-      {
-        label: 'Button',
-        route: '/button',
-        description: 'Filled, outlined, tonal, elevated, and text buttons',
-      },
-      {
-        label: 'ButtonGroup',
-        route: '/button-group',
-        description:
-          'Standard and connected button groups with single/multi select',
-      },
-      {
-        label: 'IconButton',
-        route: '/icon-button',
-        description: 'Compact icon-only actions with toggle and size variants',
-      },
-      {
-        label: 'FAB',
-        route: '/fab',
-        description:
-          'Floating action button — primary, surface, sizes, and extended',
-      },
-      {
-        label: 'Chip',
-        route: '/chip',
-        description: 'Compact elements for filters and selections',
-      },
-      {
-        label: 'TextField',
-        route: '/text-field',
-        description: 'Filled and outlined text input fields',
-      },
-      {
-        label: 'Keyboard Wrapper',
-        route: '/keyboard-avoiding-wrapper',
-        description: 'Smart keyboard-aware wrapper with platform behavior',
-      },
-    ],
-  },
-  {
-    title: 'Selection',
-    description: 'Toggles, checkboxes, radios, and sliders',
-    items: [
-      {
-        label: 'Switch',
-        route: '/switch',
-        description: 'Toggle controls for on/off settings',
-      },
-      {
-        label: 'Checkbox',
-        route: '/checkbox',
-        description: 'Selection controls for multiple choices',
-      },
-      {
-        label: 'Radio',
-        route: '/radio',
-        description: 'Selection controls for single-choice options',
-      },
-      {
-        label: 'Slider',
-        route: '/slider',
-        description: 'Continuous, discrete, range, and centered MD3 sliders',
-      },
-    ],
-  },
-  {
-    title: 'Containment & Display',
-    description: 'Surfaces, lists, app bars, avatars, and progress',
-    items: [
-      {
-        label: 'AppBar',
-        route: '/appbar',
-        description: 'Top app bars for navigation and actions',
-      },
-      {
-        label: 'Card',
-        route: '/card',
-        description: 'Contained surfaces for grouping related content',
-      },
-      {
-        label: 'List',
-        route: '/list',
-        description: 'Vertically arranged items with text and icons',
-      },
-      {
-        label: 'Divider',
-        route: '/divider',
-        description:
-          'Horizontal and vertical 1dp rules with optional edge insets',
-      },
-      {
-        label: 'Avatar',
-        route: '/avatar',
-        description: 'Circular user representations — image, icon, or initials',
-      },
-      {
-        label: 'Progress',
-        route: '/progress',
-        description:
-          'Linear and circular progress (determinate, indeterminate)',
-      },
-      {
-        label: 'Loading Indicator',
-        route: '/loading-indicator',
-        description:
-          'Expressive shape-morphing loading spinner (contained + uncontained)',
-      },
-      {
-        label: 'Portal',
-        route: '/portal',
-        description:
-          'Render overlays above the rest of the tree — toasts, dialogs, scrims',
-      },
-      {
-        label: 'Dialog',
-        route: '/dialog',
-        description: 'Basic and full-screen modal dialogs with compound slots',
-      },
-      {
-        label: 'Snackbar',
-        route: '/snackbar',
-        description: 'Queued transient messages via SnackbarProvider',
-      },
-      {
-        label: 'Menu',
-        route: '/menu',
-        description:
-          'Anchored dropdown menus that flip and shift to stay on screen',
-      },
-      {
-        label: 'Tooltip',
-        route: '/tooltip',
-        description: 'Plain and rich tooltips on hover or a long press',
-      },
-      {
-        label: 'Tabs',
-        route: '/tabs',
-        description:
-          'Primary and secondary tab rows, fixed or scrollable, with a sliding indicator',
-      },
-    ],
-  },
-]
-
-const totalComponents = sections.reduce((sum, s) => sum + s.items.length, 0)
+import { matchesQuery, sections, totalComponents } from '../src/catalog'
 
 function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
   switch (label) {
@@ -642,6 +459,37 @@ export default function HomeScreen() {
     { value: 'MIT', label: 'license' },
   ]
 
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState<string | null>(null)
+  const trimmedQuery = query.trim()
+  const isFiltering = trimmedQuery.length > 0 || category !== null
+
+  // Sections keep their grouping while filtered — seeing that "Slider" lives
+  // under Selection is part of learning the catalog. Empty ones drop out.
+  const visibleSections = useMemo(
+    () =>
+      sections
+        .filter((section) => category === null || section.title === category)
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((item) =>
+            matchesQuery(item, section.title, trimmedQuery),
+          ),
+        }))
+        .filter((section) => section.items.length > 0),
+    [category, trimmedQuery],
+  )
+  const resultCount = useMemo(
+    () =>
+      visibleSections.reduce((sum, section) => sum + section.items.length, 0),
+    [visibleSections],
+  )
+
+  const clearFilters = useCallback(() => {
+    setQuery('')
+    setCategory(null)
+  }, [])
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -680,7 +528,68 @@ export default function HomeScreen() {
           </Row>
         </Column>
 
-        {sections.map((section) => (
+        <Column gap="sm">
+          <TextField
+            label="Search components"
+            variant="outlined"
+            value={query}
+            onChangeText={setQuery}
+            leadingIcon="magnify"
+            trailingIcon={trimmedQuery.length > 0 ? 'close' : undefined}
+            onTrailingIconPress={() => setQuery('')}
+            trailingIconAccessibilityLabel="Clear search"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          <Row gap="xs" wrap>
+            <Chip
+              variant="filter"
+              selected={category === null}
+              onPress={() => setCategory(null)}
+            >
+              All
+            </Chip>
+            {sections.map((section) => (
+              <Chip
+                key={section.title}
+                variant="filter"
+                selected={category === section.title}
+                onPress={() =>
+                  setCategory((current) =>
+                    current === section.title ? null : section.title,
+                  )
+                }
+              >
+                {section.shortTitle}
+              </Chip>
+            ))}
+          </Row>
+          {isFiltering ? (
+            <Typography variant="bodySmall" style={captionStyle}>
+              {resultCount === 1 ? '1 component' : `${resultCount} components`}
+            </Typography>
+          ) : null}
+        </Column>
+
+        {visibleSections.length === 0 ? (
+          <Column align="center" gap="sm" style={styles.emptyState}>
+            <MaterialCommunityIcons
+              name="magnify-close"
+              size={48}
+              color={theme.colors.onSurfaceVariant}
+            />
+            <Typography variant="titleMedium">No components found</Typography>
+            <Typography variant="bodySmall" style={captionStyle}>
+              {`Nothing matches "${trimmedQuery}"${category ? ` in ${category}` : ''}.`}
+            </Typography>
+            <Button variant="text" onPress={clearFilters}>
+              Clear filters
+            </Button>
+          </Column>
+        ) : null}
+
+        {visibleSections.map((section) => (
           <Column gap="md" key={section.title}>
             <Column gap="xs">
               <Typography variant={sectionTitleVariant}>
@@ -760,6 +669,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+  },
+  emptyState: {
+    paddingVertical: 48,
   },
 })
 

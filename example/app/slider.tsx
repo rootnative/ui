@@ -3,6 +3,8 @@ import type { SliderValue } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function SliderScreen() {
   const theme = useTheme()
@@ -32,8 +34,7 @@ export default function SliderScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Slider</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Continuous</Typography>
         <Slider value={continuous} onValueChange={setSingle(setContinuous)} />
@@ -172,6 +173,7 @@ export default function SliderScreen() {
         <Typography variant="titleSmall">Disabled</Typography>
         <Slider value={0.7} disabled />
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

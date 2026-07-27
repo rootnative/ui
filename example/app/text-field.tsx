@@ -7,6 +7,8 @@ import {
 } from '@rootnative/components'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function TextFieldScreen() {
   const [filledValue, setFilledValue] = useState('')
@@ -23,8 +25,7 @@ export default function TextFieldScreen() {
       scrollViewProps={{ bounces: false }}
       contentContainerStyle={styles.content}
     >
-      <Typography variant="headlineSmall">TextField Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="lg">
         <Typography variant="titleSmall">Filled Variant</Typography>
         <TextField
@@ -173,6 +174,7 @@ export default function TextFieldScreen() {
           numberOfLines={4}
         />
       </Column>
+      <ScreenNavFooter />
     </KeyboardAvoidingWrapper>
   )
 }

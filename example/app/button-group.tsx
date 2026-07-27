@@ -2,6 +2,8 @@ import { ButtonGroup, Column, Typography } from '@rootnative/components'
 import type { ButtonGroupItem, ButtonGroupSize } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const alignmentItems: ButtonGroupItem[] = [
   { value: 'left', label: 'Left', leadingIcon: 'format-align-left' },
@@ -47,7 +49,7 @@ export default function ButtonGroupScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Button Group Showcase</Typography>
+      <ScreenIntro />
       <Typography variant="bodyMedium" style={styles.muted}>
         MD3 Expressive Button Groups — replaces the deprecated Segmented Button.
       </Typography>
@@ -214,6 +216,7 @@ export default function ButtonGroupScreen() {
           ]}
         />
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

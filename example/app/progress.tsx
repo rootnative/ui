@@ -8,6 +8,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function ProgressScreen() {
   const theme = useTheme()
@@ -25,8 +27,7 @@ export default function ProgressScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Progress</Typography>
-
+      <ScreenIntro />
       <Column gap="md">
         <Typography variant="titleSmall">Linear — determinate</Typography>
         <LinearProgress progress={value} />
@@ -107,6 +108,7 @@ export default function ProgressScreen() {
           <CircularProgress containerColor="#1976D2" trackColor="#BBDEFB" />
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

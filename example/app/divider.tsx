@@ -9,6 +9,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function DividerScreen() {
   const theme = useTheme()
@@ -39,6 +41,7 @@ export default function DividerScreen() {
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
       <Column gap="xl" style={styles.container}>
+        <ScreenIntro />
         {/* Horizontal */}
         <Column gap="sm">
           <Typography variant="titleMedium">Horizontal</Typography>
@@ -127,6 +130,7 @@ export default function DividerScreen() {
             </List>
           </View>
         </Column>
+        <ScreenNavFooter />
       </Column>
     </ScrollView>
   )

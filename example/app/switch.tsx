@@ -1,6 +1,8 @@
 import { Column, Row, Switch, Typography } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function SwitchScreen() {
   const [basic, setBasic] = useState(false)
@@ -10,8 +12,7 @@ export default function SwitchScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Switch</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Basic</Typography>
         <Row gap="md" align="center">
@@ -65,6 +66,7 @@ export default function SwitchScreen() {
           <Typography variant="bodyMedium">Green switch</Typography>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

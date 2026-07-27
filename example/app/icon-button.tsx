@@ -1,5 +1,7 @@
 import { Column, IconButton, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = [
   { label: 'Filled', value: 'filled' },
@@ -25,8 +27,7 @@ const widths = [
 export default function IconButtonScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">IconButton Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Row gap="lg">
@@ -208,6 +209,7 @@ export default function IconButtonScreen() {
           </Column>
         ))}
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

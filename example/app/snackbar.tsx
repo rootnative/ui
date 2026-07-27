@@ -11,6 +11,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 function Demos() {
   const theme = useTheme()
@@ -29,6 +31,7 @@ function Demos() {
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
       <Column gap="xl" style={styles.container}>
+        <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Message only</Typography>
           <Card variant="outlined">
@@ -190,6 +193,7 @@ function Demos() {
             </Column>
           </Card>
         </Column>
+        <ScreenNavFooter />
       </Column>
     </ScrollView>
   )

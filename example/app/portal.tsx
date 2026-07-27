@@ -12,7 +12,9 @@ import {
 import { useTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 function ToastDemo() {
   const [visible, setVisible] = useState(false)
@@ -248,83 +250,86 @@ export default function PortalScreen() {
 
   return (
     <PortalHost style={styles.host}>
-      <Column gap="lg" style={styles.content}>
-        <Typography variant="headlineSmall">Portal Showcase</Typography>
-        <Typography variant="bodyMedium" style={mutedTextStyle}>
-          Portals render their children into a host higher in the tree, so
-          overlays escape parent overflow and stacking contexts. Wrap your app
-          in PortalHost once, then use Portal anywhere.
-        </Typography>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Column gap="lg">
+          <ScreenIntro />
+          <Typography variant="bodyMedium" style={mutedTextStyle}>
+            Portals render their children into a host higher in the tree, so
+            overlays escape parent overflow and stacking contexts. Wrap your app
+            in PortalHost once, then use Portal anywhere.
+          </Typography>
 
-        <Column gap="sm">
-          <Typography variant="titleSmall">Toast</Typography>
-          <Card variant="outlined">
-            <Column p="md" gap="sm">
-              <Typography variant="bodySmall" style={mutedTextStyle}>
-                Anchored to the bottom of the host.
-              </Typography>
-              <ToastDemo />
-            </Column>
-          </Card>
-        </Column>
+          <Column gap="sm">
+            <Typography variant="titleSmall">Toast</Typography>
+            <Card variant="outlined">
+              <Column p="md" gap="sm">
+                <Typography variant="bodySmall" style={mutedTextStyle}>
+                  Anchored to the bottom of the host.
+                </Typography>
+                <ToastDemo />
+              </Column>
+            </Card>
+          </Column>
 
-        <Column gap="sm">
-          <Typography variant="titleSmall">Modal dialog</Typography>
-          <Card variant="outlined">
-            <Column p="md" gap="sm">
-              <Typography variant="bodySmall" style={mutedTextStyle}>
-                Renders a full-screen scrim with a centered dialog.
-              </Typography>
-              <DialogDemo />
-            </Column>
-          </Card>
-        </Column>
+          <Column gap="sm">
+            <Typography variant="titleSmall">Modal dialog</Typography>
+            <Card variant="outlined">
+              <Column p="md" gap="sm">
+                <Typography variant="bodySmall" style={mutedTextStyle}>
+                  Renders a full-screen scrim with a centered dialog.
+                </Typography>
+                <DialogDemo />
+              </Column>
+            </Card>
+          </Column>
 
-        <Column gap="sm">
-          <Typography variant="titleSmall">Stacking order</Typography>
-          <Card variant="outlined">
-            <Column p="md" gap="sm">
-              <Typography variant="bodySmall" style={mutedTextStyle}>
-                PORTAL_LAYERS defines the z-order contract: sheet (100) &lt;
-                dialog (200) &lt; snackbar (300) &lt; menu (400) &lt; tooltip
-                (500). Priority beats mount order.
-              </Typography>
-              <StackingDemo />
-            </Column>
-          </Card>
-        </Column>
+          <Column gap="sm">
+            <Typography variant="titleSmall">Stacking order</Typography>
+            <Card variant="outlined">
+              <Column p="md" gap="sm">
+                <Typography variant="bodySmall" style={mutedTextStyle}>
+                  PORTAL_LAYERS defines the z-order contract: sheet (100) &lt;
+                  dialog (200) &lt; snackbar (300) &lt; menu (400) &lt; tooltip
+                  (500). Priority beats mount order.
+                </Typography>
+                <StackingDemo />
+              </Column>
+            </Card>
+          </Column>
 
-        <Column gap="sm">
-          <Typography variant="titleSmall">Named host</Typography>
-          <Card variant="outlined">
-            <Column p="md" gap="sm">
-              <Typography variant="bodySmall" style={mutedTextStyle}>
-                A Portal with hostName renders into the matching named host
-                instead of the root overlay — useful for scoping overlays to one
-                screen or nested navigator.
-              </Typography>
-              <NamedHostDemo />
-            </Column>
-          </Card>
-        </Column>
+          <Column gap="sm">
+            <Typography variant="titleSmall">Named host</Typography>
+            <Card variant="outlined">
+              <Column p="md" gap="sm">
+                <Typography variant="bodySmall" style={mutedTextStyle}>
+                  A Portal with hostName renders into the matching named host
+                  instead of the root overlay — useful for scoping overlays to
+                  one screen or nested navigator.
+                </Typography>
+                <NamedHostDemo />
+              </Column>
+            </Card>
+          </Column>
 
-        <Column gap="sm">
-          <Typography variant="titleSmall">Why a Portal?</Typography>
-          <Box
-            bg={theme.colors.surfaceContainerLow}
-            style={styles.constrainedDemo}
-          >
-            <Column gap="xs">
-              <Typography variant="labelLarge">Constrained parent</Typography>
-              <Typography variant="bodySmall" style={mutedTextStyle}>
-                This box clips overflow and has a stacking context, but a Portal
-                child still renders above the whole screen.
-              </Typography>
-              <ToastDemo />
-            </Column>
-          </Box>
+          <Column gap="sm">
+            <Typography variant="titleSmall">Why a Portal?</Typography>
+            <Box
+              bg={theme.colors.surfaceContainerLow}
+              style={styles.constrainedDemo}
+            >
+              <Column gap="xs">
+                <Typography variant="labelLarge">Constrained parent</Typography>
+                <Typography variant="bodySmall" style={mutedTextStyle}>
+                  This box clips overflow and has a stacking context, but a
+                  Portal child still renders above the whole screen.
+                </Typography>
+                <ToastDemo />
+              </Column>
+            </Box>
+          </Column>
+          <ScreenNavFooter />
         </Column>
-      </Column>
+      </ScrollView>
     </PortalHost>
   )
 }

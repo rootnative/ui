@@ -14,6 +14,8 @@ import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import type { KeyboardAvoidingViewProps } from 'react-native'
 import { StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 type Behavior = NonNullable<KeyboardAvoidingViewProps['behavior']>
 
@@ -83,8 +85,7 @@ export default function KeyboardAvoidingWrapperScreen() {
       scrollViewProps={{ bounces: false }}
       contentContainerStyle={styles.content}
     >
-      <Typography variant="headlineSmall">KeyboardAvoidingWrapper</Typography>
-
+      <ScreenIntro />
       <Column gap="lg">
         <Typography variant="titleSmall">Settings</Typography>
 
@@ -164,6 +165,7 @@ export default function KeyboardAvoidingWrapperScreen() {
           numberOfLines={4}
         />
       </Column>
+      <ScreenNavFooter />
     </KeyboardAvoidingWrapper>
   )
 }

@@ -15,6 +15,8 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { I18nManager, ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 function SectionTitle({ children }: { children: string }) {
   const { colors } = useTheme()
@@ -59,6 +61,7 @@ export default function RTLScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScreenIntro />
       <Box
         p="md"
         style={[styles.badge, { backgroundColor: colors.tertiaryContainer }]}
@@ -154,6 +157,7 @@ export default function RTLScreen() {
           <Typography variant="bodyMedium">Off</Typography>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

@@ -9,6 +9,8 @@ import { Motion, useScroll } from '@rootnative/inertia'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants: Array<{
   key: AppBarVariant
@@ -112,8 +114,7 @@ export default function AppBarScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">AppBar Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Column gap="md">
@@ -261,6 +262,7 @@ export default function AppBarScreen() {
           ))}
         </Column>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

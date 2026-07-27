@@ -11,6 +11,8 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 type OpenDialog = 'basic' | 'icon' | 'persistent' | 'form' | 'fullscreen' | null
 
@@ -34,6 +36,7 @@ function DialogScreenContent() {
     <>
       <ScrollView contentContainerStyle={scrollStyle}>
         <Column gap="xl" style={styles.container}>
+          <ScreenIntro />
           <Column gap="sm">
             <Typography variant="titleMedium">Basic</Typography>
             <Card variant="outlined">
@@ -117,6 +120,7 @@ function DialogScreenContent() {
               </Column>
             </Card>
           </Column>
+          <ScreenNavFooter />
         </Column>
       </ScrollView>
 

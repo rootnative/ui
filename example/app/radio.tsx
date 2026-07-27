@@ -1,6 +1,8 @@
 import { Column, Radio, Row, Typography } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 export default function RadioScreen() {
   const [radioValue, setRadioValue] = useState<string>('option1')
@@ -8,8 +10,7 @@ export default function RadioScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Radio</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Radio Group</Typography>
         <Row gap="sm" align="center">
@@ -60,6 +61,7 @@ export default function RadioScreen() {
           <Typography variant="bodyMedium">Blue radio</Typography>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

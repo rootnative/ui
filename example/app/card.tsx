@@ -1,13 +1,14 @@
 import { Card, Typography, Column } from '@rootnative/components'
 import { Alert, ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['elevated', 'filled', 'outlined'] as const
 
 export default function CardScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Card Showcase</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Variants</Typography>
         <Column gap="sm">
@@ -64,6 +65,7 @@ export default function CardScreen() {
           ))}
         </Column>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

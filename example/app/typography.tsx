@@ -1,6 +1,8 @@
 import { Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = [
   'displayLarge',
@@ -33,6 +35,7 @@ export default function TypographyScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
+      <ScreenIntro />
       <View style={styles.section}>
         <Typography variant="headlineSmall">All Variants</Typography>
         {variants.map((variant) => (
@@ -81,6 +84,7 @@ export default function TypographyScreen() {
           Uppercase text
         </Typography>
       </View>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }

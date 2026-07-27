@@ -1,6 +1,8 @@
 import { Checkbox, Column, Row, Typography } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { ScreenIntro } from '../src/ScreenIntro'
+import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const topicLabels = ['Product updates', 'Security alerts', 'Weekly digest']
 
@@ -20,8 +22,7 @@ export default function CheckboxScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Typography variant="headlineSmall">Checkbox</Typography>
-
+      <ScreenIntro />
       <Column gap="sm">
         <Typography variant="titleSmall">Basic</Typography>
         <Row gap="sm" align="center">
@@ -119,6 +120,7 @@ export default function CheckboxScreen() {
           </Typography>
         </Row>
       </Column>
+      <ScreenNavFooter />
     </ScrollView>
   )
 }
