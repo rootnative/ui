@@ -101,6 +101,11 @@
       "react-native": "./dist/tabs/index.js",
       "default": "./dist/tabs/index.js"
     },
+    "./navigation-bar": {
+      "types": "./dist/navigation-bar/index.d.ts",
+      "react-native": "./dist/navigation-bar/index.js",
+      "default": "./dist/navigation-bar/index.js"
+    },
     "./list": {
       "types": "./dist/list/index.d.ts",
       "react-native": "./dist/list/index.js",
@@ -199,6 +204,9 @@
       ],
       "tabs": [
         "dist/tabs/index.d.ts"
+      ],
+      "navigation-bar": [
+        "dist/navigation-bar/index.d.ts"
       ],
       "list": [
         "dist/list/index.d.ts"

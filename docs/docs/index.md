@@ -78,3 +78,4 @@ Design-system agnostic component library for React Native. Ships with Material D
 | Component | Description |
 |-----------|-------------|
 | [Tabs](./components/tabs) | Primary and secondary tab rows, fixed or scrollable |
+| [NavigationBar](./components/navigation-bar) | 80dp bottom destination bar with an animated indicator pill |

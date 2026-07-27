@@ -289,6 +289,15 @@ export const sections: CatalogSection[] = [
         docs: 'components/tabs',
         keywords: 'tab bar indicator scrollable fixed primary secondary',
       },
+      {
+        label: 'NavigationBar',
+        route: '/navigation-bar',
+        description:
+          '80dp bottom destination bar with an animated indicator pill',
+        add: 'navigation-bar',
+        docs: 'components/navigation-bar',
+        keywords: 'bottom navigation destinations bar pill indicator shell',
+      },
     ],
   },
 ]

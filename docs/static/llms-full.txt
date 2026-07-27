@@ -1354,6 +1354,67 @@ Props:
 
 ---
 
+### NavigationBar
+
+```tsx
+import { NavigationBar } from '@rootnative/components/navigation-bar'
+
+// A bar, not a navigator: it reports the press, you own the screens/routes.
+// MD3 recommends 3–5 destinations. `selectedIcon` swaps in while active.
+<NavigationBar
+  items={[
+    { value: 'home', label: 'Home', icon: 'home-outline', selectedIcon: 'home' },
+    { value: 'search', label: 'Search', icon: 'magnify' },
+    { value: 'library', label: 'Library', icon: 'bookshelf' },
+  ]}
+  value={destination}
+  onValueChange={setDestination}
+  insetBottom // adds the safe-area bottom inset below the 80dp bar
+/>
+
+// Uncontrolled, starting on `defaultValue` (falls back to the first item).
+<NavigationBar items={items} defaultValue="search" onValueChange={go} />
+
+// Label modes: 'always' (default), 'selected' (only the active label, faded
+// in), 'never' (icons only). The label still names the item for screen readers.
+<NavigationBar labelVisibility="selected" items={items} />
+
+// Overrides: containerColor (bar), contentColor (inactive), selectedContentColor
+// (active icon+label), indicatorColor (pill), labelStyle. Disabled items stay
+// at the MD3 38%.
+<NavigationBar indicatorColor="#FFD8E4" items={items} />
+```
+
+Props:
+- `items: NavigationBarItem[]` — The destinations to render. MD3 recommends 3–5.
+- `value?: string` — Value of the active destination (controlled).
+- `defaultValue?: string` — Value of the initially active destination (uncontrolled). Defaults to the first item — a navigation bar with nothing active reads as broken.
+- `onValueChange?: (value: string) => void` — Called with the value of the destination that was pressed.
+- `labelVisibility?: 'always' | 'selected' | 'never'` — Default: `'always'`. When destination labels are shown.
+- `insetBottom?: boolean` — Default: `false`. When `true`, wraps the row in a SafeAreaView that adds the bottom inset below the bar's 80dp, so it clears the home indicator. Leave it off when an ancestor (e.g. `Layout` with a `bottom` edge) already handles it.
+- `containerColor?: string` — Default: `surfaceContainer`. Override the bar background.
+- `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon and label color of inactive destinations.
+- `selectedContentColor?: string` — Default: `onSecondaryContainer (icon) / secondary (label)`. Override the icon and label color of the active destination. State-layer colors are derived from it automatically.
+- `indicatorColor?: string` — Default: `secondaryContainer`. Override the active indicator pill color.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to every destination's label `Text` — does not affect the icons.
+- `style?: StyleProp<ViewStyle>` — Style applied to the bar container.
+- `accessibilityLabel?: string` — Screen-reader label for the bar itself.
+- `testID?: string` — Test id applied to the bar container. Each destination carries `<testID>-item-<value>` and its indicator `<testID>-indicator-<value>`.
+
+#### NavigationBarItem
+
+One destination. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.
+
+Props:
+- `value: string` — Stable identifier used for selection state and the change callback.
+- `label: string` — Text label under the icon. One line — a label that doesn't fit is truncated. Also the destination's screen-reader name, so it stays required even when `labelVisibility` hides it.
+- `icon: IconSource` — Icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
+- `selectedIcon?: IconSource` — Icon shown while the destination is active — MD3 pairs an outlined resting icon with its filled counterpart. Falls back to `icon`.
+- `disabled?: boolean` — Greys the destination out at 38% and stops it responding.
+- `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
+
+---
+
 ### Avatar
 
 ```tsx

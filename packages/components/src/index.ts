@@ -83,6 +83,13 @@ export type {
 export { Tabs } from './tabs'
 export type { TabsProps, TabItem, TabsVariant } from './tabs'
 
+export { NavigationBar } from './navigation-bar'
+export type {
+  NavigationBarItem,
+  NavigationBarLabelVisibility,
+  NavigationBarProps,
+} from './navigation-bar'
+
 export { List, ListItem, ListDivider } from './list'
 export type {
   ListProps,

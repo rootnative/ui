@@ -21,6 +21,7 @@ export default defineConfig({
     'src/menu/index.ts',
     'src/tooltip/index.ts',
     'src/tabs/index.ts',
+    'src/navigation-bar/index.ts',
     'src/list/index.ts',
     'src/keyboard-avoiding-wrapper/index.ts',
     'src/avatar/index.ts',

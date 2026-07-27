@@ -72,7 +72,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Navigation',
       collapsed: false,
-      items: ['components/tabs'],
+      items: ['components/tabs', 'components/navigation-bar'],
     },
   ],
 }

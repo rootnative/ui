@@ -1,0 +1,25 @@
+{
+  "name": "navigation-bar",
+  "description": "MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill",
+  "files": [
+    "packages/components/src/navigation-bar/NavigationBar.tsx",
+    "packages/components/src/navigation-bar/NavigationItem.tsx",
+    "packages/components/src/navigation-bar/index.ts",
+    "packages/components/src/navigation-bar/styles.ts",
+    "packages/components/src/navigation-bar/types.ts",
+    "packages/components/src/internal/useBooleanProgress.ts",
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/safe-area.tsx"
+  ],
+  "utils": ["color", "elevation", "render-icon"],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {
+    "react-native-safe-area-context": ">=4.0.0"
+  }
+}

@@ -354,6 +354,49 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           />
         </Column>
       )
+    case 'NavigationBar':
+      return (
+        <Box
+          bg={theme.colors.surfaceContainer}
+          style={previewStyles.navBarWrapper}
+        >
+          <Column align="center" gap="xs">
+            <Box
+              bg={theme.colors.secondaryContainer}
+              style={previewStyles.navBarPill}
+            >
+              <Box
+                bg={theme.colors.onSecondaryContainer}
+                style={previewStyles.navBarIcon}
+              />
+            </Box>
+            <Box
+              bg={theme.colors.secondary}
+              style={previewStyles.navBarLabel}
+            />
+          </Column>
+          <Column align="center" gap="xs">
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.navBarIconMuted}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.navBarLabelMuted}
+            />
+          </Column>
+          <Column align="center" gap="xs">
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.navBarIconMuted}
+            />
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.navBarLabelMuted}
+            />
+          </Column>
+        </Box>
+      )
     case 'Tooltip':
       return (
         <View style={previewStyles.tooltipWrapper}>
@@ -855,6 +898,45 @@ const previewStyles = StyleSheet.create({
   tabsDivider: {
     width: '100%',
     height: 1,
+  },
+  navBarWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    borderRadius: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  navBarPill: {
+    width: 28,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navBarIcon: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  navBarIconMuted: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    opacity: 0.6,
+    marginVertical: 4,
+  },
+  navBarLabel: {
+    width: 18,
+    height: 4,
+    borderRadius: 2,
+  },
+  navBarLabelMuted: {
+    width: 18,
+    height: 4,
+    borderRadius: 2,
+    opacity: 0.6,
   },
   tooltipWrapper: {
     width: '100%',

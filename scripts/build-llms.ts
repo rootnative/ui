@@ -393,6 +393,7 @@ const COMPONENT_ORDER = [
   'menu',
   'tooltip',
   'tabs',
+  'navigation-bar',
   'avatar',
   'slider',
   'progress',
@@ -422,6 +423,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   menu: 'Menu',
   tooltip: 'Tooltip',
   tabs: 'Tabs',
+  'navigation-bar': 'NavigationBar',
   avatar: 'Avatar',
   slider: 'Slider',
   progress: 'Progress',
@@ -777,6 +779,35 @@ import { Tabs } from '@rootnative/components/tabs'
 // Overrides: containerColor (row), contentColor (inactive), selectedContentColor
 // (active), indicatorColor, labelStyle. Disabled items stay at the MD3 38%.
 <Tabs items={[{ value: 'x', label: 'Deleted', disabled: true }]} showDivider={false} />
+\`\`\``,
+
+  'navigation-bar': `\`\`\`tsx
+import { NavigationBar } from '@rootnative/components/navigation-bar'
+
+// A bar, not a navigator: it reports the press, you own the screens/routes.
+// MD3 recommends 3–5 destinations. \`selectedIcon\` swaps in while active.
+<NavigationBar
+  items={[
+    { value: 'home', label: 'Home', icon: 'home-outline', selectedIcon: 'home' },
+    { value: 'search', label: 'Search', icon: 'magnify' },
+    { value: 'library', label: 'Library', icon: 'bookshelf' },
+  ]}
+  value={destination}
+  onValueChange={setDestination}
+  insetBottom // adds the safe-area bottom inset below the 80dp bar
+/>
+
+// Uncontrolled, starting on \`defaultValue\` (falls back to the first item).
+<NavigationBar items={items} defaultValue="search" onValueChange={go} />
+
+// Label modes: 'always' (default), 'selected' (only the active label, faded
+// in), 'never' (icons only). The label still names the item for screen readers.
+<NavigationBar labelVisibility="selected" items={items} />
+
+// Overrides: containerColor (bar), contentColor (inactive), selectedContentColor
+// (active icon+label), indicatorColor (pill), labelStyle. Disabled items stay
+// at the MD3 38%.
+<NavigationBar indicatorColor="#FFD8E4" items={items} />
 \`\`\``,
 
   avatar: `\`\`\`tsx
@@ -1143,6 +1174,29 @@ import { Grid } from '@rootnative/components/layout'
         typeAliases,
         '#### TabItem',
         'One tab. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.',
+      )
+    }
+
+    return output
+  }
+
+  // --- NavigationBar: bar props + the shape of one destination ---
+  if (dirName === 'navigation-bar') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'NavigationBarProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    const itemIface = interfaces.find((i) => i.name === 'NavigationBarItem')
+    if (itemIface) {
+      output += formatSubInterface(
+        itemIface,
+        typeAliases,
+        '#### NavigationBarItem',
+        'One destination. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.',
       )
     }
 

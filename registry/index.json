@@ -66,6 +66,10 @@
       "description": "Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility."
     },
     {
+      "name": "navigation-bar",
+      "description": "MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill"
+    },
+    {
       "name": "portal",
       "description": "Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips."
     },

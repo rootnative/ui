@@ -10,6 +10,7 @@ import { Dialog } from '../dialog'
 import { IconButton } from '../icon-button'
 import { LoadingIndicator } from '../loading-indicator'
 import { Menu } from '../menu'
+import { NavigationBar } from '../navigation-bar'
 import { PortalHost } from '../portal/PortalHost'
 import { Radio } from '../radio'
 import { Slider } from '../slider'
@@ -137,6 +138,23 @@ const CASES: readonly ReducedMotionCase[] = [
       fireEvent(screen.getByText('Alpha'), 'layout', {
         nativeEvent: { layout: { x: 0, y: 0, width: 60, height: 20 } },
       })
+    },
+  },
+  {
+    name: 'NavigationBar',
+    render: () => (
+      <NavigationBar
+        items={[
+          { value: 'home', label: 'Home', icon: 'home-outline' },
+          { value: 'search', label: 'Search', icon: 'magnify' },
+        ]}
+      />
+    ),
+    // The indicator progress seeds from the initial selection, so a plain
+    // mount animates nothing — the transition under test starts when the
+    // selection moves.
+    settle: () => {
+      fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
     },
   },
   {
