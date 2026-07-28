@@ -160,6 +160,34 @@ describe('Tabs — indicator', () => {
     expect(style.height).toBe(2)
   })
 
+  // MD3 caps the primary indicator on its top edge only and leaves the
+  // secondary one a plain rule. Rounding all four corners of either would lift
+  // it off the tab it marks.
+  it('rounds the top edge of a primary indicator and nothing else', () => {
+    renderTabs()
+    layOutRow()
+
+    const style = StyleSheet.flatten(
+      screen.getByTestId('tabs-indicator').props.style,
+    )
+    expect(style.borderTopLeftRadius).toBe(3)
+    expect(style.borderTopRightRadius).toBe(3)
+    expect(style.borderRadius).toBeUndefined()
+    expect(style.borderBottomLeftRadius).toBeUndefined()
+    expect(style.borderBottomRightRadius).toBeUndefined()
+  })
+
+  it('leaves a secondary indicator square', () => {
+    renderTabs({ variant: 'secondary' })
+    layOutRow()
+
+    const style = StyleSheet.flatten(
+      screen.getByTestId('tabs-indicator').props.style,
+    )
+    expect(style.borderTopLeftRadius).toBe(0)
+    expect(style.borderTopRightRadius).toBe(0)
+  })
+
   it('follows the selection', () => {
     const view = renderTabs()
     layOutRow()

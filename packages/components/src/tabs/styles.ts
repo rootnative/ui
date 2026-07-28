@@ -14,7 +14,8 @@ import type { TabsVariant } from './types'
  * secondary `ActiveLabelTextColor / ActiveIconColor = onSurface`,
  * both `Inactive… = onSurfaceVariant`,
  * `ActiveIndicatorColor = primary`, `ActiveIndicatorHeight = 3.dp`,
- * `ActiveIndicatorShape = RoundedCornerShape(3.dp)`,
+ * `TabRowDefaults.PrimaryIndicator(shape = RoundedCornerShape(topStart = 3.dp,
+ * topEnd = 3.dp))` — capped on top, flush on the bottom,
  * `HorizontalTextPadding = 16.dp`, `TextDistanceFromLeadingIcon = 8.dp`,
  * `ScrollableTabRowMinTabWidth = 90.dp`,
  * `ScrollableTabRowEdgeStartPadding = 52.dp`,
@@ -39,7 +40,25 @@ export const SCROLLABLE_EDGE_PADDING = 52
  */
 export const SECONDARY_INDICATOR_HEIGHT = 2
 
-/** Vertical gap between a stacked icon and label on a primary tab. */
+/**
+ * Only the primary indicator is a shape; the secondary one is a plain rule.
+ * `TabRowDefaults.SecondaryIndicator` takes no shape at all, and material-web
+ * gives `--md-primary-tab-active-indicator-shape` a `3px 3px 0 0` against the
+ * secondary tab's unset one. Both agree the bottom corners stay square, so the
+ * radius goes on the top edge only — the indicator sits flush against the tab
+ * it marks.
+ */
+const PRIMARY_INDICATOR_RADIUS = 3
+const SECONDARY_INDICATOR_RADIUS = 0
+
+/**
+ * Vertical gap between a stacked icon and label on a primary tab.
+ *
+ * An approximation, like Tooltip's `RICH_SUBHEAD_GAP`: Compose spaces the two
+ * with `IconDistanceFromBaseline`, a baseline offset React Native has no
+ * equivalent for. 2dp between the line boxes lands on the same visual gap for
+ * the MD3 type scale inside the 64dp icon-and-label height.
+ */
 const STACKED_GAP = 2
 
 /** Focus-ring geometry, matching the rest of the library. */
@@ -75,10 +94,13 @@ export function createTabsStyles(
   edgePadding: number,
   containerColor?: string,
 ) {
-  const indicatorHeight =
-    variant === 'primary'
-      ? PRIMARY_INDICATOR_HEIGHT
-      : SECONDARY_INDICATOR_HEIGHT
+  const isPrimary = variant === 'primary'
+  const indicatorHeight = isPrimary
+    ? PRIMARY_INDICATOR_HEIGHT
+    : SECONDARY_INDICATOR_HEIGHT
+  const indicatorRadius = isPrimary
+    ? PRIMARY_INDICATOR_RADIUS
+    : SECONDARY_INDICATOR_RADIUS
 
   return StyleSheet.create({
     root: {
@@ -104,12 +126,15 @@ export function createTabsStyles(
     },
     // Positioned from the physical left with a translate, not from `start`:
     // the measured offsets are physical too, so the same math holds in RTL.
+    // Both top corners take the same radius, so the physical spelling is
+    // RTL-safe here too.
     indicator: {
       position: 'absolute',
       left: 0,
       bottom: 0,
       height: indicatorHeight,
-      borderRadius: PRIMARY_INDICATOR_HEIGHT,
+      borderTopLeftRadius: indicatorRadius,
+      borderTopRightRadius: indicatorRadius,
       backgroundColor: colors.indicator,
     },
   })
