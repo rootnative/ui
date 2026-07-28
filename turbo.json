@@ -27,7 +27,7 @@
       "inputs": [
         "src/**",
         "jest.config.{js,ts}",
-        "jest.setup.{js,ts}",
+        "jest.setup*.{js,ts}",
         "vitest.config.ts",
         "babel.config.js",
         "tsconfig.json",
