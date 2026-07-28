@@ -14,6 +14,7 @@ import { LoadingIndicator } from '../loading-indicator'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
 import { PortalHost } from '../portal/PortalHost'
+import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
@@ -79,6 +80,21 @@ const CASES: readonly ReducedMotionCase[] = [
   {
     name: 'LoadingIndicator',
     render: () => <LoadingIndicator accessibilityLabel="Loading" />,
+  },
+  {
+    name: 'LinearProgress (indeterminate)',
+    render: () => <LinearProgress accessibilityLabel="Loading" />,
+    // The slide's keyframes derive from the measured track width — feed a
+    // layout in so the loop has distance to cover.
+    settle: () => {
+      fireEvent(screen.getByRole('progressbar'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 320, height: 4 } },
+      })
+    },
+  },
+  {
+    name: 'CircularProgress (indeterminate)',
+    render: () => <CircularProgress accessibilityLabel="Loading" />,
   },
   {
     name: 'Dialog',

@@ -21,6 +21,23 @@ export type IconResolver = (
   props: IconRenderProps,
 ) => React.ReactNode
 
+/**
+ * Anything a component will accept for an icon prop:
+ *
+ * - **string** — a name resolved via the `iconResolver` registered on
+ *   `ThemeProvider`. Falls back to `MaterialCommunityIcons` when no
+ *   resolver is set, preserving the legacy default.
+ * - **ReactElement** — a pre-rendered icon. The caller is responsible for
+ *   passing size and color; the component will not override them.
+ * - **(props) => ReactNode** — a render function that receives the
+ *   component's resolved size and color. Useful for plugging in Lucide,
+ *   SF Symbols, or custom SVGs without losing theme integration.
+ */
+export type IconSource =
+  | string
+  | React.ReactElement
+  | ((props: IconRenderProps) => React.ReactNode)
+
 export const IconResolverContext = React.createContext<IconResolver | null>(
   null,
 )

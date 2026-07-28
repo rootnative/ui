@@ -12,7 +12,7 @@ pnpm add @rootnative/icons
 
 ## Icons
 
-Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/utils'`) — one of three forms:
+Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/core'`) — one of three forms:
 
 1. **String name** — resolved through the theme's `iconResolver`. Defaults to `MaterialCommunityIcons` from `@expo/vector-icons`. Browse names at https://pictogrammers.com/library/mdi/.
 2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.

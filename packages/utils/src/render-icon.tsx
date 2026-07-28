@@ -1,24 +1,17 @@
-import type { IconRenderProps, IconResolver } from '@rootnative/core'
+import type {
+  IconRenderProps,
+  IconResolver,
+  IconSource,
+} from '@rootnative/core'
 import { isValidElement } from 'react'
-import type { ReactElement, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { getMaterialCommunityIcons } from './icon'
 
-/**
- * Anything a component will accept for an icon prop:
- *
- * - **string** — a name resolved via the `iconResolver` registered on
- *   `ThemeProvider`. Falls back to `MaterialCommunityIcons` when no
- *   resolver is set, preserving the legacy default.
- * - **ReactElement** — a pre-rendered icon. The caller is responsible for
- *   passing size and color; the component will not override them.
- * - **(props) => ReactNode** — a render function that receives the
- *   component's resolved size and color. Useful for plugging in Lucide,
- *   SF Symbols, or custom SVGs without losing theme integration.
- */
-export type IconSource =
-  | string
-  | ReactElement
-  | ((props: IconRenderProps) => ReactNode)
+// The canonical `IconSource` definition lives in `@rootnative/core` next to
+// `IconResolver` (core is the published package; this one is private).
+// Re-exported here so components and copy-pasted CLI installs keep importing
+// it from utils unchanged.
+export type { IconSource } from '@rootnative/core'
 
 /**
  * Render any `IconSource` to a node. Components should call this with the

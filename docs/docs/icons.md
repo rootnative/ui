@@ -13,7 +13,7 @@ This makes the library design-system agnostic: an Apple HIG app can use SF Symbo
 Every icon prop on every component (`leadingIcon`, `trailingIcon`, `icon`, `selectedIcon`, …) accepts an `IconSource`:
 
 ```ts
-import type { IconSource } from '@rootnative/utils'
+import type { IconSource } from '@rootnative/core'
 
 type IconSource =
   | string                                    // resolved via iconResolver (MCI by default)
@@ -339,11 +339,10 @@ The `color` may be `undefined` when the component lets the icon library inherit 
 
 ## TypeScript
 
-Types live in `@rootnative/core` (the resolver) and `@rootnative/utils` (`IconSource`):
+All three types live in `@rootnative/core`:
 
 ```ts
-import type { IconResolver, IconRenderProps } from '@rootnative/core'
-import type { IconSource } from '@rootnative/utils'
+import type { IconResolver, IconRenderProps, IconSource } from '@rootnative/core'
 ```
 
 `@rootnative/icons` re-exports `IconResolver` and `IconRenderProps` for convenience, plus its own helper types:

@@ -1,5 +1,10 @@
 import { useTheme } from '@rootnative/core'
-import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import {
+  Motion,
+  cubicBezier,
+  useAnimation,
+  useShouldReduceMotion,
+} from '@rootnative/inertia'
 import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { View } from 'react-native'
@@ -85,6 +90,13 @@ export function CircularProgress({
     }),
     [],
   )
+
+  // Under reduced motion, skip the Motion wrapper and render the arc static
+  // at 0° — visually identical to the snap-to-360° the gate would produce,
+  // and it keeps the 0 ms first keyframe step (whose inline `type: 'timing'`
+  // bypasses inertia's reduced-motion override — resolveSequence's
+  // step-override-wins merge) from running a timing primitive.
+  const shouldReduceMotion = useShouldReduceMotion()
 
   // Determinate progress, smoothly tweened to the latest prop.
   const progressShared = useAnimation(value, motionTransition)
@@ -174,7 +186,7 @@ export function CircularProgress({
       accessibilityValue={accessibilityValue}
       style={[styles.root, style]}
     >
-      {indeterminate ? (
+      {indeterminate && !shouldReduceMotion ? (
         <Motion.View animate={spinAnimate} transition={spinTransition}>
           {renderSvg()}
         </Motion.View>

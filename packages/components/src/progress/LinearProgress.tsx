@@ -1,5 +1,10 @@
 import { useTheme } from '@rootnative/core'
-import { Motion, cubicBezier, useAnimation } from '@rootnative/inertia'
+import {
+  Motion,
+  cubicBezier,
+  useAnimation,
+  useShouldReduceMotion,
+} from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
@@ -92,6 +97,16 @@ export function LinearProgress({
     [],
   )
 
+  // Under reduced motion the loop would snap to its final keyframe
+  // (`translateX: width`) and sit clipped past the track's end — an empty
+  // bar that no longer conveys activity. Render a static centered segment
+  // instead, matching the paused-arc look of the circular variant.
+  const shouldReduceMotion = useShouldReduceMotion()
+  const staticSegmentStyle = useMemo(
+    () => ({ left: (width - segmentWidth) / 2, width: segmentWidth }),
+    [width, segmentWidth],
+  )
+
   // Determinate layout. The bar is split into:
   //   [active] [gap] [inactive] [gap] [stop dot]
   // The trailing stop dot + its gap are reserved only when the dot is shown
@@ -147,11 +162,15 @@ export function LinearProgress({
       {indeterminate ? (
         <>
           <View style={styles.inactiveTrackFull} />
-          <Motion.View
-            style={[styles.activeIndicator, indeterminateSegmentStyle]}
-            animate={indeterminateAnimate}
-            transition={indeterminateTransition}
-          />
+          {shouldReduceMotion ? (
+            <View style={[styles.activeIndicator, staticSegmentStyle]} />
+          ) : (
+            <Motion.View
+              style={[styles.activeIndicator, indeterminateSegmentStyle]}
+              animate={indeterminateAnimate}
+              transition={indeterminateTransition}
+            />
+          )}
         </>
       ) : (
         <>
