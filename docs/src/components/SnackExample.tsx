@@ -20,6 +20,10 @@ const EXTERNAL_DEPENDENCIES = [
   '@material/material-color-utilities@^0.4.0',
   '@expo/vector-icons@^15.0.3',
   'react-native-safe-area-context@~5.6.0',
+  // CircularProgress and LoadingIndicator need this at runtime. Declared
+  // rather than relying on Snack preloading it with the Expo SDK — those two
+  // previews are the only ones that would fail, and silently.
+  'react-native-svg@~15.12.1',
 ]
 
 function useDefaultDependencies(): string {
