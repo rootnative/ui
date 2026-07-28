@@ -389,6 +389,7 @@ const COMPONENT_ORDER = [
   'keyboard-avoiding-wrapper',
   'portal',
   'dialog',
+  'bottom-sheet',
   'snackbar',
   'menu',
   'tooltip',
@@ -419,6 +420,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   'keyboard-avoiding-wrapper': 'KeyboardAvoidingWrapper',
   portal: 'Portal',
   dialog: 'Dialog',
+  'bottom-sheet': 'BottomSheet',
   snackbar: 'Snackbar',
   menu: 'Menu',
   tooltip: 'Tooltip',
@@ -647,6 +649,35 @@ import { Button } from '@rootnative/components/button'
   <Dialog.Actions><Button variant="text" onPress={save}>Save</Button></Dialog.Actions>
   <Dialog.Content><ProfileForm /></Dialog.Content>
 </Dialog>
+\`\`\``,
+
+  'bottom-sheet': `\`\`\`tsx
+import { BottomSheet } from '@rootnative/components/bottom-sheet'
+
+// Requires a <PortalHost> at the app root. Content-sized, drag the handle
+// down (or tap the scrim / Android back) to dismiss.
+<BottomSheet visible={open} onDismiss={close}>
+  <ShareActions />
+</BottomSheet>
+
+// Snap points: dp numbers or percentages of the portal host's height.
+// Indices are ascending by resolved height; below the lowest one, a
+// release dismisses. Scrollable content brings its own ScrollView — the
+// drag gesture lives on the handle, so the two never fight.
+<BottomSheet
+  visible={open}
+  onDismiss={close}
+  snapPoints={['50%', '90%']}
+  onSnapIndexChange={setIndex}
+>
+  <ScrollView><Places /></ScrollView>
+</BottomSheet>
+
+// Standard sheet: no scrim, screen behind stays interactive
+<BottomSheet visible={open} onDismiss={close} variant="standard">…</BottomSheet>
+
+// Must be resolved by an action — drags rubber-band back, scrim inert
+<BottomSheet visible={open} onDismiss={close} dismissable={false}>…</BottomSheet>
 \`\`\``,
 
   snackbar: `\`\`\`tsx

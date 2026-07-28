@@ -66,6 +66,13 @@ export type {
   DialogActionsProps,
 } from './dialog'
 
+export { BottomSheet } from './bottom-sheet'
+export type {
+  BottomSheetProps,
+  BottomSheetSnapPoint,
+  BottomSheetVariant,
+} from './bottom-sheet'
+
 export { Divider } from './divider'
 export type { DividerProps, DividerOrientation } from './divider'
 

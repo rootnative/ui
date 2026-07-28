@@ -1,0 +1,23 @@
+{
+  "name": "bottom-sheet",
+  "description": "MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss.",
+  "files": [
+    "packages/components/src/bottom-sheet/BottomSheet.tsx",
+    "packages/components/src/bottom-sheet/geometry.ts",
+    "packages/components/src/bottom-sheet/index.ts",
+    "packages/components/src/bottom-sheet/styles.ts",
+    "packages/components/src/bottom-sheet/types.ts",
+    "packages/components/src/safe-area.tsx"
+  ],
+  "utils": ["color", "elevation"],
+  "componentDependencies": ["portal"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.3",
+    "@rootnative/inertia": ">=0.0.2",
+    "react-native-reanimated": ">=4.0.0",
+    "react-native-worklets": ">=0.5.0"
+  },
+  "optionalDependencies": {
+    "react-native-safe-area-context": ">=4.0.0"
+  }
+}

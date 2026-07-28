@@ -706,6 +706,59 @@ Props:
 
 ---
 
+### BottomSheet
+
+```tsx
+import { BottomSheet } from '@rootnative/components/bottom-sheet'
+
+// Requires a <PortalHost> at the app root. Content-sized, drag the handle
+// down (or tap the scrim / Android back) to dismiss.
+<BottomSheet visible={open} onDismiss={close}>
+  <ShareActions />
+</BottomSheet>
+
+// Snap points: dp numbers or percentages of the portal host's height.
+// Indices are ascending by resolved height; below the lowest one, a
+// release dismisses. Scrollable content brings its own ScrollView — the
+// drag gesture lives on the handle, so the two never fight.
+<BottomSheet
+  visible={open}
+  onDismiss={close}
+  snapPoints={['50%', '90%']}
+  onSnapIndexChange={setIndex}
+>
+  <ScrollView><Places /></ScrollView>
+</BottomSheet>
+
+// Standard sheet: no scrim, screen behind stays interactive
+<BottomSheet visible={open} onDismiss={close} variant="standard">…</BottomSheet>
+
+// Must be resolved by an action — drags rubber-band back, scrim inert
+<BottomSheet visible={open} onDismiss={close} dismissable={false}>…</BottomSheet>
+```
+
+Props:
+- `visible: boolean` — Whether the sheet is shown. Exit animations run before it unmounts.
+- `onDismiss: () => void` — Called when the user dismisses the sheet — a drag below the lowest snap point, a scrim tap, or the Android back button. Set `visible` to `false` in response, or the sheet stays mounted off screen.
+- `children?: ReactNode` — Sheet content. Renders below the drag handle; scrolling is yours.
+- `variant?: 'modal' | 'standard'` — Default: `'modal'`. Sheet behavior.
+- `snapPoints?: BottomSheetSnapPoint[]` — Resting heights the sheet snaps to, e.g. `[240, '90%']`. The sheet is sized to the tallest one; indices used by `snapIndex` / `defaultSnapIndex` / `onSnapIndexChange` refer to the points sorted ascending by resolved height. Omit to size the sheet to its content with a single snap.
+- `snapIndex?: number` — Snap index to settle at. Changing it animates the sheet there; the user can still drag to other snaps, reported through `onSnapIndexChange`.
+- `defaultSnapIndex?: number` — Default: `0`. Snap index the sheet opens at.
+- `onSnapIndexChange?: (index: number) => void` — Called when the sheet settles at a different snap point.
+- `dismissable?: boolean` — Default: `true`. Whether the scrim tap, the Android back button, and a downward drag past the lowest snap point dismiss the sheet. When `false`, drags below the lowest snap rubber-band back.
+- `showDragHandle?: boolean` — Default: `true`. Whether the drag handle is shown. Without it the sheet cannot be dragged — dismissal is limited to the scrim and the back button.
+- `insetBottom?: boolean` — Default: `true`. Whether the sheet's content is padded by the bottom safe-area inset. The container color still extends under the inset.
+- `containerColor?: string` — Default: `surfaceContainerLow`. Override the container (surface) color.
+- `hostName?: string` — Render into a specific named `PortalHost`.
+- `style?: StyleProp<ViewStyle>` — Style applied to the sheet surface.
+- `scrimStyle?: StyleProp<ViewStyle>` — Style applied to the scrim. Ignored by the standard variant.
+- `scrimAccessibilityLabel?: string` — Screen-reader label for the scrim's dismiss action. @default 'Close sheet'
+- `dragHandleAccessibilityLabel?: string` — Screen-reader label for the drag handle. @default 'Drag handle'
+- `testID?: string` — Test id applied to the sheet surface.
+
+---
+
 ### Snackbar
 
 ```tsx

@@ -81,6 +81,11 @@
       "react-native": "./dist/dialog/index.js",
       "default": "./dist/dialog/index.js"
     },
+    "./bottom-sheet": {
+      "types": "./dist/bottom-sheet/index.d.ts",
+      "react-native": "./dist/bottom-sheet/index.js",
+      "default": "./dist/bottom-sheet/index.js"
+    },
     "./divider": {
       "types": "./dist/divider/index.d.ts",
       "react-native": "./dist/divider/index.js",
@@ -193,6 +198,9 @@
       "dialog": [
         "dist/dialog/index.d.ts"
       ],
+      "bottom-sheet": [
+        "dist/bottom-sheet/index.d.ts"
+      ],
       "divider": [
         "dist/divider/index.d.ts"
       ],
@@ -259,7 +267,7 @@
     "material-you"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "NODE_OPTIONS=--max-old-space-size=8192 tsup",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "lint": "eslint . --max-warnings 0"

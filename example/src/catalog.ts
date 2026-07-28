@@ -256,6 +256,15 @@ export const sections: CatalogSection[] = [
         keywords: 'modal alert prompt confirm popup full screen',
       },
       {
+        label: 'BottomSheet',
+        route: '/bottom-sheet',
+        description:
+          'Draggable modal and standard sheets with velocity-based snap points',
+        add: 'bottom-sheet',
+        docs: 'components/bottom-sheet',
+        keywords: 'sheet drawer drag swipe snap dismiss handle modal',
+      },
+      {
         label: 'Snackbar',
         route: '/snackbar',
         description: 'Queued transient messages via SnackbarProvider',

@@ -10,6 +10,10 @@
       "description": "Circular avatar with image, icon, or text initials and 5 sizes (xSmall to xLarge)."
     },
     {
+      "name": "bottom-sheet",
+      "description": "MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss."
+    },
+    {
       "name": "button",
       "description": "MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support."
     },

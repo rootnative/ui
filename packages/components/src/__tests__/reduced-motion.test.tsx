@@ -3,7 +3,9 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { useEffect } from 'react'
 import type { ReactElement } from 'react'
+import { Text } from 'react-native'
 import * as Reanimated from 'react-native-reanimated'
+import { BottomSheet } from '../bottom-sheet'
 import { Checkbox } from '../checkbox'
 import { Chip } from '../chip'
 import { Dialog } from '../dialog'
@@ -155,6 +157,24 @@ const CASES: readonly ReducedMotionCase[] = [
     // selection moves.
     settle: () => {
       fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
+    },
+  },
+  {
+    name: 'BottomSheet',
+    render: () => (
+      <PortalHost>
+        <BottomSheet visible onDismiss={() => {}} testID="rm-sheet">
+          <Text>Sheet body</Text>
+        </BottomSheet>
+      </PortalHost>
+    ),
+    // The enter slide starts once the surface has been measured, and the
+    // release-settle spring is gated on the same flag — feed the layout in,
+    // or this case would assert nothing.
+    settle: () => {
+      fireEvent(screen.getByTestId('rm-sheet'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 400 } },
+      })
     },
   },
   {

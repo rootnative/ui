@@ -60,6 +60,7 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'components/appbar',
+        'components/bottom-sheet',
         'components/dialog',
         'components/keyboard-avoiding-wrapper',
         'components/menu',
