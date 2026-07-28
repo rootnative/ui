@@ -182,7 +182,7 @@ function Hero() {
             <div className={styles.phoneNotch} />
             <iframe
               ref={iframeRef}
-              src={demoUrl}
+              src={`${demoUrl}?embed=1`}
               title="RootNative UI live demo"
               className={styles.phoneScreen}
               loading="lazy"
@@ -208,7 +208,7 @@ function Hero() {
 /* --------------------------------- stats ---------------------------------- */
 
 const stats = [
-  { value: '16', label: 'Components' },
+  { value: '28', label: 'Components' },
   { value: '100%', label: 'TypeScript' },
   { value: '0', label: 'Config theming' },
   { value: 'MIT', label: 'Licensed' },

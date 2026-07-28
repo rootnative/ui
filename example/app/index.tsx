@@ -24,7 +24,7 @@ import {
 } from '@rootnative/components'
 import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
-import { useRouter } from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import {
   Pressable,
@@ -227,7 +227,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           <ListItem
             leadingContent={<Avatar size="xSmall" label="JD" />}
             headlineText="Jane Doe"
-            supportingText="Updated just now"
+            supportingText="Online"
           />
           <ListItem
             leadingContent={<Avatar size="xSmall" label="AK" />}
@@ -441,14 +441,19 @@ export default function HomeScreen() {
   const router = useRouter()
   const theme = useTheme()
   const { width } = useWindowDimensions()
+  // The docs homepage embeds this app in a phone frame with `?embed=1`. Its own
+  // hero already carries the same name, tagline and stats, so repeating them
+  // inside the frame just pushes every component below the fold.
+  const { embed } = useLocalSearchParams<{ embed?: string }>()
+  const isEmbedded = embed === '1'
   const columnsForBreakpoint = useBreakpointValue({
     compact: 2,
     medium: 3,
     expanded: 4,
     large: 4,
   })
-  // Two 128px-preview cards don't fit side by side under ~400dp (e.g. the
-  // docs homepage phone-frame iframe) — fall back to a single column there.
+  // Two 128px-preview cards need ~190dp each before their contents start
+  // truncating — under ~400dp wide the grid drops to a single column.
   const columns = width < 400 ? 1 : columnsForBreakpoint
   const padding = useBreakpointValue({
     compact: 16,
@@ -473,6 +478,13 @@ export default function HomeScreen() {
   const sectionTitleVariant = useBreakpointValue({
     compact: 'titleMedium' as const,
     medium: 'titleLarge' as const,
+  })
+  // All four stats only fit on one line from `expanded` up. Below that they go
+  // in a 2×2 grid — a wrapping row would strand the `·` separators at the end
+  // of each line.
+  const statsInline = useBreakpointValue({
+    compact: false,
+    expanded: true,
   })
 
   const previewBoxStyle = useMemo(
@@ -541,35 +553,52 @@ export default function HomeScreen() {
       ]}
     >
       <Column style={styles.container} gap="xl">
-        <Column gap="md" style={styles.hero}>
-          <Row gap="xs" align="center">
-            <Chip variant="suggestion" leadingIcon="palette-outline">
-              Material Design 3
-            </Chip>
-          </Row>
-          <Typography variant={heroVariant}>RootNative UI</Typography>
-          <Typography variant={taglineVariant} style={captionStyle}>
-            Beautiful Material Design 3 components for React Native — copy,
-            paste, ship.
-          </Typography>
-          <Row gap="md" wrap style={styles.statsRow}>
-            {stats.map((stat, idx) => (
-              <Row gap="md" align="center" key={stat.label}>
-                <Column>
-                  <Typography variant="titleMedium">{stat.value}</Typography>
-                  <Typography variant="labelSmall" style={captionStyle}>
-                    {stat.label}
-                  </Typography>
-                </Column>
-                {idx < stats.length - 1 ? (
-                  <Typography variant="titleMedium" style={dotStyle}>
-                    ·
-                  </Typography>
-                ) : null}
+        {isEmbedded ? null : (
+          <Column gap="md" style={styles.hero}>
+            <Row gap="xs" align="center">
+              <Chip variant="suggestion" leadingIcon="palette-outline">
+                Material Design 3
+              </Chip>
+            </Row>
+            <Typography variant={heroVariant}>RootNative UI</Typography>
+            <Typography variant={taglineVariant} style={captionStyle}>
+              Beautiful Material Design 3 components for React Native — copy,
+              paste, ship.
+            </Typography>
+            {statsInline ? (
+              <Row gap="md" align="center" style={styles.statsRow}>
+                {stats.map((stat, idx) => (
+                  <Row gap="md" align="center" key={stat.label}>
+                    <Column>
+                      <Typography variant="titleMedium">
+                        {stat.value}
+                      </Typography>
+                      <Typography variant="labelSmall" style={captionStyle}>
+                        {stat.label}
+                      </Typography>
+                    </Column>
+                    {idx < stats.length - 1 ? (
+                      <Typography variant="titleMedium" style={dotStyle}>
+                        ·
+                      </Typography>
+                    ) : null}
+                  </Row>
+                ))}
               </Row>
-            ))}
-          </Row>
-        </Column>
+            ) : (
+              <Grid columns={2} gap="md" style={styles.statsRow}>
+                {stats.map((stat) => (
+                  <Column key={stat.label}>
+                    <Typography variant="titleMedium">{stat.value}</Typography>
+                    <Typography variant="labelSmall" style={captionStyle}>
+                      {stat.label}
+                    </Typography>
+                  </Column>
+                ))}
+              </Grid>
+            )}
+          </Column>
+        )}
 
         <Column gap="sm">
           <TextField
