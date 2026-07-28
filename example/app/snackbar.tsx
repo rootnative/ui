@@ -2,7 +2,6 @@ import {
   Button,
   Card,
   Column,
-  PortalHost,
   Row,
   SnackbarProvider,
   Typography,
@@ -199,13 +198,14 @@ function Demos() {
   )
 }
 
+// No <PortalHost> here on purpose: the root layout already mounts one above
+// the AppBar. An unnamed host inside another shadows it with a store of its
+// own, which would confine the snackbar to the area below the AppBar.
 export default function SnackbarScreen() {
   return (
-    <PortalHost>
-      <SnackbarProvider>
-        <Demos />
-      </SnackbarProvider>
-    </PortalHost>
+    <SnackbarProvider>
+      <Demos />
+    </SnackbarProvider>
   )
 }
 

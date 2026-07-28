@@ -98,7 +98,7 @@ export function Card({
       <AnimatedPressable
         {...props}
         role="button"
-        accessibilityState={{ disabled: isDisabled }}
+        aria-disabled={isDisabled}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={onPress}

@@ -137,6 +137,15 @@ export function LinearProgress({
     return { left, width: w }
   }, [progressArea])
 
+  const accessibilityValue = indeterminate
+    ? undefined
+    : { min: 0, max: 100, now: Math.round(value * 100) }
+  const ariaValue = accessibilityValue && {
+    'aria-valuemin': accessibilityValue.min,
+    'aria-valuemax': accessibilityValue.max,
+    'aria-valuenow': accessibilityValue.now,
+  }
+
   const stopStyle = useMemo(
     () => [
       styles.stopDot,
@@ -152,11 +161,10 @@ export function LinearProgress({
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={accessibilityLabel}
-      accessibilityValue={
-        indeterminate
-          ? undefined
-          : { min: 0, max: 100, now: Math.round(value * 100) }
-      }
+      // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads
+      // only the ARIA spelling, while RN's View merges the two for native.
+      {...ariaValue}
+      accessibilityValue={accessibilityValue}
       style={[styles.root, style]}
     >
       {indeterminate ? (

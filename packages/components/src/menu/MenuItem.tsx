@@ -73,7 +73,7 @@ export function MenuItem({
     <AnimatedPressable
       testID={testID}
       role="menuitem"
-      accessibilityState={{ disabled }}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={() => {
         onPress?.()

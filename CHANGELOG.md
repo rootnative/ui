@@ -27,6 +27,20 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ### Fixed
 
+- **Accessibility state now reaches the DOM on web.** Every stateful
+  component passed `accessibilityState={{ ... }}`, which react-native-web
+  0.21 no longer reads — so on web no `aria-selected` reached Tabs or
+  NavigationBar, no `aria-checked` reached Checkbox / Radio / Switch / filter
+  Chips, and no `aria-valuenow` reached Slider or the progress indicators. A
+  screen reader on web could not tell which tab was active or whether a
+  checkbox was checked. Components now emit `aria-*`, which RNW consumes
+  directly and React Native normalizes back to `accessibilityState` for
+  native. **Native behavior is unchanged**; this only ever affected web.
+
+  Affected: Avatar, Button, ButtonGroup, Card, Checkbox, Chip, FAB,
+  IconButton, ListItem, LoadingIndicator, Menu.Item, NavigationBar, Radio,
+  Slider, Switch, Tabs, TextField, BottomSheet's drag handle, and both
+  progress indicators.
 - `LinearProgress` (indeterminate) no longer renders an empty track under
   reduced motion — the sliding segment used to snap to its final keyframe
   past the track's end and sit clipped. It now shows a static centered

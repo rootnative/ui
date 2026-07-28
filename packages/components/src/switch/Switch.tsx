@@ -268,10 +268,8 @@ export function Switch({
       <AnimatedPressable
         {...props}
         accessibilityRole="switch"
-        accessibilityState={{
-          disabled: isDisabled,
-          checked: isSelected,
-        }}
+        aria-disabled={isDisabled}
+        aria-checked={isSelected}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={handlePress}

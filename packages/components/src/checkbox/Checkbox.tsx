@@ -169,10 +169,8 @@ export function Checkbox({
     <AnimatedPressable
       {...props}
       accessibilityRole="checkbox"
-      accessibilityState={{
-        disabled: isDisabled,
-        checked: isIndeterminate ? 'mixed' : isChecked,
-      }}
+      aria-disabled={isDisabled}
+      aria-checked={isIndeterminate ? 'mixed' : isChecked}
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
       onPress={handlePress}

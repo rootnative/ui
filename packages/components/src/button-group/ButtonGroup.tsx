@@ -419,12 +419,16 @@ function ButtonGroupItemImpl({
         ? 'checkbox'
         : 'button'
 
-  const accessibilityState =
+  // ARIA props rather than `accessibilityState`: react-native-web 0.21 no
+  // longer reads the nested state object, so it was silently dropping every
+  // state on web. RN normalizes `aria-*` back into `accessibilityState` for
+  // native, so this spelling serves both platforms.
+  const ariaState =
     selectionMode === 'single'
-      ? { disabled: isDisabled, selected: isSelected }
+      ? { 'aria-disabled': isDisabled, 'aria-selected': isSelected }
       : selectionMode === 'multiple'
-        ? { disabled: isDisabled, checked: isSelected }
-        : { disabled: isDisabled }
+        ? { 'aria-disabled': isDisabled, 'aria-checked': isSelected }
+        : { 'aria-disabled': isDisabled }
 
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 
@@ -437,7 +441,7 @@ function ButtonGroupItemImpl({
       <AnimatedPressable
         accessibilityRole={accessibilityRole}
         accessibilityLabel={item.accessibilityLabel ?? item.label}
-        accessibilityState={accessibilityState}
+        {...ariaState}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={handlePress}

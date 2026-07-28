@@ -340,10 +340,10 @@ export function Chip(props: ChipProps) {
       <AnimatedPressable
         {...rest}
         accessibilityRole="button"
-        accessibilityState={{
-          disabled: isDisabled,
-          ...(variant === 'filter' ? { selected: isSelected } : undefined),
-        }}
+        aria-disabled={isDisabled}
+        {...(variant === 'filter'
+          ? { 'aria-selected': isSelected }
+          : undefined)}
         // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
         hitSlop={Platform.OS === 'web' ? undefined : 8}
         disabled={isDisabled}
@@ -381,7 +381,7 @@ export function Chip(props: ChipProps) {
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel="Remove"
-          accessibilityState={{ disabled: isDisabled }}
+          aria-disabled={isDisabled}
           disabled={isDisabled}
           hitSlop={12}
           {...(isDisabled ? undefined : closeHandlers)}

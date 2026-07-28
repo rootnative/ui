@@ -111,7 +111,8 @@ export function Tab({
     <AnimatedPressable
       role="tab"
       accessibilityLabel={item.accessibilityLabel ?? item.label}
-      accessibilityState={{ selected, disabled }}
+      aria-selected={selected}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={() => onPress(item.value)}
       onLayout={handleLayout}

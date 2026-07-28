@@ -138,6 +138,13 @@ export function LoadingIndicator({
         max: 100,
         now: Math.round(clamp(progress as number, 0, 1) * 100),
       }
+  // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only
+  // the ARIA spelling, while RN's View merges the two for native.
+  const ariaValue = accessibilityValue && {
+    'aria-valuemin': accessibilityValue.min,
+    'aria-valuemax': accessibilityValue.max,
+    'aria-valuenow': accessibilityValue.now,
+  }
 
   const renderIndicator = () => (
     <Svg width={size} height={size}>
@@ -162,6 +169,7 @@ export function LoadingIndicator({
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={accessibilityLabel}
+      {...ariaValue}
       accessibilityValue={accessibilityValue}
       style={[styles.root, style]}
     >

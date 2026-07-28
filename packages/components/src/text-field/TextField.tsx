@@ -434,6 +434,12 @@ export function TextField({
               multiline={multiline}
               style={inputStyleArr}
               accessibilityLabel={label || undefined}
+              // Both spellings here, unlike the Pressable-based components:
+              // TextInput does not normalize `aria-*` into
+              // `accessibilityState` the way View/Pressable do, so dropping
+              // the nested object would lose the state on native — while
+              // react-native-web 0.21 only reads the ARIA one.
+              aria-disabled={isDisabled}
               accessibilityState={{ disabled: isDisabled }}
               accessibilityHint={isError && errorText ? errorText : undefined}
             />

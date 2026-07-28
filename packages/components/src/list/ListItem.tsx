@@ -124,7 +124,7 @@ export function ListItem({
       // `accessibilityRole` / `role` props win (e.g. "link", "menuitem").
       accessibilityRole="button"
       {...props}
-      accessibilityState={{ disabled: isDisabled }}
+      aria-disabled={isDisabled}
       hitSlop={Platform.OS === 'web' ? undefined : 4}
       disabled={isDisabled}
       onPress={onPress}

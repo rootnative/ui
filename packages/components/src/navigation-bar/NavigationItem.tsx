@@ -130,7 +130,8 @@ export function NavigationItem({
     <Pressable
       role="tab"
       accessibilityLabel={item.accessibilityLabel ?? item.label}
-      accessibilityState={{ selected, disabled }}
+      aria-selected={selected}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={() => onPress(item.value)}
       testID={testID}

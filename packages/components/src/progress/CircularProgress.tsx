@@ -149,6 +149,13 @@ export function CircularProgress({
   const accessibilityValue = indeterminate
     ? undefined
     : { min: 0, max: 100, now: Math.round(value * 100) }
+  // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only
+  // the ARIA spelling, while RN's View merges the two for native.
+  const ariaValue = accessibilityValue && {
+    'aria-valuemin': accessibilityValue.min,
+    'aria-valuemax': accessibilityValue.max,
+    'aria-valuenow': accessibilityValue.now,
+  }
 
   const renderSvg = () => (
     <Svg width={size} height={size}>
@@ -183,6 +190,7 @@ export function CircularProgress({
       accessible
       accessibilityRole="progressbar"
       accessibilityLabel={accessibilityLabel}
+      {...ariaValue}
       accessibilityValue={accessibilityValue}
       style={[styles.root, style]}
     >

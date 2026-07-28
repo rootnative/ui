@@ -104,9 +104,13 @@ export function IconButton({
     isToggle && isSelected && selectedIcon ? selectedIcon : icon
   const iconPixelSize = sizeTokens.iconSize
   const containerWidth = getIconButtonWidth(size, width)
-  const accessibilityState = isToggle
-    ? { disabled: isDisabled, selected: isSelected }
-    : { disabled: isDisabled }
+  // ARIA props rather than `accessibilityState`: react-native-web 0.21 no
+  // longer reads the nested state object, so it was silently dropping every
+  // state on web. RN normalizes `aria-*` back into `accessibilityState` for
+  // native, so this spelling serves both platforms.
+  const ariaState = isToggle
+    ? { 'aria-disabled': isDisabled, 'aria-selected': isSelected }
+    : { 'aria-disabled': isDisabled }
 
   const colors = useMemo(() => {
     const base = getIconButtonColors(theme, variant, isToggle, isSelected)
@@ -227,7 +231,7 @@ export function IconButton({
         {...props}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        accessibilityState={accessibilityState}
+        {...ariaState}
         disabled={isDisabled}
         hitSlop={hitSlop ?? getDefaultHitSlop(sizeTokens.height)}
         onPress={onPress}

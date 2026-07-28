@@ -582,6 +582,14 @@ export function Slider({
         now: Math.round(lowValue),
         text: formatLabel(lowValue),
       }
+  // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only
+  // the ARIA spelling, while RN merges the two for native.
+  const ariaValue = {
+    'aria-valuemin': accessibilityValue.min,
+    'aria-valuemax': accessibilityValue.max,
+    'aria-valuenow': accessibilityValue.now,
+    'aria-valuetext': accessibilityValue.text,
+  }
 
   return (
     <View {...rest} style={[styles.root, style]}>
@@ -603,7 +611,8 @@ export function Slider({
       <Pressable
         accessibilityRole="adjustable"
         accessibilityLabel={accessibilityLabel}
-        accessibilityState={{ disabled: isDisabled }}
+        aria-disabled={isDisabled}
+        {...ariaValue}
         accessibilityValue={accessibilityValue}
         accessibilityActions={ACCESSIBILITY_ACTIONS}
         onAccessibilityAction={handleAccessibilityAction}

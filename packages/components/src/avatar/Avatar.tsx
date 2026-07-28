@@ -150,7 +150,7 @@ export function Avatar({
       {...props}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ disabled: isDisabled }}
+      aria-disabled={isDisabled}
       hitSlop={hitSlop}
       disabled={isDisabled}
       onPress={onPress}

@@ -158,7 +158,7 @@ export function FAB({
         {...rest}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityState={{ disabled: isDisabled }}
+        aria-disabled={isDisabled}
         disabled={isDisabled}
         hitSlop={resolvedHitSlop}
         onPress={onPress}

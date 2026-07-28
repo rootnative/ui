@@ -3,7 +3,6 @@ import {
   Card,
   Column,
   Dialog,
-  PortalHost,
   Row,
   TextField,
   Typography,
@@ -220,12 +219,11 @@ function DialogScreenContent() {
   )
 }
 
+// No <PortalHost> here on purpose: the root layout already mounts one above
+// the AppBar. An unnamed host inside another shadows it with a store of its
+// own, which would confine the scrim to the area below the AppBar.
 export default function DialogScreen() {
-  return (
-    <PortalHost>
-      <DialogScreenContent />
-    </PortalHost>
-  )
+  return <DialogScreenContent />
 }
 
 const styles = StyleSheet.create({
