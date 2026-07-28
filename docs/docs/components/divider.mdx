@@ -34,16 +34,16 @@ Follows the [Material Design 3 Divider](https://m3.material.io/components/divide
 
 ## Insets
 
-`inset` insets the leading edge, `insetEnd` the trailing edge. Both take a number in dp.
-`inset` also accepts `true`, which applies the MD3 list inset of 56dp — the offset that
+`insetStart` insets the leading edge, `insetEnd` the trailing edge. Both take a number in dp.
+`insetStart` also accepts `true`, which applies the MD3 list inset of 56dp — the offset that
 aligns a divider with list text that follows a 24dp leading icon.
 
 | Prop value | Result |
 |------------|--------|
 | `<Divider />` | Full-bleed |
-| `<Divider inset />` | 56dp leading inset (MD3 list inset) |
-| `<Divider inset={16} />` | 16dp leading inset |
-| `<Divider inset={16} insetEnd={16} />` | Inset on both ends |
+| `<Divider insetStart />` | 56dp leading inset (MD3 list inset) |
+| `<Divider insetStart={16} />` | 16dp leading inset |
+| `<Divider insetStart={16} insetEnd={16} />` | Inset on both ends |
 
 <SnackExample
   name="RootNative Divider — Insets"
@@ -59,10 +59,10 @@ aligns a divider with list text that follows a 24dp leading icon.
           <Column gap="lg" style={{ padding: 24 }}>
             <Typography variant="labelSmall">Full-bleed</Typography>
             <Divider />
-            <Typography variant="labelSmall">inset</Typography>
-            <Divider inset />
+            <Typography variant="labelSmall">insetStart</Typography>
+            <Divider insetStart />
             <Typography variant="labelSmall">inset + insetEnd</Typography>
-            <Divider inset={16} insetEnd={16} />
+            <Divider insetStart={16} insetEnd={16} />
           </Column>
         </ThemeProvider>
       </SafeAreaProvider>
@@ -75,7 +75,7 @@ aligns a divider with list text that follows a 24dp leading icon.
 
 Set `orientation="vertical"` to separate content side by side. A vertical divider
 stretches to the height of its parent, so it must sit inside a row-direction
-container that has a height. In this orientation `inset` and `insetEnd` apply to
+container that has a height. In this orientation `insetStart` and `insetEnd` apply to
 the top and bottom edges.
 
 <SnackExample

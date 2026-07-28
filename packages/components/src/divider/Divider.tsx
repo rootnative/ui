@@ -16,7 +16,7 @@ function resolveInset(inset: boolean | number): number {
 
 export function Divider({
   orientation = 'horizontal',
-  inset = false,
+  insetStart = false,
   insetEnd = false,
   thickness = DIVIDER_THICKNESS,
   containerColor,
@@ -24,7 +24,7 @@ export function Divider({
   ...props
 }: DividerProps) {
   const theme = useTheme()
-  const startInset = resolveInset(inset)
+  const startInset = resolveInset(insetStart)
   const endInset = resolveInset(insetEnd)
 
   const styles = useMemo(

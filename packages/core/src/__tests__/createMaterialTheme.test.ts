@@ -1,4 +1,5 @@
 import { createMaterialTheme } from '../theme/createMaterialTheme'
+import type { Colors } from '../theme/types'
 
 const COLOR_KEYS = [
   'primary',
@@ -50,7 +51,7 @@ const COLOR_KEYS = [
   'inverseSurface',
   'inverseOnSurface',
   'inversePrimary',
-]
+] as const satisfies readonly (keyof Colors)[]
 
 describe('createMaterialTheme', () => {
   const result = createMaterialTheme('#006A6A')

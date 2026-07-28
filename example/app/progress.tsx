@@ -63,8 +63,8 @@ export default function ProgressScreen() {
         <Typography variant="titleSmall">Linear — custom colors</Typography>
         <LinearProgress
           progress={value}
-          containerColor="#2E7D32"
-          trackColor="#C8E6C9"
+          containerColor="#C8E6C9"
+          contentColor="#2E7D32"
         />
       </Column>
 
@@ -102,10 +102,10 @@ export default function ProgressScreen() {
         <Row gap="lg" align="center">
           <CircularProgress
             progress={value}
-            containerColor="#D32F2F"
-            trackColor="#FFCDD2"
+            containerColor="#FFCDD2"
+            contentColor="#D32F2F"
           />
-          <CircularProgress containerColor="#1976D2" trackColor="#BBDEFB" />
+          <CircularProgress containerColor="#BBDEFB" contentColor="#1976D2" />
         </Row>
       </Column>
       <ScreenNavFooter />

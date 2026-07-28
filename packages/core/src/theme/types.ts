@@ -6,12 +6,12 @@
  * @example
  * interface MyTheme extends BaseTheme {
  *   colors: { brand: string; background: string; text: string }
- *   typography: { heading: TextStyle; body: TextStyle }
+ *   typography: { heading: TypographyToken; body: TypographyToken }
  * }
  */
 export interface BaseTheme {
   colors: Record<string, string>
-  typography: Record<string, TextStyle>
+  typography: Record<string, TypographyToken>
   shape: Shape
   spacing: Spacing
   stateLayer: StateLayer
@@ -40,8 +40,7 @@ export interface Theme extends BaseTheme {
 export type MaterialTheme = Theme
 
 /** Material Design 3 color roles. All values are CSS color strings (hex, rgb, etc.). */
-export interface Colors {
-  [key: string]: string
+export type Colors = {
   primary: string
   onPrimary: string
   primaryContainer: string
@@ -101,38 +100,37 @@ export interface Colors {
  * spec additionally varies width/grade on variable fonts, which React Native
  * cannot express — weight (+tracking) is the documented approximation.
  */
-export interface Typography {
-  [key: string]: TextStyle
-  displayLarge: TextStyle
-  displayMedium: TextStyle
-  displaySmall: TextStyle
-  headlineLarge: TextStyle
-  headlineMedium: TextStyle
-  headlineSmall: TextStyle
-  titleLarge: TextStyle
-  titleMedium: TextStyle
-  titleSmall: TextStyle
-  bodyLarge: TextStyle
-  bodyMedium: TextStyle
-  bodySmall: TextStyle
-  labelLarge: TextStyle
-  labelMedium: TextStyle
-  labelSmall: TextStyle
-  displayLargeEmphasized: TextStyle
-  displayMediumEmphasized: TextStyle
-  displaySmallEmphasized: TextStyle
-  headlineLargeEmphasized: TextStyle
-  headlineMediumEmphasized: TextStyle
-  headlineSmallEmphasized: TextStyle
-  titleLargeEmphasized: TextStyle
-  titleMediumEmphasized: TextStyle
-  titleSmallEmphasized: TextStyle
-  bodyLargeEmphasized: TextStyle
-  bodyMediumEmphasized: TextStyle
-  bodySmallEmphasized: TextStyle
-  labelLargeEmphasized: TextStyle
-  labelMediumEmphasized: TextStyle
-  labelSmallEmphasized: TextStyle
+export type Typography = {
+  displayLarge: TypographyToken
+  displayMedium: TypographyToken
+  displaySmall: TypographyToken
+  headlineLarge: TypographyToken
+  headlineMedium: TypographyToken
+  headlineSmall: TypographyToken
+  titleLarge: TypographyToken
+  titleMedium: TypographyToken
+  titleSmall: TypographyToken
+  bodyLarge: TypographyToken
+  bodyMedium: TypographyToken
+  bodySmall: TypographyToken
+  labelLarge: TypographyToken
+  labelMedium: TypographyToken
+  labelSmall: TypographyToken
+  displayLargeEmphasized: TypographyToken
+  displayMediumEmphasized: TypographyToken
+  displaySmallEmphasized: TypographyToken
+  headlineLargeEmphasized: TypographyToken
+  headlineMediumEmphasized: TypographyToken
+  headlineSmallEmphasized: TypographyToken
+  titleLargeEmphasized: TypographyToken
+  titleMediumEmphasized: TypographyToken
+  titleSmallEmphasized: TypographyToken
+  bodyLargeEmphasized: TypographyToken
+  bodyMediumEmphasized: TypographyToken
+  bodySmallEmphasized: TypographyToken
+  labelLargeEmphasized: TypographyToken
+  labelMediumEmphasized: TypographyToken
+  labelSmallEmphasized: TypographyToken
 }
 
 export type FontWeight =
@@ -148,7 +146,7 @@ export type FontWeight =
   | '800'
   | '900'
 
-export interface TextStyle {
+export interface TypographyToken {
   fontFamily: string
   fontSize: number
   fontWeight: FontWeight

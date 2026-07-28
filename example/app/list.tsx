@@ -91,13 +91,13 @@ export default function ListScreen() {
             supportingText="Jan 9, 2024"
             leadingContent={<Icon name="image" />}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Recipes"
             supportingText="Jan 17, 2024"
             leadingContent={<Icon name="book-open-variant" />}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Work"
             supportingText="Jan 28, 2024"
@@ -117,7 +117,7 @@ export default function ListScreen() {
             leadingContent={<Avatar label="A" />}
             trailingSupportingText="5 min"
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Bob"
             supportingText="Sounds great, see you then!"
@@ -135,14 +135,14 @@ export default function ListScreen() {
             supportingText={longSupporting}
             leadingContent={<Icon name="email-outline" />}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Two lines"
             supportingText={longSupporting}
             supportingTextNumberOfLines={2}
             leadingContent={<Icon name="email-outline" />}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Three lines"
             supportingText={longSupporting}
@@ -161,14 +161,14 @@ export default function ListScreen() {
             leadingContent={<Icon name="wifi" />}
             onPress={() => Alert.alert('Wi-Fi tapped')}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Bluetooth"
             supportingText="Nearby devices"
             leadingContent={<Icon name="bluetooth" />}
             onPress={() => Alert.alert('Bluetooth tapped')}
           />
-          <ListDivider inset />
+          <ListDivider insetStart />
           <ListItem
             headlineText="Airplane mode"
             supportingText="Off"

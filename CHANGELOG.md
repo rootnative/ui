@@ -2,9 +2,9 @@
 
 All `@rootnative/*` packages (`core`, `components`, `icons`, `cli`, and the
 `rootnative` binary) release together with a synced version, so this is a
-single changelog for the repo. Entries before the 1.0 API freeze are
-best-effort — alphas can and do break things; breaking changes are listed
-first in each release so upgraders can scan them.
+single changelog for the repo. These are prereleases and they break things
+freely — assume every entry can require a change on upgrade, and read the
+whole release rather than scanning for a label.
 
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
@@ -13,17 +13,90 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ### Changed
 
+- **`Progress`: `containerColor` is now the track and `contentColor` the
+  indicator; `trackColor` is gone.** It was the other way round —
+  `containerColor` painted the active indicator — which contradicted the
+  library-wide contract where `containerColor` is the container. This is the one
+  change in this release the compiler cannot catch: `containerColor` still
+  exists and only changed meaning, so old call sites render inverted.
+
+  ```diff
+  - <LinearProgress containerColor="#2E7D32" trackColor="#C8E6C9" />
+  + <LinearProgress containerColor="#C8E6C9" contentColor="#2E7D32" />
+  ```
+
+- `LoadingIndicator`: `indicatorColor` → `contentColor`. `containerColor` is
+  unchanged (the contained variant's circle fill), so the three progress-family
+  components now share one `containerColor` / `contentColor` pair. `Tabs` and
+  `NavigationBar` keep their own `indicatorColor` — there the indicator is a
+  genuine third element alongside container and content.
+
+- `Divider`: `inset` → `insetStart`, so it pairs with `insetEnd`. `ListDivider`
+  takes the same props and changes with it.
+
+- `@rootnative/core`: `TextStyle` → `TypographyToken`. The old name shadowed
+  React Native's own `TextStyle` at every import site, and the two are
+  structurally different — core's has five required fields.
+
+- **`Colors` and `Typography` no longer have index signatures.**
+  `theme.colors.primry` is a compile error instead of a silently-typed `string`.
+  `BaseTheme` keeps its `[key: string]: unknown`, so custom tokens still ride on
+  the theme root — see the note in
+  [Theming](https://rootnative.github.io/ui/theming).
+
+  Both are now `type` aliases rather than `interface`s, which is what makes a
+  strict `Colors` assignable to `BaseTheme`'s `colors: Record<string, string>`
+  (TypeScript gives type aliases an implicit index signature; interfaces get
+  none). Consequence: they can no longer be extended by declaration merging — a
+  `declare module '@rootnative/core' { interface Colors { brandRed: string } }`
+  augmentation fails with `Duplicate identifier`. Put brand tokens on the theme
+  root, or define your own theme interface.
+
+- `IconResolverContext` is no longer exported from `@rootnative/core`. Use
+  `ThemeProvider`'s `iconResolver` prop to write it and `useIconResolver()` to
+  read it.
+
+- **Checkbox, Radio and Switch work uncontrolled.** They were controlled-only,
+  so `<Checkbox onValueChange={fn} />` fired the callback and never moved — a
+  silent no-op. They now self-manage when `value` is omitted, starting from a
+  new `defaultValue` prop, matching Tabs / NavigationBar / ButtonGroup /
+  Slider. Passing `value` still gives you full control. A `Radio` latches when
+  uncontrolled, since it is select-only.
+
+- **`rootnative init` pins `registryVersion`** to the release tag matching the
+  latest published `@rootnative/core`, instead of tracking `main`, so `add` and
+  `update` fetch reproducible component source. Falls back to `main` when npm
+  is unreachable or the tag has not been pushed yet. `rootnative upgrade` moves
+  the pin forward, before it re-fetches any component files. Existing
+  `rootnative.json` files are untouched until you run `upgrade`.
+
 - `@rootnative/inertia` peer range widened to `>=0.0.3 <0.1.0` for `core` and
   `components` (floor raised past 0.0.2 — 0.0.3 is all correctness fixes:
   Presence exit ordering, endless-repeat unmount, style resting). No new API.
 
 ### Added
 
+- **Every component forwards React Native props to its root node.** The 11
+  newest components declared closed prop interfaces, so `<Tabs onLayout={fn} />`
+  was a type error while `<Card onLayout={fn} />` was not. They all extend
+  `ViewProps` now. `Portal` and `SnackbarProvider` deliberately don't — they
+  render no node of their own. See
+  [API stability](https://rootnative.github.io/ui/api-stability).
+
 - `IconSource` is now exported from `@rootnative/core`, next to
   `IconResolver` / `IconRenderProps`. It was previously only exported from
   `@rootnative/utils`, which is private and unpublished, so npm consumers had
   no way to import it. `@rootnative/utils` re-exports it unchanged for
   copy-pasted CLI installs.
+
+- `api-surface.json` at the repo root snapshots every exported name, generated
+  from the built `.d.ts` files and enforced by `pnpm run api:check`, so an
+  accidental widening of the public surface shows up as a diff.
+
+- New docs page: [API stability](https://rootnative.github.io/ui/api-stability)
+  — what the `exports` maps cover, the React Native prop passthrough rule, the
+  safe-area default asymmetry, and what is deliberately not covered
+  (copy-pasted source, the vendored internal hooks, registry pinning).
 
 ### Fixed
 
@@ -48,6 +121,9 @@ Prior history: these packages were published as `@onlynative/*` through
 - `CircularProgress` (indeterminate) no longer mounts its spin loop under
   reduced motion; the arc renders statically. Both indicators are now covered
   by the reduced-motion invariant suite.
+- `BottomSheet.tsx` contained a literal NUL byte (a `'\0'` separator written as
+  a raw `0x00`), which made `grep -r` skip the file entirely and would have
+  copied the byte into projects via `rootnative add`.
 
 ## 0.0.0-alpha.4 — 2026-07-28
 
@@ -98,17 +174,6 @@ they forced.
 The MD3 Expressive release. The library is expressive-by-default with no
 scheme knob.
 
-### Breaking
-
-- **IconButton `size` values renamed**: `small` / `medium` / `large` →
-  `'xs' | 's' | 'm' | 'l' | 'xl'`, with no aliases for the old names. The
-  five sizes are the MD3 Expressive scale and drive container height, icon
-  size, and corner radius.
-- **Motion feel changed across all components**: spring tokens were replaced
-  with the Expressive motion values pinned from androidx
-  (`ExpressiveMotionTokens.kt`). Anything that read the old token values or
-  tuned around the old feel will look different.
-
 ### Added
 
 - **LoadingIndicator** — expressive shape-morphing activity indicator.
@@ -119,18 +184,19 @@ scheme knob.
 
 ### Changed
 
+- **IconButton `size` values renamed**: `small` / `medium` / `large` →
+  `'xs' | 's' | 'm' | 'l' | 'xl'`, with no aliases for the old names. The
+  five sizes are the MD3 Expressive scale and drive container height, icon
+  size, and corner radius.
+- **Motion feel changed across all components**: spring tokens were replaced
+  with the Expressive motion values pinned from androidx
+  (`ExpressiveMotionTokens.kt`). Anything that read the old token values or
+  tuned around the old feel will look different.
 - `@rootnative/inertia` pinned to its first stable release (0.0.2).
 
 ## 0.0.0-alpha.2 — 2026-07-21
 
 The animation-stack release.
-
-### Breaking
-
-- **`@rootnative/inertia` became a required peer dependency** of `core` and
-  `components`. Every animation now routes through it — components no longer
-  import `react-native-reanimated` directly (it remains a transitive
-  requirement via inertia).
 
 ### Added
 
@@ -143,6 +209,10 @@ The animation-stack release.
 
 ### Changed
 
+- **`@rootnative/inertia` became a required peer dependency** of `core` and
+  `components`. Every animation now routes through it — components no longer
+  import `react-native-reanimated` directly (it remains a transitive
+  requirement via inertia).
 - All components migrated from direct Reanimated usage to inertia's
   declarative/value layer; state layers unified on `useStateLayer`.
 
@@ -151,7 +221,7 @@ The animation-stack release.
 The MD3 compliance release — a full audit against androidx
 `compose.material3` token files, fixing every accidental deviation.
 
-### Breaking
+### Changed
 
 - Theme token corrections (state-layer opacities, elevation levels 4–5,
   palette, motion durations/easings) change rendered output anywhere the old

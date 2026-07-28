@@ -71,6 +71,11 @@ export interface SnackbarApi {
   clear: () => void
 }
 
+/**
+ * Deliberately does NOT extend `ViewProps`. `SnackbarProvider` is a provider,
+ * not a view: it renders `children` plus an imperative host, so there is no
+ * root node for RN props to address. `style` here targets the snackbar surface.
+ */
 export interface SnackbarProviderProps {
   children: ReactNode
   /**

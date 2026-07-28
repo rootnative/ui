@@ -1,6 +1,6 @@
 import type { IconSource } from '@rootnative/utils'
 import type { ReactNode } from 'react'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * `'basic'` is the centered MD3 dialog. `'fullscreen'` fills the screen with a
@@ -8,7 +8,7 @@ import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
  */
 export type DialogVariant = 'basic' | 'fullscreen'
 
-export interface DialogProps {
+export interface DialogProps extends ViewProps {
   /** Whether the dialog is shown. Exit animations run before it unmounts. */
   visible: boolean
   /**

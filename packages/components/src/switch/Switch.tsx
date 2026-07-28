@@ -16,7 +16,7 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers } from '../internal/usePressMorph'
@@ -42,7 +42,8 @@ const ICON_SIZE = 16
 
 export function Switch({
   style,
-  value = false,
+  value,
+  defaultValue = false,
   onValueChange,
   selectedIcon,
   unselectedIcon,
@@ -52,7 +53,11 @@ export function Switch({
   ...props
 }: SwitchProps) {
   const isDisabled = Boolean(disabled)
-  const isSelected = Boolean(value)
+  // Controlled when `value` is passed, self-managing otherwise — the same
+  // idiom as Tabs / NavigationBar / ButtonGroup / Slider.
+  const isControlled = value !== undefined
+  const [selfValue, setSelfValue] = useState(() => Boolean(defaultValue))
+  const isSelected = isControlled ? Boolean(value) : selfValue
   const hasUnselectedIcon = Boolean(unselectedIcon)
   const offThumbSize = hasUnselectedIcon
     ? SWITCH_THUMB_ON_SIZE
@@ -254,10 +259,11 @@ export function Switch({
     : offColors.iconColor
 
   const handlePress = useCallback(() => {
-    if (!isDisabled) {
-      onValueChange?.(!isSelected)
-    }
-  }, [isDisabled, isSelected, onValueChange])
+    if (isDisabled) return
+    const next = !isSelected
+    if (!isControlled) setSelfValue(next)
+    onValueChange?.(next)
+  }, [isDisabled, isSelected, isControlled, onValueChange])
 
   return (
     <View style={styles.wrapper}>

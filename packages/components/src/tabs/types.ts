@@ -1,5 +1,5 @@
 import type { IconSource } from '@rootnative/utils'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * `'primary'` sits directly under an app bar and marks the active tab with a
@@ -28,7 +28,7 @@ export interface TabItem {
   accessibilityLabel?: string
 }
 
-export interface TabsProps {
+export interface TabsProps extends Omit<ViewProps, 'children'> {
   /** The tabs to render. */
   items: TabItem[]
   /** Value of the active tab (controlled). */

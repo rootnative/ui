@@ -22,17 +22,17 @@ export interface LoadingIndicatorColors {
 export function getLoadingIndicatorColors(
   theme: MaterialTheme,
   contained: boolean,
-  indicatorColor?: string,
+  contentColor?: string,
   containerColor?: string,
 ): LoadingIndicatorColors {
   if (contained) {
     return {
-      indicator: indicatorColor ?? theme.colors.onPrimaryContainer,
+      indicator: contentColor ?? theme.colors.onPrimaryContainer,
       container: containerColor ?? theme.colors.primaryContainer,
     }
   }
   return {
-    indicator: indicatorColor ?? theme.colors.primary,
+    indicator: contentColor ?? theme.colors.primary,
     container: 'transparent',
   }
 }

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * `'plain'` is the transient one-liner that describes a control. `'rich'` is
@@ -17,7 +17,7 @@ export type TooltipSide = 'top' | 'bottom'
  */
 export type TooltipAlign = 'start' | 'center' | 'end'
 
-export interface TooltipProps {
+export interface TooltipProps extends ViewProps {
   /**
    * The control the tooltip describes. Rendered where the `<Tooltip>` sits in
    * the tree, wrapped in a measuring view that watches for hover.

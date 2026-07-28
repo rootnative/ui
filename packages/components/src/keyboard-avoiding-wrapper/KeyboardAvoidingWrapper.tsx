@@ -20,6 +20,7 @@ export function KeyboardAvoidingWrapper({
   onKeyboardHide,
   style,
   contentContainerStyle,
+  ...rest
 }: KeyboardAvoidingWrapperProps) {
   useEffect(() => {
     const subscriptions: ReturnType<typeof Keyboard.addListener>[] = []
@@ -41,6 +42,7 @@ export function KeyboardAvoidingWrapper({
 
   return (
     <KeyboardAvoidingView
+      {...rest}
       style={[styles.root, style]}
       behavior={behavior}
       keyboardVerticalOffset={keyboardVerticalOffset}

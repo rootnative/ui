@@ -38,7 +38,7 @@ export function CircularProgress({
   size = PROGRESS_CIRCULAR_SIZE,
   thickness = PROGRESS_CIRCULAR_STROKE,
   containerColor,
-  trackColor,
+  contentColor,
   style,
   accessibilityLabel,
   ...rest
@@ -48,8 +48,8 @@ export function CircularProgress({
   const value = indeterminate ? 0 : clamp(progress as number, 0, 1)
 
   const colors = useMemo(
-    () => getProgressColors(theme, containerColor, trackColor),
-    [theme, containerColor, trackColor],
+    () => getProgressColors(theme, containerColor, contentColor),
+    [theme, containerColor, contentColor],
   )
   const styles = useMemo(() => createCircularStyles(size), [size])
 

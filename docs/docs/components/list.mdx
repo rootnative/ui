@@ -106,7 +106,7 @@ When `onPress` is provided, the item renders as a `Pressable` with state-layer f
 
 ## Inset dividers
 
-Use `inset` to align the divider with text that follows a leading icon:
+Use `insetStart` to align the divider with text that follows a leading icon:
 
 <SnackExample
   name="RootNative List — Inset Dividers"
@@ -125,7 +125,7 @@ Use `inset` to align the divider with text that follows a leading icon:
               headlineText="Item 1"
               leadingContent={<MaterialCommunityIcons name="folder" size={24} />}
             />
-            <ListDivider inset />
+            <ListDivider insetStart />
             <ListItem
               headlineText="Item 2"
               leadingContent={<MaterialCommunityIcons name="folder" size={24} />}

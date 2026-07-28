@@ -55,28 +55,28 @@ export default function DividerScreen() {
         <Column gap="sm">
           <Typography variant="titleMedium">Insets</Typography>
           <Typography variant="bodySmall" style={mutedText}>
-            `inset` insets the leading edge, `insetEnd` the trailing edge. Both
-            accept a number in dp; `inset` also accepts `true` for the MD3 list
-            inset (56dp).
+            `insetStart` insets the leading edge, `insetEnd` the trailing edge.
+            Both accept a number in dp; `insetStart` also accepts `true` for the
+            MD3 list inset (56dp).
           </Typography>
           <Column gap="md">
             <Column gap="xs">
               <Typography variant="labelSmall" style={mutedText}>
-                inset
+                insetStart
               </Typography>
-              <Divider inset />
+              <Divider insetStart />
             </Column>
             <Column gap="xs">
               <Typography variant="labelSmall" style={mutedText}>
-                {'inset={16}'}
+                {'insetStart={16}'}
               </Typography>
-              <Divider inset={16} />
+              <Divider insetStart={16} />
             </Column>
             <Column gap="xs">
               <Typography variant="labelSmall" style={mutedText}>
-                {'inset={16} insetEnd={16}'}
+                {'insetStart={16} insetEnd={16}'}
               </Typography>
-              <Divider inset={16} insetEnd={16} />
+              <Divider insetStart={16} insetEnd={16} />
             </Column>
           </Column>
         </Column>
@@ -92,7 +92,7 @@ export default function DividerScreen() {
             <View style={surfaceBlock} />
             <Divider orientation="vertical" />
             <View style={surfaceBlock} />
-            <Divider orientation="vertical" inset={8} insetEnd={8} />
+            <Divider orientation="vertical" insetStart={8} insetEnd={8} />
             <View style={surfaceBlock} />
           </Row>
         </Column>
@@ -123,9 +123,9 @@ export default function DividerScreen() {
           <View style={listSurface}>
             <List>
               <ListItem headlineText="Photos" supportingText="248 items" />
-              <Divider inset />
+              <Divider insetStart />
               <ListItem headlineText="Videos" supportingText="12 items" />
-              <Divider inset />
+              <Divider insetStart />
               <ListItem headlineText="Documents" supportingText="61 items" />
             </List>
           </View>

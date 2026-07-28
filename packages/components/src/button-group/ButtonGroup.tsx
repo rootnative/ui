@@ -51,6 +51,7 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
     accessibilityLabel,
     testID,
     onItemPress,
+    ...rest
   } = props
 
   const theme = useTheme()
@@ -98,6 +99,7 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
 
   return (
     <View
+      {...rest}
       style={[groupStyles.container, style]}
       // Multi-select gets no special container role — items announce
       // themselves as independent checkboxes.

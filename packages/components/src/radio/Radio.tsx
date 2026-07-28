@@ -5,7 +5,7 @@ import {
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { createStyles, getResolvedRadioColors } from './styles'
@@ -15,7 +15,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Radio({
   style,
-  value = false,
+  value,
+  defaultValue = false,
   onValueChange,
   containerColor,
   contentColor,
@@ -23,7 +24,14 @@ export function Radio({
   ...props
 }: RadioProps) {
   const isDisabled = Boolean(disabled)
-  const isSelected = Boolean(value)
+  // Controlled when `value` is passed, self-managing otherwise. A radio is
+  // select-only, so an uncontrolled one latches: it turns itself on and only a
+  // controlling parent can turn it back off. That is what an uncontrolled
+  // radio in a group does — deselection is the group's job, and there is no
+  // RadioGroup component by design.
+  const isControlled = value !== undefined
+  const [selfValue, setSelfValue] = useState(() => Boolean(defaultValue))
+  const isSelected = isControlled ? Boolean(value) : selfValue
 
   const theme = useTheme()
   const styles = useMemo(() => createStyles(theme), [theme])
@@ -106,8 +114,10 @@ export function Radio({
   // Radios are select-only: pressing an already-selected radio is a no-op —
   // deselection only happens by selecting another radio in the group.
   const handlePress = useCallback(() => {
-    if (!isDisabled && !isSelected) onValueChange?.(true)
-  }, [isDisabled, isSelected, onValueChange])
+    if (isDisabled || isSelected) return
+    if (!isControlled) setSelfValue(true)
+    onValueChange?.(true)
+  }, [isDisabled, isSelected, isControlled, onValueChange])
 
   // Disabled snaps to disabled colors (no animation when disabled).
   const outerOverride = isDisabled

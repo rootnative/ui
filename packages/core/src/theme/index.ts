@@ -4,7 +4,7 @@ export type {
   MaterialTheme,
   Colors,
   Typography,
-  TextStyle,
+  TypographyToken,
   FontWeight,
   Shape,
   TopAppBarTokens,

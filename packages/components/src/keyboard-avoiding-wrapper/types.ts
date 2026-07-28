@@ -1,13 +1,13 @@
-import type { PropsWithChildren } from 'react'
 import type {
   KeyboardAvoidingViewProps,
   KeyboardEvent,
   ScrollViewProps,
   StyleProp,
+  ViewProps,
   ViewStyle,
 } from 'react-native'
 
-export interface KeyboardAvoidingWrapperProps extends PropsWithChildren {
+export interface KeyboardAvoidingWrapperProps extends ViewProps {
   /**
    * Keyboard avoidance strategy.
    * @default 'padding'

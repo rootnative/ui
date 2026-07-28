@@ -3,9 +3,10 @@ import chalk from 'chalk'
 import { execa } from 'execa'
 import fs from 'fs-extra'
 import prompts from 'prompts'
-import { readConfig } from '../lib/config'
+import { readConfig, writeConfig } from '../lib/config'
 import { detectProject, getInstallCommand } from '../lib/detector'
 import { createSpinner, logger } from '../lib/logger'
+import { resolveRegistryVersion } from '../lib/registry-version'
 import type { PackageManager } from '../lib/types'
 import { updateCommand } from './update'
 
@@ -120,6 +121,24 @@ function hasDiffChanges(diff: PeerDepDiff): boolean {
   )
 }
 
+/**
+ * Move the project's registry pin forward to the newly published release tag.
+ *
+ * `init` pins `registryVersion` so component source is reproducible, which also
+ * means a pinned project cannot pick up new component source on its own —
+ * `upgrade` is the escape hatch. This has to run BEFORE `update --all`, or the
+ * component files would be re-fetched from the tag we just moved off.
+ */
+async function repinRegistryVersion(cwd: string): Promise<void> {
+  const config = await readConfig(cwd)
+  const next = await resolveRegistryVersion()
+
+  if (config.registryVersion === next) return
+
+  await writeConfig(cwd, { ...config, registryVersion: next })
+  logger.success(`Registry pinned to ${chalk.bold(next)}`)
+}
+
 export async function upgradeCommand(
   cwd: string,
   options: UpgradeOptions = {},
@@ -161,6 +180,8 @@ export async function upgradeCommand(
       `Already on the latest version ${chalk.bold(`v${installed.version}`)}`,
     )
     logger.break()
+
+    await repinRegistryVersion(cwd)
 
     if (options.all) {
       logger.info('Updating installed components...')
@@ -313,9 +334,13 @@ export async function upgradeCommand(
     }
   }
 
+  // 11. Re-pin the registry to the tag matching the version just installed,
+  // before any component files are re-fetched.
+  await repinRegistryVersion(cwd)
+
   logger.break()
 
-  // 11. Optionally update all installed component files
+  // 12. Optionally update all installed component files
   if (options.all) {
     logger.info('Updating installed components...')
     await updateCommand([], cwd, { all: true, dryRun: false })

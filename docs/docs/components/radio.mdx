@@ -34,6 +34,25 @@ Follows the [Material Design 3 Radio button](https://m3.material.io/components/r
 `}
 />
 
+:::note Controlled or uncontrolled
+
+Pass `value` with `onValueChange` to own the state, as above. Omit `value` and
+`Radio` manages its own, starting from `defaultValue`:
+
+```tsx
+<Radio defaultValue onValueChange={handleChange} />
+```
+
+`onValueChange` still fires either way. In earlier prereleases, passing
+`onValueChange` *without* `value` did nothing visually — the callback fired but
+the control never moved. See the changelog if you are upgrading.
+
+A radio is select-only, so an uncontrolled one latches: it turns itself on and
+only a controlling parent can turn it back off. Radio groups are the controlled
+case — see [Radio Group](#radio-group) below.
+
+:::
+
 ## Radio Group
 
 Build a radio group by controlling which Radio has `value={true}`:

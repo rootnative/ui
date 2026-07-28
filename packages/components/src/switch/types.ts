@@ -6,10 +6,16 @@ export interface SwitchProps extends Omit<
   'children' | 'style'
 > {
   /**
-   * Whether the switch is toggled on.
-   * @default false
+   * Whether the switch is toggled on (controlled). Pass this together with
+   * `onValueChange` to own the state. Omit it and the component manages its
+   * own state, starting from `defaultValue`.
    */
   value?: boolean
+  /**
+   * Initial value when uncontrolled. Ignored once `value` is passed.
+   * @default false
+   */
+  defaultValue?: boolean
   /** Callback fired when the switch is toggled. Receives the new value. */
   onValueChange?: (value: boolean) => void
   /**

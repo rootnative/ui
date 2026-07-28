@@ -34,6 +34,7 @@ export function Tabs({
   style,
   accessibilityLabel,
   testID,
+  ...rest
 }: TabsProps) {
   const theme = useTheme()
   const colors = useMemo(
@@ -158,6 +159,7 @@ export function Tabs({
 
   return (
     <View
+      {...rest}
       style={[styles.root, style]}
       role="tablist"
       accessibilityLabel={accessibilityLabel}

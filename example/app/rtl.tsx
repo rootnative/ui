@@ -139,7 +139,7 @@ export default function RTLScreen() {
           headlineText="Inset divider below"
           leadingContent={<Icon name="folder-outline" />}
         />
-        <ListDivider inset />
+        <ListDivider insetStart />
         <ListItem
           headlineText="Last item"
           leadingContent={<Icon name="star-outline" />}

@@ -24,6 +24,7 @@ export function NavigationBar({
   style,
   accessibilityLabel,
   testID,
+  ...rest
 }: NavigationBarProps) {
   const theme = useTheme()
   const colors = useMemo(
@@ -76,6 +77,7 @@ export function NavigationBar({
 
   return (
     <View
+      {...rest}
       style={[styles.root, style]}
       role="tablist"
       accessibilityLabel={accessibilityLabel}

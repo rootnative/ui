@@ -103,6 +103,7 @@ export function AppBar({
   titleStyle,
   scrollOffset,
   style,
+  ...rest
 }: AppBarProps) {
   const theme = useTheme()
   const topAppBar = theme.topAppBar ?? defaultTopAppBarTokens
@@ -444,7 +445,7 @@ export function AppBar({
     )
 
     return (
-      <Animated.View style={rootStyle}>
+      <Animated.View {...rest} style={rootStyle}>
         {withTopInset(insetTop, content, safeAreaStyle)}
       </Animated.View>
     )
@@ -471,7 +472,7 @@ export function AppBar({
   )
 
   return (
-    <Animated.View style={rootStyle}>
+    <Animated.View {...rest} style={rootStyle}>
       {withTopInset(insetTop, content, safeAreaStyle)}
     </Animated.View>
   )

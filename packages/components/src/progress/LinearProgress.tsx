@@ -33,7 +33,7 @@ const clamp = (v: number, min: number, max: number) =>
 export function LinearProgress({
   progress,
   containerColor,
-  trackColor,
+  contentColor,
   stopIndicator = true,
   thickness = PROGRESS_TRACK_HEIGHT,
   style,
@@ -45,8 +45,8 @@ export function LinearProgress({
   const value = indeterminate ? 0 : clamp(progress as number, 0, 1)
 
   const styles = useMemo(
-    () => createLinearStyles(theme, thickness, containerColor, trackColor),
-    [theme, thickness, containerColor, trackColor],
+    () => createLinearStyles(theme, thickness, containerColor, contentColor),
+    [theme, thickness, containerColor, contentColor],
   )
 
   // MD3 standard curve for value transitions; duration comes from

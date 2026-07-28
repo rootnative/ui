@@ -64,6 +64,7 @@ export function BottomSheet({
   scrimAccessibilityLabel = 'Close sheet',
   dragHandleAccessibilityLabel = 'Drag handle',
   testID,
+  ...rest
 }: BottomSheetProps) {
   const theme = useTheme()
   const styles = useMemo(
@@ -404,6 +405,7 @@ export function BottomSheet({
               transition="spring-default-spatial"
             >
               <Animated.View
+                {...rest}
                 testID={testID}
                 style={[
                   styles.surface,

@@ -56,6 +56,7 @@ export function Menu({
   anchorStyle,
   dismissAccessibilityLabel = 'Close menu',
   testID,
+  ...rest
 }: MenuProps) {
   const theme = useTheme()
   const styles = useMemo(
@@ -180,6 +181,7 @@ export function Menu({
               {open ? (
                 <Motion.View
                   key="surface"
+                  {...rest}
                   testID={testID}
                   role="menu"
                   style={[styles.surface, positionStyle, style]}

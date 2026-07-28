@@ -1,5 +1,5 @@
 import type { IconSource } from '@rootnative/utils'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * When destination labels are shown. `'always'` keeps every label visible,
@@ -34,7 +34,7 @@ export interface NavigationBarItem {
   accessibilityLabel?: string
 }
 
-export interface NavigationBarProps {
+export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
   /** The destinations to render. MD3 recommends 3–5. */
   items: NavigationBarItem[]
   /** Value of the active destination (controlled). */

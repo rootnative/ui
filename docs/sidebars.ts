@@ -10,6 +10,7 @@ const sidebars: SidebarsConfig = {
     { type: 'doc', id: 'fonts', label: 'Fonts' },
     { type: 'doc', id: 'icons', label: 'Icons' },
     { type: 'doc', id: 'motion', label: 'Motion' },
+    { type: 'doc', id: 'api-stability', label: 'API Stability' },
     { type: 'doc', id: 'llms', label: 'For AI Agents' },
     {
       type: 'category',

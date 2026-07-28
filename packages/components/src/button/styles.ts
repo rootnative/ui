@@ -1,4 +1,4 @@
-import type { MaterialTheme, TextStyle } from '@rootnative/core'
+import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ButtonShape, ButtonSize, ButtonVariant } from './types'
@@ -395,7 +395,7 @@ export function createStyles(
     contentColor,
   )
   const sizeTokens = getButtonSizeTokens(size)
-  const labelStyle: TextStyle = theme.typography[sizeTokens.labelRole]
+  const labelStyle: TypographyToken = theme.typography[sizeTokens.labelRole]
   const restCorner = getButtonMorphRadii(size, shape).rest
   const padding = getHorizontalPadding(
     theme,

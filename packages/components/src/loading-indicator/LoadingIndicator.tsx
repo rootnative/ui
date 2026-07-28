@@ -42,7 +42,7 @@ export function LoadingIndicator({
   progress,
   contained = false,
   size = LOADING_INDICATOR_SIZE,
-  indicatorColor,
+  contentColor,
   containerColor,
   style,
   accessibilityLabel,
@@ -53,13 +53,8 @@ export function LoadingIndicator({
   const styles = useMemo(() => createStyles(size), [size])
   const colors = useMemo(
     () =>
-      getLoadingIndicatorColors(
-        theme,
-        contained,
-        indicatorColor,
-        containerColor,
-      ),
-    [theme, contained, indicatorColor, containerColor],
+      getLoadingIndicatorColors(theme, contained, contentColor, containerColor),
+    [theme, contained, contentColor, containerColor],
   )
 
   const shapes = indeterminate ? INDETERMINATE_POINTS : DETERMINATE_POINTS

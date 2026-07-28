@@ -5,6 +5,7 @@ import { configExists, DEFAULT_CONFIG, writeConfig } from '../lib/config'
 import { detectProject, getInstallCommand } from '../lib/detector'
 import { ensureLlmDocsPointer } from '../lib/llm-docs'
 import { createSpinner, logger } from '../lib/logger'
+import { resolveRegistryVersion } from '../lib/registry-version'
 import type { RootNativeConfig, PackageManager } from '../lib/types'
 
 export interface InitOptions {
@@ -109,9 +110,14 @@ export async function initCommand(
     libAlias = answers.libAlias
   }
 
+  // Pin the project to a release tag rather than trunk, so `add` / `update`
+  // pull reproducible component source. Falls back to `main` off-network.
+  const registryVersion = await resolveRegistryVersion()
+
   // Write config
   const config: RootNativeConfig = {
     ...DEFAULT_CONFIG,
+    registryVersion,
     aliases: {
       components: componentsAlias,
       lib: libAlias,

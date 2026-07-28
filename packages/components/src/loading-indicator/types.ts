@@ -24,7 +24,7 @@ export interface LoadingIndicatorProps extends Omit<ViewProps, 'children'> {
    * Override the morphing-indicator color. Defaults to `primary`
    * (uncontained) or `onPrimaryContainer` (contained).
    */
-  indicatorColor?: string
+  contentColor?: string
   /**
    * Override the container fill color (contained variant only). Defaults to
    * `primaryContainer`.

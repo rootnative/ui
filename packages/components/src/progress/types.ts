@@ -7,13 +7,15 @@ export interface LinearProgressProps extends Omit<ViewProps, 'children'> {
    */
   progress?: number
   /**
-   * Override the active track / indicator color.
+   * Override the inactive track color — the indicator's container.
+   * @default theme.colors.secondaryContainer
    */
   containerColor?: string
   /**
-   * Override the inactive track color.
+   * Override the active indicator color.
+   * @default theme.colors.primary
    */
-  trackColor?: string
+  contentColor?: string
   /**
    * Track / indicator thickness in dp.
    * @default 4
@@ -34,13 +36,15 @@ export interface CircularProgressProps extends Omit<ViewProps, 'children'> {
    */
   progress?: number
   /**
-   * Override the active track / indicator color.
+   * Override the inactive track color — the indicator's container.
+   * @default theme.colors.secondaryContainer
    */
   containerColor?: string
   /**
-   * Override the inactive track color.
+   * Override the active indicator color.
+   * @default theme.colors.primary
    */
-  trackColor?: string
+  contentColor?: string
   /**
    * Outer diameter in dp.
    * @default 48

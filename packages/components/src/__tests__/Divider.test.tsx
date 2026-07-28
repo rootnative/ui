@@ -24,13 +24,13 @@ describe('Divider', () => {
     expect(style.marginEnd).toBe(0)
   })
 
-  it('applies the MD3 list inset (56dp) when inset is true', () => {
-    renderWithTheme(<Divider testID="divider" inset />)
+  it('applies the MD3 list inset (56dp) when insetStart is true', () => {
+    renderWithTheme(<Divider testID="divider" insetStart />)
     expect(flatten('divider').marginStart).toBe(56)
   })
 
   it('accepts a numeric leading and trailing inset', () => {
-    renderWithTheme(<Divider testID="divider" inset={16} insetEnd={24} />)
+    renderWithTheme(<Divider testID="divider" insetStart={16} insetEnd={24} />)
     const style = flatten('divider')
     expect(style.marginStart).toBe(16)
     expect(style.marginEnd).toBe(24)
@@ -49,7 +49,7 @@ describe('Divider', () => {
       <Divider
         testID="divider"
         orientation="vertical"
-        inset={8}
+        insetStart={8}
         insetEnd={4}
       />,
     )

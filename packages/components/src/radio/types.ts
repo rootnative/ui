@@ -2,10 +2,19 @@ import type { PressableProps, StyleProp, ViewStyle } from 'react-native'
 
 export interface RadioProps extends Omit<PressableProps, 'children' | 'style'> {
   /**
-   * Whether the radio button is selected.
-   * @default false
+   * Whether the radio button is selected (controlled). Pass this together with
+   * `onValueChange` to own the state. Omit it and the component manages its
+   * own state, starting from `defaultValue`.
    */
   value?: boolean
+  /**
+   * Initial value when uncontrolled. Ignored once `value` is passed.
+   *
+   * A radio is select-only, so an uncontrolled one latches on: only a
+   * controlling parent can turn it back off.
+   * @default false
+   */
+  defaultValue?: boolean
   /**
    * Callback fired when an unselected radio is pressed. Always receives
    * `true` — radios are select-only, so pressing an already-selected radio

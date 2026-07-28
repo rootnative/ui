@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * `'modal'` blocks the screen behind a scrim. `'standard'` overlays the bottom
@@ -13,7 +13,7 @@ export type BottomSheetVariant = 'modal' | 'standard'
  */
 export type BottomSheetSnapPoint = number | `${number}%`
 
-export interface BottomSheetProps {
+export interface BottomSheetProps extends ViewProps {
   /** Whether the sheet is shown. Exit animations run before it unmounts. */
   visible: boolean
   /**

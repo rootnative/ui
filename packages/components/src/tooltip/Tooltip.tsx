@@ -57,6 +57,7 @@ export function Tooltip({
   anchorStyle,
   dismissAccessibilityLabel = 'Close tooltip',
   testID,
+  ...rest
 }: TooltipProps) {
   const theme = useTheme()
   const isRich = variant === 'rich'
@@ -245,6 +246,7 @@ export function Tooltip({
             {open ? (
               <Motion.View
                 key="surface"
+                {...rest}
                 testID={testID}
                 role="tooltip"
                 accessibilityLiveRegion="polite"

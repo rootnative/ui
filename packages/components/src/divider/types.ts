@@ -16,10 +16,10 @@ export interface DividerProps extends ViewProps {
    * list text that follows a leading icon. A number sets the inset in dp.
    * @default false
    */
-  inset?: boolean | number
+  insetStart?: boolean | number
   /**
    * Inset from the trailing edge (end for horizontal, bottom for vertical).
-   * Same units as `inset`.
+   * Same units as `insetStart`.
    * @default false
    */
   insetEnd?: boolean | number

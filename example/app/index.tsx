@@ -239,7 +239,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       return (
         <Column style={previewStyles.dividerWrapper} gap="sm">
           <Divider />
-          <Divider inset={24} insetEnd={24} />
+          <Divider insetStart={24} insetEnd={24} />
           <Row align="center" style={previewStyles.dividerRow}>
             <Box
               bg={theme.colors.surfaceContainerHighest}

@@ -1,6 +1,6 @@
 import type { SharedValue } from '@rootnative/inertia'
 import type { ReactNode } from 'react'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 import type { IconButtonProps } from '../icon-button'
 
 /** Size/layout variant of the AppBar. */
@@ -64,7 +64,7 @@ export interface AppBarTextAction extends AppBarActionBase {
  */
 export type AppBarAction = AppBarIconAction | AppBarTextAction
 
-export interface AppBarProps {
+export interface AppBarProps extends Omit<ViewProps, 'children'> {
   /** Title text displayed in the bar. */
   title: string
   /**

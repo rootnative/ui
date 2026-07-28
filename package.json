@@ -21,6 +21,8 @@
     "docs:dev": "pnpm --filter @rootnative/docs dev",
     "docs:build": "pnpm --filter @rootnative/docs build",
     "build:llms": "npx tsx scripts/build-llms.ts",
+    "api:surface": "npx tsx scripts/build-api-surface.ts",
+    "api:check": "pnpm run build && npx tsx scripts/build-api-surface.ts --check",
     "docs:serve": "pnpm --filter @rootnative/docs serve",
     "prepare": "husky"
   },

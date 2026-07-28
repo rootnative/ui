@@ -76,6 +76,35 @@ const brandTheme: Theme = {
 </ThemeProvider>
 ```
 
+:::note Color and typography keys are checked
+
+`Colors` and `Typography` list the MD3 roles exactly — there is no index
+signature, so `colors.primry` is a compile error rather than a silently-typed
+`string`. That is deliberate: `theme.colors.*` is the most-touched expression in
+consumer code, and typo detection there is worth more than being able to bolt an
+extra key onto the MD3 palette.
+
+To carry brand tokens the MD3 scheme has no role for, put them on the theme root
+rather than inside `colors` — `BaseTheme` keeps its `[key: string]: unknown`
+escape hatch:
+
+```tsx
+const brandTheme = {
+  ...lightTheme,
+  brand: { logoInk: '#101820', promoGradientFrom: '#FF6B00' },
+}
+```
+
+Or define your own theme interface, as [Custom design systems](#custom-design-systems)
+describes — a custom `Colors` type is yours to shape.
+
+`Colors` and `Typography` are `type` aliases, not interfaces, so they cannot be
+widened with a `declare module` augmentation. That is a deliberate consequence of
+being strict: a type alias is what lets a closed `Colors` still satisfy
+`BaseTheme`'s `colors: Record<string, string>`.
+
+:::
+
 ### Generate a theme from a seed color
 
 `createMaterialTheme` relies on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), a required peer of `@rootnative/core`. npm and pnpm install required peers automatically; **Yarn users must add it manually** (`yarn add @material/material-color-utilities`).
@@ -218,7 +247,7 @@ All themes extend `BaseTheme`:
 ```tsx
 interface BaseTheme {
   colors: Record<string, string>
-  typography: Record<string, TextStyle>
+  typography: Record<string, TypographyToken>
   shape: Shape
   spacing: Spacing
   stateLayer: StateLayer
@@ -249,11 +278,11 @@ interface BrandTheme extends BaseTheme {
     [key: string]: string
   }
   typography: {
-    heading: TextStyle
-    subheading: TextStyle
-    body: TextStyle
-    caption: TextStyle
-    [key: string]: TextStyle
+    heading: TypographyToken
+    subheading: TypographyToken
+    body: TypographyToken
+    caption: TypographyToken
+    [key: string]: TypographyToken
   }
 }
 
@@ -328,7 +357,7 @@ function MyComponent() {
 | Token group | Description |
 |-------------|-------------|
 | `colors` | Design-system specific color roles (`Record<string, string>`) |
-| `typography` | Type scale variants (`Record<string, TextStyle>`) |
+| `typography` | Type scale variants (`Record<string, TypographyToken>`) |
 | `shape` | Corner radius tokens (none through full) |
 | `spacing` | Spacing scale (xs, sm, md, lg, xl) |
 | `elevation` | Shadow levels 0-3 |

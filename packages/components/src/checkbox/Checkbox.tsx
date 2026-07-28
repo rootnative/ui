@@ -6,7 +6,7 @@ import {
 } from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
@@ -20,7 +20,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Checkbox({
   style,
-  value = false,
+  value,
+  defaultValue = false,
   onValueChange,
   indeterminate = false,
   error = false,
@@ -31,7 +32,11 @@ export function Checkbox({
   ...props
 }: CheckboxProps) {
   const isDisabled = Boolean(disabled)
-  const isChecked = Boolean(value)
+  // Controlled when `value` is passed, self-managing otherwise — the same
+  // idiom as Tabs / NavigationBar / ButtonGroup / Slider.
+  const isControlled = value !== undefined
+  const [selfValue, setSelfValue] = useState(() => Boolean(defaultValue))
+  const isChecked = isControlled ? Boolean(value) : selfValue
   const isIndeterminate = Boolean(indeterminate)
   const hasError = Boolean(error)
   // Indeterminate wins over checked visually — both fill the box.
@@ -138,8 +143,11 @@ export function Checkbox({
   }))
 
   const handlePress = useCallback(() => {
-    if (!isDisabled) onValueChange?.(!isChecked)
-  }, [isDisabled, isChecked, onValueChange])
+    if (isDisabled) return
+    const next = !isChecked
+    if (!isControlled) setSelfValue(next)
+    onValueChange?.(next)
+  }, [isDisabled, isChecked, isControlled, onValueChange])
 
   const markColor = isDisabled
     ? isActive

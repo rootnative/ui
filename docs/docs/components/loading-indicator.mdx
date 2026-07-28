@@ -154,7 +154,7 @@ The morphing shape scales with it, always filling about 79% of the container
 
 ## Custom colors
 
-`indicatorColor` overrides the morphing shape's fill. `containerColor`
+`contentColor` overrides the morphing shape's fill. `containerColor`
 overrides the circle behind it and only applies to the contained variant — the
 uncontained container is always transparent.
 
@@ -172,12 +172,12 @@ uncontained container is always transparent.
         <ThemeProvider>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
             <LoadingIndicator
-              indicatorColor="#00796B"
+              contentColor="#00796B"
               accessibilityLabel="Loading"
             />
             <LoadingIndicator
               contained
-              indicatorColor="#FFFFFF"
+              contentColor="#FFFFFF"
               containerColor="#B00020"
               accessibilityLabel="Loading"
             />

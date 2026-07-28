@@ -6,7 +6,7 @@ import {
   useRef,
   useSyncExternalStore,
 } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 import { PortalContext } from './context'
 import { DEFAULT_PORTAL_HOST } from './layers'
@@ -14,7 +14,7 @@ import { PortalStore } from './store'
 import { styles } from './styles'
 import type { PortalHostProps } from './types'
 
-interface PortalOutletProps {
+interface PortalOutletProps extends Omit<ViewProps, 'children'> {
   store: PortalStore
   hostName: string
   style?: StyleProp<ViewStyle>
@@ -24,7 +24,7 @@ interface PortalOutletProps {
  * Renders one host's bucket. Subscribing here rather than in the host keeps
  * an overlay opening or closing from re-rendering the host's children.
  */
-function PortalOutlet({ store, hostName, style }: PortalOutletProps) {
+function PortalOutlet({ store, hostName, style, ...rest }: PortalOutletProps) {
   const subscribe = useCallback(
     (onChange: () => void) => store.subscribe(hostName, onChange),
     [store, hostName],
@@ -39,6 +39,7 @@ function PortalOutlet({ store, hostName, style }: PortalOutletProps) {
 
   return (
     <View
+      {...rest}
       style={[styles.overlay, style]}
       pointerEvents="box-none"
       collapsable={false}
@@ -57,7 +58,7 @@ function PortalOutlet({ store, hostName, style }: PortalOutletProps) {
   )
 }
 
-function RootPortalHost({ children, name, style }: PortalHostProps) {
+function RootPortalHost({ children, name, style, ...rest }: PortalHostProps) {
   const store = useMemo(() => new PortalStore(), [])
   const warnedRef = useRef(false)
 
@@ -77,7 +78,7 @@ function RootPortalHost({ children, name, style }: PortalHostProps) {
 
   return (
     <PortalContext.Provider value={store}>
-      <View style={[styles.root, style]} collapsable={false}>
+      <View {...rest} style={[styles.root, style]} collapsable={false}>
         {children}
         <PortalOutlet store={store} hostName={DEFAULT_PORTAL_HOST} />
       </View>
@@ -95,6 +96,7 @@ function NamedPortalHost({
   name,
   store,
   style,
+  ...rest
 }: NamedPortalHostProps) {
   useEffect(() => {
     store.registerHost(name)
@@ -104,7 +106,7 @@ function NamedPortalHost({
   return (
     <>
       {children}
-      <PortalOutlet store={store} hostName={name} style={style} />
+      <PortalOutlet store={store} hostName={name} style={style} {...rest} />
     </>
   )
 }

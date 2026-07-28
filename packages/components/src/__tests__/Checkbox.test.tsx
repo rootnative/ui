@@ -188,3 +188,56 @@ describe('Checkbox', () => {
     })
   })
 })
+
+/**
+ * Before the API-freeze pass these components were controlled-only, so
+ * `<Checkbox onValueChange={fn} />` fired the callback and never changed
+ * visually — a silent no-op. The uncontrolled path is what removes that, so
+ * assert the rendered state moves, not just that the callback fired.
+ */
+describe('Checkbox — uncontrolled', () => {
+  it('toggles itself when no value prop is passed', () => {
+    renderWithTheme(<Checkbox />)
+    const cb = screen.getByRole('checkbox')
+    expect(cb.props.accessibilityState).toMatchObject({ checked: false })
+
+    fireEvent.press(cb)
+    expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
+      { checked: true },
+    )
+
+    fireEvent.press(screen.getByRole('checkbox'))
+    expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
+      { checked: false },
+    )
+  })
+
+  it('starts from defaultValue', () => {
+    renderWithTheme(<Checkbox defaultValue />)
+    expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
+      { checked: true },
+    )
+  })
+
+  it('still reports through onValueChange while self-managing', () => {
+    const onValueChange = jest.fn()
+    renderWithTheme(<Checkbox onValueChange={onValueChange} />)
+    fireEvent.press(screen.getByRole('checkbox'))
+    expect(onValueChange).toHaveBeenCalledWith(true)
+  })
+
+  it('a controlled checkbox does not move on its own', () => {
+    renderWithTheme(<Checkbox value={false} onValueChange={jest.fn()} />)
+    fireEvent.press(screen.getByRole('checkbox'))
+    expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
+      { checked: false },
+    )
+  })
+
+  it('defaultValue is ignored once value is passed', () => {
+    renderWithTheme(<Checkbox defaultValue value={false} />)
+    expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
+      { checked: false },
+    )
+  })
+})

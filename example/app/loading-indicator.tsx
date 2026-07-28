@@ -80,12 +80,12 @@ export default function LoadingIndicatorScreen() {
         <Typography variant="titleSmall">Custom Color</Typography>
         <Row gap="lg" align="center">
           <LoadingIndicator
-            indicatorColor="#00796B"
+            contentColor="#00796B"
             accessibilityLabel="Loading"
           />
           <LoadingIndicator
             contained
-            indicatorColor="#FFFFFF"
+            contentColor="#FFFFFF"
             containerColor="#B00020"
             accessibilityLabel="Loading"
           />

@@ -1,6 +1,6 @@
 import type { IconSource } from '@rootnative/utils'
 import type { ReactNode } from 'react'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /** Side of the anchor the menu opens on when it fits there. */
 export type MenuSide = 'top' | 'bottom'
@@ -11,7 +11,7 @@ export type MenuSide = 'top' | 'bottom'
  */
 export type MenuAlign = 'start' | 'center' | 'end'
 
-export interface MenuProps {
+export interface MenuProps extends ViewProps {
   /**
    * The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a
    * measuring `View`.

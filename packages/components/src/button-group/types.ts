@@ -1,5 +1,5 @@
 import type { IconSource } from '@rootnative/utils'
-import type { StyleProp, TextStyle, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
 /**
  * Visual variant of a button group.
@@ -45,7 +45,7 @@ export interface ButtonGroupItem {
   accessibilityLabel?: string
 }
 
-interface ButtonGroupBaseProps {
+interface ButtonGroupBaseProps extends Omit<ViewProps, 'children'> {
   /** The buttons to render in the group. */
   items: ButtonGroupItem[]
   /**

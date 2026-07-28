@@ -75,3 +75,49 @@ describe('Radio', () => {
     )
   })
 })
+
+/**
+ * See the equivalent block in Checkbox.test.tsx for why the uncontrolled path
+ * exists. Radio differs in one way that is intentional: it is select-only, so
+ * an uncontrolled radio latches on.
+ */
+describe('Radio — uncontrolled', () => {
+  it('selects itself when no value prop is passed', () => {
+    renderWithTheme(<Radio />)
+    expect(screen.getByRole('radio').props.accessibilityState).toMatchObject({
+      checked: false,
+    })
+
+    fireEvent.press(screen.getByRole('radio'))
+    expect(screen.getByRole('radio').props.accessibilityState).toMatchObject({
+      checked: true,
+    })
+  })
+
+  it('latches — a second press cannot deselect it', () => {
+    const onValueChange = jest.fn()
+    renderWithTheme(<Radio onValueChange={onValueChange} />)
+    fireEvent.press(screen.getByRole('radio'))
+    fireEvent.press(screen.getByRole('radio'))
+    expect(screen.getByRole('radio').props.accessibilityState).toMatchObject({
+      checked: true,
+    })
+    // Select-only: the no-op press reports nothing either.
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('starts from defaultValue', () => {
+    renderWithTheme(<Radio defaultValue />)
+    expect(screen.getByRole('radio').props.accessibilityState).toMatchObject({
+      checked: true,
+    })
+  })
+
+  it('a controlled radio does not move on its own', () => {
+    renderWithTheme(<Radio value={false} onValueChange={jest.fn()} />)
+    fireEvent.press(screen.getByRole('radio'))
+    expect(screen.getByRole('radio').props.accessibilityState).toMatchObject({
+      checked: false,
+    })
+  })
+})

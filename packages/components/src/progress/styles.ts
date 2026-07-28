@@ -18,11 +18,11 @@ interface ProgressColors {
 export function getProgressColors(
   theme: MaterialTheme,
   containerColor?: string,
-  trackColor?: string,
+  contentColor?: string,
 ): ProgressColors {
   return {
-    indicator: containerColor ?? theme.colors.primary,
-    track: trackColor ?? theme.colors.secondaryContainer,
+    indicator: contentColor ?? theme.colors.primary,
+    track: containerColor ?? theme.colors.secondaryContainer,
   }
 }
 
@@ -30,9 +30,9 @@ export function createLinearStyles(
   theme: MaterialTheme,
   thickness: number,
   containerColor?: string,
-  trackColor?: string,
+  contentColor?: string,
 ) {
-  const c = getProgressColors(theme, containerColor, trackColor)
+  const c = getProgressColors(theme, containerColor, contentColor)
   const radius = thickness / 2
 
   return StyleSheet.create({

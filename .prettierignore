@@ -3,3 +3,8 @@ node_modules
 *.md
 *.mdx
 pnpm-lock.yaml
+
+# Generated from the built .d.ts files by scripts/build-api-surface.ts and
+# byte-compared by `pnpm run api:check`. Prettier reformats it, which makes the
+# check fail against its own output.
+api-surface.json

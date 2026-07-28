@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
-export interface PortalHostProps {
+export interface PortalHostProps extends ViewProps {
   /** Content rendered inside the host. Optional on a named (slot) host. */
   children?: ReactNode
   /**
@@ -23,6 +23,12 @@ export interface PortalHostProps {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * Deliberately does NOT extend `ViewProps`, unlike every other component in
+ * the library. `Portal` renders no view of its own — it teleports `children`
+ * into a host's overlay layer — so there is no node for RN props to land on.
+ * Style the host (`PortalHost`) or the teleported content instead.
+ */
 export interface PortalProps {
   /** Content teleported into the host's overlay layer. */
   children: ReactNode

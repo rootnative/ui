@@ -194,6 +194,7 @@ Props:
 - `contentColor?: string` — Override the content (title and icon) color.
 - `titleStyle?: StyleProp<TextStyle>` — Additional style applied to the title text.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container.
+- Inherits `ViewProps` (except `children`)
 
 ---
 
@@ -287,7 +288,8 @@ import { Checkbox } from '@rootnative/components/checkbox'
 ```
 
 Props:
-- `value?: boolean` — Default: `false`. Whether the checkbox is checked.
+- `value?: boolean` — Whether the checkbox is checked (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
+- `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed.
 - `onValueChange?: (value: boolean) => void` — Callback fired when the checkbox is toggled. Receives the new value.
 - `indeterminate?: boolean` — Default: `false`. Render the MD3 indeterminate ("mixed") state — a dash mark on the selected container colors. Wins over `value` visually, and reports `checked: 'mixed'` to accessibility.
 - `error?: boolean` — Default: `false`. Render the MD3 error state: `error`-colored outline when unchecked, and an `error` container with `onError` mark when checked or indeterminate. State-layer (hover, focus, press) colors also use `error`. The standard disabled treatment wins over the error state.
@@ -307,7 +309,8 @@ import { Radio } from '@rootnative/components/radio'
 ```
 
 Props:
-- `value?: boolean` — Default: `false`. Whether the radio button is selected.
+- `value?: boolean` — Whether the radio button is selected (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
+- `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed. A radio is select-only, so an uncontrolled one latches on: only a controlling parent can turn it back off.
 - `onValueChange?: (value: boolean) => void` — Callback fired when an unselected radio is pressed. Always receives `true` — radios are select-only, so pressing an already-selected radio is a no-op.
 - `containerColor?: string` — Override the outer ring and inner dot color when selected. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the outer ring color when unselected.
@@ -326,7 +329,8 @@ import { Switch } from '@rootnative/components/switch'
 ```
 
 Props:
-- `value?: boolean` — Default: `false`. Whether the switch is toggled on.
+- `value?: boolean` — Whether the switch is toggled on (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
+- `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed.
 - `onValueChange?: (value: boolean) => void` — Callback fired when the switch is toggled. Receives the new value.
 - `selectedIcon?: IconSource` — Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Opt-in: the MD3 default switch renders no icons — pass `'check'` for the spec's "switch with icon" variant.
 - `unselectedIcon?: IconSource` — Icon shown on the thumb when unselected. When provided, the thumb renders at the larger selected size. Same accepted forms as `selectedIcon`.
@@ -471,8 +475,8 @@ import { Divider } from '@rootnative/components/divider'
 <Divider />
 
 // Leading inset — `true` is the MD3 list inset (56dp), or pass dp
-<Divider inset />
-<Divider inset={16} insetEnd={16} />
+<Divider insetStart />
+<Divider insetStart={16} insetEnd={16} />
 
 // Vertical — stretches to the height of its row
 <Row>
@@ -487,8 +491,8 @@ import { Divider } from '@rootnative/components/divider'
 
 Props:
 - `orientation?: 'horizontal' | 'vertical'` — Default: `'horizontal'`. Axis the divider is drawn along. A vertical divider stretches to the height of its parent, so it must sit inside a row-direction container.
-- `inset?: boolean | number` — Default: `false`. Inset from the leading edge (start for horizontal, top for vertical). `true` applies the MD3 list inset (56dp), which aligns the divider with list text that follows a leading icon. A number sets the inset in dp.
-- `insetEnd?: boolean | number` — Default: `false`. Inset from the trailing edge (end for horizontal, bottom for vertical). Same units as `inset`.
+- `insetStart?: boolean | number` — Default: `false`. Inset from the leading edge (start for horizontal, top for vertical). `true` applies the MD3 list inset (56dp), which aligns the divider with list text that follows a leading icon. A number sets the inset in dp.
+- `insetEnd?: boolean | number` — Default: `false`. Inset from the trailing edge (end for horizontal, bottom for vertical). Same units as `insetStart`.
 - `thickness?: number` — Default: `1`. Line thickness in dp.
 - `containerColor?: string` — Default: `theme.colors.outlineVariant`. Override the line color.
 - `style?: StyleProp<ViewStyle>`
@@ -564,7 +568,7 @@ Props:
 - `onKeyboardHide?: (event: KeyboardEvent) => void` — Called when the keyboard is about to hide (iOS) or has hidden (Android).
 - `style?: StyleProp<ViewStyle>` — Style applied to the outer `KeyboardAvoidingView`.
 - `contentContainerStyle?: StyleProp<ViewStyle>` — Style applied to the inner `ScrollView` contentContainerStyle.
-- Inherits `PropsWithChildren`
+- Inherits `ViewProps`
 
 ---
 
@@ -609,6 +613,7 @@ Props:
 - `children?: ReactNode` — Content rendered inside the host. Optional on a named (slot) host.
 - `name?: string` — Registers this host under a name that `<Portal hostName="…">` can target. A named host must sit inside a root `<PortalHost>` — it renders its portals where it appears in the tree instead of in the root overlay, which is the point of naming one (scoping overlays to a screen or a nested navigator). Cross-host stacking therefore follows tree position, not `priority`; `priority` only orders portals inside the same host. Anything that has to participate in the app-wide z-order belongs in the default host with a `priority` from `PORTAL_LAYERS`.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container on a root host, or to the overlay container on a named host (which absolute-fills its parent by default).
+- Inherits `ViewProps`
 
 #### PORTAL_LAYERS
 
@@ -666,6 +671,7 @@ Props:
 - `style?: StyleProp<ViewStyle>` — Style applied to the dialog surface.
 - `scrimStyle?: StyleProp<ViewStyle>` — Style applied to the scrim. Ignored by the fullscreen variant.
 - `testID?: string` — Test id applied to the dialog surface.
+- Inherits `ViewProps`
 
 #### Dialog.Icon
 
@@ -756,6 +762,7 @@ Props:
 - `scrimAccessibilityLabel?: string` — Screen-reader label for the scrim's dismiss action. @default 'Close sheet'
 - `dragHandleAccessibilityLabel?: string` — Screen-reader label for the drag handle. @default 'Drag handle'
 - `testID?: string` — Test id applied to the sheet surface.
+- Inherits `ViewProps`
 
 ---
 
@@ -875,6 +882,7 @@ Props:
 - `anchorStyle?: StyleProp<ViewStyle>` — Style applied to the `View` wrapping the anchor.
 - `dismissAccessibilityLabel?: string` — Default: `'Close menu'`. Screen-reader label for the full-screen region that closes the menu on an outside press.
 - `testID?: string` — Test id applied to the menu surface.
+- Inherits `ViewProps`
 
 #### Menu.Item
 
@@ -953,6 +961,7 @@ Props:
 - `anchorStyle?: StyleProp<ViewStyle>` — Style applied to the view wrapping the anchor.
 - `dismissAccessibilityLabel?: string` — Default: `'Close tooltip'`. Screen-reader label for the region that closes a rich tooltip on an outside press. Plain tooltips never render one.
 - `testID?: string` — Test id applied to the tooltip surface.
+- Inherits `ViewProps`
 
 ---
 
@@ -1006,6 +1015,7 @@ Props:
 - `style?: StyleProp<ViewStyle>` — Style applied to the row container.
 - `accessibilityLabel?: string` — Screen-reader label for the tab row itself.
 - `testID?: string` — Test id applied to the row container.
+- Inherits `ViewProps` (except `children`)
 
 #### TabItem
 
@@ -1066,6 +1076,7 @@ Props:
 - `style?: StyleProp<ViewStyle>` — Style applied to the bar container.
 - `accessibilityLabel?: string` — Screen-reader label for the bar itself.
 - `testID?: string` — Test id applied to the bar container. Each destination carries `<testID>-item-<value>` and its indicator `<testID>-indicator-<value>`.
+- Inherits `ViewProps` (except `children`)
 
 #### NavigationBarItem
 
@@ -1176,7 +1187,7 @@ import { LinearProgress, CircularProgress } from '@rootnative/components/progres
 <CircularProgress />
 
 // Custom sizing / colors
-<LinearProgress progress={value} thickness={8} containerColor="#2E7D32" trackColor="#C8E6C9" />
+<LinearProgress progress={value} thickness={8} containerColor="#C8E6C9" contentColor="#2E7D32" />
 <CircularProgress progress={value} size={56} thickness={5} />
 ```
 
@@ -1186,8 +1197,8 @@ Horizontal progress indicator. Omit `progress` for indeterminate mode.
 
 Props:
 - `progress?: number` — Progress value from 0 to 1. When omitted, the indicator shows the indeterminate animation.
-- `containerColor?: string` — Override the active track / indicator color.
-- `trackColor?: string` — Override the inactive track color.
+- `containerColor?: string` — Default: `theme.colors.secondaryContainer`. Override the inactive track color — the indicator's container.
+- `contentColor?: string` — Default: `theme.colors.primary`. Override the active indicator color.
 - `thickness?: number` — Default: `4`. Track / indicator thickness in dp.
 - `stopIndicator?: boolean` — Default: `true`. Show the trailing stop indicator dot. Only applies in determinate mode and is hidden when `progress` reaches 1.
 - Inherits `ViewProps` (except `children`)
@@ -1198,8 +1209,8 @@ Circular progress indicator. Omit `progress` for indeterminate mode.
 
 Props:
 - `progress?: number` — Progress value from 0 to 1. When omitted, the indicator shows the indeterminate animation.
-- `containerColor?: string` — Override the active track / indicator color.
-- `trackColor?: string` — Override the inactive track color.
+- `containerColor?: string` — Default: `theme.colors.secondaryContainer`. Override the inactive track color — the indicator's container.
+- `contentColor?: string` — Default: `theme.colors.primary`. Override the active indicator color.
 - `size?: number` — Default: `48`. Outer diameter in dp.
 - `thickness?: number` — Default: `4`. Stroke thickness in dp.
 - Inherits `ViewProps` (except `children`)
@@ -1221,14 +1232,14 @@ import { LoadingIndicator } from '@rootnative/components/loading-indicator'
 <LoadingIndicator progress={0.6} accessibilityLabel="Loading" />
 
 // Custom size / colors
-<LoadingIndicator size={72} indicatorColor="#00796B" accessibilityLabel="Loading" />
+<LoadingIndicator size={72} contentColor="#00796B" accessibilityLabel="Loading" />
 ```
 
 Props:
 - `progress?: number` — Determinate progress from 0 to 1. When omitted, the indicator runs the indeterminate shape-morph cycle. In determinate mode the polygon morphs from a circle toward the soft-burst shape as progress advances.
 - `contained?: boolean` — Default: `false`. When `true`, renders the morphing polygon on a filled circular container (MD3 `ContainedLoadingIndicator`). When `false` (default) the container is transparent.
 - `size?: number` — Default: `48`. Diameter of the container in dp. The morphing polygon fills ~79% of it, matching the MD3 38dp-active / 48dp-container ratio.
-- `indicatorColor?: string` — Override the morphing-indicator color. Defaults to `primary` (uncontained) or `onPrimaryContainer` (contained).
+- `contentColor?: string` — Override the morphing-indicator color. Defaults to `primary` (uncontained) or `onPrimaryContainer` (contained).
 - `containerColor?: string` — Override the container fill color (contained variant only). Defaults to `primaryContainer`.
 - `style?: StyleProp<ViewStyle>` — Root container style.
 - `accessibilityLabel?: string` — Accessibility label announced for the busy/progress state.

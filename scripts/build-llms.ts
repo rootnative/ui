@@ -565,8 +565,8 @@ import { Divider } from '@rootnative/components/divider'
 <Divider />
 
 // Leading inset — \`true\` is the MD3 list inset (56dp), or pass dp
-<Divider inset />
-<Divider inset={16} insetEnd={16} />
+<Divider insetStart />
+<Divider insetStart={16} insetEnd={16} />
 
 // Vertical — stretches to the height of its row
 <Row>
@@ -892,7 +892,7 @@ import { LinearProgress, CircularProgress } from '@rootnative/components/progres
 <CircularProgress />
 
 // Custom sizing / colors
-<LinearProgress progress={value} thickness={8} containerColor="#2E7D32" trackColor="#C8E6C9" />
+<LinearProgress progress={value} thickness={8} containerColor="#C8E6C9" contentColor="#2E7D32" />
 <CircularProgress progress={value} size={56} thickness={5} />
 \`\`\``,
 
@@ -909,7 +909,7 @@ import { LoadingIndicator } from '@rootnative/components/loading-indicator'
 <LoadingIndicator progress={0.6} accessibilityLabel="Loading" />
 
 // Custom size / colors
-<LoadingIndicator size={72} indicatorColor="#00796B" accessibilityLabel="Loading" />
+<LoadingIndicator size={72} contentColor="#00796B" accessibilityLabel="Loading" />
 \`\`\``,
 }
 
@@ -1443,10 +1443,10 @@ Identity function that validates a custom theme object against \`BaseTheme\`. Pr
 
 \`\`\`tsx
 import { defineTheme } from '@rootnative/core'
-import type { BaseTheme, TextStyle } from '@rootnative/core'
+import type { BaseTheme, TypographyToken } from '@rootnative/core'
 
 interface MyColors { [key: string]: string; brand: string; background: string; text: string }
-interface MyTypography { [key: string]: TextStyle; heading: TextStyle; body: TextStyle }
+interface MyTypography { [key: string]: TypographyToken; heading: TypographyToken; body: TypographyToken }
 interface MyTheme extends BaseTheme { colors: MyColors; typography: MyTypography }
 
 const myTheme = defineTheme<MyTheme>({
@@ -1552,7 +1552,7 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- \`BaseTheme\` — Generic base interface. All design systems extend this. Has \`colors: Record<string, string>\`, \`typography: Record<string, TextStyle>\`, plus shape, spacing, stateLayer, elevation, motion.
+- \`BaseTheme\` — Generic base interface. All design systems extend this. Has \`colors: Record<string, string>\`, \`typography: Record<string, TypographyToken>\`, plus shape, spacing, stateLayer, elevation, motion.
 - \`Theme\` — Material Design 3 theme. Extends \`BaseTheme\` with 69 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional \`topAppBar\` tokens. \`MaterialTheme\` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
@@ -1560,7 +1560,7 @@ material.defaultTopAppBarTokens
 \`\`\`
 BaseTheme {
   colors: Record<string, string>
-  typography: Record<string, TextStyle>
+  typography: Record<string, TypographyToken>
   shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
   spacing: Spacing       — xs, sm, md, lg, xl
   elevation: Elevation   — level0..level3 (shadow properties)

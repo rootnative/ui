@@ -131,3 +131,38 @@ describe('Switch', () => {
     })
   })
 })
+
+/** See the equivalent block in Checkbox.test.tsx for why this path exists. */
+describe('Switch — uncontrolled', () => {
+  it('toggles itself when no value prop is passed', () => {
+    renderWithTheme(<Switch />)
+    expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
+      checked: false,
+    })
+
+    fireEvent.press(screen.getByRole('switch'))
+    expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
+      checked: true,
+    })
+
+    fireEvent.press(screen.getByRole('switch'))
+    expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
+      checked: false,
+    })
+  })
+
+  it('starts from defaultValue', () => {
+    renderWithTheme(<Switch defaultValue />)
+    expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
+      checked: true,
+    })
+  })
+
+  it('a controlled switch does not move on its own', () => {
+    renderWithTheme(<Switch value={false} onValueChange={jest.fn()} />)
+    fireEvent.press(screen.getByRole('switch'))
+    expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
+      checked: false,
+    })
+  })
+})

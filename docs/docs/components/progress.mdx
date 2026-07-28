@@ -169,7 +169,7 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
 
 ## Custom colors
 
-`containerColor` overrides the active indicator color, and `trackColor` overrides the inactive track color. Both indicators accept the same overrides.
+`containerColor` overrides the inactive track — the indicator's container — and `contentColor` overrides the active indicator drawn on it. Both indicators accept the same overrides, and the pair matches every other component in the library.
 
 <SnackExample
   name="RootNative Progress — Custom colors"
@@ -186,14 +186,14 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 20 }}>
             <LinearProgress
               progress={0.6}
-              containerColor="#2E7D32"
-              trackColor="#C8E6C9"
+              containerColor="#C8E6C9"
+              contentColor="#2E7D32"
             />
             <View style={{ alignItems: 'center' }}>
               <CircularProgress
                 progress={0.6}
-                containerColor="#D32F2F"
-                trackColor="#FFCDD2"
+                containerColor="#FFCDD2"
+                contentColor="#D32F2F"
               />
             </View>
           </View>

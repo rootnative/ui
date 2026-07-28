@@ -9,6 +9,7 @@ import {
   ScrollView,
   View,
 } from 'react-native'
+import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -50,7 +51,8 @@ function DialogBasic({
   styles,
   style,
   testID,
-}: {
+  ...rest
+}: Omit<ViewProps, 'children' | 'style'> & {
   slots: Slots
   styles: ReturnType<typeof createDialogStyles>
   style: DialogProps['style']
@@ -58,6 +60,7 @@ function DialogBasic({
 }) {
   return (
     <View
+      {...rest}
       testID={testID}
       style={[styles.container, style]}
       role="alertdialog"
@@ -80,7 +83,8 @@ function DialogFullscreen({
   closeIcon,
   closeAccessibilityLabel,
   onDismiss,
-}: {
+  ...rest
+}: Omit<ViewProps, 'children' | 'style'> & {
   slots: Slots
   styles: ReturnType<typeof createDialogStyles>
   style: DialogProps['style']
@@ -91,6 +95,7 @@ function DialogFullscreen({
 }) {
   return (
     <View
+      {...rest}
       testID={testID}
       style={[styles.fullscreenContainer, style]}
       role="dialog"
@@ -130,6 +135,7 @@ export function Dialog({
   style,
   scrimStyle,
   testID,
+  ...rest
 }: DialogProps) {
   const theme = useTheme()
   const styles = useMemo(
@@ -226,6 +232,7 @@ export function Dialog({
                   closeIcon={closeIcon}
                   closeAccessibilityLabel={closeAccessibilityLabel}
                   onDismiss={onDismiss}
+                  {...rest}
                 />
               ) : (
                 <DialogBasic
@@ -233,6 +240,7 @@ export function Dialog({
                   styles={styles}
                   style={style}
                   testID={testID}
+                  {...rest}
                 />
               )}
             </Motion.View>
