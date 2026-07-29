@@ -52,8 +52,8 @@ associated with it:
 
 ```tsx
 <ListItem
-  headline="Push notifications"
-  trailing={<Switch value={on} onValueChange={setOn} />}
+  headlineText="Push notifications"
+  trailingContent={<Switch value={on} onValueChange={setOn} />}
 />
 
 // Standalone, with the text outside any labelled container:
