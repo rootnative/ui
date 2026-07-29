@@ -1,6 +1,11 @@
 import { flushMotion } from '@rootnative/inertia/testing'
 import type { render } from '@testing-library/react-native'
-import type { ReactElement } from 'react'
+import {
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from 'react'
 import {
   renderWithTheme,
   type RenderWithThemeOptions,
@@ -49,6 +54,54 @@ export interface RenderSettledResult extends RenderResult {
  * fireEvent.press(screen.getByRole('switch'))
  * flush()
  */
+/**
+ * Rebuild an element tree with fresh prop identities, so re-rendering it is a
+ * real second pass rather than a no-op.
+ *
+ * React bails out of re-rendering a child whose element is reference-identical
+ * (`oldProps === newProps`), which makes the plain "re-render the same element"
+ * flush stop at the first component boundary. That is invisible for a shallow
+ * tree — the animated node is usually the element itself — but fatal for a
+ * portalled one: `<Portal>` re-registers its content in an effect keyed on
+ * `children`, so with an unchanged `children` reference the host keeps the
+ * element instance it already stored and the animated node never re-renders.
+ * Every entrance in this library (Dialog, Menu, Tooltip, Snackbar, BottomSheet)
+ * is portalled, so the flush has to reach through that.
+ *
+ * `cloneElement` allocates a new props object, which is exactly enough to defeat
+ * the bailout while keeping type and key — so it reconciles as an update, not a
+ * remount, and shared values survive. Children and element-valued props are
+ * rebuilt too; anything else (strings, functions, plain objects) passes through.
+ *
+ * Children go through the variadic argument list rather than the props config
+ * because a clone loses the "statically written" mark React sets on JSX
+ * children: handed back as an array in `config.children`, keyless siblings get
+ * re-validated and warn. As trailing arguments they are marked valid again, the
+ * way the original JSX was.
+ */
+function withFreshIdentity<T>(node: T): T {
+  if (Array.isArray(node)) return node.map(withFreshIdentity) as T
+  if (!isValidElement(node)) return node
+
+  const { children, ...rest } = node.props as {
+    children?: unknown
+    [prop: string]: unknown
+  }
+  const next: Record<string, unknown> = {}
+  for (const key of Object.keys(rest)) {
+    const value = rest[key]
+    if (Array.isArray(value) || isValidElement(value)) {
+      next[key] = withFreshIdentity(value)
+    }
+  }
+
+  if (children === undefined) return cloneElement(node, next) as T
+  const rebuilt: ReactNode[] = Array.isArray(children)
+    ? children.map((child) => withFreshIdentity(child) as ReactNode)
+    : [withFreshIdentity(children) as ReactNode]
+  return cloneElement(node, next, ...rebuilt) as T
+}
+
 export function renderSettled(
   ui: ReactElement,
   options?: RenderWithThemeOptions,
@@ -67,9 +120,9 @@ export function renderSettled(
   // `flushMotion(rendered, nextUi)` is a single `rerender`, so it *is* the
   // committing pass and lands on the pre-change value. Here the two roles are
   // separated — `rerender` commits, `flush` settles — so one pass each is
-  // right, and re-rendering the same element is idempotent.
+  // right, and re-rendering the same tree is idempotent.
   const flush = () => {
-    flushMotion(rendered, current)
+    flushMotion(rendered, withFreshIdentity(current))
   }
 
   const rerender = (next: ReactElement) => {

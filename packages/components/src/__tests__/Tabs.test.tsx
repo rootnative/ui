@@ -1,5 +1,5 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import { Tabs } from '../tabs'
@@ -189,15 +189,14 @@ describe('Tabs — indicator', () => {
   })
 
   it('follows the selection', () => {
-    const view = renderTabs()
+    // `renderSettled` rather than `renderTabs`: the press is its own render pass
+    // and runs the worklet before its effect writes the new progress, so without
+    // the pass `flush()` adds this asserts the geometry of the tab that was just
+    // deselected.
+    const { flush } = renderSettled(<Tabs items={ITEMS} testID="tabs" />)
     layOutRow()
     fireEvent.press(screen.getByRole('tab', { name: 'Explore' }))
-
-    // The reanimated mock runs a worklet once per render and does not re-run it
-    // when a shared value changes afterwards, so the animated style only catches
-    // up on the next render pass. Force one — the alternative is asserting the
-    // geometry of the tab that was just deselected.
-    view.rerender(<Tabs items={ITEMS} testID="tabs" />)
+    flush()
 
     const style = StyleSheet.flatten(
       screen.getByTestId('tabs-indicator').props.style,

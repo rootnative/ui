@@ -5,6 +5,8 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
+import { Portal } from '../portal/Portal'
+import { PortalHost } from '../portal/PortalHost'
 import { Switch } from '../switch'
 
 // 52 track - 2 * 4 padding - 24 on-thumb.
@@ -39,6 +41,20 @@ describe('renderSettled', () => {
     it('settles on mount', () => {
       renderSettled(entrance)
       expect(getStyle(screen.getByTestId('entrance')).opacity).toBe(1)
+    })
+
+    // The flush has to rebuild the tree, not just re-render it: React bails out
+    // on a reference-identical element, and `<Portal>` re-registers its content
+    // in an effect keyed on `children`, so an unchanged reference leaves the
+    // host rendering the element instance it already stored. Every entrance in
+    // the library is portalled, so a flush that stops at the host is useless.
+    it('settles an entrance rendered through a Portal', async () => {
+      renderSettled(
+        <PortalHost>
+          <Portal>{entrance}</Portal>
+        </PortalHost>,
+      )
+      expect(getStyle(await screen.findByTestId('entrance')).opacity).toBe(1)
     })
   })
 

@@ -1,5 +1,9 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, View } from 'react-native'
 import { Button } from '../button'
@@ -260,6 +264,64 @@ describe('Menu — resolved placement', () => {
     expect(
       StyleSheet.flatten(screen.getByTestId('menu').props.style).maxHeight,
     ).toBe(452)
+  })
+})
+
+// What a device settles on after the entrance, which the rest of this file
+// cannot see: `renderWithTheme` is a single pass, so the surface reads its
+// `initial` (opacity 0, scale 0.8) and stays there. Worth its own coverage
+// because Menu's `animate` target is *conditional* — it only leaves HIDDEN once
+// the anchor geometry resolves, and that is the whole anti-flash guarantee.
+describe('Menu — settled entrance', () => {
+  const LAYER = { x: 0, y: 0, width: 400, height: 800 }
+  const ANCHOR = { x: 100, y: 300, width: 40, height: 40 }
+
+  function mockMeasure() {
+    jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
+      this: { props?: { pointerEvents?: string } },
+      callback,
+    ) {
+      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : ANCHOR
+      callback(rect.x, rect.y, rect.width, rect.height)
+    })
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('settles on its animate target once the geometry resolves', async () => {
+    mockMeasure()
+    const { flush } = renderSettled(
+      <PortalHost>
+        <UncontrolledMenu />
+      </PortalHost>,
+    )
+    fireEvent(await open(), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height: 120 } },
+    })
+    flush()
+
+    const style = getStyle(screen.getByTestId('menu'))
+    expect(style.opacity).toBe(1)
+    expect(style.transform).toEqual([{ scale: 1 }])
+  })
+
+  it('stays hidden while the anchor is unmeasured', async () => {
+    // No `measureInWindow` stub, so `position` stays null and `animate` is still
+    // HIDDEN — a flush cannot reveal the surface. An unpositioned menu must not
+    // appear in the corner on its way to being placed.
+    const { flush } = renderSettled(
+      <PortalHost>
+        <UncontrolledMenu />
+      </PortalHost>,
+    )
+    await open()
+    flush()
+
+    const style = getStyle(screen.getByTestId('menu'))
+    expect(style.opacity).toBe(0)
+    expect(style.transform).toEqual([{ scale: 0.8 }])
   })
 })
 

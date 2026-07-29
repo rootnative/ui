@@ -1,10 +1,15 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { act, fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { PortalHost } from '../portal/PortalHost'
 import type { SnackbarApi, SnackbarOptions } from '../snackbar'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
+import { SNACKBAR_SLIDE } from '../snackbar/styles'
 
 let api: SnackbarApi
 
@@ -255,6 +260,47 @@ describe('Snackbar queue', () => {
       jest.advanceTimersByTime(4000)
     })
     expect(screen.queryByText('second')).toBeNull()
+  })
+})
+
+// What a device settles on after the entrance, which the rest of this file
+// cannot see: `renderWithTheme` is a single pass, so the layer reads its
+// `initial` (opacity 0, translated down by SNACKBAR_SLIDE) and stays there.
+// Nothing in the snackbar API carries a `testID` down — the queue is driven by
+// `show()`, not by props — so the layer has a fixed handle.
+describe('Snackbar — settled entrance', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+  })
+
+  afterEach(() => {
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
+    jest.useRealTimers()
+  })
+
+  it('settles on its animate target', () => {
+    const { flush } = renderSettled(
+      <PortalHost>
+        <SnackbarProvider>
+          <Harness />
+        </SnackbarProvider>
+      </PortalHost>,
+    )
+    show({ message: 'Saved' })
+
+    // Un-flushed, so this is the `initial` — the entrance is a real animation,
+    // which is what makes the assertion below worth making.
+    const initial = getStyle(screen.getByTestId('snackbar-layer'))
+    expect(initial.opacity).toBe(0)
+    expect(initial.transform).toEqual([{ translateY: SNACKBAR_SLIDE }])
+
+    flush()
+
+    const settled = getStyle(screen.getByTestId('snackbar-layer'))
+    expect(settled.opacity).toBe(1)
+    expect(settled.transform).toEqual([{ translateY: 0 }])
   })
 })
 

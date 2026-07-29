@@ -1,5 +1,9 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { fireEvent, screen, within } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button'
@@ -267,5 +271,59 @@ describe('Dialog — fullscreen', () => {
       </Dialog>,
     )
     expect(await screen.findByLabelText('Discard')).toBeTruthy()
+  })
+})
+
+// What a device settles on after the entrance, which the rest of this file
+// cannot see: `renderWithTheme` is a single pass, so it reads the `initial`
+// values (basic: opacity 0 / scale 0.8, fullscreen: opacity 0 / translateY 48)
+// and stays there. The animation runs on the Motion layer *above* the surface
+// that `testID` names, hence the derived `-layer` and `-scrim` handles.
+describe('Dialog — settled entrance', () => {
+  function renderSettledDialog(ui: React.ReactElement) {
+    return renderSettled(<PortalHost>{ui}</PortalHost>)
+  }
+
+  it('settles the basic entrance on its animate target', async () => {
+    renderSettledDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>Delete file?</Dialog.Title>
+      </Dialog>,
+    )
+
+    const layer = getStyle(await screen.findByTestId('dialog-layer'))
+    expect(layer.opacity).toBe(1)
+    expect(layer.transform).toEqual([{ scale: 1 }])
+    expect(getStyle(screen.getByTestId('dialog-scrim')).opacity).toBe(1)
+  })
+
+  it('settles the fullscreen entrance on its animate target', async () => {
+    renderSettledDialog(
+      <Dialog
+        visible
+        variant="fullscreen"
+        onDismiss={jest.fn()}
+        testID="dialog"
+      >
+        <Dialog.Title>Edit profile</Dialog.Title>
+      </Dialog>,
+    )
+
+    const layer = getStyle(await screen.findByTestId('dialog-layer'))
+    expect(layer.opacity).toBe(1)
+    expect(layer.transform).toEqual([{ translateY: 0 }])
+    expect(screen.queryByTestId('dialog-scrim')).toBeNull()
+  })
+
+  it('names the animated layers off the testID, or not at all', async () => {
+    renderSettledDialog(
+      <Dialog visible onDismiss={jest.fn()}>
+        <Dialog.Title>Delete file?</Dialog.Title>
+      </Dialog>,
+    )
+
+    await screen.findByText('Delete file?')
+    expect(screen.queryByTestId('undefined-layer')).toBeNull()
+    expect(screen.queryByTestId('undefined-scrim')).toBeNull()
   })
 })

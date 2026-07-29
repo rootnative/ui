@@ -215,6 +215,7 @@ export function Dialog({
           {visible && !isFullscreen ? (
             <Motion.View
               key="scrim"
+              testID={testID === undefined ? undefined : `${testID}-scrim`}
               style={[styles.scrim, scrimStyle]}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -237,6 +238,10 @@ export function Dialog({
           {visible ? (
             <Motion.View
               key="surface"
+              // The entrance animates on this layer, not on the surface the
+              // `testID` prop lands on — so it needs its own handle for tests
+              // that assert settled entrance values.
+              testID={testID === undefined ? undefined : `${testID}-layer`}
               pointerEvents="box-none"
               style={isFullscreen ? styles.fullscreenLayer : styles.centerLayer}
               // MD3 enters a basic dialog with a scale-up + fade; the

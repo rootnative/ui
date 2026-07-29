@@ -1,5 +1,5 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import { NavigationBar } from '../navigation-bar'
@@ -106,13 +106,14 @@ describe('NavigationBar — indicator', () => {
   })
 
   it('moves to the pressed destination', () => {
-    const view = renderBar()
+    // `renderSettled` rather than `renderBar`: the press is its own render pass
+    // and runs the worklet before its effect writes the new progress, so the
+    // animated style only catches up on the pass `flush()` adds.
+    const { flush } = renderSettled(
+      <NavigationBar items={ITEMS} testID="nav" />,
+    )
     fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
-
-    // The reanimated mock runs a worklet once per render and does not re-run
-    // it when a shared value changes afterwards — force a render pass so the
-    // animated style catches up.
-    view.rerender(<NavigationBar items={ITEMS} testID="nav" />)
+    flush()
 
     expect(
       StyleSheet.flatten(

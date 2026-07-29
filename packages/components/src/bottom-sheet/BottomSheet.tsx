@@ -385,6 +385,7 @@ export function BottomSheet({
           {open && isModal ? (
             <Motion.View
               key="scrim"
+              testID={testID === undefined ? undefined : `${testID}-scrim`}
               style={[styles.scrim, scrimStyle]}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -407,6 +408,9 @@ export function BottomSheet({
           {open ? (
             <Motion.View
               key="sheet"
+              // No handle of its own: this layer only animates on the way out.
+              // The entrance is the spring on `dragY` below, which lands on the
+              // surface that already carries the consumer's `testID`.
               pointerEvents="box-none"
               style={styles.sheetLayer}
               initial={{ translateY: 0 }}

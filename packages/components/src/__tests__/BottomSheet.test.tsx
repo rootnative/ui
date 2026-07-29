@@ -1,5 +1,9 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { BottomSheet } from '../bottom-sheet'
@@ -315,6 +319,68 @@ describe('BottomSheet', () => {
         screen.getByLabelText('Drag handle').props.accessibilityValue,
       ).toEqual({ min: 0, max: 1, now: 1 })
     })
+  })
+})
+
+// What a device settles on after the entrance, which the rest of this file
+// cannot see. The sheet is the odd one of the five entrance components: its
+// `Motion.View` layer only animates on the way *out* (`initial`/`animate` are
+// both `translateY: 0`), so the entrance is the spring on `dragY` — jump to
+// fully hidden, spring onto the opening snap — and it lands on the surface that
+// already carries the consumer's `testID`. The scrim is a plain Motion fade.
+// Unlike the other four, these two also pass with a no-op flush: the entrance
+// effect calls `setEntered(true)` right after it springs `dragY`, and that state
+// update is itself the extra render pass a settle needs. `renderSettled` is kept
+// anyway — the assertion is about the settled offset, and it should not quietly
+// start reading the jumped-to value if that incidental pass ever goes away.
+describe('BottomSheet — settled entrance', () => {
+  /** The drag style is axis-agnostic, so it carries both translate keys. */
+  function sheetTranslateY() {
+    const { transform } = getStyle(screen.getByTestId('sheet')) as {
+      transform?: Array<Record<string, number>>
+    }
+    return transform?.find((entry) => 'translateY' in entry)?.translateY
+  }
+
+  it('springs the surface from fully hidden onto its snap offset', async () => {
+    const { flush } = renderSettled(
+      <PortalHost>
+        <BottomSheet visible onDismiss={jest.fn()} testID="sheet">
+          <Text>Sheet body</Text>
+        </BottomSheet>
+      </PortalHost>,
+    )
+    await screen.findByTestId('sheet')
+    // Sizing to content, so the only snap is the sheet's own height and the
+    // settled offset is 0 — fully visible, having started 400 lower.
+    measureSheet(400)
+    flush()
+
+    expect(sheetTranslateY()).toBe(0)
+    expect(getStyle(screen.getByTestId('sheet-scrim')).opacity).toBe(1)
+  })
+
+  it('settles on the opening snap rather than on fully open', async () => {
+    const { flush } = renderSettled(
+      <PortalHost>
+        <BottomSheet
+          visible
+          onDismiss={jest.fn()}
+          testID="sheet"
+          snapPoints={[200, 400]}
+        >
+          <Text>Sheet body</Text>
+        </BottomSheet>
+      </PortalHost>,
+    )
+    await screen.findByTestId('sheet')
+    measureSheet(400)
+    flush()
+
+    // Surface sized to the tallest snap (400), opening at index 0 (200 visible),
+    // so it rests 200px down — the assertion a flush-blind test cannot make,
+    // since an unflushed read is still at the 400 it was jumped to.
+    expect(sheetTranslateY()).toBe(200)
   })
 })
 

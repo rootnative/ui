@@ -47,6 +47,11 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
           {entry ? (
             <Motion.View
               key={entry.id}
+              // The entrance animates here, not on the surface — and nothing
+              // in the snackbar API carries a `testID` down, since the queue is
+              // driven by `show()` rather than by props. A fixed handle, like
+              // `switch-thumb`, so tests can assert settled entrance values.
+              testID="snackbar-layer"
               initial={{ opacity: 0, translateY: SNACKBAR_SLIDE }}
               animate={{ opacity: 1, translateY: 0 }}
               exit={{ opacity: 0, translateY: SNACKBAR_SLIDE }}

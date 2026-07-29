@@ -1,5 +1,9 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { act, fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
@@ -402,5 +406,60 @@ describe('Tooltip — resolved placement', () => {
     anchorRect = { x: 0, y: 300, width: 40, height: 40 }
     const style = openAndLayOut(<PressableAnchor />)
     expect(style.left).toBe(8)
+  })
+})
+
+// What a device settles on after the entrance, which the rest of this file
+// cannot see: `renderWithTheme` is a single pass, so the surface reads its
+// `initial` (opacity 0) and stays there. Worth its own coverage because the
+// `animate` target is *conditional* — it only leaves HIDDEN once the anchor
+// geometry resolves, and that is the whole anti-flash guarantee.
+describe('Tooltip — settled entrance', () => {
+  const LAYER = { x: 0, y: 0, width: 400, height: 800 }
+  const ANCHOR = { x: 100, y: 300, width: 40, height: 40 }
+
+  function mockMeasure() {
+    jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
+      this: { props?: { pointerEvents?: string } },
+      callback,
+    ) {
+      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : ANCHOR
+      callback(rect.x, rect.y, rect.width, rect.height)
+    })
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('settles on its animate target once the geometry resolves', () => {
+    mockMeasure()
+    const { flush } = renderSettled(
+      <PortalHost>
+        <PressableAnchor />
+      </PortalHost>,
+    )
+    fireEvent(screen.getByText('Save'), 'longPress')
+    fireEvent(screen.getByTestId('tooltip'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height: 40 } },
+    })
+    flush()
+
+    expect(getStyle(screen.getByTestId('tooltip')).opacity).toBe(1)
+  })
+
+  it('stays hidden while the anchor is unmeasured', () => {
+    // No `measureInWindow` stub, so `position` stays null and `animate` is still
+    // HIDDEN — a flush cannot reveal the surface. A tooltip must not flash at
+    // the layer's origin on its way to the anchor.
+    const { flush } = renderSettled(
+      <PortalHost>
+        <PressableAnchor />
+      </PortalHost>,
+    )
+    fireEvent(screen.getByText('Save'), 'longPress')
+    flush()
+
+    expect(getStyle(screen.getByTestId('tooltip')).opacity).toBe(0)
   })
 })
