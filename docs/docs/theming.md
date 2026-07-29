@@ -109,7 +109,7 @@ being strict: a type alias is what lets a closed `Colors` still satisfy
 
 `createMaterialTheme` relies on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), a required peer of `@rootnative/core`. npm and pnpm install required peers automatically; **Yarn users must add it manually** (`yarn add @material/material-color-utilities`).
 
-It generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 69 color roles are derived automatically:
+It generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 49 color roles are derived automatically:
 
 ```tsx
 import { createMaterialTheme } from '@rootnative/core/create-theme'
@@ -358,16 +358,16 @@ function MyComponent() {
 |-------------|-------------|
 | `colors` | Design-system specific color roles (`Record<string, string>`) |
 | `typography` | Type scale variants (`Record<string, TypographyToken>`) |
-| `shape` | Corner radius tokens (none through full) |
-| `spacing` | Spacing scale (xs, sm, md, lg, xl) |
-| `elevation` | Shadow levels 0-3 |
-| `stateLayer` | Opacity values for pressed, focused, hovered, disabled |
-| `motion` | Duration and easing tokens |
+| `shape` | `roundness` multiplier plus corner radius tokens (`cornerNone` through `cornerFull`) |
+| `spacing` | Spacing scale (`xs`, `sm`, `md`, `lg`, `xl`) |
+| `elevation` | Shadow levels `level0` through `level5` |
+| `stateLayer` | Opacity values for `pressed`, `focused`, `hovered`, `dragged`, `disabled`, and `disabledContainer` |
+| `motion` | Duration, easing, and spring tokens — see [Motion](./motion) |
 
 ## Type hierarchy
 
 - **`BaseTheme`** — Generic base. Any design system extends this.
-- **`Theme`** — MD3 theme. Extends `BaseTheme` with 69 color roles, 15 typography variants, optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias — use it to disambiguate in multi-design-system codebases.
+- **`Theme`** — MD3 theme. Extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias — use it to disambiguate in multi-design-system codebases.
 
 ## Summary
 

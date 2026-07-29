@@ -27,7 +27,7 @@ export default function App() {
 }
 ```
 
-This applies the font to all 15 MD3 typography styles (display, headline, title, body, label) at once.
+This applies the font to all 30 MD3 typography styles at once — the 15 base roles (display, headline, title, body, label) and their 15 emphasized counterparts.
 
 ## Loading fonts in Expo
 

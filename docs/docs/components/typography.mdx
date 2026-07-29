@@ -43,6 +43,24 @@ The full MD3 type scale:
 | Body | `bodyLarge`, `bodyMedium`, `bodySmall` |
 | Label | `labelLarge`, `labelMedium`, `labelSmall` |
 
+:::note Emphasized styles
+
+The theme also carries an MD3 Expressive `<name>Emphasized` token for each of
+the 15 roles above — same size and line height, weight one step heavier — so
+`theme.typography` has 30 entries. `variant` deliberately accepts only the 15
+base roles. Reach an emphasized style through `style`, which is applied after
+the variant:
+
+```tsx
+const theme = useTheme()
+
+<Typography variant="titleLarge" style={theme.typography.titleLargeEmphasized}>
+  Emphasized title
+</Typography>
+```
+
+:::
+
 ## Accessibility
 
 Display and headline variants automatically receive `accessibilityRole="header"` for screen readers.

@@ -86,7 +86,7 @@ const myTheme = defineTheme<MyTheme>({
   },
   shape: { roundness: 1, cornerNone: 0, cornerExtraSmall: 4, cornerSmall: 8, cornerMedium: 12, cornerLarge: 16, cornerExtraLarge: 28, cornerFull: 9999 },
   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
-  stateLayer: { pressedOpacity: 0.12, focusedOpacity: 0.12, hoveredOpacity: 0.08, disabledOpacity: 0.38 },
+  stateLayer: { pressedOpacity: 0.1, focusedOpacity: 0.1, hoveredOpacity: 0.08, draggedOpacity: 0.16, disabledOpacity: 0.38, disabledContainerOpacity: 0.12 },
   elevation: { ... },
   motion: { ... },
 })
@@ -101,7 +101,7 @@ Defaults are byte-identical to the upstream MD3 `material-color-utilities` libra
 **Spec-aligned options:**
 - `variant?: 'tonalSpot' | 'neutral' | 'vibrant' | 'expressive' | 'fidelity' | 'content' | 'monochrome' | 'rainbow' | 'fruitSalad'` — MD3 scheme variant (default `'tonalSpot'`, the Material You default on Android 12+). Each is a spec-defined recipe for deriving the palette. Use `'monochrome'` for spec-legal pure-grey themes, `'vibrant'` for high-colorfulness, etc.
 - `contrastLevel?: 'standard' | 'medium' | 'high'` — MD3 contrast preset (default `'standard'`). Maps to MD3 contrast values `0 / 0.5 / 1.0`. Use `'medium'` or `'high'` for WCAG AAA / low-vision modes.
-- `fontFamily?: string` — Custom font family applied to all 15 typography styles. When omitted, platform defaults are used (Roboto on Android, System on iOS).
+- `fontFamily?: string` — Custom font family applied to all 30 typography styles (15 base + 15 emphasized). When omitted, platform defaults are used (Roboto on Android, System on iOS).
 - `roundness?: number` — Global corner-radius multiplier. `0` = sharp corners, `1` = default MD3 (default), `2` = double rounding. Does not affect `cornerNone` or `cornerFull`.
 
 **Explicit overrides (NOT part of MD3 spec — use only when no built-in `variant` covers your case):**
@@ -144,7 +144,7 @@ createMaterialTheme('#006A6A', { seedAdjustments: { primary: 60, secondary: 32 }
 
 Returns: `{ lightTheme: Theme, darkTheme: Theme }`
 
-The generated themes include all 69 MD3 color roles plus shared tokens (typography, shape, spacing, stateLayer, elevation, motion, topAppBar).
+The generated themes include all 49 MD3 color roles plus shared tokens (typography, shape, spacing, stateLayer, elevation, motion, topAppBar).
 
 Requires `@material/material-color-utilities` as a peer dependency: `npm install @material/material-color-utilities`
 
@@ -182,7 +182,7 @@ material.defaultTopAppBarTokens
 ### Theme type hierarchy
 
 - `BaseTheme` — Generic base interface. All design systems extend this. Has `colors: Record<string, string>`, `typography: Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
-- `Theme` — Material Design 3 theme. Extends `BaseTheme` with 69 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional `topAppBar` tokens. `MaterialTheme` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
+- `Theme` — Material Design 3 theme. Extends `BaseTheme` with 49 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional `topAppBar` tokens. `MaterialTheme` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
 
@@ -192,13 +192,13 @@ BaseTheme {
   typography: Record<string, TypographyToken>
   shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
   spacing: Spacing       — xs, sm, md, lg, xl
-  elevation: Elevation   — level0..level3 (shadow properties)
-  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, disabledOpacity
+  elevation: Elevation   — level0..level5 (shadow properties)
+  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, draggedOpacity, disabledOpacity, disabledContainerOpacity
   motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
 }
 
 Theme extends BaseTheme {
-  colors: Colors         — 69 MD3 color roles
+  colors: Colors         — 49 MD3 color roles
   typography: Typography — 30 type scale variants: 15 base (displayLarge..labelSmall) + 15 MD3 Expressive emphasized (displayLargeEmphasized..labelSmallEmphasized)
   topAppBar?: TopAppBarTokens
 }
