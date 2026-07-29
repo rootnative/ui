@@ -3,7 +3,7 @@ import type { IconResolver, Theme } from '@rootnative/core'
 import { render, type RenderOptions } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
 
-interface RenderWithThemeOptions extends Omit<RenderOptions, 'wrapper'> {
+export interface RenderWithThemeOptions extends Omit<RenderOptions, 'wrapper'> {
   /** Pass a custom theme or `'dark'` for the built-in dark theme. Defaults to light. */
   theme?: Theme | 'dark'
   /** Optional icon resolver wired into `ThemeProvider` for the render. */

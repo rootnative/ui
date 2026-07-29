@@ -1,3 +1,6 @@
 export { renderWithTheme } from './render-with-theme'
+export type { RenderWithThemeOptions } from './render-with-theme'
+export { renderSettled } from './render-settled'
+export type { RenderSettledResult } from './render-settled'
 export { getStyle } from './get-style'
 export { rootNativeMatchers } from './custom-matchers'
