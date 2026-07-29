@@ -99,7 +99,8 @@ export function FAB({
 
   // Cross-fade level 3 (rest) and level 4 (hover) shadow layers per MD3,
   // driven by the gesture layer's hover progress (two-layer opacity swap —
-  // platform-portable, see Card.tsx for why useShadow can't replace it).
+  // platform-portable; see Card.tsx for why the mechanism stays rather than
+  // inertia's `useShadow`).
   const animatedElevationLevel3Style = useAnimatedStyle(() => ({
     opacity: 1 - states.hovered.value,
   }))

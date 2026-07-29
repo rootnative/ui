@@ -56,11 +56,19 @@ export function Card({
   const showElevationLayers = isInteractive && isElevated && !isDisabled
 
   // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
-  // driven by the gesture layer's hover progress. The two-absolute-layers
-  // mechanism stays (rather than inertia's `useShadow`) because web elevation
-  // is a `boxShadow` string — only layer opacity animates, which works on
-  // every platform. Interpolating shadow keys via `useShadow` would silently
-  // drop the hover shadow on web.
+  // driven by the gesture layer's hover progress. Two absolutely-positioned
+  // sibling Views whose opacity swaps — only opacity animates, so it works on
+  // every platform.
+  //
+  // This predates inertia 0.0.3, which added `boxShadow` to `ShadowConfig`:
+  // `useShadow` now interpolates the CSS shadow string that react-native-web
+  // actually renders, so the original reason for the two layers (shadow keys
+  // never reaching the web renderer) no longer holds. The mechanism stays
+  // because the replacement hasn't been evaluated, not because it can't be
+  // expressed. Open question: `useShadow` puts one interpolated shadow on one
+  // node, and here the shadow lives on separate nodes with their own
+  // background — whether the container can carry it while the state layer
+  // already drives its animated `backgroundColor` is untested.
   const animatedElevationLevel1Style = useAnimatedStyle(() => ({
     opacity: 1 - states.hovered.value,
   }))

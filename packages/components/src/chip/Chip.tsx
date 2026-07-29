@@ -193,8 +193,10 @@ export function Chip(props: ChipProps) {
 
   // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
   // driven by the gesture layer's hover progress (two-layer opacity swap —
-  // platform-portable, see Card.tsx for why useShadow can't replace it).
-  // Both follow the shape morphs so the shadow shape matches the container.
+  // platform-portable; see Card.tsx for why the mechanism stays rather than
+  // inertia's `useShadow`). Both follow the shape morphs so the shadow shape
+  // matches the container — these layers double as shaped surfaces, which
+  // `useShadow` does not cover.
   const animatedElevationLevel1Style = useAnimatedStyle(() => {
     const rest = interpolate(
       selectedProgress.value,
