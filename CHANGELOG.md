@@ -70,9 +70,13 @@ Prior history: these packages were published as `@onlynative/*` through
   the pin forward, before it re-fetches any component files. Existing
   `rootnative.json` files are untouched until you run `upgrade`.
 
-- `@rootnative/inertia` peer range widened to `>=0.0.3 <0.1.0` for `core` and
-  `components` (floor raised past 0.0.2 — 0.0.3 is all correctness fixes:
-  Presence exit ordering, endless-repeat unmount, style resting). No new API.
+- `@rootnative/inertia` peer range widened to `>=0.0.4 <0.1.0` for `core` and
+  `components`. The floor moves past 0.0.2 for two releases of upstream work:
+  0.0.3 is all correctness fixes (Presence exit ordering, endless-repeat
+  unmount, style resting), and 0.0.4 is purely additive — animatable
+  `boxShadow`, plus `layoutId` shared-element transitions measured in window
+  coordinates with a style carry. No RootNative API change: nothing in this
+  library reaches for the new surface yet.
 
 ### Added
 

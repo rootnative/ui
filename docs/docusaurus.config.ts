@@ -20,12 +20,12 @@ function readWorkspacePackage(dir: string): WorkspacePackage {
 const componentsPkg = readWorkspacePackage('components')
 
 // Snack encodes dependencies as a comma-separated `name@spec` list, so every
-// spec has to be a single whitespace-free token. The inertia peer range is an
-// exact pin today but is slated to widen to `>=0.0.2 <0.1.0` for 1.0, which
-// would not survive that encoding — so take the lowest version the range
-// allows. It is always published, always compatible, and always atomic.
+// spec has to be a single whitespace-free token. The inertia peer range is a
+// `>=x.y.z <0.1.0` window, which would not survive that encoding — so take the
+// lowest version the range allows. It is always published, always compatible,
+// and always atomic.
 const inertiaPeer =
-  componentsPkg.peerDependencies?.['@rootnative/inertia'] ?? '0.0.2'
+  componentsPkg.peerDependencies?.['@rootnative/inertia'] ?? '0.0.4'
 const inertiaVersion = inertiaPeer.trim().split(/\s+/)[0].replace(/^\D+/, '')
 
 const config: Config = {
