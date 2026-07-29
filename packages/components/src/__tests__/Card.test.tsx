@@ -93,6 +93,9 @@ describe('Card', () => {
     })
   })
 
+  // Elevation lives in `elevation.test.tsx` — the mechanism is shared with
+  // Button, Chip and FAB, and the invariants are the same for all four.
+
   describe('overrides', () => {
     it('applies containerColor to a non-interactive card', () => {
       renderWithTheme(

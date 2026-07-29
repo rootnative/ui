@@ -1,4 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useShadow } from '@rootnative/inertia'
 import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
 import {
   Animated,
@@ -21,6 +22,7 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { elevationShadowConfig } from '../internal/elevationShadow'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -189,38 +191,40 @@ export function Chip(props: ChipProps) {
   })
 
   const isElevated = elevated && variant !== 'input'
-  const showElevationLayers = isElevated && !isDisabled
+  const showElevationLayer = isElevated && !isDisabled
 
-  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
-  // driven by the gesture layer's hover progress (two-layer opacity swap —
-  // platform-portable; see Card.tsx for why the mechanism stays rather than
-  // inertia's `useShadow`). Both follow the shape morphs so the shadow shape
-  // matches the container — these layers double as shaped surfaces, which
-  // `useShadow` does not cover.
-  const animatedElevationLevel1Style = useAnimatedStyle(() => {
-    const rest = interpolate(
-      selectedProgress.value,
-      [0, 1],
-      [restRadius, CHIP_SELECTED_REST_RADIUS],
-    )
-    return {
-      opacity: 1 - states.hovered.value,
-      borderRadius: interpolate(
-        morphProgress.value,
-        [0, 1],
-        [rest, pressedRadius],
-      ),
-    }
+  // Elevation moves level 1 (rest) → level 2 (hover) per MD3 as one
+  // interpolated shadow on a single unclipped carrier View behind the
+  // container, driven by the gesture layer's hover progress. See Card.tsx for
+  // why the shadow rides its own node — for the Chip it is load-bearing rather
+  // than conservative: the container sets `overflow: 'hidden'`.
+  const restShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level1),
+    [theme.elevation.level1],
+  )
+  const hoveredShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level2),
+    [theme.elevation.level2],
+  )
+  const elevationShadowStyle = useShadow({
+    from: restShadow,
+    to: hoveredShadow,
+    progress: states.hovered,
   })
 
-  const animatedElevationLevel2Style = useAnimatedStyle(() => {
+  // The carrier is also a shaped surface: it follows both shape morphs so the
+  // shadow's shape matches the container's. Three driving values across the
+  // node (hover for the shadow, selection and press for the radius) — hence a
+  // separate style rather than folding the radius into `useShadow`, which only
+  // covers shadow keys. It repeats `animatedRadiusStyle`'s body rather than
+  // reusing it because one animated style must not be mounted on two nodes.
+  const animatedElevationRadiusStyle = useAnimatedStyle(() => {
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
       [restRadius, CHIP_SELECTED_REST_RADIUS],
     )
     return {
-      opacity: states.hovered.value,
       borderRadius: interpolate(
         morphProgress.value,
         [0, 1],
@@ -327,17 +331,15 @@ export function Chip(props: ChipProps) {
         pointerEvents="none"
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
-      {showElevationLayers ? (
-        <>
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel1, animatedElevationLevel1Style]}
-          />
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel2, animatedElevationLevel2Style]}
-          />
-        </>
+      {showElevationLayer ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.elevationLayer,
+            animatedElevationRadiusStyle,
+            elevationShadowStyle,
+          ]}
+        />
       ) : null}
       <AnimatedPressable
         {...rest}

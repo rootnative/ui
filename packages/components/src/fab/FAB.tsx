@@ -1,8 +1,10 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useShadow } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { elevationShadowConfig } from '../internal/elevationShadow'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   createStyles,
@@ -95,19 +97,25 @@ export function FAB({
     opacity: states.focusVisible.value,
   }))
 
-  const showElevationLayers = !isDisabled
+  const showElevationLayer = !isDisabled
 
-  // Cross-fade level 3 (rest) and level 4 (hover) shadow layers per MD3,
-  // driven by the gesture layer's hover progress (two-layer opacity swap —
-  // platform-portable; see Card.tsx for why the mechanism stays rather than
-  // inertia's `useShadow`).
-  const animatedElevationLevel3Style = useAnimatedStyle(() => ({
-    opacity: 1 - states.hovered.value,
-  }))
-
-  const animatedElevationLevel4Style = useAnimatedStyle(() => ({
-    opacity: states.hovered.value,
-  }))
+  // Elevation moves level 3 (rest) → level 4 (hover) per MD3 as one
+  // interpolated shadow on a single unclipped carrier View behind the
+  // container, driven by the gesture layer's hover progress. See Card.tsx for
+  // why the shadow rides its own node.
+  const restShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level3),
+    [theme.elevation.level3],
+  )
+  const hoveredShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level4),
+    [theme.elevation.level4],
+  )
+  const elevationShadowStyle = useShadow({
+    from: restShadow,
+    to: hoveredShadow,
+    progress: states.hovered,
+  })
 
   const elevationLayerColorStyle = useMemo(
     () => ({ backgroundColor: colors.backgroundColor }),
@@ -133,27 +141,16 @@ export function FAB({
           animatedFocusRingStyle,
         ]}
       />
-      {showElevationLayers ? (
-        <>
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              styles.elevationLayerLevel3,
-              getElevationLayerRadiusStyle(styles, size, isExtended),
-              elevationLayerColorStyle,
-              animatedElevationLevel3Style,
-            ]}
-          />
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              styles.elevationLayerLevel4,
-              getElevationLayerRadiusStyle(styles, size, isExtended),
-              elevationLayerColorStyle,
-              animatedElevationLevel4Style,
-            ]}
-          />
-        </>
+      {showElevationLayer ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.elevationLayer,
+            getElevationLayerRadiusStyle(styles, size, isExtended),
+            elevationLayerColorStyle,
+            elevationShadowStyle,
+          ]}
+        />
       ) : null}
       <AnimatedPressable
         {...rest}

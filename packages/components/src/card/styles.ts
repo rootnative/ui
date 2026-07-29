@@ -166,7 +166,6 @@ export function createStyles(
   const colors = getResolvedCardColors(theme, variant, containerColor)
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
-  const elevationLevel2 = elevationStyle(theme.elevation.level2)
   const baseElevation =
     variant === 'elevated' ? elevationLevel1 : elevationLevel0
 
@@ -187,14 +186,18 @@ export function createStyles(
     interactiveContainer: {
       cursor: 'pointer',
     },
-    // Container shadow is zeroed when the cross-fading elevation layers below
-    // own the elevation (interactive elevated cards).
+    // Container shadow is zeroed when the elevation carrier below owns the
+    // elevation (interactive elevated cards).
     elevationDelegated: {
       ...elevationLevel0,
     },
-    // Two stacked, absolutely-positioned shadow layers that cross-fade the
-    // elevated card from level 1 (rest) → level 2 (hover), per MD3.
-    elevationLayerLevel1: {
+    // Absolutely-positioned shadow carrier behind the container: `useShadow`
+    // interpolates it from level 1 (rest) → level 2 (hover) per MD3. It exists
+    // rather than putting the shadow on the container because the container
+    // clips (`overflow: 'hidden'`), and a clipped view's own shadow is clipped
+    // away on iOS. The static level-1 shadow is the rest baseline the animated
+    // style then owns.
+    elevationLayer: {
       position: 'absolute' as const,
       top: 0,
       left: 0,
@@ -203,16 +206,6 @@ export function createStyles(
       borderRadius: theme.shape.cornerMedium,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel1,
-    },
-    elevationLayerLevel2: {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: theme.shape.cornerMedium,
-      backgroundColor: colors.backgroundColor,
-      ...elevationLevel2,
     },
     focusRing: {
       position: 'absolute' as const,

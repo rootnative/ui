@@ -258,7 +258,6 @@ export function createStyles(
   const labelStyle = theme.typography.labelLarge
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
-  const elevationLevel2 = elevationStyle(theme.elevation.level2)
   const focusRingInset = -(CHIP_FOCUS_RING_OFFSET + CHIP_FOCUS_RING_WIDTH)
   const restRadius = getChipRestRadius(theme, variant)
   const focusRingRadius = restRadius + CHIP_FOCUS_RING_OFFSET
@@ -285,9 +284,14 @@ export function createStyles(
       cursor: 'auto',
       ...elevationLevel0,
     },
-    // Two stacked, absolutely-positioned shadow layers that cross-fade the
-    // elevated chip from level 1 (rest) → level 2 (hover), per MD3.
-    elevationLayerLevel1: {
+    // Absolutely-positioned shadow carrier behind the container: `useShadow`
+    // interpolates it from level 1 (rest) → level 2 (hover) per MD3 while the
+    // selection and press morphs drive its radius, so the shadow keeps the
+    // container's shape. It has to be a separate node — the container sets
+    // `overflow: 'hidden'`, and a clipped view's own shadow is clipped away on
+    // iOS (see Card.tsx). The static level-1 shadow is the rest baseline the
+    // animated style then owns.
+    elevationLayer: {
       position: 'absolute' as const,
       top: 0,
       left: 0,
@@ -296,16 +300,6 @@ export function createStyles(
       borderRadius: restRadius,
       backgroundColor: colors.backgroundColor,
       ...elevationLevel1,
-    },
-    elevationLayerLevel2: {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      borderRadius: restRadius,
-      backgroundColor: colors.backgroundColor,
-      ...elevationLevel2,
     },
     focusRing: {
       position: 'absolute' as const,

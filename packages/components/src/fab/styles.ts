@@ -119,7 +119,6 @@ export function getFABIconPixelSize(size: FABSize): number {
 export function createStyles(theme: MaterialTheme) {
   const focusRingInset = -(FAB_FOCUS_RING_OFFSET + FAB_FOCUS_RING_WIDTH)
   const elevationLevel3 = elevationStyle(theme.elevation.level3)
-  const elevationLevel4 = elevationStyle(theme.elevation.level4)
   const labelStyle = theme.typography.labelLarge
 
   return StyleSheet.create({
@@ -131,25 +130,20 @@ export function createStyles(theme: MaterialTheme) {
       justifyContent: 'center',
       cursor: 'pointer',
     },
-    // Two stacked, absolutely-positioned shadow layers that cross-fade the
-    // FAB from level 3 (rest) → level 4 (hover), per MD3. The background
-    // color is applied dynamically in the component (it depends on the
-    // resolved container color).
-    elevationLayerLevel3: {
+    // Absolutely-positioned shadow carrier behind the container: `useShadow`
+    // interpolates it from level 3 (rest) → level 4 (hover) per MD3. It is a
+    // separate node rather than the container itself because the container
+    // clips, and a clipped view's own shadow is clipped away on iOS. The
+    // background color is applied dynamically in the component (it depends on
+    // the resolved container color); the static level-3 shadow is the rest
+    // baseline the animated style then owns.
+    elevationLayer: {
       position: 'absolute' as const,
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
       ...elevationLevel3,
-    },
-    elevationLayerLevel4: {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      ...elevationLevel4,
     },
     elevationLayerRadiusSmall: {
       borderRadius: theme.shape.cornerMedium,

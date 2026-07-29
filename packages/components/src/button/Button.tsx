@@ -1,4 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
+import { useShadow } from '@rootnative/inertia'
 import {
   Animated,
   interpolate,
@@ -7,6 +8,7 @@ import {
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
+import { elevationShadowConfig } from '../internal/elevationShadow'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -124,25 +126,31 @@ export function Button({
     ),
   }))
 
-  const showElevationLayers = variant === 'elevated' && !isDisabled
+  const showElevationLayer = variant === 'elevated' && !isDisabled
 
-  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
-  // driven by the gesture layer's hover progress (two-layer opacity swap —
-  // platform-portable; see Card.tsx for why the mechanism stays rather than
-  // inertia's `useShadow`). Both follow the press morph so the shadow shape
-  // matches the container — these layers double as shaped surfaces, which
-  // `useShadow` does not cover.
-  const animatedElevationLevel1Style = useAnimatedStyle(() => ({
-    opacity: 1 - states.hovered.value,
-    borderRadius: interpolate(
-      morphProgress.value,
-      [0, 1],
-      [restRadius, pressedRadius],
-    ),
-  }))
+  // Elevation moves level 1 (rest) → level 2 (hover) per MD3 as one
+  // interpolated shadow on a single unclipped carrier View behind the
+  // container, driven by the gesture layer's hover progress. See Card.tsx for
+  // why the shadow rides its own node.
+  const restShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level1),
+    [theme.elevation.level1],
+  )
+  const hoveredShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level2),
+    [theme.elevation.level2],
+  )
+  const elevationShadowStyle = useShadow({
+    from: restShadow,
+    to: hoveredShadow,
+    progress: states.hovered,
+  })
 
-  const animatedElevationLevel2Style = useAnimatedStyle(() => ({
-    opacity: states.hovered.value,
+  // The carrier is also a shaped surface: it follows the press morph so the
+  // shadow's shape matches the container's. Two driving values (hover for the
+  // shadow, morph for the radius) on one node — hence a separate style rather
+  // than folding the radius into `useShadow`, which only covers shadow keys.
+  const animatedElevationRadiusStyle = useAnimatedStyle(() => ({
     borderRadius: interpolate(
       morphProgress.value,
       [0, 1],
@@ -176,17 +184,15 @@ export function Button({
         pointerEvents="none"
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
-      {showElevationLayers ? (
-        <>
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel1, animatedElevationLevel1Style]}
-          />
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel2, animatedElevationLevel2Style]}
-          />
-        </>
+      {showElevationLayer ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.elevationLayer,
+            animatedElevationRadiusStyle,
+            elevationShadowStyle,
+          ]}
+        />
       ) : null}
       <AnimatedPressable
         {...props}

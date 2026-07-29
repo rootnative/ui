@@ -1,7 +1,9 @@
 import { useTheme } from '@rootnative/core'
+import { useShadow } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { elevationShadowConfig } from '../internal/elevationShadow'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles, getResolvedCardColors } from './styles'
 import type { CardProps } from './types'
@@ -53,29 +55,24 @@ export function Card({
   }))
 
   const isElevated = variant === 'elevated'
-  const showElevationLayers = isInteractive && isElevated && !isDisabled
+  const showElevationLayer = isInteractive && isElevated && !isDisabled
 
-  // Cross-fade level 1 (rest) and level 2 (hover) shadow layers per MD3,
-  // driven by the gesture layer's hover progress. Two absolutely-positioned
-  // sibling Views whose opacity swaps — only opacity animates, so it works on
-  // every platform.
-  //
-  // This predates inertia 0.0.3, which added `boxShadow` to `ShadowConfig`:
-  // `useShadow` now interpolates the CSS shadow string that react-native-web
-  // actually renders, so the original reason for the two layers (shadow keys
-  // never reaching the web renderer) no longer holds. The mechanism stays
-  // because the replacement hasn't been evaluated, not because it can't be
-  // expressed. Open question: `useShadow` puts one interpolated shadow on one
-  // node, and here the shadow lives on separate nodes with their own
-  // background — whether the container can carry it while the state layer
-  // already drives its animated `backgroundColor` is untested.
-  const animatedElevationLevel1Style = useAnimatedStyle(() => ({
-    opacity: 1 - states.hovered.value,
-  }))
-
-  const animatedElevationLevel2Style = useAnimatedStyle(() => ({
-    opacity: states.hovered.value,
-  }))
+  // Elevation moves level 1 (rest) → level 2 (hover) per MD3 as one
+  // interpolated shadow on a single unclipped carrier View behind the
+  // container, driven by the gesture layer's hover progress.
+  const restShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level1),
+    [theme.elevation.level1],
+  )
+  const hoveredShadow = useMemo(
+    () => elevationShadowConfig(theme.elevation.level2),
+    [theme.elevation.level2],
+  )
+  const elevationShadowStyle = useShadow({
+    from: restShadow,
+    to: hoveredShadow,
+    progress: states.hovered,
+  })
 
   if (!isInteractive) {
     return (
@@ -91,17 +88,11 @@ export function Card({
         pointerEvents="none"
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
-      {showElevationLayers ? (
-        <>
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel1, animatedElevationLevel1Style]}
-          />
-          <Animated.View
-            pointerEvents="none"
-            style={[styles.elevationLayerLevel2, animatedElevationLevel2Style]}
-          />
-        </>
+      {showElevationLayer ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.elevationLayer, elevationShadowStyle]}
+        />
       ) : null}
       <AnimatedPressable
         {...props}
@@ -118,7 +109,7 @@ export function Card({
           // disabled it is dropped entirely so the static disabled background
           // applies instantly (no animated layer to fight it).
           isDisabled ? undefined : stateLayerStyle,
-          showElevationLayers ? styles.elevationDelegated : undefined,
+          showElevationLayer ? styles.elevationDelegated : undefined,
           isDisabled ? styles.disabledContainer : undefined,
           style,
         ]}
