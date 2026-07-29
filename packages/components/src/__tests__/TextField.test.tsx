@@ -69,6 +69,24 @@ describe('TextField', () => {
       renderWithTheme(<TextField label="Email" />)
       expect(screen.queryByText('Enter your email')).toBeNull()
     })
+
+    it('announces supporting text as the input hint', () => {
+      renderWithTheme(
+        <TextField label="Email" supportingText="Work address only" />,
+      )
+      // Native has no `aria-describedby`, so the hint is the only way the
+      // supporting text reaches a screen reader alongside the field.
+      expect(screen.getByLabelText('Email').props.accessibilityHint).toBe(
+        'Work address only',
+      )
+    })
+
+    it('leaves the hint unset when there is no supporting text', () => {
+      renderWithTheme(<TextField label="Email" />)
+      expect(
+        screen.getByLabelText('Email').props.accessibilityHint,
+      ).toBeUndefined()
+    })
   })
 
   describe('character counter', () => {

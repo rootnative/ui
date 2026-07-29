@@ -328,6 +328,33 @@ describe('Menu.Item', () => {
     expect(style.color).toBe('#B3261E')
   })
 
+  it('marks the anchor as opening a menu, and tracks whether it is open', async () => {
+    renderMenu(<UncontrolledMenu />)
+    const anchor = () => screen.getByRole('button', { name: 'Actions' })
+
+    // `aria-expanded` is asserted through `accessibilityState`, not the prop
+    // itself: RN's Pressable normalizes the ARIA spelling into the nested
+    // object on its way to the host component, and the nested object is what
+    // VoiceOver reads. `aria-haspopup` has no native equivalent, so it passes
+    // through untouched for react-native-web to pick up.
+    expect(anchor().props['aria-haspopup']).toBe('menu')
+    expect(anchor().props.accessibilityState.expanded).toBe(false)
+
+    await open()
+    expect(anchor().props.accessibilityState.expanded).toBe(true)
+  })
+
+  it('marks a controlled anchor the same way', () => {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} visible onDismiss={jest.fn()}>
+        <Menu.Item label="Edit" />
+      </Menu>,
+    )
+    const anchor = screen.getByRole('button', { name: 'Actions' })
+    expect(anchor.props['aria-haspopup']).toBe('menu')
+    expect(anchor.props.accessibilityState.expanded).toBe(true)
+  })
+
   it('throws when used outside a Menu', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => renderWithTheme(<Menu.Item label="orphan" />)).toThrow(

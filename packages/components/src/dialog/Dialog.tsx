@@ -1,7 +1,7 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
-import { Children, useEffect, useMemo } from 'react'
-import type { ReactNode } from 'react'
+import { Children, isValidElement, useEffect, useMemo } from 'react'
+import type { ReactNode, Ref } from 'react'
 import {
   BackHandler,
   Platform,
@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
+import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { DialogContext } from './context'
@@ -46,24 +47,45 @@ function collectSlots(children: ReactNode): Slots {
   return slots
 }
 
+/**
+ * A dialog needs an accessible name, and its headline is that name. Only a
+ * plain-string headline can be lifted automatically — a `Dialog.Title` built
+ * out of nodes has no single string to announce, so those dialogs pass
+ * `accessibilityLabel` themselves.
+ */
+function headlineOf(title: ReactNode[]): string | undefined {
+  const [first] = title
+  if (!isValidElement<{ children?: ReactNode }>(first)) return undefined
+  const { children } = first.props
+  if (typeof children === 'string') return children
+  if (typeof children === 'number') return String(children)
+  return undefined
+}
+
 function DialogBasic({
   slots,
   styles,
   style,
   testID,
+  surfaceRef,
+  role,
   ...rest
 }: Omit<ViewProps, 'children' | 'style'> & {
   slots: Slots
   styles: ReturnType<typeof createDialogStyles>
   style: DialogProps['style']
   testID?: string
+  surfaceRef: Ref<View>
 }) {
   return (
     <View
       {...rest}
+      ref={surfaceRef}
       testID={testID}
       style={[styles.container, style]}
-      role="alertdialog"
+      // MD3 dialogs are plain dialogs. `alertdialog` is opt-in because
+      // assistive technology treats it as an interruption.
+      role={role ?? 'dialog'}
       aria-modal
       accessibilityViewIsModal
     >
@@ -83,6 +105,8 @@ function DialogFullscreen({
   closeIcon,
   closeAccessibilityLabel,
   onDismiss,
+  surfaceRef,
+  role,
   ...rest
 }: Omit<ViewProps, 'children' | 'style'> & {
   slots: Slots
@@ -92,13 +116,15 @@ function DialogFullscreen({
   closeIcon: DialogProps['closeIcon']
   closeAccessibilityLabel: string
   onDismiss: () => void
+  surfaceRef: Ref<View>
 }) {
   return (
     <View
       {...rest}
+      ref={surfaceRef}
       testID={testID}
       style={[styles.fullscreenContainer, style]}
-      role="dialog"
+      role={role ?? 'dialog'}
       aria-modal
       accessibilityViewIsModal
     >
@@ -132,6 +158,7 @@ export function Dialog({
   closeIcon,
   closeAccessibilityLabel = 'Close',
   scrimAccessibilityLabel = 'Close dialog',
+  accessibilityLabel,
   style,
   scrimStyle,
   testID,
@@ -146,6 +173,8 @@ export function Dialog({
   const slots = useMemo(() => collectSlots(children), [children])
   const isFullscreen = variant === 'fullscreen'
 
+  const accessibleName = accessibilityLabel ?? headlineOf(slots.title)
+
   const contextValue = useMemo<DialogContextValue>(
     () => ({
       variant,
@@ -156,6 +185,14 @@ export function Dialog({
     }),
     [variant, slots.icon.length, slots.actions.length, isFullscreen],
   )
+
+  // Web keyboard containment: focus enters the surface on open, Tab cycles
+  // inside it, Escape dismisses, and focus returns to the trigger on close.
+  // No-op on native, where `accessibilityViewIsModal` above does the job.
+  const surfaceRef = useFocusTrap({
+    active: visible,
+    onEscape: dismissable ? onDismiss : undefined,
+  })
 
   // Android hardware back closes a dismissable dialog before it pops the
   // navigation stack.
@@ -232,6 +269,8 @@ export function Dialog({
                   closeIcon={closeIcon}
                   closeAccessibilityLabel={closeAccessibilityLabel}
                   onDismiss={onDismiss}
+                  surfaceRef={surfaceRef}
+                  accessibilityLabel={accessibleName}
                   {...rest}
                 />
               ) : (
@@ -240,6 +279,8 @@ export function Dialog({
                   styles={styles}
                   style={style}
                   testID={testID}
+                  surfaceRef={surfaceRef}
+                  accessibilityLabel={accessibleName}
                   {...rest}
                 />
               )}

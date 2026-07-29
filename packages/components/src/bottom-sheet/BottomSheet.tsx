@@ -14,6 +14,7 @@ import type {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AccessibilityActionEvent, LayoutChangeEvent } from 'react-native'
 import { BackHandler, Platform, Pressable, View } from 'react-native'
+import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -258,6 +259,15 @@ export function BottomSheet({
     animate(dragY, offsets[index], 'spring-default-spatial')
   }, [open, offsets, isControlled, snapIndex, animate, dragY, isDragging])
 
+  // Web keyboard containment, modal variant only — a standard sheet lets
+  // touches and tab stops through to the content behind it by design, so
+  // trapping focus there would be wrong. Arrow keys stay with the drag
+  // handle's own snap navigation rather than moving between tab stops.
+  const surfaceRef = useFocusTrap({
+    active: open && isModal,
+    onEscape: dismissable ? onDismiss : undefined,
+  })
+
   // Android hardware back closes a dismissable modal sheet before it pops
   // the navigation stack.
   useEffect(() => {
@@ -406,6 +416,7 @@ export function BottomSheet({
             >
               <Animated.View
                 {...rest}
+                ref={surfaceRef}
                 testID={testID}
                 style={[
                   styles.surface,

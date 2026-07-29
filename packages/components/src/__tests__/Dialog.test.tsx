@@ -100,15 +100,63 @@ describe('Dialog', () => {
     expect(style.backgroundColor).toBe('#FF0000')
   })
 
-  it('reports itself as a modal alertdialog', async () => {
+  it('reports itself as a modal dialog', async () => {
     renderDialog(
       <Dialog visible onDismiss={jest.fn()} testID="dialog">
         <Dialog.Title>Title</Dialog.Title>
       </Dialog>,
     )
     const surface = await screen.findByTestId('dialog')
-    expect(surface.props.role).toBe('alertdialog')
+    expect(surface.props.role).toBe('dialog')
     expect(surface.props['aria-modal']).toBe(true)
+  })
+
+  it('escalates to alertdialog only when asked', async () => {
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog" role="alertdialog">
+        <Dialog.Title>Delete everything?</Dialog.Title>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.role).toBe('alertdialog')
+  })
+
+  it('takes its accessible name from the headline', async () => {
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>Reset settings?</Dialog.Title>
+        <Dialog.Content>This cannot be undone.</Dialog.Content>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.accessibilityLabel).toBe('Reset settings?')
+  })
+
+  it('prefers an explicit accessibilityLabel over the headline', async () => {
+    renderDialog(
+      <Dialog
+        visible
+        onDismiss={jest.fn()}
+        testID="dialog"
+        accessibilityLabel="Reset confirmation"
+      >
+        <Dialog.Title>Reset settings?</Dialog.Title>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.accessibilityLabel).toBe('Reset confirmation')
+  })
+
+  it('leaves the name to the consumer when the headline is not plain text', async () => {
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>
+          <Text>Composed headline</Text>
+        </Dialog.Title>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.accessibilityLabel).toBeUndefined()
   })
 
   it('dismisses on a scrim press', async () => {

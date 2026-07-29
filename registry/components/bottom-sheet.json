@@ -7,6 +7,7 @@
     "packages/components/src/bottom-sheet/index.ts",
     "packages/components/src/bottom-sheet/styles.ts",
     "packages/components/src/bottom-sheet/types.ts",
+    "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["color", "elevation"],

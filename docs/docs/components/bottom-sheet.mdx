@@ -182,6 +182,7 @@ follows the finger 1:1 and is unaffected.
 - The scrim is announced as a button labelled "Close sheet" — override with `scrimAccessibilityLabel`. It disappears from the accessibility tree when `dismissable={false}`.
 - The drag handle announces as adjustable ("Drag handle", override with `dragHandleAccessibilityLabel`) with its snap position as the value. Increment/decrement actions expand and collapse between snap points, and an escape action dismisses.
 - On web the handle is focusable: arrow keys move between snap points and Escape dismisses.
+- **On web**, the modal variant also contains keyboard focus — focus moves into the sheet when it opens, Tab cycles inside it, Escape dismisses a `dismissable` sheet from anywhere in it, and focus returns to the opening control on close. The standard variant does none of this by design, since it lets the content behind it stay usable. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
 
 ## Props
 

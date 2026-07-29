@@ -74,6 +74,7 @@ Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 54 bund
 - Installation: https://rootnative.github.io/ui/installation
 - Theming: https://rootnative.github.io/ui/theming
 - Motion & reduced motion: https://rootnative.github.io/ui/motion
+- Accessibility (aria on both platforms, labels you must supply, web focus containment): https://rootnative.github.io/ui/accessibility
 - Components: https://rootnative.github.io/ui/components/button
 
 ## CLI

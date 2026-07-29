@@ -44,6 +44,20 @@ export interface DialogProps extends ViewProps {
   closeAccessibilityLabel?: string
   /** Screen-reader label for the scrim's dismiss action. @default 'Close dialog' */
   scrimAccessibilityLabel?: string
+  /**
+   * Announced role. An MD3 dialog is a plain `'dialog'`; pass `'alertdialog'`
+   * only for one that interrupts the user with something they must resolve
+   * (destructive confirmation, error), since assistive technology treats that
+   * role as urgent.
+   * @default 'dialog'
+   */
+  role?: ViewProps['role']
+  /**
+   * Accessible name for the dialog. Derived from `Dialog.Title` when its
+   * headline is a plain string, so this is only needed when the headline is
+   * built from nodes or the dialog has no title.
+   */
+  accessibilityLabel?: string
   /** Style applied to the dialog surface. */
   style?: StyleProp<ViewStyle>
   /** Style applied to the scrim. Ignored by the fullscreen variant. */

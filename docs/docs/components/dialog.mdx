@@ -206,8 +206,10 @@ Every one of these collapses to a hard cut under reduced motion — see [Motion]
 
 ## Accessibility
 
-- The basic surface reports `role="alertdialog"`; the fullscreen surface reports `role="dialog"`. Both set `aria-modal` and `accessibilityViewIsModal`, so assistive tech treats the content beneath as inert.
+- Both surfaces report `role="dialog"` plus `aria-modal` and `accessibilityViewIsModal`, so assistive tech treats the content beneath as inert. Pass `role="alertdialog"` for a dialog that interrupts the user with something they must resolve — assistive technology treats that role as urgent, so it is opt-in rather than the default.
+- The dialog takes its accessible name from `Dialog.Title` when the headline is a plain string. Build the headline out of nodes and there is nothing to lift, so pass `accessibilityLabel` yourself.
 - `Dialog.Title` reports `role="heading"`.
+- **On web**, focus moves into the surface when it opens, Tab and Shift-Tab cycle inside it, Escape dismisses a `dismissable` dialog, and focus returns to the control that opened it on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
 - The scrim is announced as a button labelled "Close dialog" — override with `scrimAccessibilityLabel`. It disappears from the accessibility tree when `dismissable={false}`.
 - The fullscreen close button is labelled "Close" — override with `closeAccessibilityLabel`.
 

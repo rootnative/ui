@@ -5,6 +5,7 @@ import {
   isValidElement,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -31,9 +32,17 @@ import type { TooltipProps } from './types'
 const HIDDEN = { opacity: 0 }
 const SHOWN = { opacity: 1 }
 
+/**
+ * What the anchor is cloned with. `aria-describedby` is web-only — RN has no
+ * concept of one view describing another, and react-native-web forwards it —
+ * but it is the only thing that makes a keyboard user hear the tooltip at all:
+ * the surface renders in a portal, far from the anchor in the DOM, so without
+ * the pointer nothing connects them.
+ */
 interface AnchorTriggerProps {
   onPress?: (event: GestureResponderEvent) => void
   onLongPress?: (event: GestureResponderEvent) => void
+  'aria-describedby'?: string
 }
 
 export function Tooltip({
@@ -77,6 +86,8 @@ export function Tooltip({
   const isControlled = visible !== undefined
   const [selfVisible, setSelfVisible] = useState(false)
   const open = isControlled ? visible : selfVisible
+
+  const tooltipId = `${useId()}-tooltip`
 
   const show = useCallback(() => {
     if (!isControlled) setSelfVisible(true)
@@ -123,10 +134,15 @@ export function Tooltip({
   // anchor's own press handling. Hover is caught on the wrapper below, because
   // every RootNative pressable drives its state layer from `onHoverIn` /
   // `onHoverOut` and would overwrite an injected pair.
+  // The description is pointed at only while the tooltip is mounted — an
+  // `aria-describedby` naming an absent id is announced as nothing at best.
   const trigger = useMemo(() => {
-    if (isControlled || !isValidElement(anchor)) return anchor
+    if (!isValidElement(anchor)) return anchor
     const element = anchor as ReactElement<AnchorTriggerProps>
+    const describedBy = open ? { 'aria-describedby': tooltipId } : {}
+    if (isControlled) return cloneElement(element, describedBy)
     return cloneElement(element, {
+      ...describedBy,
       onLongPress: (event: GestureResponderEvent) => {
         element.props.onLongPress?.(event)
         show()
@@ -137,7 +153,7 @@ export function Tooltip({
         hide()
       },
     })
-  }, [anchor, isControlled, show, hide])
+  }, [anchor, isControlled, show, hide, open, tooltipId])
 
   // Read through a ref so an inline `onDismiss` (a new function every render)
   // cannot restart the timeout on each render and keep the tooltip up forever.
@@ -248,6 +264,7 @@ export function Tooltip({
                 key="surface"
                 {...rest}
                 testID={testID}
+                id={tooltipId}
                 role="tooltip"
                 accessibilityLiveRegion="polite"
                 // A plain tooltip is decoration over the UI, so it stays out of

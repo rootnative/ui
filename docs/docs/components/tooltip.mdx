@@ -220,6 +220,9 @@ what decides which side it lands on, so it has to be laid out before it can be p
 - A plain tooltip's surface never takes touches, so it cannot stand between the user and the
   control it describes. A rich tooltip's does, and the region that catches outside presses is
   announced as a button labelled "Close tooltip" — override with `dismissAccessibilityLabel`.
+- **On web**, the anchor carries `aria-describedby` pointing at the tooltip while it is shown, which
+  is the only thing that connects the two — the surface renders in a portal, far from the anchor in
+  the DOM. React Native has no equivalent, so this is web-only.
 - The wrapper around the anchor stays out of the accessibility tree, so the anchor's own role and
   label are the only thing a screen reader sees. A tooltip is supplementary: an icon-only button
   still needs its `accessibilityLabel`, and the tooltip text should add to it rather than repeat it.

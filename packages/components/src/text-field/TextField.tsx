@@ -12,11 +12,22 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
+
+// react-native-web forwards both of these to the DOM, but RN's
+// `TextInputProps` declares neither — native has no equivalent for either, so
+// upstream never added them. Augmenting locally keeps them typed at the call
+// site, the same way Slider augments `onKeyDown`.
+declare module 'react-native' {
+  interface TextInputProps {
+    'aria-invalid'?: boolean
+    'aria-describedby'?: string
+  }
+}
 
 const ICON_SIZE = 24
 // 12dp icon inset + 24dp icon + 16dp gap
@@ -55,6 +66,9 @@ export function TextField({
   const isError = Boolean(error) || Boolean(errorText)
   const isFilled = variant === 'filled'
   const hasLeadingIcon = Boolean(leadingIcon)
+  // Stable across renders and unique per field, which is what
+  // `aria-describedby` needs to point at the supporting-text node.
+  const supportingTextId = `${useId()}-supporting`
 
   const { colors, styles } = useMemo(
     () => createStyles(theme, variant),
@@ -441,7 +455,19 @@ export function TextField({
               // react-native-web 0.21 only reads the ARIA one.
               aria-disabled={isDisabled}
               accessibilityState={{ disabled: isDisabled }}
-              accessibilityHint={isError && errorText ? errorText : undefined}
+              // Supporting text — the error message when there is one — is
+              // rendered as a sibling, so nothing connects it to the input
+              // unless it's spelled out. Web reads the association off
+              // `aria-describedby`; native has no equivalent and takes the
+              // text as a hint instead.
+              accessibilityHint={displaySupportingText}
+              aria-describedby={
+                displaySupportingText ? supportingTextId : undefined
+              }
+              // Web-only: react-native-web maps this to `aria-invalid`, which
+              // is what makes a screen reader announce the field as invalid.
+              // The visual error treatment is the theme's job either way.
+              aria-invalid={isError || undefined}
             />
           </View>
 
@@ -482,7 +508,7 @@ export function TextField({
 
       {displaySupportingText || showCounter ? (
         <View style={styles.supportingTextRow}>
-          <Text style={supportingTextStyleArr}>
+          <Text id={supportingTextId} style={supportingTextStyleArr}>
             {displaySupportingText ?? ''}
           </Text>
           {showCounter ? (

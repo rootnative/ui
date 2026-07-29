@@ -9,6 +9,7 @@
     "packages/components/src/menu/styles.ts",
     "packages/components/src/menu/types.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
+    "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color", "elevation", "render-icon", "rtl"],

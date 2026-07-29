@@ -7,7 +7,8 @@
     "packages/components/src/dialog/index.ts",
     "packages/components/src/dialog/slots.tsx",
     "packages/components/src/dialog/styles.ts",
-    "packages/components/src/dialog/types.ts"
+    "packages/components/src/dialog/types.ts",
+    "packages/components/src/internal/useFocusTrap.ts"
   ],
   "utils": ["color", "elevation", "render-icon"],
   "componentDependencies": ["icon-button", "portal"],

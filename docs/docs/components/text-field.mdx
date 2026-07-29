@@ -137,6 +137,13 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
 `}
 />
 
+## Accessibility
+
+- `label` becomes the input's accessible name.
+- Supporting text — the error message when there is one — is connected to the input rather than left as a loose sibling: `aria-describedby` on web, and the input's `accessibilityHint` on native, which has no equivalent.
+- `error` or `errorText` sets `aria-invalid` on web, so the field is announced as invalid and not merely described. Native has no invalid state to set, so the error message reaching the hint is what a screen reader gets there.
+- The trailing icon is a button when `onTrailingIconPress` is set — label it with `trailingIconAccessibilityLabel`.
+
 ## Props
 
 <PropTable name="TextField" />
