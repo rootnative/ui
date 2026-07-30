@@ -38,9 +38,19 @@ Follows the [Material Design 3 Card](https://m3.material.io/components/cards/ove
 
 | Variant | Use case |
 |---------|----------|
-| `elevated` | Default surface with shadow |
+| `elevated` | Default surface with shadow — see the iOS caveat below |
 | `filled` | Filled surface, no shadow |
 | `outlined` | Bordered surface, no shadow |
+
+:::caution Known issue — `elevated` shadow on iOS
+
+A **non-interactive** elevated card (no `onPress`) currently renders **no shadow on iOS**. It renders correctly on Android and web, and an interactive elevated card renders correctly everywhere.
+
+The cause is a platform rule rather than a missing style: iOS clips a view's own shadow when that view sets `overflow: 'hidden'`, and a card clips its children to the corner radius. The interactive path already puts its shadow on a separate unclipped layer — the one that also drives the [hover raise](../motion#elevation-on-hover) — so it is unaffected.
+
+Until it's fixed, the workaround for a static elevated surface on iOS is to put the shadow on a wrapping `View` of your own (matching the card's `theme.shape.cornerMedium` radius) and keep the card itself `filled` or `outlined`. Adding a no-op `onPress` also brings the shadow back, but it makes the card a real button — focusable, `role="button"`, state-layer feedback on touch — so don't reach for that on something that isn't interactive.
+
+:::
 
 ## Interactive Card
 

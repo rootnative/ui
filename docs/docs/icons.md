@@ -192,6 +192,22 @@ const resolver = withLegacyMdiFallback(baseResolver, { target: 'lucide' })
 
 The base resolver is always tried first with the original name; the alias map is only consulted when the base returns `null`. The first call with each legacy name emits a one-time `console.warn` so you know which call sites still need to be migrated. Pass `warn: false` to suppress.
 
+The maps behind `target` are exported too, as plain `Readonly<Record<string, string>>` objects — `mdiToLucideAliases` and `mdiToPhosphorAliases` from `@rootnative/icons`. Read them when you want to know whether a name is covered before relying on it, or to build a variation:
+
+```tsx
+import { mdiToLucideAliases } from '@rootnative/icons'
+
+mdiToLucideAliases.magnify // 'search'
+mdiToLucideAliases.close // 'x'
+
+// Same policy, one entry changed.
+const resolver = withLegacyMdiFallback(baseResolver, {
+  target: { ...mdiToLucideAliases, magnify: 'binoculars' },
+})
+```
+
+Both are deliberately small and hand-curated — the names that turn up in real usage plus [the library's own system icons](#components-that-use-string-icons-internally) — not a complete MDI index. A name that isn't in the map isn't a bug; extend the map for it.
+
 ### Manual resolver (no adapter)
 
 You can skip the adapter and write the resolver inline. The shape is just `(name, { size, color }) => ReactNode`:
@@ -225,6 +241,30 @@ Now any string name passed to a component flows through your resolver:
 ```
 
 You can return `null` from the resolver to render nothing for unknown names, or fall back to a default icon.
+
+### `useIconResolver` — read the resolver in your own components
+
+Components you write can accept string icon names the same way the library's do. `useIconResolver()` returns the resolver registered on the nearest `ThemeProvider`, or `null` when none was set:
+
+```tsx
+import { useIconResolver, useTheme } from '@rootnative/core'
+import { Row } from '@rootnative/components/layout'
+import { Typography } from '@rootnative/components/typography'
+
+function Badge({ icon, label }: { icon: string; label: string }) {
+  const theme = useTheme()
+  const iconResolver = useIconResolver()
+
+  return (
+    <Row align="center" gap="xs">
+      {iconResolver?.(icon, { size: 16, color: theme.colors.onSurface })}
+      <Typography variant="labelSmall">{label}</Typography>
+    </Row>
+  )
+}
+```
+
+`null` means "no resolver configured", which is a real state and not an error — the library's own components fall back to `@expo/vector-icons/MaterialCommunityIcons` at that point. Decide what your component does: fall back the same way, render nothing, or require a resolver. A resolver can also return `null` for a name it doesn't know, so handle both.
 
 ### SF Symbols on iOS (Apple HIG)
 

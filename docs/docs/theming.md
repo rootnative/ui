@@ -224,6 +224,21 @@ function MyComponent() {
 }
 ```
 
+### `applyRoundness` — scale the corner tokens directly
+
+`createMaterialTheme`'s [`roundness` option](#spec-aligned-options) is the usual way to reshape corners, but it's a seed-color API. When you're overriding an existing theme instead, `applyRoundness(multiplier)` returns the same scaled `Shape` object on its own:
+
+```tsx
+import { applyRoundness, material, defineTheme } from '@rootnative/core'
+
+const sharp = defineTheme({
+  ...material.lightTheme,
+  shape: applyRoundness(0), // every corner square
+})
+```
+
+It scales the five intermediate tokens (`cornerExtraSmall` through `cornerExtraLarge`) and **leaves `cornerNone` at 0 and `cornerFull` at 999** — those two are sentinels, not measurements, so scaling them would either do nothing or break the pill shapes that read `cornerFull`. Results are rounded to whole dp. The multiplier is echoed back on the returned object as `shape.roundness`, so a theme carries a record of how far it was reshaped — no component reads it, but your own code can.
+
 ### Material preset
 
 All MD3 values are also available as a grouped object:

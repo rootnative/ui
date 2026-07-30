@@ -100,6 +100,32 @@ describe.each(CASES)('$name elevation', ({ ui, rest }) => {
   })
 })
 
+// The non-interactive elevated Card is the one surface that still breaks the
+// rule above, and it is a known open bug rather than an oversight: without
+// `onPress` the component returns a bare `View` carrying both the level-1
+// shadow AND `overflow: 'hidden'`, so the shadow renders on web and is clipped
+// away on iOS. `it.failing` pins it — the assertion below is what *should*
+// hold, and the day Card grows a carrier for this path this test starts failing
+// as "passed unexpectedly", which is the reminder to drop the marker.
+//
+// Not fixed here because the fix is structural: the carrier needs a wrapper
+// View above the container (what the interactive path already does), and that
+// moves `style`'s layout props one level down the tree — a `<Card style={{ flex:
+// 1 }}>` that stretches today would stop. That needs a device pass on iOS, not
+// just a green suite.
+describe('non-interactive elevated Card (known iOS bug)', () => {
+  it.failing('paints its shadow on a node that does not clip', () => {
+    renderWithTheme(
+      <Card>
+        <Text>Body</Text>
+      </Card>,
+    )
+    const layers = shadowed()
+    expect(layers).toHaveLength(1)
+    expect(layers[0].overflow).not.toBe('hidden')
+  })
+})
+
 describe('elevation is dropped where MD3 has none', () => {
   it.each([
     {

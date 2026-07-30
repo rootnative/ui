@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 11
 ---
 
 # API stability
@@ -83,11 +83,23 @@ yours once copied — we can't break them, because nothing resolves back to us.
 The compatibility mechanism there is `rootnative update`, which diffs incoming
 changes against your copy, not semver.
 
-That includes the shared hooks the CLI vendors alongside components
-(`useStateLayer`, `usePressMorph`, `useBooleanProgress`, `useAnchorPosition`).
-They are internal to the library, flattened into each component's directory on
-install, and their shape is **not** part of the promise. Build on the props of
-the components themselves, not on these.
+That includes the shared internals the CLI vendors alongside components. They are
+internal to the library, flattened into each component's directory on install,
+and their shape is **not** part of the promise — build on the props of the
+components themselves, not on these:
+
+`useStateLayer.ts`, `useBooleanProgress.ts`, `usePressMorph.ts`,
+`elevationShadow.ts`, `useFocusTrap.ts`, `useAnchorPosition.ts` and
+`safe-area.tsx`. Which of them a given component pulls is recorded in its
+registry entry (`registry/components/<name>.json`, the `files` array), which is
+generated from the source — so that stays accurate as components change.
+
+A file used by more than one component is copied into each of them, so the same
+hook can exist several times in your project. That is deliberate: it keeps every
+installed component self-contained with relative imports, which is what lets
+`rootnative update` touch one component without reasoning about what else shares
+its internals. It is also why these files can't move to a shared `lib/` — that
+would change paths in every project that already installed them.
 
 ### Registry pinning
 

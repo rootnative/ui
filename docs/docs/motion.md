@@ -78,6 +78,26 @@ import { Motion } from '@rootnative/inertia'
 
 The names are registered as TypeScript types too, so they autocomplete and a typo is a compile error. Nest your own `<MotionConfig transitions>` to add more — nested registries merge, child wins.
 
+#### `motionTransitions` — build that registry yourself
+
+The mapping in the table above is a pure function, exported for the case where you mount a `<MotionConfig>` that `ThemeProvider` isn't the parent of:
+
+```tsx
+import { motionTransitions, useTheme } from '@rootnative/core'
+import { MotionConfig } from '@rootnative/inertia'
+
+function MotionIsland({ children }) {
+  const theme = useTheme()
+  return (
+    <MotionConfig transitions={motionTransitions(theme.motion)}>
+      {children}
+    </MotionConfig>
+  )
+}
+```
+
+`motionTransitions(motion)` takes a theme's `motion` object and returns inertia's `NamedTransitions` — the nine names in the table, resolved against those tokens. You don't need it for normal use: `ThemeProvider` already calls it and feeds the result to its own `MotionConfig`, and a nested `MotionConfig` inherits what the parent registered. Reach for it when you're overriding `reducedMotion` on a nested config and want to be explicit about carrying the theme's transitions through, or when you're driving inertia from outside a `ThemeProvider` entirely.
+
 ### Retuning motion
 
 Motion is part of the theme, so retuning it is a theme override:
@@ -98,6 +118,21 @@ const calmTheme = {
 ```
 
 Every component that references `springDefaultSpatial` picks the new value up — no per-component props to thread.
+
+## Elevation on hover
+
+Four components raise their shadow one MD3 elevation level while hovered, and interpolate between the two levels rather than swapping them:
+
+| Component | Rest → hover | Applies when |
+|-----------|--------------|--------------|
+| `Card` | `level1` → `level2` | `variant="elevated"`, interactive (`onPress` set), not disabled |
+| `Button` | `level1` → `level2` | `variant="elevated"`, not disabled |
+| `Chip` | `level1` → `level2` | `elevated`, on any variant except `input`, not disabled |
+| `FAB` | `level3` → `level4` | Always (FAB is elevated by definition), not disabled |
+
+This is hover, so in practice it's web, a trackpad, or a pointer-capable tablet — touch has no hover state, and nothing changes on a phone. Disabled surfaces stay flat at their resting level; the raise is interaction feedback, and a control that can't be interacted with shouldn't offer it.
+
+There's nothing to configure and no prop to opt out. If you need a fixed shadow, set it in `style` on a non-interactive variant, or retune the elevation tokens on the theme — both endpoints read `theme.elevation.*`, so a flatter theme flattens the hover raise with it.
 
 ## Reduced motion
 

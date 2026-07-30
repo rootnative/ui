@@ -15,7 +15,7 @@ Design-system agnostic component library for React Native. Ships with Material D
 - Full TypeScript support with strict types
 - Accessible by default — proper roles, labels, and states, and the OS [reduce-motion setting](./motion#reduced-motion) is respected out of the box
 - Tree-shakeable with subpath exports
-- Responsive layout hooks (`useBreakpoint`, `useBreakpointValue`)
+- [Responsive layout hooks](./responsive) (`useBreakpoint`, `useBreakpointValue`) on MD3 window size classes
 
 ## Get started
 
