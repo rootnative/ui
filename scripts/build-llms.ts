@@ -1651,9 +1651,11 @@ Creates \`rootnative.json\`:
   "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "main"
+  "registryVersion": "v${COMPONENTS_VERSION}"
 }
 \`\`\`
+
+\`init\` pins \`registryVersion\` to the \`v<version>\` git tag of the latest published release, so a project keeps fetching the same component sources until you run \`rootnative upgrade\` (which moves the pin forward). It falls back to \`main\` only when npm is unreachable or the tag has not been pushed yet.
 
 #### \`rootnative add <components...>\`
 
@@ -1662,7 +1664,7 @@ Add components to your project. Resolves dependency graph, copies files with rew
 \`\`\`bash
 npx rootnative add button
 npx rootnative add card chip text-field
-npx rootnative add appbar      # auto-adds icon-button + typography
+npx rootnative add appbar      # auto-adds button + icon-button + typography
 \`\`\`
 
 Options:
@@ -1689,6 +1691,7 @@ npx rootnative upgrade -y      # Non-interactive — skip confirmation
 
 Options:
 - \`-y, --yes\` — Skip confirmation prompt
+- \`-a, --all\` — Also update the installed component files, not just the package
 - \`--package-manager <pm>\` — Package manager to use (\`npm\`, \`yarn\`, \`pnpm\`, \`bun\`)
 
 What it does:
@@ -1699,6 +1702,8 @@ What it does:
 5. Upgrades \`@rootnative/core\` and installs any new required peer dependencies in one step
 6. Reports optional peer deps that aren't installed (does not auto-install optional deps)
 7. Lists peer deps that are no longer required so you can remove them manually
+8. Moves \`registryVersion\` forward to the new release tag, so later \`add\`/\`update\` calls fetch matching sources
+9. With \`-a, --all\`, also updates the installed component files
 
 #### \`rootnative list\`
 
@@ -1718,6 +1723,13 @@ function utilsContent(): string {
   return `## @rootnative/utils
 
 Shared utilities used by \`@rootnative/components\` and available for custom component development.
+
+> **Not published to npm.** \`@rootnative/utils\` is a private workspace package —
+> \`npm install @rootnative/utils\` will 404. Do not add it to a project's
+> dependencies. These helpers reach user projects only as source files copied by
+> the CLI (\`rootnative add\`) into the configured \`lib/\` directory, where they are
+> imported from that local path (e.g. \`@/lib/rootnative-utils\`) rather than from
+> the package name. The import below shows the API as it exists inside this repo.
 
 \`\`\`tsx
 import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, transformOrigin, selectRTL } from '@rootnative/utils'
@@ -1894,7 +1906,7 @@ function generateCoreLlms(): string {
   return `# @rootnative/core — Theme System for React Native
 
 > Version: ${CORE_VERSION}
-> Peer deps: react >=18, react-native >=0.72
+> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia >=0.0.4 <0.1.0 (required — every animation runs on it)
 > Optional: @material/material-color-utilities >=0.4.0 (for createMaterialTheme)
 
 ## Quick Start
@@ -1921,7 +1933,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
+> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia >=0.0.4 <0.1.0 (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage
@@ -1980,12 +1992,12 @@ cd my-app
 npx expo start
 \`\`\`
 
-The \`create\` command scaffolds a ready-to-run Expo project with \`ThemeProvider\`, example components (Button, Card), Expo Router, and all dependencies pre-configured.
+The \`create\` command scaffolds a ready-to-run Expo project with \`ThemeProvider\`, example components (Box, Column, Typography, Card), and all dependencies pre-configured. Two templates: \`blank\` (the default) and \`with-router\`, which adds Expo Router.
 
-Interactive prompts: project name, display name (shown on home screen), package manager (npm/yarn/pnpm/bun), install dependencies.
+Interactive prompts: template, project name, display name (shown on home screen), package manager (npm/yarn/pnpm/bun), install dependencies.
 
 Options:
-- \`-y, --yes\` — Skip all prompts, use defaults (name: \`my-app\`, pm: \`npm\`, auto-install)
+- \`-y, --yes\` — Skip the optional prompts (template: \`blank\`, pm: \`npm\`, auto-install). The project name is still prompted for unless you pass it as an argument.
 
 Pass name directly: \`npx rootnative create my-app\`
 

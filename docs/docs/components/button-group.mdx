@@ -48,7 +48,7 @@ Follows the [Material Design 3 Button Group](https://m3.material.io/components/b
 | Variant | Use case |
 |---------|----------|
 | `standard` | Pill-shaped buttons separated by a small gap |
-| `connected` | Buttons share edges as a single segmented bar; the selected button morphs to a smaller corner radius |
+| `connected` | Buttons read as a single segmented bar, divided by a 2dp separator gap; the selected button morphs to a smaller corner radius |
 
 <SnackExample
   name="RootNative ButtonGroup — Variants"
@@ -102,7 +102,7 @@ Follows the [Material Design 3 Button Group](https://m3.material.io/components/b
 | Mode | Behavior | `value` type |
 |------|----------|--------------|
 | `none` (default) | Items act as standalone actions; no selection state. Use `onItemPress` | — |
-| `single` | Exactly one item can be selected | `string \| null` |
+| `single` | At most one item can be selected. Pressing the selected item deselects it, and `onValueChange` fires with `null` | `string \| null` |
 | `multiple` | Any number of items can be selected | `string[]` |
 
 Both `single` and `multiple` modes can be controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`).

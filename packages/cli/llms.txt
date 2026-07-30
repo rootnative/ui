@@ -47,9 +47,11 @@ Creates `rootnative.json`:
   "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "main"
+  "registryVersion": "v0.0.0-alpha.4"
 }
 ```
+
+`init` pins `registryVersion` to the `v<version>` git tag of the latest published release, so a project keeps fetching the same component sources until you run `rootnative upgrade` (which moves the pin forward). It falls back to `main` only when npm is unreachable or the tag has not been pushed yet.
 
 #### `rootnative add <components...>`
 
@@ -58,7 +60,7 @@ Add components to your project. Resolves dependency graph, copies files with rew
 ```bash
 npx rootnative add button
 npx rootnative add card chip text-field
-npx rootnative add appbar      # auto-adds icon-button + typography
+npx rootnative add appbar      # auto-adds button + icon-button + typography
 ```
 
 Options:
@@ -85,6 +87,7 @@ npx rootnative upgrade -y      # Non-interactive — skip confirmation
 
 Options:
 - `-y, --yes` — Skip confirmation prompt
+- `-a, --all` — Also update the installed component files, not just the package
 - `--package-manager <pm>` — Package manager to use (`npm`, `yarn`, `pnpm`, `bun`)
 
 What it does:
@@ -95,6 +98,8 @@ What it does:
 5. Upgrades `@rootnative/core` and installs any new required peer dependencies in one step
 6. Reports optional peer deps that aren't installed (does not auto-install optional deps)
 7. Lists peer deps that are no longer required so you can remove them manually
+8. Moves `registryVersion` forward to the new release tag, so later `add`/`update` calls fetch matching sources
+9. With `-a, --all`, also updates the installed component files
 
 #### `rootnative list`
 

@@ -173,8 +173,9 @@ nothing at all — a `useState` and a conditional render.
 ## The indicator
 
 The indicator is placed from measured geometry, not from a flex rule, because a **primary**
-indicator matches the width of the label rather than the width of the tab (floored at 24dp so a
-one-character label still gets something to see). A **secondary** indicator spans the whole tab.
+indicator matches the width of the tab's *content* — the label, or the icon-and-label column when
+an icon stacks above it — rather than the width of the tab (floored at 24dp so a one-character
+label still gets something to see). A **secondary** indicator spans the whole tab.
 
 It stays unmounted until the active tab reports a layout, so it appears in place instead of sliding
 in from the row's leading edge on first render. After that, both its offset and its width ride
@@ -207,7 +208,7 @@ When you pass `testID`, the indicator and the divider carry `<testID>-indicator`
 | Height | 48dp, 64dp with an icon above the label | 48dp |
 | Label | `titleSmall` — active `primary`, inactive `onSurfaceVariant` | `titleSmall` — active `onSurface`, inactive `onSurfaceVariant` |
 | Icon | 24dp, same colors as the label | 24dp, same colors as the label |
-| Indicator | `primary`, 3dp, matched to the label | `primary`, 2dp, full tab width |
+| Indicator | `primary`, 3dp, matched to the tab's content | `primary`, 2dp, full tab width |
 | Padding | 16dp horizontal per tab | 16dp horizontal per tab |
 | Divider | 1dp `outlineVariant` along the bottom | 1dp `outlineVariant` along the bottom |
 

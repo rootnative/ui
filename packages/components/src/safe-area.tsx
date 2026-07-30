@@ -1,13 +1,15 @@
-import type { ComponentType, ReactNode } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { ComponentType } from 'react'
+import type { ViewProps } from 'react-native'
 import { View } from 'react-native'
 
 type Edge = 'top' | 'right' | 'bottom' | 'left'
 
-interface SafeAreaViewProps {
+// Extends `ViewProps` because both possible underlying components accept them:
+// the real `SafeAreaView` spreads its rest onto a `View`, and the fallback *is*
+// a `View`. Declaring only `edges`/`style`/`children` made ordinary View props
+// (`pointerEvents`, `testID`, accessibility props) type-errors at call sites.
+interface SafeAreaViewProps extends ViewProps {
   edges?: Edge[]
-  style?: StyleProp<ViewStyle>
-  children?: ReactNode
 }
 
 let SafeAreaViewComponent: ComponentType<SafeAreaViewProps> =

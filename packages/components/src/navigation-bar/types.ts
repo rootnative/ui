@@ -90,7 +90,7 @@ export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
   accessibilityLabel?: string
   /**
    * Test id applied to the bar container. Each destination carries
-   * `<testID>-item-<value>` and its indicator `<testID>-indicator-<value>`.
+   * `<testID>-item-<value>` and its indicator `<testID>-item-<value>-indicator`.
    */
   testID?: string
 }

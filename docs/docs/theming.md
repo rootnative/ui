@@ -268,6 +268,9 @@ interface BaseTheme {
   stateLayer: StateLayer
   elevation: Elevation
   motion: Motion
+  // Escape hatch for your own token groups — this is what lets a custom theme
+  // carry extra keys and still satisfy `BaseTheme`.
+  [key: string]: unknown
 }
 ```
 
@@ -276,7 +279,7 @@ interface BaseTheme {
 Use `defineTheme` for type-safe theme creation:
 
 ```tsx
-import { defineTheme } from '@rootnative/core'
+import { defineTheme, material } from '@rootnative/core'
 import type { BaseTheme } from '@rootnative/core'
 
 interface BrandTheme extends BaseTheme {
@@ -319,21 +322,27 @@ const brandTheme = defineTheme<BrandTheme>({
     body: { fontSize: 16, fontWeight: '400', lineHeight: 22 },
     caption: { fontSize: 12, fontWeight: '400', lineHeight: 16 },
   },
-  shape: { none: 0, extraSmall: 4, small: 8, medium: 12, large: 16, extraLarge: 28, full: 9999 },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
-  stateLayer: { pressed: 0.12, focused: 0.12, hovered: 0.08, disabled: 0.38 },
-  elevation: {
-    level0: {},
-    level1: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 1 },
-    level2: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 6, elevation: 3 },
-    level3: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 6 },
-  },
-  motion: {
-    duration: { short: 100, medium: 300, long: 500 },
-    easing: { standard: 'ease-in-out', accelerate: 'ease-in', decelerate: 'ease-out' },
-  },
+  // `shape`, `spacing`, `stateLayer`, `elevation` and `motion` are required by
+  // `BaseTheme` and each has a fixed token set. Spread the MD3 defaults and
+  // override only what your brand changes, rather than spelling them out —
+  // `motion` alone is 29 tokens, and components read every one of them.
+  ...material.lightTheme,
+  shape: { ...material.lightTheme.shape, roundness: 1, cornerMedium: 10 },
 })
 ```
+
+:::caution
+
+`shape`, `stateLayer`, `elevation` and `motion` are **not** freely shaped
+objects. Each is a fixed interface — `shape` is `roundness` plus `cornerNone`
+through `cornerFull`, `stateLayer` is the six `*Opacity` keys, `elevation` is
+`level0`–`level5` (every level needing all five shadow fields), and `motion` is
+a flat set of 16 `duration*`, 7 `easing*` and 6 `spring*` tokens. Omitting or
+renaming any of them fails to type-check, and a partially populated token set
+breaks the components that read it at runtime. Spreading a preset is the
+supported way to supply them.
+
+:::
 
 ### ThemeProvider
 
@@ -376,7 +385,7 @@ function MyComponent() {
 | `shape` | `roundness` multiplier plus corner radius tokens (`cornerNone` through `cornerFull`) |
 | `spacing` | Spacing scale (`xs`, `sm`, `md`, `lg`, `xl`) |
 | `elevation` | Shadow levels `level0` through `level5` |
-| `stateLayer` | Opacity values for `pressed`, `focused`, `hovered`, `dragged`, `disabled`, and `disabledContainer` |
+| `stateLayer` | Opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
 | `motion` | Duration, easing, and spring tokens — see [Motion](./motion) |
 
 ## Type hierarchy

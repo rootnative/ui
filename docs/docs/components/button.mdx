@@ -108,7 +108,18 @@ import { Check, ArrowRight } from 'lucide-react-native'
 <Button trailingIcon={<ArrowRight size={18} color="#fff" />}>Continue</Button>
 ```
 
-Or use a render function to receive the button's resolved icon size and color:
+Or use a render function to receive the icon size and color the button resolved
+from its `size`, `variant` and current state, so the icon tracks them without
+hardcoding:
+
+```tsx
+<Button leadingIcon={({ size, color }) => <Check size={size} color={color} />}>
+  Save
+</Button>
+```
+
+`iconSize` and `contentColor` override what the function receives, if you need
+to depart from the resolved values:
 
 ```tsx
 <Button

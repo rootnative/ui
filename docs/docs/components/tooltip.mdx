@@ -188,8 +188,9 @@ side it resolved to.
 | `textStyle` | The supporting-text `Text` only |
 | `anchorStyle` | The view wrapping the anchor |
 
-A tooltip is not interactive, so there are no state layers to re-derive from `containerColor` —
-it just recolors the surface. Nodes you pass as `children` or `actions` are yours to color.
+The tooltip surface draws no state layer of its own, so there is nothing to re-derive from
+`containerColor` — it just recolors the surface. Nodes you pass as `children` or `actions` are
+yours to color.
 
 ## Tokens
 

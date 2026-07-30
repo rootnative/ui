@@ -5,10 +5,14 @@ Design-system agnostic theme engine for [RootNative UI](https://github.com/rootn
 ## Install
 
 ```bash
-pnpm add @rootnative/core
+pnpm add @rootnative/core @rootnative/inertia
 ```
 
-Peer dependencies: `react >=18`, `react-native >=0.72`
+Peer dependencies: `react >=18`, `react-native >=0.72`, `@rootnative/inertia >=0.0.4 <0.1.0`
+
+`@rootnative/inertia` is required — every animation in the library runs on it.
+npm and pnpm install required peers automatically; Yarn classic does not, so add
+it by hand there.
 
 Optional: `@material/material-color-utilities >=0.4` — only needed for `createMaterialTheme`.
 
@@ -112,20 +116,20 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- `BaseTheme` — Generic base. Colors as `Record<string, string>`, typography as `Record<string, TextStyle>`, plus shape, spacing, stateLayer, elevation, motion.
-- `Theme` — MD3 theme. Extends `BaseTheme` with 69 color roles, 15 typography variants, optional `topAppBar` tokens. `MaterialTheme` is an identical alias — use it to disambiguate in multi-design-system codebases.
+- `BaseTheme` — Generic base. Colors as `Record<string, string>`, typography as `Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
+- `Theme` — MD3 theme. Extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 emphasized), optional `topAppBar` tokens. `MaterialTheme` is an identical alias — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
 
 | Token group | Description |
 |-------------|-------------|
 | `colors` | Design-system specific color roles (`Record<string, string>`) |
-| `typography` | Type scale variants (`Record<string, TextStyle>`) |
-| `shape` | Corner radius tokens (none through full) |
+| `typography` | Type scale variants (`Record<string, TypographyToken>`) |
+| `shape` | `roundness` multiplier plus corner radius tokens (`cornerNone` through `cornerFull`) |
 | `spacing` | Spacing scale (xs, sm, md, lg, xl) |
-| `elevation` | Shadow levels 0–3 |
-| `stateLayer` | Opacity values for pressed, focused, hovered, disabled |
-| `motion` | Duration and easing tokens |
+| `elevation` | Shadow levels `level0` through `level5` |
+| `stateLayer` | Opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
+| `motion` | 16 `duration*`, 7 `easing*` and 6 `spring*` tokens |
 
 ### Custom MD3 theme
 
@@ -174,7 +178,8 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 - `useBreakpointValue` — Responsive values
 - `lightTheme` / `darkTheme` — Built-in MD3 themes
 - `defaultTopAppBarTokens` — MD3 top app bar defaults
-- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `Shape`, `Spacing`, `Elevation`, `StateLayer`, `Motion`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `ThemeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
+- `motionTransitions` — The named-transition registry mounted by `ThemeProvider`
+- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `TypographyToken`, `FontWeight`, `Shape`, `Spacing`, `Elevation`, `ElevationLevel`, `ShadowOffset`, `StateLayer`, `Motion`, `MotionSpring`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `IconSource`, `ThemeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
 
 ## Docs
 

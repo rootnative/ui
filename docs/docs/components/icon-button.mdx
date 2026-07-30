@@ -48,6 +48,16 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
 
 ## Sizes
 
+Five MD3 Expressive sizes. `s` is the default.
+
+| `size` | Height | Icon |
+|--------|--------|------|
+| `xs` | 32dp | 20dp |
+| `s` | 40dp | 24dp |
+| `m` | 56dp | 24dp |
+| `l` | 96dp | 32dp |
+| `xl` | 136dp | 40dp |
+
 <SnackExample
   name="RootNative IconButton — Sizes"
   code={`
@@ -61,9 +71,9 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
       <SafeAreaProvider>
         <ThemeProvider>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <IconButton icon="star" size="small" accessibilityLabel="Star" onPress={() => {}} />
-            <IconButton icon="star" size="medium" accessibilityLabel="Star" onPress={() => {}} />
-            <IconButton icon="star" size="large" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="xs" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="s" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="m" accessibilityLabel="Star" onPress={() => {}} />
           </View>
         </ThemeProvider>
       </SafeAreaProvider>
@@ -71,6 +81,20 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
   }
 `}
 />
+
+## Width and shape
+
+`width` trades horizontal padding at a fixed height — `'narrow'`, `'uniform'`
+(default), or `'wide'`. At `size="s"` that is 32 / 40 / 52dp wide.
+
+`shape` controls the resting container: `'round'` (default) rests as a
+circle/pill, `'square'` rests at a size-dependent corner. Toggle buttons invert
+their shape when selected, so a round toggle squares off to signal the change.
+
+```tsx
+<IconButton icon="star" width="wide" accessibilityLabel="Star" />
+<IconButton icon="star" shape="square" accessibilityLabel="Star" />
+```
 
 ## Bring your own icon library
 
@@ -84,7 +108,7 @@ import { Heart } from 'lucide-react-native'
 />
 ```
 
-The render-function form receives the size and color the IconButton would have given to its default icon (24dp for `medium`, plus the variant + state color), so the icon stays in sync with size/variant changes automatically.
+The render-function form receives the size and color the IconButton would have given to its default icon (24dp at the default `s` size, plus the variant + state color), so the icon stays in sync with size/variant changes automatically.
 
 ## Toggle Mode
 

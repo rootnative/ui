@@ -69,8 +69,11 @@ This will:
 2. Detect your package manager (npm, yarn, pnpm, bun)
 3. Detect path aliases from your `tsconfig.json`
 4. Prompt for component and utility output directories
-5. Install `@rootnative/core`
-6. Create an `rootnative.json` config file
+5. Create an `rootnative.json` config file
+6. Offer to add the LLM-docs pointer to your project's `CLAUDE.md`
+7. Offer to install `@rootnative/core`
+
+Steps 6 and 7 are confirmation prompts; `-y` accepts both.
 
 Options:
 
@@ -98,7 +101,7 @@ Add one or more components to your project.
 ```bash
 npx rootnative add button
 npx rootnative add card chip text-field
-npx rootnative add appbar  # auto-adds icon-button + typography dependencies
+npx rootnative add appbar  # auto-adds button + icon-button + typography dependencies
 ```
 
 Options:
@@ -111,7 +114,7 @@ Options:
 
 The `add` command:
 
-1. Resolves the full dependency graph (e.g. `appbar` requires `icon-button` and `typography`)
+1. Resolves the full dependency graph (e.g. `appbar` requires `button`, `icon-button` and `typography`)
 2. Shows a plan of components, utilities, and npm packages to install
 3. Copies component files with import paths rewritten to match your project
 4. Generates a utility barrel file (`rootnative-utils.ts`)
@@ -161,6 +164,8 @@ The `upgrade` command:
 5. Upgrades `@rootnative/core` and installs any new required peer dependencies
 6. Reports optional peer deps that aren't installed (does not auto-install them)
 7. Lists peer deps that are no longer required so you can remove them manually
+8. Moves `registryVersion` in `rootnative.json` forward to the new release tag, so subsequent `add`/`update` calls fetch matching sources
+9. With `-a, --all`, also updates the installed component files
 
 Non-interactive mode for CI/automation:
 
@@ -190,7 +195,8 @@ Checks include:
 - `@rootnative/core` is installed
 - React Native version compatibility
 - Installed component file integrity
-- Peer dependencies (`react-native-safe-area-context`, `@expo/vector-icons`)
+- `@rootnative/inertia` — a hard failure when missing, since every animated component needs it
+- Optional peer dependencies (`react-native-safe-area-context`, `@expo/vector-icons`) — reported as warnings
 
 ## Configuration
 
@@ -204,7 +210,7 @@ Checks include:
     "lib": "@/lib"
   },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "main"
+  "registryVersion": "v0.0.0-alpha.4"
 }
 ```
 
@@ -213,7 +219,7 @@ Checks include:
 | `aliases.components` | Where component directories are created |
 | `aliases.lib` | Where utility files are placed |
 | `registryUrl` | Base URL for fetching component source files |
-| `registryVersion` | Git ref to fetch from (branch, tag, or commit) |
+| `registryVersion` | Git ref to fetch from (branch, tag, or commit). `init` pins this to the `v<version>` tag of the latest published release, falling back to `main` only when npm is unreachable or the tag isn't pushed yet. `upgrade` moves the pin forward |
 
 ## Output structure
 
@@ -228,27 +234,40 @@ src/
         types.ts
         styles.ts
         index.ts
+        elevationShadow.ts  # shared internal, flattened per component
+        usePressMorph.ts
+        useStateLayer.ts
       icon-button/          # auto-added (appbar dependency)
         IconButton.tsx
         types.ts
         styles.ts
         index.ts
+        useBooleanProgress.ts
+        usePressMorph.ts
+        useStateLayer.ts
       typography/           # auto-added (appbar dependency)
         Typography.tsx
         types.ts
+        styles.ts
         index.ts
       appbar/
         AppBar.tsx
         types.ts
         styles.ts
         index.ts
+        safe-area.tsx
   lib/
     color.ts
     elevation.ts
-    icon.ts
+    pressable.ts
+    render-icon.tsx
     rtl.ts
     rootnative-utils.ts    # generated barrel
 ```
+
+Shared internal hooks (`useStateLayer`, `usePressMorph`, …) are copied into
+*each* component directory that uses them rather than into a shared folder, so
+each installed component stays self-contained.
 
 ## Available components
 
@@ -271,7 +290,16 @@ src/
 | `text-field` | Text input with animated floating label, 2 variants (filled, outlined) |
 | `layout` | Layout primitives: Box, Row, Column, Grid, and SafeAreaView wrapper |
 | `list` | List container with interactive items and dividers |
+| `divider` | Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides. |
+| `loading-indicator` | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
 | `portal` | Render children into a host elsewhere in the tree (overlays, dialogs, sheets) |
+| `dialog` | Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling. |
+| `snackbar` | Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement. |
+| `menu` | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility. |
+| `tooltip` | Plain and rich tooltips anchored to a control, shown on hover or a long press |
+| `bottom-sheet` | MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss. |
+| `tabs` | Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator |
+| `navigation-bar` | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
 | `keyboard-avoiding-wrapper` | Zero-config keyboard-aware wrapper for form layouts |
 
 ## Import rewriting

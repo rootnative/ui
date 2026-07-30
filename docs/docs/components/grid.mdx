@@ -37,7 +37,7 @@ A multi-column grid that wraps children into equal-width columns. Built on top o
 
 ## How It Works
 
-Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all columns are equal width. The `gap` prop controls spacing between cells — cells shrink proportionally to account for it.
+Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all columns are equal width. The `gap` prop is implemented as gutters rather than by shrinking cells: each cell takes half the gap as horizontal padding, and the row cancels the outer half on both edges with a negative margin. `flexBasis` stays exactly `100 / columns%`, so the row occupies the full width of its parent and the outermost cells stay flush with its edges.
 
 ## Different Column Counts
 

@@ -134,7 +134,7 @@ except the label. Anything else you put in a Menu renders as given, which is how
 | `leadingIcon` | 24dp / `onSurfaceVariant` |
 | `trailingText` | `labelLarge` / `onSurfaceVariant` — a keyboard shortcut or short status |
 | `trailingIcon` | 24dp / `onSurfaceVariant` |
-| `disabled` | Label and both icons at 38% `onSurface`; the item stops responding |
+| `disabled` | Label and both icons dim together at 38% opacity, keeping their own colors; the item stops responding |
 
 **An item press closes the menu.** Set `closeOnPress={false}` on an item that toggles something
 and should stay open — a sort choice or a "show hidden files" switch.
@@ -238,7 +238,7 @@ what decides which side it lands on, so it has to be laid out before it can be p
 
 ## Accessibility
 
-- The surface reports `role="menu"` and items report `role="menuitem"`. The surface is deliberately not an accessibility element itself — marking it one would collapse the items beneath it into a single node for screen readers.
+- The surface reports `role="menu"` and items report `role="menuitem"`.
 - Items expose `accessibilityState.disabled`.
 - The anchor is annotated for you, in both the controlled and uncontrolled forms: `aria-haspopup="menu"` plus an `aria-expanded` that tracks the menu, so a screen reader announces the trigger as opening a menu rather than as a plain button.
 - **On web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web). The surface is deliberately *not* marked modal on native — that would take the dismiss region below out of the accessibility tree along with it.

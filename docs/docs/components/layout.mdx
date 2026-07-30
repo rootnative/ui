@@ -81,7 +81,15 @@ Control which safe area edges are applied:
 `}
 />
 
-By default, only the `bottom` edge is applied. In immersive mode, no edges are applied.
+By default, only the `bottom` edge is applied. In immersive mode, no edges are applied. `edges` is checked first and overrides `immersive` — `<Layout immersive edges={['top']} />` applies the top inset and ignores `immersive`.
+
+:::note
+
+`Layout` always paints `theme.colors.background` and strips `backgroundColor`
+from the `style` you pass, so the app background stays a single themed surface.
+To draw a different background, nest a `Box` (or any `View`) inside it.
+
+:::
 
 ## Props
 

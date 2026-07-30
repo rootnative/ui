@@ -140,10 +140,10 @@ npx rootnative add appbar
 1. The CLI fetches the component registry and validates the requested names
 2. It resolves the full dependency graph
 3. It shows a summary of what will be installed — components, utilities, and npm packages
-4. After confirmation, it fetches the source files from the registry
-5. Import paths are rewritten to match your project's alias configuration
-6. Utility files are copied to your `lib/` directory
-7. A barrel file (`rootnative-utils.ts`) is generated that re-exports only the utilities your installed components need
+4. After confirmation, utility files are copied to your `lib/` directory
+5. A barrel file (`rootnative-utils.ts`) is generated that re-exports only the utilities your installed components need
+6. It fetches the component source files from the registry
+7. Import paths are rewritten to match your project's alias configuration
 8. Any required npm packages are installed via your package manager
 
 ### `update`

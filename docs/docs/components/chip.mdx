@@ -44,7 +44,7 @@ Follows the [Material Design 3 Chip](https://m3.material.io/components/chips/ove
 
 ## Elevated
 
-Available on `assist`, `filter`, and `suggestion` variants. Ignored on `input`.
+Available on `assist`, `filter`, and `suggestion` variants. Input chips are always outlined, so `elevated` is not part of their props — TypeScript rejects `<Chip variant="input" elevated>` rather than ignoring it.
 
 <SnackExample
   name="RootNative Chip — Elevated"

@@ -42,7 +42,14 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
 
   return (
     <Portal priority={PORTAL_LAYERS.snackbar}>
-      <SafeAreaView edges={['bottom']} style={styles.layer}>
+      {/* `box-none` so the layer's own band — full width, plus 16dp of
+          padding — never intercepts touches meant for the UI behind it. Only
+          the snackbar surface itself is tappable. */}
+      <SafeAreaView
+        edges={['bottom']}
+        style={styles.layer}
+        pointerEvents="box-none"
+      >
         <Presence>
           {entry ? (
             <Motion.View

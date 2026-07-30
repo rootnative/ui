@@ -6,9 +6,12 @@ sidebar_position: 3
 
 ## Prerequisites
 
-- React Native 0.81+
-- React 19+
+- React Native 0.72+
+- React 18+
 - Expo SDK 54+ (if using Expo)
+
+The library is developed and tested against React Native 0.81 / React 19 / Expo
+SDK 54, which is what the example app and templates pin.
 
 ## Install packages
 
@@ -16,7 +19,7 @@ sidebar_position: 3
 
 ### Peer dependencies
 
-**Install these yourself.** Every one of them except `@rootnative/inertia` is declared as an *optional* peer dependency (so you can drop the ones you don't use), and optional peers are never auto-installed — not by npm, not by pnpm, and Yarn classic doesn't auto-install any peers at all. Install the full list once and every component and theming feature works:
+**Install these yourself.** Every package in the list below is declared as an *optional* peer dependency (so you can drop the ones you don't use), and optional peers are never auto-installed — not by npm, not by pnpm, and Yarn classic doesn't auto-install any peers at all. Install the full list once and every component and theming feature works:
 
 <PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets @expo/vector-icons @material/material-color-utilities" />
 

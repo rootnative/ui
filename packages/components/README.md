@@ -5,8 +5,14 @@ Material Design 3 UI components for React Native, part of [RootNative UI](https:
 ## Install
 
 ```bash
-pnpm add @rootnative/core @rootnative/components react-native-safe-area-context react-native-reanimated react-native-worklets
+pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-native-safe-area-context react-native-reanimated react-native-worklets
 ```
+
+`@rootnative/inertia` is a **required** peer of both `@rootnative/core` and
+`@rootnative/components` — every animation in the library runs on it. npm and
+pnpm install required peers automatically; Yarn classic does not. The rest of
+the packages above are *optional* peers, so no package manager installs them
+for you.
 
 Reanimated 4 runs on `react-native-worklets` (installed above). **Expo SDK 54 bundles its Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` last in your `babel.config.js` `plugins`.
 
@@ -22,7 +28,7 @@ pnpm add @expo/vector-icons
 pnpm add react-native-svg
 ```
 
-> `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; static components (Typography, Layout, Portal, KeyboardAvoidingWrapper) work without it. With Expo SDK 54 it's also already available in Expo Go.
+> `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Needed for any interactive component; static components (Typography, Layout, Portal, KeyboardAvoidingWrapper, Divider) work without it. It is declared as an *optional* peer, so nothing installs it for you. With Expo SDK 54 it's also already available in Expo Go.
 >
 > Note that peer dependencies are not installed automatically: these are optional peers, so npm/pnpm skip them too, and Yarn classic installs no peers at all. Install the blocks above explicitly.
 
@@ -71,7 +77,9 @@ import { Button, Card } from '@rootnative/components'
 | Snackbar | `./snackbar` | SnackbarProvider + useSnackbar() — imperative queue |
 | Menu | `./menu` | Menu, Menu.Item · self-managing or controlled · anchored with collision flipping |
 | Tooltip | `./tooltip` | plain, rich · hover or long press · anchored with collision flipping |
+| BottomSheet | `./bottom-sheet` | modal, standard · snap points · velocity-based settle · drag-to-dismiss |
 | Tabs | `./tabs` | primary, secondary · fixed or scrollable · sliding active indicator |
+| NavigationBar | `./navigation-bar` | 3–5 destinations · label visibility always / selected / never |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
 ## Quick examples

@@ -42,13 +42,16 @@
     "md3"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm --outDir dist --clean --external lucide-react-native --external phosphor-react-native --external @expo/vector-icons --external react --external react-native",
+    "build": "tsup src/index.ts --dts --format esm --outDir dist --clean --external @rootnative/core --external lucide-react-native --external phosphor-react-native --external @expo/vector-icons --external react --external react-native",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
+    "@expo/vector-icons": ">=14.0.0",
     "@rootnative/core": ">=0.0.0-alpha.4",
+    "lucide-react-native": ">=0.400.0",
+    "phosphor-react-native": ">=2.0.0",
     "react": ">=18.0.0",
     "react-native": ">=0.72.0"
   },

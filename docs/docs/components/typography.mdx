@@ -63,7 +63,7 @@ const theme = useTheme()
 
 ## Accessibility
 
-Display and headline variants automatically receive `accessibilityRole="header"` for screen readers.
+Display and headline variants receive `accessibilityRole="header"` for screen readers unless you pass an explicit `accessibilityRole`, which always wins.
 
 ## Custom Styles
 
@@ -101,7 +101,8 @@ Use the `as` prop to render with a custom text component:
   import { Typography } from '@rootnative/components'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
-  import { Animated, View } from 'react-native'
+  import { Animated } from '@rootnative/inertia/reanimated'
+  import { View } from 'react-native'
 
   export default function App() {
     return (
