@@ -105,7 +105,9 @@ Users who set **Reduce Motion** (iOS), **Remove animations** (Android), or `pref
 
 This is on by default. `ThemeProvider` mounts `<MotionConfig>` with inertia's default `reducedMotion="user"`, which reads the OS setting through Reanimated's `useReducedMotion()`.
 
-Components that animate — and therefore respond to the setting — are AppBar, Avatar, Button, ButtonGroup, Card, Checkbox, Chip, FAB, IconButton, ListItem, LoadingIndicator, LinearProgress, CircularProgress, Radio, Slider, Switch, and TextField.
+Every component animates something and therefore responds to the setting, except these five, which have no animated value at all: `Divider`, `KeyboardAvoidingWrapper`, `Layout` (`Box`, `Row`, `Column`, `Grid`), `Portal`, and `Typography`.
+
+That includes the overlay surfaces — `Dialog`, `Menu`, `Tooltip`, `Snackbar` and `BottomSheet` all cut straight to their open state instead of scaling and fading in, and `BottomSheet` still drags: a gesture you are actively driving is not an animation, so reduced motion only collapses the release settle.
 
 ### Overriding it
 

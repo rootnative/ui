@@ -26,7 +26,7 @@ If you'd rather install only what you use:
 
 | Package | Powers | Skip when |
 |---------|--------|-----------|
-| `react-native-reanimated` | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, or KeyboardAvoidingWrapper |
+| `react-native-reanimated` | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
 | `react-native-worklets` | Reanimated 4's worklet runtime | You skip Reanimated |
 | `react-native-safe-area-context` | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Always skippable — without it those components render without insets and log a one-time warning |
 | `react-native-svg` | CircularProgress and LoadingIndicator | You never import Progress or LoadingIndicator |

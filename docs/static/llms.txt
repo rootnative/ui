@@ -61,7 +61,7 @@ import { Button, Card } from '@rootnative/components'
 - Required peers (npm/pnpm install these for you; Yarn classic users add them by hand): `@rootnative/inertia` (animation engine, peer of both `core` and `components`)
 - The *optional* peers are never auto-installed (npm/pnpm only auto-install required peers; Yarn classic installs none). Install the full list above explicitly — including `@material/material-color-utilities` if you use `createMaterialTheme`.
 
-`react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; safe to skip only if you use Typography/Layout/Portal/KeyboardAvoidingWrapper exclusively. Bundled with Expo SDK 54 and works in Expo Go.
+`react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; safe to skip only if you use Typography/Layout/Portal/KeyboardAvoidingWrapper/Divider exclusively (the only components with no animated value). Bundled with Expo SDK 54 and works in Expo Go.
 
 Components never import `react-native-reanimated` directly — they animate through `@rootnative/inertia`, which resolves the theme's motion tokens by name and collapses every transition to a hard cut when the OS reduce-motion setting is on. `ThemeProvider` wires this up; nothing to configure. Override per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
 

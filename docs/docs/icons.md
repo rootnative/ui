@@ -305,15 +305,20 @@ A few components render system icons of their own (for example, the checkmark in
 
 The system names that components rely on:
 
-| Component | System icon names |
-|-----------|-------------------|
-| `Checkbox` | `check` |
-| `Chip` | `check` (filter, when selected), `close` (close button) |
+| Component | System icon names | Rendered when | Override prop |
+|-----------|-------------------|---------------|---------------|
+| `AppBar` | `chevron-left` / `chevron-right` on iOS, `arrow-left` / `arrow-right` elsewhere | `canGoBack` | — |
+| `Checkbox` | `check` | Always (the mark) | `checkIcon` |
+| `Chip` | `check`, `close` | `variant="filter"` and selected; `onClose` given | — |
+| `Dialog` | `close` | `variant="fullscreen"` | `closeIcon` |
+| `Snackbar` | `close` | `showCloseIcon` on the entry | `closeIcon` on the entry |
+
+The AppBar pair mirrors under RTL and splits by platform, so a resolver that maps only what it saw on one device will still lose the back arrow on the other — map all four.
 
 You have two ways to handle this when adopting a custom resolver:
 
-1. **Map the system names in your resolver.** Just include `check`, `close`, etc. alongside your other mappings — easiest path.
-2. **Override per-component** with an explicit `IconSource`. `Checkbox` exposes a `checkIcon?: IconSource` prop for this:
+1. **Map the system names in your resolver.** Include `check`, `close` and the back-arrow set alongside your other mappings — easiest path, and the [`mdiCompat` alias maps](#lucide) already carry all six.
+2. **Override per-component** with an explicit `IconSource`, where the component offers a prop for it (the right-hand column above). `Checkbox` exposes `checkIcon?: IconSource`:
 
 ```tsx
 import { Checkbox } from '@rootnative/components'
@@ -328,7 +333,9 @@ import { Check } from 'lucide-react-native'
 
 ## Sizing and color reference
 
-Each component decides its own default icon size based on its variant or size prop. The values passed to your resolver / render function come from:
+Each component decides its own default icon size based on its variant or size prop. The general rule, which holds library-wide: `size` comes from an explicit `iconSize` prop where one exists and is otherwise derived from the component's `size` or variant, and `color` is whatever the component resolved for its content — the variant default, then `contentColor` (or a narrower icon-color prop where the component has one), then the disabled treatment, which nothing overrides. Check the component's own page for its numbers.
+
+Two worked examples rather than an exhaustive list:
 
 | Component | Source of `size` | Source of `color` |
 |-----------|------------------|-------------------|
