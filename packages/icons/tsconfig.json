@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2019",
+    // `lib` outruns `target` on purpose: emit stays ES2019 for the shipped
+    // bundle, while the checker knows about ES2020 APIs the Node-side tests use
+    // (peer-deps.test.ts reads package.json with String.matchAll).
+    "lib": ["ES2020", "DOM"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
@@ -10,7 +14,8 @@
     "declarationMap": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["jest"]
+    // `node` is for the tests only — no src file may import a Node builtin.
+    "types": ["jest", "node"]
   },
   "include": ["src"]
 }
