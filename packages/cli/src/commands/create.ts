@@ -98,7 +98,7 @@ const TEMPLATE_BINARY_FILES = [
 ]
 
 // Fetched with graceful skip — older release tags don't include these yet
-const TEMPLATE_OPTIONAL_TEXT_FILES = ['CLAUDE.md']
+const TEMPLATE_OPTIONAL_TEXT_FILES = ['CLAUDE.md', 'README.md']
 
 function isValidTemplate(value: string): value is TemplateName {
   return value in TEMPLATE_CONFIGS

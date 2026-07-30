@@ -193,7 +193,7 @@ export async function doctorCommand(cwd: string): Promise<void> {
   } else {
     logCheck(
       'warn',
-      'react-native-safe-area-context not installed (needed by: appbar, layout)',
+      'react-native-safe-area-context not installed (needed by: appbar, layout, bottom-sheet, navigation-bar, snackbar)',
     )
   }
 

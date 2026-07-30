@@ -57,9 +57,9 @@ import { Button, Card } from '@rootnative/components'
 ## Requirements
 
 - React Native 0.81+, React 19+, Expo SDK 54+
-- Optional peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5`, `react-native-svg >=15` (CircularProgress, LoadingIndicator), `@expo/vector-icons >=14` (only needed if you plan to use icons)
-- Required peers (npm/pnpm install these for you; Yarn classic users add them by hand): `@rootnative/inertia` (animation engine, peer of both `core` and `components`), `@material/material-color-utilities >=0.4` (peer of `@rootnative/core`, used by `createMaterialTheme`)
-- The *optional* peers are never auto-installed (npm/pnpm only auto-install required peers; Yarn classic installs none). Install the full list above explicitly.
+- Optional peer deps: `react-native-safe-area-context >=4` (AppBar, Layout, BottomSheet, NavigationBar, Snackbar), `react-native-reanimated >=4`, `react-native-worklets >=0.5`, `react-native-svg >=15` (CircularProgress, LoadingIndicator), `@expo/vector-icons >=14` (only needed if you plan to use icons), `@material/material-color-utilities >=0.4` (peer of `@rootnative/core`, only reachable via the `@rootnative/core/create-theme` subpath — needed for `createMaterialTheme`)
+- Required peers (npm/pnpm install these for you; Yarn classic users add them by hand): `@rootnative/inertia` (animation engine, peer of both `core` and `components`)
+- The *optional* peers are never auto-installed (npm/pnpm only auto-install required peers; Yarn classic installs none). Install the full list above explicitly — including `@material/material-color-utilities` if you use `createMaterialTheme`.
 
 `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; safe to skip only if you use Typography/Layout/Portal/KeyboardAvoidingWrapper exclusively. Bundled with Expo SDK 54 and works in Expo Go.
 

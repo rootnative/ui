@@ -107,7 +107,7 @@ being strict: a type alias is what lets a closed `Colors` still satisfy
 
 ### Generate a theme from a seed color
 
-`createMaterialTheme` relies on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), a required peer of `@rootnative/core`. npm and pnpm install required peers automatically; **Yarn users must add it manually** (`yarn add @material/material-color-utilities`).
+`createMaterialTheme` relies on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), an **optional** peer of `@rootnative/core` — so **no package manager installs it for you**. Add it yourself before using this API (`npm install @material/material-color-utilities`). It's optional because it lives behind the `@rootnative/core/create-theme` subpath: importing `@rootnative/core` alone never pulls it in, so projects that define themes by hand don't carry it.
 
 It generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 49 color roles are derived automatically:
 

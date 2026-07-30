@@ -25,7 +25,7 @@ Then press `i` for iOS, `a` for Android, or `w` for web.
 - `@rootnative/core` — Theme system with Material Design 3 tokens
 - `@rootnative/components` — UI components (Button, Card, Typography, and more)
 - ThemeProvider already wired up in the root layout
-- Example home screen with Buttons and Cards
+- Example home screen using Typography and Card
 
 ## Project Structure
 
@@ -35,8 +35,10 @@ app/
 └── index.tsx         # Home screen with example components
 assets/               # App icons and splash screen
 app.json              # Expo config
+babel.config.js
 package.json
 tsconfig.json
+CLAUDE.md             # Points AI agents at the RootNative LLM docs
 ```
 
 ## Learn More
