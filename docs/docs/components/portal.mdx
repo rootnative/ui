@@ -135,6 +135,14 @@ Two rules follow from that:
 - **`priority` orders portals within one host only.** Stacking *between* hosts follows tree position. Anything that must participate in the app-wide z-order belongs in the default host with a `PORTAL_LAYERS` priority — that is what RootNative's own Dialog, Snackbar, Menu, Tooltip, and BottomSheet do.
 - **An unmatched `hostName` falls back to the default host** rather than dropping the content. If the named host mounts later, the portal moves to it; if it unmounts, the portal moves back.
 
+The root host's name is exported as `DEFAULT_PORTAL_HOST` (the string `'default'`), so code that needs to target it explicitly — or compare against it — can import the constant instead of repeating the literal:
+
+```tsx
+import { DEFAULT_PORTAL_HOST } from '@rootnative/components/portal'
+
+<Portal hostName={DEFAULT_PORTAL_HOST}>{overlay}</Portal>
+```
+
 ## Without a host
 
 If `<Portal>` is rendered outside a `<PortalHost>`, it logs a development error and falls back to inline rendering so your screen still works. Add a `PortalHost` at the app root to silence the warning and get the overlay behavior.

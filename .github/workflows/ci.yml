@@ -39,5 +39,13 @@ jobs:
       - name: Test
         run: pnpm run test
 
+      - name: Docs check
+        run: pnpm run docs:check
+
       - name: Build
         run: pnpm run build
+
+      # Runs the snapshot script directly rather than `pnpm run api:check`,
+      # which would rebuild — the Build step above already produced `dist/`.
+      - name: API surface
+        run: npx tsx scripts/build-api-surface.ts --check
