@@ -1,5 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { useInterpolatedStyle } from '@rootnative/inertia'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import type { LayoutChangeEvent, StyleProp, TextStyle } from 'react-native'
@@ -73,9 +74,9 @@ export function Tab({
     disabled,
   })
 
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   const iconProps = useMemo(
     () => ({ size: TAB_ICON_SIZE, color: contentColor }),

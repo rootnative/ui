@@ -1,10 +1,10 @@
 import { useTheme } from '@rootnative/core'
-import { useColorTransition } from '@rootnative/inertia'
+import { useColorTransition, useInterpolatedStyle } from '@rootnative/inertia'
 import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -101,15 +101,16 @@ export function Radio({
   // (colors stay on the effects spring above). The underdamped spring
   // undershoots below 0 on deselect — clamp so scale never goes negative
   // (a negative scale renders a mirrored dot flash).
-  const animatedInnerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: Math.max(0, dotProgress.value) }],
-  }))
+  // Clamped so a spring undershoot never flips the dot inside-out.
+  const animatedInnerStyle = useInterpolatedStyle(dotProgress, {
+    scale: [0, 1],
+  })
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   // Radios are select-only: pressing an already-selected radio is a no-op —
   // deselection only happens by selecting another radio in the group.

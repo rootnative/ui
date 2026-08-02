@@ -1,5 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { useInterpolatedStyle } from '@rootnative/inertia'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
@@ -45,9 +46,9 @@ export function MenuItem({
 
   // Interop escape hatch: the focus ring rides the same keyboard-focus progress
   // the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   // Icon color derives from the item's content color, not from `labelStyle` —
   // `labelStyle` is text-only per the override contract.

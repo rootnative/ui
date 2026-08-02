@@ -1,6 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { StyleProp, TextStyle } from 'react-native'
@@ -64,9 +64,9 @@ export function NavigationItem({
     disabled,
   })
 
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   // The pill fades in while expanding from its centre, per the MD3 indicator
   // motion. Extrapolation clamps, so a spatial spring's overshoot never

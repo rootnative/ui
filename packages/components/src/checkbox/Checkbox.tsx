@@ -1,10 +1,10 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useColorTransition } from '@rootnative/inertia'
+import { useColorTransition, useInterpolatedStyle } from '@rootnative/inertia'
 import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
@@ -131,16 +131,18 @@ export function Checkbox({
   // Interop escape hatch: the mark pop rides the spatial selection spring
   // (box colors ride the effects spring above). Clamp the underdamped
   // spring's undershoot so scale never goes negative on the way out.
-  const animatedIconStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ scale: Math.max(0, progress.value) }],
-  }))
+  // `scale` clamps at 0 so a spring undershoot never flips the icon
+  // inside-out; `opacity` rides the raw progress as before.
+  const animatedIconStyle = useInterpolatedStyle(progress, {
+    opacity: [0, 1],
+    scale: [0, 1],
+  })
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   const handlePress = useCallback(() => {
     if (isDisabled) return

@@ -1,5 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { useInterpolatedStyle } from '@rootnative/inertia'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Image, Platform, Pressable, Text, View } from 'react-native'
@@ -107,9 +108,9 @@ export function Avatar({
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   const content = imageUri ? (
     <Image source={{ uri: imageUri }} style={styles.image} accessible={false} />

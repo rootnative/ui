@@ -1,6 +1,6 @@
 import { useTheme } from '@rootnative/core'
-import { useShadow } from '@rootnative/inertia'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
+import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
@@ -50,9 +50,9 @@ export function Card({
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
   const isElevated = variant === 'elevated'
   const showElevationLayer = isInteractive && isElevated && !isDisabled
