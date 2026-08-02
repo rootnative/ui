@@ -93,9 +93,13 @@ export function CircularProgress({
 
   // Under reduced motion, skip the Motion wrapper and render the arc static
   // at 0° — visually identical to the snap-to-360° the gate would produce,
-  // and it keeps the 0 ms first keyframe step (whose inline `type: 'timing'`
-  // bypasses inertia's reduced-motion override — resolveSequence's
-  // step-override-wins merge) from running a timing primitive.
+  // and cheaper, since it mounts no animated wrapper at all.
+  //
+  // This also used to be load-bearing for correctness: the 0 ms first keyframe
+  // step's inline `type: 'timing'` bypassed inertia's reduced-motion override
+  // (resolveSequence's step-override-wins merge). That bug is fixed as of
+  // @rootnative/inertia 0.0.5, so the wrapper would now be gated correctly —
+  // but this path stays because the static render is the better result.
   const shouldReduceMotion = useShouldReduceMotion()
 
   // Determinate progress, smoothly tweened to the latest prop.
