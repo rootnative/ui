@@ -1074,6 +1074,8 @@ import { Grid } from '@rootnative/components/layout'
       '- `contentColor?: string` — Override the content (label and icon) color. State-layer colors auto-derived when no `containerColor` is set.\n'
     output +=
       '- `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.\n'
+    output +=
+      '- `closeAccessibilityLabel?: string` — Default: `` `Remove ${children}` ``. Accessible name for the trailing close affordance, which is a separate a11y target from the chip itself.\n'
     output += '- Inherits `PressableProps` (except `children`)\n\n'
 
     const interfaceVariants: {

@@ -36,13 +36,24 @@ both spellings internally.
 
 The library cannot invent these.
 
-**Labels for anything icon-only.** `IconButton`, `FAB` with no label, and
-`Chip`'s trailing close affordance render a glyph and nothing else. Pass
-`accessibilityLabel`:
+**Labels for anything icon-only.** `IconButton` and `FAB` with no label render
+a glyph and nothing else. Pass `accessibilityLabel`:
 
 ```tsx
 <IconButton icon="delete" accessibilityLabel="Delete message" />
 <FAB icon="add" accessibilityLabel="New event" />
+```
+
+`Chip`'s trailing close affordance is the exception — it labels itself as
+`Remove {label}`, composing in the chip's own text, because it is a second
+accessibility target inside what looks like one control and "Remove" alone
+would not say which chip. That default is English, so localized apps should
+pass the whole string:
+
+```tsx
+<Chip variant="input" onClose={remove} closeAccessibilityLabel="Salmon entfernen">
+  Salmon
+</Chip>
 ```
 
 **Labels for bare selection controls.** `Checkbox`, `Radio` and `Switch` draw

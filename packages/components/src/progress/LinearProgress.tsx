@@ -101,6 +101,14 @@ export function LinearProgress({
   // (`translateX: width`) and sit clipped past the track's end — an empty
   // bar that no longer conveys activity. Render a static centered segment
   // instead, matching the paused-arc look of the circular variant.
+  //
+  // This is a rendering choice, not a gate workaround, and it outlived the bug
+  // that once made it load-bearing: the 0 ms first keyframe's inline
+  // `type: 'timing'` used to bypass inertia's reduced-motion override
+  // (resolveSequence's step-override-wins merge), fixed as of
+  // @rootnative/inertia 0.0.5. The gate is correct now, but a gated sequence
+  // still snaps to its last keyframe — which is the clipped, empty bar above.
+  // So this path stays. Same reasoning as CircularProgress.
   const shouldReduceMotion = useShouldReduceMotion()
   const staticSegmentStyle = useMemo(
     () => ({ left: (width - segmentWidth) / 2, width: segmentWidth }),

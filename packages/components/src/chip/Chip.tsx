@@ -49,6 +49,7 @@ type ChipImplProps = Omit<PressableProps, 'children'> & {
   containerColor?: string
   contentColor?: string
   labelStyle?: StyleProp<TextStyle>
+  closeAccessibilityLabel?: string
 }
 
 export function Chip(props: ChipProps) {
@@ -65,6 +66,7 @@ export function Chip(props: ChipProps) {
     containerColor,
     contentColor,
     labelStyle: labelStyleOverride,
+    closeAccessibilityLabel,
     disabled = false,
     ...rest
   } = props as ChipImplProps
@@ -384,7 +386,10 @@ export function Chip(props: ChipProps) {
         <AnimatedPressable
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel="Remove"
+          // Composed with the chip's label by default: this button is a second
+          // accessibility target inside what reads as one control, so a bare
+          // "Remove" gives no clue which chip is about to go.
+          accessibilityLabel={closeAccessibilityLabel ?? `Remove ${children}`}
           aria-disabled={isDisabled}
           disabled={isDisabled}
           hitSlop={12}

@@ -31,6 +31,18 @@ interface ChipCommonProps extends Omit<PressableProps, 'children' | 'style'> {
   /** Additional style applied to the label text. */
   labelStyle?: StyleProp<TextStyle>
   /**
+   * Accessible label for the trailing close affordance, when one renders.
+   *
+   * The close button is a second target inside what looks like one control, so
+   * a bare "Remove" leaves a screen-reader user with no way to tell which chip
+   * they are on. Defaults to `` `Remove ${children}` `` — the chip's own label
+   * composed in — which is also why this is a prop: that default is English,
+   * and word order does not survive translation.
+   *
+   * @default `Remove ${children}`
+   */
+  closeAccessibilityLabel?: string
+  /**
    * Style applied to the root container. Static form only — the function
    * form `(state) => style` is not supported because the component drives
    * its container background through Reanimated. Use `containerColor` /

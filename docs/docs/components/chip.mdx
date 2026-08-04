@@ -102,6 +102,8 @@ Filter chips support a `selected` state. When selected, a checkmark icon appears
 
 Pass `onClose` to show a trailing close icon. Only renders on `input` and `filter` (when selected) variants.
 
+The close icon is a separate accessibility target from the chip itself, so it names itself `Remove {label}` rather than a bare "Remove" — a screen-reader user hears which chip they are about to remove. Override the whole string with `closeAccessibilityLabel` when localizing.
+
 <SnackExample
   name="RootNative Chip — Close"
   code={`

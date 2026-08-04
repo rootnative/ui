@@ -236,6 +236,7 @@ Common props (every variant):
 - `containerColor?: string` — Override the container (background) color. State-layer colors auto-derived.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors auto-derived when no `containerColor` is set.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
+- `closeAccessibilityLabel?: string` — Default: `` `Remove ${children}` ``. Accessible name for the trailing close affordance, which is a separate a11y target from the chip itself.
 - Inherits `PressableProps` (except `children`)
 
 #### Assist (default)

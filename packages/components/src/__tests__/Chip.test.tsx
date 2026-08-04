@@ -85,7 +85,7 @@ describe('Chip', () => {
           Tag
         </Chip>,
       )
-      fireEvent.press(screen.getByLabelText('Remove'))
+      fireEvent.press(screen.getByLabelText('Remove Tag'))
       expect(onClose).toHaveBeenCalledTimes(1)
     })
 
@@ -96,8 +96,41 @@ describe('Chip', () => {
           Tag
         </Chip>,
       )
-      fireEvent.press(screen.getByLabelText('Remove'))
+      fireEvent.press(screen.getByLabelText('Remove Tag'))
       expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('composes the chip label into the close button name by default', () => {
+      // The close button is a second a11y target inside one visual control, so
+      // a bare "Remove" would not say which chip a screen-reader user is on.
+      renderWithTheme(
+        <>
+          <Chip variant="input" onClose={jest.fn()}>
+            Salmon
+          </Chip>
+          <Chip variant="input" onClose={jest.fn()}>
+            Tuna
+          </Chip>
+        </>,
+      )
+      expect(screen.getByLabelText('Remove Salmon')).toBeTruthy()
+      expect(screen.getByLabelText('Remove Tuna')).toBeTruthy()
+    })
+
+    it('lets closeAccessibilityLabel override the composed default', () => {
+      // Word order does not survive translation, so the default is only a
+      // default — a localized app supplies the whole string.
+      renderWithTheme(
+        <Chip
+          variant="input"
+          onClose={jest.fn()}
+          closeAccessibilityLabel="Salmon entfernen"
+        >
+          Salmon
+        </Chip>,
+      )
+      expect(screen.getByLabelText('Salmon entfernen')).toBeTruthy()
+      expect(screen.queryByLabelText('Remove Salmon')).toBeNull()
     })
 
     it('exposes the close target as a sibling of the chip pressable, not a child', () => {
@@ -108,7 +141,7 @@ describe('Chip', () => {
         </Chip>,
       )
       const chip = screen.getByRole('button', { name: 'Tag' })
-      const close = screen.getByLabelText('Remove')
+      const close = screen.getByLabelText('Remove Tag')
       const isDescendant = (
         node: { parent: unknown } | null,
         ancestor: unknown,
