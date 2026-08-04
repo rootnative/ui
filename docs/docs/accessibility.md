@@ -159,11 +159,24 @@ component collapses to a hard cut when the OS setting is on.
 Stated rather than implied, because they affect what you can promise your own
 users:
 
-- **Native modal containment is unverified.** `Dialog` and the modal
-  `BottomSheet` set `accessibilityViewIsModal`, but iOS applies that flag
-  relative to a view's *siblings*, and a portal surface's siblings are other
-  portal layers rather than your app content. Whether VoiceOver can reach
-  behind an open dialog on iOS has not been confirmed on a device.
+- **Native modal containment does not work.** `Dialog` and the modal
+  `BottomSheet` set `accessibilityViewIsModal`, but the flag hides the flagged
+  view's *siblings*, and a portal surface's siblings are other portal layers —
+  your app content sits one level up, as a sibling of the portal outlet, out of
+  the flag's reach. A screen reader can therefore swipe past an open dialog
+  into the content behind it on iOS and Android. Web is unaffected: focus
+  containment there is real, and does not depend on this flag.
+
+  Fixing it means the portal *host* owning the flag rather than the surface,
+  which is a structural change we have not made. If your app depends on
+  containment today, the workaround is to mark your own content branch
+  `importantForAccessibility="no-hide-descendants"` (Android) /
+  `accessibilityElementsHidden` (iOS) while a modal surface is open.
+- **Nothing restores the screen-reader cursor on native.** Closing a `Dialog`,
+  `Menu` or modal `BottomSheet` returns *keyboard* focus on web, but the native
+  reader cursor is not moved back to the control that opened the surface — it
+  falls back to wherever the platform puts it, usually the top of the screen.
+  On web, focus return works as described above.
 - **`Menu` is deliberately not marked modal on native.** Marking the surface
   modal removes its siblings from the accessibility tree, and the dismiss
   region behind the menu is a sibling — it is the only exit a screen-reader
@@ -174,3 +187,14 @@ users:
   a single tab stop.
 - **RTL has not been swept.** Everything routes through `selectRTL`, but no
   platform pass has been run against a right-to-left locale.
+
+The first two are pinned as failing tests in
+`packages/components/src/__tests__/screen-reader-native.test.tsx`, so they are
+tracked rather than merely known. Both are implementation gaps behind a settled
+API — closing them needs no change to any prop, so neither is a breaking
+change to fix.
+
+Beyond these, the library's screen-reader behaviour is verified by source audit
+and by DOM-level tests on web. A full VoiceOver and TalkBack pass over the
+component catalog has not been run, so announcement wording and traversal order
+on native are less thoroughly checked than the roles and labels themselves.
