@@ -6,6 +6,7 @@ import { detectProject, getInstallCommand } from '../lib/detector'
 import { ensureLlmDocsPointer } from '../lib/llm-docs'
 import { createSpinner, logger } from '../lib/logger'
 import { resolveRegistryVersion } from '../lib/registry-version'
+import { ensureTsconfigPaths } from '../lib/tsconfig-paths'
 import type { RootNativeConfig, PackageManager } from '../lib/types'
 
 export interface InitOptions {
@@ -112,12 +113,12 @@ export async function initCommand(
 
   // Pin the project to a release tag rather than trunk, so `add` / `update`
   // pull reproducible component source. Falls back to `main` off-network.
-  const registryVersion = await resolveRegistryVersion()
+  const registry = await resolveRegistryVersion()
 
   // Write config
   const config: RootNativeConfig = {
     ...DEFAULT_CONFIG,
-    registryVersion,
+    registryVersion: registry.version,
     aliases: {
       components: componentsAlias,
       lib: libAlias,
@@ -126,6 +127,46 @@ export async function initCommand(
 
   await writeConfig(cwd, config)
   logger.success('Created rootnative.json')
+
+  // Never let the pin degrade to trunk quietly. `add` copies component source
+  // from this ref, and trunk can use `@rootnative/core` APIs the installed
+  // release does not export yet — which reads to the user as broken generated
+  // code with no cause in sight.
+  if (registry.fallback) {
+    logger.break()
+
+    if (registry.fallback.reason === 'tag-missing') {
+      logger.warn(
+        `Could not pin the registry to v${registry.fallback.version}; using "main".`,
+      )
+      logger.warn(
+        'Copied component source may not match your installed packages.',
+      )
+    } else {
+      logger.warn('Could not reach npm to pin the registry; using "main".')
+      logger.warn(
+        'Copied component source will come from the development branch.',
+      )
+    }
+
+    logger.break()
+  }
+
+  // `add` rewrites imports to the alias above, but nothing used to write the
+  // matching tsconfig mapping — so an Expo project from `create`, which
+  // declares no `paths`, could not resolve a single generated import.
+  const tsconfigPatch = await ensureTsconfigPaths(cwd, componentsAlias)
+
+  if (tsconfigPatch.status === 'added') {
+    logger.success(
+      `Added "${tsconfigPatch.prefix}/*" path alias to tsconfig.json`,
+    )
+  } else if (tsconfigPatch.status === 'failed') {
+    logger.warn(`Could not update tsconfig.json: ${tsconfigPatch.error}`)
+    logger.info(
+      `Add a "paths" mapping for "${componentsAlias.split('/')[0]}/*" by hand.`,
+    )
+  }
 
   // Point AI agents at the LLM docs via CLAUDE.md
   let addLlmDocs = options.yes

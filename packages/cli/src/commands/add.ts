@@ -11,6 +11,7 @@ import type { PackageManager } from '../lib/types'
 interface AddOptions {
   force: boolean
   dryRun: boolean
+  yes?: boolean
   packageManager?: PackageManager
 }
 
@@ -88,17 +89,20 @@ export async function addCommand(
     return
   }
 
-  // Confirm
-  const { proceed } = await prompts({
-    type: 'confirm',
-    name: 'proceed',
-    message: 'Proceed with installation?',
-    initial: true,
-  })
+  // Confirm. `create` and `init` both take `--yes`; without it here, scripted
+  // use had to pipe `yes` into the process.
+  if (!options.yes) {
+    const { proceed } = await prompts({
+      type: 'confirm',
+      name: 'proceed',
+      message: 'Proceed with installation?',
+      initial: true,
+    })
 
-  if (!proceed) {
-    logger.info('Cancelled.')
-    return
+    if (!proceed) {
+      logger.info('Cancelled.')
+      return
+    }
   }
 
   // Detect package manager

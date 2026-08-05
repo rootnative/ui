@@ -168,6 +168,25 @@ jobs:
 
           echo "tag=$TAG" >> "$GITHUB_ENV"
 
+          # The CLI reads the component registry and the `create` templates from
+          # a `v<version>` ref, which the descriptive tag above does not provide.
+          # Without it `resolveRegistryVersion` 404s on its probe and silently
+          # pins every new project to `main`, so `rootnative add` copies trunk
+          # source against released packages and the result does not compile.
+          # Only tag when core is part of this release — that is the package
+          # whose `dist-tags.latest` the CLI resolves the version from.
+          case " ${{ steps.packages.outputs.packages }} " in
+            *" core "*)
+              VERSION_TAG="v${{ steps.version.outputs.version }}"
+              if git rev-parse -q --verify "refs/tags/$VERSION_TAG" >/dev/null; then
+                echo "::error::$VERSION_TAG already exists; refusing to move it."
+                exit 1
+              fi
+              git tag "$VERSION_TAG"
+              echo "version_tag=$VERSION_TAG" >> "$GITHUB_ENV"
+              ;;
+          esac
+
       - name: Publish packages
         run: |
           # Publish core first if included (other packages may depend on it)
@@ -191,3 +210,9 @@ jobs:
         run: |
           git push origin main
           git push origin "${{ env.tag }}"
+
+          # The ref the CLI resolves registry + templates from. Empty when this
+          # release did not include core.
+          if [ -n "${{ env.version_tag }}" ]; then
+            git push origin "${{ env.version_tag }}"
+          fi

@@ -175,6 +175,32 @@ describe('detector', () => {
       expect(info.aliases).toEqual({ '@': 'src' })
     })
 
+    it('detects aliases in a tsconfig that also has comments and globs', async () => {
+      // The comment stripper used to be a regex, which read the `/*` inside a
+      // glob like `"**/*.ts"` as a block-comment opener and deleted through to
+      // the next `*/`. With `paths` ahead of `include` — the order `init` now
+      // writes — that spans the paths block and leaves invalid JSON, so
+      // `detectAliases` swallowed the parse error and reported no aliases at
+      // all. An Expo tsconfig has both a comment and a glob.
+      await fs.writeJSON(path.join(tmpDir, 'package.json'), {
+        dependencies: { expo: '~54.0.0' },
+      })
+      await fs.writeFile(
+        path.join(tmpDir, 'tsconfig.json'),
+        `{
+  // https://docs.expo.dev/guides/typescript/
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}`,
+      )
+
+      const info = await detectProject(tmpDir)
+      expect(info.aliases).toEqual({ '@': 'src' })
+    })
+
     it('detects src directory', async () => {
       await fs.writeJSON(path.join(tmpDir, 'package.json'), {
         dependencies: { expo: '~54.0.0' },

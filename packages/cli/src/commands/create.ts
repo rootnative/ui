@@ -21,6 +21,17 @@ interface TemplateSource {
 }
 
 const NPM_REGISTRY = 'https://registry.npmjs.org'
+/**
+ * Packages that version together with the release being scaffolded, so they can
+ * all be pinned to the single `pinnedVersion` resolved from npm.
+ *
+ * `@rootnative/inertia` is deliberately NOT in this list. It versions on its own
+ * ladder — `0.0.5` while core is on `0.0.0-alpha.4` — so pinning it to the core
+ * version would ask npm for a release that does not exist. The templates pin it
+ * directly instead, and that pin has to satisfy the `@rootnative/inertia` peer
+ * range in `packages/components/package.json`. Bumping inertia is the multi-file
+ * checklist in CLAUDE.md; the template pins are part of it.
+ */
 const ROOTNATIVE_PACKAGES = ['@rootnative/core', '@rootnative/components']
 
 /**

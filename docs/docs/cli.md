@@ -45,10 +45,11 @@ The CLI will:
 3. Read path aliases from your `tsconfig.json` to seed the defaults
 4. Ask where to place components and utility files
 5. Create an `rootnative.json` config file, pinned to the current release tag
-6. Offer to point AI agents at the [LLM docs](./llms) from your `CLAUDE.md`
-7. Offer to install `@rootnative/core`
+6. Add a `paths` mapping to your `tsconfig.json` when your alias prefix has none
+7. Offer to point AI agents at the [LLM docs](./llms) from your `CLAUDE.md`
+8. Offer to install `@rootnative/core`
 
-Steps 6 and 7 are confirmation prompts; `-y` accepts both.
+Steps 7 and 8 are confirmation prompts; `-y` accepts both.
 
 ### 2. Add components
 
@@ -115,6 +116,20 @@ If `rootnative.json` already exists, you'll be asked whether to overwrite it.
 | `--lib-alias <alias>` | Utility files path alias (e.g. `@/lib`) |
 | `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
+**What `init` writes:**
+
+1. `rootnative.json` — your aliases, plus a `registryVersion` pinned to the release tag
+   that matches the latest published `@rootnative/core`.
+2. A `paths` mapping in `tsconfig.json` for your alias prefix, when one is not already
+   there. `add` rewrites every generated import to that alias, so without the mapping
+   TypeScript cannot resolve any of them. An existing mapping is never overwritten.
+3. A pointer to the LLM docs in `CLAUDE.md`, if you accept the prompt.
+
+If `init` cannot pin `registryVersion` to a release tag — npm unreachable, or the tag is
+not pushed yet — it warns and falls back to `main`. Take that warning seriously: `main` is
+the development branch, and component source copied from it can use `@rootnative/core`
+APIs that your installed release does not export yet.
+
 ### `add`
 
 Add one or more components to your project.
@@ -131,6 +146,7 @@ npx rootnative add appbar
 
 | Flag | Description |
 |------|-------------|
+| `-y`, `--yes` | Skip prompts and use defaults |
 | `--force`, `-f` | Overwrite existing component files |
 | `--dry-run`, `-d` | Preview what would be installed without writing any files |
 | `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
@@ -214,17 +230,19 @@ Checks performed:
 
 | Check | Description | On failure |
 |-------|-------------|------------|
-| Config | `rootnative.json` exists — everything below is skipped without it | fail |
+| Config | `rootnative.json` exists. Missing is not an error — a project that uses the published packages never needs one | info |
 | Project type | An Expo or bare React Native project was detected | fail |
 | React Native | `react-native` is present in your dependencies (the version is reported, not enforced) | fail |
 | Core package | `@rootnative/core` is installed | fail |
 | TypeScript | `tsconfig.json` present | warn |
-| Component integrity | Every installed component directory has an `index.ts` | warn |
-| Utility barrel | `rootnative-utils.ts` exists | warn |
+| Component integrity | Every installed component directory has an `index.ts`. Skipped without a config | warn |
+| Utility barrel | `rootnative-utils.ts` exists. Skipped without a config | warn |
 | Animation engine | `@rootnative/inertia` is installed — every animated component imports it | fail |
+| Required peers | `react-native-svg` is installed — the `@rootnative/components` barrel requires it at load time | fail |
 | Optional peers | `react-native-safe-area-context` and `@expo/vector-icons` status | warn |
 
-Only `fail` rows count toward the issue total in the summary line.
+Only `fail` rows count toward the issue total in the summary line. `info` rows never do,
+so `doctor` runs and exits zero on a project straight out of `create`.
 
 ## Configuration
 

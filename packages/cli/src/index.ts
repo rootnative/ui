@@ -71,6 +71,7 @@ program
   .command('add')
   .description('Add components to your project')
   .argument('<components...>', 'Component names to add')
+  .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('-f, --force', 'Overwrite existing components', false)
   .option(
     '-d, --dry-run',
@@ -89,6 +90,7 @@ program
       await addCommand(components, process.cwd(), {
         force: options.force,
         dryRun: options.dryRun,
+        yes: options.yes,
         packageManager: options.packageManager,
       })
     } catch (error) {

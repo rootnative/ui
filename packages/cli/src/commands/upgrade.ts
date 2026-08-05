@@ -133,10 +133,20 @@ async function repinRegistryVersion(cwd: string): Promise<void> {
   const config = await readConfig(cwd)
   const next = await resolveRegistryVersion()
 
-  if (config.registryVersion === next) return
+  // A failed resolve returns `main`, which would move a correctly pinned
+  // project backwards onto trunk just because npm was slow. Keep the pin and
+  // say why instead — `upgrade` is not the place to lose reproducibility.
+  if (next.fallback && config.registryVersion !== 'main') {
+    logger.warn(
+      `Kept the registry pinned to ${chalk.bold(config.registryVersion)} — could not resolve a newer release tag.`,
+    )
+    return
+  }
 
-  await writeConfig(cwd, { ...config, registryVersion: next })
-  logger.success(`Registry pinned to ${chalk.bold(next)}`)
+  if (config.registryVersion === next.version) return
+
+  await writeConfig(cwd, { ...config, registryVersion: next.version })
+  logger.success(`Registry pinned to ${chalk.bold(next.version)}`)
 }
 
 export async function upgradeCommand(

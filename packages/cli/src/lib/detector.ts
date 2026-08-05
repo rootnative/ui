@@ -1,5 +1,6 @@
 import path from 'node:path'
 import fs from 'fs-extra'
+import { stripJsonComments } from './tsconfig-paths'
 import type { PackageManager, ProjectInfo, ProjectType } from './types'
 
 async function detectProjectType(cwd: string): Promise<ProjectType> {
@@ -73,12 +74,10 @@ async function detectAliases(
 
   try {
     const raw = await fs.readFile(tsconfigPath, 'utf-8')
-    // Strip comments (tsconfig allows them)
-    const stripped = raw.replace(
-      /\/\*[\s\S]*?\*\/|\/\/.*/g,
-      '',
-    )
-    const tsconfig = JSON.parse(stripped)
+    // Strip comments (tsconfig allows them). Shared with the patcher in
+    // `tsconfig-paths.ts` — it has to be string-aware, or the `/*` inside a
+    // glob like `"**/*.ts"` reads as a comment opener.
+    const tsconfig = JSON.parse(stripJsonComments(raw))
     const paths = tsconfig.compilerOptions?.paths
 
     if (!paths) {

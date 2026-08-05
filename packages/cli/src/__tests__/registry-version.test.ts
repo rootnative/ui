@@ -33,7 +33,9 @@ describe('resolveRegistryVersion', () => {
       .mockResolvedValueOnce(npmOk('1.2.3'))
       .mockResolvedValueOnce({ ok: true })
 
-    await expect(resolveRegistryVersion()).resolves.toBe('v1.2.3')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'v1.2.3',
+    })
   })
 
   it('probes the registry index at that tag, not just the tag', async () => {
@@ -55,22 +57,61 @@ describe('resolveRegistryVersion', () => {
       .mockResolvedValueOnce(npmOk('1.2.3'))
       .mockResolvedValueOnce({ ok: false, status: 404 })
 
-    await expect(resolveRegistryVersion()).resolves.toBe('main')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'main',
+      fallback: { reason: 'tag-missing', version: '1.2.3' },
+    })
+  })
+
+  it('names the version it wanted, so the warning can be acted on', async () => {
+    // This is the alpha.4 failure. The user needs to know a *specific* release
+    // tag is missing — that is the difference between "someone forgot to push
+    // a tag" and an unactionable "using main".
+    fetchMock
+      .mockResolvedValueOnce(npmOk('0.0.0-alpha.4'))
+      .mockResolvedValueOnce({ ok: false, status: 404 })
+
+    const result = await resolveRegistryVersion()
+
+    expect(result.fallback).toEqual({
+      reason: 'tag-missing',
+      version: '0.0.0-alpha.4',
+    })
   })
 
   it('falls back to main when npm is unreachable', async () => {
     fetchMock.mockRejectedValueOnce(new Error('ENOTFOUND'))
-    await expect(resolveRegistryVersion()).resolves.toBe('main')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'main',
+      fallback: { reason: 'npm-unreachable' },
+    })
   })
 
   it('falls back to main when npm responds non-ok', async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 500 })
-    await expect(resolveRegistryVersion()).resolves.toBe('main')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'main',
+      fallback: { reason: 'npm-unreachable' },
+    })
   })
 
   it('falls back to main when dist-tags has no latest', async () => {
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({}) })
-    await expect(resolveRegistryVersion()).resolves.toBe('main')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'main',
+      fallback: { reason: 'no-latest-tag' },
+    })
+  })
+
+  it('reports no fallback when the pin succeeds', async () => {
+    // The guard that keeps the warning from firing on every healthy init.
+    fetchMock
+      .mockResolvedValueOnce(npmOk('1.2.3'))
+      .mockResolvedValueOnce({ ok: true })
+
+    const result = await resolveRegistryVersion()
+
+    expect(result.fallback).toBeUndefined()
   })
 
   it('handles prerelease versions, which is what ships today', async () => {
@@ -78,6 +119,8 @@ describe('resolveRegistryVersion', () => {
       .mockResolvedValueOnce(npmOk('0.0.0-alpha.4'))
       .mockResolvedValueOnce({ ok: true })
 
-    await expect(resolveRegistryVersion()).resolves.toBe('v0.0.0-alpha.4')
+    await expect(resolveRegistryVersion()).resolves.toEqual({
+      version: 'v0.0.0-alpha.4',
+    })
   })
 })
