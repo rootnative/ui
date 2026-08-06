@@ -14,6 +14,13 @@
  * catch: the shadow lives on a node that does not clip, and native gets the
  * `shadow*` surface only — never `boxShadow` alongside it, which paints two
  * shadows on the new architecture. The CSS side is in `web/elevation.web.test.tsx`.
+ *
+ * The invariant is "a clipped node must not carry a clipped shadow surface", and
+ * there are two ways to satisfy it. Four components move the shadow onto an
+ * unclipped carrier. The non-interactive elevated Card cannot — a carrier needs a
+ * wrapper above the root, which relocates consumer `style` — so it changes
+ * surface instead: on iOS it trades `shadow*` for `boxShadow`, which Fabric
+ * deliberately paints outside the clip. Its own block below asserts that shape.
  */
 import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
@@ -100,29 +107,91 @@ describe.each(CASES)('$name elevation', ({ ui, rest }) => {
   })
 })
 
-// The non-interactive elevated Card is the one surface that still breaks the
-// rule above, and it is a known open bug rather than an oversight: without
-// `onPress` the component returns a bare `View` carrying both the level-1
-// shadow AND `overflow: 'hidden'`, so the shadow renders on web and is clipped
-// away on iOS. `it.failing` pins it — the assertion below is what *should*
-// hold, and the day Card grows a carrier for this path this test starts failing
-// as "passed unexpectedly", which is the reminder to drop the marker.
+// The non-interactive elevated Card satisfies the same invariant by swapping the
+// shadow *surface* instead of moving the shadow to another node, and that choice
+// is what these tests pin. It has no carrier, because a carrier is an
+// absolutely-positioned sibling and so needs a wrapper View above the container
+// — which would make the wrapper the node the parent lays out and silently stop
+// `<Card style={{ flex: 1 }}>` from stretching. Moving the clip to an inner view
+// instead would push children one level down and break `flexDirection` /
+// `alignItems` / `gap` passed through `style`.
 //
-// Not fixed here because the fix is structural: the carrier needs a wrapper
-// View above the container (what the interactive path already does), and that
-// moves `style`'s layout props one level down the tree — a `<Card style={{ flex:
-// 1 }}>` that stretches today would stop. That needs a device pass on iOS, not
-// just a green suite.
-describe('non-interactive elevated Card (known iOS bug)', () => {
-  it.failing('paints its shadow on a node that does not clip', () => {
+// So on iOS the container keeps its clip and its single node, and trades
+// `shadow*` for `boxShadow`: when a view clips *and* declares `boxShadow`,
+// Fabric moves the subviews into a container view of its own and paints the
+// shadow as unclipped overflow ink (`RCTViewComponentView.mm`,
+// `styleWouldClipOverflowInk`). This was the `it.failing` case until 2026-08-06.
+//
+// These run as `Platform.OS === 'ios'` (the react-native preset's default), so
+// the branch under test is the real one.
+describe('non-interactive elevated Card', () => {
+  const level1 = lightTheme.elevation.level1
+  // Rebuilt from the token rather than imported, so a format change in the
+  // builder has to be acknowledged here too.
+  const expectedInk =
+    `${level1.shadowOffset.width}px ${level1.shadowOffset.height}px ` +
+    `${level1.shadowRadius}px rgba(0, 0, 0, ${level1.shadowOpacity})`
+
+  function root() {
     renderWithTheme(
-      <Card>
+      <Card testID="card">
         <Text>Body</Text>
       </Card>,
     )
-    const layers = shadowed()
-    expect(layers).toHaveLength(1)
-    expect(layers[0].overflow).not.toBe('hidden')
+    return StyleSheet.flatten(screen.getByTestId('card').props.style) as Style
+  }
+
+  it('paints its MD3 level-1 shadow as overflow ink', () => {
+    expect(root().boxShadow).toBe(expectedInk)
+  })
+
+  it('drops the clipped shadow* surface, so the node never carries both', () => {
+    expect(root().shadowOpacity).toBe(0)
+    expect(shadowed()).toHaveLength(0)
+  })
+
+  it('still clips, which is the whole reason the surface had to change', () => {
+    expect(root().overflow).toBe('hidden')
+  })
+
+  // The structural promise: the node the consumer styles is the node that
+  // paints. No wrapper above it and no clip view below it, so every layout prop
+  // passed through `style` keeps behaving as it did before the fix.
+  it('keeps the shadow on the same single node consumer style lands on', () => {
+    renderWithTheme(
+      <Card testID="card">
+        <Text>Body</Text>
+      </Card>,
+    )
+    const inked = styles(screen.toJSON()).filter(
+      (style) => style.boxShadow !== undefined && style.boxShadow !== 'none',
+    )
+    // Exactly one inked node, and it is the consumer-styled root — `flatten`
+    // returns a fresh object per call, so this compares by value.
+    expect(inked).toHaveLength(1)
+    expect(inked[0]).toEqual(
+      StyleSheet.flatten(screen.getByTestId('card').props.style),
+    )
+  })
+})
+
+// The surface swap is scoped to the variant that actually has a shadow. A
+// non-elevated non-interactive Card must not pick up overflow ink — pinned
+// because a blanket version would put a `boxShadow` on every Card.
+describe.each([
+  { variant: 'filled' as const },
+  { variant: 'outlined' as const },
+])('non-interactive $variant Card', ({ variant }) => {
+  it('paints no shadow on either surface', () => {
+    renderWithTheme(
+      <Card variant={variant} testID="card">
+        <Text>Body</Text>
+      </Card>,
+    )
+    const root = StyleSheet.flatten(screen.getByTestId('card').props.style)
+    expect(shadowed()).toHaveLength(0)
+    expect(root.boxShadow).toBeUndefined()
+    expect(root.overflow).toBe('hidden')
   })
 })
 

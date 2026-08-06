@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
+import { elevationBoxShadow } from '../internal/elevationShadow'
 import type { CardVariant } from './types'
 
 export const CARD_FOCUS_RING_OFFSET = 2
@@ -186,6 +187,30 @@ export function createStyles(
     interactiveContainer: {
       cursor: 'pointer',
     },
+    // iOS-only rescue for the non-interactive elevated Card, which has no
+    // carrier and so carries its own shadow on the clipping container.
+    //
+    // iOS paints a clipping view's own `shadow*` inside the clip, which left
+    // that card flat. The CSS `boxShadow` surface does not have the problem:
+    // when a view clips *and* declares `boxShadow`, Fabric moves its subviews
+    // into a separate container view and paints the shadow as unclipped
+    // "overflow ink". So iOS swaps the shadow *surface* instead of
+    // restructuring the tree — no wrapper above the container, no inner clip
+    // view, so consumer `style` keeps landing on the one node it always did and
+    // every layout prop on it (`flex`, `flexDirection`, `gap`) behaves
+    // unchanged. Both structural alternatives break one of those; see Card.tsx.
+    //
+    // `shadowOpacity: 0` drops the clipped surface, so the node never carries
+    // two shadow systems. Android needs nothing (the parent draws the
+    // `elevation` shadow from the child's outline) and web already gets
+    // `boxShadow` from `elevationStyle`.
+    overflowInkElevation:
+      Platform.OS === 'ios'
+        ? {
+            shadowOpacity: 0,
+            boxShadow: elevationBoxShadow(theme.elevation.level1),
+          }
+        : {},
     // Container shadow is zeroed when the elevation carrier below owns the
     // elevation (interactive elevated cards).
     elevationDelegated: {

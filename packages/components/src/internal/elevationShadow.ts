@@ -19,17 +19,32 @@ import { Platform } from 'react-native'
  * layers; paired against a real level it pads with an invisible layer and
  * fades in, CSS-transition style.
  */
+/**
+ * One elevation level as a CSS `box-shadow` string.
+ *
+ * Shared by the web branch below and by the non-interactive elevated Card,
+ * which needs this surface on **iOS** as well: iOS paints a clipping view's own
+ * `shadow*` inside the clip, but when a view clips *and* declares `boxShadow`,
+ * Fabric moves its subviews into a separate container view and paints the
+ * shadow as unclipped "overflow ink" (`RCTViewComponentView.mm`,
+ * `styleWouldClipOverflowInk` → `currentContainerView`). That makes the surface
+ * swap a complete fix with no change to the view tree.
+ *
+ * New-architecture only, which RN 0.81 defaults to. On old arch `RCTView.m`
+ * renders neither, so such a node stays flat — no worse than the `shadow*` it
+ * replaces, which was already clipped away there.
+ */
+export function elevationBoxShadow(level: ElevationLevel): string {
+  const { shadowOffset, shadowOpacity, shadowRadius } = level
+
+  if (shadowOpacity === 0) return 'none'
+
+  return `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(0, 0, 0, ${shadowOpacity})`
+}
+
 export function elevationShadowConfig(level: ElevationLevel): ShadowConfig {
   if (Platform.OS === 'web') {
-    const { shadowOffset, shadowOpacity, shadowRadius } = level
-
-    if (shadowOpacity === 0) {
-      return { boxShadow: 'none' }
-    }
-
-    return {
-      boxShadow: `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(0, 0, 0, ${shadowOpacity})`,
-    }
+    return { boxShadow: elevationBoxShadow(level) }
   }
 
   return {

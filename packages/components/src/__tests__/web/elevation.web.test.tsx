@@ -40,6 +40,34 @@ it('renders the interactive elevated Card shadow as a CSS box-shadow', () => {
   expect(shadows[0]).toMatch(/^0px 1px 2px 0px rgba\(0, 0, 0, 0\.16\d*\)$/)
 })
 
+// The non-interactive path has no carrier — it keeps the shadow on the
+// container and moves the clip to an inner view instead. Web never had the iOS
+// clipping bug, so this asserts the fix did not cost the shadow on the platform
+// where it always worked.
+//
+// It needs a different reader, and the difference is an RNW translation fact
+// worth having written down: a carrier's shadow comes from `useShadow`, so it is
+// a *dynamic* style and RNW leaves it inline, where `boxShadows` above finds it.
+// This one comes from `StyleSheet.create`, which RNW compiles into an atomic CSS
+// class — `node.style.boxShadow` is empty and only the computed style resolves
+// it. Reading inline here would have reported a missing shadow on a card that
+// paints one perfectly well.
+it('renders the non-interactive elevated Card shadow as a CSS box-shadow', () => {
+  const { container } = renderWeb(
+    <Card>
+      <Text>Elevated</Text>
+    </Card>,
+  )
+
+  const computed = Array.from(container.querySelectorAll<HTMLElement>('*'))
+    .map((node) => getComputedStyle(node).boxShadow)
+    .filter((value) => value !== '' && value !== 'none')
+
+  // The class-based form carries three lengths (no explicit spread), unlike the
+  // inline form the carrier emits.
+  expect(computed).toEqual(['0px 1px 2px rgba(0, 0, 0, 0.16)'])
+})
+
 it('does not paint a shadow for a filled Card', () => {
   const { container } = renderWeb(
     <Card onPress={() => {}} variant="filled">

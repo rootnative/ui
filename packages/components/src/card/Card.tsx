@@ -75,8 +75,30 @@ export function Card({
   })
 
   if (!isInteractive) {
+    // An elevated Card without `onPress` keeps its shadow on this node, because
+    // neither structural alternative is free. A carrier is an
+    // absolutely-positioned *sibling*, so it needs a wrapper View above the
+    // container — and that makes the wrapper the node the parent lays out, so
+    // `<Card style={{ flex: 1 }}>` silently stops stretching (the docs homepage
+    // grid relies on exactly that; the interactive path already has the
+    // limitation). Moving the clip to an inner view instead puts the children
+    // one level down, which breaks `flexDirection` / `alignItems` / `gap`
+    // passed through `style` — the common media-plus-text card.
+    //
+    // So the surface changes instead of the tree: on iOS the container swaps
+    // `shadow*` for `boxShadow` (`styles.overflowInkElevation`), which Fabric
+    // renders *outside* the clip by moving the subviews into a container view
+    // of its own. One node, `style` still lands on it, every layout prop
+    // unchanged. New-arch only, and old arch was already flat here.
     return (
-      <View {...props} style={[styles.container, style]}>
+      <View
+        {...props}
+        style={[
+          styles.container,
+          isElevated ? styles.overflowInkElevation : undefined,
+          style,
+        ]}
+      >
         {children}
       </View>
     )
