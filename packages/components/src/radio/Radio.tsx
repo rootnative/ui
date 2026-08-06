@@ -4,7 +4,7 @@ import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
-import { Animated } from '@rootnative/inertia/reanimated'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -98,13 +98,23 @@ export function Radio({
   )
 
   // Interop escape hatch: the dot pop rides its own fast-spatial spring
-  // (colors stay on the effects spring above). The underdamped spring
-  // undershoots below 0 on deselect — clamp so scale never goes negative
-  // (a negative scale renders a mirrored dot flash).
-  // Clamped so a spring undershoot never flips the dot inside-out.
-  const animatedInnerStyle = useInterpolatedStyle(dotProgress, {
-    scale: [0, 1],
-  })
+  // (colors stay on the effects spring above). The clamp is deliberately
+  // one-sided — `Math.max`, not an interpolation:
+  //
+  // - Below 0 the spring must be clamped. It undershoots on deselect, and a
+  //   negative scale renders a mirrored dot flash.
+  // - Above 1 it must NOT be. `spring-fast-spatial` is underdamped by design
+  //   (ζ ≈ 0.60) and overshoots to ~1.09; that overshoot *is* the pop this
+  //   spring was chosen for. Clamping it flattens the selection into a plain
+  //   ease and loses the MD3 Expressive character.
+  //
+  // `useInterpolatedStyle` cannot express this: its `extrapolate` option
+  // applies one mode to both ends, so `scale: [0, 1]` clamps the overshoot
+  // away too. Hence the hand-rolled worklet, per the CLAUDE.md rule that keeps
+  // one when `useInterpolatedStyle` has no way to say it.
+  const animatedInnerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: Math.max(0, dotProgress.value) }],
+  }))
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.

@@ -4,7 +4,7 @@ import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
-import { Animated } from '@rootnative/inertia/reanimated'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
@@ -129,14 +129,23 @@ export function Checkbox({
   )
 
   // Interop escape hatch: the mark pop rides the spatial selection spring
-  // (box colors ride the effects spring above). Clamp the underdamped
-  // spring's undershoot so scale never goes negative on the way out.
-  // `scale` clamps at 0 so a spring undershoot never flips the icon
-  // inside-out; `opacity` rides the raw progress as before.
-  const animatedIconStyle = useInterpolatedStyle(progress, {
-    opacity: [0, 1],
-    scale: [0, 1],
-  })
+  // (box colors ride the effects spring above). The clamp is deliberately
+  // one-sided — `Math.max`, not an interpolation:
+  //
+  // - Below 0 the spring must be clamped. It undershoots on deselect, and a
+  //   negative scale flips the mark inside-out.
+  // - Above 1 it must NOT be. `spring-default-spatial` is underdamped by
+  //   design (ζ ≈ 0.80) and overshoots past its target; that overshoot is the
+  //   mark's pop. Clamping it flattens the selection into a plain ease.
+  //
+  // `useInterpolatedStyle` cannot express this: its `extrapolate` option
+  // applies one mode to both ends, so `scale: [0, 1]` clamps the overshoot
+  // away too. Hence the hand-rolled worklet, per the CLAUDE.md rule that keeps
+  // one when `useInterpolatedStyle` has no way to say it.
+  const animatedIconStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ scale: Math.max(0, progress.value) }],
+  }))
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
