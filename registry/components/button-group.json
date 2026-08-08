@@ -5,7 +5,8 @@
     "packages/components/src/button-group/ButtonGroup.tsx",
     "packages/components/src/button-group/index.ts",
     "packages/components/src/button-group/styles.ts",
-    "packages/components/src/button-group/types.ts"
+    "packages/components/src/button-group/types.ts",
+    "packages/components/src/internal/touchTarget.ts"
   ],
   "utils": ["color", "pressable", "render-icon"],
   "componentDependencies": [],

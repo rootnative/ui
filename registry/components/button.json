@@ -7,6 +7,7 @@
     "packages/components/src/button/styles.ts",
     "packages/components/src/button/types.ts",
     "packages/components/src/internal/elevationShadow.ts",
+    "packages/components/src/internal/touchTarget.ts",
     "packages/components/src/internal/usePressMorph.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],

@@ -7,6 +7,7 @@ import {
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, View } from 'react-native'
+import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -61,12 +62,6 @@ function getIconColor(
   return theme.colors.onSurfaceVariant
 }
 
-// Extra touch-target padding (via hitSlop) to reach the WCAG/MD3 48dp
-// minimum on the smaller sizes, per side.
-function getDefaultHitSlop(height: number): number {
-  return Math.max(0, Math.round((48 - height) / 2))
-}
-
 export function IconButton({
   icon,
   selectedIcon,
@@ -104,6 +99,22 @@ export function IconButton({
     isToggle && isSelected && selectedIcon ? selectedIcon : icon
   const iconPixelSize = sizeTokens.iconSize
   const containerWidth = getIconButtonWidth(size, width)
+
+  // Per axis, because the container is not square: `narrow` at `xs` is 28dp
+  // wide and 32dp tall, so one shared value taken from the height would leave
+  // the width at 44dp — still under the 48dp floor. Collapses to a plain
+  // number when both axes agree, which is the common `uniform` case.
+  const defaultHitSlop = useMemo(() => {
+    const vertical = getDefaultHitSlop(sizeTokens.height)
+    const horizontal = getDefaultHitSlop(containerWidth)
+    if (vertical === horizontal) return vertical
+    return {
+      top: vertical,
+      bottom: vertical,
+      left: horizontal,
+      right: horizontal,
+    }
+  }, [sizeTokens.height, containerWidth])
   // ARIA props rather than `accessibilityState`: react-native-web 0.21 no
   // longer reads the nested state object, so it was silently dropping every
   // state on web. RN normalizes `aria-*` back into `accessibilityState` for
@@ -233,7 +244,7 @@ export function IconButton({
         accessibilityLabel={accessibilityLabel}
         {...ariaState}
         disabled={isDisabled}
-        hitSlop={hitSlop ?? getDefaultHitSlop(sizeTokens.height)}
+        hitSlop={hitSlop ?? defaultHitSlop}
         onPress={onPress}
         {...(isDisabled ? undefined : composedHandlers)}
         style={[

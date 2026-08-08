@@ -9,6 +9,7 @@ import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
+import { getDefaultHitSlop } from '../internal/touchTarget'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -43,7 +44,8 @@ export function Button({
   const hasTrailing = Boolean(trailingIcon)
   const theme = useTheme()
   const iconResolver = useIconResolver()
-  const resolvedIconSize = iconSize ?? getButtonSizeTokens(size).iconSize
+  const sizeTokens = getButtonSizeTokens(size)
+  const resolvedIconSize = iconSize ?? sizeTokens.iconSize
 
   const styles = useMemo(
     () =>
@@ -198,7 +200,14 @@ export function Button({
         {...props}
         accessibilityRole="button"
         aria-disabled={isDisabled}
-        hitSlop={Platform.OS === 'web' ? undefined : 4}
+        hitSlop={
+          // Sized per token, not a flat 4: `xs` is 32dp tall, so a constant
+          // slop left it at 40dp — under the 48dp WCAG/MD3 floor. Web is
+          // excluded because react-native-web does not implement `hitSlop`.
+          Platform.OS === 'web'
+            ? undefined
+            : getDefaultHitSlop(sizeTokens.height)
+        }
         disabled={isDisabled}
         {...(isDisabled ? undefined : composedHandlers)}
         style={[

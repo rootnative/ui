@@ -18,6 +18,7 @@ import {
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers } from '../internal/usePressMorph'
 import {
@@ -26,6 +27,7 @@ import {
   SWITCH_THUMB_ON_SIZE,
   SWITCH_THUMB_PRESSED_SIZE,
   SWITCH_TRACK_BORDER_WIDTH,
+  SWITCH_TRACK_HEIGHT,
   SWITCH_TRACK_PADDING,
   SWITCH_TRACK_WIDTH,
   createStyles,
@@ -276,7 +278,14 @@ export function Switch({
         accessibilityRole="switch"
         aria-disabled={isDisabled}
         aria-checked={isSelected}
-        hitSlop={Platform.OS === 'web' ? undefined : 4}
+        hitSlop={
+          // The track is the pressable, and MD3 makes it 32dp tall — a flat 4
+          // left the control at 40dp, under the 48dp WCAG/MD3 floor. Web is
+          // excluded because react-native-web does not implement `hitSlop`.
+          Platform.OS === 'web'
+            ? undefined
+            : getDefaultHitSlop(SWITCH_TRACK_HEIGHT)
+        }
         disabled={isDisabled}
         onPress={handlePress}
         {...handlers}

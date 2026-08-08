@@ -63,6 +63,22 @@ expect(screen.getByText('check', { includeHiddenElements: true })).toBeTruthy()
 If you pass your own node as an icon, the same applies — it is wrapped for you,
 so it needs no flag of its own.
 
+## Touch targets
+
+Several MD3 Expressive size tokens are deliberately smaller than the 48dp
+WCAG 2.5.5 / MD3 minimum — a `Button` at `xs` and a `ButtonGroup` item at
+`extraSmall` are 32dp tall, and a `Switch` track is 32dp. On native those
+controls carry a `hitSlop` sized to bring the *touch* area back to 48dp without
+moving a single pixel of layout, so the small sizes stay usable.
+
+`ButtonGroup` grows its target vertically only. Items in the `connected`
+variant sit 2dp apart, so horizontal slop would make each item's touch area
+overlap its neighbour's.
+
+**This does not apply on web.** react-native-web does not implement `hitSlop`,
+so on web these controls are exactly their token size. If you use `xs` /
+`extraSmall` on a touch-capable web build, give them room yourself.
+
 ## What you have to supply
 
 The library cannot invent these.
@@ -234,6 +250,9 @@ users:
   a single tab stop.
 - **RTL has not been swept.** Everything routes through `selectRTL`, but no
   platform pass has been run against a right-to-left locale.
+- **Touch targets are only corrected on native.** The `hitSlop` that lifts the
+  smallest size tokens to 48dp is a no-op under react-native-web, so a
+  touch-capable web build gets the token size. See "Touch targets" above.
 
 The first two are pinned as failing tests in
 `packages/components/src/__tests__/screen-reader-native.test.tsx`, so they are

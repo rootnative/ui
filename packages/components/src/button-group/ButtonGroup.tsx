@@ -17,6 +17,7 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { getDefaultHitSlop } from '../internal/touchTarget'
 import {
   createGroupStyles,
   createItemStyles,
@@ -192,6 +193,18 @@ function ButtonGroupItemImpl({
 
   const tokens = getSizeTokens(size)
   const resolvedIconSize = iconSizeOverride ?? tokens.iconSize
+
+  // Vertical only, unlike Button's symmetric slop. `extraSmall` is 32dp tall,
+  // so it needs 8dp a side to clear the 48dp floor — but items in the
+  // `connected` variant sit 2dp apart, and 8dp of horizontal slop would make
+  // each item's touch area swallow 6dp of its neighbour's. Height is the axis
+  // that actually breaks the rule; widening it is what would break the group.
+  // Web is excluded because react-native-web does not implement `hitSlop`.
+  const hitSlop = useMemo(() => {
+    if (Platform.OS === 'web') return undefined
+    const vertical = getDefaultHitSlop(tokens.height)
+    return { top: vertical, bottom: vertical, left: 0, right: 0 }
+  }, [tokens.height])
 
   const unselectedColors = useMemo(
     () =>
@@ -444,7 +457,7 @@ function ButtonGroupItemImpl({
         accessibilityRole={accessibilityRole}
         accessibilityLabel={item.accessibilityLabel ?? item.label}
         {...ariaState}
-        hitSlop={Platform.OS === 'web' ? undefined : 4}
+        hitSlop={hitSlop}
         disabled={isDisabled}
         onPress={handlePress}
         {...handlers}
