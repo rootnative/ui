@@ -31,6 +31,11 @@ const COMPONENTS_VERSION: string = readPkg(
 ).version
 const CLI_VERSION: string = readPkg('packages/cli/package.json').version
 const ICONS_VERSION: string = readPkg('packages/icons/package.json').version
+// Read the inertia peer range rather than hard-coding it. A literal here
+// drifted two releases behind (it still said `>=0.0.4` at 0.0.6), because a
+// version bump has no reason to bring anyone to this file.
+const INERTIA_PEER: string = readPkg('packages/core/package.json')
+  .peerDependencies['@rootnative/inertia']
 
 // ============================================================
 // Type Extraction — Interfaces & Type Aliases from TS source
@@ -1908,7 +1913,7 @@ function generateCoreLlms(): string {
   return `# @rootnative/core — Theme System for React Native
 
 > Version: ${CORE_VERSION}
-> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia >=0.0.4 <0.1.0 (required — every animation runs on it)
+> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it)
 > Optional: @material/material-color-utilities >=0.4.0 (for createMaterialTheme)
 
 ## Quick Start
@@ -1935,7 +1940,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia >=0.0.4 <0.1.0 (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
+> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage

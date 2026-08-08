@@ -70,13 +70,28 @@ Prior history: these packages were published as `@onlynative/*` through
   the pin forward, before it re-fetches any component files. Existing
   `rootnative.json` files are untouched until you run `upgrade`.
 
-- `@rootnative/inertia` peer range widened to `>=0.0.4 <0.1.0` for `core` and
-  `components`. The floor moves past 0.0.2 for two releases of upstream work:
-  0.0.3 is all correctness fixes (Presence exit ordering, endless-repeat
-  unmount, style resting), and 0.0.4 is purely additive — animatable
+- `@rootnative/inertia` peer range widened to `>=0.0.6 <0.1.0` for `core`,
+  `utils` and `components`. The floor moves past 0.0.2 for four releases of
+  upstream work: 0.0.3 is all correctness fixes (Presence exit ordering,
+  endless-repeat unmount, style resting), 0.0.4 is purely additive — animatable
   `boxShadow`, plus `layoutId` shared-element transitions measured in window
-  coordinates with a style carry. No RootNative API change: nothing in this
-  library reaches for the new surface yet.
+  coordinates with a style carry — 0.0.5 makes the 40 layout and text-metric
+  style keys animatable and rejects undriven keys at compile time, and 0.0.6
+  fixes two animations that never ran (`animate={{ boxShadow }}` under the
+  default spring, and any colour key resting at its `'transparent'` default).
+
+  No RootNative API change, and the floor is a correctness floor rather than a
+  feature one: nothing here animates a colour key or a `boxShadow` through
+  `animate`, and every colour this library moves goes through
+  `useColorTransition` / `useGestureLayer`, which interpolate rather than
+  spring and were never affected. 0.0.5's reduced-motion fix for
+  sequence-declared step types is the one upstream change this library
+  surfaced, from `LinearProgress` / `CircularProgress`.
+
+  0.0.6 also exports `TRANSPARENT`, the seed value for a colour shared value a
+  custom animated component drives itself. Unused here — `Switch` is the only
+  component that calls `resolveTransition` directly and it drives a numeric
+  press progress, not a colour.
 
 ### Added
 

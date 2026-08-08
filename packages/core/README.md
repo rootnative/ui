@@ -8,7 +8,7 @@ Design-system agnostic theme engine for [RootNative UI](https://github.com/rootn
 pnpm add @rootnative/core @rootnative/inertia
 ```
 
-Peer dependencies: `react >=18`, `react-native >=0.72`, `@rootnative/inertia >=0.0.4 <0.1.0`
+Peer dependencies: `react >=18`, `react-native >=0.72`, `@rootnative/inertia >=0.0.6 <0.1.0`
 
 `@rootnative/inertia` is required — every animation in the library runs on it.
 npm and pnpm install required peers automatically; Yarn classic does not, so add
