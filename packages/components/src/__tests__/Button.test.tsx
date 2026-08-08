@@ -34,12 +34,16 @@ describe('Button', () => {
 
   it('renders a leading icon', () => {
     renderWithTheme(<Button leadingIcon="check">OK</Button>)
-    expect(screen.getByText('check')).toBeTruthy()
+    expect(
+      screen.getByText('check', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   it('renders a trailing icon', () => {
     renderWithTheme(<Button trailingIcon="arrow-right">Next</Button>)
-    expect(screen.getByText('arrow-right')).toBeTruthy()
+    expect(
+      screen.getByText('arrow-right', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   describe('icon sources', () => {
@@ -47,7 +51,9 @@ describe('Button', () => {
       renderWithTheme(
         <Button leadingIcon={<Text testID="custom-icon">★</Text>}>Star</Button>,
       )
-      expect(screen.getByTestId('custom-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function leadingIcon with size and color', () => {
@@ -60,7 +66,10 @@ describe('Button', () => {
         </Button>,
       )
       expect(renderFn).toHaveBeenCalledWith({ size: 20, color: '#123456' })
-      expect(screen.getByTestId('fn-icon').props.children).toBe('20:#123456')
+      expect(
+        screen.getByTestId('fn-icon', { includeHiddenElements: true }).props
+          .children,
+      ).toBe('20:#123456')
     })
 
     it('routes string icon names through the iconResolver when provided', () => {
@@ -74,9 +83,10 @@ describe('Button', () => {
         'check',
         expect.objectContaining({ size: 20 }),
       )
-      expect(screen.getByTestId('resolved').props.children).toBe(
-        'resolved:check',
-      )
+      expect(
+        screen.getByTestId('resolved', { includeHiddenElements: true }).props
+          .children,
+      ).toBe('resolved:check')
     })
   })
 

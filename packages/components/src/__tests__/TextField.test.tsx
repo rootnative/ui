@@ -277,12 +277,16 @@ describe('TextField', () => {
   describe('icons', () => {
     it('renders a leading icon', () => {
       renderWithTheme(<TextField label="Search" leadingIcon="magnify" />)
-      expect(screen.getByText('magnify')).toBeTruthy()
+      expect(
+        screen.getByText('magnify', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('renders a trailing icon', () => {
       renderWithTheme(<TextField label="Password" trailingIcon="eye" />)
-      expect(screen.getByText('eye')).toBeTruthy()
+      expect(
+        screen.getByText('eye', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('calls onTrailingIconPress when the trailing icon is pressed', () => {
@@ -331,7 +335,9 @@ describe('TextField', () => {
           leadingIcon={<Text testID="lucide-icon">★</Text>}
         />,
       )
-      expect(screen.getByTestId('lucide-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('lucide-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function trailingIcon with size and color', () => {

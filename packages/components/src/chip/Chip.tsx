@@ -312,14 +312,14 @@ export function Chip(props: ChipProps) {
     }
     if (leadingIcon) {
       return (
-        <View style={styles.leadingIcon}>
+        <View aria-hidden style={styles.leadingIcon}>
           {renderIcon(leadingIcon, leadingIconRenderProps, iconResolver)}
         </View>
       )
     }
     if (variant === 'filter' && isSelected) {
       return (
-        <View style={styles.leadingIcon}>
+        <View aria-hidden style={styles.leadingIcon}>
           {renderIcon('check', leadingIconRenderProps, iconResolver)}
         </View>
       )
@@ -400,7 +400,9 @@ export function Chip(props: ChipProps) {
             animatedCloseStyle,
           ]}
         >
-          {renderIcon('close', closeIconRenderProps, iconResolver)}
+          <View aria-hidden>
+            {renderIcon('close', closeIconRenderProps, iconResolver)}
+          </View>
         </AnimatedPressable>
       ) : null}
     </View>

@@ -181,7 +181,10 @@ export function FAB({
         ]}
       >
         {icon ? (
-          <View style={isExtended ? styles.extendedIcon : undefined}>
+          <View
+            aria-hidden
+            style={isExtended ? styles.extendedIcon : undefined}
+          >
             {renderIcon(
               icon,
               { size: iconPixelSize, color: resolvedContentColor },

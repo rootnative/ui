@@ -49,7 +49,11 @@ export function DialogIcon({ icon, color, size, style }: DialogIconProps) {
     resolver,
   )
 
-  return <View style={[styles.icon, style]}>{node}</View>
+  return (
+    <View aria-hidden style={[styles.icon, style]}>
+      {node}
+    </View>
+  )
 }
 DialogIcon.dialogSlot = 'icon' satisfies DialogSlotKind
 

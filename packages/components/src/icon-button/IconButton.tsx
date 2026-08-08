@@ -6,7 +6,7 @@ import {
 } from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Pressable } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -256,11 +256,13 @@ export function IconButton({
           typeof style === 'function' ? undefined : style,
         ]}
       >
-        {renderIcon(
-          displayIcon,
-          { size: iconPixelSize, color: resolvedIconColor },
-          iconResolver,
-        )}
+        <View aria-hidden>
+          {renderIcon(
+            displayIcon,
+            { size: iconPixelSize, color: resolvedIconColor },
+            iconResolver,
+          )}
+        </View>
       </AnimatedPressable>
     </Animated.View>
   )

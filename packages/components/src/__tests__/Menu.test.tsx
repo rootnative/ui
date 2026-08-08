@@ -337,7 +337,9 @@ describe('Menu.Item', () => {
     expect(screen.getByText('Settings')).toBeTruthy()
     expect(screen.getByText('⌘,')).toBeTruthy()
     // The MaterialCommunityIcons mock renders the icon name as text.
-    expect(screen.getByText('cog')).toBeTruthy()
+    expect(
+      screen.getByText('cog', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   it('applies the MD3 item metrics and label token', async () => {

@@ -153,7 +153,7 @@ export function NavigationItem({
             pointerEvents="none"
             style={[styles.focusRing, animatedFocusRingStyle]}
           />
-          {icon}
+          {icon ? <View aria-hidden>{icon}</View> : null}
         </View>
         {labelVisibility === 'always' ? (
           <Text style={resolvedLabelStyle} numberOfLines={1}>

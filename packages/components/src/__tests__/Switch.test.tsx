@@ -63,17 +63,23 @@ describe('Switch', () => {
 
   it('renders selectedIcon when value is true', () => {
     renderWithTheme(<Switch value selectedIcon="check" />)
-    expect(screen.getByText('check')).toBeTruthy()
+    expect(
+      screen.getByText('check', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   it('does not render an icon by default (MD3 default switch)', () => {
     renderWithTheme(<Switch value />)
-    expect(screen.queryByText('check')).toBeNull()
+    expect(
+      screen.queryByText('check', { includeHiddenElements: true }),
+    ).toBeNull()
   })
 
   it('renders unselectedIcon when value is false', () => {
     renderWithTheme(<Switch value={false} unselectedIcon="close" />)
-    expect(screen.getByText('close')).toBeTruthy()
+    expect(
+      screen.getByText('close', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   describe('disabled visuals', () => {
@@ -108,7 +114,9 @@ describe('Switch', () => {
       renderWithTheme(
         <Switch value selectedIcon={<Text testID="custom-icon">★</Text>} />,
       )
-      expect(screen.getByTestId('custom-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function selectedIcon with size and color', () => {

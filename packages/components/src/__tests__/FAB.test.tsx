@@ -51,7 +51,7 @@ describe('FAB', () => {
       renderWithTheme(
         <FAB icon="plus" accessibilityLabel="Add" contentColor="#00FF00" />,
       )
-      const icon = screen.getByText('plus')
+      const icon = screen.getByText('plus', { includeHiddenElements: true })
       expect(icon.props.color).toBe('#00FF00')
     })
 
@@ -94,7 +94,9 @@ describe('FAB', () => {
           accessibilityLabel="Star"
         />,
       )
-      expect(screen.getByTestId('custom-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('routes string icon names through the iconResolver when provided', () => {
@@ -108,9 +110,10 @@ describe('FAB', () => {
         'plus',
         expect.objectContaining({ size: 24 }),
       )
-      expect(screen.getByTestId('resolved').props.children).toBe(
-        'resolved:plus',
-      )
+      expect(
+        screen.getByTestId('resolved', { includeHiddenElements: true }).props
+          .children,
+      ).toBe('resolved:plus')
     })
 
     it('uses 36px icon size for the large size', () => {

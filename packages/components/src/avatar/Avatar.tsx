@@ -119,11 +119,16 @@ export function Avatar({
       {initials}
     </Text>
   ) : (
-    renderIcon(
-      icon ?? 'account',
-      { size: iconPx, color: fgColor },
-      iconResolver,
-    )
+    // Only the icon branch is hidden. The initials above are real text, and
+    // without an `accessibilityLabel` the container is not accessible, so they
+    // are the only name a reader could get.
+    <View aria-hidden>
+      {renderIcon(
+        icon ?? 'account',
+        { size: iconPx, color: fgColor },
+        iconResolver,
+      )}
+    </View>
   )
 
   if (!isInteractive) {

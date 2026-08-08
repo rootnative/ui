@@ -63,12 +63,16 @@ describe('Checkbox', () => {
 
   it('renders check icon when checked', () => {
     renderWithTheme(<Checkbox value />)
-    expect(screen.getByText('check')).toBeTruthy()
+    expect(
+      screen.getByText('check', { includeHiddenElements: true }),
+    ).toBeTruthy()
   })
 
   it('does not render check icon when unchecked', () => {
     renderWithTheme(<Checkbox value={false} />)
-    expect(screen.queryByText('check')).toBeNull()
+    expect(
+      screen.queryByText('check', { includeHiddenElements: true }),
+    ).toBeNull()
   })
 
   it('uses the MD3 2dp container corner radius', () => {
@@ -90,13 +94,17 @@ describe('Checkbox', () => {
     it('renders the dash mark instead of the check icon', () => {
       renderWithTheme(<Checkbox indeterminate />)
       expect(screen.getByTestId('checkbox-indeterminate-mark')).toBeTruthy()
-      expect(screen.queryByText('check')).toBeNull()
+      expect(
+        screen.queryByText('check', { includeHiddenElements: true }),
+      ).toBeNull()
     })
 
     it('wins over checked visually and in accessibility', () => {
       renderWithTheme(<Checkbox value indeterminate />)
       expect(screen.getByTestId('checkbox-indeterminate-mark')).toBeTruthy()
-      expect(screen.queryByText('check')).toBeNull()
+      expect(
+        screen.queryByText('check', { includeHiddenElements: true }),
+      ).toBeNull()
       const cb = screen.getByRole('checkbox')
       expect(cb.props.accessibilityState).toEqual(
         expect.objectContaining({ checked: 'mixed' }),
@@ -163,9 +171,13 @@ describe('Checkbox', () => {
       renderWithTheme(
         <Checkbox value checkIcon={<Text testID="custom-check">✓</Text>} />,
       )
-      expect(screen.getByTestId('custom-check')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-check', { includeHiddenElements: true }),
+      ).toBeTruthy()
       // Default 'check' string should not have rendered.
-      expect(screen.queryByText('check')).toBeNull()
+      expect(
+        screen.queryByText('check', { includeHiddenElements: true }),
+      ).toBeNull()
     })
 
     it('invokes a render-function checkIcon with size and color', () => {

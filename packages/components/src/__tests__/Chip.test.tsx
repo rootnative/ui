@@ -36,7 +36,9 @@ describe('Chip', () => {
   describe('leading icon', () => {
     it('renders a custom leading icon', () => {
       renderWithTheme(<Chip leadingIcon="star">Starred</Chip>)
-      expect(screen.getByText('star')).toBeTruthy()
+      expect(
+        screen.getByText('star', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('shows checkmark when filter variant is selected', () => {
@@ -45,7 +47,9 @@ describe('Chip', () => {
           Active
         </Chip>,
       )
-      expect(screen.getByText('check')).toBeTruthy()
+      expect(
+        screen.getByText('check', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('shows custom leadingIcon instead of checkmark on selected filter', () => {
@@ -54,8 +58,12 @@ describe('Chip', () => {
           Liked
         </Chip>,
       )
-      expect(screen.getByText('heart')).toBeTruthy()
-      expect(screen.queryByText('check')).toBeNull()
+      expect(
+        screen.getByText('heart', { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(
+        screen.queryByText('check', { includeHiddenElements: true }),
+      ).toBeNull()
     })
 
     it('renders avatar for input variant', () => {
@@ -75,7 +83,9 @@ describe('Chip', () => {
           Tag
         </Chip>,
       )
-      expect(screen.getByText('close')).toBeTruthy()
+      expect(
+        screen.getByText('close', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('calls onClose when close icon is pressed', () => {
@@ -162,14 +172,18 @@ describe('Chip', () => {
           Filter
         </Chip>,
       )
-      expect(screen.queryByText('close')).toBeNull()
+      expect(
+        screen.queryByText('close', { includeHiddenElements: true }),
+      ).toBeNull()
 
       rerender(
         <Chip variant="filter" selected onClose={jest.fn()}>
           Filter
         </Chip>,
       )
-      expect(screen.getByText('close')).toBeTruthy()
+      expect(
+        screen.getByText('close', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
   })
 
@@ -343,7 +357,9 @@ describe('Chip', () => {
       renderWithTheme(
         <Chip leadingIcon={<Text testID="lucide-icon">★</Text>}>Star</Chip>,
       )
-      expect(screen.getByTestId('lucide-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('lucide-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function leadingIcon with size and color', () => {

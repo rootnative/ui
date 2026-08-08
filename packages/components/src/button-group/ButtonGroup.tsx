@@ -455,7 +455,7 @@ function ButtonGroupItemImpl({
         ]}
       >
         {item.leadingIcon ? (
-          <View style={itemStyles.leadingIcon}>
+          <View aria-hidden style={itemStyles.leadingIcon}>
             {renderIcon(item.leadingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}
@@ -463,7 +463,7 @@ function ButtonGroupItemImpl({
           <Text style={computedLabelStyle}>{item.label}</Text>
         ) : null}
         {item.trailingIcon ? (
-          <View style={itemStyles.trailingIcon}>
+          <View aria-hidden style={itemStyles.trailingIcon}>
             {renderIcon(item.trailingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}

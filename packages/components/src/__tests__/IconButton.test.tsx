@@ -61,7 +61,7 @@ describe('IconButton', () => {
           contentColor="#00FF00"
         />,
       )
-      const icon = screen.getByText('heart')
+      const icon = screen.getByText('heart', { includeHiddenElements: true })
       expect(icon.props.color).toBe('#00FF00')
     })
 
@@ -74,7 +74,7 @@ describe('IconButton', () => {
           contentColor="#00FF00"
         />,
       )
-      const icon = screen.getByText('heart')
+      const icon = screen.getByText('heart', { includeHiddenElements: true })
       expect(icon.props.color).toBe('#00FF00')
     })
 
@@ -87,7 +87,7 @@ describe('IconButton', () => {
           disabled
         />,
       )
-      const icon = screen.getByText('heart')
+      const icon = screen.getByText('heart', { includeHiddenElements: true })
       expect(icon.props.color).toBe(DISABLED_ICON_COLOR)
     })
 
@@ -100,7 +100,7 @@ describe('IconButton', () => {
           disabled
         />,
       )
-      const icon = screen.getByText('heart')
+      const icon = screen.getByText('heart', { includeHiddenElements: true })
       expect(icon.props.color).toBe(DISABLED_ICON_COLOR)
     })
 
@@ -126,7 +126,9 @@ describe('IconButton', () => {
           accessibilityLabel="Star"
         />,
       )
-      expect(screen.getByTestId('custom-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function icon with size and color', () => {
@@ -141,7 +143,10 @@ describe('IconButton', () => {
         />,
       )
       expect(renderFn).toHaveBeenCalledWith({ size: 24, color: '#123456' })
-      expect(screen.getByTestId('fn-icon').props.children).toBe('24:#123456')
+      expect(
+        screen.getByTestId('fn-icon', { includeHiddenElements: true }).props
+          .children,
+      ).toBe('24:#123456')
     })
 
     it('routes string icon names through the iconResolver when provided', () => {
@@ -155,9 +160,10 @@ describe('IconButton', () => {
         'heart',
         expect.objectContaining({ size: 24 }),
       )
-      expect(screen.getByTestId('resolved').props.children).toBe(
-        'resolved:heart',
-      )
+      expect(
+        screen.getByTestId('resolved', { includeHiddenElements: true }).props
+          .children,
+      ).toBe('resolved:heart')
     })
 
     it('uses selectedIcon when toggled and selected', () => {
@@ -169,8 +175,12 @@ describe('IconButton', () => {
           selected
         />,
       )
-      expect(screen.getByTestId('on-icon')).toBeTruthy()
-      expect(screen.queryByTestId('off-icon')).toBeNull()
+      expect(
+        screen.getByTestId('on-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(
+        screen.queryByTestId('off-icon', { includeHiddenElements: true }),
+      ).toBeNull()
     })
   })
 

@@ -317,6 +317,7 @@ export function Switch({
         >
           {selectedIcon ? (
             <Animated.View
+              aria-hidden
               pointerEvents="none"
               style={[styles.iconLayer, animatedSelectedIconStyle]}
             >
@@ -329,6 +330,7 @@ export function Switch({
           ) : null}
           {unselectedIcon ? (
             <Animated.View
+              aria-hidden
               pointerEvents="none"
               style={[styles.iconLayer, animatedUnselectedIconStyle]}
             >

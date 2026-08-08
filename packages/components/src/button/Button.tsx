@@ -215,13 +215,13 @@ export function Button({
         ]}
       >
         {leadingIcon ? (
-          <View style={styles.leadingIcon}>
+          <View aria-hidden style={styles.leadingIcon}>
             {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}
         <Text style={computedLabelStyle}>{children}</Text>
         {trailingIcon ? (
-          <View style={styles.trailingIcon}>
+          <View aria-hidden style={styles.trailingIcon}>
             {renderIcon(trailingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}

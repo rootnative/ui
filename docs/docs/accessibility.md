@@ -32,6 +32,37 @@ It matters if you override accessibility props yourself:
 `TextInput` is the exception — it does *not* normalize, so `TextField` carries
 both spellings internally.
 
+## Icons are decorative
+
+Every icon a component renders for you — `leadingIcon`, `trailingIcon`, a
+`Checkbox`'s check mark, a `Switch`'s thumb glyph, a `Tab`'s icon — sits inside
+a node marked `aria-hidden`, so it never reaches the accessibility tree. The
+accessible name of a control comes from its visible text, or from the
+`accessibilityLabel` you pass, and never from the icon.
+
+That is not cosmetic. An icon font renders its glyph as *text* in a
+private-use-area codepoint, and React Native merges the text of descendant
+nodes into an accessible ancestor's name. Without the flag,
+`<Button leadingIcon="plus">Add Item</Button>` announced as "&#xF0415;, Add
+Item", and a checked `Checkbox` — which has no text of its own — announced as
+the check glyph alone. A screen reader reads a private-use codepoint as nothing,
+or as an unknown symbol.
+
+One consequence worth knowing if you test with
+`@testing-library/react-native`: its queries skip elements hidden from
+accessibility by default, so an assertion that an icon rendered has to opt in.
+
+```tsx
+// Finds nothing — the icon is hidden from the accessibility tree.
+expect(screen.queryByText('check')).toBeNull()
+
+// Asserts the icon rendered.
+expect(screen.getByText('check', { includeHiddenElements: true })).toBeTruthy()
+```
+
+If you pass your own node as an icon, the same applies — it is wrapped for you,
+so it needs no flag of its own.
+
 ## What you have to supply
 
 The library cannot invent these.
@@ -137,6 +168,22 @@ Both come from props you already pass:
   value={email}
   onChangeText={setEmail}
   errorText={invalid ? 'Enter a valid address' : undefined}
+/>
+```
+
+A `trailingIcon` is a button only when you give it `onTrailingIconPress`. With
+a handler it is a real control and needs a name — pass
+`trailingIconAccessibilityLabel`, because the icon itself is hidden and cannot
+supply one. Without a handler the icon is pure decoration, so it leaves the
+accessibility tree entirely rather than announcing itself as a disabled,
+unnamed button.
+
+```tsx
+<TextField
+  label="Search"
+  trailingIcon="close"
+  onTrailingIconPress={clear}
+  trailingIconAccessibilityLabel="Clear search"
 />
 ```
 

@@ -594,7 +594,7 @@ export function Slider({
   return (
     <View {...rest} style={[styles.root, style]}>
       {startIcon ? (
-        <View style={styles.decoration}>
+        <View aria-hidden style={styles.decoration}>
           {renderIcon(
             startIcon,
             {
@@ -764,7 +764,7 @@ export function Slider({
       </Pressable>
 
       {endIcon ? (
-        <View style={styles.decoration}>
+        <View aria-hidden style={styles.decoration}>
           {renderIcon(
             endIcon,
             {

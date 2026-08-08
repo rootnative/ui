@@ -220,7 +220,11 @@ export function Checkbox({
             />
           </Animated.View>
         ) : isChecked ? (
-          <Animated.View pointerEvents="none" style={animatedIconStyle}>
+          <Animated.View
+            aria-hidden
+            pointerEvents="none"
+            style={animatedIconStyle}
+          >
             {renderIcon(
               checkIcon,
               { size: CHECKBOX_ICON_SIZE, color: markColor },

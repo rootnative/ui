@@ -242,7 +242,9 @@ describe('Avatar', () => {
   describe('icon sources', () => {
     it('accepts a pre-rendered ReactElement as icon', () => {
       renderWithTheme(<Avatar icon={<Text testID="custom-icon">★</Text>} />)
-      expect(screen.getByTestId('custom-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('custom-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('invokes a render-function icon with size and color', () => {

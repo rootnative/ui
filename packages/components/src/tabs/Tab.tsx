@@ -132,7 +132,7 @@ export function Tab({
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
       <View style={contentStyle} onLayout={handleContentLayout}>
-        {icon}
+        {icon ? <View aria-hidden>{icon}</View> : null}
         {item.label !== undefined ? (
           <Text style={resolvedLabelStyle} numberOfLines={1}>
             {item.label}

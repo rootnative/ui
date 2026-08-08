@@ -96,7 +96,10 @@ export function MenuItem({
         style={[styles.focusRing, animatedFocusRingStyle]}
       />
       <View style={contentStyle}>
-        {leading}
+        {/* The wrapper stays conditional: `contentStyle` lays its children out
+            with a gap, so an always-rendered wrapper would add an empty slot
+            when the item has no icon. */}
+        {leading ? <View aria-hidden>{leading}</View> : null}
         <Text style={resolvedLabelStyle} numberOfLines={1}>
           {label}
         </Text>
@@ -105,7 +108,7 @@ export function MenuItem({
             {trailingText}
           </Text>
         ) : null}
-        {trailing}
+        {trailing ? <View aria-hidden>{trailing}</View> : null}
       </View>
     </AnimatedPressable>
   )

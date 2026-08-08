@@ -304,7 +304,9 @@ describe('ButtonGroup', () => {
         'star',
         expect.objectContaining({ size: expect.any(Number) }),
       )
-      expect(screen.getByTestId('leading-resolved')).toBeTruthy()
+      expect(
+        screen.getByTestId('leading-resolved', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
 
     it('renders a trailingIcon ReactElement as-is', () => {
@@ -319,7 +321,9 @@ describe('ButtonGroup', () => {
           ]}
         />,
       )
-      expect(screen.getByTestId('trailing-icon')).toBeTruthy()
+      expect(
+        screen.getByTestId('trailing-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
     })
   })
 

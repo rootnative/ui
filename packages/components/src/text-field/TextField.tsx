@@ -66,6 +66,7 @@ export function TextField({
   const isError = Boolean(error) || Boolean(errorText)
   const isFilled = variant === 'filled'
   const hasLeadingIcon = Boolean(leadingIcon)
+  const isTrailingIconInteractive = onTrailingIconPress !== undefined
   // Stable across renders and unique per field, which is what
   // `aria-describedby` needs to point at the supporting-text node.
   const supportingTextId = `${useId()}-supporting`
@@ -418,7 +419,7 @@ export function TextField({
           ) : null}
 
           {leadingIcon ? (
-            <View style={styles.leadingIcon}>
+            <View aria-hidden style={styles.leadingIcon}>
               {renderIcon(
                 leadingIcon,
                 { size: ICON_SIZE, color: leadingIconColor },
@@ -474,13 +475,20 @@ export function TextField({
           {trailingIcon ? (
             <Pressable
               onPress={onTrailingIconPress}
-              disabled={isDisabled || !onTrailingIconPress}
-              accessibilityRole="button"
+              disabled={isDisabled || !isTrailingIconInteractive}
+              // A trailing icon with no press handler is decoration, not a
+              // control. Announcing it as a disabled, unnamed button is noise,
+              // so it leaves the accessibility tree entirely — the field's own
+              // label already carries the meaning.
+              aria-hidden={!isTrailingIconInteractive || undefined}
+              accessibilityRole={
+                isTrailingIconInteractive ? 'button' : undefined
+              }
               accessibilityLabel={trailingIconAccessibilityLabel}
               hitSlop={12}
               style={styles.trailingIconPressable}
             >
-              <View style={styles.trailingIcon}>
+              <View aria-hidden style={styles.trailingIcon}>
                 {renderIcon(
                   trailingIcon,
                   { size: ICON_SIZE, color: trailingIconColor },
