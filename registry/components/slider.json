@@ -10,7 +10,7 @@
     "packages/components/src/slider/types.ts",
     "packages/components/src/internal/useBooleanProgress.ts"
   ],
-  "utils": ["color", "focus-visible", "render-icon"],
+  "utils": ["color", "focus-visible", "render-icon", "rtl"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.5",

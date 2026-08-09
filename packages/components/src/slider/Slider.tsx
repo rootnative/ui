@@ -1,6 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useAnimator, useMotionValue } from '@rootnative/inertia'
-import { isFocusVisible, renderIcon } from '@rootnative/utils'
+import { isFocusVisible, isRTLDirection, renderIcon } from '@rootnative/utils'
 import {
   Fragment,
   useCallback,
@@ -14,7 +14,7 @@ import type {
   GestureResponderEvent,
   LayoutChangeEvent,
 } from 'react-native'
-import { I18nManager, PanResponder, Pressable, View } from 'react-native'
+import { PanResponder, Pressable, View } from 'react-native'
 // Sanctioned escape hatch: the slider's hover/focus/label progress is routed
 // imperatively between two thumbs from one Pressable (`keyboardThumb`), a
 // shape inertia's gesture hooks don't express. `useAnimator` drives the raw
@@ -109,7 +109,9 @@ export function Slider({
 
   const isRange = Array.isArray(controlledValue) || Array.isArray(defaultValue)
   const isDisabled = Boolean(disabled)
-  const isRTL = I18nManager.isRTL
+  // Not `I18nManager.isRTL`: that reports LTR forever on web, where RNW ships
+  // it as a stub. `isRTLDirection` reads the browser's real direction there.
+  const isRTL = isRTLDirection()
 
   const initialValue = useMemo<SliderValue>(() => {
     if (defaultValue !== undefined) return defaultValue

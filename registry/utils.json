@@ -37,7 +37,7 @@
   },
   "rtl": {
     "file": "packages/utils/src/rtl.ts",
-    "exports": ["transformOrigin", "selectRTL"],
+    "exports": ["transformOrigin", "selectRTL", "isRTLDirection"],
     "dependencies": {}
   }
 }

@@ -68,7 +68,7 @@ const UTIL_EXPORTS: Record<string, string[]> = {
   icon: ['getMaterialCommunityIcons'],
   pressable: ['resolvePressableStyle', 'resolveColorFromStyle'],
   'render-icon': ['renderIcon'],
-  rtl: ['transformOrigin', 'selectRTL'],
+  rtl: ['transformOrigin', 'selectRTL', 'isRTLDirection'],
 }
 
 // Utility type-only exports (emitted as `export type {...}` from the barrel)
