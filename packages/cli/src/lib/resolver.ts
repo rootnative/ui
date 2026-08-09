@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { fetchComponentEntry, fetchUtilsRegistry } from './registry'
 import type {
   ComponentRegistryEntry,
@@ -62,10 +63,17 @@ function buildResult(
     }
   }
 
-  // Also collect npm dependencies from utils themselves
+  // Also collect npm dependencies from utils themselves, and record the file
+  // name each one installs as. `path.basename` is what `copyUtilFiles` uses to
+  // name the file it writes, so reading it the same way here keeps the printed
+  // plan and the written file from drifting apart.
+  const utilFileNames: Record<string, string> = {}
+
   for (const utilName of utilSet) {
     const utilEntry = utilsRegistry[utilName]
     if (utilEntry) {
+      utilFileNames[utilName] = path.basename(utilEntry.file)
+
       for (const [pkg, version] of Object.entries(utilEntry.dependencies)) {
         optionalDeps[pkg] = version
       }
@@ -75,6 +83,7 @@ function buildResult(
   return {
     components,
     utils: Array.from(utilSet).sort(),
+    utilFileNames,
     npmDependencies: npmDeps,
     optionalNpmDependencies: optionalDeps,
   }

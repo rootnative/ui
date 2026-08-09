@@ -65,7 +65,14 @@ export async function addCommand(
   if (resolution.utils.length > 0) {
     logger.break()
     console.log(chalk.bold('Utilities to copy:'))
-    console.log(`  ${resolution.utils.map((u) => `${u}.ts`).join(', ')}`)
+    // Read the file name from the registry rather than appending `.ts`:
+    // `render-icon` installs as `render-icon.tsx`. Fall back to the bare name
+    // for a util the registry does not describe, so the plan never claims an
+    // extension it did not read.
+    const fileNames = resolution.utils.map(
+      (u) => resolution.utilFileNames[u] ?? u,
+    )
+    console.log(`  ${fileNames.join(', ')}`)
   }
 
   const npmDeps = Object.keys(resolution.npmDependencies)

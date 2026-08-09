@@ -64,6 +64,14 @@ export interface ResolvedComponent {
 export interface ResolutionResult {
   components: ResolvedComponent[]
   utils: string[]
+  /**
+   * The file name each entry of `utils` is written as, keyed by util name.
+   *
+   * The extension is not derivable from the name: `render-icon` ships as
+   * `render-icon.tsx` while every other util is `.ts`. `add` used to append
+   * `.ts` to the name and so printed a file that does not exist.
+   */
+  utilFileNames: Record<string, string>
   npmDependencies: Record<string, string>
   optionalNpmDependencies: Record<string, string>
 }

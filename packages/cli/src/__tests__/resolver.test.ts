@@ -42,6 +42,14 @@ const mockUtilsRegistry = {
     exports: ['transformOrigin', 'selectRTL'],
     dependencies: {},
   },
+  // The one util that is not `.ts`. Keep it in the fixture — it is the only
+  // thing standing between `utilFileNames` and a silent return to appending
+  // `.ts` to every name.
+  'render-icon': {
+    file: 'packages/utils/src/render-icon.tsx',
+    exports: ['renderIcon'],
+    dependencies: {},
+  },
 }
 
 const mockComponents = {
@@ -67,7 +75,7 @@ const mockComponents = {
     name: 'icon-button',
     description: 'Icon button',
     files: ['packages/components/src/icon-button/IconButton.tsx'],
-    utils: ['color', 'icon'],
+    utils: ['color', 'icon', 'render-icon'],
     componentDependencies: [],
     dependencies: { '@rootnative/core': '>=0.1.1-alpha.1' },
     optionalDependencies: { '@expo/vector-icons': '>=14.0.0' },
@@ -203,6 +211,48 @@ describe('resolveComponents', () => {
     expect(iconButtons).toHaveLength(1)
     // Direct request takes precedence
     expect(iconButtons[0].isDirectRequest).toBe(true)
+  })
+
+  // `add` printed `${util}.ts`, so it announced `render-icon.ts` while the
+  // installer wrote `render-icon.tsx`. The extension has to come from the
+  // registry, because it is not derivable from the util name.
+  describe('utilFileNames', () => {
+    it('reports the real extension for the one .tsx util', async () => {
+      const result = await resolveComponents(config, ['icon-button'])
+
+      expect(result.utilFileNames['render-icon']).toBe('render-icon.tsx')
+    })
+
+    it('does not report the name with a guessed .ts extension', async () => {
+      const result = await resolveComponents(config, ['icon-button'])
+
+      expect(result.utilFileNames['render-icon']).not.toBe('render-icon.ts')
+    })
+
+    it('reports .ts for the utils that really are .ts', async () => {
+      const result = await resolveComponents(config, ['button'])
+
+      expect(result.utilFileNames).toEqual({
+        color: 'color.ts',
+        elevation: 'elevation.ts',
+        icon: 'icon.ts',
+      })
+    })
+
+    it('names a file for every resolved util', async () => {
+      const result = await resolveComponents(config, ['icon-button', 'appbar'])
+
+      for (const util of result.utils) {
+        expect(result.utilFileNames[util]).toBeDefined()
+      }
+      expect(Object.keys(result.utilFileNames).sort()).toEqual(result.utils)
+    })
+
+    it('is empty for a component with no utils', async () => {
+      const result = await resolveComponents(config, ['typography'])
+
+      expect(result.utilFileNames).toEqual({})
+    })
   })
 
   it('handles component with no utils or deps', async () => {
