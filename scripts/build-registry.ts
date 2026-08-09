@@ -23,6 +23,43 @@ const componentsPkg = JSON.parse(
 )
 const VERSION = componentsPkg.version as string
 
+/**
+ * The floor the CLI installs for `@rootnative/inertia`, derived from the
+ * components peer range rather than repeated as a literal.
+ *
+ * `>=0.0.6 <0.1.0` → `>=0.0.6`. A scaffolded project needs an open-ended floor
+ * (the upper bound is the library's constraint, not the consumer's), so only the
+ * lower comparator is carried over.
+ *
+ * This used to be a hardcoded `'>=0.0.6'`, which is the exact drift CLAUDE.md
+ * warns about for generated surfaces: a version bump gives nobody a reason to
+ * open this file, so the floor silently lags. The `llms.txt` generator sat two
+ * releases behind for the same reason.
+ */
+const INERTIA_FLOOR = (() => {
+  const range = componentsPkg.peerDependencies?.['@rootnative/inertia'] as
+    | string
+    | undefined
+
+  if (!range) {
+    throw new Error(
+      'packages/components/package.json declares no @rootnative/inertia peer — ' +
+        'the registry cannot derive the floor the CLI should install.',
+    )
+  }
+
+  const floor = range.trim().split(/\s+/)[0] ?? ''
+
+  if (!/^>=\d+\.\d+\.\d+/.test(floor)) {
+    throw new Error(
+      `Unexpected @rootnative/inertia peer range "${range}" — expected it to ` +
+        'start with a ">=x.y.z" comparator.',
+    )
+  }
+
+  return floor
+})()
+
 // Utility value exports mapping (file stem → runtime exports)
 const UTIL_EXPORTS: Record<string, string[]> = {
   color: ['alphaColor', 'blendColor'],
@@ -145,6 +182,7 @@ function analyzeImports(componentDir: string): {
     )
     for (const match of internalImports) {
       const name = match[1]
+      if (!name) continue
       const fileName = ['.ts', '.tsx'].some((ext) => name.endsWith(ext))
         ? name
         : fs.existsSync(path.join(COMPONENTS_SRC, 'internal', `${name}.tsx`))
@@ -158,7 +196,9 @@ function analyzeImports(componentDir: string): {
 
     const rootImports = content.matchAll(/from\s+['"]\.\.\/([^/'"]+)['"]/g)
     for (const match of rootImports) {
-      const fileName = SHARED_ROOT_MODULES[match[1]]
+      const moduleName = match[1]
+      if (!moduleName) continue
+      const fileName = SHARED_ROOT_MODULES[moduleName]
       if (!fileName || sharedRootFiles.has(fileName)) continue
       sharedRootFiles.add(fileName)
       pendingShared.push(fileName)
@@ -217,7 +257,7 @@ function analyzeImports(componentDir: string): {
       if (importLines) {
         for (const line of importLines) {
           const match = line.match(/{([^}]+)}/)
-          if (match) {
+          if (match?.[1]) {
             const names = match[1].split(',').map((s) => s.trim())
             for (const name of names) {
               const utilFile = EXPORT_TO_UTIL[name]
@@ -236,6 +276,7 @@ function analyzeImports(componentDir: string): {
     )
     for (const match of componentImports) {
       const dep = match[1]
+      if (!dep) continue
       // Only count as dep if it's a known component directory
       const depDir = path.join(COMPONENTS_SRC, dep)
       if (
@@ -330,7 +371,7 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   }
 
   if (externalDeps.has('@rootnative/inertia')) {
-    dependencies['@rootnative/inertia'] = '>=0.0.6'
+    dependencies['@rootnative/inertia'] = INERTIA_FLOOR
     // Inertia is a thin wrapper over Reanimated 4 — its peers must be present
     // for the scaffolded component to run, even when the component itself no
     // longer imports Reanimated directly.
