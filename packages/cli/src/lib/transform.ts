@@ -1,3 +1,4 @@
+import path from 'node:path'
 import type { RootNativeConfig } from './types'
 
 interface TransformOptions {
@@ -19,11 +20,62 @@ const MULTI_LINE_IMPORT_REGEX =
 // SHARED_ROOT_MODULES in scripts/build-registry.ts.
 const SHARED_ROOT_MODULES = new Set(['safe-area'])
 
+/**
+ * True for an alias a bundler resolves by prefix, e.g. `@/lib` or `~/lib`.
+ *
+ * A relative alias (`./lib`, `../shared/lib`) is not one: `resolveAliasPath`
+ * anchors it at the project root, but an import specifier is resolved from the
+ * importing file's own directory. Writing it through unchanged produced
+ * `components/button/lib/rootnative-utils`, which does not exist.
+ */
+function isPrefixAlias(alias: string): boolean {
+  return !alias.startsWith('.')
+}
+
+/**
+ * The specifier that reaches `<alias>/<rest>` from inside the directory a
+ * component's files are written to.
+ *
+ * A prefix alias is position-independent, so it is used verbatim. A relative
+ * alias has to be re-anchored: both aliases resolve against the project root,
+ * and the file being written sits at `<componentsAlias>/<componentName>/`, so
+ * the real specifier is the path between those two directories. Uses POSIX
+ * separators — this is an import specifier, not a filesystem path, so it must
+ * not pick up `\` on Windows.
+ */
+function buildSpecifier(
+  alias: string,
+  rest: string,
+  componentsAlias: string,
+  componentName: string,
+): string {
+  if (isPrefixAlias(alias)) {
+    return `${alias}/${rest}`
+  }
+
+  const fromDir = path.posix.join(
+    toPosix(stripRelativePrefix(componentsAlias)),
+    componentName,
+  )
+  const target = path.posix.join(toPosix(stripRelativePrefix(alias)), rest)
+  const relative = path.posix.relative(fromDir, target)
+
+  return relative.startsWith('.') ? relative : `./${relative}`
+}
+
+function stripRelativePrefix(alias: string): string {
+  return alias.replace(/^\.\//, '')
+}
+
+function toPosix(value: string): string {
+  return value.replace(/\\/g, '/')
+}
+
 export function transformImports(
   source: string,
   options: TransformOptions,
 ): string {
-  const { config, installedComponents } = options
+  const { config, componentName, installedComponents } = options
   const componentsAlias = config.aliases.components
   const libAlias = config.aliases.lib
 
@@ -35,7 +87,13 @@ export function transformImports(
   ): string {
     // @rootnative/utils → local barrel
     if (importPath === '@rootnative/utils') {
-      return `${prefix}${quote}${libAlias}/rootnative-utils${quote}`
+      const specifier = buildSpecifier(
+        libAlias,
+        'rootnative-utils',
+        componentsAlias,
+        componentName,
+      )
+      return `${prefix}${quote}${specifier}${quote}`
     }
 
     // @rootnative/core → keep as-is (npm package)
@@ -64,7 +122,15 @@ export function transformImports(
 
       if (targetComponent && installedComponents.includes(targetComponent)) {
         const restOfPath = importPath.replace(/^\.\.\//, '')
-        return `${prefix}${quote}${componentsAlias}/${restOfPath}${quote}`
+        // With a relative components alias this resolves back to `../<rest>`:
+        // sibling component directories, which is what the source already said.
+        const specifier = buildSpecifier(
+          componentsAlias,
+          restOfPath,
+          componentsAlias,
+          componentName,
+        )
+        return `${prefix}${quote}${specifier}${quote}`
       }
     }
 

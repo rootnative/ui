@@ -254,6 +254,106 @@ describe('transformImports', () => {
       expect(output).toBe(`import { alphaColor } from '~/lib/rootnative-utils'`)
     })
   })
+
+  // `resolveAliasPath` accepts a relative alias and the installer writes the
+  // files to the right place, but the specifier used to be the raw alias — so
+  // `--lib-alias ./lib` wrote `'./lib/rootnative-utils'` into
+  // `components/button/Button.tsx`, which resolves to
+  // `components/button/lib/rootnative-utils` and does not exist. A relative
+  // alias is anchored at the project root; a specifier is resolved from the
+  // importing file.
+  describe('relative alias config', () => {
+    function transformWith(
+      aliases: RootNativeConfig['aliases'],
+      source: string,
+      componentName = 'button',
+    ) {
+      return transformImports(source, {
+        config: { ...config, aliases },
+        componentName,
+        installedComponents,
+      })
+    }
+
+    const relativeAliases = {
+      components: './components',
+      lib: './lib',
+    }
+
+    it('re-anchors the utils barrel to the importing file', () => {
+      const output = transformWith(
+        relativeAliases,
+        `import { alphaColor } from '@rootnative/utils'`,
+      )
+
+      expect(output).toBe(
+        `import { alphaColor } from '../../lib/rootnative-utils'`,
+      )
+    })
+
+    it('does not write the alias through verbatim', () => {
+      const output = transformWith(
+        relativeAliases,
+        `import { alphaColor } from '@rootnative/utils'`,
+      )
+
+      // The old output. It resolves to components/button/lib/rootnative-utils.
+      expect(output).not.toContain(`'./lib/rootnative-utils'`)
+    })
+
+    it('keeps sibling component imports relative', () => {
+      const output = transformWith(
+        relativeAliases,
+        `import { IconButton } from '../icon-button'`,
+        'appbar',
+      )
+
+      expect(output).toBe(`import { IconButton } from '../icon-button'`)
+    })
+
+    it('keeps a sibling subpath import relative', () => {
+      const output = transformWith(
+        relativeAliases,
+        `import type { IconButtonProps } from '../icon-button/types'`,
+        'appbar',
+      )
+
+      expect(output).toBe(
+        `import type { IconButtonProps } from '../icon-button/types'`,
+      )
+    })
+
+    it('handles a nested relative alias', () => {
+      const output = transformWith(
+        { components: './src/components/ui', lib: './src/lib' },
+        `import { alphaColor } from '@rootnative/utils'`,
+      )
+
+      expect(output).toBe(
+        `import { alphaColor } from '../../../lib/rootnative-utils'`,
+      )
+    })
+
+    it('handles aliases at different depths', () => {
+      const output = transformWith(
+        { components: './app/components', lib: './shared' },
+        `import { alphaColor } from '@rootnative/utils'`,
+      )
+
+      expect(output).toBe(
+        `import { alphaColor } from '../../../shared/rootnative-utils'`,
+      )
+    })
+
+    it('leaves a prefix alias untouched', () => {
+      const output = transformWith(
+        { components: '@/components/ui', lib: '@/lib' },
+        `import { alphaColor } from '@rootnative/utils'`,
+      )
+
+      expect(output).toBe(`import { alphaColor } from '@/lib/rootnative-utils'`)
+    })
+  })
 })
 
 describe('generateUtilsBarrel', () => {
