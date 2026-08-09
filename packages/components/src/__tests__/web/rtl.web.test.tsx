@@ -32,6 +32,7 @@
 import { isRTLDirection, selectRTL, transformOrigin } from '@rootnative/utils'
 import { screen } from '@testing-library/react'
 import { AppBar } from '../../appbar'
+import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { renderWeb } from './render-web'
 
 /**
@@ -125,5 +126,56 @@ describe('AppBar back affordance points the right way', () => {
     renderBackBar()
     // The icon mirrors; the accessible name must not.
     expect(screen.getByLabelText('Go back')).toBeTruthy()
+  })
+})
+
+/**
+ * Overlay placement resolves a *logical* alignment (`start`/`end`) to a physical
+ * edge, so it goes through `selectRTL` and inherits everything above.
+ *
+ * The native suite covers this geometry thoroughly — 23 cases in
+ * `useAnchorPosition.test.ts`, including both RTL alignments — but it sets
+ * direction by stubbing `I18nManager.isRTL`, which **on web does nothing**:
+ * RNW's `I18nManager` is a dead stub and `selectRTL` reads the document instead.
+ * So those RTL cases prove the maths and say nothing about the browser, and
+ * without these two a Menu could resolve `align="start"` to the wrong edge on
+ * every RTL web page with the whole suite green.
+ *
+ * The expected numbers are the same ones the native alignment tests assert, on
+ * the same geometry — they have to be, since it is one shared function and only
+ * the direction *source* differs.
+ */
+describe('overlay placement resolves logical alignment against the document', () => {
+  const WIDE = {
+    anchor: { x: 250, y: 300, width: 40, height: 40 },
+    overlay: { width: 200, height: 150 },
+    layer: { x: 0, y: 0, width: 600, height: 800 },
+    windowWidth: 600,
+    windowHeight: 800,
+    preferredSide: 'bottom' as const,
+    align: 'start' as const,
+    offset: 0,
+    screenMargin: 8,
+    maxOverlayHeight: Infinity,
+  }
+
+  it('aligns start to the anchor left edge in LTR', () => {
+    const position = resolveAnchorPosition(WIDE)
+    expect(position.left).toBe(250)
+    expect(position.transformOrigin).toBe('left top')
+  })
+
+  it('aligns start to the anchor right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const position = resolveAnchorPosition(WIDE)
+    expect(position.left).toBe(90)
+    expect(position.transformOrigin).toBe('right top')
+  })
+
+  it('aligns end to the anchor left edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const position = resolveAnchorPosition({ ...WIDE, align: 'end' })
+    expect(position.left).toBe(250)
+    expect(position.transformOrigin).toBe('left top')
   })
 })
