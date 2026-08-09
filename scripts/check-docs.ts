@@ -8,16 +8,18 @@
  * two `ListItem` props that don't exist. Every one of those is mechanically
  * detectable, so detecting it by hand once a year is the wrong plan.
  *
- * Three groups of checks:
+ * Two groups of checks:
  *
  *   cli-reference   `docs/docs/cli.md` vs `packages/cli/src` + `registry/`
  *   component-props every JSX prop in every docs example vs the component's
  *                   real props type, resolved through the TypeScript checker so
  *                   inherited React Native props count too
- *   claude-md       the repo's own `CLAUDE.md` vs the same sources. Added after
- *                   an audit found it stale in two places while `cli.md` — the
- *                   file this script already read — was correct. It is the file
- *                   an agent reads first, so stale guidance there is costly.
+ *
+ * Only files that are committed belong here. A third `claude-md` group once
+ * checked the repo's own root `CLAUDE.md`, which is never tracked — so it
+ * passed locally, crashed CI on the commit that added it, and could not have
+ * done otherwise. A check whose input is absent on a clean checkout is not a
+ * check. Whatever guards an untracked file, it is not this script.
  *
  * Usage:
  *   npx tsx scripts/check-docs.ts          # report and exit 1 on any problem
@@ -28,12 +30,10 @@
  * Every checker was validated by fault injection before being trusted: an
  * earlier ad-hoc version of the prop audit reported a false clean twice, once
  * because an outer `<SnackExample code={`…`}>` match swallowed the inner
- * component tags and once because the file walker only visited `.ts`. The
- * `claude-md` group went the same way — its first cut read every dash-led word
- * in a table cell as a flag and called hyphenated prose a defect, and
- * `claude-md/paths` stayed green on a step that named a real file for a thing
- * the file does not hold, which is why `component-steps` exists.
- * If you extend this script, break it on purpose first and confirm it complains.
+ * component tags and once because the file walker only visited `.ts`.
+ * If you extend this script, break it on purpose first and confirm it
+ * complains — and confirm it still passes on a checkout that has only tracked
+ * files, which is the half that was missed when `claude-md` went in.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -46,7 +46,6 @@ const DOCTOR_SRC = path.join(ROOT, 'packages/cli/src/commands/doctor.ts')
 const REGISTRY_DIR = path.join(ROOT, 'registry/components')
 const DOCS_DIR = path.join(ROOT, 'docs/docs')
 const COMPONENTS_ENTRY = path.join(ROOT, 'packages/components/src/index.ts')
-const CLAUDE_MD = path.join(ROOT, 'CLAUDE.md')
 
 interface Problem {
   check: string
@@ -159,211 +158,6 @@ function checkCliFlags(doc: string) {
     notes.push(
       `${command.name}: ${command.flags.size} flag(s) in source, ${documented.size} documented`,
     )
-  }
-}
-
-/**
- * The `| \`rootnative x\` | … |` rows of CLAUDE.md's "Commands" table, as
- * command name → the flags its description cell claims.
- *
- * A different shape from cli.md, which gives each command its own `###`
- * section and a flag table — here one row holds both the description and an
- * inline `Options: \`-y/--yes\`, …` list, so the flags come out of the second
- * cell rather than the first.
- */
-function claudeMdCommandTable(doc: string): Map<string, Set<string>> {
-  const start = doc.search(/^### Commands\s*$/m)
-  const rest = start === -1 ? '' : doc.slice(start)
-  const section = rest.slice(0, rest.search(/^#{2,3} .*$/m) || undefined)
-  const rows = new Map<string, Set<string>>()
-
-  for (const row of section.split('\n')) {
-    if (!row.startsWith('|')) continue
-    const cells = row.split('|')
-    const name = cells[1]?.match(/`rootnative ([a-z]+)/)?.[1]
-    if (!name) continue
-
-    const flags = new Set<string>()
-    // Only inside backticks. Reading every dash-led word out of the cell
-    // instead picks up ordinary hyphenated prose — "pre-configured" and
-    // "LLM-docs" both parsed as flags and reported a clean table as broken.
-    for (const code of (cells[2] ?? '').matchAll(/`([^`]+)`/g)) {
-      for (const spelling of code[1].matchAll(
-        /(?:^|[\s/,])(--?[a-z][\w-]*)/g,
-      )) {
-        flags.add(spelling[1])
-      }
-    }
-    rows.set(name, flags)
-  }
-
-  return rows
-}
-
-/**
- * CLAUDE.md's command table vs Commander, the same way `cli-reference/flags`
- * checks cli.md.
- *
- * `docs:check` used to read the docs site only, so this table drifted unseen:
- * an audit found `add` missing `-y/--yes` while cli.md — which *is* checked —
- * documented it correctly. CLAUDE.md is the file an agent reads first, so a
- * wrong flag list there is the expensive kind of stale.
- */
-function checkClaudeMdCommands() {
-  const check = 'claude-md/cli-commands'
-  const documented = claudeMdCommandTable(read(CLAUDE_MD))
-
-  if (documented.size === 0) {
-    fail(check, 'CLAUDE.md has no "### Commands" table rows')
-    return
-  }
-
-  for (const command of cliCommands()) {
-    const flags = documented.get(command.name)
-    if (!flags) {
-      fail(check, `CLAUDE.md's command table has no \`${command.name}\` row`)
-      continue
-    }
-    for (const flag of command.flags) {
-      if (!flags.has(flag)) {
-        fail(
-          check,
-          `\`${command.name}\` accepts ${flag}, CLAUDE.md doesn't list it`,
-        )
-      }
-    }
-    for (const flag of flags) {
-      if (!command.flags.has(flag)) {
-        fail(
-          check,
-          `CLAUDE.md lists ${flag} on \`${command.name}\`, which doesn't accept it`,
-        )
-      }
-    }
-    notes.push(
-      `CLAUDE.md ${command.name}: ${command.flags.size} flag(s) in source, ${flags.size} documented`,
-    )
-  }
-
-  for (const name of documented.keys()) {
-    if (!cliCommands().some((command) => command.name === name)) {
-      fail(check, `CLAUDE.md documents \`${name}\`, which is not a command`)
-    }
-  }
-}
-
-/**
- * Paths CLAUDE.md tells the reader to edit, which have to exist.
- *
- * The same audit found step 4 of "Adding a New Component" pointing at the
- * `build` script in `packages/components/package.json` for the entry list,
- * which moved to `tsup.config.ts`. A path is cheap to verify, and a checklist
- * that names the wrong file sends every reader to the wrong place.
- */
-function checkClaudeMdPaths() {
-  const check = 'claude-md/paths'
-  const doc = read(CLAUDE_MD)
-  let checked = 0
-  let skipped = 0
-
-  for (const match of doc.matchAll(
-    /`((?:packages|scripts|docs|example|templates|registry)\/[^`\s]*?\.(?:ts|tsx|json|md|mdx))`/g,
-  )) {
-    const rel = match[1]
-
-    // `<component-name>` is a placeholder and `{core,utils}` is a brace
-    // expansion standing for several real files; neither is a path that can be
-    // checked. Skipping them is required, but a silent skip is how an audit
-    // reports a false clean — so they are counted and reported instead.
-    if (/[<>{}*]/.test(rel)) {
-      skipped++
-      continue
-    }
-
-    // A path the reader is told to *create* does not exist yet by definition —
-    // the "add a new adapter" steps name `createTablerResolver.tsx` as the file
-    // to write. Only paths presented as existing are checkable.
-    if (/\bCreate\s+$/.test(doc.slice(0, match.index))) {
-      skipped++
-      continue
-    }
-
-    checked++
-    if (!fs.existsSync(path.join(ROOT, rel))) {
-      fail(check, `CLAUDE.md names \`${rel}\`, which does not exist`)
-    }
-  }
-
-  notes.push(
-    `CLAUDE.md: ${checked} file path(s) checked, ${skipped} placeholder(s) skipped`,
-  )
-}
-
-/**
- * The "Adding a New Component" checklist vs where those edits really go.
- *
- * `claude-md/paths` cannot catch this class: step 4 used to send the reader to
- * the `build` script in `packages/components/package.json` for the tsup entry
- * list, and that file plainly exists — the path was real and the claim was
- * false. So the file a step names is checked against the file that actually
- * holds the thing.
- */
-function checkClaudeMdComponentSteps() {
-  const check = 'claude-md/component-steps'
-  const doc = read(CLAUDE_MD)
-  const start = doc.search(/^## Adding a New Component\s*$/m)
-
-  if (start === -1) {
-    fail(check, 'CLAUDE.md has no "## Adding a New Component" section')
-    return
-  }
-
-  const rest = doc.slice(start + 1)
-  const end = rest.search(/^## /m)
-  const section = end === -1 ? rest : rest.slice(0, end)
-
-  // Each claim: the step that names a file, and the file that owns the thing.
-  const claims: {
-    what: string
-    step: RegExp
-    owner: string
-    holds: RegExp
-  }[] = [
-    {
-      what: 'the tsup entry list',
-      step: /entry point[^\n]*?\bin `([^`]+)`/,
-      owner: 'packages/components/tsup.config.ts',
-      holds: /entry:\s*\[/,
-    },
-    {
-      what: 'the subpath exports',
-      step: /subpath export in `([^`]+)`/,
-      owner: 'packages/components/package.json',
-      holds: /"exports"/,
-    },
-  ]
-
-  for (const claim of claims) {
-    const named = section.match(claim.step)?.[1]
-
-    if (!named) {
-      fail(check, `no step in the checklist names where ${claim.what} lives`)
-      continue
-    }
-    if (named !== claim.owner) {
-      fail(
-        check,
-        `checklist puts ${claim.what} in \`${named}\`; it lives in \`${claim.owner}\``,
-      )
-      continue
-    }
-    // Guard the expectation itself, so this check fails loudly rather than
-    // going stale if the entry list moves again.
-    if (!claim.holds.test(read(path.join(ROOT, claim.owner)))) {
-      fail(check, `\`${claim.owner}\` no longer holds ${claim.what}`)
-      continue
-    }
-    notes.push(`CLAUDE.md: ${claim.what} → ${named}`)
   }
 }
 
@@ -690,9 +484,6 @@ function main() {
   checkComponentTable(doc)
   checkDoctorChecks(doc)
   checkComponentProps()
-  checkClaudeMdCommands()
-  checkClaudeMdPaths()
-  checkClaudeMdComponentSteps()
 
   if (process.argv.includes('--list')) {
     for (const note of notes) console.log(`  ${note}`)
