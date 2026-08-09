@@ -316,7 +316,18 @@ export const catalogEntries: CatalogEntry[] = sections.flatMap(
   (section) => section.items,
 )
 
-export const totalComponents = catalogEntries.length
+/**
+ * How many components the library ships — the number the home screen reports.
+ *
+ * Counts entries with an `add` name rather than every catalog entry. The
+ * catalog also carries the RTL demo, which is a `@rootnative/utils` feature and
+ * not an installable component, so `catalogEntries.length` claimed 29 for a
+ * library of 28. An entry with no `add` is by definition not something
+ * `rootnative add` can install.
+ */
+export const totalComponents = catalogEntries.filter(
+  (entry) => entry.add,
+).length
 
 /** Look up the entry for an Expo Router pathname (e.g. `/button`). */
 export function findEntry(route: string): CatalogEntry | undefined {

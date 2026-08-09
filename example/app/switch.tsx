@@ -16,7 +16,11 @@ export default function SwitchScreen() {
       <Column gap="sm">
         <Typography variant="titleSmall">Basic</Typography>
         <Row gap="md" align="center">
-          <Switch value={basic} onValueChange={setBasic} />
+          <Switch
+            value={basic}
+            onValueChange={setBasic}
+            accessibilityLabel="Basic switch"
+          />
           <Typography variant="bodyMedium">{basic ? 'On' : 'Off'}</Typography>
         </Row>
         <Row gap="md" align="center">
@@ -24,6 +28,7 @@ export default function SwitchScreen() {
             value={withIcon}
             onValueChange={setWithIcon}
             selectedIcon="check"
+            accessibilityLabel="With check icon"
           />
           <Typography variant="bodyMedium">With check icon</Typography>
         </Row>
@@ -37,6 +42,7 @@ export default function SwitchScreen() {
             onValueChange={setCustomIcon}
             selectedIcon="bell"
             unselectedIcon="bell-off"
+            accessibilityLabel="Bell / Bell-off"
           />
           <Typography variant="bodyMedium">Bell / Bell-off</Typography>
         </Row>
@@ -45,11 +51,11 @@ export default function SwitchScreen() {
       <Column gap="sm">
         <Typography variant="titleSmall">Disabled</Typography>
         <Row gap="md" align="center">
-          <Switch value={false} disabled />
+          <Switch value={false} disabled accessibilityLabel="Off (disabled)" />
           <Typography variant="bodyMedium">Off (disabled)</Typography>
         </Row>
         <Row gap="md" align="center">
-          <Switch value disabled />
+          <Switch value disabled accessibilityLabel="On (disabled)" />
           <Typography variant="bodyMedium">On (disabled)</Typography>
         </Row>
       </Column>
@@ -62,6 +68,7 @@ export default function SwitchScreen() {
             onValueChange={setGreenSwitch}
             containerColor="#2E7D32"
             contentColor="#C8E6C9"
+            accessibilityLabel="Green switch"
           />
           <Typography variant="bodyMedium">Green switch</Typography>
         </Row>

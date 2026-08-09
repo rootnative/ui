@@ -17,6 +17,7 @@ export default function RadioScreen() {
           <Radio
             value={radioValue === 'option1'}
             onValueChange={() => setRadioValue('option1')}
+            accessibilityLabel="Option 1"
           />
           <Typography variant="bodyMedium">Option 1</Typography>
         </Row>
@@ -24,6 +25,7 @@ export default function RadioScreen() {
           <Radio
             value={radioValue === 'option2'}
             onValueChange={() => setRadioValue('option2')}
+            accessibilityLabel="Option 2"
           />
           <Typography variant="bodyMedium">Option 2</Typography>
         </Row>
@@ -31,6 +33,7 @@ export default function RadioScreen() {
           <Radio
             value={radioValue === 'option3'}
             onValueChange={() => setRadioValue('option3')}
+            accessibilityLabel="Option 3"
           />
           <Typography variant="bodyMedium">Option 3</Typography>
         </Row>
@@ -39,11 +42,15 @@ export default function RadioScreen() {
       <Column gap="sm">
         <Typography variant="titleSmall">Disabled</Typography>
         <Row gap="sm" align="center">
-          <Radio value={false} disabled />
+          <Radio
+            value={false}
+            disabled
+            accessibilityLabel="Unselected (disabled)"
+          />
           <Typography variant="bodyMedium">Unselected (disabled)</Typography>
         </Row>
         <Row gap="sm" align="center">
-          <Radio value disabled />
+          <Radio value disabled accessibilityLabel="Selected (disabled)" />
           <Typography variant="bodyMedium">Selected (disabled)</Typography>
         </Row>
       </Column>
@@ -57,6 +64,7 @@ export default function RadioScreen() {
               setBlueRadio((v) => (v === 'blue' ? '' : 'blue'))
             }
             containerColor="#1565C0"
+            accessibilityLabel="Blue radio"
           />
           <Typography variant="bodyMedium">Blue radio</Typography>
         </Row>
