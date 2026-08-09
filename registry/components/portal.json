@@ -14,7 +14,7 @@
   "utils": [],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.5"
+    "@rootnative/core": ">=0.0.0-alpha.6"
   },
   "optionalDependencies": {}
 }

@@ -11,6 +11,54 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+## 0.0.0-alpha.6 — 2026-08-10
+
+The web pass. `0.0.0-alpha.5` covered Android; this one is react-native-web,
+and it is mostly test coverage over behaviour that was already correct — the
+web test project went from 53 to 125 tests. One real fix, plus the tail of the
+Android audit.
+
+### Fixed
+
+- **Layout direction is now read from the browser on web.** Every RTL branch in
+  the library asked `I18nManager`, which react-native-web ships as a hardcoded
+  stub (`isRTL` is always `false`). So on an RTL page the *layout* mirrored
+  correctly — react-native-web emits CSS logical properties and the browser
+  resolves them — while the JavaScript still answered "LTR": the `AppBar` back
+  arrow pointed the wrong way, `Menu`/`Tooltip` resolved `align="start"` to the
+  wrong edge, and `Slider` ran its drag maths backwards. `selectRTL` and
+  `transformOrigin` now read the document's resolved `direction` on web and keep
+  using `I18nManager` on native. Native behaviour is unchanged.
+- **Decorative icons no longer leak their glyph into the accessible name.** All
+  22 `renderIcon` sites sit under `aria-hidden` on a `View`, so screen readers
+  stop announcing private-use-area characters alongside a control's label.
+- **Touch targets meet the 48dp floor.** `Button` (`xs` is 32dp tall), `Switch`
+  (a 32dp track), `Avatar`, `ButtonGroup` and the other small controls size
+  their `hitSlop` from their own height instead of a flat 4dp. Web is excluded
+  because react-native-web does not implement `hitSlop`.
+- **`rootnative add` resolves utility file names and import aliases correctly.**
+  Two independent CLI bugs found by installing into a fresh project.
+
+### Added
+
+- `isRTLDirection()` in the shared utilities, for the places that need the
+  boolean rather than a choice between two values (`Slider` threads it through
+  track geometry and keyboard handling). Also added to the component registry,
+  so a CLI-installed `Slider` gets it.
+- `pnpm run check:inertia-pins` — fails when any `@rootnative/inertia` pin
+  disagrees with the components peer range. The template pins were previously
+  silent: nothing failed locally when one lagged.
+
+### Notes
+
+- A modifier chord (⌘R, Ctrl+C) still flips input modality to keyboard, so the
+  next mouse click paints a focus ring. The cause is upstream in
+  `@rootnative/inertia`, whose focus-visible tracker has no modifier guard; it
+  is pinned as a known-failing test here and fixes itself once inertia ships the
+  guard.
+
+## 0.0.0-alpha.5 — 2026-08-07
+
 ### Changed
 
 - **`Progress`: `containerColor` is now the track and `contentColor` the
