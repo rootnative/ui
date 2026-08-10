@@ -124,7 +124,15 @@ Skip all prompts with `-y` (uses the `blank` template, npm, auto display name, a
 npx rootnative create my-app -y
 ```
 
-See the [CLI reference](./cli#create) for every flag.
+Pass `.` to scaffold into the directory you are already in, instead of a new
+subdirectory. The project name comes from that directory's name:
+
+```bash
+npx rootnative create .
+```
+
+See the [CLI reference](./cli#create) for every flag, and for what happens when
+the template meets a file that is already there.
 
 ## Next steps
 
