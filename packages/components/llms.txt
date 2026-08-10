@@ -33,7 +33,7 @@ import { Typography } from '@rootnative/components/typography'
 
 Props:
 - `children: ReactNode` — Content to display. Accepts strings, numbers, or nested elements.
-- `variant?: 'displayLarge' | 'displayMedium' | 'displaySmall' | 'headlineLarge' | 'headlineMedium' | 'headlineSmall' | 'titleLarge' | 'titleMedium' | 'titleSmall' | 'bodyLarge' | 'bodyMedium' | 'bodySmall' | 'labelLarge' | 'labelMedium' | 'labelSmall'` — Default: `'bodyMedium'`. MD3 type scale role. Controls font size, weight, line height, and letter spacing.
+- `variant?: 'displayLarge' | 'displayMedium' | 'displaySmall' | 'headlineLarge' | 'headlineMedium' | 'headlineSmall' | 'titleLarge' | 'titleMedium' | 'titleSmall' | 'bodyLarge' | 'bodyMedium' | 'bodySmall' | 'labelLarge' | 'labelMedium' | 'labelSmall' | 'displayLargeEmphasized' | 'displayMediumEmphasized' | 'displaySmallEmphasized' | 'headlineLargeEmphasized' | 'headlineMediumEmphasized' | 'headlineSmallEmphasized' | 'titleLargeEmphasized' | 'titleMediumEmphasized' | 'titleSmallEmphasized' | 'bodyLargeEmphasized' | 'bodyMediumEmphasized' | 'bodySmallEmphasized' | 'labelLargeEmphasized' | 'labelMediumEmphasized' | 'labelSmallEmphasized'` — Default: `'bodyMedium'`. MD3 type scale role. Controls font size, weight, line height, and letter spacing.
 - `color?: string` — Override the text color. Takes priority over `style.color`. Defaults to the theme's `onSurface` color.
 - `style?: StyleProp<TextStyle>` — Additional text styles. Can override the default theme color via `style.color` when no `color` prop is set.
 - `as?: ComponentType<TextProps>` — Default: `Text`. Override the underlying text component (e.g. Animated.Text).

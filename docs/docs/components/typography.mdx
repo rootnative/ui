@@ -43,23 +43,25 @@ The full MD3 type scale:
 | Body | `bodyLarge`, `bodyMedium`, `bodySmall` |
 | Label | `labelLarge`, `labelMedium`, `labelSmall` |
 
-:::note Emphasized styles
+Each of the 15 roles also has an MD3 Expressive `<name>Emphasized` counterpart —
+same size and line height, weight one step heavier — so `variant` accepts 30
+values in total:
 
-The theme also carries an MD3 Expressive `<name>Emphasized` token for each of
-the 15 roles above — same size and line height, weight one step heavier — so
-`theme.typography` has 30 entries. `variant` deliberately accepts only the 15
-base roles. Reach an emphasized style through `style`, which is applied after
-the variant:
+| Category | Emphasized variants |
+|----------|---------------------|
+| Display | `displayLargeEmphasized`, `displayMediumEmphasized`, `displaySmallEmphasized` |
+| Headline | `headlineLargeEmphasized`, `headlineMediumEmphasized`, `headlineSmallEmphasized` |
+| Title | `titleLargeEmphasized`, `titleMediumEmphasized`, `titleSmallEmphasized` |
+| Body | `bodyLargeEmphasized`, `bodyMediumEmphasized`, `bodySmallEmphasized` |
+| Label | `labelLargeEmphasized`, `labelMediumEmphasized`, `labelSmallEmphasized` |
 
 ```tsx
-const theme = useTheme()
-
-<Typography variant="titleLarge" style={theme.typography.titleLargeEmphasized}>
-  Emphasized title
-</Typography>
+<Typography variant="titleMediumEmphasized">Emphasized title</Typography>
 ```
 
-:::
+Use an emphasized variant instead of a base variant plus a `fontWeight`
+override. The emphasized tokens also adjust tracking, which a weight override
+does not.
 
 ## Accessibility
 

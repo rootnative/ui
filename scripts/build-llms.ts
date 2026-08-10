@@ -301,9 +301,35 @@ function parseComponentDir(dirName: string): ParseResult {
 // Formatting Helpers
 // ============================================================
 
+// `keyof <CoreType>` expanded to its literal members. A prop whose type is
+// derived from a core type (TypographyVariant is `keyof Typography`) would
+// otherwise reach consumers as the bare alias text, which tells an agent
+// reading node_modules nothing about the accepted values. Keys are read from
+// core's declaration, so this cannot drift from the theme.
+function coreTypeKeys(typeName: string): string[] | null {
+  const source = fs.readFileSync(
+    path.join(ROOT, 'packages/core/src/theme/types.ts'),
+    'utf-8',
+  )
+  const decl = source.match(
+    new RegExp(`export type ${typeName} = \\{([\\s\\S]*?)\\n\\}`),
+  )
+  if (!decl) return null
+  const keys = [...decl[1].matchAll(/^\s{2}(\w+)[?]?:/gm)].map((m) => m[1])
+  return keys.length > 0 ? keys : null
+}
+
 function resolveTypeAlias(type: string, aliases: TypeAliasInfo[]): string {
   const alias = aliases.find((a) => a.name === type)
-  return alias ? alias.type : type
+  const resolved = alias ? alias.type : type
+
+  const keyofMatch = resolved.match(/^keyof (\w+)$/)
+  if (keyofMatch) {
+    const keys = coreTypeKeys(keyofMatch[1])
+    if (keys) return keys.map((k) => `'${k}'`).join(' | ')
+  }
+
+  return resolved
 }
 
 function formatInheritsNote(ext: string): string | null {
