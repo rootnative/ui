@@ -1,3 +1,6 @@
+<!-- Absolute URL: npm does not resolve repository-relative image paths. -->
+<img src="https://raw.githubusercontent.com/rootnative/ui/main/assets/brand/rootnative-mark.png" alt="" width="88" height="88" />
+
 # @rootnative/icons
 
 Icon-library adapters for [RootNative UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice — Lucide, Phosphor, any `@expo/vector-icons` set, or your own resolver.

@@ -1,3 +1,5 @@
+<img src="assets/brand/rootnative-mark.png" alt="" width="88" height="88" />
+
 # RootNative UI
 
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)

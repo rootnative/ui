@@ -13,13 +13,14 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "primaryColor": "#2563eb",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0a0a0f"
       }
     },
     "plugins": ["expo-router"],

@@ -1,0 +1,48 @@
+<!--
+  Open Graph / Twitter card, 1200x630. Text is baked into the raster output,
+  so the font stack only has to resolve on the machine running this script.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <title>RootNative UI — design-system agnostic components for React Native</title>
+  <defs>
+    <linearGradient id="cardBar" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1200" y2="0">
+      <stop offset="0" stop-color="#bfdbfe" />
+      <stop offset="0.55" stop-color="#60a5fa" />
+      <stop offset="1" stop-color="#2563eb" />
+    </linearGradient>
+    <radialGradient id="cardGlow" gradientUnits="userSpaceOnUse" cx="1020" cy="110" r="560">
+      <stop offset="0" stop-color="#1739a8" stop-opacity="0.34" />
+      <stop offset="0.55" stop-color="#60a5fa" stop-opacity="0.09" />
+      <stop offset="1" stop-color="#0a0a0f" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0a0a0f" />
+  <g transform="translate(0 0)">
+    <rect width="1200" height="630" fill="#0a0a0f" />
+    <rect width="1200" height="630" fill="url(#cardGlow)" />
+    <rect y="625" width="1200" height="5" fill="url(#cardBar)" />
+
+    <!--
+      The mark is wider than it is tall, so this scale is set from its visual
+      weight against the wordmark rather than from a nominal box height.
+    -->
+    <g transform="translate(84 74) scale(4.0)">
+      <g>
+        <path d="M 17 25.5 L 30 32 L 17 38.5 L 4 32 Z" fill="#bfdbfe" />
+        <path d="M 4 32 L 17 38.5 L 17 51.5 L 4 45 Z" fill="#2563eb" />
+        <path d="M 17 38.5 L 30 32 L 30 45 L 17 51.5 Z" fill="#60a5fa" />
+        <path d="M 47 25.5 L 60 32 L 47 38.5 L 34 32 Z" fill="#bfdbfe" />
+        <path d="M 34 32 L 47 38.5 L 47 51.5 L 34 45 Z" fill="#2563eb" />
+        <path d="M 47 38.5 L 60 32 L 60 45 L 47 51.5 Z" fill="#60a5fa" />
+        <path d="M 32 4.5 L 45 11 L 32 17.5 L 19 11 Z" fill="#bfdbfe" />
+        <path d="M 19 11 L 32 17.5 L 32 30.5 L 19 24 Z" fill="#2563eb" />
+        <path d="M 32 17.5 L 45 11 L 45 24 L 32 30.5 Z" fill="#60a5fa" />
+      </g>
+    </g>
+
+    <text x="110" y="392" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="90" font-weight="800" letter-spacing="-3" fill="#fafafa">RootNative UI</text>
+    <text x="110" y="448" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="34" font-weight="500" fill="#a1a1aa">Design-system agnostic components for React Native</text>
+    <text x="110" y="524" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="26" font-weight="500" letter-spacing="0.4" fill="#71717a">@rootnative/components</text>
+  </g>
+</svg>

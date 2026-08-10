@@ -20,6 +20,7 @@
     "format": "prettier . --write",
     "docs:dev": "pnpm --filter @rootnative/docs dev",
     "docs:build": "pnpm --filter @rootnative/docs build",
+    "build:brand": "node scripts/build-brand.mjs",
     "build:llms": "npx tsx scripts/build-llms.ts",
     "api:surface": "npx tsx scripts/build-api-surface.ts",
     "api:check": "pnpm run build && npx tsx scripts/build-api-surface.ts --check",

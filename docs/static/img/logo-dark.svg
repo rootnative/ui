@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-label="RootNative UI">
+  <title>RootNative UI</title>
+  <g transform="translate(0 4)">
+    <g>
+      <path d="M 17 25.5 L 30 32 L 17 38.5 L 4 32 Z" fill="#bfdbfe" />
+      <path d="M 4 32 L 17 38.5 L 17 51.5 L 4 45 Z" fill="#2563eb" />
+      <path d="M 17 38.5 L 30 32 L 30 45 L 17 51.5 Z" fill="#60a5fa" />
+      <path d="M 47 25.5 L 60 32 L 47 38.5 L 34 32 Z" fill="#bfdbfe" />
+      <path d="M 34 32 L 47 38.5 L 47 51.5 L 34 45 Z" fill="#2563eb" />
+      <path d="M 47 38.5 L 60 32 L 60 45 L 47 51.5 Z" fill="#60a5fa" />
+      <path d="M 32 4.5 L 45 11 L 32 17.5 L 19 11 Z" fill="#bfdbfe" />
+      <path d="M 19 11 L 32 17.5 L 32 30.5 L 19 24 Z" fill="#2563eb" />
+      <path d="M 32 17.5 L 45 11 L 45 24 L 32 30.5 Z" fill="#60a5fa" />
+    </g>
+  </g>
+</svg>

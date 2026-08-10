@@ -17,6 +17,11 @@ function readWorkspacePackage(dir: string): WorkspacePackage {
   ) as WorkspacePackage
 }
 
+// Docusaurus resolves `baseUrl` for `favicon` and `themeConfig.image`, but not
+// for `headTags` hrefs — those are emitted verbatim, so they have to be built
+// from the same constant rather than hard-coded.
+const baseUrl = '/ui/'
+
 const componentsPkg = readWorkspacePackage('components')
 
 // Snack encodes dependencies as a comma-separated `name@spec` list, so every
@@ -45,7 +50,7 @@ const config: Config = {
   title: 'RootNative UI',
   tagline: 'Design-system agnostic components for React Native',
   url: 'https://rootnative.github.io',
-  baseUrl: '/ui/',
+  baseUrl,
   onBrokenLinks: 'throw',
 
   markdown: {
@@ -61,6 +66,14 @@ const config: Config = {
   },
 
   headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: `${baseUrl}img/favicon.png`,
+      },
+    },
     {
       tagName: 'link',
       attributes: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -139,8 +152,14 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    image: 'img/social-card.png',
     navbar: {
       title: 'RootNative UI',
+      logo: {
+        alt: 'RootNative UI',
+        src: 'img/logo.svg',
+        srcDark: 'img/logo-dark.svg',
+      },
       hideOnScroll: true,
       items: [
         {

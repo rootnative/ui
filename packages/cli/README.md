@@ -1,3 +1,6 @@
+<!-- Absolute URL: npm does not resolve repository-relative image paths. -->
+<img src="https://raw.githubusercontent.com/rootnative/ui/main/assets/brand/rootnative-mark.png" alt="" width="88" height="88" />
+
 # rootnative
 
 CLI for adding [RootNative UI](https://github.com/rootnative/ui) components directly into your React Native or Expo project. Inspired by [shadcn/ui](https://ui.shadcn.com) — you own the code.

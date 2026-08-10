@@ -1,3 +1,9 @@
+<!--
+  Absolute URL, not a relative path: this README is the npm package page, and
+  npm does not resolve repository-relative image paths.
+-->
+<img src="https://raw.githubusercontent.com/rootnative/ui/main/assets/brand/rootnative-mark.png" alt="" width="88" height="88" />
+
 # @rootnative/core
 
 Design-system agnostic theme engine for [RootNative UI](https://github.com/rootnative/ui) — a React Native component library. Ships with Material Design 3 out of the box.
