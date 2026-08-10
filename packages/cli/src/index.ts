@@ -19,7 +19,7 @@ program
 program
   .command('create')
   .description('Create a new project with RootNative UI pre-configured')
-  .argument('[name]', 'Project name')
+  .argument('[name]', 'Project name, or "." to use the current directory')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('-t, --template <name>', 'Template to use (blank, with-router)')
   .option(

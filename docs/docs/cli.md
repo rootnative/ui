@@ -85,9 +85,14 @@ Create a new project with RootNative UI pre-configured. See [Quick Start](./quic
 ```bash
 npx rootnative create
 npx rootnative create my-app
+npx rootnative create .
 ```
 
 The CLI prompts for template, project name, display name, and package manager, then scaffolds a ready-to-run Expo project with `ThemeProvider` and example components.
+
+**Scaffolding into the current directory:** pass `.` as the name. The CLI writes the template into the directory you are in, and takes the project name from that directory's name. Your directory is never deleted. If the template would overwrite a file that is already there — an existing `.gitignore` or `README.md`, for example — the CLI lists each file and asks first. With `-y` it stops instead, and changes nothing.
+
+A named project goes into a new subdirectory. If that subdirectory already exists, the CLI asks to delete it and all of its contents. With `-y` it stops instead.
 
 **Options:**
 

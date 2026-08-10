@@ -1626,8 +1626,11 @@ Create a new project with RootNative UI pre-configured. Fetches the quickstart t
 \`\`\`bash
 npx rootnative create            # Interactive
 npx rootnative create my-app     # With name
+npx rootnative create .          # Into the current directory, named after it
 npx rootnative create my-app -y  # Non-interactive, accept defaults
 \`\`\`
+
+Pass \`.\` to scaffold into the directory you are already in. The project name comes from that directory's name, and the directory is never deleted — the CLI lists any file the template would overwrite and asks first (with \`-y\` it stops and changes nothing). A named project goes into a new subdirectory, and the CLI asks before it deletes an existing one.
 
 Options:
 - \`-y, --yes\` — Skip prompts and use defaults

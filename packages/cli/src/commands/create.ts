@@ -122,6 +122,94 @@ function slugify(input: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+export interface ProjectTarget {
+  /** Slug used for the package name, the Expo slug and the scheme. */
+  projectName: string
+  /** Absolute directory the template is written into. */
+  targetDir: string
+  /** True when the template goes into the directory the user is already in. */
+  useCurrentDir: boolean
+}
+
+export type ProjectTargetResult =
+  | { ok: true; target: ProjectTarget }
+  | { ok: false; reason: 'invalid-name' | 'invalid-folder-name' }
+
+function isCurrentDirName(input: string): boolean {
+  const trimmed = input.trim()
+  return trimmed === '.' || trimmed === './' || trimmed === '.\\'
+}
+
+/**
+ * Turns the user's name input into a target directory.
+ *
+ * `.` means "scaffold into the current folder and take the project name from
+ * it" — the folder is kept, and only conflicting files are ever written.
+ *
+ * The guard on the last branch is load-bearing. `slugify` strips every
+ * character that is not a letter or a digit, so `'.'` used to become `''` and
+ * `path.resolve(cwd, '')` is the current directory. `create .` then took the
+ * "directory already exists" path and ran `fs.remove` on the user's own working
+ * directory, which deleted `.git` with it. An empty slug is now an error, and
+ * anything that still resolves back to the current directory is treated as
+ * current-directory mode instead of as a delete target.
+ */
+export function resolveProjectTarget(
+  input: string,
+  cwd: string,
+): ProjectTargetResult {
+  const currentDir = path.resolve(cwd)
+
+  if (isCurrentDirName(input)) {
+    const projectName = slugify(path.basename(currentDir))
+    if (!projectName) return { ok: false, reason: 'invalid-folder-name' }
+    return {
+      ok: true,
+      target: { projectName, targetDir: currentDir, useCurrentDir: true },
+    }
+  }
+
+  const projectName = slugify(input)
+  if (!projectName) return { ok: false, reason: 'invalid-name' }
+
+  const targetDir = path.resolve(currentDir, projectName)
+  return {
+    ok: true,
+    target: {
+      projectName,
+      targetDir,
+      useCurrentDir: targetDir === currentDir,
+    },
+  }
+}
+
+/**
+ * Every path the template can write, relative to the target directory.
+ *
+ * The optional and binary entries are included on purpose. They are fetched
+ * with a graceful skip, so a listed file is not always written — over-warning
+ * costs one confirmation, while under-warning overwrites a file the user keeps.
+ */
+export function templateFiles(templateName: TemplateName): string[] {
+  return [
+    ...TEMPLATE_CONFIGS[templateName].textFiles,
+    ...TEMPLATE_OPTIONAL_TEXT_FILES,
+    ...TEMPLATE_BINARY_FILES,
+  ]
+}
+
+/** Returns the subset of `files` that already exists in `dir`. */
+export async function findConflicts(
+  dir: string,
+  files: string[],
+): Promise<string[]> {
+  const conflicts: string[] = []
+  for (const file of files) {
+    if (await fs.pathExists(path.join(dir, file))) conflicts.push(file)
+  }
+  return conflicts
+}
+
 function toDisplayName(slug: string): string {
   return slug
     .split('-')
@@ -204,10 +292,10 @@ export async function createCommand(
   }
 
   // --- Project name ---
-  let projectName: string
+  let nameInput: string
 
   if (name) {
-    projectName = slugify(name)
+    nameInput = name
   } else {
     const { value } = await prompts({
       type: 'text',
@@ -221,8 +309,31 @@ export async function createCommand(
       logger.info('Create cancelled.')
       return
     }
-    projectName = slugify(value)
+    nameInput = value
   }
+
+  // The prompted value goes through the same resolver as the argument, so `.`
+  // typed at the prompt cannot reach a different code path than `create .`.
+  const resolved = resolveProjectTarget(nameInput, process.cwd())
+
+  if (!resolved.ok) {
+    if (resolved.reason === 'invalid-folder-name') {
+      logger.error(
+        `Cannot make a project name from the folder ${chalk.bold(
+          path.basename(path.resolve(process.cwd())),
+        )}.`,
+      )
+      logger.info(
+        `Give a name instead: ${chalk.bold('npx rootnative create my-app')}`,
+      )
+    } else {
+      logger.error(`${chalk.bold(nameInput)} is not a usable project name.`)
+      logger.info('Use letters and numbers, for example my-app.')
+    }
+    process.exit(1)
+  }
+
+  const { projectName, targetDir, useCurrentDir } = resolved.target
 
   // --- Display name ---
   let displayName: string
@@ -271,9 +382,40 @@ export async function createCommand(
   }
 
   // --- Check target directory ---
-  const targetDir = path.resolve(process.cwd(), projectName)
+  if (useCurrentDir) {
+    // Never delete the current directory. Only the files the template writes
+    // are at stake, so ask about those and leave everything else alone.
+    const conflicts = await findConflicts(
+      targetDir,
+      templateFiles(templateName),
+    )
 
-  if (await fs.pathExists(targetDir)) {
+    if (conflicts.length > 0) {
+      logger.warn('These files in the current directory will be overwritten:')
+      for (const file of conflicts) {
+        logger.info(`  ${file}`)
+      }
+      logger.break()
+
+      if (options.yes) {
+        logger.error('Nothing was changed.')
+        logger.info('Move or delete these files, then run create again.')
+        process.exit(1)
+      }
+
+      const { overwrite } = await prompts({
+        type: 'confirm',
+        name: 'overwrite',
+        message: 'Overwrite them?',
+        initial: false,
+      })
+
+      if (!overwrite) {
+        logger.info('Create cancelled.')
+        return
+      }
+    }
+  } else if (await fs.pathExists(targetDir)) {
     if (options.yes) {
       logger.warn(`Directory ${chalk.bold(projectName)} already exists.`)
       process.exit(1)
@@ -282,7 +424,7 @@ export async function createCommand(
     const { overwrite } = await prompts({
       type: 'confirm',
       name: 'overwrite',
-      message: `Directory ${chalk.bold(projectName)} already exists. Overwrite?`,
+      message: `Directory ${chalk.bold(projectName)} already exists. Delete it and all of its contents?`,
       initial: false,
     })
 
@@ -390,7 +532,9 @@ export async function createCommand(
       logger.break()
       logger.error('Failed to install dependencies')
       logger.info(
-        `Run manually: ${chalk.bold(`cd ${projectName} && ${installCmd}`)}`,
+        `Run manually: ${chalk.bold(
+          useCurrentDir ? installCmd : `cd ${projectName} && ${installCmd}`,
+        )}`,
       )
     }
   }
@@ -400,7 +544,9 @@ export async function createCommand(
   logger.success(`Project ${chalk.bold(displayName)} is ready!`)
   logger.break()
   logger.info('Next steps:')
-  logger.info(`  cd ${projectName}`)
+  if (!useCurrentDir) {
+    logger.info(`  cd ${projectName}`)
+  }
   if (!shouldInstall) {
     logger.info(`  ${getInstallCommand(packageManager)}`)
   }
