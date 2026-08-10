@@ -8,13 +8,14 @@ import { updateCommand } from './commands/update'
 import { upgradeCommand } from './commands/upgrade'
 import { logger } from './lib/logger'
 import { isValidPackageManager, PACKAGE_MANAGERS } from './lib/types'
+import { getCliVersion } from './lib/version'
 
 const program = new Command()
 
 program
   .name('rootnative')
   .description('Add RootNative UI components to your React Native project')
-  .version('0.1.0')
+  .version(getCliVersion())
 
 program
   .command('create')
