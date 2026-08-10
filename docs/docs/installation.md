@@ -39,7 +39,7 @@ If you'd rather install only what you use:
 
 > **Importing from the root entry?** `import { Button } from '@rootnative/components'` loads every component, so all the component peers above must be installed. The skip rules apply only if you use subpath imports (`@rootnative/components/button`) exclusively.
 
-`react-native-reanimated` is bundled with Expo SDK 54 and works in Expo Go — no custom dev client required. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
+`react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 54 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 
 > **Expo SDK 54 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
 
