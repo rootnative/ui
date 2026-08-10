@@ -549,7 +549,21 @@ import { AppBar } from '@rootnative/components/appbar'
   card: `\`\`\`tsx
 import { Card } from '@rootnative/components/card'
 
-<Card variant="elevated">{children}</Card>
+// Region slots carry the MD3 spacing. Card itself applies no padding.
+<Card variant="elevated">
+  <Card.Media height={160}>
+    <Image source={{ uri }} resizeMode="cover" />
+  </Card.Media>
+  <Card.Content>
+    <Typography variant="titleMedium">Title</Typography>
+    <Typography variant="bodyMedium">Supporting text.</Typography>
+  </Card.Content>
+  <Card.Actions>
+    <Button variant="text" onPress={handleShare}>Share</Button>
+  </Card.Actions>
+</Card>
+
+// Raw children still work and stay unpadded — you own the spacing.
 <Card variant="outlined" onPress={handlePress}>{children}</Card>
 \`\`\``,
 
@@ -1285,6 +1299,44 @@ import { Grid } from '@rootnative/components/layout'
         '#### Menu.Item',
         'One choice. Pressing it closes the menu unless `closeOnPress` is `false`.',
       )
+    }
+
+    return output
+  }
+
+  // --- Card: main props + the three region slots ---
+  if (dirName === 'card') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'CardProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    const slots: [string, string, string][] = [
+      [
+        'CardMediaProps',
+        '#### Card.Media',
+        'Edge-to-edge media. No padding of its own, and the card clips it to the corner radius. Size it with `height` or `aspectRatio`; children then stretch to fill.',
+      ],
+      [
+        'CardContentProps',
+        '#### Card.Content',
+        'Padded text block — 16dp on every side, with a small gap between children.',
+      ],
+      [
+        'CardActionsProps',
+        '#### Card.Actions',
+        'Row of action buttons, 8dp gap, aligned to the trailing edge by default.',
+      ],
+    ]
+
+    for (const [ifaceName, heading, description] of slots) {
+      const iface = interfaces.find((i) => i.name === ifaceName)
+      if (!iface) continue
+      output += formatSubInterface(iface, typeAliases, heading, description)
+      output += '\n'
     }
 
     return output

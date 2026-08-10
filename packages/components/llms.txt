@@ -203,17 +203,59 @@ Props:
 ```tsx
 import { Card } from '@rootnative/components/card'
 
-<Card variant="elevated">{children}</Card>
+// Region slots carry the MD3 spacing. Card itself applies no padding.
+<Card variant="elevated">
+  <Card.Media height={160}>
+    <Image source={{ uri }} resizeMode="cover" />
+  </Card.Media>
+  <Card.Content>
+    <Typography variant="titleMedium">Title</Typography>
+    <Typography variant="bodyMedium">Supporting text.</Typography>
+  </Card.Content>
+  <Card.Actions>
+    <Button variant="text" onPress={handleShare}>Share</Button>
+  </Card.Actions>
+</Card>
+
+// Raw children still work and stay unpadded — you own the spacing.
 <Card variant="outlined" onPress={handlePress}>{children}</Card>
 ```
 
 Props:
-- `children: ReactNode` — Content rendered inside the card surface.
+- `children: ReactNode` — Content rendered inside the card surface. The card applies no padding of its own. Use the region slots — `Card.Media`, `Card.Content` and `Card.Actions` — to get the MD3 spacing without repeating it at every call site. Raw children remain fully supported and unpadded, so you own the spacing when you pass them.
 - `variant?: 'elevated' | 'filled' | 'outlined'` — Default: `'elevated'`. Surface style variant.
 - `onPress?: () => void` — When provided, the card becomes interactive (Pressable). Omit to render as a plain View.
 - `disabled?: boolean` — Default: `false`. Disables the press interaction and reduces opacity. Only effective when `onPress` is provided.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - Inherits `ViewProps`
+
+#### Card.Media
+
+Edge-to-edge media. No padding of its own, and the card clips it to the corner radius. Size it with `height` or `aspectRatio`; children then stretch to fill.
+
+Props:
+- `children: ReactNode` — Media to render — an `Image`, `expo-image`, a video surface, or any other node. The slot does not own the image, so any library works. Children are stretched to fill the slot, so a plain `Image` needs no style of its own.
+- `height?: number` — Fixed height of the media region in dp. Omit to let the media size itself (for example an `Image` with an `aspectRatio` style).
+- `aspectRatio?: number` — Aspect ratio of the media region (width / height). Ignored when `height` is set.
+- Inherits `ViewProps`
+
+#### Card.Content
+
+Padded text block — 16dp on every side, with a small gap between children.
+
+Props:
+- `children: ReactNode` — Content rendered inside the padded region.
+- Inherits `ViewProps`
+
+#### Card.Actions
+
+Row of action buttons, 8dp gap, aligned to the trailing edge by default.
+
+Props:
+- `children: ReactNode` — Action buttons, laid out in a row.
+- `align?: 'start' | 'end' | 'center' | 'space-between'` — Default: `'end'`. Horizontal placement of the actions.
+- Inherits `ViewProps`
+
 
 ---
 

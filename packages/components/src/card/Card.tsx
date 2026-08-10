@@ -5,6 +5,9 @@ import { useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
 import { useStateLayer } from '../internal/useStateLayer'
+import { CardActions } from './CardActions'
+import { CardContent } from './CardContent'
+import { CardMedia } from './CardMedia'
 import { createStyles, getResolvedCardColors } from './styles'
 import type { CardProps } from './types'
 
@@ -145,3 +148,10 @@ export function Card({
     </View>
   )
 }
+
+// Region slots, following the `Menu.Item` attach pattern. They are additive:
+// the card applies no padding of its own, so raw children keep rendering
+// exactly as before.
+Card.Media = CardMedia
+Card.Content = CardContent
+Card.Actions = CardActions

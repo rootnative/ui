@@ -23,8 +23,10 @@ Follows the [Material Design 3 Card](https://m3.material.io/components/cards/ove
         <ThemeProvider>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Card variant="elevated">
-              <Typography variant="titleMedium">Card Title</Typography>
-              <Typography variant="bodyMedium">Card content goes here.</Typography>
+              <Card.Content>
+                <Typography variant="titleMedium">Card Title</Typography>
+                <Typography variant="bodyMedium">Card content goes here.</Typography>
+              </Card.Content>
             </Card>
           </View>
         </ThemeProvider>
@@ -68,7 +70,9 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
         <ThemeProvider>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Card variant="filled" onPress={() => Alert.alert('Tapped')}>
-              <Typography>Tap me</Typography>
+              <Card.Content>
+                <Typography>Tap me</Typography>
+              </Card.Content>
             </Card>
           </View>
         </ThemeProvider>
@@ -78,6 +82,95 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
 `}
 />
 
+## Regions
+
+`Card` is a surface and applies no padding of its own. Use the region slots to get the Material Design 3 card spacing without repeating it at every call site.
+
+| Slot | Role |
+|------|------|
+| `Card.Media` | Edge-to-edge media. No padding, and the card's corner radius clips it. |
+| `Card.Content` | Padded text block (16dp) with a small gap between children. |
+| `Card.Actions` | Row of buttons, aligned to the trailing edge by default. |
+
+<SnackExample
+  name="RootNative Card — Regions"
+  code={`
+  import { Button, Card, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { Alert, Image, View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <Card variant="elevated">
+              <Card.Media height={160}>
+                <Image
+                  source={{ uri: 'https://picsum.photos/600/400' }}
+                  resizeMode="cover"
+                />
+              </Card.Media>
+              <Card.Content>
+                <Typography variant="titleMedium">Yosemite</Typography>
+                <Typography variant="bodyMedium">
+                  Granite cliffs, waterfalls and giant sequoia groves.
+                </Typography>
+              </Card.Content>
+              <Card.Actions>
+                <Button variant="text" onPress={() => Alert.alert('Shared')}>
+                  Share
+                </Button>
+                <Button variant="filled" onPress={() => Alert.alert('Booked')}>
+                  Book
+                </Button>
+              </Card.Actions>
+            </Card>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+### Sizing media
+
+`Card.Media` needs a height from somewhere, because a React Native `Image` with a remote URI has no intrinsic size:
+
+- `height` — a fixed height in dp.
+- `aspectRatio` — width / height, which keeps the media proportional as the card resizes. Ignored when `height` is set.
+- Neither — the media sizes itself, and its own child provides the height.
+
+With `height` or `aspectRatio` set, children stretch to fill the region, so a plain `Image` needs no style of its own.
+
+### Raw children still work
+
+The slots are additive. A card with raw children renders exactly as before and stays unpadded, so you own the spacing:
+
+```tsx
+<Card>
+  <View style={{ padding: 16 }}>
+    <Typography>Hand-rolled padding</Typography>
+  </View>
+</Card>
+```
+
+Prefer the slots in new code — that is what keeps spacing consistent between cards.
+
 ## Props
 
 <PropTable name="Card" />
+
+### `Card.Media`
+
+<PropTable name="CardMedia" />
+
+### `Card.Content`
+
+<PropTable name="CardContent" />
+
+### `Card.Actions`
+
+<PropTable name="CardActions" />

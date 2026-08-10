@@ -23,7 +23,7 @@
     },
     {
       "name": "card",
-      "description": "Surface container with 3 variants (elevated, filled, outlined) and optional press handler."
+      "description": "Surface container with 3 variants (elevated, filled, outlined), optional press handler, and Media / Content / Actions region slots."
     },
     {
       "name": "checkbox",

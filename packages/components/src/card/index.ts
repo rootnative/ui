@@ -1,2 +1,12 @@
 export { Card } from './Card'
-export type { CardProps, CardVariant } from './types'
+export { CardMedia } from './CardMedia'
+export { CardContent } from './CardContent'
+export { CardActions } from './CardActions'
+export type {
+  CardProps,
+  CardVariant,
+  CardMediaProps,
+  CardContentProps,
+  CardActionsProps,
+  CardActionsAlign,
+} from './types'

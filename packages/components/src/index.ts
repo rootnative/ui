@@ -38,8 +38,15 @@ export type {
   AppBarVariant,
 } from './appbar'
 
-export { Card } from './card'
-export type { CardProps, CardVariant } from './card'
+export { Card, CardMedia, CardContent, CardActions } from './card'
+export type {
+  CardProps,
+  CardVariant,
+  CardMediaProps,
+  CardContentProps,
+  CardActionsProps,
+  CardActionsAlign,
+} from './card'
 
 export { Chip } from './chip'
 export type { ChipProps, ChipVariant } from './chip'

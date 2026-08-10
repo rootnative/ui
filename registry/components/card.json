@@ -1,8 +1,11 @@
 {
   "name": "card",
-  "description": "Surface container with 3 variants (elevated, filled, outlined) and optional press handler.",
+  "description": "Surface container with 3 variants (elevated, filled, outlined), optional press handler, and Media / Content / Actions region slots.",
   "files": [
     "packages/components/src/card/Card.tsx",
+    "packages/components/src/card/CardActions.tsx",
+    "packages/components/src/card/CardContent.tsx",
+    "packages/components/src/card/CardMedia.tsx",
     "packages/components/src/card/index.ts",
     "packages/components/src/card/styles.ts",
     "packages/components/src/card/types.ts",

@@ -159,6 +159,64 @@ export function getResolvedCardColors(
   )
 }
 
+/**
+ * MD3 card region metrics.
+ *
+ * The actions row is shorter at the top than the content block it follows,
+ * because a Button carries its own vertical padding — a full 16dp on both sides
+ * reads as a gap roughly twice the size of the one between the title and the
+ * body text.
+ */
+export const CARD_CONTENT_PADDING = 16
+export const CARD_ACTIONS_PADDING_TOP = 8
+export const CARD_ACTIONS_GAP = 8
+
+const ACTIONS_JUSTIFY = {
+  start: 'flex-start',
+  end: 'flex-end',
+  center: 'center',
+  'space-between': 'space-between',
+} as const
+
+export function createCardRegionStyles(theme: MaterialTheme) {
+  return StyleSheet.create({
+    // No padding and no radius of its own: the media sits edge-to-edge and the
+    // container's `overflow: 'hidden'` + `borderRadius` already round it.
+    media: {
+      width: '100%',
+      overflow: 'hidden',
+    },
+    // Children fill the slot so a plain `<Image>` needs no style. Absolute
+    // fill rather than `flex: 1`, because the slot is a block whose height
+    // comes from `height`/`aspectRatio`, and a flex child of an
+    // auto-height parent would collapse to zero.
+    mediaFill: {
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
+    },
+    content: {
+      padding: CARD_CONTENT_PADDING,
+      gap: theme.spacing.xs,
+    },
+    actions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: CARD_ACTIONS_GAP,
+      paddingTop: CARD_ACTIONS_PADDING_TOP,
+      paddingBottom: CARD_CONTENT_PADDING,
+      paddingStart: CARD_CONTENT_PADDING,
+      paddingEnd: CARD_CONTENT_PADDING,
+    },
+  })
+}
+
+export function cardActionsJustify(
+  align: keyof typeof ACTIONS_JUSTIFY,
+): (typeof ACTIONS_JUSTIFY)[keyof typeof ACTIONS_JUSTIFY] {
+  return ACTIONS_JUSTIFY[align]
+}
+
 export function createStyles(
   theme: MaterialTheme,
   variant: CardVariant,
