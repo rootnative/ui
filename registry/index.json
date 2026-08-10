@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0-alpha.6",
+  "version": "0.0.0-alpha.8",
   "components": [
     {
       "name": "appbar",
@@ -111,7 +111,7 @@
     },
     {
       "name": "typography",
-      "description": "Text component using MD3 type scale with 15 variants (displayLarge to labelSmall)."
+      "description": "Text component using the MD3 type scale — 15 base variants (displayLarge to labelSmall) plus their Expressive *Emphasized counterparts."
     }
   ]
 }
