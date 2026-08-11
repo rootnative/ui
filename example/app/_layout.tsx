@@ -4,19 +4,13 @@ import {
   darkTheme,
   lightTheme,
   useTheme,
+  useThemeMode,
 } from '@rootnative/core'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
-import { useCallback, useMemo, useState } from 'react'
-import {
-  Alert,
-  I18nManager,
-  Platform,
-  StyleSheet,
-  View,
-  useColorScheme,
-} from 'react-native'
+import { useMemo } from 'react'
+import { Alert, I18nManager, Platform, StyleSheet, View } from 'react-native'
 import { findEntry } from '../src/catalog'
 import { JumpMenu } from '../src/JumpMenu'
 
@@ -62,27 +56,6 @@ function resolveTitle(routeName: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-type ThemePreference = 'system' | 'light' | 'dark'
-
-function isDarkColor(color: string): boolean {
-  const normalizedHex = color.replace('#', '')
-
-  if (normalizedHex.length !== 6 && normalizedHex.length !== 8) {
-    return false
-  }
-
-  const r = Number.parseInt(normalizedHex.slice(0, 2), 16)
-  const g = Number.parseInt(normalizedHex.slice(2, 4), 16)
-  const b = Number.parseInt(normalizedHex.slice(4, 6), 16)
-
-  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
-    return false
-  }
-
-  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
-  return luminance < 0.5
-}
-
 async function toggleRTL() {
   const nextIsRTL = !I18nManager.isRTL
   I18nManager.allowRTL(true)
@@ -108,22 +81,16 @@ async function toggleRTL() {
   }
 }
 
-interface RootLayoutContentProps {
-  isDarkTheme: boolean
-  onToggleTheme: () => void
-}
-
-function RootLayoutContent({
-  isDarkTheme,
-  onToggleTheme,
-}: RootLayoutContentProps) {
+function RootLayoutContent() {
   const theme = useTheme()
+  const { scheme, setMode } = useThemeMode()
   const router = useRouter()
   const segments = useSegments()
   const routeName = useMemo(() => resolveRouteName(segments), [segments])
   const title = useMemo(() => resolveTitle(routeName), [routeName])
   const canGoBack = routeName !== 'index'
-  const statusBarStyle = isDarkColor(theme.colors.surface) ? 'light' : 'dark'
+  const isDarkTheme = scheme === 'dark'
+  const statusBarStyle = isDarkTheme ? 'light' : 'dark'
   // Native screens render an opaque background of their own, so the themed
   // one from <Layout> can't show through — push it onto the screen instead.
   const stackScreenOptions = useMemo(
@@ -167,12 +134,12 @@ function RootLayoutContent({
             accessibilityLabel={
               isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'
             }
-            onPress={onToggleTheme}
+            onPress={() => setMode(isDarkTheme ? 'light' : 'dark')}
           />
         </View>
       </View>
     ),
-    [isDarkTheme, onToggleTheme],
+    [isDarkTheme, setMode],
   )
 
   return (
@@ -223,31 +190,9 @@ const styles = StyleSheet.create({
 })
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme()
-  const [themePreference, setThemePreference] =
-    useState<ThemePreference>('system')
-  const isDarkTheme =
-    themePreference === 'system'
-      ? colorScheme === 'dark'
-      : themePreference === 'dark'
-  const theme = isDarkTheme ? darkTheme : lightTheme
-  const toggleTheme = useCallback(() => {
-    setThemePreference((currentPreference) => {
-      const currentIsDark =
-        currentPreference === 'system'
-          ? colorScheme === 'dark'
-          : currentPreference === 'dark'
-
-      return currentIsDark ? 'light' : 'dark'
-    })
-  }, [colorScheme])
-
   return (
-    <ThemeProvider theme={theme}>
-      <RootLayoutContent
-        isDarkTheme={isDarkTheme}
-        onToggleTheme={toggleTheme}
-      />
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+      <RootLayoutContent />
     </ThemeProvider>
   )
 }

@@ -36,23 +36,114 @@ import { ThemeProvider, darkTheme } from '@rootnative/core'
 </ThemeProvider>
 ```
 
-Switch between light and dark based on system preference:
+To follow the system preference, pass both themes as a `{ light, dark }` pair.
+The provider reads the OS setting and keeps following it as it changes:
 
 ```tsx
-import { useColorScheme } from 'react-native'
 import { ThemeProvider, lightTheme, darkTheme } from '@rootnative/core'
 
 export default function App() {
-  const colorScheme = useColorScheme()
-  const theme = colorScheme === 'dark' ? darkTheme : lightTheme
-
   return (
-    <ThemeProvider theme={theme}>
-      {/* Follows system theme */}
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+      {/* Follows the system theme */}
     </ThemeProvider>
   )
 }
 ```
+
+`createMaterialTheme()` returns a pair already, so rename on destructure:
+
+```tsx
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+
+const { lightTheme: light, darkTheme: dark } = createMaterialTheme('#006A6A')
+
+<ThemeProvider theme={{ light, dark }}>{children}</ThemeProvider>
+```
+
+### Letting the user choose
+
+A provider with a theme pair gives descendants `useThemeMode()`:
+
+```tsx
+import { useThemeMode } from '@rootnative/core'
+
+function ThemeToggle() {
+  const { mode, scheme, setMode } = useThemeMode()
+
+  return (
+    <Button onPress={() => setMode(scheme === 'dark' ? 'light' : 'dark')}>
+      {scheme === 'dark' ? 'Light mode' : 'Dark mode'}
+    </Button>
+  )
+}
+```
+
+The hook returns four values:
+
+| Value | Type | Meaning |
+|-------|------|---------|
+| `mode` | `'system' \| 'light' \| 'dark'` | What was asked for. `'system'` means "follow the OS" |
+| `scheme` | `'light' \| 'dark'` | What is actually on screen, with `'system'` resolved |
+| `setMode` | `(mode) => void` | Switches mode. Persists it when `storage` is set |
+| `isReady` | `boolean` | `false` until a persisted mode loads. Always `true` without `storage` |
+
+Read `scheme`, not `mode`, when you need to know which theme is rendering —
+`mode` can be `'system'`, which does not tell you the answer. Use it to sync
+anything that lives outside the theme, most commonly the status bar:
+
+```tsx
+import { useThemeMode } from '@rootnative/core'
+import { StatusBar } from 'expo-status-bar'
+
+function ThemedStatusBar() {
+  const { scheme } = useThemeMode()
+
+  return <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+}
+```
+
+`useThemeMode()` throws when the nearest provider was given a single theme
+rather than a pair. There is no mode to control in that case, so the error is
+raised instead of reporting a mode the provider cannot honour.
+
+### Remembering the choice
+
+`@rootnative/core` takes no storage dependency. Pass any object with
+`getItem`/`setItem` — AsyncStorage, MMKV, or `localStorage` — and the mode is
+saved on change and restored on launch. Both methods may be sync or async:
+
+```tsx
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+<ThemeProvider
+  theme={{ light: lightTheme, dark: darkTheme }}
+  storage={AsyncStorage}
+>
+  {children}
+</ThemeProvider>
+```
+
+Reading storage takes a moment, so the first frame renders with `defaultMode`
+before the saved mode arrives. Gate your splash screen on `isReady` to avoid a
+visible flash:
+
+```tsx
+function Gate({ children }) {
+  const { isReady } = useThemeMode()
+
+  if (!isReady) {
+    return null // or keep the splash screen up
+  }
+
+  return children
+}
+```
+
+To drive mode from your own state instead, pass `mode` and `onModeChange`. The
+provider then never changes mode on its own, and ignores `storage` — your state
+is the source of truth, and writing behind it would restore a stale value on the
+next launch.
 
 ### Override specific tokens
 
@@ -399,6 +490,9 @@ function MyComponent() {
 |------|-----|
 | Use MD3 defaults | `<ThemeProvider>` |
 | Dark mode | `<ThemeProvider theme={darkTheme}>` |
+| Follow the OS light/dark setting | `<ThemeProvider theme={{ light, dark }}>` |
+| Let the user switch theme | `const { scheme, setMode } = useThemeMode()` |
+| Remember the choice | `<ThemeProvider theme={{ light, dark }} storage={AsyncStorage}>` |
 | Override a few MD3 colors | Spread `lightTheme` and override |
 | Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
 | Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |

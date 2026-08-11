@@ -205,8 +205,24 @@ import { ThemeProvider, darkTheme } from '@rootnative/core'
 // Dark theme
 <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
 
-// Custom theme
+// Light/dark, following the OS setting
 import { lightTheme } from '@rootnative/core'
+
+<ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+  {children}
+</ThemeProvider>
+
+// ...and remembering the user's override across launches
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+<ThemeProvider
+  theme={{ light: lightTheme, dark: darkTheme }}
+  storage={AsyncStorage}
+>
+  {children}
+</ThemeProvider>
+
+// Custom theme
 import type { Theme } from '@rootnative/core'
 
 const custom: Theme = {
@@ -217,8 +233,41 @@ const custom: Theme = {
 ```
 
 Props:
-- `theme?: BaseTheme` — Theme object. Default: `lightTheme` (MD3)
+- `theme?: BaseTheme | { light: BaseTheme; dark: BaseTheme }` — A single theme, or a light/dark pair. A pair enables `useThemeMode()`. Default: `lightTheme` (MD3)
+- `mode?: 'system' | 'light' | 'dark'` — Controlled mode. Leave unset and use `setMode()` instead. Pair with `onModeChange`
+- `defaultMode?: 'system' | 'light' | 'dark'` — Initial mode when uncontrolled. Default: `'system'`
+- `onModeChange?: (mode: ThemeMode) => void`
+- `storage?: { getItem, setItem }` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
+- `iconResolver?: IconResolver`
 - `children: ReactNode`
+
+### useThemeMode()
+
+Reads and controls light/dark mode. Requires a provider given a `{ light, dark }` pair — it throws otherwise, since a single-theme provider has no mode to control.
+
+Returns `{ mode, scheme, setMode, isReady }`:
+- `mode` — what was asked for, including `'system'`
+- `scheme` — the resolved `'light' | 'dark'` actually rendering. Use this to sync anything outside the theme, such as the status bar
+- `setMode(mode)` — switches mode, and persists it when `storage` is set
+- `isReady` — `false` until a persisted mode has loaded. Always `true` without `storage`. Gate a splash screen on it to avoid a launch flash
+
+```tsx
+import { useThemeMode } from '@rootnative/core'
+import { StatusBar } from 'expo-status-bar'
+
+function ThemeToggle() {
+  const { scheme, setMode } = useThemeMode()
+
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <Button onPress={() => setMode(scheme === 'dark' ? 'light' : 'dark')}>
+        Toggle theme
+      </Button>
+    </>
+  )
+}
+```
 
 ### useTheme()
 
@@ -307,11 +356,14 @@ createMaterialTheme('#006A6A', { surfaceTone: 'neutral' })
 // Override: per-palette chroma
 createMaterialTheme('#006A6A', { seedAdjustments: { primary: 60, secondary: 32 } })
 
-// Use in provider
+// Use in provider — pinned light
 <ThemeProvider theme={lightTheme}>{children}</ThemeProvider>
 
-// Or with dark mode
-<ThemeProvider theme={isDark ? darkTheme : lightTheme}>{children}</ThemeProvider>
+// Or hand both to the provider and let it follow the OS. Rename on
+// destructure so the pair matches the prop's { light, dark } shape.
+const { lightTheme: light, darkTheme: dark } = createMaterialTheme('#006A6A')
+
+<ThemeProvider theme={{ light, dark }}>{children}</ThemeProvider>
 ```
 
 Returns: `{ lightTheme: Theme, darkTheme: Theme }`

@@ -28,11 +28,22 @@ export {
   motionTransitions,
 } from './theme'
 
-export { ThemeProvider, useIconResolver, useTheme } from './provider'
+export {
+  THEME_MODE_STORAGE_KEY,
+  ThemeProvider,
+  useIconResolver,
+  useTheme,
+  useThemeMode,
+} from './provider'
 export type {
+  ColorScheme,
   IconRenderProps,
   IconResolver,
   IconSource,
+  ThemeMode,
+  ThemeModeContextValue,
+  ThemeModeStorage,
+  ThemePair,
   ThemeProviderProps,
 } from './provider'
 

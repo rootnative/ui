@@ -1,5 +1,11 @@
 import { Box, Column, Typography, Card } from '@rootnative/components'
-import { ThemeProvider, useTheme } from '@rootnative/core'
+import {
+  ThemeProvider,
+  darkTheme,
+  lightTheme,
+  useTheme,
+  useThemeMode,
+} from '@rootnative/core'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet } from 'react-native'
 
@@ -42,11 +48,24 @@ function HomeScreen() {
   )
 }
 
+/**
+ * Keeps the status bar readable against the current theme. `scheme` is the
+ * resolved 'light' | 'dark' — `mode` may be 'system', which tells you what was
+ * asked for rather than what is on screen.
+ */
+function ThemedStatusBar() {
+  const { scheme } = useThemeMode()
+
+  return <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+}
+
 export default function App() {
   return (
-    <ThemeProvider>
+    // Follows the OS light/dark setting. Call `setMode()` from `useThemeMode()`
+    // to override it, and pass `storage={AsyncStorage}` to remember the choice.
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
       <HomeScreen />
-      <StatusBar style="auto" />
+      <ThemedStatusBar />
     </ThemeProvider>
   )
 }

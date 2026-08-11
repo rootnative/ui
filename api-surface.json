@@ -9,6 +9,7 @@
         "BaseTheme",
         "Breakpoint",
         "BreakpointValues",
+        "ColorScheme",
         "Colors",
         "Elevation",
         "ElevationLevel",
@@ -23,7 +24,12 @@
         "Shape",
         "Spacing",
         "StateLayer",
+        "THEME_MODE_STORAGE_KEY",
         "Theme",
+        "ThemeMode",
+        "ThemeModeContextValue",
+        "ThemeModeStorage",
+        "ThemePair",
         "ThemeProvider",
         "ThemeProviderProps",
         "TopAppBarTokens",
@@ -40,7 +46,8 @@
         "useBreakpoint",
         "useBreakpointValue",
         "useIconResolver",
-        "useTheme"
+        "useTheme",
+        "useThemeMode"
       ],
       "./create-theme": [
         "createMaterialTheme"
