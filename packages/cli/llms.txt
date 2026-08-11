@@ -1,6 +1,6 @@
 # @rootnative/cli — CLI for RootNative UI
 
-> Version: 0.0.0-alpha.8
+> Version: 0.0.0-alpha.9
 > Binary: `rootnative`
 > Requirements: Node >=18
 
@@ -50,7 +50,7 @@ Creates `rootnative.json`:
   "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "v0.0.0-alpha.8"
+  "registryVersion": "v0.0.0-alpha.9"
 }
 ```
 
