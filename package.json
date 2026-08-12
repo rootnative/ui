@@ -26,6 +26,7 @@
     "api:check": "pnpm run build && npx tsx scripts/build-api-surface.ts --check",
     "docs:check": "npx tsx scripts/check-docs.ts",
     "check:inertia-pins": "npx tsx scripts/check-inertia-pins.ts",
+    "check:singletons": "npx tsx scripts/check-singletons.ts",
     "docs:serve": "pnpm --filter @rootnative/docs serve",
     "prepare": "husky"
   },

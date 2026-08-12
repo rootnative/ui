@@ -39,6 +39,15 @@ export default defineConfig({
   // `import ... from '@rootnative/utils'` that consumers can't resolve.
   dts: { resolve: ['@rootnative/utils'] },
   format: 'cjs',
+  // Load-bearing, and NOT the default for CJS. Without it every one of the 30
+  // entries above is a self-contained bundle that inlines each module it
+  // reaches, so a module-level singleton is emitted once *per entry*.
+  // `PortalContext` shipped as 7 separate contexts that way, which silently
+  // broke every overlay (Tooltip, Menu, Dialog, BottomSheet, Snackbar) for
+  // anyone mixing subpath and root imports — the import style the docs
+  // recommend. `pnpm run check:singletons` guards it; see that script's header
+  // for why nothing else in CI can see this class of regression.
+  splitting: true,
   outDir: 'dist',
   clean: true,
   noExternal: ['@rootnative/utils'],

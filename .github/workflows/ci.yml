@@ -55,3 +55,10 @@ jobs:
       # which would rebuild — the Build step above already produced `dist/`.
       - name: API surface
         run: npx tsx scripts/build-api-surface.ts --check
+
+      # Reads the built bundles, so it must follow Build. A duplicated context
+      # is invisible to typecheck, to the tests (they import from `src/`, where
+      # there is only ever one copy) and to the API surface snapshot — the
+      # emitted layout is the only place it shows.
+      - name: Singleton check
+        run: pnpm run check:singletons
