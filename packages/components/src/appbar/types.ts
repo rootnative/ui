@@ -110,6 +110,10 @@ export interface AppBarProps extends Omit<ViewProps, 'children'> {
    * to your scroll view:
    *
    * ```tsx
+   * // `Motion` and `useScroll` both come from the inertia package root.
+   * // There is no `@rootnative/inertia/motion` subpath.
+   * import { Motion, useScroll } from '@rootnative/inertia'
+   *
    * const { scrollY, onScroll } = useScroll()
    * <AppBar variant="large" title="Title" scrollOffset={scrollY} />
    * <Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16}>

@@ -2096,6 +2096,23 @@ function generateComponentsLlms(): string {
 > Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
+## The animation layer lives in a separate package
+
+Every animation runs on \`@rootnative/inertia\`, which ships its own reference at
+\`node_modules/@rootnative/inertia/llms.txt\`. Read it when an example here uses a
+symbol this file does not define — \`Motion.*\`, \`useScroll\`, \`Presence\`,
+\`MotionConfig\` and the value-layer hooks are all documented there, not here.
+
+\`Motion\` and the hooks are exported from the **package root**:
+
+\`\`\`tsx
+import { Motion, useScroll } from '@rootnative/inertia'
+\`\`\`
+
+inertia's subpaths (\`./view\`, \`./scroll-view\`, \`./flat-list\`, …) exist for
+tree-shaking and export differently named symbols (\`MotionScrollView\`, not
+\`Motion.ScrollView\`). There is no \`@rootnative/inertia/motion\`.
+
 ## Usage
 
 ${componentsContent()}
