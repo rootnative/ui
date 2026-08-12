@@ -241,13 +241,33 @@ function parseTypeSource(content: string): ParseResult {
           continue
         }
 
-        // Property signature
-        const propMatch = memberLine.match(/^(\w+)(\?)?:\s*(.+)$/)
+        // Property signature. The type may continue on following lines — a
+        // union Prettier wrapped past 80 columns puts nothing after the colon,
+        // and each arm arrives as its own `| 'x'` line. Requiring the type on
+        // the same line silently dropped such props: `Box.justify` was fully
+        // implemented and typed, yet absent from every generated `llms.txt`,
+        // so anyone reading the docs concluded the prop did not exist.
+        const propMatch = memberLine.match(/^(\w+)(\?)?:\s*(.*)$/)
         if (propMatch) {
+          let type = propMatch[3].trim()
+
+          // Continuation lines are the wrapped union arms. Stop at the next
+          // member, JSDoc, or the interface's closing brace.
+          if (!type || type.endsWith('|')) {
+            const parts = type ? [type.replace(/\|$/, '').trim()] : []
+            while (i + 1 < lines.length) {
+              const next = lines[i + 1].trim()
+              if (!next.startsWith('|')) break
+              parts.push(next.replace(/^\|\s*/, ''))
+              i++
+            }
+            type = parts.filter(Boolean).join(' | ')
+          }
+
           members.push({
             name: propMatch[1],
             optional: !!propMatch[2],
-            type: simplifyType(propMatch[3]),
+            type: simplifyType(type),
             comment: pendingJsDoc.comment,
             defaultValue: pendingJsDoc.defaultValue,
           })
@@ -2073,7 +2093,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (+ react-native-worklets/plugin Babel plugin)
+> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## Usage
@@ -2119,7 +2139,7 @@ function generateFullLlms(): string {
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: React Native 0.81+, React 19+, Expo SDK 54+
-> Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`, \`react-native-worklets >=0.5\` (Reanimated 4 runtime — also enable the \`react-native-worklets/plugin\` Babel plugin; bundled in \`babel-preset-expo\` on Expo SDK 54)
+> Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`, \`react-native-worklets >=0.5\` (Reanimated 4 runtime — Expo SDK 54 configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
 > Optional peer deps: \`@expo/vector-icons >=14\` (only needed for icon props)
 
 ---

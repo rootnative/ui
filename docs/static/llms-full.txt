@@ -3,7 +3,7 @@
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: `@rootnative/core` 0.0.0-alpha.9 · `@rootnative/components` 0.0.0-alpha.9 · `@rootnative/icons` 0.0.0-alpha.9 · `@rootnative/cli` 0.0.0-alpha.9
 > Requirements: React Native 0.81+, React 19+, Expo SDK 54+
-> Peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5` (Reanimated 4 runtime — also enable the `react-native-worklets/plugin` Babel plugin; bundled in `babel-preset-expo` on Expo SDK 54)
+> Peer deps: `react-native-safe-area-context >=4`, `react-native-reanimated >=4`, `react-native-worklets >=0.5` (Reanimated 4 runtime — Expo SDK 54 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
 > Optional peer deps: `@expo/vector-icons >=14` (only needed for icon props)
 
 ---
@@ -916,6 +916,7 @@ Props:
 - `columnGap?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number` — Column gap between children
 - `flex?: number` — Flex value
 - `align?: FlexAlignType` — Align items along the cross axis
+- `justify?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly'` — Justify content along the main axis
 - `bg?: string` — Background color
 - Inherits `ViewProps`
 
