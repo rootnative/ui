@@ -144,14 +144,33 @@ describe('AppBar', () => {
   })
 
   describe('trailing', () => {
-    it('overrides actions when trailing is provided', () => {
+    it('renders custom trailing content', () => {
       renderWithTheme(
+        <AppBar
+          title="Home"
+          trailing={<Text testID="custom-trailing">Custom</Text>}
+        />,
+      )
+      expect(screen.getByTestId('custom-trailing')).toBeTruthy()
+    })
+
+    // `trailing` and `actions` fill the same slot, so the type makes them
+    // mutually exclusive. Passing both used to type-check while only `trailing`
+    // rendered, which left the unused prop as dead code with nothing to catch
+    // it. @ts-expect-error is the assertion: it fails the build if the union
+    // ever stops rejecting the pair.
+    it('rejects actions and trailing together at the type level', () => {
+      renderWithTheme(
+        // @ts-expect-error - trailing cannot be combined with actions
         <AppBar
           title="Home"
           actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
           trailing={<Text testID="custom-trailing">Custom</Text>}
         />,
       )
+      // The runtime precedence is unchanged, and still worth pinning: a
+      // consumer on plain JS gets no type error, so `trailing` must keep
+      // winning rather than rendering both slots.
       expect(screen.queryByLabelText('Search')).toBeNull()
       expect(screen.getByTestId('custom-trailing')).toBeTruthy()
     })

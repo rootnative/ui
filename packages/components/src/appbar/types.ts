@@ -64,7 +64,7 @@ export interface AppBarTextAction extends AppBarActionBase {
  */
 export type AppBarAction = AppBarIconAction | AppBarTextAction
 
-export interface AppBarProps extends Omit<ViewProps, 'children'> {
+interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   /** Title text displayed in the bar. */
   title: string
   /**
@@ -128,13 +128,6 @@ export interface AppBarProps extends Omit<ViewProps, 'children'> {
   scrollOffset?: SharedValue<number>
   /** Custom leading content. When provided, overrides `canGoBack`. */
   leading?: ReactNode
-  /** Custom trailing content. When provided, overrides `actions`. */
-  trailing?: ReactNode
-  /**
-   * Array of actions rendered in the trailing slot. Each entry is either an
-   * icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save").
-   */
-  actions?: AppBarAction[]
   /**
    * Override the container (background) color.
    * Applied to both normal and elevated states.
@@ -149,3 +142,38 @@ export interface AppBarProps extends Omit<ViewProps, 'children'> {
   /** Custom style applied to the root container. */
   style?: StyleProp<ViewStyle>
 }
+
+/**
+ * Trailing slot of the AppBar. `trailing` and `actions` both fill the same
+ * space, so they are mutually exclusive: only one can render, and accepting
+ * both meant the unused prop became dead code with no error, no warning, and a
+ * screen that looked correct.
+ *
+ * Use `actions` for the MD3 default — a row of icon or text buttons. Use
+ * `trailing` when the slot needs something `actions` cannot build, such as a
+ * `Menu` anchor or a `Tooltip`.
+ */
+type AppBarTrailingProps =
+  | {
+      /**
+       * Array of actions rendered in the trailing slot. Each entry is either an
+       * icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save").
+       */
+      actions?: AppBarAction[]
+      trailing?: never
+    }
+  | {
+      actions?: never
+      /**
+       * Custom trailing content. Use this instead of `actions` when the slot
+       * needs a component `actions` cannot build, such as a `Menu` anchor or a
+       * `Tooltip`.
+       */
+      trailing: ReactNode
+    }
+
+/**
+ * Props of the AppBar. `trailing` and `actions` fill the same slot and are
+ * mutually exclusive — see `AppBarTrailingProps`.
+ */
+export type AppBarProps = AppBarCommonProps & AppBarTrailingProps

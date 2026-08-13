@@ -174,7 +174,18 @@ function parseTypeSource(content: string): ParseResult {
     }
 
     // --- Interface ---
-    if (line.startsWith('export interface ')) {
+    // Local (non-exported) interfaces count only when the name ends in
+    // `CommonProps`. A props type that makes two props mutually exclusive keeps
+    // its shared props in a local `<Name>CommonProps` interface and exports a
+    // type alias, so matching `export interface` alone dropped that whole props
+    // block — silently, which is this parser's failure mode. Matching *every*
+    // local interface is too broad: component files declare private prop bags
+    // for internal sub-components (Tooltip, Slider, ButtonGroup), and those
+    // shadow the real props type because they are declared earlier in the file.
+    if (
+      line.startsWith('export interface ') ||
+      /^interface \w*CommonProps\b/.test(line)
+    ) {
       const jsDoc = collectJsDoc()
 
       // Collect full declaration up to opening brace
@@ -185,7 +196,7 @@ function parseTypeSource(content: string): ParseResult {
       }
       declText += lines[i]
 
-      const nameMatch = declText.match(/export interface (\w+)/)
+      const nameMatch = declText.match(/(?:export )?interface (\w+)/)
       const name = nameMatch![1]
 
       // Parse extends clause
@@ -1097,9 +1108,27 @@ import { Grid } from '@rootnative/components/layout'
   if (dirName === 'appbar') {
     let output = `### ${displayName}\n\n${example}\n\n`
 
-    const propsIface = interfaces.find((i) => i.name === 'AppBarProps')
+    // `AppBarProps` is a type alias — `AppBarCommonProps` intersected with a
+    // union that makes `actions` and `trailing` mutually exclusive. The parser
+    // reads interfaces, so the shared props come from the common interface and
+    // the exclusive pair is described here, where the constraint can be stated
+    // rather than implied by two independent optional props.
+    const propsIface = interfaces.find((i) => i.name === 'AppBarCommonProps')
     if (propsIface) {
-      output += formatPropsSection(propsIface, typeAliases)
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine = '- Inherits `ViewProps` (except `children`)\n'
+      const trailingProps =
+        '- `actions?: AppBarAction[]` — Array of actions rendered in the ' +
+        'trailing slot. Each entry is either an icon action (`{ icon }`) or a ' +
+        'text action (`{ label }`, e.g. "Save"). Mutually exclusive with ' +
+        '`trailing`.\n' +
+        '- `trailing?: ReactNode` — Custom trailing content. Use instead of ' +
+        '`actions` when the slot needs something `actions` cannot build, such ' +
+        'as a `Menu` anchor or a `Tooltip`. Mutually exclusive with `actions` ' +
+        '— the type rejects both together.\n'
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, trailingProps + inheritsLine)
+        : section + trailingProps
     }
 
     const actionIface = interfaces.find((i) => i.name === 'AppBarAction')
