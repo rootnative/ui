@@ -11,6 +11,38 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Snackbar bottom offset is computed, not guessed
+
+`SnackbarProvider`'s `bottomOffset` was a raw number the consumer had to work
+out and keep in sync by hand, and the documented value for a standard FAB was
+**wrong**. `88` assumed the offset had to include the snackbar's own 16dp
+margin; the layer already adds that margin *and* the safe-area inset, so `88`
+produced 104dp of padding and pushed the snackbar 32dp above the FAB it was
+supposed to clear. Measured against the rendered layer, not inferred.
+
+Three additions, all exported from the root and from their subpaths:
+
+- **`FAB_SIZES`** / **`FAB_ICON_SIZES`** (`@rootnative/components/fab`) — the MD3
+  container and icon heights per FAB size, plus `extended` (56dp, whatever the
+  `size` prop says). They were previously literals inside `createStyles`, so a
+  consumer computing clearance had nothing to read.
+- **`snackbarOffsetFor(height)`** (`@rootnative/components/snackbar`) — the
+  offset that clears an element of `height` at the bottom edge.
+  `snackbarOffsetFor(FAB_SIZES.medium)` is `72`. It takes a raw height rather
+  than a `FABSize` so `snackbar` does not gain `fab` as a component dependency —
+  `rootnative add snackbar` should not copy in the whole FAB for four numbers —
+  and so it also covers a bottom bar.
+- **`useSnackbarOffset(offset)`** — raises the offset while the calling component
+  is mounted, so the constant lives next to the FAB that determines it instead of
+  in the app root two files away. A mounted caller wins over the provider's prop.
+  With several mounted (a navigation transition, where the outgoing screen has
+  not unmounted yet) the largest applies. A pushed `0` is an override, not an
+  absence.
+
+`bottomOffset` is unchanged and still correct for an app whose screens all carry
+the same bottom furniture. **On upgrade, re-check any hard-coded value**: it was
+almost certainly copied from the old docs and is 16dp too large.
+
 ## 0.0.0-alpha.6 — 2026-08-10
 
 The web pass. `0.0.0-alpha.5` covered Android; this one is react-native-web,

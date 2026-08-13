@@ -24,9 +24,19 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
     store.getSnapshot,
   )
 
+  // A mounted `useSnackbarOffset` wins over the prop. `null` means nobody
+  // pushed one — distinct from a pushed `0`, which is a screen deliberately
+  // overriding the prop down to zero.
+  const pushedOffset = useSyncExternalStore(
+    store.subscribeOffset,
+    store.getOffset,
+    store.getOffset,
+  )
+  const effectiveOffset = pushedOffset ?? bottomOffset
+
   const styles = useMemo(
-    () => createSnackbarStyles(theme, bottomOffset, false),
-    [theme, bottomOffset],
+    () => createSnackbarStyles(theme, effectiveOffset, false),
+    [theme, effectiveOffset],
   )
 
   const durationMs = entry?.durationMs ?? null
@@ -49,6 +59,11 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
         edges={['bottom']}
         style={styles.layer}
         pointerEvents="box-none"
+        // Fixed handle, like `snackbar-layer` below: the snackbar API carries no
+        // `testID` down because the queue is driven by `show()` rather than by
+        // props, and `bottomOffset` lands on this node's padding, not on the
+        // animated one.
+        testID="snackbar-safe-area"
       >
         <Presence>
           {entry ? (
@@ -66,7 +81,7 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
             >
               <SnackbarSurface
                 entry={entry}
-                bottomOffset={bottomOffset}
+                bottomOffset={effectiveOffset}
                 style={style}
                 onAction={() => {
                   entry.onAction?.()

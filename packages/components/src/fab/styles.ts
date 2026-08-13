@@ -6,6 +6,29 @@ import type { FABSize, FABVariant } from './types'
 export const FAB_FOCUS_RING_OFFSET = 2
 export const FAB_FOCUS_RING_WIDTH = 3
 
+/**
+ * Container height in dp for each FAB size, per MD3. Exported because a FAB is
+ * the usual reason to raise `SnackbarProvider`'s `bottomOffset`, and a consumer
+ * computing that clearance should read the real number rather than hard-code
+ * one that silently goes stale when a size changes. See `snackbarOffsetForFAB`.
+ *
+ * `extended` is the label form, which is always 56dp and ignores `size`.
+ */
+export const FAB_SIZES = {
+  small: 40,
+  medium: 56,
+  large: 96,
+  extended: 56,
+} as const
+
+/** Icon size in dp for each FAB size. `large` is the only one that differs. */
+export const FAB_ICON_SIZES = {
+  small: 24,
+  medium: 24,
+  large: 36,
+  extended: 24,
+} as const
+
 export interface FABColors {
   backgroundColor: string
   contentColor: string
@@ -112,8 +135,7 @@ export function getFABSizeStyle(
 }
 
 export function getFABIconPixelSize(size: FABSize): number {
-  if (size === 'large') return 36
-  return 24
+  return FAB_ICON_SIZES[size]
 }
 
 export function createStyles(theme: MaterialTheme) {
@@ -155,23 +177,23 @@ export function createStyles(theme: MaterialTheme) {
       borderRadius: theme.shape.cornerExtraLarge,
     },
     sizeSmall: {
-      width: 40,
-      height: 40,
+      width: FAB_SIZES.small,
+      height: FAB_SIZES.small,
       borderRadius: theme.shape.cornerMedium,
     },
     sizeMedium: {
-      width: 56,
-      height: 56,
+      width: FAB_SIZES.medium,
+      height: FAB_SIZES.medium,
       borderRadius: theme.shape.cornerLarge,
     },
     sizeLarge: {
-      width: 96,
-      height: 96,
+      width: FAB_SIZES.large,
+      height: FAB_SIZES.large,
       borderRadius: theme.shape.cornerExtraLarge,
     },
     extended: {
       flexDirection: 'row',
-      height: 56,
+      height: FAB_SIZES.extended,
       minWidth: 80,
       // MD3 spec: 20dp horizontal padding (no token in theme.spacing).
       paddingHorizontal: 20,

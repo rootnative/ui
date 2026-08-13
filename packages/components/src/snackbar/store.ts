@@ -42,6 +42,22 @@ export class SnackbarStore {
   private queue: SnackbarEntry[] = []
   private listeners = new Set<() => void>()
   private nextId: SnackbarId = 1
+  /**
+   * Offsets pushed by mounted `useSnackbarOffset` callers, newest last.
+   *
+   * A stack rather than a single number because screens overlap during a
+   * navigation transition: the outgoing screen unmounts *after* the incoming
+   * one mounts, so a single slot would be cleared by the leaver and strand the
+   * arriver's offset. Entries are removed by identity, so the order of unmounts
+   * does not matter.
+   */
+  private offsets: { value: number }[] = []
+  /**
+   * Separate from `listeners` on purpose. The queue and the offset change for
+   * unrelated reasons — a `show()` must not wake the offset subscriber, and a
+   * screen mounting must not push the queue host through a snapshot compare.
+   */
+  private offsetListeners = new Set<() => void>()
 
   show = (options: SnackbarOptions): SnackbarId => {
     const id = this.nextId++
@@ -119,11 +135,59 @@ export class SnackbarStore {
   /** Test/debug helper — how many snackbars are waiting behind the visible one. */
   getQueueLength = (): number => this.queue.length
 
+  /**
+   * Push an offset and get back the function that removes it. Called by
+   * `useSnackbarOffset` on mount; the returned function is the effect cleanup.
+   */
+  pushOffset = (value: number): (() => void) => {
+    const entry = { value }
+    this.offsets.push(entry)
+    this.emitOffset()
+    return () => {
+      const index = this.offsets.indexOf(entry)
+      if (index === -1) return
+      this.offsets.splice(index, 1)
+      this.emitOffset()
+    }
+  }
+
+  /**
+   * The offset in effect — the largest pushed, or `null` when none is.
+   *
+   * Largest rather than newest: during a navigation transition two screens are
+   * mounted at once, and taking the newest makes the offset flicker with mount
+   * order. The largest clears every FAB currently on screen, which is the point
+   * of the offset.
+   *
+   * `null` means "nobody pushed", which the host reads as "use the provider's
+   * `bottomOffset` prop" — distinct from a pushed `0`, which deliberately
+   * overrides that prop down to zero.
+   */
+  getOffset = (): number | null => {
+    if (this.offsets.length === 0) return null
+    let max = this.offsets[0].value
+    for (const entry of this.offsets) {
+      if (entry.value > max) max = entry.value
+    }
+    return max
+  }
+
+  subscribeOffset = (listener: () => void): (() => void) => {
+    this.offsetListeners.add(listener)
+    return () => {
+      this.offsetListeners.delete(listener)
+    }
+  }
+
   private settle(entry: SnackbarEntry, reason: SnackbarDismissReason): void {
     entry.onDismiss?.(reason)
   }
 
   private emit(): void {
     for (const listener of this.listeners) listener()
+  }
+
+  private emitOffset(): void {
+    for (const listener of this.offsetListeners) listener()
   }
 }

@@ -49,7 +49,7 @@ export default function App() {
   return (
     <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
       <PortalHost>
-        <SnackbarProvider bottomOffset={88}>
+        <SnackbarProvider>
           {/* Your app */}
         </SnackbarProvider>
       </PortalHost>
@@ -78,9 +78,13 @@ Why that order:
   `name` for a scoped host.
 - **`SnackbarProvider`** — inside both, because it renders through a `Portal` and
   its snackbars are themed. It owns the queue; `useSnackbar()` works anywhere
-  below it. It applies the bottom safe-area inset itself; `bottomOffset` is added
-  on top of that, plus the snackbar's own 16dp margin. Use `88` to clear a
-  standard 56dp `FAB` with its 16dp margin, or `80` for a `NavigationBar`.
+  below it. No `bottomOffset` is needed here unless every screen carries the same
+  bottom furniture: the provider already applies the bottom safe-area inset **and**
+  the snackbar's own 16dp margin, so the offset covers only what sits on top of
+  those. A screen with a FAB should call `useSnackbarOffset(snackbarOffsetFor(
+  FAB_SIZES.medium))` instead, which applies while that screen is mounted and
+  reverts on unmount. Compute the number rather than hard-coding one — a literal
+  `88` double-counts the 16dp margin the layer already added.
 
 **No gesture-handler setup is required.** `react-native-gesture-handler` is not a
 peer dependency of any `@rootnative/*` package, so there is no
@@ -1355,15 +1359,31 @@ Props:
 ### Snackbar
 
 ```tsx
-import { SnackbarProvider, useSnackbar } from '@rootnative/components/snackbar'
+import {
+  SnackbarProvider,
+  snackbarOffsetFor,
+  useSnackbar,
+  useSnackbarOffset,
+} from '@rootnative/components/snackbar'
+import { FAB_SIZES } from '@rootnative/components/fab'
 
 // Mount once, inside <ThemeProvider> and inside <PortalHost>.
-// `bottomOffset` clears a FAB or bottom navigation.
+// `bottomOffset` is the app-wide default — use it when every screen has the
+// same bottom furniture. The layer already adds its own 16dp margin and the
+// safe-area inset, so do not include either in the number.
 <PortalHost>
-  <SnackbarProvider bottomOffset={80}>
+  <SnackbarProvider bottomOffset={0}>
     <App />
   </SnackbarProvider>
 </PortalHost>
+
+// When only SOME screens carry a FAB, raise the offset from the screen that
+// owns it instead. It applies while that screen is mounted and reverts on
+// unmount, so the constant lives next to the component that determines it.
+function ComposeScreen() {
+  useSnackbarOffset(snackbarOffsetFor(FAB_SIZES.medium))   // 56 + 16 = 72
+  return <FAB icon="plus" accessibilityLabel="Compose" onPress={compose} />
+}
 
 // Imperative only — there is no <Snackbar visible> component.
 const snackbar = useSnackbar()

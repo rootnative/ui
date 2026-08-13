@@ -75,6 +75,26 @@ export function createSnackbarStyles(
   })
 }
 
+/**
+ * The `bottomOffset` that clears an element of `height` sitting at the bottom
+ * edge — usually a FAB. Pass `FAB_SIZES[size]` from `@rootnative/components`.
+ *
+ * Exists because the alternative is a magic number. The layer already adds
+ * `SNACKBAR_MARGIN` and the safe-area inset itself, so a consumer working the
+ * clearance out by hand has to know both that the margin is applied and that
+ * the inset is not theirs to add — and their number goes stale when a FAB size
+ * or the margin changes. The `88` in the old docs was exactly that: 56 + 16 + 16.
+ *
+ * Takes a raw height rather than a `FABSize` on purpose. Importing `FAB_SIZES`
+ * here would make `fab` a component dependency of `snackbar`, so every
+ * `rootnative add snackbar` would copy the whole FAB component in for four
+ * numbers. It also keeps the helper usable for a bottom bar or any other
+ * bottom-anchored element.
+ */
+export function snackbarOffsetFor(height: number): number {
+  return height + SNACKBAR_MARGIN
+}
+
 export function resolveActionColor(
   theme: MaterialTheme,
   actionColor?: string,

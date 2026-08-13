@@ -145,6 +145,8 @@
         "FABProps",
         "FABSize",
         "FABVariant",
+        "FAB_ICON_SIZES",
+        "FAB_SIZES",
         "Grid",
         "GridProps",
         "IconButton",
@@ -214,7 +216,9 @@
         "Typography",
         "TypographyProps",
         "TypographyVariant",
-        "useSnackbar"
+        "snackbarOffsetFor",
+        "useSnackbar",
+        "useSnackbarOffset"
       ]
     }
   },

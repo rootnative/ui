@@ -141,12 +141,49 @@ replaces dismisses with reason `'replaced'`.
 ## Positioning
 
 The snackbar anchors to the bottom of the screen with 16dp margins and respects the
-safe-area bottom inset. Set `bottomOffset` on the provider to clear a FAB or bottom
-navigation:
+safe-area bottom inset. Both are applied by the layer itself, so an offset you pass
+covers only what sits **on top** of them — a FAB or a bottom navigation bar.
+
+`snackbarOffsetFor(height)` does that arithmetic, and `FAB_SIZES` gives the height:
 
 ```tsx
-<SnackbarProvider bottomOffset={80}>{children}</SnackbarProvider>
+import { FAB_SIZES, snackbarOffsetFor } from '@rootnative/components'
+
+snackbarOffsetFor(FAB_SIZES.medium) // 56 + 16 = 72
 ```
+
+Hard-coding the number is the trap this replaces. A literal `88` double-counts the
+16dp margin the layer already added and pushes the snackbar 32dp too high.
+
+### App-wide vs per-screen
+
+Use the provider's `bottomOffset` prop when every screen carries the same bottom
+furniture:
+
+```tsx
+<SnackbarProvider bottomOffset={snackbarOffsetFor(FAB_SIZES.medium)}>
+  {children}
+</SnackbarProvider>
+```
+
+When only some screens have a FAB, raise the offset from the screen that owns it.
+`useSnackbarOffset` applies while its component is mounted and reverts on unmount,
+so the constant lives next to the component that determines it rather than in the
+app root two files away:
+
+```tsx
+import { FAB, FAB_SIZES, snackbarOffsetFor, useSnackbarOffset } from '@rootnative/components'
+
+function ComposeScreen() {
+  useSnackbarOffset(snackbarOffsetFor(FAB_SIZES.medium))
+  return <FAB icon="plus" accessibilityLabel="Compose" onPress={compose} />
+}
+```
+
+A mounted `useSnackbarOffset` wins over the provider's prop. With several mounted —
+which happens during a navigation transition, while the outgoing screen has not
+unmounted yet — the largest applies, so the snackbar clears every FAB on screen.
+Passing `0` is meaningful: it overrides the prop down to zero for that screen.
 
 The layer is `pointerEvents="box-none"`, so a visible snackbar never blocks the UI behind it.
 

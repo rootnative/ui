@@ -10,12 +10,13 @@
     "packages/components/src/snackbar/styles.ts",
     "packages/components/src/snackbar/types.ts",
     "packages/components/src/snackbar/useSnackbar.ts",
+    "packages/components/src/snackbar/useSnackbarOffset.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["elevation", "render-icon"],
   "componentDependencies": ["button", "icon-button", "portal"],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.8",
+    "@rootnative/core": ">=0.0.0-alpha.9",
     "@rootnative/inertia": ">=0.0.6",
     "react-native-reanimated": ">=4.0.0",
     "react-native-worklets": ">=0.5.0"

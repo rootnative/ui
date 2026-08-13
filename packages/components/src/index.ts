@@ -126,7 +126,12 @@ export {
 } from './portal'
 export type { PortalProps, PortalHostProps, PortalLayerName } from './portal'
 
-export { SnackbarProvider, useSnackbar } from './snackbar'
+export {
+  SnackbarProvider,
+  snackbarOffsetFor,
+  useSnackbar,
+  useSnackbarOffset,
+} from './snackbar'
 export type {
   SnackbarApi,
   SnackbarDismissReason,
@@ -145,5 +150,5 @@ export type { LinearProgressProps, CircularProgressProps } from './progress'
 export { LoadingIndicator } from './loading-indicator'
 export type { LoadingIndicatorProps } from './loading-indicator'
 
-export { FAB } from './fab'
+export { FAB, FAB_ICON_SIZES, FAB_SIZES } from './fab'
 export type { FABProps, FABSize, FABVariant } from './fab'

@@ -291,6 +291,10 @@ const NOT_COMPONENTS = new Set([
   'PORTAL_LAYERS',
   'DEFAULT_PORTAL_HOST',
   'useSnackbar',
+  'useSnackbarOffset',
+  'snackbarOffsetFor',
+  'FAB_SIZES',
+  'FAB_ICON_SIZES',
 ])
 
 function componentProps(): Map<string, Set<string>> {
