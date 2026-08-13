@@ -4,7 +4,7 @@ import type {
   IconSource,
 } from '@rootnative/core'
 import { isValidElement } from 'react'
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { getMaterialCommunityIcons } from './icon'
 
 // The canonical `IconSource` definition lives in `@rootnative/core` next to
@@ -44,7 +44,13 @@ export function renderIcon(
   if (typeof source === 'string') {
     if (resolver) return resolver(source, props)
     const MCI = getMaterialCommunityIcons()
-    return <MCI name={source} size={props.size} color={props.color} />
+    // `IconSource` is a plain `string` by design — the public API accepts any
+    // glyph name, and narrowing it to the vendored union would be a breaking
+    // change that also couples consumers to the icon package's typings. The
+    // static import now brings those typings along, so the cast absorbs the
+    // difference at the one place the two meet.
+    const name = source as ComponentProps<typeof MCI>['name']
+    return <MCI name={name} size={props.size} color={props.color} />
   }
 
   if (typeof source === 'function') {

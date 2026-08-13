@@ -1,30 +1,27 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _MCIcons: any = null
-let _resolved = false
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 /**
- * Lazily resolves MaterialCommunityIcons from `@expo/vector-icons`.
+ * MaterialCommunityIcons from `@expo/vector-icons`.
  *
- * Called at render time (not module load) so that components can be
- * imported without `@expo/vector-icons` installed — the error only
- * fires when an icon is actually rendered.
+ * The import is **static on purpose**. A lazy `require()` inside a try/catch
+ * looks like the right shape for an optional peer, but it does not survive the
+ * build: `splitting: true` makes esbuild compile through an ESM intermediate,
+ * where `require` does not exist, so every literal `require('x')` becomes an
+ * indirect `__require.call(void 0, 'x')`. Metro builds its module graph by
+ * scanning for literal `require('...')` / `import` statements, so an indirect
+ * call is invisible to it — the module never enters the graph and the call
+ * throws "Requiring unknown module" at runtime. Every icon in the library
+ * failed that way while the catch block reported the package as not installed.
+ *
+ * A static import is what Metro can see, so the module is bundled and resolves.
+ * `@expo/vector-icons` stays in tsup's `external` list, so it is not inlined.
  */
 export function getMaterialCommunityIcons() {
-  if (!_resolved) {
-    _resolved = true
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod = require('@expo/vector-icons/MaterialCommunityIcons')
-      _MCIcons = mod.default || mod
-    } catch {
-      _MCIcons = null
-    }
-  }
-  if (!_MCIcons) {
+  if (!MaterialCommunityIcons) {
     throw new Error(
       '@expo/vector-icons is required for icon support. ' +
         'Install it with: npx expo install @expo/vector-icons',
     )
   }
-  return _MCIcons
+  return MaterialCommunityIcons
 }
