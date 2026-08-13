@@ -11,6 +11,19 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+## 0.0.0-alpha.10 — 2026-08-14
+
+Closes the last open item from the developer-experience audit, and the docs
+guard that audit asked for.
+
+### `@rootnative/inertia` floor moves to `0.0.7`
+
+Peer range is now `>=0.0.7 <0.1.0` across `core`, `utils` and `components`.
+`0.0.7` adds `Motion.FlatList` and fixes `gesture={{ pressed }}` on web for
+non-`Pressable` primitives. **This library uses neither**, so the raised floor is
+a judgment call rather than a technical requirement — upgrading is only forced if
+you consume `@rootnative/ui`'s peer range directly.
+
 ### Snackbar bottom offset is computed, not guessed
 
 `SnackbarProvider`'s `bottomOffset` was a raw number the consumer had to work
@@ -43,7 +56,44 @@ Three additions, all exported from the root and from their subpaths:
 the same bottom furniture. **On upgrade, re-check any hard-coded value**: it was
 almost certainly copied from the old docs and is 16dp too large.
 
+### ButtonGroup's props were missing from `llms.txt` entirely
+
+Not a missing prop — the whole block. `ButtonGroupProps` is a union over
+interfaces named `ButtonGroupBaseProps`, and the `llms.txt` generator admits a
+local interface only when the name ends in `CommonProps`, so all four were
+skipped and the generic branch found nothing to document. The section shipped
+with an example and no prop list in every release to date.
+
+Renamed to `ButtonGroupCommonProps` and gave the generator a ButtonGroup branch
+that describes the three `selectionMode` arms, the same shape the AppBar branch
+uses. That recovers 13 common props plus `selectionMode`, `value`,
+`defaultValue`, `onValueChange` and `onItemPress`. No API change — the renamed
+interface was never exported.
+
+### `pnpm run docs:check` now verifies documentation coverage
+
+A fifth check group, `props-coverage`. The existing checks are one-directional:
+they prove a documented prop is real, never that a real prop is documented, so a
+prop absent from the docs left nothing to scan. `Box.justify` was implemented,
+typed and undocumented for the library's whole life with every gate green, and
+ButtonGroup above is the same failure one level up.
+
+It asserts that every prop the library declares appears in
+`packages/components/llms.txt`. Scoped to props declared in the same directory as
+their props type, so React Native's inherited `ViewProps` are not demanded and a
+`declare module 'react-native'` augmentation is not mistaken for a library prop.
+Runs in CI inside the existing Docs check step.
+
+Its limit is documented in the source: it reads `llms.txt` as one flat set, so it
+catches a prop documented nowhere, not one documented for a different component.
+
 ## 0.0.0-alpha.6 — 2026-08-10
+
+_Note: `0.0.0-alpha.7`, `-alpha.8` and `-alpha.9` published to npm without
+entries here, and `-alpha.6` above was never published. Their user-facing work —
+`Card` region slots, `Typography` Emphasized variants, and `rootnative create`
+scaffolding into the current directory — is recorded only in the commit history.
+The gap is left as-is rather than reconstructed after the fact._
 
 The web pass. `0.0.0-alpha.5` covered Android; this one is react-native-web,
 and it is mostly test coverage over behaviour that was already correct — the
