@@ -1492,6 +1492,75 @@ Disabled state always uses standard MD3 disabled treatment (38% onSurface) regar
 }
 
 // ============================================================
+// Content: App root setup (static template)
+// ============================================================
+
+/**
+ * The assembled provider stack, in one snippet.
+ *
+ * Every constraint below is stated correctly in its own section — `PortalHost`
+ * under Portal, `SnackbarProvider` under Snackbar, `ThemeProvider` in
+ * `core/llms.txt` — and nowhere together. A reader who needs a working app root
+ * had to find four sections in two files and hold the nesting rules in their
+ * head. This section is the assembled result, so it stays first.
+ */
+function appRootContent(): string {
+  return `Mount the providers once, at the app root, in this order. Each provider
+below is also documented on its own; this is the assembled result.
+
+\`\`\`tsx
+import { PortalHost } from '@rootnative/components/portal'
+import { SnackbarProvider } from '@rootnative/components/snackbar'
+import { ThemeProvider, darkTheme, lightTheme } from '@rootnative/core'
+
+export default function App() {
+  return (
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+      <PortalHost>
+        <SnackbarProvider bottomOffset={88}>
+          {/* Your app */}
+        </SnackbarProvider>
+      </PortalHost>
+    </ThemeProvider>
+  )
+}
+\`\`\`
+
+That is the whole stack — three providers, and **no \`SafeAreaProvider\`**.
+\`react-native-safe-area-context\` is a required peer dep, but the components that
+apply insets (\`Layout\`, \`AppBar\`, \`NavigationBar\`, \`BottomSheet\`, \`Snackbar\`) use
+its native \`SafeAreaView\`, which reads no React context. Only its
+\`useSafeAreaInsets\` hook needs a provider, and nothing here calls it. Adding one
+is harmless if your own code uses that hook.
+
+Why that order:
+
+- **\`ThemeProvider\`** — above every component, since all of them read the theme.
+  Passing the \`{ light, dark }\` pair (rather than one theme) is what enables
+  \`useThemeMode()\` in descendants; it then follows the OS setting on its own. Add
+  \`storage={AsyncStorage}\` to remember an explicit choice across launches.
+- **\`PortalHost\`** — inside \`ThemeProvider\`, so portalled overlays are themed
+  too, and above your screens, so overlays get the whole window. One host at the
+  root; \`Dialog\`, \`BottomSheet\`, \`Menu\`, \`Tooltip\` and \`Snackbar\` all need it.
+  Nesting an unnamed host inside another **shadows** the outer one — use
+  \`name\` for a scoped host.
+- **\`SnackbarProvider\`** — inside both, because it renders through a \`Portal\` and
+  its snackbars are themed. It owns the queue; \`useSnackbar()\` works anywhere
+  below it. It applies the bottom safe-area inset itself; \`bottomOffset\` is added
+  on top of that, plus the snackbar's own 16dp margin. Use \`88\` to clear a
+  standard 56dp \`FAB\` with its 16dp margin, or \`80\` for a \`NavigationBar\`.
+
+**No gesture-handler setup is required.** \`react-native-gesture-handler\` is not a
+peer dependency of any \`@rootnative/*\` package, so there is no
+\`GestureHandlerRootView\` in the stack above. \`BottomSheet\` drag runs on
+\`@rootnative/inertia/touch\`, which is built on React Native's own \`PanResponder\`
+for exactly this reason; every other interaction uses \`Pressable\`.
+
+Nothing else belongs at the root. Every other component works wherever you
+render it.`
+}
+
+// ============================================================
 // Content: Core API (static templates)
 // ============================================================
 
@@ -2096,6 +2165,10 @@ function generateComponentsLlms(): string {
 > Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
+## App root setup
+
+${appRootContent()}
+
 ## The animation layer lives in a separate package
 
 Every animation runs on \`@rootnative/inertia\`, which ships its own reference at
@@ -2185,6 +2258,12 @@ pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native
 \`\`\`
 
 Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK 54 bundles its Babel plugin — nothing to configure. On bare React Native, add \`'react-native-worklets/plugin'\` last in \`babel.config.js\` plugins.
+
+---
+
+## App root setup
+
+${appRootContent()}
 
 ---
 
