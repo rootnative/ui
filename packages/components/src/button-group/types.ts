@@ -45,7 +45,7 @@ export interface ButtonGroupItem {
   accessibilityLabel?: string
 }
 
-interface ButtonGroupBaseProps extends Omit<ViewProps, 'children'> {
+interface ButtonGroupCommonProps extends Omit<ViewProps, 'children'> {
   /** The buttons to render in the group. */
   items: ButtonGroupItem[]
   /**
@@ -86,7 +86,7 @@ interface ButtonGroupBaseProps extends Omit<ViewProps, 'children'> {
   testID?: string
 }
 
-interface ButtonGroupNoSelectionProps extends ButtonGroupBaseProps {
+interface ButtonGroupNoSelectionProps extends ButtonGroupCommonProps {
   selectionMode?: 'none'
   value?: never
   defaultValue?: never
@@ -95,7 +95,7 @@ interface ButtonGroupNoSelectionProps extends ButtonGroupBaseProps {
   onItemPress?: (value: string) => void
 }
 
-interface ButtonGroupSingleSelectionProps extends ButtonGroupBaseProps {
+interface ButtonGroupSingleSelectionProps extends ButtonGroupCommonProps {
   selectionMode: 'single'
   /** Currently selected item value (controlled). */
   value?: string | null
@@ -106,7 +106,7 @@ interface ButtonGroupSingleSelectionProps extends ButtonGroupBaseProps {
   onItemPress?: (value: string) => void
 }
 
-interface ButtonGroupMultipleSelectionProps extends ButtonGroupBaseProps {
+interface ButtonGroupMultipleSelectionProps extends ButtonGroupCommonProps {
   selectionMode: 'multiple'
   /** Currently selected item values (controlled). */
   value?: string[]

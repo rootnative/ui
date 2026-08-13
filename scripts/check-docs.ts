@@ -8,12 +8,22 @@
  * two `ListItem` props that don't exist. Every one of those is mechanically
  * detectable, so detecting it by hand once a year is the wrong plan.
  *
- * Two groups of checks:
+ * Three groups of checks:
  *
  *   cli-reference   `docs/docs/cli.md` vs `packages/cli/src` + `registry/`
  *   component-props every JSX prop in every docs example vs the component's
  *                   real props type, resolved through the TypeScript checker so
  *                   inherited React Native props count too
+ *   props-coverage  the other direction — every prop the library declares is
+ *                   documented in `packages/components/llms.txt`
+ *
+ * `props-coverage` exists because the other two are one-directional: they prove
+ * a documented prop is real, never that a real prop is documented. `Box.justify`
+ * was implemented, typed and undocumented for the library's whole life while
+ * `docs:check` stayed green, because there was nothing in the docs to scan. The
+ * generator that omitted it exited 0, which is the failure mode this whole file
+ * is about — a generator that can emit an incomplete file successfully needs an
+ * assertion about its OUTPUT, not just its input.
  *
  * Only files that are committed belong here. A third `claude-md` group once
  * checked the repo's own root `CLAUDE.md`, which is never tracked — so it
@@ -46,6 +56,7 @@ const DOCTOR_SRC = path.join(ROOT, 'packages/cli/src/commands/doctor.ts')
 const REGISTRY_DIR = path.join(ROOT, 'registry/components')
 const DOCS_DIR = path.join(ROOT, 'docs/docs')
 const COMPONENTS_ENTRY = path.join(ROOT, 'packages/components/src/index.ts')
+const COMPONENTS_LLMS = path.join(ROOT, 'packages/components/llms.txt')
 
 interface Problem {
   check: string
@@ -477,6 +488,160 @@ function checkComponentProps() {
 }
 
 // ---------------------------------------------------------------------------
+// props-coverage
+// ---------------------------------------------------------------------------
+
+/**
+ * Props the library itself declares, per props type — the ones that must be
+ * documented. Deliberately NOT every prop the type resolves to: `BoxProps` has
+ * 112, of which 90 come from `ViewProps`. Documenting React Native's surface is
+ * not this library's job, and demanding it would make the check unsatisfiable.
+ *
+ * The filter is "declared in the same directory as the props type itself", not
+ * "declared anywhere in the repo". That distinction is load-bearing:
+ * `BottomSheet.tsx` augments the global `ViewProps` with `onKeyDown` to patch a
+ * hole in RN-Web's types, so a repo-wide filter attributes `onKeyDown` to Box,
+ * Button and everything else that extends `ViewProps` — none of which offer it.
+ *
+ * Union props types contribute every arm, since `AppBarProps` splits `actions`
+ * and `trailing` across two and both need documenting.
+ */
+/**
+ * True when a property is declared inside a `declare module 'react-native'`
+ * block rather than on one of the library's own interfaces.
+ *
+ * These are type patches, not props. `BottomSheet.tsx` and `Slider.tsx` each
+ * augment upstream `ViewProps` / `PressableProps` with `onKeyDown`, and
+ * `TextField.tsx` adds `aria-invalid` / `aria-describedby`, because RN-Web
+ * forwards all of them to the DOM while the upstream types omit them. They live
+ * in the component's own directory, so the scope filter alone still attributes
+ * them to that component and demands documentation for a prop the library does
+ * not offer.
+ */
+function isModuleAugmentation(declaration: ts.Node): boolean {
+  for (let node: ts.Node | undefined = declaration; node; node = node.parent) {
+    if (ts.isModuleDeclaration(node)) return true
+  }
+  return false
+}
+
+function declaredProps(): Map<string, Set<string>> {
+  const program = ts.createProgram([COMPONENTS_ENTRY], {
+    target: ts.ScriptTarget.ESNext,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
+    jsx: ts.JsxEmit.ReactJSX,
+    strict: true,
+    skipLibCheck: true,
+    noEmit: true,
+  })
+  const source = program.getSourceFile(COMPONENTS_ENTRY)
+  if (!source) throw new Error(`Could not load ${COMPONENTS_ENTRY}`)
+
+  const checker = program.getTypeChecker()
+  const moduleSymbol = checker.getSymbolAtLocation(source)
+  if (!moduleSymbol)
+    throw new Error('No module symbol for the components entry')
+
+  const byType = new Map<string, Set<string>>()
+
+  for (const symbol of checker.getExportsOfModule(moduleSymbol)) {
+    const name = symbol.getName()
+    if (!name.endsWith('Props')) continue
+
+    // Every props type reaches the entry as a re-export, so the alias resolves
+    // to `index.ts` itself. Without this hop every scope directory is the entry
+    // directory, no prop matches it, and the check reports a vacuous clean.
+    const resolved =
+      symbol.getFlags() & ts.SymbolFlags.Alias
+        ? checker.getAliasedSymbol(symbol)
+        : symbol
+    const declaration = resolved.getDeclarations()?.[0]
+    if (!declaration) continue
+    const scope = path.dirname(declaration.getSourceFile().fileName)
+
+    const declared = checker.getDeclaredTypeOfSymbol(resolved)
+    const constituents = declared.isUnion() ? declared.types : [declared]
+    const own = new Set<string>()
+    for (const type of constituents) {
+      for (const property of checker.getPropertiesOfType(type)) {
+        const propertyDeclaration = property.getDeclarations()?.[0]
+        if (!propertyDeclaration) continue
+        const file = propertyDeclaration.getSourceFile().fileName
+        if (path.dirname(file) !== scope) continue
+        if (isModuleAugmentation(propertyDeclaration)) continue
+        own.add(property.getName())
+      }
+    }
+    if (own.size > 0) byType.set(name.slice(0, -'Props'.length), own)
+  }
+  return byType
+}
+
+/**
+ * Prop names `llms.txt` documents, from its `- \`name?: type\` — …` bullets.
+ *
+ * Read as one flat set for the whole file rather than per component section. The
+ * finer check would be per section, but the generator writes some props under a
+ * shared heading (the override-pattern block covers `containerColor` /
+ * `contentColor` / `labelStyle` for every component at once), so a per-section
+ * assertion would demand duplication the document deliberately avoids.
+ *
+ * **The cost of that choice, stated so nobody reads more into a green run than
+ * it means:** a flat set catches a prop documented NOWHERE, not a prop
+ * documented for a *different* component. Common names hide behind each other —
+ * `variant` appears on 16 prop lines and `containerColor` on 27, so dropping
+ * either from one component's block still passes. It was measured, not assumed:
+ * reverting the `ButtonGroupCommonProps` rename drops 13 props from the file and
+ * this check reports 3, because the other 10 share a name with some other
+ * component's documented prop. Those 3 are enough to fail CI and name the cause,
+ * which is the job. Tightening to per-section is the obvious next step if the
+ * hiding ever matters; it needs the generator's shared-heading props modelled
+ * first.
+ */
+function documentedProps(text: string): Set<string> {
+  const names = new Set<string>()
+  for (const match of text.matchAll(/^- `([A-Za-z_][\w]*)\??(?::|`)/gm)) {
+    names.add(match[1])
+  }
+  return names
+}
+
+function checkPropsCoverage() {
+  const check = 'props-coverage'
+  const documented = documentedProps(read(COMPONENTS_LLMS))
+
+  // A guard, not a formality. The bullet regex is the only thing standing
+  // between this check and a silent pass: if the generator ever changes its
+  // prop-line format, the set goes empty, every prop reads as undocumented, and
+  // the failure at least names the real cause instead of 391 false positives.
+  if (documented.size === 0) {
+    fail(
+      check,
+      'parsed zero prop bullets out of packages/components/llms.txt — the `- `name?: type`` format changed, so this check is blind. Fix the parser.',
+    )
+    return
+  }
+
+  const declared = declaredProps()
+  let total = 0
+  for (const [component, props] of [...declared].sort()) {
+    for (const prop of [...props].sort()) {
+      total++
+      if (!documented.has(prop)) {
+        fail(
+          check,
+          `\`${component}.${prop}\` is declared but appears in no \`llms.txt\` prop line. Run \`pnpm run build:llms\`; if the generator drops it, its parser cannot see that prop shape.`,
+        )
+      }
+    }
+  }
+  notes.push(
+    `props coverage: ${total} declared prop(s) across ${declared.size} props type(s), ${documented.size} documented name(s)`,
+  )
+}
+
+// ---------------------------------------------------------------------------
 
 function main() {
   const doc = read(CLI_DOC)
@@ -484,6 +649,7 @@ function main() {
   checkComponentTable(doc)
   checkDoctorChecks(doc)
   checkComponentProps()
+  checkPropsCoverage()
 
   if (process.argv.includes('--list')) {
     for (const note of notes) console.log(`  ${note}`)

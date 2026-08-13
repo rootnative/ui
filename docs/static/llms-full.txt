@@ -619,6 +619,34 @@ import { ButtonGroup } from '@rootnative/components/button-group'
 />
 ```
 
+Props:
+- `items: ButtonGroupItem[]` — The buttons to render in the group.
+- `variant?: 'standard' | 'connected'` — Default: `'standard'`. Visual variant.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. Button size.
+- `iconSize?: number` — Override the icon size (in dp) for all items. Defaults to a size that matches the group `size`.
+- `disabled?: boolean` — Disable the entire group. Per-item `disabled` is also honored.
+- `containerColor?: string` — Override the container (background) color of unselected items. State-layer colors (hover, press) are derived automatically.
+- `contentColor?: string` — Override the content (label and icon) color of unselected items.
+- `selectedContainerColor?: string` — Override the container color of selected items.
+- `selectedContentColor?: string` — Override the content color of selected items.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to each item label.
+- `style?: StyleProp<ViewStyle>` — Style applied to the root container.
+- `accessibilityLabel?: string` — Accessibility label for the group container.
+- `testID?: string` — Test ID forwarded to the root container.
+- `selectionMode?: 'none' | 'single' | 'multiple'` — Default: `'none'`. Discriminates the props below. `'single'` selects one item, `'multiple'` selects several, `'none'` is an action-only group with no selection state.
+- `value?: string | null | string[]` — Selected item value(s), controlled. `string | null` when `selectionMode` is `'single'`, `string[]` when `'multiple'`. Rejected when `'none'`.
+- `defaultValue?: string | null | string[]` — Initial selected value(s), uncontrolled. Same type per mode as `value`.
+- `onValueChange?: (value: string | null | string[]) => void` — Called when the selection changes. Same type per mode as `value`. Rejected when `selectionMode` is `'none'`.
+- `onItemPress?: (value: string) => void` — Called when an item is pressed, in every mode. The only press callback available when `selectionMode` is `'none'`.
+- Inherits `ViewProps` (except `children`)
+
+ButtonGroupItem:
+- `value: string` — Stable identifier used for selection state and the press callback.
+- `label?: string` — Text label rendered inside the button.
+- `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function receiving `{ size, color }`.
+- `trailingIcon?: IconSource` — Icon rendered after the label.
+- `disabled?: boolean` — Disable this item only.
+- `accessibilityLabel?: string` — Accessibility label override (defaults to `label`).
 
 ---
 

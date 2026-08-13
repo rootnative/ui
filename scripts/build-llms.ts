@@ -1104,6 +1104,57 @@ import { Grid } from '@rootnative/components/layout'
     return output
   }
 
+  // --- ButtonGroup: common props + the selection-mode arms ---
+  if (dirName === 'button-group') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    // Same shape as AppBar below: `ButtonGroupProps` is a type alias over a
+    // three-arm union discriminated on `selectionMode`, so the shared props come
+    // from `ButtonGroupCommonProps` and the arms are described here. The arms
+    // carry `selectionMode`, `value`, `defaultValue`, `onValueChange` and
+    // `onItemPress`, none of which any interface the parser can see declares.
+    const propsIface = interfaces.find(
+      (i) => i.name === 'ButtonGroupCommonProps',
+    )
+    if (propsIface) {
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine = '- Inherits `ViewProps` (except `children`)\n'
+      const armProps =
+        "- `selectionMode?: 'none' | 'single' | 'multiple'` — Default: " +
+        "`'none'`. Discriminates the props below. `'single'` selects one item, " +
+        "`'multiple'` selects several, `'none'` is an action-only group with no " +
+        'selection state.\n' +
+        '- `value?: string | null | string[]` — Selected item value(s), ' +
+        "controlled. `string | null` when `selectionMode` is `'single'`, " +
+        "`string[]` when `'multiple'`. Rejected when `'none'`.\n" +
+        '- `defaultValue?: string | null | string[]` — Initial selected ' +
+        'value(s), uncontrolled. Same type per mode as `value`.\n' +
+        '- `onValueChange?: (value: string | null | string[]) => void` — ' +
+        'Called when the selection changes. Same type per mode as `value`. ' +
+        "Rejected when `selectionMode` is `'none'`.\n" +
+        '- `onItemPress?: (value: string) => void` — Called when an item is ' +
+        'pressed, in every mode. The only press callback available when ' +
+        "`selectionMode` is `'none'`.\n"
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, armProps + inheritsLine)
+        : section + armProps
+    }
+
+    const itemIface = interfaces.find((i) => i.name === 'ButtonGroupItem')
+    if (itemIface) {
+      output += '\nButtonGroupItem:\n'
+      for (const member of itemIface.members) {
+        const resolved = resolveTypeAlias(member.type, typeAliases)
+        const opt = member.optional ? '?' : ''
+        let line = `- \`${member.name}${opt}: ${resolved}\``
+        if (member.comment) line += ` — ${member.comment}`
+        output += line + '\n'
+      }
+    }
+
+    return output
+  }
+
   // --- AppBar: main props + AppBarAction ---
   if (dirName === 'appbar') {
     let output = `### ${displayName}\n\n${example}\n\n`
