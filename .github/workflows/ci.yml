@@ -62,3 +62,12 @@ jobs:
       # emitted layout is the only place it shows.
       - name: Singleton check
         run: pnpm run check:singletons
+
+      # Also reads the built bundles, and for the same reason: the bundler
+      # decides whether the Reanimated Babel plugin can workletize a hook call,
+      # and it matches by callee name. `format: 'cjs'` + `splitting: true`
+      # emitted `_reanimated.useAnimatedStyle.call(void 0, cb)`, which it cannot
+      # see — so every animated component crashed on mount in alpha.10/alpha.11
+      # while typecheck, 957 tests and the API snapshot all stayed green.
+      - name: Worklet check
+        run: pnpm run check:worklets
