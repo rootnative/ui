@@ -22,7 +22,7 @@ module.exports = {
       preset: 'react-native',
       rootDir: __dirname,
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-      setupFiles: ['<rootDir>/jest.setup.js'],
+      setupFiles: ['<rootDir>/jest.setup.cjs'],
       moduleNameMapper: workspaceAliases,
       transformIgnorePatterns,
       testPathIgnorePatterns: [
@@ -36,7 +36,7 @@ module.exports = {
       testEnvironment: 'jsdom',
       testMatch: ['<rootDir>/src/__tests__/web/**/*.test.tsx'],
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-      setupFiles: ['<rootDir>/jest.setup.web.js'],
+      setupFiles: ['<rootDir>/jest.setup.web.cjs'],
       transform: { '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest' },
       moduleNameMapper: {
         ...workspaceAliases,

@@ -2,11 +2,12 @@
  * Guards that every module-level singleton in `@rootnative/components` is
  * defined exactly once across the built bundles.
  *
- * Why this exists: the package ships 30 entry points in **CJS**, and tsup does
- * not code-split CJS unless `splitting: true` is set. Without it each entry is
- * a self-contained bundle that *inlines* every module it touches — so
- * `PortalContext` was emitted five separate times, once per entry that reached
- * it.
+ * Why this exists: the package ships 30 entry points, and without
+ * `splitting: true` each one is a self-contained bundle that *inlines* every
+ * module it touches — so `PortalContext` was emitted five separate times, once
+ * per entry that reached it. Splitting was the explicit switch back when the
+ * package built CJS; it is automatic for the ESM it builds now, so the flag is
+ * belt-and-braces and this check is what keeps the guarantee honest either way.
  *
  * `createContext` identity is what React matches a provider to a consumer, so
  * five copies are five unrelated contexts. A `PortalHost` imported from
