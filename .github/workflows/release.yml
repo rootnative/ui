@@ -64,8 +64,33 @@ jobs:
       - name: Test
         run: pnpm run test
 
+      - name: Docs check
+        run: pnpm run docs:check
+
+      - name: Inertia pin check
+        run: pnpm run check:inertia-pins
+
       - name: Build
         run: pnpm run build
+
+      # Everything from here to `Configure git` mirrors the post-build gates in
+      # ci.yml, and the mirroring is load-bearing: these five checks read the
+      # built output, which is the only place their failure modes are
+      # observable. Releasing without them is how alpha.10 and alpha.11 shipped
+      # with every animated component dead on native — the worklet check existed
+      # in CI, but the release path never ran it, so a green CI on main said
+      # nothing about the artifact actually being published.
+      #
+      # Keep this list in sync with ci.yml. A guard that runs on PRs but not on
+      # release protects the branch and not the users.
+      - name: API surface
+        run: npx tsx scripts/build-api-surface.ts --check
+
+      - name: Singleton check
+        run: pnpm run check:singletons
+
+      - name: Worklet check
+        run: pnpm run check:worklets
 
       - name: Configure git
         run: |
@@ -130,10 +155,21 @@ jobs:
       - name: Regenerate LLM docs with new versions
         run: npx tsx scripts/build-llms.ts
 
+      # The registry derives its `@rootnative/core` floor from the components
+      # peer range, which the bump above just moved — so it is generated output
+      # that goes stale on every release unless it is regenerated here. It was:
+      # alpha.10 and alpha.11 both shipped a registry still claiming
+      # `>=0.0.0-alpha.9`, because only `llms.txt` was regenerated. The CLI
+      # fetches `registry/index.json` from the release tag, so a stale floor
+      # reaches every scaffolded project.
+      - name: Regenerate registry with new versions
+        run: npx tsx scripts/build-registry.ts
+
       - name: Commit and tag
         run: |
           git add pnpm-lock.yaml
           git add packages/*/llms.txt docs/static/llms-full.txt
+          git add registry
           for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
             git add "packages/$PKG_DIR/package.json"
           done

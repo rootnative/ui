@@ -95,8 +95,39 @@ jobs:
           echo "packages=$VALIDATED" >> "$GITHUB_OUTPUT"
           echo "Validated packages: $VALIDATED"
 
+      # This workflow publishes a hand-picked subset of packages, which makes it
+      # the *more* dangerous path, not the safer one — so it runs the same gates
+      # as ci.yml and release.yml rather than fewer. It previously ran none of
+      # them, not even lint or test, so a one-package hotfix could publish code
+      # that no check had ever seen.
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Docs check
+        run: pnpm run docs:check
+
+      - name: Inertia pin check
+        run: pnpm run check:inertia-pins
+
       - name: Build
         run: pnpm run build
+
+      # Read the built output — see the note in release.yml for why these five
+      # cannot be skipped on a publishing path. Keep in sync with ci.yml.
+      - name: API surface
+        run: npx tsx scripts/build-api-surface.ts --check
+
+      - name: Singleton check
+        run: pnpm run check:singletons
+
+      - name: Worklet check
+        run: pnpm run check:worklets
 
       - name: Configure git
         run: |
@@ -152,6 +183,12 @@ jobs:
       - name: Regenerate LLM docs with new versions
         run: npx tsx scripts/build-llms.ts
 
+      # See the note in release.yml — the registry's `@rootnative/core` floor is
+      # derived from the components peer range, so it goes stale on every bump
+      # unless regenerated and staged here.
+      - name: Regenerate registry with new versions
+        run: npx tsx scripts/build-registry.ts
+
       - name: Commit and tag
         run: |
           # Build tag from package names and version
@@ -160,6 +197,7 @@ jobs:
 
           git add pnpm-lock.yaml
           git add packages/*/llms.txt docs/static/llms-full.txt
+          git add registry
           for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
             git add "packages/$PKG_DIR/package.json"
           done
