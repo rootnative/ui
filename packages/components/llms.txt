@@ -1,7 +1,7 @@
 # @rootnative/components — MD3 UI Components for React Native
 
-> Version: 0.0.0-alpha.11
-> Peer deps: @rootnative/core >=0.0.0-alpha.11, @rootnative/inertia >=0.0.7 <0.1.0 (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
+> Version: 0.0.0-alpha.12
+> Peer deps: @rootnative/core >=0.0.0-alpha.12, @rootnative/inertia >=0.0.7 <0.1.0 (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## App root setup
@@ -1425,7 +1425,7 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.11)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.12)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 
