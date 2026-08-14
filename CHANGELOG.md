@@ -11,6 +11,53 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+## 0.0.0-alpha.11 — 2026-08-14
+
+### Every icon threw, and safe-area insets were silently dropped
+
+`IconButton`, and anything else rendering a string icon name, failed at runtime
+under Metro with:
+
+```
+Requiring unknown module "@expo/vector-icons/MaterialCommunityIcons"
+```
+
+followed by the library's own `@expo/vector-icons is required for icon support`
+error. `Layout` and `AppBar` hit the same fault one step quieter: they warned
+that `react-native-safe-area-context` was not installed and rendered a plain
+`View`, so every screen lost its insets. **Both packages were installed and
+resolvable in every case.** Reported against `0.0.0-alpha.10` from a consumer
+app; the icon path has been broken for far longer.
+
+The source was never wrong. Both peers were loaded the way an optional
+dependency normally is — a literal `require()` inside a `try`/`catch` — and
+the build broke it. `splitting: true` makes esbuild compile through an ESM
+intermediate, where `require` does not exist, so each call was rewritten to
+esbuild's own shim and emitted as `__require.call(void 0, '…')`. Metro builds
+its module graph by scanning for **literal** `require('…')` and `import`
+statements, so an indirect call through an aliased binding is invisible to it:
+the module never entered the graph, the call threw, and the `catch` blamed the
+consumer for a package that was sitting in `node_modules`.
+
+Listing both in tsup's `external` does not help — the shim breaks the call
+before externalization is reached. Nor can `splitting` be dropped to avoid it;
+that is what keeps `PortalContext` and friends single instances, and
+`check:singletons` exists to defend it.
+
+So both are now **static imports**, in `packages/utils/src/icon.ts` and
+`packages/components/src/safe-area.tsx`. That is a form esbuild leaves intact
+and Metro can see, and it keeps both packages external rather than inlined.
+
+**Behavior change worth reading before you upgrade.** These two peers are now
+resolved when the module loads, not when an icon first renders. Both are already
+declared peer dependencies and both ship in any Expo app, so this should reach
+nobody — but a consumer who genuinely omitted one now fails at import time
+instead of at first icon. The old `try`/`catch` never actually bought that
+tolerance: the only reason it ever ran was this bug.
+
+Nothing changed in the public API — `api:check` reports no drift, and all 957
+tests pass.
+
 ## 0.0.0-alpha.10 — 2026-08-14
 
 Closes the last open item from the developer-experience audit, and the docs
