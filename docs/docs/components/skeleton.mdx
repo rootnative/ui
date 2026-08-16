@@ -1,0 +1,148 @@
+# Skeleton
+
+Skeletons are pulsing placeholder blocks that hold the shape of content while
+it loads. Use one where a spinner cannot — when the placeholder must match the
+size of the image, avatar, or text line it stands in for.
+
+The block is drawn in `surfaceContainerHighest` and pulses its opacity on a
+repeating timing loop built from `theme.motion.durationExtraLong4` and
+`theme.motion.easingStandard`. Under reduced motion the pulse collapses to a
+static block. The component is hidden from the accessibility tree — announce
+the loading state on the container instead (for example with `aria-busy`).
+
+## Usage
+
+<SnackExample
+  name="RootNative Skeleton — Usage"
+  code={`
+  import { Column, Skeleton } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Column gap="md" style={{ padding: 24 }}>
+            <Skeleton />
+            <Skeleton width="80%" />
+            <Skeleton width="60%" />
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Shapes
+
+`shape` controls the corner treatment:
+
+| Prop value | Result |
+|------------|--------|
+| `'rounded'` (default) | `theme.shape.cornerSmall` corners |
+| `'circle'` | Fully rounded — pass an equal `width` and `height` |
+| `'rectangle'` | Square corners |
+
+<SnackExample
+  name="RootNative Skeleton — Shapes"
+  code={`
+  import { Column, Row, Skeleton } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Row gap="md" align="center" style={{ padding: 24 }}>
+            <Skeleton shape="circle" width={48} height={48} />
+            <Column gap="sm" style={{ flex: 1 }}>
+              <Skeleton height={12} />
+              <Skeleton width="70%" height={12} />
+            </Column>
+          </Row>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Card placeholder
+
+Compose skeletons to mirror the layout they replace, then swap in the real
+content when it arrives:
+
+<SnackExample
+  name="RootNative Skeleton — Card"
+  code={`
+  import { Card, Column, Row, Skeleton } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Column style={{ padding: 24 }}>
+            <Card variant="outlined">
+              <Column p="md" gap="md">
+                <Row gap="md" align="center">
+                  <Skeleton shape="circle" width={40} height={40} />
+                  <Skeleton width={120} height={20} />
+                </Row>
+                <Skeleton height={160} />
+                <Column gap="sm">
+                  <Skeleton />
+                  <Skeleton width="70%" />
+                </Column>
+              </Column>
+            </Card>
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Static and custom color
+
+Set `animated={false}` for a block that does not pulse — for example when many
+skeletons render at once and the motion becomes noise. `containerColor`
+overrides the block color.
+
+<SnackExample
+  name="RootNative Skeleton — Static & Color"
+  code={`
+  import { Column, Skeleton } from '@rootnative/components'
+  import { ThemeProvider, useTheme } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  function Demo() {
+    const theme = useTheme()
+    return (
+      <Column gap="md" style={{ padding: 24 }}>
+        <Skeleton animated={false} />
+        <Skeleton containerColor={theme.colors.secondaryContainer} />
+      </Column>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Demo />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Props
+
+<PropTable name="Skeleton" />

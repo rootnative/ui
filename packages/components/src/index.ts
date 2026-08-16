@@ -150,5 +150,8 @@ export type { LinearProgressProps, CircularProgressProps } from './progress'
 export { LoadingIndicator } from './loading-indicator'
 export type { LoadingIndicatorProps } from './loading-indicator'
 
+export { Skeleton } from './skeleton'
+export type { SkeletonProps, SkeletonShape } from './skeleton'
+
 export { FAB, FAB_ICON_SIZES, FAB_SIZES } from './fab'
 export type { FABProps, FABSize, FABVariant } from './fab'

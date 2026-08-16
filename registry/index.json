@@ -86,6 +86,10 @@
       "description": "Single-choice selection control with selected/unselected states."
     },
     {
+      "name": "skeleton",
+      "description": ""
+    },
+    {
       "name": "slider",
       "description": "Single-thumb or range slider with continuous and discrete (stepped) modes and optional centered origin."
     },

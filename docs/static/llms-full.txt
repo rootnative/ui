@@ -1877,6 +1877,40 @@ Props:
 - `accessibilityLabel?: string` — Accessibility label announced for the busy/progress state.
 - Inherits `ViewProps` (except `children`)
 
+---
+
+### Skeleton
+
+```tsx
+import { Skeleton } from '@rootnative/components/skeleton'
+
+// One line of text (100% wide, 16dp tall, pulsing)
+<Skeleton />
+<Skeleton width="70%" />
+
+// Match the content it stands in for
+<Skeleton shape="circle" width={40} height={40} />  // avatar
+<Skeleton height={160} />                           // image
+<Skeleton shape="rectangle" width={96} height={48} />
+
+// Static block / custom color
+<Skeleton animated={false} />
+<Skeleton containerColor="#E8DEF8" />
+```
+
+The block reads `surfaceContainerHighest` and pulses with a repeating timing
+loop from `theme.motion.durationExtraLong4` + `theme.motion.easingStandard`.
+It is hidden from the accessibility tree — announce loading on the container.
+Under reduced motion the pulse collapses to a static block.
+
+Props:
+- `width?: DimensionValue` — Default: `'100%'`. Block width, in dp or as a percentage of the parent.
+- `height?: DimensionValue` — Default: `16`. Block height, in dp or as a percentage of the parent.
+- `shape?: 'rounded' | 'circle' | 'rectangle'` — Default: `'rounded'`. Corner treatment. `'rounded'` uses `theme.shape.cornerSmall`, `'circle'` uses `theme.shape.cornerFull` (pass an equal `width` and `height` for a true circle), `'rectangle'` uses square corners.
+- `containerColor?: string` — Default: `theme.colors.surfaceContainerHighest`. Override the block color.
+- `animated?: boolean` — Default: `true`. Run the opacity pulse. Set `false` for a static block — for example when many skeletons render at once and one pulse is enough.
+- Inherits `ViewProps` (except `children`)
+
 
 ---
 

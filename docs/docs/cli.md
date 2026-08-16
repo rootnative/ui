@@ -404,6 +404,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `portal` | — | Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips |
 | `progress` | — | Linear and circular progress indicators with determinate and indeterminate modes |
 | `radio` | — | Single-choice selection control with selected/unselected states |
+| `skeleton` | — | Pulsing loading placeholder block that matches the shape of the content it stands in for |
 | `slider` | — | Single-thumb or range slider with continuous and discrete (stepped) modes and optional centered origin |
 | `snackbar` | button, icon-button, portal | Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement |
 | `switch` | — | Toggle control with optional icons and customizable thumb/track colors |

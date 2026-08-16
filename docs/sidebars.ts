@@ -54,6 +54,7 @@ const sidebars: SidebarsConfig = {
         'components/list',
         'components/loading-indicator',
         'components/progress',
+        'components/skeleton',
         'components/typography',
       ],
     },

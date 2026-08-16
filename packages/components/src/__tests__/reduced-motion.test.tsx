@@ -23,6 +23,7 @@ import { NavigationBar } from '../navigation-bar'
 import { PortalHost } from '../portal/PortalHost'
 import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
+import { Skeleton } from '../skeleton'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
 import { Switch } from '../switch'
@@ -201,6 +202,7 @@ const CASES: readonly ReducedMotionCase[] = [
     name: 'CircularProgress (indeterminate)',
     render: () => <CircularProgress accessibilityLabel="Loading" />,
   },
+  { name: 'Skeleton', render: () => <Skeleton /> },
   {
     name: 'Dialog',
     render: () => (

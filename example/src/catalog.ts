@@ -239,6 +239,14 @@ export const sections: CatalogSection[] = [
         keywords: 'spinner loader busy expressive morph shapes',
       },
       {
+        label: 'Skeleton',
+        route: '/skeleton',
+        description: 'Pulsing loading placeholders that match content shape',
+        add: 'skeleton',
+        docs: 'components/skeleton',
+        keywords: 'placeholder shimmer loading pulse ghost block',
+      },
+      {
         label: 'Portal',
         route: '/portal',
         description:

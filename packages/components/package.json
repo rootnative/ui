@@ -152,6 +152,11 @@
       "react-native": "./dist/loading-indicator/index.js",
       "default": "./dist/loading-indicator/index.js"
     },
+    "./skeleton": {
+      "types": "./dist/skeleton/index.d.ts",
+      "react-native": "./dist/skeleton/index.js",
+      "default": "./dist/skeleton/index.js"
+    },
     "./fab": {
       "types": "./dist/fab/index.d.ts",
       "react-native": "./dist/fab/index.js",
@@ -240,6 +245,9 @@
       ],
       "loading-indicator": [
         "dist/loading-indicator/index.d.ts"
+      ],
+      "skeleton": [
+        "dist/skeleton/index.d.ts"
       ],
       "fab": [
         "dist/fab/index.d.ts"

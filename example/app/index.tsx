@@ -17,6 +17,7 @@ import {
   ListItem,
   Radio,
   Row,
+  Skeleton,
   Slider,
   Switch,
   TextField,
@@ -266,6 +267,17 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
         <Column gap="md" align="center" style={previewStyles.progressWrapper}>
           <LinearProgress progress={0.65} />
           <CircularProgress progress={0.5} size={36} />
+        </Column>
+      )
+    case 'Skeleton':
+      return (
+        <Column gap="sm" style={previewStyles.skeletonWrapper}>
+          <Row gap="sm" align="center">
+            <Skeleton shape="circle" width={24} height={24} />
+            <Skeleton width={80} height={10} />
+          </Row>
+          <Skeleton height={8} />
+          <Skeleton width="70%" height={8} />
         </Column>
       )
     case 'Dialog':
@@ -805,6 +817,10 @@ const previewStyles = StyleSheet.create({
     flex: 1,
     height: 28,
     borderRadius: 6,
+  },
+  skeletonWrapper: {
+    width: '100%',
+    maxWidth: 180,
   },
   dialogWrapper: {
     width: '100%',

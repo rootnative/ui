@@ -461,6 +461,7 @@ const COMPONENT_ORDER = [
   'slider',
   'progress',
   'loading-indicator',
+  'skeleton',
 ]
 
 const COMPONENT_NAMES: Record<string, string> = {
@@ -492,6 +493,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   slider: 'Slider',
   progress: 'Progress',
   'loading-indicator': 'LoadingIndicator',
+  skeleton: 'Skeleton',
 }
 
 const COMPONENT_EXAMPLES: Record<string, string> = {
@@ -1003,6 +1005,28 @@ import { LoadingIndicator } from '@rootnative/components/loading-indicator'
 // Custom size / colors
 <LoadingIndicator size={72} contentColor="#00796B" accessibilityLabel="Loading" />
 \`\`\``,
+
+  skeleton: `\`\`\`tsx
+import { Skeleton } from '@rootnative/components/skeleton'
+
+// One line of text (100% wide, 16dp tall, pulsing)
+<Skeleton />
+<Skeleton width="70%" />
+
+// Match the content it stands in for
+<Skeleton shape="circle" width={40} height={40} />  // avatar
+<Skeleton height={160} />                           // image
+<Skeleton shape="rectangle" width={96} height={48} />
+
+// Static block / custom color
+<Skeleton animated={false} />
+<Skeleton containerColor="#E8DEF8" />
+\`\`\`
+
+The block reads \`surfaceContainerHighest\` and pulses with a repeating timing
+loop from \`theme.motion.durationExtraLong4\` + \`theme.motion.easingStandard\`.
+It is hidden from the accessibility tree — announce loading on the container.
+Under reduced motion the pulse collapses to a static block.`,
 }
 
 // ============================================================
