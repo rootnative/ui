@@ -30,7 +30,7 @@ const componentsPkg = readWorkspacePackage('components')
 // lowest version the range allows. It is always published, always compatible,
 // and always atomic.
 const inertiaPeer =
-  componentsPkg.peerDependencies?.['@rootnative/inertia'] ?? '0.0.7'
+  componentsPkg.peerDependencies?.['@rootnative/inertia'] ?? '0.0.8'
 const inertiaVersion = inertiaPeer.trim().split(/\s+/)[0].replace(/^\D+/, '')
 
 const config: Config = {

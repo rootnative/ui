@@ -87,7 +87,7 @@
     },
     {
       "name": "skeleton",
-      "description": ""
+      "description": "Pulsing loading placeholder block that matches the shape of the content it stands in for"
     },
     {
       "name": "slider",
