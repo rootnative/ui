@@ -25,6 +25,18 @@
  * identical literal range would force floor bumps on `core` and `utils` for API
  * they don't use.
  *
+ * **The upper bound needs an external referent, and that is the newest check
+ * here.** Every other rule compares the declared ranges against one another, so
+ * a value that is *consistently* wrong reads as consistently right. That gap was
+ * live: all three packages capped inertia at `<0.1.0` while inertia was
+ * preparing its 1.0.0, and this script reported "Every @rootnative/inertia
+ * reference agrees" — a cap that excludes the very release being planned would
+ * have failed peer resolution for every consumer install. The dev pin is the
+ * referent, because it is the inertia the workspace installs, typechecks and
+ * tests against. Validated by fault injection (dev pin 1.0.0 against a `<0.1.0`
+ * cap fails on all three packages; applying the range the error suggests
+ * restores a clean run).
+ *
  * Usage:
  *   npx tsx scripts/check-inertia-pins.ts
  */
@@ -137,6 +149,30 @@ for (const rel of [
       `${rel}: dev pin ${dev} is below its own peer floor ${ownFloor}`,
     )
   }
+
+  // The window must admit the version this workspace actually builds against.
+  //
+  // Every other check in this file compares the declared ranges against *each
+  // other*, so a value that is consistently wrong reads as consistently right.
+  // That is not hypothetical: all three packages capped inertia at `<0.1.0`
+  // while inertia was preparing 1.0.0, and this script printed "Every
+  // @rootnative/inertia reference agrees" — a cap that excludes the very
+  // release being planned. The upper bound is the one field with no internal
+  // referent, so it needs an external one: the dev pin, which is the inertia
+  // the workspace installs, typechecks and tests against.
+  if (dev && upper && /^<\d+\.\d+\.\d+$/.test(upper)) {
+    const ceiling = upper.slice(1)
+    if (cmp(dev, ceiling) >= 0) {
+      problems.push(
+        `${rel}: peer range "${range}" excludes the dev pin ${dev} — the ` +
+          'upper bound must admit the inertia this workspace builds against, ' +
+          `so widen it to ">=${ownFloor} <${
+            Number(dev.split('.')[0]) + 1
+          }.0.0"`,
+      )
+    }
+  }
+
   notes.push(`${rel}: peer ${range}, dev ${dev ?? '—'}`)
 }
 

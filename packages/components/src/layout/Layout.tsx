@@ -12,7 +12,13 @@ export interface LayoutProps extends PropsWithChildren {
    * @default false
    */
   immersive?: boolean
-  /** Explicit set of safe-area edges to apply. Overrides `immersive` when provided. */
+  /**
+   * Explicit set of safe-area edges to apply. Overrides `immersive` when
+   * provided. Only the bottom edge is applied by default, because `AppBar`
+   * usually owns the top inset — pass `['top', 'bottom']` on a screen with no
+   * AppBar, or a title placed under the status bar will be clipped.
+   * @default ['bottom']
+   */
   edges?: Edge[]
   /** Additional styles applied to the SafeAreaView container. */
   style?: StyleProp<ViewStyle>

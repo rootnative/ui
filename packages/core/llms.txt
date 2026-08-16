@@ -148,7 +148,27 @@ Generates a complete MD3 light and dark theme from a single seed color. Uses Goo
 Defaults are byte-identical to the upstream MD3 `material-color-utilities` library — pure spec output.
 
 **Spec-aligned options:**
-- `variant?: 'tonalSpot' | 'neutral' | 'vibrant' | 'expressive' | 'fidelity' | 'content' | 'monochrome' | 'rainbow' | 'fruitSalad'` — MD3 scheme variant (default `'tonalSpot'`, the Material You default on Android 12+). Each is a spec-defined recipe for deriving the palette. Use `'monochrome'` for spec-legal pure-grey themes, `'vibrant'` for high-colorfulness, etc.
+- `variant?: 'tonalSpot' | 'neutral' | 'vibrant' | 'expressive' | 'fidelity' | 'content' | 'monochrome' | 'rainbow' | 'fruitSalad'` — MD3 scheme variant (default `'tonalSpot'`, the Material You default on Android 12+). Each is a spec-defined recipe for deriving the palette. Use `'monochrome'` for spec-legal pure-grey themes, `'vibrant'` for high-colorfulness, etc. **Two variants move the primary hue away from your seed — see the table below.**
+
+**Does the variant keep the seed hue?**
+
+Ask this first if the seed is a brand color. `expressive` and `fruitSalad` rotate the primary hue by design — this is correct MD3 behavior, not a defect, but it means the generated `primary` is not your brand color. Example results for the seed `#E07A3F` (a strong orange):
+
+| Variant | Light `primary` | Keeps the seed hue? |
+| --- | --- | --- |
+| `tonalSpot` | `#8d4e2a` | Yes |
+| `neutral` | — | Yes (low chroma) |
+| `vibrant` | `#9d4300` | Yes |
+| `expressive` | `#585799` | **No — rotates to blue-violet** |
+| `fidelity` | `#9b450b` | Yes — also returns the seed as `primaryContainer` |
+| `content` | `#9b450b` | Yes |
+| `monochrome` | — | Yes (chroma 0) |
+| `rainbow` | `#984714` | Yes |
+| `fruitSalad` | `#974066` | **No — rotates to magenta** |
+
+Use `fidelity`, `content`, or `tonalSpot` to keep the seed hue. Pick `expressive` for colorfulness only when the palette does not have to match a brand color.
+
+**`fidelity` pins `primaryContainer` to the seed in both modes.** With `variant: 'fidelity'` the seed is returned as `primaryContainer` in the light theme **and** the dark theme (`onPrimaryContainer` stays dark in both). This is upstream MD3 fidelity behavior: the scheme holds the source color exactly. Every other container role gets darker in dark mode, so a bright container with dark text can break the surface ramp. Override `primaryContainer` / `onPrimaryContainer` for the dark theme if the ramp matters more than seed fidelity.
 - `contrastLevel?: 'standard' | 'medium' | 'high'` — MD3 contrast preset (default `'standard'`). Maps to MD3 contrast values `0 / 0.5 / 1.0`. Use `'medium'` or `'high'` for WCAG AAA / low-vision modes.
 - `fontFamily?: string` — Custom font family applied to all 30 typography styles (15 base + 15 emphasized). When omitted, platform defaults are used (Roboto on Android, System on iOS).
 - `roundness?: number` — Global corner-radius multiplier. `0` = sharp corners, `1` = default MD3 (default), `2` = double rounding. Does not affect `cornerNone` or `cornerFull`.
@@ -198,7 +218,15 @@ Returns: `{ lightTheme: Theme, darkTheme: Theme }`
 
 The generated themes include all 49 MD3 color roles plus shared tokens (typography, shape, spacing, stateLayer, elevation, motion, topAppBar).
 
-Requires `@material/material-color-utilities` as a peer dependency: `npm install @material/material-color-utilities`
+**Install the peer dependency before you call this function:**
+
+```bash
+npm install @material/material-color-utilities
+# pnpm add @material/material-color-utilities
+# yarn add @material/material-color-utilities
+```
+
+`@material/material-color-utilities` is declared as an **optional** peer dependency, so no package manager warns you when it is absent — the templates do not install it either. It is optional only for a project that never calls `createMaterialTheme`. Any project with a custom theme requires it, and the import fails at run time without it.
 
 ### applyRoundness(roundness)
 
