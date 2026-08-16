@@ -11,6 +11,82 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+## 0.0.0-alpha.13 — 2026-08-16
+
+### Skeleton, a pulsing loading placeholder
+
+New component: `Skeleton` renders a pulsing placeholder block that matches the
+shape of the content it stands in for. It ships as the 29th component, with its
+own subpath export (`@rootnative/components/skeleton`), a registry entry for
+`rootnative add skeleton`, and an example screen.
+
+### `@rootnative/inertia` moves to `0.0.8`
+
+Every pin moves together: the `core` / `utils` / `components` peer ranges are
+now `>=0.0.8 <0.1.0`, the dev, example, and template pins are `0.0.8` exact,
+and the registry's derived floor is `>=0.0.8`. Nothing in the library consumes
+the `0.0.8` additions yet — `<Stagger>` is a consumer-app feature, and the
+`buildReleaseAnimation` settle callback is not reachable through `useTouchDrag`
+(the one drag surface this library uses) until inertia exposes it there.
+
+### Documentation
+
+The CLI reference documents command usage in full, the theming page explains
+which package owns the `createMaterialTheme` dependency, the Portal docs
+clarify where `PortalHost` must sit, and the API reference and component pages
+got a clarity pass. All of it is covered by `docs:check`, which verifies every
+JSX prop in every example against the real props types.
+
+## 0.0.0-alpha.12 — 2026-08-14
+
+### Every animated component died on mount on native — `components` now ships ESM
+
+On `alpha.10` and `alpha.11`, mounting any animated component on iOS or
+Android — a single `<IconButton />` was enough — crashed the app with:
+
+```
+TypeError: updater is not a function (it is Object)
+```
+
+The source was never wrong, and every test was green. The build format broke
+it: under `format: 'cjs'` + `splitting: true`, esbuild emits a cross-chunk hook
+call as `_reanimated.useAnimatedStyle.call(void 0, cb)`. The Reanimated Babel
+plugin auto-workletizes a callback **by callee name**, which resolves to
+`call`, never matches, and the callback ships un-workletized — the UI thread
+receives a plain object instead of a worklet and the component dies on mount.
+`alpha.9` worked because CJS *without* splitting emits
+`(0, import_reanimated.useAnimatedStyle)(cb)`, which the plugin does match;
+`alpha.10` added `splitting: true` to fix the PortalContext duplication and
+silently flipped all 30 hook calls into the broken shape.
+
+The two constraints are coupled, and ESM is what satisfies both at once: bare
+`useAnimatedStyle(cb)` calls for the Babel plugin, and one definition per
+singleton for the overlays. `@rootnative/components` now builds
+`format: 'esm'` with `"type": "module"`; `outExtension` pins the emitted files
+back to `.js`, so every `exports` path, `typesVersions` entry, and consumer
+import is unchanged. The fix was confirmed on an Android emulator, not just in
+the build output.
+
+Two new guards keep both constraints honest, because nothing else in CI can
+see either failure (the tests import from `src/`, and the public API surface
+is identical either way):
+
+- `pnpm run check:worklets` asserts the emitted call shape in the built
+  bundles — the only place the regression is observable.
+- `pnpm run check:singletons` (existing) still asserts one definition per
+  React context.
+
+### The release path now runs the guards it was supposed to enforce
+
+`alpha.10` and `alpha.11` shipped **through a release workflow that ran none of
+the five build guards** — the worklet check existed in CI, but the publishing
+path never ran it, so a green CI on main said nothing about the artifact. Both
+release workflows now run the same gate list as `ci.yml` (docs check, inertia
+pin check, API surface, singleton check, worklet check) and regenerate the
+component registry, which had shipped two releases stale — still claiming a
+`@rootnative/core` floor of `>=0.0.0-alpha.9` — because only `llms.txt` was
+regenerated at release time.
+
 ## 0.0.0-alpha.11 — 2026-08-14
 
 ### Every icon threw, and safe-area insets were silently dropped
