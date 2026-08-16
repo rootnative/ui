@@ -1511,7 +1511,7 @@ import { Grid } from '@rootnative/components/layout'
         portalIface,
         typeAliases,
         '#### Portal',
-        'Teleports its children into a host overlay layer. Renders nothing inline.',
+        'Teleports its children into a host overlay layer. Renders nothing inline. With no `<PortalHost>` ancestor it falls back to rendering its children inline and logs a `console.error` in dev — check the console first if a `BottomSheet`, `Dialog`, `Snackbar`, `Menu` or `Tooltip` renders nothing at all.',
       )
       output += '\n'
     }

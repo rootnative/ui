@@ -1,4 +1,5 @@
 import { Box, Column, Typography, Card } from '@rootnative/components'
+import { PortalHost } from '@rootnative/components/portal'
 import {
   ThemeProvider,
   darkTheme,
@@ -64,7 +65,14 @@ export default function App() {
     // Follows the OS light/dark setting. Call `setMode()` from `useThemeMode()`
     // to override it, and pass `storage={AsyncStorage}` to remember the choice.
     <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
-      <HomeScreen />
+      {/*
+        PortalHost is required by BottomSheet, Dialog, Snackbar, Menu and
+        Tooltip — without it they render nothing at all. Keep it wrapping the
+        app content, because a host inside a screen cannot paint above it.
+      */}
+      <PortalHost>
+        <HomeScreen />
+      </PortalHost>
       <ThemedStatusBar />
     </ThemeProvider>
   )
