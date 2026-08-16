@@ -15,7 +15,7 @@
   "utils": [],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.12"
+    "@rootnative/core": ">=0.0.0-alpha.13"
   },
   "optionalDependencies": {
     "react-native-safe-area-context": ">=4.0.0"
