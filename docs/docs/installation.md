@@ -21,7 +21,7 @@ SDK 54, which is what the example app and templates pin.
 
 **Install these yourself.** Every package in the list below is declared as an *optional* peer dependency (so you can drop the ones you don't use), and optional peers are never auto-installed — not by npm, not by pnpm, and Yarn classic doesn't auto-install any peers at all. Install the full list once and every component and theming feature works:
 
-<PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets @expo/vector-icons @material/material-color-utilities" />
+<PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets @expo/vector-icons" />
 
 On Expo, prefer `npx expo install` with the same package list so every version matches your SDK.
 
@@ -34,10 +34,11 @@ If you'd rather install only what you use:
 | `react-native-safe-area-context` | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Always skippable — without it those components render without insets and log a one-time warning |
 | `react-native-svg` | CircularProgress and LoadingIndicator | You never import Progress or LoadingIndicator |
 | `@expo/vector-icons` | Default resolver for string icon names (`leadingIcon="check"`) | You pass icons as React elements or register a custom `iconResolver` — see the [Icons guide](./icons) |
-| `@material/material-color-utilities` | [`createMaterialTheme`](./theming#generate-a-theme-from-a-seed-color) seed-color theme generation | You define themes manually. It's only reachable through the `@rootnative/core/create-theme` subpath, so importing `@rootnative/core` alone never touches it |
 | `@rootnative/inertia` | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a *required* peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
 
 > **Importing from the root entry?** `import { Button } from '@rootnative/components'` loads every component, so all the component peers above must be installed. The skip rules apply only if you use subpath imports (`@rootnative/components/button`) exclusively.
+
+[`createMaterialTheme`](./theming#generate-a-theme-from-a-seed-color) needs no extra install: the MD3 color engine (`@material/material-color-utilities`) is bundled inside `@rootnative/core`, behind the `@rootnative/core/create-theme` subpath. Projects that define themes by hand never load it.
 
 `react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 54 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 

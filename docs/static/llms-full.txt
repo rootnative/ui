@@ -452,15 +452,13 @@ Returns: `{ lightTheme: Theme, darkTheme: Theme }`
 
 The generated themes include all 49 MD3 color roles plus shared tokens (typography, shape, spacing, stateLayer, elevation, motion, topAppBar).
 
-**Install the peer dependency before you call this function:**
+No extra install is needed: `@material/material-color-utilities` is bundled inside `@rootnative/core`, behind the `create-theme` subpath. Projects that never import the subpath never load it.
+
+The subpath also imports nothing from `react-native`, so it runs in plain Node — print a palette from a script, check a theme in CI, or feed the roles to a design-token pipeline:
 
 ```bash
-npm install @material/material-color-utilities
-# pnpm add @material/material-color-utilities
-# yarn add @material/material-color-utilities
+node -e "import('@rootnative/core/create-theme').then(({ createMaterialTheme }) => console.log(createMaterialTheme('#006A6A').lightTheme.colors))"
 ```
-
-`@material/material-color-utilities` is declared as an **optional** peer dependency, so no package manager warns you when it is absent — the templates do not install it either. It is optional only for a project that never calls `createMaterialTheme`. Any project with a custom theme requires it, and the import fails at run time without it.
 
 ### applyRoundness(roundness)
 

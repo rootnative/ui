@@ -20,7 +20,9 @@ Peer dependencies: `react >=18`, `react-native >=0.72`, `@rootnative/inertia >=0
 npm and pnpm install required peers automatically; Yarn classic does not, so add
 it by hand there.
 
-Optional: `@material/material-color-utilities >=0.4` — only needed for `createMaterialTheme`.
+`createMaterialTheme` needs no extra install — its MD3 color engine
+(`@material/material-color-utilities`) is bundled behind the
+`@rootnative/core/create-theme` subpath.
 
 ## Quick start (Material Design 3)
 
@@ -96,7 +98,9 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
 <ThemeProvider theme={lightTheme}>{children}</ThemeProvider>
 ```
 
-Requires: `npm install @material/material-color-utilities`
+No extra install is needed, and the subpath imports nothing from
+`react-native`, so it also runs in plain Node — print a palette from a script
+or check a theme in CI.
 
 ### applyRoundness(roundness)
 
