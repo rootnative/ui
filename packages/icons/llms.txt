@@ -20,6 +20,17 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
 
+### When to pick which
+
+| Situation | Reach for |
+| --- | --- |
+| `@expo/vector-icons` is installed and MDI names are fine | Nothing — the built-in resolver already works |
+| Lucide icons | `createLucideResolver` |
+| Phosphor icons | `createPhosphorResolver` |
+| Any other `@expo/vector-icons` set (Ionicons, FontAwesome, …) | `createVectorIconsResolver` |
+| Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
+| A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
+
 ### `@rootnative/icons` adapter package (v0.0.0-alpha.12)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.

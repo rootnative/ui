@@ -6,6 +6,18 @@
 
 ## CLI (`rootnative`)
 
+### Which command
+
+| You want | Run |
+| --- | --- |
+| A new project from scratch | `rootnative create` |
+| The copy-paste workflow in an existing project | `rootnative init` |
+| Copy a component (and its dependencies) into the project | `rootnative add <component>` |
+| Refresh installed component files from the pinned registry | `rootnative update` |
+| Move to a new release — bump `@rootnative/core` and the registry pin | `rootnative upgrade` |
+| See what is available and what is installed | `rootnative list` |
+| Diagnose a broken setup | `rootnative doctor` |
+
 ### Commands
 
 #### `rootnative create [name]`

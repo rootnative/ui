@@ -1585,6 +1585,27 @@ function componentsContent(): string {
   output += `Import via subpath (preferred): \`import { X } from '@rootnative/components/x'\`
 Import via root: \`import { X } from '@rootnative/components'\`
 
+### When to pick which
+
+**Overlays** — all five render through \`Portal\` and need the root \`PortalHost\` (see App root setup):
+
+| You want | Component |
+| --- | --- |
+| A blocking decision or confirmation | \`Dialog\` |
+| A task panel or options sheet from the bottom edge | \`BottomSheet\` |
+| A list of contextual actions anchored to a control | \`Menu\` |
+| A short label on hover / long-press | \`Tooltip\` |
+| A transient, passive message with an optional action | \`Snackbar\` (via \`useSnackbar()\`) |
+
+**Loading and progress:**
+
+| You want | Component |
+| --- | --- |
+| Determinate or indeterminate progress on a bar | \`LinearProgress\` |
+| The same, in a circle | \`CircularProgress\` |
+| An indeterminate MD3 Expressive wait indicator | \`LoadingIndicator\` |
+| A placeholder shaped like the content it stands in for (image, text row) | \`Skeleton\` |
+
 ### Component override pattern
 
 All interactive components follow a 3-tier override system. Merge order: theme defaults → variant → semantic props → style props (last wins).
@@ -1689,7 +1710,20 @@ render it.`
 // ============================================================
 
 function coreContent(): string {
-  return `### ThemeProvider
+  return `### When to pick which — theme paths
+
+Ask this first. Every path below ends in the same \`<ThemeProvider theme={...}>\`.
+
+| You want | Reach for |
+| --- | --- |
+| MD3 defaults, no setup | \`<ThemeProvider>\` alone (light), or \`theme={{ light: lightTheme, dark: darkTheme }}\` to follow the OS |
+| A full MD3 palette from one brand color | \`createMaterialTheme(seed)\` from \`@rootnative/core/create-theme\` |
+| MD3 with a few token overrides | Spread over \`lightTheme\` / \`darkTheme\` (see the custom-theme example under ThemeProvider) |
+| MD3 with sharper or rounder corners | The \`roundness\` option on \`createMaterialTheme\`, or \`applyRoundness()\` on an existing theme |
+| A fully custom design system (your own tokens) | \`defineTheme<MyTheme>()\` + \`useTheme<MyTheme>()\` |
+| Light/dark switching and persistence | The \`{ light, dark }\` pair + \`useThemeMode()\`; add \`storage\` to persist |
+
+### ThemeProvider
 
 Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
 
@@ -1986,7 +2020,19 @@ Type: \`useBreakpointValue<T>(values: Partial<Record<Breakpoint, T>> & Record<'c
 // ============================================================
 
 function cliContent(): string {
-  return `### Commands
+  return `### Which command
+
+| You want | Run |
+| --- | --- |
+| A new project from scratch | \`rootnative create\` |
+| The copy-paste workflow in an existing project | \`rootnative init\` |
+| Copy a component (and its dependencies) into the project | \`rootnative add <component>\` |
+| Refresh installed component files from the pinned registry | \`rootnative update\` |
+| Move to a new release — bump \`@rootnative/core\` and the registry pin | \`rootnative upgrade\` |
+| See what is available and what is installed | \`rootnative list\` |
+| Diagnose a broken setup | \`rootnative doctor\` |
+
+### Commands
 
 #### \`rootnative create [name]\`
 
@@ -2158,6 +2204,17 @@ Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@r
 3. **Render function** — \`(props: { size: number; color?: string }) => ReactNode\`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
 Per-call elements/functions always take precedence over the resolver. \`@expo/vector-icons\` is only required if you actually pass string icon names without a custom resolver.
+
+### When to pick which
+
+| Situation | Reach for |
+| --- | --- |
+| \`@expo/vector-icons\` is installed and MDI names are fine | Nothing — the built-in resolver already works |
+| Lucide icons | \`createLucideResolver\` |
+| Phosphor icons | \`createPhosphorResolver\` |
+| Any other \`@expo/vector-icons\` set (Ionicons, FontAwesome, …) | \`createVectorIconsResolver\` |
+| Your own SVGs, SF Symbols, or a one-off mapping | A manual \`IconResolver\` function — no adapter package needed |
+| A custom resolver, but existing call sites still use MDI names | \`withLegacyMdiFallback(resolver)\` |
 
 ### \`@rootnative/icons\` adapter package (v${ICONS_VERSION})
 

@@ -86,6 +86,27 @@ tree-shaking and export differently named symbols (`MotionScrollView`, not
 Import via subpath (preferred): `import { X } from '@rootnative/components/x'`
 Import via root: `import { X } from '@rootnative/components'`
 
+### When to pick which
+
+**Overlays** — all five render through `Portal` and need the root `PortalHost` (see App root setup):
+
+| You want | Component |
+| --- | --- |
+| A blocking decision or confirmation | `Dialog` |
+| A task panel or options sheet from the bottom edge | `BottomSheet` |
+| A list of contextual actions anchored to a control | `Menu` |
+| A short label on hover / long-press | `Tooltip` |
+| A transient, passive message with an optional action | `Snackbar` (via `useSnackbar()`) |
+
+**Loading and progress:**
+
+| You want | Component |
+| --- | --- |
+| Determinate or indeterminate progress on a bar | `LinearProgress` |
+| The same, in a circle | `CircularProgress` |
+| An indeterminate MD3 Expressive wait indicator | `LoadingIndicator` |
+| A placeholder shaped like the content it stands in for (image, text row) | `Skeleton` |
+
 ### Component override pattern
 
 All interactive components follow a 3-tier override system. Merge order: theme defaults → variant → semantic props → style props (last wins).
@@ -1458,6 +1479,17 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 3. **Render function** — `(props: { size: number; color?: string }) => ReactNode`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
 Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
+
+### When to pick which
+
+| Situation | Reach for |
+| --- | --- |
+| `@expo/vector-icons` is installed and MDI names are fine | Nothing — the built-in resolver already works |
+| Lucide icons | `createLucideResolver` |
+| Phosphor icons | `createPhosphorResolver` |
+| Any other `@expo/vector-icons` set (Ionicons, FontAwesome, …) | `createVectorIconsResolver` |
+| Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
+| A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
 
 ### `@rootnative/icons` adapter package (v0.0.0-alpha.12)
 

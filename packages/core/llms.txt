@@ -20,6 +20,19 @@ export default function App() {
 
 ## API
 
+### When to pick which — theme paths
+
+Ask this first. Every path below ends in the same `<ThemeProvider theme={...}>`.
+
+| You want | Reach for |
+| --- | --- |
+| MD3 defaults, no setup | `<ThemeProvider>` alone (light), or `theme={{ light: lightTheme, dark: darkTheme }}` to follow the OS |
+| A full MD3 palette from one brand color | `createMaterialTheme(seed)` from `@rootnative/core/create-theme` |
+| MD3 with a few token overrides | Spread over `lightTheme` / `darkTheme` (see the custom-theme example under ThemeProvider) |
+| MD3 with sharper or rounder corners | The `roundness` option on `createMaterialTheme`, or `applyRoundness()` on an existing theme |
+| A fully custom design system (your own tokens) | `defineTheme<MyTheme>()` + `useTheme<MyTheme>()` |
+| Light/dark switching and persistence | The `{ light, dark }` pair + `useThemeMode()`; add `storage` to persist |
+
 ### ThemeProvider
 
 Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
