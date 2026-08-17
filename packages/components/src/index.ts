@@ -1,11 +1,12 @@
 export { Typography } from './typography'
 export type { TypographyProps, TypographyVariant } from './typography'
 
-export { Layout, Box, Column, Grid, Row } from './layout'
+export { Layout, Box, Column, Grid, GridCell, Row } from './layout'
 export type {
   LayoutProps,
   BoxProps,
   ColumnProps,
+  GridCellProps,
   GridProps,
   RowProps,
   SpacingValue,

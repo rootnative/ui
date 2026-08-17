@@ -178,6 +178,31 @@ export default function LayoutScreen() {
       </Column>
 
       <Column gap="sm">
+        <Typography variant="titleSmall">Grid — Responsive Columns</Typography>
+        <Grid columns={{ compact: 2, medium: 3, expanded: 4 }} gap="sm">
+          <Swatch label="1" />
+          <Swatch label="2" />
+          <Swatch label="3" />
+          <Swatch label="4" />
+        </Grid>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Grid — Spanning Cells</Typography>
+        <Grid columns={12} gap="sm">
+          <Grid.Cell span={8}>
+            <Swatch label="span 8" />
+          </Grid.Cell>
+          <Grid.Cell span={4}>
+            <Swatch label="span 4" />
+          </Grid.Cell>
+          <Grid.Cell span={{ compact: 12, medium: 6 }}>
+            <Swatch label="12 → 6" />
+          </Grid.Cell>
+        </Grid>
+      </Column>
+
+      <Column gap="sm">
         <Typography variant="titleSmall">Nested Layout</Typography>
         <Column
           gap="sm"

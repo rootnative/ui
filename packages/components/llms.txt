@@ -633,6 +633,23 @@ import { Grid } from '@rootnative/components/layout'
 Props:
 - `columns: number | BreakpointValues<number>` — Number of equal-width columns, or a breakpoint map of column counts. A map cascades down to the nearest smaller breakpoint, so `{ compact: 1, expanded: 4 }` gives 1 column below 840dp and 4 at or above.
 
+#### Grid.Cell
+
+Grid child that spans more than one column. A plain Grid child spans exactly one. Also exported as GridCell.
+
+```tsx
+import { Grid } from '@rootnative/components/layout'
+
+<Grid columns={12} gap="md">
+  <Grid.Cell span={8}>{main}</Grid.Cell>
+  <Grid.Cell span={4}>{aside}</Grid.Cell>
+</Grid>
+```
+
+Props:
+- `span?: number | BreakpointValues<number>` — Default: `1`. Number of grid columns this cell spans, or a breakpoint map of spans. Clamped to the parent Grid's column count, so an oversized span fills the row instead of overflowing it.
+- Inherits `ViewProps`
+
 
 ---
 

@@ -112,6 +112,53 @@ The map requires a `compact` key, so every width resolves to a value. Use
 `useBreakpointValue` from `@rootnative/core` directly when a value other than
 the column count must follow the same breakpoints.
 
+## Spanning Cells
+
+A plain child always spans one column. Wrap a child in `Grid.Cell` to make it
+span more, for asymmetric layouts such as a main area with a sidebar. The
+`span` prop also accepts a breakpoint map, and an oversized span is clamped to
+the column count, so it fills the row instead of overflowing it.
+
+<SnackExample
+  name="RootNative Grid — Spanning Cells"
+  code={`
+  import { Card, Grid, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <Grid columns={12} gap="sm">
+              <Grid.Cell span={8}>
+                <Card variant="outlined"><Typography>Main</Typography></Card>
+              </Grid.Cell>
+              <Grid.Cell span={4}>
+                <Card variant="outlined"><Typography>Aside</Typography></Card>
+              </Grid.Cell>
+              <Grid.Cell span={{ compact: 12, medium: 6 }}>
+                <Card variant="outlined"><Typography>Half on tablets</Typography></Card>
+              </Grid.Cell>
+            </Grid>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+`Grid.Cell` is also exported as `GridCell` for direct imports. It only sizes
+itself inside a `Grid` — rendered anywhere else it warns in development and
+falls back to full width.
+
 ## Props
 
 <PropTable name="Grid" />
+
+### Grid.Cell
+
+<PropTable name="GridCell" />

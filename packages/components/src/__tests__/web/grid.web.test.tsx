@@ -82,6 +82,22 @@ describe('cell flex-basis reaches the DOM as a real percentage', () => {
   })
 })
 
+describe('Grid.Cell span reaches the DOM', () => {
+  it('emits the spanned percentage as flex-basis', () => {
+    const { container } = renderWeb(
+      <Grid testID="grid" columns={4}>
+        <Grid.Cell testID="wide" span={2}>
+          <Text>wide</Text>
+        </Grid.Cell>
+        <Text>plain</Text>
+      </Grid>,
+    )
+    const wide = container.querySelector('[data-testid="wide"]') as HTMLElement
+    expect(wide.style.flexBasis).toBe('50%')
+    expect(getComputedStyle(wide).flexBasis).toBe('50%')
+  })
+})
+
 describe('cell structure', () => {
   it('wraps each non-null child in exactly one cell', () => {
     const { cells } = renderGrid(

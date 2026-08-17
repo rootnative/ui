@@ -4,6 +4,7 @@ import { Dimensions, StyleSheet, Text } from 'react-native'
 import { Box } from '../layout/Box'
 import { Column } from '../layout/Column'
 import { Grid } from '../layout/Grid'
+import { GridCell } from '../layout/GridCell'
 import { Layout } from '../layout/Layout'
 import { Row } from '../layout/Row'
 import type { GridProps } from '../layout/types'
@@ -441,6 +442,148 @@ describe('Grid', () => {
       jest.restoreAllMocks()
       mockWidth(1300)
       expect(firstCellBasis(3)).toMatch(/^33\.3/)
+    })
+  })
+
+  describe('Grid.Cell', () => {
+    const cellBasis = (testID: string) =>
+      StyleSheet.flatten(screen.getByTestId(testID).props.style).flexBasis
+
+    it('is exposed as a namespace property and a named export', () => {
+      expect(Grid.Cell).toBe(GridCell)
+    })
+
+    it('spans the given fraction of the columns', () => {
+      renderWithTheme(
+        <Grid columns={12}>
+          <Grid.Cell testID="main" span={8}>
+            <Text>main</Text>
+          </Grid.Cell>
+          <Grid.Cell testID="aside" span={4}>
+            <Text>aside</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      expect(cellBasis('main')).toMatch(/^66\.6/)
+      expect(cellBasis('aside')).toMatch(/^33\.3/)
+    })
+
+    it('is not wrapped in a default cell', () => {
+      const { toJSON } = renderWithTheme(
+        <Grid columns={2}>
+          <Grid.Cell testID="cell">
+            <Text>A</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      // The cell's own View must be a direct child of the row — a wrapper
+      // would pin the cell back to the default single-column basis.
+      const root = toJSON()
+      expect(root.children.length).toBe(1)
+      expect(root.children[0].props.testID).toBe('cell')
+    })
+
+    it('defaults to a span of one column', () => {
+      renderWithTheme(
+        <Grid columns={4}>
+          <Grid.Cell testID="cell">
+            <Text>A</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      expect(cellBasis('cell')).toBe('25%')
+    })
+
+    it('clamps an oversized span to the column count', () => {
+      renderWithTheme(
+        <Grid columns={4}>
+          <Grid.Cell testID="cell" span={9}>
+            <Text>A</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      expect(cellBasis('cell')).toBe('100%')
+    })
+
+    it('clamps a zero span up to one column', () => {
+      renderWithTheme(
+        <Grid columns={4}>
+          <Grid.Cell testID="cell" span={0}>
+            <Text>A</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      expect(cellBasis('cell')).toBe('25%')
+    })
+
+    it('takes half the column gap as padding, like a default cell', () => {
+      renderWithTheme(
+        <Grid columns={2} gap="md">
+          <Grid.Cell testID="cell">
+            <Text>A</Text>
+          </Grid.Cell>
+        </Grid>,
+      )
+      const flat = StyleSheet.flatten(screen.getByTestId('cell').props.style)
+      // "md" spacing token = 16, half = 8
+      expect(flat.paddingStart).toBe(8)
+      expect(flat.paddingEnd).toBe(8)
+    })
+
+    it('mixes with plain children, which keep the default basis', () => {
+      const { toJSON } = renderWithTheme(
+        <Grid columns={4}>
+          <Grid.Cell testID="wide" span={2}>
+            <Text>wide</Text>
+          </Grid.Cell>
+          <Text>plain</Text>
+        </Grid>,
+      )
+      expect(cellBasis('wide')).toBe('50%')
+      // The plain child is wrapped in a default single-column cell — the row
+      // child that is not the spanned one.
+      const root = toJSON()
+      const wrapper = root.children.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (child: any) => child.props.testID !== 'wide',
+      )
+      expect(StyleSheet.flatten(wrapper.props.style).flexBasis).toBe('25%')
+    })
+
+    it('resolves a breakpoint-map span against the window width', () => {
+      jest
+        .spyOn(Dimensions, 'get')
+        .mockReturnValue({ width: 900, height: 800, scale: 2, fontScale: 1 })
+      try {
+        renderWithTheme(
+          <Grid columns={4}>
+            <Grid.Cell testID="cell" span={{ compact: 4, expanded: 2 }}>
+              <Text>A</Text>
+            </Grid.Cell>
+          </Grid>,
+        )
+        // 900dp → expanded → span 2 of 4
+        expect(cellBasis('cell')).toBe('50%')
+      } finally {
+        jest.restoreAllMocks()
+      }
+    })
+
+    it('warns and renders full-width outside a Grid', () => {
+      const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+      try {
+        renderWithTheme(
+          <GridCell testID="stray">
+            <Text>A</Text>
+          </GridCell>,
+        )
+        expect(cellBasis('stray')).toBe('100%')
+        expect(spy).toHaveBeenCalledWith(
+          expect.stringContaining('<Grid.Cell> must be a direct child'),
+        )
+      } finally {
+        spy.mockRestore()
+      }
     })
   })
 })

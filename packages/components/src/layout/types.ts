@@ -84,3 +84,13 @@ export interface GridProps extends RowProps {
    */
   columns: number | BreakpointValues<number>
 }
+
+export interface GridCellProps extends ViewProps {
+  /**
+   * Number of grid columns this cell spans, or a breakpoint map of spans.
+   * Clamped to the parent Grid's column count, so an oversized span fills the
+   * row instead of overflowing it.
+   * @default 1
+   */
+  span?: number | BreakpointValues<number>
+}

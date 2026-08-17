@@ -5,6 +5,7 @@
     "packages/components/src/layout/Box.tsx",
     "packages/components/src/layout/Column.tsx",
     "packages/components/src/layout/Grid.tsx",
+    "packages/components/src/layout/GridCell.tsx",
     "packages/components/src/layout/Layout.tsx",
     "packages/components/src/layout/Row.tsx",
     "packages/components/src/layout/index.ts",

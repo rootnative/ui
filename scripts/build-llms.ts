@@ -1102,6 +1102,19 @@ import { Grid } from '@rootnative/components/layout'
 \`\`\``,
         ifaceName: 'GridProps',
       },
+      {
+        title: '#### Grid.Cell',
+        desc: 'Grid child that spans more than one column. A plain Grid child spans exactly one. Also exported as GridCell.',
+        example: `\`\`\`tsx
+import { Grid } from '@rootnative/components/layout'
+
+<Grid columns={12} gap="md">
+  <Grid.Cell span={8}>{main}</Grid.Cell>
+  <Grid.Cell span={4}>{aside}</Grid.Cell>
+</Grid>
+\`\`\``,
+        ifaceName: 'GridCellProps',
+      },
     ]
 
     for (const entry of layoutEntries) {

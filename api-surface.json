@@ -149,6 +149,8 @@
         "FAB_ICON_SIZES",
         "FAB_SIZES",
         "Grid",
+        "GridCell",
+        "GridCellProps",
         "GridProps",
         "IconButton",
         "IconButtonProps",
