@@ -1,11 +1,12 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { Dimensions, StyleSheet, Text } from 'react-native'
 import { Box } from '../layout/Box'
 import { Column } from '../layout/Column'
 import { Grid } from '../layout/Grid'
 import { Layout } from '../layout/Layout'
 import { Row } from '../layout/Row'
+import type { GridProps } from '../layout/types'
 
 describe('Box', () => {
   it('renders children', () => {
@@ -388,6 +389,59 @@ describe('Grid', () => {
       (child: any) => child.type === 'View',
     )
     expect(cells.length).toBe(2)
+  })
+
+  describe('responsive columns', () => {
+    // useWindowDimensions seeds from Dimensions.get('window'), and the
+    // Dimensions instance is shared, so this spy reaches the hook. A spy on
+    // a namespace import would not: Babel's interop hands the test a copy.
+    const mockWidth = (width: number) =>
+      jest
+        .spyOn(Dimensions, 'get')
+        .mockReturnValue({ width, height: 800, scale: 2, fontScale: 1 })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    const firstCellBasis = (columns: GridProps['columns']) => {
+      const { toJSON } = renderWithTheme(
+        <Grid columns={columns}>
+          <Text>A</Text>
+          <Text>B</Text>
+        </Grid>,
+      )
+      const cells = toJSON().children.filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (child: any) => child.type === 'View',
+      )
+      return StyleSheet.flatten(cells[0].props.style).flexBasis
+    }
+
+    it('picks the value for the current breakpoint from a map', () => {
+      mockWidth(900) // expanded (>= 840)
+      expect(firstCellBasis({ compact: 1, medium: 2, expanded: 4 })).toBe('25%')
+    })
+
+    it('uses the compact value below 600dp', () => {
+      mockWidth(400) // compact (< 600)
+      expect(firstCellBasis({ compact: 1, medium: 2, expanded: 4 })).toBe(
+        '100%',
+      )
+    })
+
+    it('cascades down to the nearest smaller breakpoint', () => {
+      mockWidth(1300) // large (>= 1200), map has no large key
+      expect(firstCellBasis({ compact: 1, medium: 2 })).toBe('50%')
+    })
+
+    it('keeps a plain number constant across breakpoints', () => {
+      mockWidth(400)
+      expect(firstCellBasis(3)).toMatch(/^33\.3/)
+      jest.restoreAllMocks()
+      mockWidth(1300)
+      expect(firstCellBasis(3)).toMatch(/^33\.3/)
+    })
   })
 })
 

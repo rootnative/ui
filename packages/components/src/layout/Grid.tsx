@@ -1,4 +1,4 @@
-import { useTheme } from '@rootnative/core'
+import { useBreakpointValue, useTheme } from '@rootnative/core'
 import React, { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
@@ -16,18 +16,23 @@ export function Grid({
   ...rowProps
 }: GridProps) {
   const { spacing } = useTheme()
+  // The hook call must stay unconditional, so a plain number becomes a
+  // constant one-entry map instead of skipping the hook.
+  const resolvedColumns = useBreakpointValue(
+    typeof columns === 'number' ? { compact: columns } : columns,
+  )
   const resolvedColumnGap = resolveSpacing(spacing, columnGap ?? gap)
   const resolvedRowGap = resolveSpacing(spacing, rowGap ?? gap)
   const halfGap = resolvedColumnGap ? resolvedColumnGap / 2 : 0
 
   const cellStyle = useMemo<ViewStyle>(
     () => ({
-      flexBasis: `${100 / columns}%` as unknown as number,
+      flexBasis: `${100 / resolvedColumns}%` as unknown as number,
       flexShrink: 1,
       paddingStart: halfGap,
       paddingEnd: halfGap,
     }),
-    [columns, halfGap],
+    [resolvedColumns, halfGap],
   )
 
   const rowStyle = useMemo<ViewStyle>(

@@ -74,6 +74,44 @@ Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all colu
 `}
 />
 
+## Responsive Columns
+
+`columns` also accepts a map of [window size classes](../responsive). The grid
+re-resolves the count when the window crosses a breakpoint. A map cascades down
+to the nearest smaller breakpoint, so you only set the widths where the count
+changes.
+
+<SnackExample
+  name="RootNative Grid — Responsive Columns"
+  code={`
+  import { Card, Grid, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <Grid columns={{ compact: 1, medium: 2, expanded: 4 }} gap="sm">
+              <Card variant="outlined"><Typography>Item 1</Typography></Card>
+              <Card variant="outlined"><Typography>Item 2</Typography></Card>
+              <Card variant="outlined"><Typography>Item 3</Typography></Card>
+              <Card variant="outlined"><Typography>Item 4</Typography></Card>
+            </Grid>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The map requires a `compact` key, so every width resolves to a value. Use
+`useBreakpointValue` from `@rootnative/core` directly when a value other than
+the column count must follow the same breakpoints.
+
 ## Props
 
 <PropTable name="Grid" />

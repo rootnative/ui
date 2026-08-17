@@ -1,4 +1,4 @@
-import type { MaterialTheme } from '@rootnative/core'
+import type { BreakpointValues, MaterialTheme } from '@rootnative/core'
 import type { FlexAlignType, ViewProps } from 'react-native'
 
 /** A theme spacing token name or a raw numeric value in dp. */
@@ -77,6 +77,10 @@ export interface ColumnProps extends BoxProps {
 }
 
 export interface GridProps extends RowProps {
-  /** Number of equal-width columns. */
-  columns: number
+  /**
+   * Number of equal-width columns, or a breakpoint map of column counts.
+   * A map cascades down to the nearest smaller breakpoint, so
+   * `{ compact: 1, expanded: 4 }` gives 1 column below 840dp and 4 at or above.
+   */
+  columns: number | BreakpointValues<number>
 }
