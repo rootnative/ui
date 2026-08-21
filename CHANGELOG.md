@@ -11,6 +11,67 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+## 0.0.0-alpha.14 — 2026-08-22
+
+### `Grid` takes a breakpoint map for `columns`
+
+`columns` now accepts a map of [window size
+classes](https://rootnative.github.io/ui/responsive) as well as a number, so
+`<Grid columns={{ compact: 1, medium: 2, expanded: 4 }}>` replaces a
+`useBreakpointValue` call at the call site. A map cascades down to the nearest
+smaller breakpoint, and the required `compact` key makes a missing width a
+compile error rather than an `undefined` reaching `flexBasis`.
+
+The numeric form is unchanged, but `Grid` now reads the window width for every
+consumer. A constant `columns` resolves to a stable value, so the cell style
+keeps its object identity and nothing re-renders that did not before.
+
+### `Grid.Cell` spans more than one column
+
+A plain `Grid` child always fills one column, so an asymmetric layout meant
+dropping to `Row` with a hand-written `flexBasis`. `Grid.Cell` spans a
+`span` count of columns instead:
+
+```tsx
+<Grid columns={12} gap="sm">
+  <Grid.Cell span={8}>{/* main */}</Grid.Cell>
+  <Grid.Cell span={4}>{/* sidebar */}</Grid.Cell>
+</Grid>
+```
+
+`span` takes a breakpoint map too, and clamps to the parent's column count — an
+oversized span fills the row instead of overflowing it. Plain children keep
+today's behaviour and still read as `span={1}`, so the two forms mix in one
+grid.
+
+`Grid` passes the column count and gutter to a cell through `cloneElement`, and
+detects a cell by element type rather than by `displayName`, which a minifier
+rewrites. That keeps the geometry a private contract between the two components:
+it adds no React context, and the injected fields stay off `GridCellProps`. A
+`Grid.Cell` rendered outside a `Grid` warns once in development and renders
+full-width.
+
+New exports: `GridCell` and `GridCellProps`.
+
+### `Grid` is now tested against the DOM
+
+`Grid` had no web test, so every assertion about it lived in the native
+project — which asserts on the React prop and is structurally blind to what
+react-native-web emits. Two things were unproven for the component's whole life:
+that the percentage `flexBasis` survives the `as unknown as number` cast into a
+real `flex-basis: 50%`, and that the row's negative margin stays the exact
+negation of the cell padding, which is what keeps a grid from adding a
+horizontal scrollbar.
+
+`grid.web.test.tsx` pins both. One finding is worth recording, because it
+contradicts what the elevation notes imply: react-native-web resolves *inline*
+logical properties to physical ones at render time, so the DOM shows
+`padding-left`, never `padding-inline-start`. Logical-property emission applies
+to `StyleSheet`-class styles, and `Grid`'s cell styles are dynamic `useMemo`
+objects. The gutter is direction-correct on web because it is symmetric, so the
+web suite pins that symmetry and the native suite keeps asserting the logical
+source keys.
+
 ## 0.0.0-alpha.13 — 2026-08-16
 
 ### Skeleton, a pulsing loading placeholder
