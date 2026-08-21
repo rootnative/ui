@@ -1,6 +1,6 @@
 {
   "name": "layout",
-  "description": "Layout primitives: Box, Row, Column, Grid (flexbox utilities), and Layout (SafeAreaView wrapper).",
+  "description": "Layout primitives: Box, Row, Column, Grid with responsive columns and spanning cells, and Layout (SafeAreaView wrapper).",
   "files": [
     "packages/components/src/layout/Box.tsx",
     "packages/components/src/layout/Column.tsx",

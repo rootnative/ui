@@ -291,7 +291,7 @@ each installed component stays self-contained.
 | `slider` | Single-thumb or range slider with continuous and discrete modes |
 | `progress` | Linear and circular progress indicators (determinate and indeterminate) |
 | `text-field` | Text input with animated floating label, 2 variants (filled, outlined) |
-| `layout` | Layout primitives: Box, Row, Column, Grid, and SafeAreaView wrapper |
+| `layout` | Layout primitives: Box, Row, Column, Grid with responsive columns and spanning cells, and SafeAreaView wrapper |
 | `list` | List container with interactive items and dividers |
 | `divider` | Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides. |
 | `loading-indicator` | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
