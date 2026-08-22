@@ -1719,6 +1719,80 @@ render it.`
 }
 
 // ============================================================
+// Content: Jest setup (static template)
+// ============================================================
+
+/**
+ * How to make a consumer's Jest suite load these packages.
+ *
+ * This is the one setup step no `llms.txt` stated, and it is not guessable:
+ * the failure is a syntax error inside `node_modules` on a package the reader
+ * did not write, and the obvious fix (`transformIgnorePatterns`) does nothing
+ * on its own. Reported by the `reelist` validation consumer, which lost a
+ * debugging cycle to it, and verified here against the installed presets —
+ * `react-native/jest-preset` transforms `^.+\.(js|ts|tsx)$`, so the 11 `.mjs`
+ * files in `@rootnative/inertia/dist` match no transform at all.
+ */
+function jestSetupContent(): string {
+  return `Every \`@rootnative/*\` package ships ESM. A consumer's Jest suite needs
+two things to load them, and the second one is the step people miss.
+
+\`\`\`js
+// jest.config.js
+module.exports = {
+  preset: require.resolve('@rootnative/inertia/jest-preset'),
+  transform: {
+    // The preset's parent matches .js/.ts/.tsx only — .mjs needs its own entry.
+    '^.+\\\\.mjs$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(react-native|@react-native|@rootnative|@material/material-color-utilities)/)',
+  ],
+}
+\`\`\`
+
+**\`transformIgnorePatterns\` alone is not enough, and that is the trap.** The two
+settings do different jobs, and only one of them is widely known:
+
+- \`transformIgnorePatterns\` says a file is *allowed* to be transformed.
+- \`transform\` says a file *matches a transformer*.
+
+A file that matches no transformer is never transformed — allowed or not. The
+\`react-native\` preset transforms \`^.+\\.(js|ts|tsx)$\`, which does not include
+\`.mjs\`, and \`@rootnative/inertia\` ships \`.mjs\` in its \`dist/\`. So widening only
+\`transformIgnorePatterns\` leaves the import failing with a syntax error on
+\`export\` — inside \`node_modules\`, in a package the reader did not write, which
+is why it reads as a broken package rather than a missing config line.
+
+**The transform entry needs a Babel config that transpiles ESM, and both halves
+are required.** Measured on all four combinations: the transform entry with no
+applicable Babel config still fails on \`export\`, because \`babel-jest\` then
+passes the file through unchanged; a Babel config with no transform entry fails
+too, because nothing routes \`.mjs\` to it. An Expo app already has a
+\`babel.config.js\` with \`babel-preset-expo\`, so in practice the transform entry
+is the missing half — but if you run Jest somewhere without one, add
+\`@babel/preset-env\` targeting the current Node.
+
+\`@material/material-color-utilities\` needs the same allowance whenever
+\`createMaterialTheme\` is on a tested path; it is ESM-only too.
+
+**Two version pins, if the app is Expo SDK 54.** Both cost a debugging cycle in
+a real consumer, and neither failure names its cause:
+
+- **Jest 29, not 30.** \`jest-expo@54\` depends on Jest 29 packages. On Jest 30
+  every suite dies with \`this._moduleMocker.clearMocksOnScope is not a function\`.
+- **\`@testing-library/react-native\` 13, not 14.** Version 14 replaces
+  \`react-test-renderer\` with the \`test-renderer\` package; under this preset its
+  \`render\` returns an empty object while \`screen\` reports
+  \`\\\`render\\\` function has not been called\`.
+
+**Screens need the providers.** A component that reads the theme fails inside
+\`useTheme\` when rendered bare. Wrap \`render\` in the same stack as the app root
+(see App root setup) and export that wrapper as your test utility, rather than
+repeating the providers in every file.`
+}
+
+// ============================================================
 // Content: Core API (static templates)
 // ============================================================
 
@@ -2389,6 +2463,10 @@ function generateComponentsLlms(): string {
 
 ${appRootContent()}
 
+## Jest setup
+
+${jestSetupContent()}
+
 ## The animation layer lives in a separate package
 
 Every animation runs on \`@rootnative/inertia\`, which ships its own reference at
@@ -2484,6 +2562,12 @@ Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK 54 bu
 ## App root setup
 
 ${appRootContent()}
+
+---
+
+## Jest setup
+
+${jestSetupContent()}
 
 ---
 
