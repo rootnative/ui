@@ -1,5 +1,6 @@
 ---
 sidebar_position: 9
+description: Adapt a layout to the current window width with two hooks built on Material Design 3 window size classes.
 ---
 
 # Responsive

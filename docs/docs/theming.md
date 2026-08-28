@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+description: Customize MD3, generate a branded theme from a seed color, or replace the design system entirely — the theme engine is design-system agnostic.
 ---
 
 # Theming

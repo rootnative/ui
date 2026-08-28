@@ -1,5 +1,6 @@
 ---
 sidebar_position: 8
+description: "Every animation runs on @rootnative/inertia: the theme owns the motion values, inertia owns the mechanism."
 ---
 
 # Motion

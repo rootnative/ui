@@ -1,5 +1,6 @@
 ---
 sidebar_position: 3
+description: Install RootNative UI into an existing app — peer dependencies, provider setup, and the pinned React Native 0.81 / React 19 / Expo SDK 54 runtime.
 ---
 
 # Installation

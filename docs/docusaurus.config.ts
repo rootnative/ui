@@ -52,6 +52,7 @@ const config: Config = {
   url: 'https://rootnative.github.io',
   baseUrl,
   onBrokenLinks: 'throw',
+  onBrokenAnchors: 'throw',
 
   markdown: {
     hooks: {

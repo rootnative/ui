@@ -1,5 +1,6 @@
 ---
 sidebar_position: 6
+description: Replace the platform-default font stack with any custom font, and map a family across the MD3 type scale.
 ---
 
 # Fonts

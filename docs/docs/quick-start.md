@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+description: Scaffold a new React Native project with RootNative UI and render your first themed component.
 ---
 
 # Quick Start

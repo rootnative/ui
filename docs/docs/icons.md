@@ -1,5 +1,6 @@
 ---
 sidebar_position: 7
+description: Pass icons as a string name, a React element, or a render function — and plug in any icon library globally.
 ---
 
 # Icons

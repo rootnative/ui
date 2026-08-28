@@ -1,6 +1,7 @@
 ---
 slug: /introduction
 sidebar_position: 1
+description: Design-system agnostic component library for React Native, with Material Design 3 out of the box.
 ---
 
 # RootNative UI

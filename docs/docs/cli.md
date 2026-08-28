@@ -1,5 +1,6 @@
 ---
 sidebar_position: 4
+description: Add components to your project as owned source files with the RootNative CLI, in the shadcn/ui model — no component npm package.
 ---
 
 # CLI

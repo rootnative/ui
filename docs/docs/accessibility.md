@@ -1,5 +1,6 @@
 ---
 sidebar_position: 10
+description: What MD3 roles, labels, and state the components wire for you — and what you still have to supply per platform.
 ---
 
 # Accessibility

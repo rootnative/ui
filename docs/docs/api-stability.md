@@ -1,5 +1,6 @@
 ---
 sidebar_position: 11
+description: What RootNative promises to keep working and what it does not, stated rather than left to be inferred.
 ---
 
 # API stability
