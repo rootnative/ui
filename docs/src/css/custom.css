@@ -40,7 +40,13 @@
   --rn-fg: #0a0a0a;
   --rn-fg-muted: #52525b;
   --rn-fg-subtle: #71717a;
-  --rn-accent: #2563eb;
+  /* Logo tones. `--rn-accent` is the mark's lit top face and
+     `--rn-accent-strong` its right face -- both mirror `LIGHT_FACES` in
+     scripts/build-brand.mjs, which `pnpm run check:brand-accent` enforces.
+     The top tone is only 2.54:1 on white, so anything that has to meet
+     WCAG 1.4.11 (focus rings, borders) takes `--rn-accent-strong` at 5.17:1. */
+  --rn-accent: #60a5fa;
+  --rn-accent-strong: #2563eb;
 }
 
 [data-theme='dark'] {
@@ -64,7 +70,8 @@
   --rn-fg: #fafafa;
   --rn-fg-muted: #a1a1aa;
   --rn-fg-subtle: #8a8a93;
-  --rn-accent: #60a5fa;
+  --rn-accent: #bfdbfe;
+  --rn-accent-strong: #60a5fa;
 }
 
 html {
@@ -247,4 +254,20 @@ code {
   border-radius: 8px;
   margin-bottom: 1rem;
   background: var(--ifm-background-surface-color);
+}
+
+/* ===== Accent usage ===== */
+/* The brand blue was previously defined and never referenced, so the logo was
+   the only place it appeared. These two rules mirror inertia's docs, which
+   already spends its accent on the same pair of surfaces. */
+.tabs__item--active {
+  border-bottom-color: var(--rn-accent-strong);
+}
+
+a:focus-visible,
+button:focus-visible,
+.menu__link:focus-visible {
+  outline: 2px solid var(--rn-accent-strong);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
