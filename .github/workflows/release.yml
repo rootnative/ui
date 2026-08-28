@@ -70,6 +70,13 @@ jobs:
       - name: Inertia pin check
         run: pnpm run check:inertia-pins
 
+      # The mark and the docs accent tokens hold the same hex values in two
+      # files; the palette comment declares the CSS as the follower and nothing
+      # checked it, so both themes had drifted by one rung of the ramp while the
+      # token was unreferenced. Needs no build.
+      - name: Brand accent check
+        run: pnpm run check:brand-accent
+
       - name: Build
         run: pnpm run build
 

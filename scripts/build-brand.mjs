@@ -52,7 +52,11 @@ const EXAMPLE_ASSET_DIR = path.join(ROOT, 'example', 'assets')
 // --- palette -----------------------------------------------------------------
 // A block is lit, not translucent. Each of a cube's three faces takes one FLAT,
 // FULLY OPAQUE colour from a three-tone ramp -- top lit, right mid, left shaded.
-// Keep the top tone in step with `--rn-accent` in docs/src/css/custom.css.
+// Keep the top tone in step with `--rn-accent`, and the right tone with
+// `--rn-accent-strong`, in docs/src/css/custom.css. Both pairs are enforced by
+// `pnpm run check:brand-accent` -- they had drifted by one rung of this ramp
+// while the token was unused, so nothing looked wrong. The mark is the source
+// of truth; the stylesheet follows it.
 //
 // This replaced a gradient-plus-opacity model, and both halves of that were
 // defects visible the moment the mark was viewed on a transparency checkerboard:
