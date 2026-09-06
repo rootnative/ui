@@ -1,6 +1,7 @@
 import {
   useGesture,
   useInterpolatedStyle,
+  type InterpolatedStyle,
   type SharedValue,
   type TransitionName,
   type UseGestureHandlers,
@@ -29,7 +30,7 @@ export interface UsePressMorphOptions {
 
 export interface UsePressMorphResult {
   /** Animated `borderRadius` style for the pressed shape morph. */
-  style: ReturnType<typeof useInterpolatedStyle>
+  style: InterpolatedStyle<'borderRadius'>
   /**
    * Press handlers driving the morph. Attach alongside the state-layer
    * handlers via `composePressHandlers` — spreading both bags directly would

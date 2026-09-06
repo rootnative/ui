@@ -34,8 +34,18 @@ const ICONS_VERSION: string = readPkg('packages/icons/package.json').version
 // Read the inertia peer range rather than hard-coding it. A literal here
 // drifted two releases behind (it still said `>=0.0.4` at 0.0.6), because a
 // version bump has no reason to bring anyone to this file.
-const INERTIA_PEER: string = readPkg('packages/core/package.json')
-  .peerDependencies['@rootnative/inertia']
+//
+// Read it *per package*, not once. The ranges are deliberately allowed to
+// differ — `components` uses far more inertia API than `core`, so it carries
+// the higher floor — and one shared constant quietly published `core`'s
+// lower floor as the requirement for `components` too.
+const inertiaPeerOf = (pkg: string): string =>
+  readPkg(`packages/${pkg}/package.json`).peerDependencies[
+    '@rootnative/inertia'
+  ]
+
+const CORE_INERTIA_PEER: string = inertiaPeerOf('core')
+const COMPONENTS_INERTIA_PEER: string = inertiaPeerOf('components')
 
 // ============================================================
 // Type Extraction — Interfaces & Type Aliases from TS source
@@ -2429,7 +2439,7 @@ function generateCoreLlms(): string {
   return `# @rootnative/core — Theme System for React Native
 
 > Version: ${CORE_VERSION}
-> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it)
+> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia ${CORE_INERTIA_PEER} (required — every animation runs on it)
 > createMaterialTheme needs no extra install — its color engine (@material/material-color-utilities) is bundled behind the create-theme subpath
 
 ## Quick Start
@@ -2456,7 +2466,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
+> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional: @expo/vector-icons >=14 (only needed for icon props)
 
 ## App root setup
