@@ -4,7 +4,7 @@
 
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![pnpm 9](https://img.shields.io/badge/pnpm-9.x-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![Expo SDK 54](https://img.shields.io/badge/expo-54-000020?logo=expo&logoColor=white)](https://expo.dev/)
+[![Expo SDK 57](https://img.shields.io/badge/expo-57-000020?logo=expo&logoColor=white)](https://expo.dev/)
 [![Turborepo](https://img.shields.io/badge/monorepo-turbo-EF4444)](https://turbo.build/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -186,7 +186,7 @@ pnpm --filter example web
 
 | Layer | Technology |
 | --- | --- |
-| Runtime | React 19.1, React Native 0.81.5, Expo SDK 54 |
+| Runtime | React 19.2, React Native 0.86.3, Expo SDK 57 |
 | Language | TypeScript 5 (strict mode) |
 | Build | tsup (package bundling), Turborepo (task orchestration) |
 | Package Manager | pnpm 9 (workspace protocol) |

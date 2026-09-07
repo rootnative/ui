@@ -8,32 +8,37 @@ Material Design 3 UI components for React Native, part of [RootNative UI](https:
 ## Install
 
 ```bash
-pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-native-safe-area-context react-native-reanimated react-native-worklets
+pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-native-safe-area-context @expo/vector-icons react-native-svg
 ```
 
-`@rootnative/inertia` is a **required** peer of both `@rootnative/core` and
-`@rootnative/components` — every animation in the library runs on it. npm and
-pnpm install required peers automatically; Yarn classic does not. The rest of
-the packages above are *optional* peers, so no package manager installs them
-for you.
+Everything in that line is a **required** peer. `@rootnative/inertia` runs every
+animation in the library, and `react-native-safe-area-context`,
+`@expo/vector-icons` and `react-native-svg` are imported statically, so the
+bundle fails to resolve without them however little of the library you use.
 
-Reanimated 4 runs on `react-native-worklets` (installed above). **Expo SDK 54 bundles its Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` last in your `babel.config.js` `plugins`.
+> An earlier release marked the last three optional. They were imported
+> statically all the same, so Metro failed on `Unable to resolve module` before
+> the runtime fallback could apply. A lazy `require` is not a fix here: it does
+> not survive `splitting: true`, which `src/safe-area.tsx` explains.
 
-**Optional** — only needed if you plan to use icons in your app:
+npm and pnpm install required peers automatically; Yarn classic installs no
+peers at all, so add them explicitly there.
+
+**Optional** — only needed for interactive components:
 
 ```bash
-pnpm add @expo/vector-icons
+pnpm add react-native-reanimated react-native-worklets
 ```
 
-**Optional** — `react-native-svg` is only needed for the circular Progress variant:
-
-```bash
-pnpm add react-native-svg
-```
-
-> `react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Needed for any interactive component; static components (Typography, Layout, Portal, KeyboardAvoidingWrapper, Divider) work without it. It is declared as an *optional* peer, so nothing installs it for you. With Expo SDK 54 it's also already available in Expo Go.
+> These power state-layer transitions and gesture-driven components (Slider,
+> Switch). Static components (Typography, Layout, Portal,
+> KeyboardAvoidingWrapper, Divider) work without them. They are genuinely
+> optional: nothing imports them statically. With Expo SDK 57 both are already
+> available in Expo Go.
 >
-> Note that peer dependencies are not installed automatically: these are optional peers, so npm/pnpm skip them too, and Yarn classic installs no peers at all. Install the blocks above explicitly.
+> Reanimated 4 runs on `react-native-worklets`. **Expo SDK 57 bundles its Babel
+> plugin — nothing to configure.** On bare React Native, add
+> `'react-native-worklets/plugin'` last in your `babel.config.js` `plugins`.
 
 Wrap your app with `ThemeProvider` from `@rootnative/core` (see [@rootnative/core](https://www.npmjs.com/package/@rootnative/core)).
 
