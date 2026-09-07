@@ -36,6 +36,28 @@ const VERSION = componentsPkg.version as string
  * open this file, so the floor silently lags. The `llms.txt` generator sat two
  * releases behind for the same reason.
  */
+/**
+ * The exact range `packages/components` declares for a peer.
+ *
+ * Unlike `INERTIA_FLOOR` this keeps the **upper** bound, because for the
+ * animation runtime the upper bound is the consumer's constraint too. A bare
+ * `>=4.0.0` resolves to Reanimated 4.6.0 and worklets 0.12.1 today, and the
+ * components peers reject both (`<4.6.0`, `<0.11.0`), so the scaffold would
+ * hand the user an ERESOLVE the moment they installed it.
+ */
+const peerRange = (name: string): string => {
+  const range = componentsPkg.peerDependencies?.[name] as string | undefined
+
+  if (!range) {
+    throw new Error(
+      `packages/components/package.json declares no ${name} peer — ` +
+        'the registry cannot derive what the CLI should install.',
+    )
+  }
+
+  return range
+}
+
 const INERTIA_FLOOR = (() => {
   const range = componentsPkg.peerDependencies?.['@rootnative/inertia'] as
     | string
@@ -109,7 +131,9 @@ for (const [util, exports] of Object.entries(UTIL_TYPE_EXPORTS)) {
 // Directories to skip
 // 'internal' holds shared hooks (useStateLayer) that ship as util-style
 // files, not as standalone registry components.
-const SKIP_DIRS = new Set(['__tests__', 'internal'])
+// 'test-support' holds helpers the test suite imports. It is not shipped —
+// tsup has no entry for it — so scaffolding it at a consumer would be wrong.
+const SKIP_DIRS = new Set(['__tests__', 'internal', 'test-support'])
 
 interface ComponentEntry {
   name: string
@@ -154,8 +178,6 @@ function analyzeImports(componentDir: string): {
   utils: Set<string>
   componentDeps: Set<string>
   externalDeps: Set<string>
-  /** External packages the component's own code imports, not just shared modules. */
-  directExternals: Set<string>
   internalFiles: Set<string>
   sharedRootFiles: Set<string>
 } {
@@ -237,13 +259,6 @@ function analyzeImports(componentDir: string): {
     collectSharedImports(content)
   }
 
-  const directExternals = new Set<string>()
-  for (const content of ownContents) {
-    if (content.includes('react-native-safe-area-context')) {
-      directExternals.add('react-native-safe-area-context')
-    }
-  }
-
   const contents = [...ownContents, ...sharedContents]
 
   for (const content of contents) {
@@ -313,21 +328,14 @@ function analyzeImports(componentDir: string): {
     utils,
     componentDeps,
     externalDeps,
-    directExternals,
     internalFiles,
     sharedRootFiles,
   }
 }
 
 function buildComponentEntry(componentDir: string): ComponentEntry {
-  const {
-    utils,
-    componentDeps,
-    externalDeps,
-    directExternals,
-    internalFiles,
-    sharedRootFiles,
-  } = analyzeImports(componentDir)
+  const { utils, componentDeps, externalDeps, internalFiles, sharedRootFiles } =
+    analyzeImports(componentDir)
   const files = [
     ...getComponentFiles(componentDir),
     ...Array.from(internalFiles)
@@ -341,33 +349,42 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   const dependencies: Record<string, string> = {
     '@rootnative/core': `>=${VERSION}`,
   }
+  // Empty today, and kept in the schema on purpose: an installed CLI reads this
+  // field, so dropping it would break older clients. Nothing a scaffolded
+  // component imports is optional any more — the two peers components still
+  // marks optional (Reanimated, worklets) are required for the generated code
+  // to run, so they go in `dependencies` below.
   const optionalDependencies: Record<string, string> = {}
 
+  // Always required, however it is reached. The shared `safe-area` module used
+  // to require() this in a try/catch and fall back to a plain View, which made
+  // it optional when reached indirectly. That lazy require did not survive tsup
+  // `splitting: true`, so the import is static now and Metro fails without the
+  // package — see the comment in packages/components/src/safe-area.tsx.
   if (externalDeps.has('react-native-safe-area-context')) {
-    // Direct import → required. Reached only through the shared `safe-area`
-    // module → optional, because that module require()s the package in a
-    // try/catch and falls back to a plain View.
-    if (directExternals.has('react-native-safe-area-context')) {
-      dependencies['react-native-safe-area-context'] = '>=4.0.0'
-    } else {
-      optionalDependencies['react-native-safe-area-context'] = '>=4.0.0'
-    }
+    dependencies['react-native-safe-area-context'] = peerRange(
+      'react-native-safe-area-context',
+    )
   }
 
+  // Required for the same reason: packages/utils/src/icon.ts imports
+  // `@expo/vector-icons/MaterialCommunityIcons` statically.
   if (externalDeps.has('@expo/vector-icons')) {
-    optionalDependencies['@expo/vector-icons'] = '>=14.0.0'
+    dependencies['@expo/vector-icons'] = peerRange('@expo/vector-icons')
   }
 
   if (externalDeps.has('react-native-svg')) {
-    dependencies['react-native-svg'] = '>=15.0.0'
+    dependencies['react-native-svg'] = peerRange('react-native-svg')
   }
 
   if (externalDeps.has('react-native-reanimated')) {
-    dependencies['react-native-reanimated'] = '>=4.0.0'
+    dependencies['react-native-reanimated'] = peerRange(
+      'react-native-reanimated',
+    )
     // Reanimated 4 runs on react-native-worklets (its own peer dep) and needs
     // the react-native-worklets/plugin Babel plugin. Pull it in alongside so
     // consumers don't hit a Metro/worklet error.
-    dependencies['react-native-worklets'] = '>=0.5.0'
+    dependencies['react-native-worklets'] = peerRange('react-native-worklets')
   }
 
   if (externalDeps.has('@rootnative/inertia')) {
@@ -375,8 +392,10 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
     // Inertia is a thin wrapper over Reanimated 4 — its peers must be present
     // for the scaffolded component to run, even when the component itself no
     // longer imports Reanimated directly.
-    dependencies['react-native-reanimated'] = '>=4.0.0'
-    dependencies['react-native-worklets'] = '>=0.5.0'
+    dependencies['react-native-reanimated'] = peerRange(
+      'react-native-reanimated',
+    )
+    dependencies['react-native-worklets'] = peerRange('react-native-worklets')
   }
 
   return {

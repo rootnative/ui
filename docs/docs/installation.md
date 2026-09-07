@@ -29,22 +29,24 @@ The example app and the templates pin the same SDK 57 runtime.
 
 ### Peer dependencies
 
-**Install these yourself.** Every package in the list below is declared as an *optional* peer dependency (so you can drop the ones you don't use), and optional peers are never auto-installed — not by npm, not by pnpm, and Yarn classic doesn't auto-install any peers at all. Install the full list once and every component and theming feature works:
+**npm and pnpm install the required peers for you.** Only two entries below are optional, and no package manager installs an optional peer. Yarn classic installs no peers at all, so Yarn users add the whole list by hand. Installing the full list once is the simplest path, and it makes every component and theming feature work:
 
 <PackageManagerTabs cmd="npm install react-native-safe-area-context react-native-svg react-native-reanimated react-native-worklets @expo/vector-icons" />
 
 On Expo, prefer `npx expo install` with the same package list so every version matches your SDK.
 
-If you'd rather install only what you use:
+What each one does, and which two you can leave out:
 
-| Package | Powers | Skip when |
-|---------|--------|-----------|
-| `react-native-reanimated` | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
-| `react-native-worklets` | Reanimated 4's worklet runtime | You skip Reanimated |
-| `react-native-safe-area-context` | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Always skippable — without it those components render without insets and log a one-time warning |
-| `react-native-svg` | CircularProgress and LoadingIndicator | You never import Progress or LoadingIndicator |
-| `@expo/vector-icons` | Default resolver for string icon names (`leadingIcon="check"`) | You pass icons as React elements or register a custom `iconResolver` — see the [Icons guide](./icons) |
-| `@rootnative/inertia` | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a *required* peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
+| Package | Status | Powers | Skip when |
+|---------|--------|--------|-----------|
+| `react-native-reanimated` | optional | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
+| `react-native-worklets` | optional | Reanimated 4's worklet runtime | You skip Reanimated |
+| `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Never |
+| `@expo/vector-icons` | **required** | Default resolver for string icon names (`leadingIcon="check"`) | Never |
+| `react-native-svg` | **required** | CircularProgress and LoadingIndicator | Never |
+| `@rootnative/inertia` | **required** | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a required peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
+
+> **Three of these used to be optional and no longer are.** The library imports `react-native-safe-area-context`, `@expo/vector-icons` and `react-native-svg` **statically**, and a static import cannot be skipped. A lazy `require()` in a try/catch is the natural shape for an optional peer, but it does not survive the build — see the comment in `src/safe-area.tsx`. Metro builds its module graph by scanning for literal import calls, so it fails with `Unable to resolve module` before any runtime fallback can run. Declaring them optional advertised a fallback that never executed.
 
 > **Importing from the root entry?** `import { Button } from '@rootnative/components'` loads every component, so all the component peers above must be installed. The skip rules apply only if you use subpath imports (`@rootnative/components/button`) exclusively.
 
