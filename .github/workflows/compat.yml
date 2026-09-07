@@ -1,0 +1,81 @@
+name: SDK Compatibility
+
+# Checks the packed release candidate against every Expo SDK fixture in
+# rootnative/sdk-compat, before it is published rather than after.
+#
+# components is the urgent case. It advertises `react >=18.0.0` and
+# `react-native >=0.72.0` while depending on @rootnative/inertia, whose own
+# floor is `react >=19.0.0` and `react-native >=0.81.0`. npm rejects the
+# advertised floor with ERESOLVE, and that is already published.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/compat.yml"
+  pull_request:
+    paths:
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/compat.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compat-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pack:
+    name: Pack candidate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # components ships `dist` only — its react-native export condition points
+      # there — so the tarball must be built before it is packed.
+      - name: Build
+        run: pnpm run build
+
+      # `pnpm --filter <pkg> pack` is a pnpm 10 feature; this repo is on
+      # pnpm 9, where it fails with "Unknown option: 'recursive'". Pack from
+      # the package directory instead.
+      - name: Pack components
+        working-directory: packages/components
+        run: pnpm pack --pack-destination ../../pack
+
+      - name: Upload candidate
+        uses: actions/upload-artifact@v5
+        with:
+          name: candidate-components
+          path: pack/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  compat:
+    name: Matrix
+    needs: pack
+    uses: rootnative/sdk-compat/.github/workflows/compat.yml@main
+    with:
+      package: "@rootnative/components"
+      tarball-artifact: candidate-components
+      # Enforced. The ranges were narrowed to the SDK 57 band, which is the
+      # widest set that admits no combination npm would reject.
+      enforce-range: true
