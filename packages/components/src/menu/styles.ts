@@ -36,11 +36,11 @@ export function createMenuStyles(
     // Absolute-fills the portal layer, giving the anchor-relative surface a
     // coordinate space and the dismiss region something to cover.
     layer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     // MD3 menus have no scrim — this is a transparent press target, not a dim.
     dismissRegion: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     surface: {
       position: 'absolute',

@@ -3,6 +3,7 @@ import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
+import { childrenOf, rootOf } from '../test-support/rendered-node'
 import { TextField } from '../text-field/TextField'
 
 const disabledTextColor = alphaColor(
@@ -43,7 +44,7 @@ describe('TextField', () => {
   describe('variants', () => {
     it('renders filled variant by default', () => {
       const { toJSON } = renderWithTheme(<TextField label="Filled" />)
-      const root = toJSON()
+      const root = rootOf(toJSON())
       // Filled variant has a child container with a non-transparent background
       expect(root).toBeTruthy()
     })
@@ -52,7 +53,7 @@ describe('TextField', () => {
       const { toJSON } = renderWithTheme(
         <TextField label="Outlined" variant="outlined" />,
       )
-      const root = toJSON()
+      const root = rootOf(toJSON())
       expect(root).toBeTruthy()
     })
   })
@@ -374,9 +375,9 @@ describe('TextField', () => {
       const { toJSON } = renderWithTheme(
         <TextField label="Name" containerColor="#FF0000" />,
       )
-      const root = toJSON()
+      const root = rootOf(toJSON())
       // The container is the Pressable's child View (second level)
-      const container = root.children[0].children[0]
+      const container = childrenOf(childrenOf(root)[0])[0]
       const flatStyle = StyleSheet.flatten(container.props.style)
       expect(flatStyle.backgroundColor).toBe('#FF0000')
     })
@@ -401,7 +402,7 @@ describe('TextField', () => {
       const { toJSON } = renderWithTheme(
         <TextField label="Name" style={{ margin: 10 }} />,
       )
-      const root = toJSON()
+      const root = rootOf(toJSON())
       const flatStyle = StyleSheet.flatten(root.props.style)
       expect(flatStyle.margin).toBe(10)
     })
@@ -410,8 +411,8 @@ describe('TextField', () => {
       const { toJSON } = renderWithTheme(
         <TextField label="Name" containerColor="#FF0000" disabled />,
       )
-      const root = toJSON()
-      const container = root.children[0].children[0]
+      const root = rootOf(toJSON())
+      const container = childrenOf(childrenOf(root)[0])[0]
       const flatStyle = StyleSheet.flatten(container.props.style)
       expect(flatStyle.backgroundColor).not.toBe('#FF0000')
     })

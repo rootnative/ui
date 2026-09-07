@@ -14,8 +14,8 @@ import {
 } from '@rootnative/inertia/reanimated'
 import { selectRTL } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
-import type { ReactNode } from 'react'
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
+import type { ComponentProps, ReactNode } from 'react'
+import type { LayoutChangeEvent, ViewStyle } from 'react-native'
 import { Platform, View } from 'react-native'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
@@ -27,6 +27,11 @@ import { createStyles, getColorSchemeColors } from './styles'
 import type { AppBarProps } from './types'
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
+
+// Reanimated 4.5 brands the value `useAnimatedStyle` returns, so it no longer
+// widens to `ViewStyle`. Every style here reaches an animated view, so take
+// the style prop from one instead of re-declaring a narrower type.
+type AnimatedViewStyle = ComponentProps<typeof Animated.View>['style']
 
 type AppBarSize = 'small' | 'medium' | 'large'
 function getBackIcon(): IconButtonProps['icon'] {
@@ -70,7 +75,7 @@ function getSizeStyle(
 function withTopInset(
   enabled: boolean,
   content: ReactNode,
-  style: StyleProp<ViewStyle>,
+  style: AnimatedViewStyle,
 ) {
   if (enabled) {
     return (
@@ -365,13 +370,13 @@ export function AppBar({
   const containerOverride = containerColor
     ? ({ backgroundColor: containerColor } as ViewStyle)
     : undefined
-  const rootStyle: StyleProp<ViewStyle> = [
+  const rootStyle: AnimatedViewStyle = [
     styles.root,
     animatedSurfaceStyle,
     containerOverride,
     style,
   ]
-  const safeAreaStyle: StyleProp<ViewStyle> = [
+  const safeAreaStyle: AnimatedViewStyle = [
     styles.safeArea,
     animatedSurfaceStyle,
     containerOverride,

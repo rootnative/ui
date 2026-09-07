@@ -39,19 +39,19 @@ export function createDialogStyles(
 
   return StyleSheet.create({
     scrim: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: alphaColor(theme.colors.scrim, DIALOG_SCRIM_OPACITY),
     },
     // Centering layer for the basic variant. `box-none` so taps on the empty
     // area fall through to the scrim below and dismiss.
     centerLayer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       alignItems: 'center',
       justifyContent: 'center',
       padding: theme.spacing.lg,
     },
     fullscreenLayer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     container: {
       minWidth: DIALOG_MIN_WIDTH,

@@ -1,18 +1,27 @@
 ---
 sidebar_position: 3
-description: Install RootNative UI into an existing app — peer dependencies, provider setup, and the pinned React Native 0.81 / React 19 / Expo SDK 54 runtime.
+description: Install RootNative UI into an existing app — peer dependencies, provider setup, and the Expo SDK 57 runtime the library targets.
 ---
 
 # Installation
 
 ## Prerequisites
 
-- React Native 0.72+
-- React 18+
-- Expo SDK 54+ (if using Expo)
+- Expo SDK 57 (if using Expo)
+- React Native 0.86.x
+- React 19.2.3
 
-The library is developed and tested against React Native 0.81 / React 19 / Expo
-SDK 54, which is what the example app and templates pin.
+The library targets **one SDK band, not a floor.** Expo SDK 57 is the whole
+supported range today, so `SDK 57+` is not correct: the peer ranges stop below
+React Native 0.87 and below Reanimated 4.6, which the next SDK will carry.
+
+The reason is that Reanimated and `react-native-worklets` move together, and
+each pair works with one React Native band. Reanimated 4.5 needs worklets
+0.10.x and React Native 0.83–0.86. A wider range would let a package manager
+mix a new Reanimated with an old worklets, which cannot install. Supporting a
+second SDK therefore needs a second release line, not a wider range.
+
+The example app and the templates pin the same SDK 57 runtime.
 
 ## Install packages
 
@@ -41,9 +50,9 @@ If you'd rather install only what you use:
 
 [`createMaterialTheme`](./theming#generate-a-theme-from-a-seed-color) needs no extra install: the MD3 color engine (`@material/material-color-utilities`) is bundled inside `@rootnative/core`, behind the `@rootnative/core/create-theme` subpath. Projects that define themes by hand never load it.
 
-`react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 54 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
+`react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 57 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 
-> **Expo SDK 54 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
+> **Expo SDK 57 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
 
 If you pass **string icon names** (e.g. `leadingIcon="check"`) and don't register a custom `iconResolver`, the library resolves them through [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) from `@expo/vector-icons` (installed above). See the [Icons guide](./icons) for details.
 

@@ -114,7 +114,7 @@ describe('Avatar', () => {
       const button = screen.getByRole('button')
       const dimmed = button.findAll(
         (node: TestInstance) =>
-          node.type === 'View' &&
+          (node.type as string) === 'View' &&
           (StyleSheet.flatten(node.props.style) as ViewStyle)?.opacity ===
             lightTheme.stateLayer.disabledOpacity,
       )
@@ -124,7 +124,7 @@ describe('Avatar', () => {
 
   describe('focus ring', () => {
     const isFocusRing = (node: TestInstance) => {
-      if (node.type !== 'View') return false
+      if ((node.type as string) !== 'View') return false
       const flat = StyleSheet.flatten(node.props.style) as ViewStyle
       return (
         flat?.borderWidth === 3 &&

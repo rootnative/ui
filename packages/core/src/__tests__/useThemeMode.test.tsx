@@ -126,8 +126,10 @@ describe('mode resolution', () => {
     )
   })
 
-  it('treats a null OS scheme as light', () => {
-    mockedUseColorScheme.mockReturnValue(null)
+  // RN 0.86 replaced the `null` "no OS preference" value with 'unspecified'.
+  // `useColorScheme()` no longer returns null at all.
+  it('treats an unspecified OS scheme as light', () => {
+    mockedUseColorScheme.mockReturnValue('unspecified')
 
     render(
       <ThemeProvider theme={pair}>

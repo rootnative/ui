@@ -830,7 +830,7 @@ const previewStyles = StyleSheet.create({
     alignItems: 'center',
   },
   dialogScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0.32,
     borderRadius: 8,
   },

@@ -4,16 +4,13 @@ import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import type { TextStyle, ViewStyle } from 'react-native'
 import { AppBar } from '../appbar/AppBar'
+import { childrenOf, rootOf } from '../test-support/rendered-node'
+import type { RenderedNode } from '../test-support/rendered-node'
 
 // The Jest mock evaluates worklets once per render, so a plain `{ value }`
 // stub is all a scroll offset needs to drive the collapse interpolation.
 function scrollOffsetAt(value: number): SharedValue<number> {
   return { value } as SharedValue<number>
-}
-
-type RenderedNode = {
-  props?: { style?: ViewStyle | TextStyle }
-  children?: RenderedNode[] | null
 }
 
 function collectFlattenedStyles(
@@ -26,7 +23,7 @@ function collectFlattenedStyles(
   const own = node.props?.style
     ? [StyleSheet.flatten(node.props.style) as ViewStyle & TextStyle]
     : []
-  return [...own, ...collectFlattenedStyles(node.children ?? null)]
+  return [...own, ...collectFlattenedStyles(childrenOf(node))]
 }
 
 describe('AppBar', () => {
@@ -320,7 +317,7 @@ describe('AppBar', () => {
       const { toJSON } = renderWithTheme(
         <AppBar title="Custom" containerColor="#FF0000" />,
       )
-      const root = toJSON()
+      const root = rootOf(toJSON())
       const flatStyle = StyleSheet.flatten(root.props.style)
       expect(flatStyle.backgroundColor).toBe('#FF0000')
     })
@@ -345,7 +342,7 @@ describe('AppBar', () => {
       const { toJSON } = renderWithTheme(
         <AppBar title="Home" style={{ margin: 10 }} />,
       )
-      const root = toJSON()
+      const root = rootOf(toJSON())
       const flatStyle = StyleSheet.flatten(root.props.style)
       expect(flatStyle.margin).toBe(10)
     })

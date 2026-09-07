@@ -117,12 +117,12 @@ export function createNavigationItemStyles(
       justifyContent: 'center',
     },
     indicator: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       borderRadius: theme.shape.cornerFull,
       backgroundColor: colors.indicator,
     },
     stateLayer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       borderRadius: theme.shape.cornerFull,
     },
     label: {

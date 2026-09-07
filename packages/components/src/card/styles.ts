@@ -191,7 +191,7 @@ export function createCardRegionStyles(theme: MaterialTheme) {
     // comes from `height`/`aspectRatio`, and a flex child of an
     // auto-height parent would collapse to zero.
     mediaFill: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       width: '100%',
       height: '100%',
     },

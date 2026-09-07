@@ -8,6 +8,7 @@ import { GridCell } from '../layout/GridCell'
 import { Layout } from '../layout/Layout'
 import { Row } from '../layout/Row'
 import type { GridProps } from '../layout/types'
+import { childrenOf, findChild, rootOf } from '../test-support/rendered-node'
 
 describe('Box', () => {
   it('renders children', () => {
@@ -278,12 +279,9 @@ describe('Grid', () => {
         <Text>C</Text>
       </Grid>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     // Grid is a Row (View) containing cell wrapper Views
-    const cells = root.children.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (child: any) => child.type === 'View',
-    )
+    const cells = childrenOf(root).filter((child) => child.type === 'View')
     expect(cells.length).toBe(3)
     const cellStyle = StyleSheet.flatten(cells[0].props.style)
     // 100 / 3 ≈ 33.333...%
@@ -297,11 +295,8 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
-    const cells = root.children.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (child: any) => child.type === 'View',
-    )
+    const root = rootOf(toJSON())
+    const cells = childrenOf(root).filter((child) => child.type === 'View')
     const cellStyle = StyleSheet.flatten(cells[0].props.style)
     expect(cellStyle.paddingStart).toBeDefined()
     expect(cellStyle.paddingEnd).toBeDefined()
@@ -316,7 +311,7 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const rowStyle = StyleSheet.flatten(root.props.style)
     expect(rowStyle.marginStart).toBeDefined()
     expect(rowStyle.marginEnd).toBeDefined()
@@ -331,11 +326,8 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
-    const cells = root.children.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (child: any) => child.type === 'View',
-    )
+    const root = rootOf(toJSON())
+    const cells = childrenOf(root).filter((child) => child.type === 'View')
     const cellStyle = StyleSheet.flatten(cells[0].props.style)
     // "md" spacing token = 16, half = 8
     expect(cellStyle.paddingStart).toBe(8)
@@ -349,7 +341,7 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const rowStyle = StyleSheet.flatten(root.props.style)
     // "md" spacing token = 16, half = 8, negative = -8
     expect(rowStyle.marginStart).toBe(-8)
@@ -363,11 +355,8 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
-    const cells = root.children.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (child: any) => child.type === 'View',
-    )
+    const root = rootOf(toJSON())
+    const cells = childrenOf(root).filter((child) => child.type === 'View')
     const cellStyle = StyleSheet.flatten(cells[0].props.style)
     const rowStyle = StyleSheet.flatten(root.props.style)
     expect(cellStyle.paddingStart).toBe(0)
@@ -384,11 +373,8 @@ describe('Grid', () => {
         <Text>B</Text>
       </Grid>,
     )
-    const root = toJSON()
-    const cells = root.children.filter(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (child: any) => child.type === 'View',
-    )
+    const root = rootOf(toJSON())
+    const cells = childrenOf(root).filter((child) => child.type === 'View')
     expect(cells.length).toBe(2)
   })
 
@@ -412,9 +398,8 @@ describe('Grid', () => {
           <Text>B</Text>
         </Grid>,
       )
-      const cells = toJSON().children.filter(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (child: any) => child.type === 'View',
+      const cells = childrenOf(rootOf(toJSON())).filter(
+        (child) => child.type === 'View',
       )
       return StyleSheet.flatten(cells[0].props.style).flexBasis
     }
@@ -478,9 +463,9 @@ describe('Grid', () => {
       )
       // The cell's own View must be a direct child of the row — a wrapper
       // would pin the cell back to the default single-column basis.
-      const root = toJSON()
-      expect(root.children.length).toBe(1)
-      expect(root.children[0].props.testID).toBe('cell')
+      const root = rootOf(toJSON())
+      expect(childrenOf(root).length).toBe(1)
+      expect(childrenOf(root)[0].props.testID).toBe('cell')
     })
 
     it('defaults to a span of one column', () => {
@@ -542,11 +527,8 @@ describe('Grid', () => {
       expect(cellBasis('wide')).toBe('50%')
       // The plain child is wrapped in a default single-column cell — the row
       // child that is not the spanned one.
-      const root = toJSON()
-      const wrapper = root.children.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (child: any) => child.props.testID !== 'wide',
-      )
+      const root = rootOf(toJSON())
+      const wrapper = findChild(root, (child) => child.props.testID !== 'wide')
       expect(StyleSheet.flatten(wrapper.props.style).flexBasis).toBe('25%')
     })
 
@@ -604,7 +586,7 @@ describe('Layout', () => {
         <Text>Content</Text>
       </Layout>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const flatStyle = StyleSheet.flatten(root.props.style)
     expect(flatStyle.flex).toBe(1)
   })
@@ -615,7 +597,7 @@ describe('Layout', () => {
         <Text>Content</Text>
       </Layout>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const flatStyle = StyleSheet.flatten(root.props.style)
     expect(flatStyle.backgroundColor).toBeDefined()
   })
@@ -626,7 +608,7 @@ describe('Layout', () => {
         <Text>Content</Text>
       </Layout>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const flatStyle = StyleSheet.flatten(root.props.style)
     expect(flatStyle.borderWidth).toBe(1)
   })
@@ -637,7 +619,7 @@ describe('Layout', () => {
         <Text>Content</Text>
       </Layout>,
     )
-    const root = toJSON()
+    const root = rootOf(toJSON())
     const flatStyle = StyleSheet.flatten(root.props.style)
     // backgroundColor should be the theme color, not the override
     expect(flatStyle.backgroundColor).not.toBe('#FF0000')

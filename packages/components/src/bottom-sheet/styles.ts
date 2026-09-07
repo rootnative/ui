@@ -37,21 +37,21 @@ export function createBottomSheetStyles(
     // Absolute-fills the portal layer. `box-none` at the call site so a
     // standard sheet leaves the screen behind it interactive.
     layer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     scrim: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: alphaColor(theme.colors.scrim, SHEET_SCRIM_OPACITY),
     },
     // The press target inside the scrim stays transparent — giving it the
     // scrim color too would composite two 32% layers into ~54%.
     scrimPressArea: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     // Bottom-anchors the surface; centering handles large screens where the
     // sheet is narrower than the window.
     sheetLayer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       justifyContent: 'flex-end',
       alignItems: 'center',
     },

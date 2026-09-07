@@ -19,7 +19,7 @@ module.exports = {
   projects: [
     {
       displayName: 'native',
-      preset: 'react-native',
+      preset: '@react-native/jest-preset',
       rootDir: __dirname,
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
       setupFiles: ['<rootDir>/jest.setup.cjs'],

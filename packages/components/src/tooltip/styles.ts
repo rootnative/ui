@@ -69,12 +69,12 @@ export function createTooltipStyles(
     // Absolute-fills the portal layer, giving the anchor-relative surface a
     // coordinate space to be positioned in.
     layer: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     // Rich tooltips are persistent, so they need a way out. Transparent, never
     // a scrim — a tooltip does not dim what it describes.
     dismissRegion: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
     },
     surface: {
       position: 'absolute',
