@@ -7,13 +7,14 @@
     "packages/components/src/tabs/index.ts",
     "packages/components/src/tabs/styles.ts",
     "packages/components/src/tabs/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color", "render-icon"],
   "componentDependencies": ["divider"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.14",
-    "@rootnative/inertia": ">=0.0.10",
+    "@rootnative/inertia": ">=0.0.11",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
     "react-native-worklets": ">=0.10.0 <0.11.0"
   },

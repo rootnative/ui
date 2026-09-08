@@ -58,7 +58,7 @@
   },
   "peerDependencies": {
     "@rootnative/core": ">=0.0.0-alpha.0",
-    "@rootnative/inertia": ">=0.0.8 <0.1.0",
+    "@rootnative/inertia": ">=0.0.11 <0.1.0",
     "react-native": ">=0.83.0 <0.87.0"
   },
   "peerDependenciesMeta": {
@@ -70,7 +70,7 @@
     "@react-native/babel-preset": "^0.86.3",
     "@react-native/jest-preset": "^0.86.3",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.10",
+    "@rootnative/inertia": "0.0.11",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.0",

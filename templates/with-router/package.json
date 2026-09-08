@@ -13,7 +13,7 @@
     "@expo/vector-icons": "^15.0.3",
     "@rootnative/components": "latest",
     "@rootnative/core": "latest",
-    "@rootnative/inertia": "0.0.10",
+    "@rootnative/inertia": "0.0.11",
     "expo": "~57.0.20",
     "expo-constants": "~57.0.17",
     "expo-font": "~57.0.3",

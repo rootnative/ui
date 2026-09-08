@@ -8,6 +8,7 @@
     "packages/components/src/menu/index.ts",
     "packages/components/src/menu/styles.ts",
     "packages/components/src/menu/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useStateLayer.ts"
@@ -16,7 +17,7 @@
   "componentDependencies": ["portal"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.14",
-    "@rootnative/inertia": ">=0.0.10",
+    "@rootnative/inertia": ">=0.0.11",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
     "react-native-worklets": ">=0.10.0 <0.11.0"
   },

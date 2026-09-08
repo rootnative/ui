@@ -9,7 +9,8 @@
     "packages/components/src/portal/layers.ts",
     "packages/components/src/portal/store.ts",
     "packages/components/src/portal/styles.ts",
-    "packages/components/src/portal/types.ts"
+    "packages/components/src/portal/types.ts",
+    "packages/components/src/internal/pointerEvents.ts"
   ],
   "utils": [],
   "componentDependencies": [],

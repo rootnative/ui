@@ -7,6 +7,7 @@
     "packages/components/src/bottom-sheet/index.ts",
     "packages/components/src/bottom-sheet/styles.ts",
     "packages/components/src/bottom-sheet/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/safe-area.tsx"
   ],
@@ -15,7 +16,7 @@
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.14",
     "react-native-safe-area-context": ">=4.0.0",
-    "@rootnative/inertia": ">=0.0.10",
+    "@rootnative/inertia": ">=0.0.11",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
     "react-native-worklets": ">=0.10.0 <0.11.0"
   },

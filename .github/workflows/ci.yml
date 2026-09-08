@@ -42,6 +42,15 @@ jobs:
       - name: Docs check
         run: pnpm run docs:check
 
+      # `check-inertia-pins` reads the registry but only compares the inertia
+      # floor in each entry, so the `files` lists were unguarded: 21 of 29 were
+      # missing internal/pointerEvents.ts after somebody added the import
+      # without re-running the generator. The registry is what `rootnative add`
+      # copies into a consumer project, so a stale list hands them a component
+      # with a missing import. Needs no build.
+      - name: Registry drift check
+        run: pnpm run registry:check
+
       # The inertia version is pinned in six places and CLAUDE.md warns that
       # missing one is silent — a lagging template pin makes every scaffolded
       # project install a floor the components do not satisfy. Needs no build.

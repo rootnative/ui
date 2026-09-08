@@ -284,7 +284,7 @@
   "peerDependencies": {
     "@expo/vector-icons": ">=14.0.0",
     "@rootnative/core": ">=0.0.0-alpha.14",
-    "@rootnative/inertia": ">=0.0.10 <0.1.0",
+    "@rootnative/inertia": ">=0.0.11 <0.1.0",
     "react": ">=19.2.3 <20.0.0",
     "react-native": ">=0.83.0 <0.87.0",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
@@ -304,7 +304,7 @@
     "@react-native/babel-preset": "^0.86.3",
     "@react-native/jest-preset": "^0.86.3",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.10",
+    "@rootnative/inertia": "0.0.11",
     "@rootnative/utils": "workspace:*",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-native": "^13.3.3",

@@ -25,6 +25,8 @@
     "api:surface": "npx tsx scripts/build-api-surface.ts",
     "api:check": "pnpm run build && npx tsx scripts/build-api-surface.ts --check",
     "docs:check": "npx tsx scripts/check-docs.ts",
+    "registry": "npx tsx scripts/build-registry.ts",
+    "registry:check": "npx tsx scripts/build-registry.ts --check",
     "check:inertia-pins": "npx tsx scripts/check-inertia-pins.ts",
     "check:template-pins": "npx tsx scripts/check-template-pins.ts",
     "check:singletons": "npx tsx scripts/check-singletons.ts",

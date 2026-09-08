@@ -47,6 +47,74 @@ const inertiaPeerOf = (pkg: string): string =>
 const CORE_INERTIA_PEER: string = inertiaPeerOf('core')
 const COMPONENTS_INERTIA_PEER: string = inertiaPeerOf('components')
 
+// Every other runtime requirement in the generated headers is read the same
+// way, and for the same reason the inertia range already is. A literal here has
+// no reason to bring anyone to this file when a version moves, and all of them
+// had gone stale: the headers still advertised `react >=18`, `react-native
+// >=0.72`, `react-native-reanimated >=4` and `react-native-worklets >=0.5` on a
+// tree whose real floors are 19.2.3, 0.83.0, 4.5.0 and 0.10.0, and still named
+// Expo SDK 54 three SDKs later. `llms.txt` is the file CLAUDE.md tells an agent
+// to trust over the hosted docs, so an understated floor there is worse than no
+// statement at all — it reads as permission to install a combination the
+// package rejects.
+const peerOf = (pkg: string, dep: string): string => {
+  const range = readPkg(`packages/${pkg}/package.json`).peerDependencies?.[dep]
+
+  if (!range) {
+    throw new Error(
+      `packages/${pkg}/package.json declares no ${dep} peer — the generated ` +
+        'llms.txt must not state a requirement the package does not declare.',
+    )
+  }
+
+  return range
+}
+
+const CORE_REACT: string = peerOf('core', 'react')
+const CORE_RN: string = peerOf('core', 'react-native')
+
+const COMPONENTS_REACT: string = peerOf('components', 'react')
+const COMPONENTS_RN: string = peerOf('components', 'react-native')
+const COMPONENTS_SAFE_AREA: string = peerOf(
+  'components',
+  'react-native-safe-area-context',
+)
+const COMPONENTS_REANIMATED: string = peerOf(
+  'components',
+  'react-native-reanimated',
+)
+const COMPONENTS_WORKLETS: string = peerOf(
+  'components',
+  'react-native-worklets',
+)
+const COMPONENTS_VECTOR_ICONS: string = peerOf(
+  'components',
+  '@expo/vector-icons',
+)
+
+const ICONS_REACT: string = peerOf('icons', 'react')
+const ICONS_RN: string = peerOf('icons', 'react-native')
+
+const CLI_NODE: string = readPkg('packages/cli/package.json').engines.node
+
+// The SDK band, read from the Expo the workspace installs — the same source of
+// truth `check-template-pins.ts` uses. Nothing in a peer range names an SDK
+// number, so this is the only place it can be derived from rather than typed.
+const EXPO_SDK: string = (() => {
+  const expoPkg = path.join(ROOT, 'node_modules/expo/package.json')
+
+  if (!fs.existsSync(expoPkg)) {
+    throw new Error(
+      'node_modules/expo/package.json is missing — the generated llms.txt ' +
+        'reads the SDK band from the installed Expo. Run `pnpm install` first.',
+    )
+  }
+
+  return (
+    JSON.parse(fs.readFileSync(expoPkg, 'utf-8')).version as string
+  ).split('.')[0]
+})()
+
 // ============================================================
 // Type Extraction — Interfaces & Type Aliases from TS source
 // ============================================================
@@ -1786,10 +1854,10 @@ is the missing half — but if you run Jest somewhere without one, add
 \`@material/material-color-utilities\` needs the same allowance whenever
 \`createMaterialTheme\` is on a tested path; it is ESM-only too.
 
-**Two version pins, if the app is Expo SDK 54.** Both cost a debugging cycle in
+**Two version pins, whatever the SDK.** Both cost a debugging cycle in
 a real consumer, and neither failure names its cause:
 
-- **Jest 29, not 30.** \`jest-expo@54\` depends on Jest 29 packages. On Jest 30
+- **Jest 29, not 30.** \`jest-expo\` depends on Jest 29 packages. On Jest 30
   every suite dies with \`this._moduleMocker.clearMocksOnScope is not a function\`.
 - **\`@testing-library/react-native\` 13, not 14.** Version 14 replaces
   \`react-test-renderer\` with the \`test-renderer\` package; under this preset its
@@ -2439,7 +2507,7 @@ function generateCoreLlms(): string {
   return `# @rootnative/core — Theme System for React Native
 
 > Version: ${CORE_VERSION}
-> Peer deps: react >=18, react-native >=0.72, @rootnative/inertia ${CORE_INERTIA_PEER} (required — every animation runs on it)
+> Peer deps: react ${CORE_REACT}, react-native ${CORE_RN}, @rootnative/inertia ${CORE_INERTIA_PEER} (required — every animation runs on it)
 > createMaterialTheme needs no extra install — its color engine (@material/material-color-utilities) is bundled behind the create-theme subpath
 
 ## Quick Start
@@ -2466,8 +2534,8 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react >=18, react-native >=0.72, react-native-safe-area-context >=4, react-native-reanimated >=4, react-native-worklets >=0.5 (Expo SDK 54 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
-> Optional: @expo/vector-icons >=14 (only needed for icon props)
+> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
+> Optional: @expo/vector-icons ${COMPONENTS_VECTOR_ICONS} (only needed for icon props)
 
 ## App root setup
 
@@ -2508,7 +2576,7 @@ function generateCliLlms(): string {
 
 > Version: ${CLI_VERSION}
 > Binary: \`rootnative\`
-> Requirements: Node >=18
+> Requirements: Node ${CLI_NODE}
 
 ## CLI (\`rootnative\`)
 
@@ -2519,7 +2587,7 @@ function generateIconsLlms(): string {
   return `# @rootnative/icons — Icon Library Adapters for RootNative UI
 
 > Version: ${ICONS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, react >=18, react-native >=0.72
+> Peer deps: @rootnative/core >=${CORE_VERSION}, react ${ICONS_REACT}, react-native ${ICONS_RN}
 > Optional peer deps: lucide-react-native, phosphor-react-native, @expo/vector-icons
 
 Pre-built resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
@@ -2536,9 +2604,9 @@ function generateFullLlms(): string {
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
-> Requirements: React Native 0.81+, React 19+, Expo SDK 54+
-> Peer deps: \`react-native-safe-area-context >=4\`, \`react-native-reanimated >=4\`, \`react-native-worklets >=0.5\` (Reanimated 4 runtime — Expo SDK 54 configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
-> Optional peer deps: \`@expo/vector-icons >=14\` (only needed for icon props)
+> Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
+> Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
+> Optional peer deps: \`@expo/vector-icons ${COMPONENTS_VECTOR_ICONS}\` (only needed for icon props)
 
 ---
 
@@ -2565,7 +2633,7 @@ Pass name directly: \`npx rootnative create my-app\`
 pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated react-native-worklets
 \`\`\`
 
-Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK 54 bundles its Babel plugin — nothing to configure. On bare React Native, add \`'react-native-worklets/plugin'\` last in \`babel.config.js\` plugins.
+Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK ${EXPO_SDK} bundles its Babel plugin — nothing to configure. On bare React Native, add \`'react-native-worklets/plugin'\` last in \`babel.config.js\` plugins.
 
 ---
 
