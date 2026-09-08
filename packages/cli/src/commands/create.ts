@@ -99,10 +99,11 @@ const TEMPLATE_CONFIGS: Record<
   },
 }
 
+// Fetched with graceful skip, so removing one does not break an older CLI.
 const TEMPLATE_BINARY_FILES = [
   'assets/icon.png',
-  'assets/splash.png',
   'assets/adaptive-icon.png',
+  'assets/splash.png',
   'assets/favicon.png',
 ]
 

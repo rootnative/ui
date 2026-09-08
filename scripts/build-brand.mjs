@@ -48,6 +48,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const BRAND_DIR = path.join(ROOT, 'assets', 'brand')
 const DOCS_IMG_DIR = path.join(ROOT, 'docs', 'static', 'img')
 const EXAMPLE_ASSET_DIR = path.join(ROOT, 'example', 'assets')
+// `rootnative create` copies these into every scaffolded project, so they carry
+// the same mark as the example rather than Expo's blank placeholders.
+const TEMPLATE_ASSET_DIRS = ['blank', 'with-router'].map((name) =>
+  path.join(ROOT, 'templates', name, 'assets'),
+)
 
 // --- palette -----------------------------------------------------------------
 // A block is lit, not translucent. Each of a cube's three faces takes one FLAT,
@@ -728,30 +733,41 @@ function main() {
     buildIco([16, 32, 48].map((size) => ({ size, png: favicon(size) }))),
   )
 
-  // 4. Example app. Scales are per slot: the store icon fills its tile, the
-  //    adaptive foreground has to stay inside Android's 66% safe circle, and
-  //    the splash is small because `resizeMode: contain` fits a square image to
-  //    the full screen width.
+  // 4. Expo app assets -- the example, and both `rootnative create` templates.
+  //    Rendered once and written to every app directory, so a scaffolded
+  //    project cannot drift from the example it is modelled on.
+  //
+  //    Scales are per slot: the store icon fills its tile, the adaptive
+  //    foreground has to stay inside Android's 66% safe circle, and the splash
+  //    mark is small because it sits on a 1024 square that the
+  //    `expo-splash-screen` plugin renders at `imageWidth: 400` -- 0.34 of 400
+  //    puts the mark at ~136dp. That scale and that width are a pair: change one
+  //    and change the other in all three `app.json` files, or the mark resizes
+  //    on the splash. SDK 57 removed the legacy top-level `splash` key that used
+  //    to stretch this square to the full screen width, which is where the 0.34
+  //    came from.
+  //
   //    The store icon is the one raster composited onto the dark canvas, so it
-  //    takes the lighter face tones -- the same pair the social card uses.
-  write(
-    path.join(EXAMPLE_ASSET_DIR, 'icon.png'),
-    renderMark({
+  //    takes the lighter face tones -- the same pair the social card uses. Every
+  //    `app.json` therefore pairs it with `adaptiveIcon.backgroundColor` of
+  //    CANVAS_DARK; a white tile there would frame the dark icon in a halo.
+  const appAssets = {
+    'icon.png': renderMark({
       ...MARK_DARK,
       size: 1024,
       scale: 0.66,
       background: CANVAS_DARK,
     }),
-  )
-  write(
-    path.join(EXAMPLE_ASSET_DIR, 'adaptive-icon.png'),
-    renderMark({ ...MARK, size: 1024, scale: 0.45 }),
-  )
-  write(
-    path.join(EXAMPLE_ASSET_DIR, 'splash.png'),
-    renderMark({ ...MARK, size: 1024, scale: 0.34 }),
-  )
-  write(path.join(EXAMPLE_ASSET_DIR, 'favicon.png'), favicon(64))
+    'adaptive-icon.png': renderMark({ ...MARK, size: 1024, scale: 0.45 }),
+    'splash.png': renderMark({ ...MARK, size: 1024, scale: 0.34 }),
+    'favicon.png': favicon(64),
+  }
+
+  for (const dir of [EXAMPLE_ASSET_DIR, ...TEMPLATE_ASSET_DIRS]) {
+    for (const [file, contents] of Object.entries(appAssets)) {
+      write(path.join(dir, file), contents)
+    }
+  }
 
   if (scratch) rmSync(scratch, { recursive: true, force: true })
 

@@ -56,7 +56,7 @@ For `blank`:
 my-app/
 ├── App.tsx               # Home screen, wrapped in ThemeProvider
 ├── index.ts              # Expo entry point (registerRootComponent)
-├── assets/               # Placeholder app icons and splash screen
+├── assets/               # App icons and splash screen, RootNative mark
 ├── app.json              # Expo config with your project name
 ├── package.json
 ├── tsconfig.json
@@ -66,6 +66,11 @@ my-app/
 
 There is no `babel.config.js`. Expo SDK 57 applies `babel-preset-expo` by
 default, so the templates ship no Babel config.
+
+The app icon, adaptive icon, favicon and splash screen carry the RootNative
+mark, declared through the `expo-splash-screen` plugin in `app.json`. Replace the
+files in `assets/` with your own artwork — keep `imageWidth` in step with how
+much of the splash square your mark fills.
 
 `with-router` swaps `App.tsx` and `index.ts` for an `app/` directory holding
 `_layout.tsx` (the root layout) and `index.tsx` (the home screen).
