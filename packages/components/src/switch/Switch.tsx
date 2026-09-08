@@ -18,6 +18,7 @@ import {
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers } from '../internal/usePressMorph'
@@ -270,8 +271,7 @@ export function Switch({
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <AnimatedPressable
         {...props}
@@ -302,13 +302,13 @@ export function Switch({
         ]}
       >
         <Animated.View
-          pointerEvents="none"
           style={[
             styles.stateLayer,
             haloPositionStyle,
             haloOpacityStyle,
             haloColorStyle,
             animatedHaloStyle,
+            pointerEvents.none,
           ]}
         />
         <Animated.View
@@ -327,8 +327,11 @@ export function Switch({
           {selectedIcon ? (
             <Animated.View
               aria-hidden
-              pointerEvents="none"
-              style={[styles.iconLayer, animatedSelectedIconStyle]}
+              style={[
+                styles.iconLayer,
+                animatedSelectedIconStyle,
+                pointerEvents.none,
+              ]}
             >
               {renderIcon(
                 selectedIcon,
@@ -340,8 +343,11 @@ export function Switch({
           {unselectedIcon ? (
             <Animated.View
               aria-hidden
-              pointerEvents="none"
-              style={[styles.iconLayer, animatedUnselectedIconStyle]}
+              style={[
+                styles.iconLayer,
+                animatedUnselectedIconStyle,
+                pointerEvents.none,
+              ]}
             >
               {renderIcon(
                 unselectedIcon,

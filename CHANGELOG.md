@@ -11,6 +11,33 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `pointerEvents` moved from a prop to a style
+
+Every component that marked a decorative overlay non-interactive — focus rings,
+state layers, elevation carriers, the Tabs indicator, the Menu / Tooltip /
+BottomSheet / Snackbar overlay layers — passed `pointerEvents` as a prop.
+react-native-web deprecated that spelling: `createDOMProps` warns
+`props.pointerEvents is deprecated. Use style.pointerEvents`. The warning is
+`warnOnce`-guarded, so it appeared exactly once, unattributed, in the console of
+every web app that rendered any of these — 69 call sites across 24 components.
+
+Nothing renders differently. react-native-web's own implementation translated
+the prop into the identical style object and appended it after the caller's
+`style`, so the components now write it themselves, last in the style array,
+which is where it already landed. React Native has read the key from `style`
+since 0.71, so native is unchanged too. `cursor.web.test.tsx`, which reads the
+real DOM, was green before and after.
+
+No public API change: `pointerEvents` was never part of any component's props.
+A consumer passing it to a component that forwards `ViewProps` still works, and
+still warns — that call site should move it into `style` as well.
+
+`react/forbid-component-props` now fails the build on the prop form. It is a
+lint rule rather than a test because the warning is `warnOnce`-guarded: only the
+first offender in a process is observable, so a per-component test passes for
+every component rendered after it. Fault injection confirmed that directly —
+putting the prop back on `Button` left the web suite green, and fails lint.
+
 ## 0.0.0-alpha.14 — 2026-08-22
 
 ### `Grid` takes a breakpoint map for `columns`

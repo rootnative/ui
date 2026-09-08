@@ -15,6 +15,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
 
@@ -415,7 +416,7 @@ export function TextField({
       >
         <Animated.View style={containerStyleArr}>
           {isFilled ? (
-            <Animated.View pointerEvents="none" style={hoverLayerStyleArr} />
+            <Animated.View style={[hoverLayerStyleArr, pointerEvents.none]} />
           ) : null}
 
           {leadingIcon ? (
@@ -499,11 +500,11 @@ export function TextField({
           ) : null}
 
           {!isFilled ? (
-            <Animated.View pointerEvents="none" style={borderLayerStyleArr} />
+            <Animated.View style={[borderLayerStyleArr, pointerEvents.none]} />
           ) : null}
 
           {label ? (
-            <Animated.View pointerEvents="none" style={labelWrapperStyleArr}>
+            <Animated.View style={[labelWrapperStyleArr, pointerEvents.none]}>
               <Animated.Text numberOfLines={1} style={labelTextStyleArr}>
                 {label}
               </Animated.Text>

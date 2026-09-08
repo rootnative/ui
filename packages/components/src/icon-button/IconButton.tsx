@@ -7,6 +7,7 @@ import {
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
@@ -235,8 +236,7 @@ export function IconButton({
   return (
     <Animated.View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <AnimatedPressable
         {...props}

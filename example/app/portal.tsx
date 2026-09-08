@@ -39,7 +39,7 @@ function ToastDemo() {
       </Button>
       {visible ? (
         <Portal priority={PORTAL_LAYERS.snackbar}>
-          <View style={portalStyles.toastWrapper} pointerEvents="box-none">
+          <View style={portalStyles.toastWrapper}>
             <Pressable
               onPress={() => setVisible(false)}
               style={toastStyle}
@@ -158,7 +158,7 @@ function StackingDemo() {
         <>
           {/* Mounted first, but sits on top — priority wins over mount order. */}
           <Portal priority={PORTAL_LAYERS.snackbar}>
-            <View style={portalStyles.toastWrapper} pointerEvents="box-none">
+            <View style={portalStyles.toastWrapper}>
               <View style={toastStyle}>
                 <Typography variant="bodyMedium" style={toastTextStyle}>
                   Snackbar layer — above the dialog scrim
@@ -228,7 +228,7 @@ function NamedHostDemo() {
 
       {visible ? (
         <Portal hostName="scoped">
-          <View style={portalStyles.scopedWrapper} pointerEvents="box-none">
+          <View style={portalStyles.scopedWrapper}>
             <View style={badgeStyle}>
               <Typography variant="labelLarge" style={badgeTextStyle}>
                 Scoped to the box
@@ -356,6 +356,8 @@ const portalStyles = StyleSheet.create({
     bottom: 24,
     alignItems: 'center',
     paddingHorizontal: 16,
+    // Only the toast itself is tappable; the band around it is not.
+    pointerEvents: 'box-none',
   },
   toast: {
     paddingHorizontal: 16,
@@ -391,6 +393,7 @@ const portalStyles = StyleSheet.create({
   scopedWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
+    pointerEvents: 'box-none',
   },
   scopedBadge: {
     paddingHorizontal: 16,

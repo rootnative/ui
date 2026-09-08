@@ -13,6 +13,7 @@ import {
 import type { ReactElement } from 'react'
 import type { GestureResponderEvent } from 'react-native'
 import { BackHandler, Platform, Pressable, Text, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -240,8 +241,7 @@ export function Tooltip({
       <Portal priority={PORTAL_LAYERS.tooltip} hostName={hostName}>
         <View
           ref={layerRef}
-          style={styles.layer}
-          pointerEvents="box-none"
+          style={[styles.layer, pointerEvents.boxNone]}
           collapsable={false}
           onLayout={measure}
         >
@@ -269,8 +269,12 @@ export function Tooltip({
                 accessibilityLiveRegion="polite"
                 // A plain tooltip is decoration over the UI, so it stays out of
                 // the way of touches; a rich one owns its actions.
-                pointerEvents={isRich ? 'auto' : 'none'}
-                style={[styles.surface, positionStyle, style]}
+                style={[
+                  styles.surface,
+                  positionStyle,
+                  style,
+                  isRich ? pointerEvents.auto : pointerEvents.none,
+                ]}
                 initial={HIDDEN}
                 animate={position === null ? HIDDEN : SHOWN}
                 exit={HIDDEN}

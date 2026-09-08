@@ -96,13 +96,13 @@ describe('BottomSheet', () => {
     )
     const surface = await screen.findByTestId('sheet')
     expect(StyleSheet.flatten(surface.props.style).opacity).toBe(0)
-    expect(surface.props.pointerEvents).toBe('none')
+    expect(StyleSheet.flatten(surface.props.style).pointerEvents).toBe('none')
 
     measureSheet()
 
     const measured = screen.getByTestId('sheet')
     expect(StyleSheet.flatten(measured.props.style).opacity).not.toBe(0)
-    expect(measured.props.pointerEvents).toBe('auto')
+    expect(StyleSheet.flatten(measured.props.style).pointerEvents).toBe('auto')
   })
 
   it('reports itself as a modal dialog', async () => {

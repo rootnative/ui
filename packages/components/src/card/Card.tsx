@@ -4,6 +4,7 @@ import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { CardActions } from './CardActions'
 import { CardContent } from './CardContent'
@@ -110,13 +111,15 @@ export function Card({
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       {showElevationLayer ? (
         <Animated.View
-          pointerEvents="none"
-          style={[styles.elevationLayer, elevationShadowStyle]}
+          style={[
+            styles.elevationLayer,
+            elevationShadowStyle,
+            pointerEvents.none,
+          ]}
         />
       ) : null}
       <AnimatedPressable

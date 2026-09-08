@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -242,8 +243,10 @@ export function Dialog({
               // `testID` prop lands on — so it needs its own handle for tests
               // that assert settled entrance values.
               testID={testID === undefined ? undefined : `${testID}-layer`}
-              pointerEvents="box-none"
-              style={isFullscreen ? styles.fullscreenLayer : styles.centerLayer}
+              style={[
+                isFullscreen ? styles.fullscreenLayer : styles.centerLayer,
+                pointerEvents.boxNone,
+              ]}
               // MD3 enters a basic dialog with a scale-up + fade; the
               // fullscreen variant slides up. A true full-height slide would
               // need the measured surface height, which fights the safe-area

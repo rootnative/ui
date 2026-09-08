@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
 import { ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
+import { pointerEvents } from '../internal/pointerEvents'
 import {
   PRIMARY_INDICATOR_MIN_WIDTH,
   SCROLLABLE_EDGE_PADDING,
@@ -205,8 +206,7 @@ function TabIndicator({ x, width, style, testID }: TabIndicatorProps) {
   return (
     <Animated.View
       testID={testID}
-      pointerEvents="none"
-      style={[style, animatedStyle]}
+      style={[style, animatedStyle, pointerEvents.none]}
     />
   )
 }

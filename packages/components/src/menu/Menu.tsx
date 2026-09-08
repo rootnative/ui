@@ -18,6 +18,7 @@ import {
   ScrollView,
   View,
 } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
@@ -183,8 +184,7 @@ export function Menu({
         <MenuContext.Provider value={contextValue}>
           <View
             ref={layerRef}
-            style={styles.layer}
-            pointerEvents="box-none"
+            style={[styles.layer, pointerEvents.boxNone]}
             collapsable={false}
             onLayout={measure}
           >

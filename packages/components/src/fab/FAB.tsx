@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   createStyles,
@@ -134,21 +135,21 @@ export function FAB({
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
         style={[
           styles.focusRing,
           getFocusRingSizeStyle(styles, size, isExtended),
           animatedFocusRingStyle,
+          pointerEvents.none,
         ]}
       />
       {showElevationLayer ? (
         <Animated.View
-          pointerEvents="none"
           style={[
             styles.elevationLayer,
             getElevationLayerRadiusStyle(styles, size, isExtended),
             elevationLayerColorStyle,
             elevationShadowStyle,
+            pointerEvents.none,
           ]}
         />
       ) : null}

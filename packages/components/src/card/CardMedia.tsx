@@ -1,6 +1,7 @@
 import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { createCardRegionStyles } from './styles'
 import type { CardMediaProps } from './types'
 
@@ -37,7 +38,7 @@ export function CardMedia({
   return (
     <View {...props} style={[styles.media, sizeStyle, style]}>
       {isSized ? (
-        <View pointerEvents="box-none" style={styles.mediaFill}>
+        <View style={[styles.mediaFill, pointerEvents.boxNone]}>
           {children}
         </View>
       ) : (

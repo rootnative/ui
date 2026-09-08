@@ -17,6 +17,7 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import {
   createGroupStyles,
@@ -450,8 +451,11 @@ function ButtonGroupItemImpl({
   return (
     <View>
       <Animated.View
-        pointerEvents="none"
-        style={[itemStyles.focusRing, animatedFocusRingStyle]}
+        style={[
+          itemStyles.focusRing,
+          animatedFocusRingStyle,
+          pointerEvents.none,
+        ]}
       />
       <AnimatedPressable
         accessibilityRole={accessibilityRole}

@@ -5,6 +5,7 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 import { StyleSheet, View } from 'react-native'
 import { Button } from '../button'
 import { Divider } from '../divider'
@@ -214,12 +215,17 @@ describe('Menu — resolved placement', () => {
 
   beforeEach(() => {
     jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { pointerEvents?: string } },
+      this: { props?: { style?: StyleProp<ViewStyle> } },
       callback,
     ) {
       // The two measured views are the overlay layer and the anchor wrapper;
-      // only the layer absolute-fills with `box-none`.
-      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : ANCHOR
+      // only the layer absolute-fills with `box-none`. Read it out of the
+      // resolved style, not a prop — react-native-web deprecated the prop
+      // spelling, so the components carry the flag in `style`.
+      const rect =
+        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+          ? LAYER
+          : ANCHOR
       callback(rect.x, rect.y, rect.width, rect.height)
     })
   })
@@ -278,10 +284,13 @@ describe('Menu — settled entrance', () => {
 
   function mockMeasure() {
     jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { pointerEvents?: string } },
+      this: { props?: { style?: StyleProp<ViewStyle> } },
       callback,
     ) {
-      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : ANCHOR
+      const rect =
+        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+          ? LAYER
+          : ANCHOR
       callback(rect.x, rect.y, rect.width, rect.height)
     })
   }

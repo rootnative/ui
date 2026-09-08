@@ -4,6 +4,7 @@ import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Image, Platform, Pressable, Text, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
 import type { AvatarProps, AvatarSize } from './types'
@@ -173,8 +174,7 @@ export function Avatar({
       ]}
     >
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       {isDisabled ? (
         <View style={styles.disabledContent}>{content}</View>

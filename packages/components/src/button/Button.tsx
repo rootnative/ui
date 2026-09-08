@@ -9,6 +9,7 @@ import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Platform, Pressable, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
+import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -183,16 +184,15 @@ export function Button({
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       {showElevationLayer ? (
         <Animated.View
-          pointerEvents="none"
           style={[
             styles.elevationLayer,
             animatedElevationRadiusStyle,
             elevationShadowStyle,
+            pointerEvents.none,
           ]}
         />
       ) : null}

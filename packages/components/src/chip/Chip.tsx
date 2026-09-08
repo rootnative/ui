@@ -23,6 +23,7 @@ import {
   type TextStyle,
 } from 'react-native'
 import { elevationShadowConfig } from '../internal/elevationShadow'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -330,16 +331,15 @@ export function Chip(props: ChipProps) {
   return (
     <View style={styles.wrapper}>
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       {showElevationLayer ? (
         <Animated.View
-          pointerEvents="none"
           style={[
             styles.elevationLayer,
             animatedElevationRadiusStyle,
             elevationShadowStyle,
+            pointerEvents.none,
           ]}
         />
       ) : null}

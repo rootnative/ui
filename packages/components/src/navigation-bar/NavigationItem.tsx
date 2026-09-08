@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { StyleProp, TextStyle } from 'react-native'
 import { Pressable, Text, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -141,17 +142,22 @@ export function NavigationItem({
       <Animated.View style={contentStyle}>
         <View style={styles.pill}>
           <Animated.View
-            pointerEvents="none"
             testID={testID === undefined ? undefined : `${testID}-indicator`}
-            style={[styles.indicator, animatedIndicatorStyle]}
+            style={[
+              styles.indicator,
+              animatedIndicatorStyle,
+              pointerEvents.none,
+            ]}
           />
           <Animated.View
-            pointerEvents="none"
-            style={[styles.stateLayer, stateLayerStyle]}
+            style={[styles.stateLayer, stateLayerStyle, pointerEvents.none]}
           />
           <Animated.View
-            pointerEvents="none"
-            style={[styles.focusRing, animatedFocusRingStyle]}
+            style={[
+              styles.focusRing,
+              animatedFocusRingStyle,
+              pointerEvents.none,
+            ]}
           />
           {icon ? <View aria-hidden>{icon}</View> : null}
         </View>

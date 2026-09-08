@@ -5,6 +5,7 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { act, fireEvent, screen } from '@testing-library/react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
 import { PortalHost } from '../portal/PortalHost'
@@ -246,7 +247,10 @@ describe('Tooltip — rich', () => {
 
   it('takes touches, unlike a plain tooltip', () => {
     renderRich()
-    expect(screen.getByTestId('tooltip').props.pointerEvents).toBe('auto')
+    expect(
+      StyleSheet.flatten(screen.getByTestId('tooltip').props.style)
+        .pointerEvents,
+    ).toBe('auto')
   })
 
   it('warns when a plain tooltip is given rich content', () => {
@@ -349,7 +353,7 @@ describe('Tooltip — tokens and accessibility', () => {
   it('reports role="tooltip" and stays out of the way of touches', () => {
     const surface = open(<PressableAnchor />)
     expect(surface.props.role).toBe('tooltip')
-    expect(surface.props.pointerEvents).toBe('none')
+    expect(StyleSheet.flatten(surface.props.style).pointerEvents).toBe('none')
     expect(screen.queryByLabelText('Close tooltip')).toBeNull()
   })
 })
@@ -364,12 +368,17 @@ describe('Tooltip — resolved placement', () => {
   beforeEach(() => {
     anchorRect = { x: 100, y: 300, width: 40, height: 40 }
     jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { pointerEvents?: string } },
+      this: { props?: { style?: StyleProp<ViewStyle> } },
       callback,
     ) {
       // Only the overlay layer absolute-fills with `box-none`; the other
-      // measured view is the wrapper around the anchor.
-      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : anchorRect
+      // measured view is the wrapper around the anchor. The flag is read out
+      // of the resolved style, not a prop — react-native-web deprecated the
+      // prop spelling, so the components carry it in `style`.
+      const rect =
+        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+          ? LAYER
+          : anchorRect
       callback(rect.x, rect.y, rect.width, rect.height)
     })
   })
@@ -420,10 +429,13 @@ describe('Tooltip — settled entrance', () => {
 
   function mockMeasure() {
     jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { pointerEvents?: string } },
+      this: { props?: { style?: StyleProp<ViewStyle> } },
       callback,
     ) {
-      const rect = this.props?.pointerEvents === 'box-none' ? LAYER : ANCHOR
+      const rect =
+        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+          ? LAYER
+          : ANCHOR
       callback(rect.x, rect.y, rect.width, rect.height)
     })
   }

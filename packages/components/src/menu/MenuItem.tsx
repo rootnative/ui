@@ -4,6 +4,7 @@ import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useMenuContext } from './context'
 import { MENU_ITEM_ICON_SIZE, createMenuItemStyles } from './styles'
@@ -92,8 +93,7 @@ export function MenuItem({
       ]}
     >
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <View style={contentStyle}>
         {/* The wrapper stays conditional: `contentStyle` lays its children out

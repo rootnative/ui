@@ -345,3 +345,13 @@ describe('decorative overlays do not intercept pointer events', () => {
     expect(none.length).toBeGreaterThan(0)
   })
 })
+
+/**
+ * The prop spelling of `pointerEvents` is forbidden by `react/forbid-component-props`
+ * in `eslint.config.mjs`, not by a test here. A test cannot do it: RNW's
+ * `props.pointerEvents is deprecated` goes through `warnOnce`, so only the
+ * first offender in a process is ever observable and every component rendered
+ * after it passes for free. Fault injection confirmed exactly that — putting
+ * the prop back on Button left this file green, because earlier cases in it
+ * had already burned the warning.
+ */

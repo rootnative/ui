@@ -8,6 +8,7 @@ import {
 } from 'react'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import { View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { PortalContext } from './context'
 import { DEFAULT_PORTAL_HOST } from './layers'
 import { PortalStore } from './store'
@@ -40,15 +41,13 @@ function PortalOutlet({ store, hostName, style, ...rest }: PortalOutletProps) {
   return (
     <View
       {...rest}
-      style={[styles.overlay, style]}
-      pointerEvents="box-none"
+      style={[styles.overlay, style, pointerEvents.boxNone]}
       collapsable={false}
     >
       {records.map((record) => (
         <View
           key={record.id}
-          style={styles.overlay}
-          pointerEvents="box-none"
+          style={[styles.overlay, pointerEvents.boxNone]}
           collapsable={false}
         >
           {record.node}

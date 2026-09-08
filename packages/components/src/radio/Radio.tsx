@@ -7,6 +7,7 @@ import {
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
@@ -160,12 +161,15 @@ export function Radio({
       ]}
     >
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <Animated.View
-        pointerEvents="none"
-        style={[styles.stateLayer, haloOpacityStyle, haloColorStyle]}
+        style={[
+          styles.stateLayer,
+          haloOpacityStyle,
+          haloColorStyle,
+          pointerEvents.none,
+        ]}
       />
       <Animated.View style={[styles.outer, outerBorderStyle, outerOverride]}>
         <Animated.View

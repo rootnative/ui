@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import type { LayoutChangeEvent, StyleProp, TextStyle } from 'react-native'
 import { Pressable, Text, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { TAB_ICON_SIZE, createTabStyles } from './styles'
 import type { TabColors } from './styles'
@@ -128,8 +129,7 @@ export function Tab({
       ]}
     >
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <View style={contentStyle} onLayout={handleContentLayout}>
         {icon ? <View aria-hidden>{icon}</View> : null}

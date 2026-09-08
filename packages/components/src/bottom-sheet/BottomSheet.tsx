@@ -14,6 +14,7 @@ import type {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AccessibilityActionEvent, LayoutChangeEvent } from 'react-native'
 import { BackHandler, Platform, Pressable, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -377,8 +378,7 @@ export function BottomSheet({
   return (
     <Portal priority={PORTAL_LAYERS.sheet} hostName={hostName}>
       <View
-        style={styles.layer}
-        pointerEvents="box-none"
+        style={[styles.layer, pointerEvents.boxNone]}
         onLayout={onLayerLayout}
       >
         <Presence>
@@ -411,8 +411,7 @@ export function BottomSheet({
               // No handle of its own: this layer only animates on the way out.
               // The entrance is the spring on `dragY` below, which lands on the
               // surface that already carries the consumer's `testID`.
-              pointerEvents="box-none"
-              style={styles.sheetLayer}
+              style={[styles.sheetLayer, pointerEvents.boxNone]}
               initial={{ translateY: 0 }}
               animate={{ translateY: 0 }}
               exit={{ translateY: exitDistance }}
@@ -428,10 +427,10 @@ export function BottomSheet({
                   drag.animatedStyle,
                   entered ? null : styles.surfaceUnmeasured,
                   style,
+                  // Invisible until measured, so it must not swallow touches
+                  // during that frame either.
+                  entered ? pointerEvents.auto : pointerEvents.none,
                 ]}
-                // Invisible until measured, so it must not swallow touches
-                // during that frame either.
-                pointerEvents={entered ? 'auto' : 'none'}
                 onLayout={onSurfaceLayout}
                 role={isModal ? 'dialog' : undefined}
                 aria-modal={isModal || undefined}

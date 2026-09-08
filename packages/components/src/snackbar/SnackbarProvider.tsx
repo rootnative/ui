@@ -1,6 +1,7 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { useEffect, useMemo, useSyncExternalStore } from 'react'
+import { pointerEvents } from '../internal/pointerEvents'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -57,8 +58,7 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
           the snackbar surface itself is tappable. */}
       <SafeAreaView
         edges={['bottom']}
-        style={styles.layer}
-        pointerEvents="box-none"
+        style={[styles.layer, pointerEvents.boxNone]}
         // Fixed handle, like `snackbar-layer` below: the snackbar API carries no
         // `testID` down because the queue is driven by `show()` rather than by
         // props, and `bottomOffset` lands on this node's padding, not on the

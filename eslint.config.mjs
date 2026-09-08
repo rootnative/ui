@@ -63,6 +63,31 @@ export default [
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
       'react/jsx-no-duplicate-props': ['warn', { ignoreCase: true }],
+      // `pointerEvents` belongs in `style`, never as a prop. react-native-web
+      // deprecated the prop form and warns once per process, so one component
+      // using it prints `props.pointerEvents is deprecated` in the console of
+      // every app that renders it. React Native has read the key from `style`
+      // since 0.71, and react-native-web's own implementation translated the
+      // prop into exactly that style — so the two are equivalent and only the
+      // prop spelling is noisy.
+      //
+      // A lint rule rather than a test: the warning is `warnOnce`-guarded, so
+      // only the first offender in a process is ever observable and a
+      // per-component test passes for everyone after it. Use the shared table
+      // in `packages/components/src/internal/pointerEvents.ts`, appended last
+      // in the style array — that is where the prop used to land.
+      'react/forbid-component-props': [
+        'error',
+        {
+          forbid: [
+            {
+              propName: 'pointerEvents',
+              message:
+                'Put pointerEvents in `style`, not in a prop — react-native-web deprecated the prop form. Use the table in internal/pointerEvents.ts, last in the style array.',
+            },
+          ],
+        },
+      ],
 
       // React Native
       'react-native/no-raw-text': 'off',

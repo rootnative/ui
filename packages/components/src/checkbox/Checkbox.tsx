@@ -8,6 +8,7 @@ import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
   CHECKBOX_ICON_SIZE,
@@ -201,19 +202,22 @@ export function Checkbox({
       ]}
     >
       <Animated.View
-        pointerEvents="none"
-        style={[styles.focusRing, animatedFocusRingStyle]}
+        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
       <Animated.View
-        pointerEvents="none"
-        style={[styles.stateLayer, haloOpacityStyle, haloColorStyle]}
+        style={[
+          styles.stateLayer,
+          haloOpacityStyle,
+          haloColorStyle,
+          pointerEvents.none,
+        ]}
       />
       <Animated.View
         testID="checkbox-box"
         style={[styles.box, boxBackgroundStyle, boxBorderStyle, boxOverride]}
       >
         {isIndeterminate ? (
-          <Animated.View pointerEvents="none" style={animatedIconStyle}>
+          <Animated.View style={[animatedIconStyle, pointerEvents.none]}>
             <View
               testID="checkbox-indeterminate-mark"
               style={indeterminateMarkStyle}
@@ -222,8 +226,7 @@ export function Checkbox({
         ) : isChecked ? (
           <Animated.View
             aria-hidden
-            pointerEvents="none"
-            style={animatedIconStyle}
+            style={[animatedIconStyle, pointerEvents.none]}
           >
             {renderIcon(
               checkIcon,

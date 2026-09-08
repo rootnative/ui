@@ -6,6 +6,7 @@ import {
 } from '@rootnative/inertia/reanimated'
 import type { LayoutChangeEvent, TextStyle, ViewStyle } from 'react-native'
 import { Text } from 'react-native'
+import { pointerEvents } from '../internal/pointerEvents'
 import {
   PRESSED_HALF,
   REST_HALF,
@@ -85,8 +86,13 @@ export function SegmentSlot({
 
   return (
     <Animated.View
-      pointerEvents="none"
-      style={[baseStyle, kindStyle, disabledStyle, animatedStyle]}
+      style={[
+        baseStyle,
+        kindStyle,
+        disabledStyle,
+        animatedStyle,
+        pointerEvents.none,
+      ]}
     />
   )
 }
@@ -122,8 +128,13 @@ export function StopIndicatorSlot({
 
   return (
     <Animated.View
-      pointerEvents="none"
-      style={[baseStyle, kindStyle, disabledStyle, animatedStyle]}
+      style={[
+        baseStyle,
+        kindStyle,
+        disabledStyle,
+        animatedStyle,
+        pointerEvents.none,
+      ]}
     />
   )
 }
@@ -155,8 +166,7 @@ export function ThumbSlot({
 
   return (
     <Animated.View
-      pointerEvents="none"
-      style={[baseStyle, disabledStyle, animatedStyle]}
+      style={[baseStyle, disabledStyle, animatedStyle, pointerEvents.none]}
     />
   )
 }
@@ -196,9 +206,8 @@ export function ValueLabelSlot({
 
   return (
     <Animated.View
-      pointerEvents="none"
       onLayout={onLayout}
-      style={[baseStyle, positionStyle, animatedStyle]}
+      style={[baseStyle, positionStyle, animatedStyle, pointerEvents.none]}
     >
       <Text style={textStyle} numberOfLines={1}>
         {text}
@@ -244,7 +253,7 @@ export function StateLayerSlot({
     [centerX, HOVER_OPACITY, FOCUS_OPACITY, PRESS_OPACITY],
   )
   return (
-    <Animated.View pointerEvents="none" style={[baseStyle, animatedStyle]} />
+    <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
 }
 
@@ -269,7 +278,7 @@ export function FocusRingSlot({
     [centerX],
   )
   return (
-    <Animated.View pointerEvents="none" style={[baseStyle, animatedStyle]} />
+    <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
 }
 
@@ -319,8 +328,13 @@ export function TickSlot({
 
   return (
     <Animated.View
-      pointerEvents="none"
-      style={[baseStyle, disabledStyle, positionStyle, animatedStyle]}
+      style={[
+        baseStyle,
+        disabledStyle,
+        positionStyle,
+        animatedStyle,
+        pointerEvents.none,
+      ]}
     />
   )
 }
