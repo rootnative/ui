@@ -21,7 +21,7 @@ Then press `i` for iOS, `a` for Android, or `w` for web.
 
 ## What's Included
 
-- Expo SDK 54 with Expo Router
+- Expo SDK 57 with Expo Router
 - `@rootnative/core` — Theme system with Material Design 3 tokens
 - `@rootnative/components` — UI components (Button, Card, Typography, and more)
 - ThemeProvider already wired up in the root layout
@@ -35,7 +35,6 @@ app/
 └── index.tsx         # Home screen with example components
 assets/               # App icons and splash screen
 app.json              # Expo config
-babel.config.js
 package.json
 tsconfig.json
 CLAUDE.md             # Points AI agents at the RootNative LLM docs
