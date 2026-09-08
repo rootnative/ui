@@ -48,6 +48,12 @@ jobs:
       - name: Inertia pin check
         run: pnpm run check:inertia-pins
 
+      # The templates are not workspace members, so no install, typecheck or
+      # test run ever reads their pins. They sat a whole Expo SDK behind the
+      # library and every gate stayed green. Needs no build.
+      - name: Template pin check
+        run: pnpm run check:template-pins
+
       # The mark and the docs accent tokens hold the same hex values in two
       # files; the palette comment declares the CSS as the follower and nothing
       # checked it, so both themes had drifted by one rung of the ramp while the

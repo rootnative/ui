@@ -26,6 +26,7 @@
     "api:check": "pnpm run build && npx tsx scripts/build-api-surface.ts --check",
     "docs:check": "npx tsx scripts/check-docs.ts",
     "check:inertia-pins": "npx tsx scripts/check-inertia-pins.ts",
+    "check:template-pins": "npx tsx scripts/check-template-pins.ts",
     "check:singletons": "npx tsx scripts/check-singletons.ts",
     "check:worklets": "npx tsx scripts/check-worklets.ts",
     "check:brand-accent": "npx tsx scripts/check-brand-accent.ts",

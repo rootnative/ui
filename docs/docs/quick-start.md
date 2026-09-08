@@ -55,17 +55,19 @@ For `blank`:
 ```
 my-app/
 ├── App.tsx               # Home screen, wrapped in ThemeProvider
-├── index.js              # Expo entry point (registerRootComponent)
+├── index.ts              # Expo entry point (registerRootComponent)
 ├── assets/               # Placeholder app icons and splash screen
 ├── app.json              # Expo config with your project name
-├── babel.config.js
 ├── package.json
 ├── tsconfig.json
 ├── CLAUDE.md             # Points AI agents at the RootNative LLM docs
 └── .gitignore
 ```
 
-`with-router` swaps `App.tsx` and `index.js` for an `app/` directory holding
+There is no `babel.config.js`. Expo SDK 57 applies `babel-preset-expo` by
+default, so the templates ship no Babel config.
+
+`with-router` swaps `App.tsx` and `index.ts` for an `app/` directory holding
 `_layout.tsx` (the root layout) and `index.tsx` (the home screen).
 
 ### Where ThemeProvider lives
