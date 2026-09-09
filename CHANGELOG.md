@@ -103,6 +103,48 @@ first offender in a process is observable, so a per-component test passes for
 every component rendered after it. Fault injection confirmed that directly —
 putting the prop back on `Button` left the web suite green, and fails lint.
 
+### One shared `AnimatedPressable`, and six worklets fold into `useInterpolatedStyle`
+
+Thirteen components each declared their own
+`const AnimatedPressable = Animated.createAnimatedComponent(Pressable)`.
+`createAnimatedComponent` builds a new wrapper class per call, so the package
+shipped thirteen distinct classes for one base component. They now share
+`internal/AnimatedPressable.ts`, and the built bundle carries one definition in
+one chunk.
+
+**The npm package is what gains here; a CLI-installed project is unchanged.**
+The installer flattens `../internal/*` into each consuming component's own
+directory, so `rootnative add button chip switch` still writes one
+`AnimatedPressable.ts` per component. That self-containment is the point of the
+copy-paste path, not an oversight. What does change for a CLI consumer is the
+file list: those thirteen components each ship one more file, and `rootnative
+update` rewrites the component that imports it.
+
+Separately, six `useAnimatedStyle` blocks driven by a *single* progress value
+move to `useInterpolatedStyle` — Button's elevation radius, three plain-opacity
+styles in Switch, TextField's hover layer, and the Slider thumb. Nothing renders
+differently. Twenty-seven hand-rolled worklets remain, each of which either
+mixes two or more driving values or needs a key `useInterpolatedStyle` cannot
+express.
+
+**The Slider thumb needed `extrapolate: 'extend'`, and without it this would
+have been a silent regression.** `useInterpolatedStyle` defaults to `'clamp'`;
+a hand-rolled `interpolate` defaults to `'extend'`. `pressed` rides
+`spring-fast-spatial`, which is underdamped by design and overshoots both ends,
+and `evalEdge` extrapolates that same value unclamped for the track segments and
+the stop indicators. A clamped thumb would have drifted out of step with its own
+track for the length of every settle.
+
+`Slider.test.tsx` pins the option rather than the arithmetic, and the reason is
+worth knowing before writing any similar test: `@rootnative/inertia/jest-setup`
+stubs `interpolate` as `value >= 1 ? last : first`. That is a binary step which
+ignores the input range and the extrapolation config, so a measured width reads
+identically under `'extend'` and `'clamp'` and an assertion on one would pass
+against either. Validated by fault injection — dropping the option fails the
+case, and only that case.
+
+No public API change: `internal/` is not exported and `api:check` is unchanged.
+
 ### Both templates ship Expo SDK 57
 
 `rootnative create` now scaffolds on `expo ~57.0.20` with React Native
