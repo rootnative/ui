@@ -1,7 +1,7 @@
 # RootNative UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
-> Versions: `@rootnative/core` 0.0.0-alpha.14 · `@rootnative/components` 0.0.0-alpha.14 · `@rootnative/icons` 0.0.0-alpha.14 · `@rootnative/cli` 0.0.0-alpha.14
+> Versions: `@rootnative/core` 0.0.0-alpha.15 · `@rootnative/components` 0.0.0-alpha.15 · `@rootnative/icons` 0.0.0-alpha.15 · `@rootnative/cli` 0.0.0-alpha.15
 > Requirements: react-native >=0.83.0 <0.87.0, react >=19.2.3 <20.0.0, Expo SDK 57
 > Peer deps: `react-native-safe-area-context >=4.0.0`, `react-native-reanimated >=4.5.0 <4.6.0`, `react-native-worklets >=0.10.0 <0.11.0` (Reanimated 4 runtime — Expo SDK 57 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
 > Optional peer deps: `@expo/vector-icons >=14.0.0` (only needed for icon props)
@@ -216,7 +216,7 @@ Creates `rootnative.json`:
   "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "v0.0.0-alpha.14"
+  "registryVersion": "v0.0.0-alpha.15"
 }
 ```
 
@@ -2059,7 +2059,7 @@ Per-call elements/functions always take precedence over the resolver. `@expo/vec
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.14)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.15)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
 
