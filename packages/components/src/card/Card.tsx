@@ -2,7 +2,8 @@ import { useTheme } from '@rootnative/core'
 import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { elevationShadowConfig } from '../internal/elevationShadow'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -11,8 +12,6 @@ import { CardContent } from './CardContent'
 import { CardMedia } from './CardMedia'
 import { createStyles, getResolvedCardColors } from './styles'
 import type { CardProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Card({
   children,

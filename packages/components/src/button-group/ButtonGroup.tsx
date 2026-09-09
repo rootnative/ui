@@ -11,12 +11,12 @@ import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useMemo, useState, type ReactElement } from 'react'
 import {
   Platform,
-  Pressable,
   Text,
   View,
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import {
@@ -33,8 +33,6 @@ import type {
   ButtonGroupSize,
   ButtonGroupVariant,
 } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function ButtonGroup(props: ButtonGroupProps): ReactElement {
   const {

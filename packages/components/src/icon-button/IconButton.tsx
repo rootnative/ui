@@ -6,7 +6,8 @@ import {
 } from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Pressable, View } from 'react-native'
+import { View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -23,8 +24,6 @@ import {
   getIconButtonWidth,
 } from './styles'
 import type { IconButtonProps, IconButtonVariant } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 function getIconColor(
   variant: IconButtonVariant,

@@ -1,5 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useShadow } from '@rootnative/inertia'
+import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
 import {
   Animated,
   interpolate,
@@ -7,7 +7,8 @@ import {
 } from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Platform, Pressable, Text, View } from 'react-native'
+import { Platform, Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { elevationShadowConfig } from '../internal/elevationShadow'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
@@ -22,8 +23,6 @@ import {
   getResolvedButtonColors,
 } from './styles'
 import type { ButtonProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Button({
   children,
@@ -153,13 +152,9 @@ export function Button({
   // shadow's shape matches the container's. Two driving values (hover for the
   // shadow, morph for the radius) on one node — hence a separate style rather
   // than folding the radius into `useShadow`, which only covers shadow keys.
-  const animatedElevationRadiusStyle = useAnimatedStyle(() => ({
-    borderRadius: interpolate(
-      morphProgress.value,
-      [0, 1],
-      [restRadius, pressedRadius],
-    ),
-  }))
+  const animatedElevationRadiusStyle = useInterpolatedStyle(morphProgress, {
+    borderRadius: [restRadius, pressedRadius],
+  })
 
   const resolvedIconColor = useMemo(
     () =>

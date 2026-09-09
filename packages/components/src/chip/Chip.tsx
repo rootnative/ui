@@ -15,13 +15,13 @@ import type { IconSource } from '@rootnative/utils'
 import { useMemo, type ReactNode } from 'react'
 import {
   Platform,
-  Pressable,
   Text,
   View,
   type PressableProps,
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { elevationShadowConfig } from '../internal/elevationShadow'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -35,8 +35,6 @@ import {
   getResolvedChipColors,
 } from './styles'
 import type { ChipProps, ChipVariant } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 type ChipImplProps = Omit<PressableProps, 'children'> & {
   children: string

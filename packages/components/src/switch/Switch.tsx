@@ -2,6 +2,7 @@ import { useIconResolver, useTheme } from '@rootnative/core'
 import {
   resolveTransition,
   useColorTransition,
+  useInterpolatedStyle,
   useMotionValue,
   useNamedTransitions,
   useShouldReduceMotion,
@@ -17,7 +18,8 @@ import {
 } from '@rootnative/inertia/reanimated'
 import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -35,8 +37,6 @@ import {
   getResolvedColors,
 } from './styles'
 import type { SwitchProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 const THUMB_TRANSLATE_X =
   SWITCH_TRACK_WIDTH - SWITCH_TRACK_PADDING * 2 - SWITCH_THUMB_ON_SIZE
@@ -241,16 +241,18 @@ export function Switch({
 
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: states.focusVisible.value,
-  }))
+  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
+    opacity: [0, 1],
+  })
 
-  const animatedSelectedIconStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-  }))
-  const animatedUnselectedIconStyle = useAnimatedStyle(() => ({
-    opacity: 1 - progress.value,
-  }))
+  // The two icons cross-fade on one progress value: the selected icon follows
+  // it, the unselected icon runs the inverted range.
+  const animatedSelectedIconStyle = useInterpolatedStyle(progress, {
+    opacity: [0, 1],
+  })
+  const animatedUnselectedIconStyle = useInterpolatedStyle(progress, {
+    opacity: [1, 0],
+  })
 
   const disabledIconColor = useMemo(
     () => resolveColorFromStyle(styles.disabledIconColor),

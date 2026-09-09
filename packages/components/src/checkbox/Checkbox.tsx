@@ -7,7 +7,8 @@ import {
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform, Pressable, View } from 'react-native'
+import { Platform, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
@@ -16,8 +17,6 @@ import {
   getResolvedCheckboxColors,
 } from './styles'
 import type { CheckboxProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Checkbox({
   style,

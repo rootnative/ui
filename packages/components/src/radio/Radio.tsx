@@ -6,13 +6,12 @@ import {
 } from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform, Pressable } from 'react-native'
+import { Platform } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function Radio({
   style,

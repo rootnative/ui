@@ -3,14 +3,13 @@ import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useMenuContext } from './context'
 import { MENU_ITEM_ICON_SIZE, createMenuItemStyles } from './styles'
 import type { MenuItemProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 export function MenuItem({
   label,

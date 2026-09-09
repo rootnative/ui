@@ -3,7 +3,8 @@ import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { elevationShadowConfig } from '../internal/elevationShadow'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -14,8 +15,6 @@ import {
   getResolvedFABColors,
 } from './styles'
 import type { FABProps, FABSize } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 function getFocusRingSizeStyle(
   styles: ReturnType<typeof createStyles>,

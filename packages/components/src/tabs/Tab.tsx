@@ -4,14 +4,13 @@ import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
 import type { LayoutChangeEvent, StyleProp, TextStyle } from 'react-native'
-import { Pressable, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { TAB_ICON_SIZE, createTabStyles } from './styles'
 import type { TabColors } from './styles'
 import type { TabItem, TabsVariant } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 /** What the row needs from each tab to place the indicator. */
 export interface TabMeasurement {

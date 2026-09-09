@@ -1,4 +1,5 @@
 import { useTheme } from '@rootnative/core'
+import { useInterpolatedStyle } from '@rootnative/inertia'
 import {
   Animated,
   type SharedValue,
@@ -153,16 +154,19 @@ export function ThumbSlot({
   baseStyle,
   disabledStyle,
 }: ThumbSlotProps) {
-  const animatedStyle = useAnimatedStyle(() => {
-    const w =
-      SLIDER_THUMB_WIDTH +
-      (SLIDER_THUMB_WIDTH_PRESSED - SLIDER_THUMB_WIDTH) * pressed.value
-    return {
-      left: centerX - w / 2,
-      width: w,
-      borderRadius: w / 2,
-    }
-  }, [centerX])
+  // `extend`, not the default `clamp`: `pressed` rides `spring-fast-spatial`,
+  // which is underdamped and overshoots both ends. `evalEdge` extrapolates the
+  // same value unclamped for the segments and the stop indicators, so clamping
+  // here alone would desync the thumb from the track it sits in.
+  const animatedStyle = useInterpolatedStyle(
+    pressed,
+    {
+      left: [centerX - REST_HALF, centerX - PRESSED_HALF],
+      width: [SLIDER_THUMB_WIDTH, SLIDER_THUMB_WIDTH_PRESSED],
+      borderRadius: [REST_HALF, PRESSED_HALF],
+    },
+    { extrapolate: 'extend' },
+  )
 
   return (
     <Animated.View

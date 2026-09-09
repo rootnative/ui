@@ -196,9 +196,9 @@ export function TextField({
     }
   })
 
-  const animatedHoverLayerStyle = useAnimatedStyle(() => ({
-    opacity: hovered.value * hoverOpacity,
-  }))
+  const animatedHoverLayerStyle = useInterpolatedStyle(hovered, {
+    opacity: [0, hoverOpacity],
+  })
 
   // Label start: 16dp container padding + leading icon space (12dp inset + 24dp + 16dp gap)
   const labelStart =

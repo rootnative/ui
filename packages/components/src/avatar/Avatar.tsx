@@ -3,13 +3,12 @@ import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Image, Platform, Pressable, Text, View } from 'react-native'
+import { Image, Platform, Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
 import type { AvatarProps, AvatarSize } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 // Minimum touch target for interactive avatars (WCAG / MD3).
 const MIN_TOUCH_TARGET = 48

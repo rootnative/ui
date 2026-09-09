@@ -2,13 +2,12 @@ import { useTheme } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
-import { Platform, Pressable, Text, View } from 'react-native'
+import { Platform, Text, View } from 'react-native'
+import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createListItemStyles } from './styles'
 import type { ListItemLines, ListItemProps } from './types'
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
 function getLines(
   supportingText?: string,

@@ -9,7 +9,72 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.15 — 2026-09-09
+
+The Expo SDK 57 release. Every package moves to the SDK 57 runtime band and
+stops claiming SDK 54, so an app that stays on SDK 54 stays on
+`0.0.0-alpha.14`. No one set of ranges serves both bands.
+
+### Breaking: the peer ranges are narrowed to the Expo SDK 57 band
+
+`core`, `components` and `icons` declare `react >=19.2.3 <20.0.0` and
+`react-native >=0.83.0 <0.87.0`. `components` also narrows
+`react-native-reanimated` to `>=4.5.0 <4.6.0` and `react-native-worklets` to
+`>=0.10.0 <0.11.0`. The floors they replace — `react >=18.0.0`,
+`react-native >=0.72.0`, `react-native-reanimated >=4.0.0` and
+`react-native-worklets >=0.5.0` — were never installable: `components` depends
+on `@rootnative/inertia`, whose own floor was already `react >=19.0.0` with
+`react-native >=0.81.0`, so npm rejected the advertised floor with `ERESOLVE`.
+
+The band cannot be wider. Each peer range resolves on its own, so any set that
+admits both SDK 54 (`react-native 0.81` with Reanimated `4.1`) and SDK 57
+(`react-native 0.86` with Reanimated `4.5`) also admits `react-native 0.81`
+with Reanimated `4.6`, which cannot install. A range promises every combination
+it permits, not only the combinations that were tested. `@rootnative/inertia`
+`0.0.11` narrowed its own ranges for that reason, and this release tracks it so
+the two cannot disagree.
+
+Migration: move the app to Expo SDK 57 — React `19.2.3`, React Native
+`0.86.3`, Reanimated `4.5.1`, Worklets `0.10.1`. A project on SDK 54 stays on
+`0.0.0-alpha.14`. A project that runs Jest also needs
+`@react-native/jest-preset` at the version that matches its `react-native`:
+React Native `0.86` moved the preset into that package and left a shim that
+declares it as an optional peer, which no package manager installs.
+
+The claim is gated rather than reviewed. `compat.yml` packs the `components`
+tarball and installs it into every Expo SDK fixture in `rootnative/sdk-compat`
+with `enforce-range: true`, on every push to `main` and every pull request that
+touches `packages/**`. The test suite in this repository says nothing about
+what a consumer can install, and that gap is what let the old floors ship.
+
+### `@rootnative/inertia` floor moves to `0.0.11`
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges are
+now `>=0.0.11 <0.1.0`, the dev, example and template pins are `0.0.11` exact,
+and the registry's derived floor follows. `0.0.11` is the release whose own
+peer ranges match the SDK 57 band. `0.0.10` declares `react-native >=0.81.0`
+and `react-native-reanimated >=4.0.0`, which a fresh install can reject.
+
+`0.0.11` also fixes a crash and exports three style types. The crash was a
+keyframe array — `animate={{ translateY: [0, -8, 0] }}` — taking the whole
+render down under reduced motion. The types are `ColorStyle`, `TranslateStyle`
+and `ShadowStyle`. This library writes no keyframe array and names none of the
+three: every call of `useColorTransition`, `useColorCascade` and `useShadow`
+spreads the style into a `style` array, where inference is enough. So the
+raised floor is a requirement of the SDK band rather than of anything the
+library consumes.
+
+### `@expo/vector-icons` and `react-native-safe-area-context` are required peers
+
+Both were marked optional in `peerDependenciesMeta`, and no package manager
+installs an optional peer. The library imports both **statically**, so no
+runtime fallback exists to make them skippable: Metro builds its module graph
+by scanning for literal import calls and fails with `Unable to resolve module`
+before any fallback could run. The comment in `src/safe-area.tsx` records why
+the lazy `require()` shape does not survive the build. The flags are gone, so
+npm and pnpm now install both. `react-native-svg` was already required, and the
+installation page states the status of every peer in one column. Yarn classic
+installs no peers at all, so a Yarn project still adds the list by hand.
 
 ### `pointerEvents` moved from a prop to a style
 
@@ -37,6 +102,39 @@ lint rule rather than a test because the warning is `warnOnce`-guarded: only the
 first offender in a process is observable, so a per-component test passes for
 every component rendered after it. Fault injection confirmed that directly —
 putting the prop back on `Button` left the web suite green, and fails lint.
+
+### Both templates ship Expo SDK 57
+
+`rootnative create` now scaffolds on `expo ~57.0.20` with React Native
+`0.86.3`, Reanimated `4.5.1`, Worklets `0.10.1` and inertia `0.0.11`. SDK 57
+removed the legacy top-level `splash` key from `app.json`, so both templates
+declare the splash screen through the `expo-splash-screen` plugin, and
+`newArchEnabled` / `edgeToEdgeEnabled` are gone because the SDK defaults
+them. Android's predictive back gesture is switched off explicitly with
+`predictiveBackGestureEnabled: false`. `babel.config.js` is gone as well — it
+held nothing but `babel-preset-expo`. The blank template's entry point is
+`index.ts`.
+
+The icon, adaptive icon, favicon and splash mark in both templates now carry
+the RootNative mark. `scripts/build-brand.mjs` renders them into the template
+asset directories as well as the example app, from one source, so a scaffolded
+project cannot drift from the example it is modelled on.
+
+### Two guards the release path was missing
+
+`pnpm run check:template-pins` compares every template pin against the
+installed Expo SDK and the `components` peer ranges. The templates are not
+workspace members, so no install, typecheck or test run ever reads their pins:
+they sat a whole Expo SDK behind the library while every gate stayed green.
+
+`pnpm run registry:check` regenerates the registry and fails on drift.
+`check:inertia-pins` reads the registry but compares only the inertia floor in
+each entry, so the `files` lists were unguarded — 21 of 29 were missing
+`internal/pointerEvents.ts` after the import was added without re-running the
+generator. The registry is what `rootnative add` copies into a consumer
+project, so a stale list hands them a component with a missing import.
+
+Both guards run in `ci.yml` and in `release.yml`.
 
 ## 0.0.0-alpha.14 — 2026-08-22
 
