@@ -222,6 +222,8 @@
         "Typography",
         "TypographyProps",
         "TypographyVariant",
+        "elevationBoxShadow",
+        "elevationShadowConfig",
         "snackbarOffsetFor",
         "useSnackbar",
         "useSnackbarOffset"

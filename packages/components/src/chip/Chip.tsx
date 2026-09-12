@@ -21,8 +21,8 @@ import {
   type StyleProp,
   type TextStyle,
 } from 'react-native'
+import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
-import { elevationShadowConfig } from '../internal/elevationShadow'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'

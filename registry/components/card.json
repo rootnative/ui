@@ -10,9 +10,9 @@
     "packages/components/src/card/styles.ts",
     "packages/components/src/card/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
-    "packages/components/src/internal/elevationShadow.ts",
     "packages/components/src/internal/pointerEvents.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/elevation-shadow.ts"
   ],
   "utils": ["color", "elevation"],
   "componentDependencies": [],

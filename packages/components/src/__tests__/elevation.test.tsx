@@ -29,6 +29,7 @@ import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button'
 import { Card } from '../card'
 import { Chip } from '../chip'
+import { elevationBoxShadow, elevationShadowConfig } from '../elevation-shadow'
 import { FAB } from '../fab'
 
 type Style = Record<string, unknown>
@@ -238,5 +239,61 @@ describe('elevation is dropped where MD3 has none', () => {
   ])('$name paints no shadow', ({ ui }) => {
     renderWithTheme(ui)
     expect(shadowed()).toHaveLength(0)
+  })
+})
+
+/**
+ * `elevationShadowConfig` and `elevationBoxShadow` are public exports, so the
+ * platform split is a contract rather than an implementation detail. The four
+ * component cases above exercise it indirectly; these pin it directly, because
+ * a consumer can now call the helper on a node this file never renders.
+ *
+ * The mutual exclusion is the whole point. A config carrying `boxShadow`
+ * *and* the `shadow*` keys paints two shadows on RN 0.76+ new architecture,
+ * which is also why `theme.elevation.level*` has no `boxShadow` field — a
+ * token holding both shapes could not be handed to `useShadow` anywhere. The
+ * web half of this contract is in `web/elevation.web.test.tsx`.
+ */
+describe('elevationShadowConfig (native branch)', () => {
+  it('returns the shadow* keys and never boxShadow', () => {
+    const config = elevationShadowConfig(lightTheme.elevation.level2)
+
+    expect(config).toEqual({
+      shadowColor: lightTheme.elevation.level2.shadowColor,
+      shadowOffset: {
+        width: lightTheme.elevation.level2.shadowOffset.width,
+        height: lightTheme.elevation.level2.shadowOffset.height,
+      },
+      shadowOpacity: lightTheme.elevation.level2.shadowOpacity,
+      shadowRadius: lightTheme.elevation.level2.shadowRadius,
+      elevation: lightTheme.elevation.level2.elevation,
+    })
+    expect(config).not.toHaveProperty('boxShadow')
+  })
+
+  it('carries level0 as a real zero, not as an absent key', () => {
+    // `useShadow` pairs endpoints by key. A level0 that omitted the keys
+    // would tween from `undefined`, not from flat.
+    expect(elevationShadowConfig(lightTheme.elevation.level0)).toMatchObject({
+      shadowOpacity: 0,
+      elevation: 0,
+    })
+  })
+})
+
+describe('elevationBoxShadow', () => {
+  it('renders a level as one CSS layer', () => {
+    const { shadowOffset, shadowRadius, shadowOpacity } =
+      lightTheme.elevation.level1
+
+    expect(elevationBoxShadow(lightTheme.elevation.level1)).toBe(
+      `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(0, 0, 0, ${shadowOpacity})`,
+    )
+  })
+
+  it("maps a zero-opacity level to 'none'", () => {
+    // inertia parses `'none'` to zero layers, so paired against a real level
+    // it pads with an invisible layer and fades in rather than popping.
+    expect(elevationBoxShadow(lightTheme.elevation.level0)).toBe('none')
   })
 })

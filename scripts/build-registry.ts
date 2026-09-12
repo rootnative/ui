@@ -183,6 +183,7 @@ function getComponentFiles(componentDir: string): string[] {
  */
 const SHARED_ROOT_MODULES: Record<string, string> = {
   'safe-area': 'safe-area.tsx',
+  'elevation-shadow': 'elevation-shadow.ts',
 }
 
 function analyzeImports(componentDir: string): {

@@ -156,3 +156,5 @@ export type { SkeletonProps, SkeletonShape } from './skeleton'
 
 export { FAB, FAB_ICON_SIZES, FAB_SIZES } from './fab'
 export type { FABProps, FABSize, FABVariant } from './fab'
+
+export { elevationBoxShadow, elevationShadowConfig } from './elevation-shadow'

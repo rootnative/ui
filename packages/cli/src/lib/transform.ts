@@ -18,7 +18,7 @@ const MULTI_LINE_IMPORT_REGEX =
 // Shared modules under `packages/components/src/` (not `src/internal/`) that
 // the registry ships inside each consuming component. Keep in sync with
 // SHARED_ROOT_MODULES in scripts/build-registry.ts.
-const SHARED_ROOT_MODULES = new Set(['safe-area'])
+const SHARED_ROOT_MODULES = new Set(['safe-area', 'elevation-shadow'])
 
 /**
  * True for an alias a bundler resolves by prefix, e.g. `@/lib` or `~/lib`.

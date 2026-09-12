@@ -11,10 +11,15 @@
  * So: read the DOM. The elevated Card's shadow has to arrive as a real
  * `box-shadow` declaration on a real element.
  */
+import { lightTheme } from '@rootnative/core'
 import { Text } from 'react-native'
 import { Button } from '../../button'
 import { Card } from '../../card'
 import { Chip } from '../../chip'
+import {
+  elevationBoxShadow,
+  elevationShadowConfig,
+} from '../../elevation-shadow'
 import { FAB } from '../../fab'
 import { renderWeb } from './render-web'
 
@@ -100,4 +105,31 @@ it.each([
   const shadows = boxShadows(container)
   expect(shadows).toHaveLength(1)
   expect(shadows[0]).toMatch(shadow)
+})
+
+/**
+ * The web half of the `elevationShadowConfig` contract. The native half is in
+ * `../elevation.test.tsx`; this project is the only place `Platform.OS` is
+ * `'web'`, so it is the only place the CSS branch is reachable.
+ *
+ * The exclusion matters in both directions. Emitting the `shadow*` keys here
+ * would render nothing at all (react-native-web drops them, which is why this
+ * file exists); emitting them *alongside* `boxShadow` would paint two shadows
+ * on RN 0.76+ new-architecture native.
+ */
+it('gives the web branch boxShadow and none of the shadow* keys', () => {
+  const config = elevationShadowConfig(lightTheme.elevation.level2)
+
+  expect(config).toEqual({
+    boxShadow: elevationBoxShadow(lightTheme.elevation.level2),
+  })
+  for (const key of [
+    'shadowColor',
+    'shadowOffset',
+    'shadowOpacity',
+    'shadowRadius',
+    'elevation',
+  ]) {
+    expect(config).not.toHaveProperty(key)
+  }
 })

@@ -7,11 +7,11 @@
     "packages/components/src/chip/styles.ts",
     "packages/components/src/chip/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
-    "packages/components/src/internal/elevationShadow.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/usePressMorph.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/elevation-shadow.ts"
   ],
   "utils": ["color", "elevation", "pressable", "render-icon"],
   "componentDependencies": [],

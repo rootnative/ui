@@ -1,7 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { Platform, StyleSheet } from 'react-native'
-import { elevationBoxShadow } from '../internal/elevationShadow'
+import { elevationBoxShadow } from '../elevation-shadow'
 import type { CardVariant } from './types'
 
 export const CARD_FOCUS_RING_OFFSET = 2
