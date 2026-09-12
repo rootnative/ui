@@ -64,6 +64,53 @@ Reverse the layout direction with `inverted`:
 `}
 />
 
+## Wrapping a child in your own layer
+
+`align` maps straight to flexbox `alignItems`, so `align="center"` sizes every
+child to its own content on the cross axis rather than stretching it to the
+column's width. That is the correct behaviour, and it is invisible until you
+put a wrapper between the `Column` and its child — most often an animation
+layer:
+
+```tsx
+// The Typography centres its own text, but the wrapper has shrunk to fit that
+// text, so there is nothing left to centre it against.
+<Column align="center">
+  <Motion.View initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <Typography variant="displayMedium">Centred heading</Typography>
+  </Motion.View>
+</Column>
+```
+
+The wrapper is now a child of the column, so it — not the text — is what
+`align="center"` sizes. Give the wrapper `alignSelf: 'stretch'` and the inner
+block gets the full width back:
+
+```tsx
+<Column align="center">
+  <Motion.View
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    style={styles.stretch}
+  >
+    <Typography variant="displayMedium">Centred heading</Typography>
+  </Motion.View>
+</Column>
+
+// const styles = StyleSheet.create({ stretch: { alignSelf: 'stretch' } })
+```
+
+This is ordinary flexbox rather than a quirk of `Column`, but it is the
+predictable cost of inserting a layer of your own: any wrapper you add becomes
+the aligned child, and anything the original child did with its own width now
+measures against the wrapper instead. It applies to a child that centres its
+own text, one that lays out its own row, and any block sized as a share of the
+available width.
+
+`Row` behaves the same way on its cross axis, where `align` controls height
+instead — less often noticed, because a wrapper shrinking to its content height
+usually looks correct.
+
 ## Props
 
 <PropTable name="Column" />

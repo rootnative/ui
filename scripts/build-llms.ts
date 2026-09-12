@@ -1162,11 +1162,19 @@ import { Row } from '@rootnative/components/layout'
       },
       {
         title: '#### Column',
-        desc: 'Vertical flex container (extends Box).',
+        desc: 'Vertical flex container (extends Box). `align` maps to flexbox `alignItems`, so `align="center"` sizes each child to its own content rather than stretching it. A wrapper you insert between the Column and a child — an animation layer, most often — becomes the aligned child, so a block that centres its own text or lays out its own row collapses to that text. Give the wrapper `alignSelf: \'stretch\'`. `Row` does the same on its cross axis, where `align` controls height.',
         example: `\`\`\`tsx
 import { Column } from '@rootnative/components/layout'
 
 <Column gap="md">{children}</Column>
+
+// align="center" sizes children to their content. A wrapper needs
+// alignSelf: 'stretch' to give its own child the full width back.
+<Column align="center">
+  <Motion.View style={{ alignSelf: 'stretch' }}>
+    <Typography variant="displayMedium">Centred heading</Typography>
+  </Motion.View>
+</Column>
 \`\`\``,
         ifaceName: 'ColumnProps',
       },
