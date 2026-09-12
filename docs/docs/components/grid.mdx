@@ -156,6 +156,35 @@ the column count, so it fills the row instead of overflowing it.
 itself inside a `Grid` — rendered anywhere else it warns in development and
 falls back to full width.
 
+## Staggered entrances
+
+A `<Stagger>` from `@rootnative/inertia` can wrap the grid's children directly.
+`Grid` looks through it, so each child still gets its own cell and still
+inherits its own delay:
+
+```tsx
+import { Grid } from '@rootnative/components'
+import { Motion, Stagger } from '@rootnative/inertia'
+
+<Grid columns={{ compact: 1, medium: 2 }} gap="md">
+  <Stagger interval={60}>
+    {items.map((item) => (
+      <Motion.View
+        key={item.id}
+        initial={{ opacity: 0, translateY: 12 }}
+        animate={{ opacity: 1, translateY: 0 }}
+      >
+        <Card>{/* … */}</Card>
+      </Motion.View>
+    ))}
+  </Stagger>
+</Grid>
+```
+
+Put the `Stagger` **inside** the `Grid`, not around it. A `Grid` wrapped in a
+`Stagger` is a single child of that stagger, so every card shares one delay and
+the cascade disappears.
+
 ## Props
 
 <PropTable name="Grid" />

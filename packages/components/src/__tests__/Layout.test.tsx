@@ -1,6 +1,8 @@
+import { Motion, Stagger } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
 import { Dimensions, StyleSheet, Text } from 'react-native'
+import * as Reanimated from 'react-native-reanimated'
 import { Box } from '../layout/Box'
 import { Column } from '../layout/Column'
 import { Grid } from '../layout/Grid'
@@ -624,6 +626,107 @@ describe('Layout', () => {
     // backgroundColor should be the theme color, not the override
     expect(flatStyle.backgroundColor).not.toBe('#FF0000')
     expect(flatStyle.borderWidth).toBe(1)
+  })
+})
+
+/**
+ * `<Stagger>` composing through `<Grid>`.
+ *
+ * `Stagger` renders a fragment of context providers and no host view, and
+ * `React.Children.map` does not descend into a fragment. So a stagger
+ * wrapping N cards reached `Grid` as one child and every card landed in a
+ * single cell — a one-column grid, on the page the grid exists for.
+ *
+ * The delays were never the problem, and that is the part worth pinning:
+ * `Stagger` assigns them per child, so they came out correct even while the
+ * layout was collapsed. A test that only asserted on delays would have gone
+ * green throughout. Both halves are checked below.
+ */
+describe('Grid + Stagger', () => {
+  const cells = () => childrenOf(rootOf(screen.toJSON()))
+
+  it('gives each staggered child its own cell', () => {
+    renderWithTheme(
+      <Grid columns={3}>
+        <Stagger interval={50}>
+          <Text>A</Text>
+          <Text>B</Text>
+          <Text>C</Text>
+        </Stagger>
+      </Grid>,
+    )
+    expect(cells()).toHaveLength(3)
+    expect(screen.getByText('A')).toBeTruthy()
+    expect(screen.getByText('C')).toBeTruthy()
+  })
+
+  it('gives those cells the same flex basis as plain children', () => {
+    renderWithTheme(
+      <Grid columns={2}>
+        <Stagger interval={50}>
+          <Text>A</Text>
+          <Text>B</Text>
+        </Stagger>
+      </Grid>,
+    )
+    // Assert the count first: with the collapse, `cells()` is a single cell
+    // that still reads 50%, so a loop on its own passes vacuously.
+    expect(cells()).toHaveLength(2)
+    for (const cell of cells()) {
+      expect(StyleSheet.flatten(cell.props.style)).toMatchObject({
+        flexBasis: '50%',
+      })
+    }
+  })
+
+  it('keeps the cascade intact through the cells', () => {
+    const withDelay = jest.spyOn(Reanimated, 'withDelay')
+    renderWithTheme(
+      <Grid columns={3}>
+        <Stagger interval={50}>
+          <Motion.View initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+          <Motion.View initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+          <Motion.View initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+        </Stagger>
+      </Grid>,
+    )
+    // Child 0's delay is 0, which `applyDelay` passes through, so only
+    // children 1 and 2 reach `withDelay`.
+    expect(withDelay.mock.calls.map((c) => c[0])).toEqual([50, 100])
+    withDelay.mockRestore()
+  })
+
+  it('still honours a Grid.Cell span inside the stagger', () => {
+    renderWithTheme(
+      <Grid columns={4}>
+        <Stagger interval={50}>
+          <GridCell span={2}>
+            <Text>wide</Text>
+          </GridCell>
+          <Text>narrow</Text>
+        </Stagger>
+      </Grid>,
+    )
+    const [wide, narrow] = cells()
+    expect(StyleSheet.flatten(wide.props.style)).toMatchObject({
+      flexBasis: '50%',
+    })
+    expect(StyleSheet.flatten(narrow.props.style)).toMatchObject({
+      flexBasis: '25%',
+    })
+  })
+
+  it('mixes staggered and plain children in one grid', () => {
+    renderWithTheme(
+      <Grid columns={2}>
+        <Text>plain</Text>
+        <Stagger interval={50}>
+          <Text>A</Text>
+          <Text>B</Text>
+        </Stagger>
+      </Grid>,
+    )
+    expect(cells()).toHaveLength(3)
   })
 })
 
