@@ -2177,6 +2177,16 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 \`\`\`
 
 Type: \`useBreakpointValue<T>(values: Partial<Record<Breakpoint, T>> & Record<'compact', T>): T\`
+
+### Breakpoints and static export (web)
+
+Both hooks are hydration-safe, so **no \`useHydrated\` gate is needed at the call site**.
+
+A static export (\`web.output: 'static'\`) renders on a server with no DOM, where react-native-web's \`Dimensions\` is fixed at \`width: 0\` — so every breakpoint resolves to \`compact\` and that is what ships in the HTML. React 19 does **not** repair a \`className\`/\`style\` mismatch during hydration: it adopts the server DOM, keeps it, and fires no recoverable error, so a tablet would silently keep the phone layout.
+
+\`useBreakpoint\` therefore reports \`compact\` for as long as the client is hydrating, matching that markup, and switches to the measured breakpoint on the re-render React schedules once hydration finishes. On native and on a single-page web build there is no hydration, so the measured value is returned from the first render at no cost.
+
+The practical consequence: a breakpoint-dependent layout **starts compact and widens a frame later** on a static export. That is unavoidable — the server cannot know the viewport — so design the compact variant to be the honest first paint. \`Grid\` inherits all of this, which matters because it resolves a \`columns\` map internally and leaves a consumer nowhere to put a gate of their own.
 `
 }
 
