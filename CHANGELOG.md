@@ -9,6 +9,120 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.16 — 2026-09-13
+
+No breaking changes. One silent correctness fix that reaches every static
+export, two helpers promoted out of `internal/`, and two layout and keyboard
+traps closed.
+
+### `useBreakpointValue` is hydration-safe by construction
+
+A static export renders on a server with no DOM, where react-native-web pins
+`Dimensions` to `width: 0`. Every breakpoint resolved to `compact`, and that is
+what shipped in the HTML — while the client measured the real width on its very
+first render. **React does not repair that disagreement.** Measured against
+React 19.2.3: a `style` mismatch is adopted from the server DOM, left on
+screen, and reported through *zero* recoverable errors. A tablet got the phone
+layout, permanently, with no console signal.
+
+`useBreakpoint` now reads a `useSyncExternalStore` whose only job is to report
+*when* React is reading it. React calls `getServerSnapshot` during server
+rendering and through the hydration pass, then `getSnapshot` for every render
+after, so the hook returns `compact` for exactly as long as the client is
+reproducing the server's markup and switches to the measured breakpoint on the
+re-render React schedules once hydration finishes. That correction is an
+ordinary update, which *does* patch the DOM.
+
+The visible consequence is that a breakpoint-dependent layout starts compact
+and widens a frame later. The server cannot know the viewport, so make the
+compact variant an honest first paint rather than a placeholder.
+
+**Consumers can delete their own `useHydrated` gates.** So can any code that
+hands a breakpoint map to `Grid` (`columns`) or `Grid.Cell` (`span`): those
+resolve the map internally, which put the trap somewhere a consumer's gate
+could not reach.
+
+It costs nothing where there is no hydration. On native, and on a single-page
+web build, `getServerSnapshot` is never called, so the measured breakpoint is
+returned from the first render with no extra pass.
+
+### `elevationShadowConfig` and `elevationBoxShadow` are public
+
+Both are exported from `@rootnative/components`. They convert a
+`theme.elevation.level*` token into the surface each platform actually renders:
+web gets a CSS `boxShadow` string, native gets the classic
+`shadow*` / `elevation` keys.
+
+Reach for `elevationShadowConfig` whenever an elevation is **animated**.
+`useShadow` accepts the classic keys, and on web they animate nothing —
+react-native-web 0.21 deprecated those props and the per-frame values never
+reach CSS, so a hover lift stays visibly flat with a single deprecation warning
+as the only signal. Passing `theme.elevation.level*` straight to `useShadow`
+does not work either: those tokens are built from the `shadow*` keys and carry
+no `boxShadow` field.
+
+**Nothing about the helpers changed** — `Button`, `Card`, `Chip` and `FAB` have
+used them since alpha.5. They simply lived in `packages/components/src/internal/`,
+so a consumer who hit the web tween problem had to rebuild the conversion by
+hand and had no way to know one already shipped. This is an access change, not
+a new shape.
+
+**Do not flatten the platform split and emit both keys.** RN 0.76+ on the new
+architecture renders `boxShadow` natively too, so a config carrying both
+applies two shadow systems to one view and whichever resolves last wins. That
+is also why `ElevationLevel` carries no `boxShadow` field: a token holding both
+shapes at once cannot be handed to `useShadow` on any platform.
+
+### `<Stagger>` works inside `<Grid>`
+
+A `<Stagger>` wrapping N cards used to collapse into a single grid cell, so the
+whole cascade landed in one column.
+
+`Grid` wraps every child that is not a `Grid.Cell` in a cell of its own, and
+`React.Children.map` does not descend into a fragment — `Stagger` renders a
+fragment of context providers and no host view, so N cards arrived as *one*
+child. `Grid` now looks through a `Stagger` element: it cell-wraps the
+stagger's children and keeps the `Stagger` element itself, so each cell still
+sits under its own delay provider.
+
+The fix had to live in `Grid`. `Stagger` already assigns its delays per child
+rather than per parent slot, so the cascade was never what broke — only the
+layout — and nothing `Stagger` could do would help, because the collapse
+happens before it renders.
+
+### `TextField` no longer adds a second tab stop per field
+
+The container `Pressable` widens the press target and catches hover. It is not
+a control, and it carried `accessible={false}` and `focusable={false}` to say
+so — but **neither prop removes the tab stop on web.** Measured in jsdom
+against react-native-web 0.21.2: an enabled `Pressable` renders `tabindex="0"`
+and keeps it with both props set. Every field therefore cost a keyboard user
+two stops, and the first one only forwarded focus to the second.
+
+It now carries `tabIndex={-1}`, the same way `Tooltip` blocks the same stop.
+Two web tests pin the attribute — reading the rendered DOM, not the props,
+because the props are exactly what mislead here.
+
+### Developed against `@rootnative/inertia` `0.0.12`
+
+The dev pin moves from `0.0.11` to `0.0.12`. **The peer range is unchanged at
+`>=0.0.11 <0.1.0`** — no package here calls a `0.0.12` API, so nothing forces a
+consumer to upgrade. `0.0.12` adds `useInView`, a static-export entrance guard,
+a `pointerHandlers` bag on `useGesture`, and a widened `useMotionValue`; all
+four serve a page rather than a component library.
+
+### Documentation
+
+`Column` gains a page section on alignment and on when a wrapper collapses to
+its content, which is the shape behind most "my centred block is the wrong
+width" reports.
+
+The responsive page replaces its server-rendering note. It used to tell you to
+"treat the first render as `compact` and let the client correct it" — advice
+the first entry above makes unnecessary — and now states what the hook
+guarantees, what it costs, and that `Grid` inherits the same safety for its
+`columns` map.
+
 ## 0.0.0-alpha.15 — 2026-09-09
 
 The Expo SDK 57 release. Every package moves to the SDK 57 runtime band and
