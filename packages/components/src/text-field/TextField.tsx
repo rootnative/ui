@@ -412,6 +412,15 @@ export function TextField({
         disabled={isDisabled}
         accessible={false}
         focusable={false}
+        // `focusable={false}` is the native half. On web it does nothing:
+        // react-native-web 0.21 renders `tabindex="0"` on an enabled
+        // `Pressable` and keeps it with `accessible={false}` *and*
+        // `focusable={false}` both set. Without `tabIndex={-1}` every field
+        // costs the keyboard two stops — this wrapper and then the input —
+        // and the first one only forwards focus to the second. The wrapper
+        // exists to widen the press target and to catch hover, not to be
+        // reached. `Tooltip` blocks the same stop the same way.
+        tabIndex={-1}
         style={styles.pressableReset}
       >
         <Animated.View style={containerStyleArr}>

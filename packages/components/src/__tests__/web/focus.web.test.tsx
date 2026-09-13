@@ -268,6 +268,49 @@ describe('TextField supporting text and validity', () => {
   })
 })
 
+describe('TextField tab order', () => {
+  /**
+   * The container `Pressable` widens the press target and catches hover. It is
+   * not a control, and it must not be a tab stop: focusing it does nothing a
+   * keyboard user wants, and the input is one Tab further on either way.
+   *
+   * `accessible={false}` and `focusable={false}` do **not** stop it.
+   * react-native-web 0.21 renders `tabindex="0"` on an enabled `Pressable`
+   * and keeps it with both of those props set — measured, not assumed, which
+   * is why this test reads the attribute rather than the props.
+   */
+  it('gives the input the only tab stop', () => {
+    renderWeb(<TextField label="Email" />)
+
+    const stops = [...document.querySelectorAll('[tabindex]')].filter(
+      (el) => el.getAttribute('tabindex') !== '-1',
+    )
+    expect(stops).toHaveLength(0)
+
+    // The input carries no `tabindex` of its own — it is focusable because it
+    // is an `<input>`, which is exactly the one stop a field should have.
+    const input = screen.getByRole('textbox')
+    expect(input.getAttribute('tabindex')).toBeNull()
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('does not add a stop per field', () => {
+    renderWeb(
+      <>
+        <TextField label="Email" />
+        <TextField label="Name" />
+      </>,
+    )
+
+    const stops = [...document.querySelectorAll('[tabindex]')].filter(
+      (el) => el.getAttribute('tabindex') !== '-1',
+    )
+    expect(stops).toHaveLength(0)
+    expect(screen.getAllByRole('textbox')).toHaveLength(2)
+  })
+})
+
 describe('Tooltip description', () => {
   it('links the anchor to the tooltip only while it is shown', () => {
     function Host({ visible }: { visible: boolean }) {
