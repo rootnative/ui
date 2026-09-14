@@ -195,6 +195,11 @@ export function useAnchorPosition(
   // previous one's position.
   useEffect(() => {
     if (active) return
+    // Deliberate and terminal: dropping the stale size on close is what makes
+    // the next open wait for a fresh layout instead of flashing at the previous
+    // position. It runs once per close and sets a value that cannot re-trigger
+    // it, so there is no cascade.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOverlay(null)
   }, [active])
 

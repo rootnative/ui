@@ -9,6 +9,58 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+No breaking changes, and no change to the public API — `api-surface.json` is
+unchanged. This is a lint and internal-hygiene pass. One dev-only behaviour
+changes, and `rootnative add` copies one more file.
+
+### The React Compiler lint rules are on
+
+`eslint-plugin-react-hooks` moves from `4.6.2` to `7.1.1`, which brings the
+React Compiler rule set. The build does not run the React Compiler, so these
+rules are advisory here: each one reports a pattern the compiler cannot
+optimize, or one a future concurrent re-render could break.
+
+Three places wrote a ref during render and now write it in an effect:
+`BottomSheet`, `useFocusTrap` and `ThemeProvider`. Every one of those refs is
+read from a callback — a PanResponder handler, a keydown listener, or an async
+loader — and a callback cannot run before the commit that produced the value it
+reads. **The behaviour is the same.** `react-hooks/refs` forbids the
+render-time write because a render that never commits must not leave its value
+behind.
+
+`react-hooks/immutability` is off for the whole repo. A Reanimated
+`SharedValue` is mutated through `.value`, and that write is the entire API of
+the type. It never triggers a render, so the hazard the rule describes cannot
+happen, and no refactor satisfies the rule. `inertia`, `impulse` and
+`rootnative` turn off the same single rule and nothing else from the compiler
+set.
+
+The compiler rules are also off in tests. A test harness assigns a hook's
+result to a module-level `let` on purpose, so the test body can reach it. None
+of that ships.
+
+### A misuse warning prints once, not once per instance
+
+Five misuses print a dev-only error: `<Grid.Cell>` outside a `<Grid>`,
+`<Portal>` outside a `<PortalHost>`, a named `<PortalHost>` acting as the root,
+an uncontrolled `<Menu>` with an invalid `anchor`, and a plain `<Tooltip>`
+carrying `subhead` or `actions`.
+
+Each component held its own `useRef` latch, so the error repeated once per
+mounted instance. A list of 100 misused cells printed 100 identical errors. A
+shared `warnOnce` helper now keys the guard by the misuse, so each message
+prints once for the lifetime of the module. Keying it rather than using one
+boolean keeps two different misuses from silencing each other.
+
+The warnings stay dev-only, and production is unaffected.
+
+**`rootnative add` copies one more file.** The `layout`, `menu`, `portal` and
+`tooltip` entries gain `internal/warnOnce.ts`. A component you scaffolded
+before this release carries its own latch and still works, so there is nothing
+to redo.
+
 ## 0.0.0-alpha.16 — 2026-09-13
 
 No breaking changes. One silent correctness fix that reaches every static

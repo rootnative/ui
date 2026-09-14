@@ -104,8 +104,15 @@ export function IconButton({
   // wide and 32dp tall, so one shared value taken from the height would leave
   // the width at 44dp — still under the 48dp floor. Collapses to a plain
   // number when both axes agree, which is the common `uniform` case.
+  // Read off the token object before the memo rather than inside it. Reading
+  // `sizeTokens.height` in the body makes the React Compiler infer the whole
+  // `sizeTokens` object as the dependency while the declared list says only
+  // `.height` — a mismatch that makes it skip optimizing this component
+  // entirely (`react-hooks/preserve-manual-memoization`). A local const makes
+  // the inferred and declared dependencies the same thing.
+  const tokenHeight = sizeTokens.height
   const defaultHitSlop = useMemo(() => {
-    const vertical = getDefaultHitSlop(sizeTokens.height)
+    const vertical = getDefaultHitSlop(tokenHeight)
     const horizontal = getDefaultHitSlop(containerWidth)
     if (vertical === horizontal) return vertical
     return {
@@ -114,7 +121,12 @@ export function IconButton({
       left: horizontal,
       right: horizontal,
     }
-  }, [sizeTokens.height, containerWidth])
+    // `containerWidth` is a plain local const and is never mutated, but the
+    // compiler cannot prove that through `getIconButtonWidth`, so it declines
+    // to optimize the component. Advisory only — `ui` does not run the React
+    // Compiler in its build — and the memo itself is correct.
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  }, [tokenHeight, containerWidth])
   // ARIA props rather than `accessibilityState`: react-native-web 0.21 no
   // longer reads the nested state object, so it was silently dropping every
   // state on web. RN normalizes `aria-*` back into `accessibilityState` for

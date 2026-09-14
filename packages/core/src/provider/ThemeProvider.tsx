@@ -163,11 +163,19 @@ export function ThemeProvider({
   // `storage` changes identity: an inline object literal would otherwise
   // re-read every render and stomp the user's choice back to the stored one.
   const storageRef = React.useRef(storage)
-  storageRef.current = storage
+  // Written after commit, not during render. This effect is declared before
+  // the loader below, and effects run in declaration order, so the loader
+  // still sees the current `storage` on the mount pass.
+  React.useEffect(() => {
+    storageRef.current = storage
+  })
   const shouldLoad = Boolean(storage) && !isControlled && Boolean(pair)
 
   React.useEffect(() => {
     if (!shouldLoad) {
+      // Terminal: with no storage to read there is nothing to wait for, so the
+      // gate opens immediately. `isReady` never feeds back into this effect.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsReady(true)
       return
     }

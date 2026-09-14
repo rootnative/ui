@@ -59,6 +59,16 @@ export default [
       // React
       ...reactPlugin.configs.recommended.rules,
       ...reactHooksPlugin.configs.recommended.rules,
+      // `react-hooks/immutability` comes from the React Compiler, which treats
+      // every value a hook returns as frozen. A Reanimated `SharedValue` —
+      // what `useSharedValue` and inertia's `useMotionValue` return — is
+      // mutated through `.value`, and that write IS the type's entire API. It
+      // never triggers a render, so the hazard the rule describes cannot
+      // happen. No refactor satisfies the rule; the write is the operation.
+      // Off org-wide for that reason: `ui`, `inertia`, `impulse` and
+      // `rootnative` all disable exactly this one rule, and nothing else from
+      // the React Compiler set.
+      'react-hooks/immutability': 'off',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/self-closing-comp': 'warn',
@@ -135,4 +145,23 @@ export default [
     },
   },
   prettierConfig,
+  {
+    // React Compiler rules off in tests. A test harness deliberately does the
+    // things they forbid — assigning a hook's result to a module-level `let`
+    // so the test body can reach it, rendering a component just to grab its
+    // API. None of that ships, and rewriting it to satisfy the compiler makes
+    // the tests harder to read for no runtime benefit.
+    files: [
+      '**/__tests__/**/*.{ts,tsx}',
+      '**/*.test.{ts,tsx}',
+      '**/*.test-d.{ts,tsx}',
+    ],
+    rules: {
+      'react-hooks/globals': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/static-components': 'off',
+    },
+  },
 ]

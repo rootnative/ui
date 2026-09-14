@@ -3,12 +3,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useSyncExternalStore,
 } from 'react'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { warnOnce } from '../internal/warnOnce'
 import { PortalContext } from './context'
 import { DEFAULT_PORTAL_HOST } from './layers'
 import { PortalStore } from './store'
@@ -59,16 +59,9 @@ function PortalOutlet({ store, hostName, style, ...rest }: PortalOutletProps) {
 
 function RootPortalHost({ children, name, style, ...rest }: PortalHostProps) {
   const store = useMemo(() => new PortalStore(), [])
-  const warnedRef = useRef(false)
-
-  if (
-    __DEV__ &&
-    name !== undefined &&
-    name !== DEFAULT_PORTAL_HOST &&
-    !warnedRef.current
-  ) {
-    warnedRef.current = true
-    console.error(
+  if (name !== undefined && name !== DEFAULT_PORTAL_HOST) {
+    warnOnce(
+      `portal-host-named-root:${name}`,
       `[@rootnative/components] <PortalHost name="${name}"> has no enclosing ` +
         '<PortalHost>, so it is acting as the root host and the name is ' +
         'ignored. Named hosts must be rendered inside a root <PortalHost>.',

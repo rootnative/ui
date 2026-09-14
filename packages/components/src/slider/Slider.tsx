@@ -245,6 +245,12 @@ export function Slider({
     }
   }, [])
 
+  // The refs below are read inside responder callbacks, which only run from a
+  // touch — long after commit. The compiler sees them nested in a `useMemo`
+  // factory, treats that as render, and flags every one. Restructuring the
+  // responder to satisfy it would mean rebuilding it on every render, which is
+  // what the memo exists to prevent.
+  /* eslint-disable react-hooks/refs */
   const panResponder = useMemo(
     () =>
       PanResponder.create({
@@ -271,6 +277,7 @@ export function Slider({
       }),
     [isDisabled, handleTouch],
   )
+  /* eslint-enable react-hooks/refs */
 
   const arrValue = Array.isArray(value) ? value : null
   const lowValue = arrValue ? arrValue[0] : (value as number)
@@ -315,6 +322,9 @@ export function Slider({
   const isFocused = useRef(false)
 
   useEffect(() => {
+    // Mirrors the thumb the pan gesture last touched so the keyboard acts on
+    // the same one. Terminal: `keyboardThumb` drives no effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (activeThumb) setKeyboardThumb(activeThumb)
   }, [activeThumb])
 

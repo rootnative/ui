@@ -6,7 +6,6 @@ import {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
 import type { ReactElement } from 'react'
@@ -21,6 +20,7 @@ import {
 import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { MenuContext } from './context'
@@ -106,15 +106,9 @@ export function Menu({
     arrowNavigation: true,
   })
 
-  const warnedRef = useRef(false)
-  if (
-    __DEV__ &&
-    !isControlled &&
-    !isValidElement(anchor) &&
-    !warnedRef.current
-  ) {
-    warnedRef.current = true
-    console.error(
+  if (!isControlled && !isValidElement(anchor)) {
+    warnOnce(
+      'menu-uncontrolled-invalid-anchor',
       '[@rootnative/components] <Menu> opens itself when `visible` is omitted, ' +
         'which needs a single element accepting `onPress` as its `anchor`. ' +
         'Pass `visible` + `onDismiss` to drive visibility yourself instead.',

@@ -10,7 +10,8 @@
     "packages/components/src/portal/store.ts",
     "packages/components/src/portal/styles.ts",
     "packages/components/src/portal/types.ts",
-    "packages/components/src/internal/pointerEvents.ts"
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": [],

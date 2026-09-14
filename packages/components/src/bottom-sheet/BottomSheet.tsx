@@ -121,18 +121,27 @@ export function BottomSheet({
     hiddenOffset: number
     dismissable: boolean
   } | null>(null)
-  geometryRef.current =
-    offsets !== null && sheetHeight !== null
-      ? { offsets, hiddenOffset: sheetHeight, dismissable }
-      : null
   const onDismissRef = useRef(onDismiss)
-  onDismissRef.current = onDismiss
   const onSnapIndexChangeRef = useRef(onSnapIndexChange)
-  onSnapIndexChangeRef.current = onSnapIndexChange
   const reduceMotionRef = useRef(shouldReduceMotion)
-  reduceMotionRef.current = shouldReduceMotion
   const springRef = useRef(theme.motion.springDefaultSpatial)
-  springRef.current = theme.motion.springDefaultSpatial
+
+  // Written after commit rather than during render. Every one of these refs is
+  // read only from the PanResponder built below, and a responder callback can
+  // only run from a touch — which is always after the commit that produced the
+  // value it reads. Assigning during render is what `react-hooks/refs` (React
+  // Compiler) forbids, and under a future concurrent re-render it would also
+  // let a render that never commits leave its value behind.
+  useEffect(() => {
+    geometryRef.current =
+      offsets !== null && sheetHeight !== null
+        ? { offsets, hiddenOffset: sheetHeight, dismissable }
+        : null
+    onDismissRef.current = onDismiss
+    onSnapIndexChangeRef.current = onSnapIndexChange
+    reduceMotionRef.current = shouldReduceMotion
+    springRef.current = theme.motion.springDefaultSpatial
+  })
 
   const settleAtIndex = useCallback((index: number) => {
     if (index === currentIndexRef.current) return

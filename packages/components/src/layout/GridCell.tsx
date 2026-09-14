@@ -1,7 +1,8 @@
 import { useBreakpointValue } from '@rootnative/core'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
+import { warnOnce } from '../internal/warnOnce'
 import type { GridCellProps } from './types'
 
 /**
@@ -23,17 +24,15 @@ export function GridCell(props: GridCellProps) {
     gridHalfGap = 0,
     ...viewProps
   } = rest as typeof rest & GridCellInjected
-  const warnedRef = useRef(false)
-
   // The hook call must stay unconditional, so a plain number becomes a
   // constant one-entry map instead of skipping the hook.
   const resolvedSpan = useBreakpointValue(
     typeof span === 'number' ? { compact: span } : span,
   )
 
-  if (gridColumns === undefined && __DEV__ && !warnedRef.current) {
-    warnedRef.current = true
-    console.error(
+  if (gridColumns === undefined) {
+    warnOnce(
+      'grid-cell-outside-grid',
       '[@rootnative/components] <Grid.Cell> must be a direct child of a ' +
         '<Grid>. Rendering it full-width.',
     )

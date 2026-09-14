@@ -108,7 +108,11 @@ export function useFocusTrap({
   // Read inside the listener rather than captured, so re-registering on every
   // `onEscape` identity change isn't necessary.
   const onEscapeRef = useRef(onEscape)
-  onEscapeRef.current = onEscape
+  // After commit, not during render: the ref is read only from the keydown
+  // listener registered below, which cannot fire before the commit.
+  useEffect(() => {
+    onEscapeRef.current = onEscape
+  })
 
   // Entry and return. One effect, because the element to return focus to is
   // whatever was active at entry time and nothing else may overwrite it.

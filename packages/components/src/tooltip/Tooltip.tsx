@@ -15,6 +15,7 @@ import type { GestureResponderEvent } from 'react-native'
 import { BackHandler, Platform, Pressable, Text, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
+import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import {
@@ -115,15 +116,9 @@ export function Tooltip({
       screenMargin,
     })
 
-  const warnedRef = useRef(false)
-  if (
-    __DEV__ &&
-    !isRich &&
-    (subhead !== undefined || actions) &&
-    !warnedRef.current
-  ) {
-    warnedRef.current = true
-    console.error(
+  if (!isRich && (subhead !== undefined || actions)) {
+    warnOnce(
+      'tooltip-plain-with-rich-props',
       '[@rootnative/components] <Tooltip> renders `subhead` and `actions` on ' +
         'the rich variant only — a plain tooltip is a single line of text. ' +
         'Pass `variant="rich"` to show them.',

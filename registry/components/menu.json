@@ -12,7 +12,8 @@
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
     "packages/components/src/internal/useFocusTrap.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "elevation", "render-icon", "rtl"],
   "componentDependencies": ["portal"],
