@@ -1,7 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { Platform, StyleSheet } from 'react-native'
-import { elevationBoxShadow } from '../elevation-shadow'
+import { elevationBoxShadowForFabric } from '../elevation-shadow'
 import type { CardVariant } from './types'
 
 export const CARD_FOCUS_RING_OFFSET = 2
@@ -262,11 +262,15 @@ export function createStyles(
     // two shadow systems. Android needs nothing (the parent draws the
     // `elevation` shadow from the child's outline) and web already gets
     // `boxShadow` from `elevationStyle`.
+    //
+    // The blur is doubled on the way in, because Fabric halves it on the way
+    // out. Without that this one card rendered at half the softness of the
+    // same token everywhere else on iOS; see `elevationBoxShadowForFabric`.
     overflowInkElevation:
       Platform.OS === 'ios'
         ? {
             shadowOpacity: 0,
-            boxShadow: elevationBoxShadow(theme.elevation.level1),
+            boxShadow: elevationBoxShadowForFabric(theme.elevation.level1),
           }
         : {},
     // Container shadow is zeroed when the elevation carrier below owns the

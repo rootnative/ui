@@ -29,7 +29,11 @@ import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button'
 import { Card } from '../card'
 import { Chip } from '../chip'
-import { elevationBoxShadow, elevationShadowConfig } from '../elevation-shadow'
+import {
+  elevationBoxShadow,
+  elevationBoxShadowForFabric,
+  elevationShadowConfig,
+} from '../elevation-shadow'
 import { FAB } from '../fab'
 
 type Style = Record<string, unknown>
@@ -129,9 +133,16 @@ describe('non-interactive elevated Card', () => {
   const level1 = lightTheme.elevation.level1
   // Rebuilt from the token rather than imported, so a format change in the
   // builder has to be acknowledged here too.
+  //
+  // The blur is `shadowRadius * 2`, and that factor is the whole point of
+  // `elevationBoxShadowForFabric`. This string is read by React Native, not by
+  // a browser, and Fabric halves a `boxShadow` blur before it reaches the
+  // `CALayer` (`RCTBoxShadow.mm`). So doubling here is what makes this card
+  // land on the token's own radius, matching every `shadow*` surface beside
+  // it. Writing the token's radius straight in is the bug this replaced.
   const expectedInk =
     `${level1.shadowOffset.width}px ${level1.shadowOffset.height}px ` +
-    `${level1.shadowRadius}px rgba(0, 0, 0, ${level1.shadowOpacity})`
+    `${level1.shadowRadius * 2}px rgba(0, 0, 0, ${level1.shadowOpacity})`
 
   function root() {
     renderWithTheme(
@@ -295,5 +306,45 @@ describe('elevationBoxShadow', () => {
     // inertia parses `'none'` to zero layers, so paired against a real level
     // it pads with an invisible layer and fades in rather than popping.
     expect(elevationBoxShadow(lightTheme.elevation.level0)).toBe('none')
+  })
+})
+
+/**
+ * The two readers of a `boxShadow` string do not agree on what the blur number
+ * means, so the library needs both spellings.
+ *
+ * A browser takes it as written, and react-native-web emits `shadowRadius` as
+ * the blur radius 1:1 — so `elevationBoxShadow` is right for the web. React
+ * Native halves it: `shadowLayer.shadowRadius = shadow.blurRadius / 2` in
+ * `React/Fabric/Utils/RCTBoxShadow.mm`, an adjustment its own comment says
+ * exists to make the blur look more like the web. The doubling is what stops
+ * the one component that takes this path — the non-interactive Card on iOS —
+ * from rendering at half the softness of the same token beside it.
+ */
+describe('elevationBoxShadowForFabric', () => {
+  it('doubles the blur so Fabric halves it back to the token radius', () => {
+    const { shadowOffset, shadowRadius, shadowOpacity } =
+      lightTheme.elevation.level1
+
+    expect(elevationBoxShadowForFabric(lightTheme.elevation.level1)).toBe(
+      `${shadowOffset.width}px ${shadowOffset.height}px ` +
+        `${shadowRadius * 2}px rgba(0, 0, 0, ${shadowOpacity})`,
+    )
+  })
+
+  it('leaves the web spelling alone', () => {
+    // The two must not converge. Doubling the web branch would make every web
+    // shadow in the library twice as soft.
+    expect(elevationBoxShadowForFabric(lightTheme.elevation.level2)).not.toBe(
+      elevationBoxShadow(lightTheme.elevation.level2),
+    )
+  })
+
+  it("keeps a zero-opacity level at 'none'", () => {
+    // Doubling zero is still zero, but the early return is what has to hold:
+    // `0px 0px 0px rgba(...)` would be a layer, not the absence of one.
+    expect(elevationBoxShadowForFabric(lightTheme.elevation.level0)).toBe(
+      'none',
+    )
   })
 })
