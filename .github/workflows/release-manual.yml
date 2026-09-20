@@ -41,8 +41,65 @@ on:
           - rc
 
 jobs:
+  # The compat matrix gates the publish. compat.yml runs on push and pull
+  # request only, so without this job a release can ship from a commit whose
+  # matrix was red, or never ran. The candidate is the tree as dispatched,
+  # before the version bump; the bump changes the version field and the
+  # `@rootnative/core` floor, nothing the fixtures install differently.
+  pack:
+    name: Pack candidate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # components ships `dist` only, so the tarball must be built before it
+      # is packed.
+      - name: Build
+        run: pnpm run build
+
+      # `pnpm --filter <pkg> pack` needs pnpm 10; this repo is on pnpm 9.
+      - name: Pack components
+        working-directory: packages/components
+        run: pnpm pack --pack-destination ../../pack
+
+      - name: Upload candidate
+        uses: actions/upload-artifact@v5
+        with:
+          name: release-candidate-components
+          path: pack/*.tgz
+          if-no-files-found: error
+          retention-days: 1
+
+  # A push to main during this run starts compat.yml, and the two matrix runs
+  # share one concurrency group in sdk-compat. If this job is cancelled, re-run
+  # the release.
+  compat:
+    name: Matrix
+    needs: pack
+    uses: rootnative/sdk-compat/.github/workflows/compat.yml@main
+    with:
+      package: '@rootnative/components'
+      tarball-artifact: release-candidate-components
+      enforce-range: true
+
   release:
     name: Release (Manual)
+    needs: compat
     runs-on: ubuntu-latest
     permissions:
       contents: write
