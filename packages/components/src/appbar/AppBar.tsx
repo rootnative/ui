@@ -221,7 +221,7 @@ export function AppBar({
 
   const leadingContent = useMemo(() => {
     if (leading) {
-      return leading
+      return <View style={styles.slotContent}>{leading}</View>
     }
 
     if (!canGoBack) {
@@ -240,11 +240,18 @@ export function AppBar({
         />
       </View>
     )
-  }, [canGoBack, resolvedContentColor, leading, onBackPress, styles.iconFrame])
+  }, [
+    canGoBack,
+    resolvedContentColor,
+    leading,
+    onBackPress,
+    styles.iconFrame,
+    styles.slotContent,
+  ])
 
   const actionsContent = useMemo(() => {
     if (trailing) {
-      return trailing
+      return <View style={styles.slotContent}>{trailing}</View>
     }
 
     if (!actions || actions.length === 0) {
@@ -252,7 +259,7 @@ export function AppBar({
     }
 
     return (
-      <View style={styles.actionsRow}>
+      <View style={styles.slotContent}>
         {actions.map((action, index) => {
           if (action.label !== undefined) {
             return (
@@ -291,8 +298,8 @@ export function AppBar({
   }, [
     actions,
     resolvedContentColor,
-    styles.actionsRow,
     styles.iconFrame,
+    styles.slotContent,
     trailing,
   ])
 

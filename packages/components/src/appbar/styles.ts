@@ -113,7 +113,11 @@ export function createStyles(
       alignItems: 'center',
       minHeight: topAppBar.sideSlotMinHeight,
     },
-    actionsRow: {
+    // The side slot centres this view, and this view is only as tall as its
+    // content. A direct child of the slot with its own `alignSelf` escapes
+    // the slot's `alignItems`: `IconButton` sets `flex-start` and sat 4pt
+    // above the title.
+    slotContent: {
       flexDirection: 'row',
       alignItems: 'center',
     },

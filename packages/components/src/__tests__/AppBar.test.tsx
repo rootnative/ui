@@ -1,9 +1,11 @@
+import { defaultTopAppBarTokens } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import type { TextStyle, ViewStyle } from 'react-native'
 import { AppBar } from '../appbar/AppBar'
+import { IconButton } from '../icon-button'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 import type { RenderedNode } from '../test-support/rendered-node'
 
@@ -24,6 +26,31 @@ function collectFlattenedStyles(
     ? [StyleSheet.flatten(node.props.style) as ViewStyle & TextStyle]
     : []
   return [...own, ...collectFlattenedStyles(childrenOf(node))]
+}
+
+function findSideSlots(node: RenderedNode): RenderedNode[] {
+  const style = StyleSheet.flatten(node.props?.style) as ViewStyle | undefined
+  const isSideSlot =
+    style?.flexDirection === 'row' &&
+    style.minHeight === defaultTopAppBarTokens.sideSlotMinHeight
+  return [
+    ...(isSideSlot ? [node] : []),
+    ...childrenOf(node).flatMap(findSideSlots),
+  ]
+}
+
+// Jest does no layout, so this asserts the rule that decides it: the side
+// slot centres its children through `alignItems`, and a child that sets its
+// own `alignSelf` escapes that. `IconButton` sets `flex-start`.
+function expectSlotChildrenCentred(node: RenderedNode) {
+  const slots = findSideSlots(node)
+  expect(slots).toHaveLength(2)
+  for (const slot of slots) {
+    for (const child of childrenOf(slot)) {
+      const style = StyleSheet.flatten(child.props.style) as ViewStyle
+      expect(style?.alignSelf ?? 'auto').toMatch(/^(auto|center)$/)
+    }
+  }
 }
 
 describe('AppBar', () => {
@@ -69,6 +96,45 @@ describe('AppBar', () => {
       )
       expect(screen.queryByLabelText('Go back')).toBeNull()
       expect(screen.getByTestId('custom-leading')).toBeTruthy()
+    })
+  })
+
+  describe('side slot alignment', () => {
+    it('centres an IconButton passed to leading and trailing', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="About"
+          leading={<IconButton icon="close" accessibilityLabel="Close" />}
+          trailing={<IconButton icon="share" accessibilityLabel="Share" />}
+        />,
+      )
+      expectSlotChildrenCentred(rootOf(toJSON()))
+    })
+
+    it('centres a fragment of IconButtons in trailing', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="About"
+          trailing={
+            <>
+              <IconButton icon="magnify" accessibilityLabel="Search" />
+              <IconButton icon="share" accessibilityLabel="Share" />
+            </>
+          }
+        />,
+      )
+      expectSlotChildrenCentred(rootOf(toJSON()))
+    })
+
+    it('centres the built-in navigation button and actions', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Details"
+          canGoBack
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      expectSlotChildrenCentred(rootOf(toJSON()))
     })
   })
 

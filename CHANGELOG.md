@@ -12,8 +12,23 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 No breaking changes, and no change to the public API — `api-surface.json` is
-unchanged. This is a lint and internal-hygiene pass. One dev-only behaviour
-changes, and `rootnative add` copies one more file.
+unchanged. `AppBar` now centres custom slot content on the title line. The
+rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
+and `rootnative add` copies one more file.
+
+### `AppBar` centres an `IconButton` in `leading` and `trailing`
+
+An `IconButton` passed to `leading` or `trailing` sat 4pt above the title. The
+`IconButton` root sets `alignSelf: 'flex-start'`, so that the button does not
+stretch in a column. In the row of the side slot, the same rule acts on the
+vertical axis and overrides the slot's `alignItems: 'center'`. The built-in
+back button and the `actions` escaped the defect only because each one sits in
+a centred 48×48 frame.
+
+Custom slot content is now wrapped in a row that the slot centres. The row
+keeps a fragment of several buttons side by side. If you wrapped an
+`IconButton` in your own centred `View` to correct the offset, you can remove
+the wrapper. It is not necessary, and it does no harm.
 
 ### The React Compiler lint rules are on
 
