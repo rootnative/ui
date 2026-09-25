@@ -143,15 +143,23 @@ export function AppBar({
   const titleVariant = titleVariantBySize[size]
   const isCenterAligned = variant === 'center-aligned'
   const isExpanded = size !== 'small'
+  // Same geometry as the Compose Material 3 `TopAppBarLayout`: each side slot
+  // and the title carry `horizontalPadding`, so the title starts 16dp from
+  // the edge with no leading content and 56dp after a 48dp navigation icon.
   const titleStartInset =
-    topAppBar.horizontalPadding +
-    Math.max(topAppBar.titleStartInset, leadingWidth)
-  const compactTitleEndInset = topAppBar.horizontalPadding + actionsWidth
-  const centeredSideInset =
-    topAppBar.horizontalPadding + Math.max(leadingWidth, actionsWidth)
+    Math.max(
+      topAppBar.titleStartInset,
+      topAppBar.horizontalPadding + leadingWidth,
+    ) + topAppBar.horizontalPadding
+  const compactTitleEndInset = 2 * topAppBar.horizontalPadding + actionsWidth
+  const centeredSideInset = Math.max(titleStartInset, compactTitleEndInset)
+  // The expanded row of a medium or large bar has no leading content in
+  // MD3, so its title aligns under the navigation icon.
+  const expandedTitleStartInset =
+    topAppBar.titleStartInset + topAppBar.horizontalPadding
   const expandedTitleInsetStyle = useMemo<ViewStyle>(
-    () => ({ paddingStart: titleStartInset }),
-    [titleStartInset],
+    () => ({ paddingStart: expandedTitleStartInset }),
+    [expandedTitleStartInset],
   )
   const overlayTitleInsetStyle = useMemo<ViewStyle>(
     () =>
@@ -203,9 +211,14 @@ export function AppBar({
   const containerCollapseStyle = useInterpolatedStyle(collapseProgress, {
     height: [expandedHeight, topAppBar.smallContainerHeight],
   })
-  // Stays hand-rolled: `end` is a logical (RTL-aware) inset, which isn't one
-  // of `useInterpolatedStyle`'s numeric keys.
+  // Stays hand-rolled: `start` and `end` are logical (RTL-aware) insets,
+  // which aren't among `useInterpolatedStyle`'s numeric keys.
   const titleContainerCollapseStyle = useAnimatedStyle(() => ({
+    start: interpolate(
+      collapseProgress.value,
+      [0, 1],
+      [expandedTitleStartInset, titleStartInset],
+    ),
     top: interpolate(
       collapseProgress.value,
       [0, 1],
@@ -226,10 +239,6 @@ export function AppBar({
     fontSize: [expandedTitleType.fontSize, collapsedTitleType.fontSize],
     lineHeight: [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
   })
-  const collapsibleTitleInsetStyle = useMemo<ViewStyle>(
-    () => ({ start: titleStartInset }),
-    [titleStartInset],
-  )
 
   const leadingContent = useMemo(() => {
     if (leading) {
@@ -424,7 +433,6 @@ export function AppBar({
         <Animated.View
           style={[
             styles.collapsibleTitleContainer,
-            collapsibleTitleInsetStyle,
             titleContainerCollapseStyle,
           ]}
         >

@@ -53,6 +53,26 @@ function expectSlotChildrenCentred(node: RenderedNode) {
   }
 }
 
+// Jest fires no layout events, so a test reports the measured widths of the
+// leading and trailing slots itself.
+function layoutSideSlots(leadingWidth: number, actionsWidth: number) {
+  const [leadingSlot, actionsSlot] = screen
+    .UNSAFE_getAllByProps({ collapsable: false })
+    .filter((node) => typeof node.type === 'string' && node.props.onLayout)
+  const layout = (width: number) => ({
+    nativeEvent: { layout: { x: 0, y: 0, width, height: 48 } },
+  })
+  fireEvent(leadingSlot, 'layout', layout(leadingWidth))
+  fireEvent(actionsSlot, 'layout', layout(actionsWidth))
+}
+
+function titleInsets(node: RenderedNode) {
+  const host = collectFlattenedStyles(node).find(
+    (s) => s.start !== undefined || s.paddingStart !== undefined,
+  )
+  return { start: host?.start ?? host?.paddingStart, end: host?.end }
+}
+
 describe('AppBar', () => {
   it('renders the title text', () => {
     renderWithTheme(<AppBar title="Home" />)
@@ -129,6 +149,62 @@ describe('AppBar', () => {
       )
       expect(screen.queryByLabelText('Go back')).toBeNull()
       expect(screen.getByTestId('custom-leading')).toBeTruthy()
+    })
+  })
+
+  // The expected numbers are the Compose Material 3 `TopAppBarLayout`
+  // geometry: 4dp slot padding plus 4dp title padding, and a 12dp title
+  // inset when the leading slot is empty.
+  describe('title insets', () => {
+    it('starts the title 16dp from the edge without leading content', () => {
+      const { toJSON } = renderWithTheme(<AppBar title="Home" />)
+      layoutSideSlots(0, 0)
+      expect(titleInsets(rootOf(toJSON()))).toEqual({ start: 16, end: 8 })
+    })
+
+    it('starts the title 56dp from the edge after a 48dp navigation icon', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Details"
+          canGoBack
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      layoutSideSlots(48, 48)
+      expect(titleInsets(rootOf(toJSON()))).toEqual({ start: 56, end: 56 })
+    })
+
+    it('aligns an expanded title under the navigation icon', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar title="Large" variant="large" canGoBack />,
+      )
+      layoutSideSlots(48, 0)
+      expect(titleInsets(rootOf(toJSON())).start).toBe(16)
+    })
+
+    it('moves a collapsing title from 16dp to the small-bar inset', () => {
+      const expanded = renderWithTheme(
+        <AppBar
+          title="Large"
+          variant="large"
+          canGoBack
+          scrollOffset={scrollOffsetAt(0)}
+        />,
+      )
+      layoutSideSlots(48, 0)
+      expect(titleInsets(rootOf(expanded.toJSON())).start).toBe(16)
+      expanded.unmount()
+
+      const collapsed = renderWithTheme(
+        <AppBar
+          title="Large"
+          variant="large"
+          canGoBack
+          scrollOffset={scrollOffsetAt(500)}
+        />,
+      )
+      layoutSideSlots(48, 0)
+      expect(titleInsets(rootOf(collapsed.toJSON())).start).toBe(56)
     })
   })
 

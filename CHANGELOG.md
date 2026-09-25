@@ -12,8 +12,8 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 No breaking changes. `AppBar` gains one prop and one exported type,
-`AppBarNavigationIcon`, and custom slot content now sits on the title line.
-The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
+`AppBarNavigationIcon`, and its layout moves to the MD3 geometry, so every bar
+shifts by a few dp. The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
 and `rootnative add` copies one more file.
 
 ### `AppBar` centres an `IconButton` in `leading` and `trailing`
@@ -26,9 +26,34 @@ back button and the `actions` escaped the defect only because each one sits in
 a centred 48×48 frame.
 
 Custom slot content is now wrapped in a row that the slot centres. The row
-keeps a fragment of several buttons side by side. If you wrapped an
-`IconButton` in your own centred `View` to correct the offset, you can remove
-the wrapper. It is not necessary, and it does no harm.
+keeps a fragment of several buttons side by side, and it is at least 48dp
+wide, so a custom `IconButton` takes the same space as the built-in one. If
+you wrapped an `IconButton` in your own centred `View` to correct the offset,
+you can remove the wrapper. It is not necessary, and it does no harm.
+
+### `AppBar` layout matches the MD3 geometry
+
+The reference is the Compose Material 3 `TopAppBarLayout`, measured on the
+web export of the example app. **Every bar moves by a few dp:**
+
+| Position, in dp from the bar edge | Before | Now |
+| --- | --- | --- |
+| Navigation button | 4–44 | 8–48 |
+| Last action, from the end edge | 12 | 8 |
+| Title, after a navigation button | 52 | 56 |
+| Title, after a custom `leading` `IconButton` | 44 | 56 |
+| Medium or large title, with a navigation button | 52 | 16 |
+
+- The built-in buttons had the same `flex-start` defect on the horizontal
+  axis: each sat 4dp to the start of its 48dp frame.
+- The title had no padding of its own. MD3 gives it 4dp on each side, the
+  same as each side slot.
+- MD3 puts the expanded title of a medium or large bar under the navigation
+  button, not after it. On scroll, the title now moves from 16dp to the
+  small-bar position while it collapses.
+
+No theme token changes. `horizontalPadding: 4` and `titleStartInset: 12`
+already had the MD3 values; the formulas that read them were wrong.
 
 ### `AppBar` has a close button for a modal
 
