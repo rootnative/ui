@@ -24,7 +24,7 @@ import { SafeAreaView } from '../safe-area'
 import { Typography } from '../typography'
 import type { TypographyVariant } from '../typography'
 import { createStyles, getColorSchemeColors } from './styles'
-import type { AppBarProps } from './types'
+import type { AppBarNavigationIcon, AppBarProps } from './types'
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView)
 
@@ -40,6 +40,17 @@ function getBackIcon(): IconButtonProps['icon'] {
   }
 
   return selectRTL('arrow-left', 'arrow-right')
+}
+
+function getNavigationButton(navigationIcon: AppBarNavigationIcon): {
+  icon: IconButtonProps['icon']
+  accessibilityLabel: string
+} {
+  if (navigationIcon === 'close') {
+    return { icon: 'close', accessibilityLabel: 'Close' }
+  }
+
+  return { icon: getBackIcon(), accessibilityLabel: 'Go back' }
 }
 
 const titleVariantBySize: Record<AppBarSize, TypographyVariant> = {
@@ -97,6 +108,7 @@ export function AppBar({
   variant = 'small',
   colorScheme = 'surface',
   canGoBack = false,
+  navigationIcon = 'back',
   onBackPress,
   insetTop = false,
   elevated = false,
@@ -228,20 +240,23 @@ export function AppBar({
       return null
     }
 
+    const navigationButton = getNavigationButton(navigationIcon)
+
     return (
       <View style={styles.iconFrame}>
         <IconButton
-          icon={getBackIcon()}
+          icon={navigationButton.icon}
           size="s"
           variant="standard"
           iconColor={resolvedContentColor}
-          accessibilityLabel="Go back"
+          accessibilityLabel={navigationButton.accessibilityLabel}
           onPress={onBackPress}
         />
       </View>
     )
   }, [
     canGoBack,
+    navigationIcon,
     resolvedContentColor,
     leading,
     onBackPress,

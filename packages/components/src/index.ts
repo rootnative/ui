@@ -35,6 +35,7 @@ export { AppBar } from './appbar'
 export type {
   AppBarAction,
   AppBarColorScheme,
+  AppBarNavigationIcon,
   AppBarProps,
   AppBarVariant,
 } from './appbar'

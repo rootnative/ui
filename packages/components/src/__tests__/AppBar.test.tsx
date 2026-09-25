@@ -85,6 +85,39 @@ describe('AppBar', () => {
     })
   })
 
+  describe('navigationIcon', () => {
+    it('renders a close button that announces "Close"', () => {
+      const onBackPress = jest.fn()
+      renderWithTheme(
+        <AppBar
+          title="About"
+          canGoBack
+          navigationIcon="close"
+          onBackPress={onBackPress}
+        />,
+      )
+      expect(
+        screen.getByText('close', { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(screen.queryByLabelText('Go back')).toBeNull()
+      fireEvent.press(screen.getByLabelText('Close'))
+      expect(onBackPress).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps the back arrow and its label by default', () => {
+      renderWithTheme(
+        <AppBar title="Details" canGoBack navigationIcon="back" />,
+      )
+      expect(screen.getByLabelText('Go back')).toBeTruthy()
+      expect(screen.queryByLabelText('Close')).toBeNull()
+    })
+
+    it('renders nothing without canGoBack', () => {
+      renderWithTheme(<AppBar title="About" navigationIcon="close" />)
+      expect(screen.queryByLabelText('Close')).toBeNull()
+    })
+  })
+
   describe('leading', () => {
     it('overrides the back button when leading is provided', () => {
       renderWithTheme(

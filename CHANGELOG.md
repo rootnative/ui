@@ -11,9 +11,9 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-No breaking changes, and no change to the public API — `api-surface.json` is
-unchanged. `AppBar` now centres custom slot content on the title line. The
-rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
+No breaking changes. `AppBar` gains one prop and one exported type,
+`AppBarNavigationIcon`, and custom slot content now sits on the title line.
+The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
 and `rootnative add` copies one more file.
 
 ### `AppBar` centres an `IconButton` in `leading` and `trailing`
@@ -29,6 +29,19 @@ Custom slot content is now wrapped in a row that the slot centres. The row
 keeps a fragment of several buttons side by side. If you wrapped an
 `IconButton` in your own centred `View` to correct the offset, you can remove
 the wrapper. It is not necessary, and it does no harm.
+
+### `AppBar` has a close button for a modal
+
+`navigationIcon="close"` changes the icon that `canGoBack` renders from a back
+arrow to a cross. The button keeps the built-in size, colour, and frame, so a
+modal no longer needs a custom `leading`. The accessibility label follows the
+icon: the cross announces "Close", and the arrow still announces "Go back".
+`onBackPress` fires for both. The default is `'back'`, so an existing bar does
+not change.
+
+```tsx
+<AppBar title="About" canGoBack navigationIcon="close" onBackPress={dismiss} />
+```
 
 ### The React Compiler lint rules are on
 

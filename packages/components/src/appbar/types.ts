@@ -7,6 +7,14 @@ import type { IconButtonProps } from '../icon-button'
 export type AppBarVariant = 'small' | 'center-aligned' | 'medium' | 'large'
 
 /**
+ * Icon of the built-in navigation button.
+ *
+ * - `'back'` — a back arrow (a chevron on iOS), labelled "Go back"
+ * - `'close'` — a cross for a modal or a full-screen dialog, labelled "Close"
+ */
+export type AppBarNavigationIcon = 'back' | 'close'
+
+/**
  * Color scheme that determines the default container and content colors.
  *
  * - `'surface'` — `surface` / `onSurface` (default, elevated uses `surfaceContainer`)
@@ -79,11 +87,18 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    */
   colorScheme?: AppBarColorScheme
   /**
-   * When `true`, renders a back button in the leading slot.
+   * When `true`, renders the navigation button in the leading slot. Its icon
+   * is set by `navigationIcon`.
    * @default false
    */
   canGoBack?: boolean
-  /** Called when the auto-rendered back button is pressed. */
+  /**
+   * Icon of the navigation button that `canGoBack` renders. Use `'close'` for
+   * a modal. The accessibility label follows the icon: "Go back" or "Close".
+   * @default 'back'
+   */
+  navigationIcon?: AppBarNavigationIcon
+  /** Called when the auto-rendered navigation button is pressed. */
   onBackPress?: () => void
   /**
    * When `true`, wraps the bar in a SafeAreaView that handles the top inset.
@@ -126,7 +141,10 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    * `'small'` and `'center-aligned'` variants.
    */
   scrollOffset?: SharedValue<number>
-  /** Custom leading content. When provided, overrides `canGoBack`. */
+  /**
+   * Custom leading content. When provided, overrides `canGoBack` and
+   * `navigationIcon`.
+   */
   leading?: ReactNode
   /**
    * Override the container (background) color.

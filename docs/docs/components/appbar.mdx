@@ -69,6 +69,44 @@ Follows the [Material Design 3 Top App Bar](https://m3.material.io/components/to
 `}
 />
 
+## In a Modal
+
+A modal closes, so it shows a cross, not a back arrow. Set
+`navigationIcon="close"`. The button keeps the built-in size, colour, and
+position, and it announces "Close" to screen readers. `onBackPress` fires for
+both icons.
+
+<SnackExample
+  name="RootNative AppBar — Close Button"
+  code={`
+  import { AppBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { Alert, View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1 }}>
+            <AppBar
+              title="About"
+              canGoBack
+              navigationIcon="close"
+              onBackPress={() => Alert.alert('Close pressed')}
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+For any other leading control, pass it to `leading`. The bar centres custom
+`leading` and `trailing` content on the title, so an `IconButton` needs no
+wrapper.
+
 ## With Actions
 
 <SnackExample

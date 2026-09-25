@@ -651,6 +651,7 @@ import { AppBar } from '@rootnative/components/appbar'
 
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
+<AppBar title="About" canGoBack navigationIcon="close" onBackPress={router.back} />
 <AppBar title="Settings" variant="center-aligned" actions={[
   { icon: 'magnify', accessibilityLabel: 'Search', onPress: onSearch },
   { icon: 'dots-vertical', accessibilityLabel: 'More', onPress: onMore },

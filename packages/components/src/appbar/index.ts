@@ -3,6 +3,7 @@ export type {
   AppBarAction,
   AppBarColorScheme,
   AppBarIconAction,
+  AppBarNavigationIcon,
   AppBarProps,
   AppBarTextAction,
   AppBarVariant,

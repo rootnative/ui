@@ -1,4 +1,10 @@
-import { AppBar, Box, Typography, Column } from '@rootnative/components'
+import {
+  AppBar,
+  Box,
+  Column,
+  IconButton,
+  Typography,
+} from '@rootnative/components'
 import type {
   AppBarAction,
   AppBarColorScheme,
@@ -150,6 +156,44 @@ export default function AppBarScreen() {
               </Box>
             </Column>
           ))}
+        </Column>
+      </Column>
+
+      <Column gap="sm">
+        <Typography variant="titleSmall">Close Button</Typography>
+        <Typography variant="bodySmall">
+          navigationIcon=&quot;close&quot; for a modal. The second bar passes an
+          IconButton to leading and trailing; both sit on the title line.
+        </Typography>
+        <Column gap="md">
+          <Box style={previewStyle}>
+            <AppBar
+              title="About"
+              canGoBack
+              navigationIcon="close"
+              onBackPress={() => router.back()}
+            />
+          </Box>
+          <Box style={previewStyle}>
+            <AppBar
+              title="About"
+              leading={
+                <IconButton
+                  icon="close"
+                  variant="standard"
+                  accessibilityLabel="Close"
+                  onPress={() => router.back()}
+                />
+              }
+              trailing={
+                <IconButton
+                  icon="share-variant"
+                  variant="standard"
+                  accessibilityLabel="Share"
+                />
+              }
+            />
+          </Box>
         </Column>
       </Column>
 
