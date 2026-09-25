@@ -29,7 +29,7 @@ The theme system (`@rootnative/core`) stays as an npm dependency so theme update
 ## Requirements
 
 - Node.js >= 18
-- Expo SDK 57: React Native >=0.83.0 <0.87.0 and React >=19.2.3 <20.0.0, the band the published packages declare
+- Expo SDK 57: React Native `>=0.83.0 <0.87.0` and React `>=19.2.3 <20.0.0`, the band the published packages declare
 - TypeScript project (recommended)
 
 ## Commands
