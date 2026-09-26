@@ -101,7 +101,10 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   /** Called when the auto-rendered navigation button is pressed. */
   onBackPress?: () => void
   /**
-   * When `true`, wraps the bar in a SafeAreaView that handles the top inset.
+   * When `true`, pads the bar by the top safe-area inset. Inside a
+   * `SafeAreaProvider` the inset comes from context, so it is correct on the
+   * first paint of a modal route. Without a provider the bar falls back to the
+   * native `SafeAreaView`.
    * @default false
    */
   insetTop?: boolean
