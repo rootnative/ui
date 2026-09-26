@@ -9,6 +9,66 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.18 — 2026-09-27
+
+No breaking changes. `TextField` gains a `ref` prop. Every component that
+applies a safe-area inset reads it from `SafeAreaProvider` when one is
+mounted. The snackbar fits a phone screen on native. All three came from the
+`reelist` app, and each one names the workaround you can now remove.
+
+### `TextField` forwards a ref to its `TextInput`
+
+`TextField` took every `TextInputProps` but no `ref`, so a screen could not
+call `focus()`, `blur()` or `setSelection()` on it. `TextFieldProps` now
+declares `ref?: Ref<TextInput>`, and the component merges it with the ref it
+uses for its own press-to-focus.
+
+```tsx
+const ref = useRef<TextInput>(null)
+<TextField ref={ref} label="Search" />
+ref.current?.focus()
+```
+
+React 19 passes `ref` as a prop, so the component is not wrapped in
+`forwardRef`. If you drew a plain `TextInput` to get a programmatic focus,
+you can use `TextField` again.
+
+### Safe-area insets come from the provider on the first paint
+
+`AppBar insetTop`, `Layout`, `NavigationBar insetBottom`, `BottomSheet` and
+the snackbar layer all wrapped their content in the native `SafeAreaView`
+from `react-native-safe-area-context`. That view measures its own inset on
+the native side, and on a `transparentModal` route from
+`react-native-screens` the first measurement is 0. The bar sat under the
+status bar until something re-rendered it, such as a theme change.
+
+The shared wrapper now reads `SafeAreaInsetsContext`. Inside a
+`SafeAreaProvider` it renders a plain `View` and adds each requested edge's
+inset to the padding the style carries, the same additive maths as the
+package's own web `SafeAreaView`. That value is correct on the first render.
+Without a provider the context is `null`, and the wrapper renders the native
+`SafeAreaView` as before.
+
+**Expo Router mounts a `SafeAreaProvider` at its root**, so every Expo Router
+app takes the new path with no change. If you dropped `insetTop` and padded
+an `AppBar` from `useSafeAreaInsets` yourself, put `insetTop` back and remove
+the padding. Do not keep both, or the bar gets a double inset on a phone.
+
+### The snackbar fits a phone screen on iOS and Android
+
+On native, the snackbar surface was 600dp wide on a 402dp phone, and the
+layer centred it 99dp off the left edge. The reader saw the tail of the
+message and no action label. The surface set `width: '100%'` and
+`maxWidth: 600`, but its parent, the entrance `Motion.View`, had no width. In
+Yoga a percentage width does not resolve against a grandparent, so the
+surface took its maximum. A browser resolves it, which is why the web build
+was correct.
+
+The entrance view now carries `width: '100%'` and `maxWidth: 600`, and the
+surface no longer sets `maxWidth`. The surface still fills the 16dp-margined
+layer up to 600dp, so a tablet layout does not change. If you passed a
+numeric `width` through the provider `style` as a workaround, remove it.
+
 ## 0.0.0-alpha.17 — 2026-09-26
 
 No breaking changes. `AppBar` gains one prop and one exported type,
