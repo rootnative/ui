@@ -1,5 +1,11 @@
 import type { IconSource } from '@rootnative/utils'
-import type { StyleProp, TextInputProps, TextStyle } from 'react-native'
+import type { Ref } from 'react'
+import type {
+  StyleProp,
+  TextInput,
+  TextInputProps,
+  TextStyle,
+} from 'react-native'
 
 /** Visual container style for the text field. */
 export type TextFieldVariant = 'filled' | 'outlined'
@@ -65,4 +71,9 @@ export interface TextFieldProps extends Omit<
   contentColor?: string
   /** Additional style applied to the text input element. */
   inputStyle?: StyleProp<TextStyle>
+  /**
+   * Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and
+   * `setSelection()` calls. The field keeps its own press-to-focus.
+   */
+  ref?: Ref<TextInput>
 }

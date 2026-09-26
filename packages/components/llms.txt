@@ -595,6 +595,7 @@ Props:
 - `containerColor?: string` — Override the container (background) color. Disabled state still uses the standard disabled appearance.
 - `contentColor?: string` — Override the content (input text and icon) color. Error and disabled states take precedence.
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
+- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `setSelection()` calls. The field keeps its own press-to-focus.
 
 ---
 

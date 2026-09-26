@@ -2,6 +2,8 @@ import { lightTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
+import { createRef } from 'react'
+import type { TextInput } from 'react-native'
 import { StyleSheet, Text } from 'react-native'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 import { TextField } from '../text-field/TextField'
@@ -415,6 +417,32 @@ describe('TextField', () => {
       const container = childrenOf(childrenOf(root)[0])[0]
       const flatStyle = StyleSheet.flatten(container.props.style)
       expect(flatStyle.backgroundColor).not.toBe('#FF0000')
+    })
+  })
+
+  describe('ref', () => {
+    it('forwards an object ref to the inner TextInput', () => {
+      const ref = createRef<TextInput>()
+      renderWithTheme(<TextField label="Search" ref={ref} />)
+      expect(ref.current).not.toBeNull()
+      expect(typeof ref.current?.focus).toBe('function')
+    })
+
+    it('forwards a callback ref to the inner TextInput', () => {
+      const ref = jest.fn()
+      renderWithTheme(<TextField label="Search" ref={ref} />)
+      expect(ref).toHaveBeenCalledWith(expect.anything())
+      expect(ref.mock.calls[0][0]).not.toBeNull()
+    })
+
+    it('keeps press-to-focus on the container with a consumer ref', () => {
+      const ref = createRef<TextInput>()
+      renderWithTheme(<TextField label="Search" ref={ref} />)
+      const focus = jest.fn()
+      Object.assign(ref.current as object, { focus })
+      const input = screen.getByLabelText('Search')
+      fireEvent.press(input.parent!.parent!)
+      expect(focus).toHaveBeenCalled()
     })
   })
 })

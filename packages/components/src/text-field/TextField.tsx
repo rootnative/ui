@@ -59,6 +59,7 @@ export function TextField({
   maxLength,
   cursorColor,
   selectionColor,
+  ref,
   ...textInputProps
 }: TextFieldProps) {
   const theme = useTheme()
@@ -82,6 +83,14 @@ export function TextField({
     () => value ?? textInputProps.defaultValue ?? '',
   )
   const inputRef = useRef<TextInput>(null)
+  const setInputRef = useCallback(
+    (node: TextInput | null) => {
+      inputRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) ref.current = node
+    },
+    [ref],
+  )
 
   const isControlled = value !== undefined
   const currentValue = isControlled ? value : internalValue
@@ -440,7 +449,7 @@ export function TextField({
 
           <View style={inputWrapperStyleArr}>
             <TextInput
-              ref={inputRef}
+              ref={setInputRef}
               {...textInputProps}
               value={value}
               onChangeText={handleChangeText}
