@@ -169,6 +169,11 @@ jobs:
       - name: Docs check
         run: pnpm run docs:check
 
+      # The regenerate step below repairs drift without a report. This check
+      # stops the release first, the same as in release.yml. Needs no build.
+      - name: Registry drift check
+        run: pnpm run registry:check
+
       - name: Inertia pin check
         run: pnpm run check:inertia-pins
 

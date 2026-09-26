@@ -9,11 +9,12 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.17 — 2026-09-26
 
 No breaking changes. `AppBar` gains one prop and one exported type,
 `AppBarNavigationIcon`, and its layout moves to the MD3 geometry, so every bar
-shifts by a few dp. The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
+shifts by a few dp. On iOS, the shadow of a non-interactive elevated `Card`
+is softer. The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
 and `rootnative add` copies one more file.
 
 ### `AppBar` centres an `IconButton` in `leading` and `trailing`
@@ -68,6 +69,19 @@ not change.
 <AppBar title="About" canGoBack navigationIcon="close" onBackPress={dismiss} />
 ```
 
+### An elevated `Card` has the correct shadow blur on iOS
+
+This change applies only to an elevated `Card` with no `onPress`, on iOS. That
+card paints its shadow through `boxShadow`, because iOS clips the `shadow*`
+keys of a view that clips its children. Fabric halves the blur of a
+`boxShadow` on iOS (`React/Fabric/Utils/RCTBoxShadow.mm`), so the card had a
+blur radius of 1 instead of the level-1 value of 2. The card now doubles the
+blur before Fabric halves it, and its shadow is the same as the level-1 shadow
+on every other surface.
+
+**The shadow is softer than in alpha.16.** Android and web do not change, and
+an interactive `Card` does not change.
+
 ### The React Compiler lint rules are on
 
 `eslint-plugin-react-hooks` moves from `4.6.2` to `7.1.1`, which brings the
@@ -113,6 +127,10 @@ The warnings stay dev-only, and production is unaffected.
 `tooltip` entries gain `internal/warnOnce.ts`. A component you scaffolded
 before this release carries its own latch and still works, so there is nothing
 to redo.
+
+**`rootnative create` pins `@rootnative/inertia` `0.0.13`.** The two templates
+pinned `0.0.11`. The peer range stays `>=0.0.11 <0.1.0`, because no component
+uses an inertia API that is newer than `0.0.11`.
 
 ## 0.0.0-alpha.16 — 2026-09-13
 

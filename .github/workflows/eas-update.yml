@@ -9,6 +9,9 @@ on:
       - "example/**"
       - "pnpm-lock.yaml"
 
+permissions:
+  contents: read
+
 jobs:
   update:
     name: EAS Update
@@ -37,6 +40,9 @@ jobs:
 
       - name: Publish update
         working-directory: example
-        run: eas update --channel main --message "${{ github.event.head_commit.message }}"
+        # The commit message goes through `env`, not into the script text. A
+        # message that holds `"` or `$(...)` then stays data and cannot run.
+        run: eas update --channel main --message "$COMMIT_MESSAGE"
         env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
