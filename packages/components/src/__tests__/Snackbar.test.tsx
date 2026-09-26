@@ -332,7 +332,24 @@ describe('Snackbar tokens', () => {
     expect(style.backgroundColor).toBe(lightTheme.colors.inverseSurface)
     expect(style.borderRadius).toBe(lightTheme.shape.cornerExtraSmall)
     expect(style.minHeight).toBe(48)
-    expect(style.maxWidth).toBe(600)
+  })
+
+  it('gives the entrance wrapper the width the surface resolves against', () => {
+    renderProvider()
+    show({ message: 'Saved' })
+
+    // Yoga resolves a percentage width against the parent only, so the
+    // wrapper, not the surface, must carry the maximum. See styles.ts.
+    const wrapper = StyleSheet.flatten(
+      screen.getByTestId('snackbar-layer').props.style,
+    )
+    expect(wrapper.width).toBe('100%')
+    expect(wrapper.maxWidth).toBe(600)
+
+    const surface = screen.UNSAFE_getByProps({ role: 'alert' })
+    const surfaceStyle = StyleSheet.flatten(surface.props.style)
+    expect(surfaceStyle.width).toBe('100%')
+    expect(surfaceStyle.maxWidth).toBeUndefined()
   })
 
   it('renders the message in inverseOnSurface', () => {

@@ -42,14 +42,23 @@ export function createSnackbarStyles(
       paddingHorizontal: SNACKBAR_MARGIN,
       paddingBottom: SNACKBAR_MARGIN + bottomOffset,
     },
+    // The entrance `Motion.View` between the layer and the surface. It must
+    // own a width: in Yoga a percentage width does not resolve against a
+    // grandparent, so a surface at `width: '100%'` inside an auto-width
+    // wrapper took its 600dp maximum and the layer centred it off both edges
+    // of a phone. The web engine resolves it either way, which is why only
+    // native overflowed.
+    wrapper: {
+      width: '100%',
+      maxWidth: SNACKBAR_MAX_WIDTH,
+    },
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      // `width: '100%'` inside the 16dp-margined layer already produces the
-      // MD3 compact behaviour (full width minus margins), so the 344dp minimum
-      // would only ever fight small screens.
+      // `width: '100%'` of the wrapper, which the 16dp-margined layer already
+      // limits, produces the MD3 compact behaviour (full width minus margins),
+      // so the 344dp minimum would only ever fight small screens.
       width: '100%',
-      maxWidth: SNACKBAR_MAX_WIDTH,
       minHeight: 48,
       borderRadius: theme.shape.cornerExtraSmall,
       backgroundColor: containerColor ?? theme.colors.inverseSurface,
