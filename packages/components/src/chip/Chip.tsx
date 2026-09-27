@@ -29,7 +29,7 @@ import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   CHIP_FOCUS_RING_OFFSET,
-  CHIP_SELECTED_REST_RADIUS,
+  getChipSelectedRadius,
   createStyles,
   getChipRestRadius,
   getResolvedChipColors,
@@ -144,6 +144,7 @@ export function Chip(props: ChipProps) {
   // baseline shape — the morph is pinned to rest for them.
   const isSelectable = variant === 'filter' || variant === 'input'
   const restRadius = getChipRestRadius(theme, variant)
+  const selectedRadius = getChipSelectedRadius(theme)
   const pressedRadius = theme.shape.cornerSmall
   const morph = usePressMorph({
     rest: restRadius,
@@ -163,7 +164,7 @@ export function Chip(props: ChipProps) {
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
-      [restRadius, CHIP_SELECTED_REST_RADIUS],
+      [restRadius, selectedRadius],
     )
     return {
       borderRadius: interpolate(
@@ -181,7 +182,7 @@ export function Chip(props: ChipProps) {
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
-      [restRadius, CHIP_SELECTED_REST_RADIUS],
+      [restRadius, selectedRadius],
     )
     return {
       opacity: states.focusVisible.value,
@@ -223,7 +224,7 @@ export function Chip(props: ChipProps) {
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
-      [restRadius, CHIP_SELECTED_REST_RADIUS],
+      [restRadius, selectedRadius],
     )
     return {
       borderRadius: interpolate(

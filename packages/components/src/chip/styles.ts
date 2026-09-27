@@ -7,9 +7,18 @@ export const CHIP_FOCUS_RING_OFFSET = 2
 export const CHIP_FOCUS_RING_WIDTH = 3
 
 export const CHIP_HEIGHT = 32
-// Selected filter chips rest as a pill (MD3 Expressive) — the effective
-// radius is half the chip height, not the `cornerFull` sentinel.
-export const CHIP_SELECTED_REST_RADIUS = CHIP_HEIGHT / 2
+
+/**
+ * Resting corner radius of a selected filter chip. MD3 Expressive draws it as
+ * a pill, and at the default roundness `cornerLarge` (16dp) is exactly half
+ * the chip height, so the pill is read from that token rather than from the
+ * `cornerFull` sentinel — `applyRoundness` never scales the sentinel, so a
+ * theme with `roundness: 0` would still get a pill and could not express a
+ * square selected chip. The cap keeps a rounder theme at a true pill.
+ */
+export function getChipSelectedRadius(theme: MaterialTheme): number {
+  return Math.min(theme.shape.cornerLarge, CHIP_HEIGHT / 2)
+}
 
 /**
  * Resting corner radius per MD3 Expressive: selectable chips (filter/input)

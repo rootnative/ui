@@ -1,4 +1,4 @@
-import { lightTheme } from '@rootnative/core'
+import { applyRoundness, lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -225,6 +225,37 @@ describe('Chip', () => {
       const chip = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(chip.props.style)
       expect(flatStyle.backgroundColor).toBe('rgba(29, 27, 32, 0.12)')
+    })
+  })
+
+  describe('shape', () => {
+    it('a selected filter chip rests as a pill on the default theme', () => {
+      renderWithTheme(
+        <Chip variant="filter" selected>
+          Pill
+        </Chip>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.borderRadius).toBe(16)
+    })
+
+    it('a selected filter chip stays square under roundness 0', () => {
+      // The pill is read from `cornerLarge`, which `applyRoundness` scales,
+      // not from the `cornerFull` sentinel, which it never does. A flat theme
+      // must be able to say "selected is still square".
+      const theme = { ...lightTheme, shape: applyRoundness(0) }
+      renderWithTheme(
+        <Chip variant="filter" selected>
+          Square
+        </Chip>,
+        { theme },
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByRole('button').props.style,
+      )
+      expect(flatStyle.borderRadius).toBe(0)
     })
   })
 

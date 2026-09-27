@@ -9,6 +9,21 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+No breaking changes. A selected filter chip reads its pill from the theme.
+
+### A selected filter `Chip` respects `roundness`
+
+The selected rest radius was a constant, half the chip height, while the
+unselected radius read `theme.shape.cornerMedium`. Under `applyRoundness(0)`
+every surface was square except a selected filter chip, which morphed into a
+16dp pill and could not be themed out of it. Found in `rootnative/ui-example`,
+whose Survey theme is flat by design. The selected radius now reads
+`theme.shape.cornerLarge`, which is 16dp at the default roundness and scales
+with it, capped at half the chip height so a rounder theme still draws a true
+pill. The default look is unchanged.
+
 ## 0.0.0-alpha.18 — 2026-09-27
 
 No breaking changes. `TextField` gains a `ref` prop. Every component that
