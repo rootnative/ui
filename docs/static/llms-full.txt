@@ -1864,6 +1864,7 @@ Props:
 - `label: string` — Text label under the icon. One line — a label that doesn't fit is truncated. Also the destination's screen-reader name, so it stays required even when `labelVisibility` hides it.
 - `icon: IconSource` — Icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
 - `selectedIcon?: IconSource` — Icon shown while the destination is active — MD3 pairs an outlined resting icon with its filled counterpart. Falls back to `icon`.
+- `badge?: boolean | number | string` — Badge on the icon. `true` renders a small dot. A number or a short string renders a large badge with that content, capped at `999+`. The badge is decorative: put the count in `accessibilityLabel` so a screen reader announces it.
 - `disabled?: boolean` — Greys the destination out at 38% and stops it responding.
 - `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
 
@@ -1892,6 +1893,47 @@ Props:
 - `disabled?: boolean` — Default: `false`. Whether the avatar is disabled. Blocks interaction, renders the content at 38% opacity, and reports `accessibilityState: { disabled: true }`. Only applies when `onPress` is set.
 - `accessibilityLabel?: string` — Required when `onPress` is provided — labels the button for screen readers.
 - Inherits `ViewProps` (except `style`)
+
+---
+
+### Badge
+
+```tsx
+import { Badge } from '@rootnative/components/badge'
+
+// No label: a 6dp dot. Give it a label for screen readers.
+<Badge accessibilityLabel="New activity">
+  <MaterialCommunityIcons name="bell-outline" size={24} />
+</Badge>
+
+// Label: a 16dp pill. Numbers above max (default 999) render as "999+".
+<Badge label={3}>
+  <MaterialCommunityIcons name="email-outline" size={24} />
+</Badge>
+<Badge label={1200} max={99}>
+  <MaterialCommunityIcons name="message-outline" size={24} />
+</Badge>
+
+// Hidden badge keeps the anchor layout. No children renders inline.
+<Badge label={count} visible={count > 0}>{icon}</Badge>
+<Badge label={12} />
+
+// NavigationBar items take `badge`: true for a dot, a number or string for a count.
+<NavigationBar items={[{ value: 'inbox', label: 'Inbox', icon: 'email-outline', badge: 7 }]} />
+```
+
+Props:
+- `label?: string | number` — Content of the badge. A number or a short string, for example a count. Omit it for a small dot. A number above `max` renders as `{max}+`.
+- `max?: number` — Default: `999`. The largest number the badge shows before it truncates to `{max}+`. Applies to numeric labels only.
+- `visible?: boolean` — Default: `true`. Whether the badge renders. When `false`, the anchor still renders and keeps its layout, so a badge can appear later without a shift.
+- `children?: ReactNode` — The element the badge anchors to, usually a 24dp icon. The badge sits at the anchor's top-end corner per the MD3 offsets. Without children the badge renders inline on its own.
+- `containerColor?: string` — Default: `error`. Override the badge fill.
+- `contentColor?: string` — Default: `onError`. Override the label color.
+- `style?: StyleProp<ViewStyle>` — Style applied to the badge itself, not to the anchor wrapper.
+- `wrapperStyle?: StyleProp<ViewStyle>` — Style applied to the wrapper that holds the anchor and the badge.
+- `accessibilityLabel?: string` — Screen-reader text for the badge, for example "3 unread messages". A small badge has no text of its own, so without this label a screen reader does not announce it.
+- `testID?: string` — Test id applied to the badge. The anchor wrapper, when children are given, carries `<testID>-wrapper`.
+- Inherits `ViewProps` (except `children`, `style`)
 
 ---
 

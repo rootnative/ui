@@ -120,6 +120,9 @@ export type { KeyboardAvoidingWrapperProps } from './keyboard-avoiding-wrapper'
 export { Avatar } from './avatar'
 export type { AvatarProps, AvatarSize } from './avatar'
 
+export { Badge, BADGE_MAX_DEFAULT } from './badge'
+export type { BadgeProps, BadgeSize } from './badge'
+
 export {
   Portal,
   PortalHost,

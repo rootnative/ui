@@ -127,6 +127,11 @@
       "react-native": "./dist/avatar/index.js",
       "default": "./dist/avatar/index.js"
     },
+    "./badge": {
+      "types": "./dist/badge/index.d.ts",
+      "react-native": "./dist/badge/index.js",
+      "default": "./dist/badge/index.js"
+    },
     "./portal": {
       "types": "./dist/portal/index.d.ts",
       "react-native": "./dist/portal/index.js",
@@ -230,6 +235,9 @@
       ],
       "avatar": [
         "dist/avatar/index.d.ts"
+      ],
+      "badge": [
+        "dist/badge/index.d.ts"
       ],
       "portal": [
         "dist/portal/index.d.ts"

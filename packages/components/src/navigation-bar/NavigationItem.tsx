@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { StyleProp, TextStyle } from 'react-native'
 import { Pressable, Text, View } from 'react-native'
+import { Badge } from '../badge'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -159,7 +160,20 @@ export function NavigationItem({
               pointerEvents.none,
             ]}
           />
-          {icon ? <View aria-hidden>{icon}</View> : null}
+          {icon ? (
+            <View aria-hidden>
+              {item.badge === undefined || item.badge === false ? (
+                icon
+              ) : (
+                <Badge
+                  label={item.badge === true ? undefined : item.badge}
+                  testID={testID === undefined ? undefined : `${testID}-badge`}
+                >
+                  {icon}
+                </Badge>
+              )}
+            </View>
+          ) : null}
         </View>
         {labelVisibility === 'always' ? (
           <Text style={resolvedLabelStyle} numberOfLines={1}>

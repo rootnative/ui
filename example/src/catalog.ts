@@ -315,6 +315,14 @@ export const sections: CatalogSection[] = [
         docs: 'components/navigation-bar',
         keywords: 'bottom navigation destinations bar pill indicator shell',
       },
+      {
+        label: 'Badge',
+        route: '/badge',
+        description: 'Small dot or count anchored to an icon',
+        add: 'badge',
+        docs: 'components/badge',
+        keywords: 'badge count notification dot unread indicator',
+      },
     ],
   },
 ]

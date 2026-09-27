@@ -536,6 +536,7 @@ const COMPONENT_ORDER = [
   'tabs',
   'navigation-bar',
   'avatar',
+  'badge',
   'slider',
   'progress',
   'loading-indicator',
@@ -568,6 +569,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   tabs: 'Tabs',
   'navigation-bar': 'NavigationBar',
   avatar: 'Avatar',
+  badge: 'Badge',
   slider: 'Slider',
   progress: 'Progress',
   'loading-indicator': 'LoadingIndicator',
@@ -1021,6 +1023,30 @@ import { Avatar } from '@rootnative/components/avatar'
 <Avatar icon="account" size="medium" containerColor="#E8DEF8" />
 <Avatar label="JD" size="small" />
 <Avatar icon="plus" onPress={handleAdd} accessibilityLabel="Add user" />
+\`\`\``,
+
+  badge: `\`\`\`tsx
+import { Badge } from '@rootnative/components/badge'
+
+// No label: a 6dp dot. Give it a label for screen readers.
+<Badge accessibilityLabel="New activity">
+  <MaterialCommunityIcons name="bell-outline" size={24} />
+</Badge>
+
+// Label: a 16dp pill. Numbers above max (default 999) render as "999+".
+<Badge label={3}>
+  <MaterialCommunityIcons name="email-outline" size={24} />
+</Badge>
+<Badge label={1200} max={99}>
+  <MaterialCommunityIcons name="message-outline" size={24} />
+</Badge>
+
+// Hidden badge keeps the anchor layout. No children renders inline.
+<Badge label={count} visible={count > 0}>{icon}</Badge>
+<Badge label={12} />
+
+// NavigationBar items take \`badge\`: true for a dot, a number or string for a count.
+<NavigationBar items={[{ value: 'inbox', label: 'Inbox', icon: 'email-outline', badge: 7 }]} />
 \`\`\``,
 
   slider: `\`\`\`tsx

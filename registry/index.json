@@ -10,6 +10,10 @@
       "description": "Circular avatar with image, icon, or text initials and 5 sizes (xSmall to xLarge)."
     },
     {
+      "name": "badge",
+      "description": "Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support."
+    },
+    {
       "name": "bottom-sheet",
       "description": "MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss."
     },

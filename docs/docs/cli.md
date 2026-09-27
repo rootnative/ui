@@ -386,6 +386,7 @@ what `npx rootnative list` prints, since both read the same registry.
 |-----------|-------------|-------------|
 | `appbar` | button, icon-button, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
 | `avatar` | — | Circular avatar with image, icon, or text initials and 5 sizes (xSmall to xLarge) |
+| `badge` | — | Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support |
 | `bottom-sheet` | portal | MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss |
 | `button` | — | MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support |
 | `button-group` | — | Standard and connected button groups with single or multi-select toggle behavior; replaces the deprecated MD3 segmented button |
@@ -401,7 +402,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `list` | divider | List container with interactive items, supporting headline/trailing text and dividers |
 | `loading-indicator` | — | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
 | `menu` | portal | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility |
-| `navigation-bar` | — | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
+| `navigation-bar` | badge | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
 | `portal` | — | Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips |
 | `progress` | — | Linear and circular progress indicators with determinate and indeterminate modes |
 | `radio` | — | Single-choice selection control with selected/unselected states |

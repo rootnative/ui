@@ -295,6 +295,7 @@ const NOT_COMPONENTS = new Set([
   'snackbarOffsetFor',
   'FAB_SIZES',
   'FAB_ICON_SIZES',
+  'BADGE_MAX_DEFAULT',
   'elevationBoxShadow',
   'elevationShadowConfig',
 ])

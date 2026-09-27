@@ -1,0 +1,17 @@
+{
+  "name": "badge",
+  "description": "Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support.",
+  "files": [
+    "packages/components/src/badge/Badge.tsx",
+    "packages/components/src/badge/index.ts",
+    "packages/components/src/badge/styles.ts",
+    "packages/components/src/badge/types.ts",
+    "packages/components/src/internal/pointerEvents.ts"
+  ],
+  "utils": [],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.18"
+  },
+  "optionalDependencies": {}
+}

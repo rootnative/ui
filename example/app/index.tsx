@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   ButtonGroup,
@@ -260,6 +261,32 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           <Avatar size="small" label="JD" />
           <Avatar size="medium" label="AK" />
           <Avatar size="small" icon="account" />
+        </Row>
+      )
+    case 'Badge':
+      return (
+        <Row gap="lg" align="center">
+          <Badge>
+            <MaterialCommunityIcons
+              name="bell-outline"
+              size={24}
+              color={theme.colors.onSurfaceVariant}
+            />
+          </Badge>
+          <Badge label={3}>
+            <MaterialCommunityIcons
+              name="email-outline"
+              size={24}
+              color={theme.colors.onSurfaceVariant}
+            />
+          </Badge>
+          <Badge label={1200}>
+            <MaterialCommunityIcons
+              name="message-outline"
+              size={24}
+              color={theme.colors.onSurfaceVariant}
+            />
+          </Badge>
         </Row>
       )
     case 'Progress':

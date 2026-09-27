@@ -1,0 +1,148 @@
+---
+sidebar_position: 2
+description: Badges show a small dot or a short count on an icon to signal new or unread items.
+---
+
+# Badge
+
+Badges show a small dot or a short count on an icon. A badge with no label is a 6dp dot. A badge with a label is a 16dp pill that holds a count or a short word.
+
+## Usage
+
+Wrap the anchor, usually a 24dp icon, and the badge sits at the anchor's top-end corner with the MD3 offsets.
+
+<SnackExample
+  name="RootNative Badge — Usage"
+  code={`
+  import { Badge } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
+            <Badge accessibilityLabel="New activity">
+              <MaterialCommunityIcons name="bell-outline" size={24} color="#49454F" />
+            </Badge>
+            <Badge label={3}>
+              <MaterialCommunityIcons name="email-outline" size={24} color="#49454F" />
+            </Badge>
+            <Badge label={1200}>
+              <MaterialCommunityIcons name="message-outline" size={24} color="#49454F" />
+            </Badge>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Sizes
+
+The size follows from `label`. There is no size prop.
+
+| Label | Size | Anatomy |
+|-------|------|---------|
+| none | small | 6dp dot, no content |
+| number or string | large | 16dp tall pill, `labelSmall` text, 4dp side padding, min width 16dp |
+
+## Counts and `max`
+
+A number above `max` renders as `{max}+`. The default `max` is 999, so `1200` renders as `999+`. Set `max` to a lower number for a narrower badge.
+
+<SnackExample
+  name="RootNative Badge — Max"
+  code={`
+  import { Badge } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
+            <Badge label={120} max={99}>
+              <MaterialCommunityIcons name="message-outline" size={24} color="#49454F" />
+            </Badge>
+            <Badge label="NEW">
+              <MaterialCommunityIcons name="star-outline" size={24} color="#49454F" />
+            </Badge>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Visibility
+
+Set `visible={false}` to hide the badge. The anchor keeps its layout, so the badge can appear later without a shift.
+
+```tsx
+<Badge label={count} visible={count > 0}>
+  <MaterialCommunityIcons name="cart-outline" size={24} color="#49454F" />
+</Badge>
+```
+
+## Standalone
+
+Without children the badge renders inline on its own, for example next to a list headline.
+
+```tsx
+<Badge label={12} />
+```
+
+## In a NavigationBar
+
+Each `NavigationBar` item accepts a `badge` value. `true` renders a dot. A number or a string renders a large badge.
+
+```tsx
+<NavigationBar
+  items={[
+    { value: 'home', label: 'Home', icon: 'home-outline' },
+    {
+      value: 'inbox',
+      label: 'Inbox',
+      icon: 'email-outline',
+      badge: 7,
+      accessibilityLabel: 'Inbox, 7 unread',
+    },
+    {
+      value: 'alerts',
+      label: 'Alerts',
+      icon: 'bell-outline',
+      badge: true,
+      accessibilityLabel: 'Alerts, new activity',
+    },
+  ]}
+/>
+```
+
+## Accessibility
+
+A large badge is text and a screen reader reads it. A small badge has no text, so give it an `accessibilityLabel`, for example "New activity".
+
+Inside a `NavigationBar` the icon block is hidden from screen readers, and the badge with it. Put the count in the item's `accessibilityLabel`.
+
+## Custom colors
+
+Override the fill with `containerColor` and the text with `contentColor`. The defaults are `error` and `onError`.
+
+```tsx
+<Badge label={5} containerColor="#6750A4" contentColor="#FFFFFF">
+  <MaterialCommunityIcons name="bell-outline" size={24} color="#49454F" />
+</Badge>
+```
+
+## Props
+
+<PropTable name="Badge" />

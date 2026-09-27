@@ -49,6 +49,7 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'components/avatar',
+        'components/badge',
         'components/card',
         'components/divider',
         'components/list',

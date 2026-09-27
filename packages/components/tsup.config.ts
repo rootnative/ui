@@ -26,6 +26,7 @@ export default defineConfig({
     'src/list/index.ts',
     'src/keyboard-avoiding-wrapper/index.ts',
     'src/avatar/index.ts',
+    'src/badge/index.ts',
     'src/portal/index.ts',
     'src/snackbar/index.ts',
     'src/slider/index.ts',

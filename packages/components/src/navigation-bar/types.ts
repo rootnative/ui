@@ -28,6 +28,13 @@ export interface NavigationBarItem {
    * resting icon with its filled counterpart. Falls back to `icon`.
    */
   selectedIcon?: IconSource
+  /**
+   * Badge on the icon. `true` renders a small dot. A number or a short
+   * string renders a large badge with that content, capped at `999+`. The
+   * badge is decorative: put the count in `accessibilityLabel` so a screen
+   * reader announces it.
+   */
+  badge?: boolean | number | string
   /** Greys the destination out at 38% and stops it responding. */
   disabled?: boolean
   /** Screen-reader label. Defaults to `label`. */
