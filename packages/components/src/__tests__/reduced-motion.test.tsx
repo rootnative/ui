@@ -23,6 +23,7 @@ import { NavigationBar } from '../navigation-bar'
 import { PortalHost } from '../portal/PortalHost'
 import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
+import { SearchBar } from '../search-bar'
 import { Skeleton } from '../skeleton'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
@@ -173,6 +174,14 @@ const CASES: readonly ReducedMotionCase[] = [
     // Focus drives the label float and the outline/label colour cascades.
     settle: () => {
       fireEvent(screen.getByLabelText('Name'), 'focus')
+    },
+  },
+  {
+    name: 'SearchBar',
+    render: () => <SearchBar placeholder="Search" />,
+    // Focus drives the focus state layer and the focus ring.
+    settle: () => {
+      fireEvent(screen.getByLabelText('Search'), 'focus')
     },
   },
   {

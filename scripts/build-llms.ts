@@ -523,6 +523,7 @@ const COMPONENT_ORDER = [
   'radio',
   'switch',
   'text-field',
+  'search-bar',
   'layout',
   'divider',
   'list',
@@ -556,6 +557,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   radio: 'Radio',
   switch: 'Switch',
   'text-field': 'TextField',
+  'search-bar': 'SearchBar',
   layout: 'Layout Components',
   divider: 'Divider',
   list: 'List',
@@ -715,6 +717,25 @@ import { TextField } from '@rootnative/components/text-field'
 <TextField label="Email" variant="outlined" value={email} onChangeText={setEmail} />
 <TextField label="Password" variant="filled" error errorText="Required" />
 <TextField label="Search" leadingIcon="magnify" trailingIcon="close" onTrailingIconPress={clear} />
+\`\`\``,
+
+  'search-bar': `\`\`\`tsx
+import { SearchBar } from '@rootnative/components/search-bar'
+
+// MD3 search bar: 56dp pill, leading search icon, clear button while it holds text.
+<SearchBar placeholder="Search mail" value={query} onChangeText={setQuery} onSearch={runSearch} />
+
+// Navigation icon as the leading button, plus trailing icon actions.
+<SearchBar
+  placeholder="Search"
+  leadingIcon="menu"
+  onLeadingIconPress={openDrawer}
+  leadingIconAccessibilityLabel="Open menu"
+  actions={[{ icon: 'microphone', accessibilityLabel: 'Voice search', onPress: listen }]}
+/>
+
+// Custom trailing content, such as an avatar.
+<SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
 \`\`\``,
 
   divider: `\`\`\`tsx
@@ -1365,6 +1386,52 @@ import { Grid } from '@rootnative/components/layout'
         output += line + '\n'
       }
     }
+
+    return output
+  }
+
+  // --- SearchBar: common props + the exclusive trailing pair + SearchBarAction ---
+  if (dirName === 'search-bar') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    // `SearchBarProps` is a type alias, the same shape as `AppBarProps`: the
+    // shared props come from `SearchBarCommonProps`, and the exclusive
+    // `actions` / `trailing` pair is described here.
+    const propsIface = interfaces.find((i) => i.name === 'SearchBarCommonProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output +=
+        '- `actions?: SearchBarAction[]` — Icon buttons rendered in the ' +
+        'trailing slot, such as a voice action. Mutually exclusive with ' +
+        '`trailing`.\n' +
+        '- `trailing?: ReactNode` — Custom trailing content, such as an ' +
+        '`Avatar`. Mutually exclusive with `actions` — the type rejects both ' +
+        'together. The clear button is not part of the slot: it shows before ' +
+        'either one while the bar holds text.\n' +
+        '- Inherits `TextInputProps` (except `editable`, `style`)\n'
+    }
+
+    const actionIface = interfaces.find((i) => i.name === 'SearchBarAction')
+    if (actionIface) {
+      output += '\nSearchBarAction:\n'
+      for (const member of actionIface.members) {
+        const resolved = resolveTypeAlias(member.type, typeAliases)
+        const opt = member.optional ? '?' : ''
+        let line = `- \`${member.name}${opt}: ${resolved}\``
+        if (member.defaultValue && member.comment) {
+          line += ` — Default: \`${member.defaultValue}\`. ${member.comment}`
+        } else if (member.defaultValue) {
+          line += ` — Default: \`${member.defaultValue}\``
+        } else if (member.comment) {
+          line += ` — ${member.comment}`
+        }
+        output += line + '\n'
+      }
+    }
+
+    output +=
+      '\nThis is the MD3 search **bar** only. The MD3 search **view** (the ' +
+      'expanded suggestions panel) is not part of the library yet.\n'
 
     return output
   }

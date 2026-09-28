@@ -46,6 +46,7 @@ Design-system agnostic component library for React Native. Ships with Material D
 | [FAB](./components/fab) | Floating action button for the screen's primary action |
 | [IconButton](./components/icon-button) | Icon-only actions |
 | [Radio](./components/radio) | Selection controls for single choice options |
+| [SearchBar](./components/search-bar) | MD3 search bar with a clear button and trailing actions |
 | [Slider](./components/slider) | Select a value or range from a continuous track |
 | [Switch](./components/switch) | Toggle controls for on/off settings |
 | [TextField](./components/text-field) | Text input with labels and validation |

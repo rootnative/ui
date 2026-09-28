@@ -1,0 +1,178 @@
+---
+sidebar_position: 5
+description: The search bar lets users enter a query to find content. Follows the Material Design 3 Search specification.
+---
+
+# SearchBar
+
+The search bar lets users enter a query to find content.
+Follows the [Material Design 3 Search](https://m3.material.io/components/search/overview) specification.
+
+MD3 Search has two parts: the **search bar** and the **search view**, the panel that opens from the bar and shows suggestions. This component is the search bar. The search view is not part of the library yet.
+
+## Usage
+
+<SnackExample
+  name="RootNative SearchBar — Usage"
+  code={`
+  import { SearchBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  export default function App() {
+    const [query, setQuery] = useState('')
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <SearchBar
+              placeholder="Search mail"
+              value={query}
+              onChangeText={setQuery}
+              onSearch={(text) => console.log('search', text)}
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The bar shows a clear button while it holds text. The clear button empties the bar through `onChangeText('')`, calls `onClear`, and moves focus back to the input. Set `showClearButton={false}` to remove it.
+
+The keyboard shows a **Search** key. When the user presses it, `onSearch` receives the current query.
+
+## Leading navigation icon
+
+The leading icon is a search icon by default, and it is decoration. Set `onLeadingIconPress` to make it a button, for example a menu or a back arrow. Give the button a name with `leadingIconAccessibilityLabel`.
+
+<SnackExample
+  name="RootNative SearchBar — Navigation icon"
+  code={`
+  import { SearchBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <SearchBar
+              placeholder="Search"
+              leadingIcon="menu"
+              onLeadingIconPress={() => console.log('open drawer')}
+              leadingIconAccessibilityLabel="Open menu"
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Trailing slot
+
+The trailing slot takes one of two props:
+
+| Prop | Use it for |
+|------|------------|
+| `actions` | Icon buttons, such as a voice action. Each entry needs an `accessibilityLabel`. |
+| `trailing` | Custom content that `actions` cannot build, such as an `Avatar`. MD3 sizes the avatar at 30dp. |
+
+The two props fill the same slot, so the type rejects both together.
+
+<SnackExample
+  name="RootNative SearchBar — Trailing slot"
+  code={`
+  import { Avatar, SearchBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 16 }}>
+            <SearchBar
+              placeholder="Search"
+              actions={[
+                {
+                  icon: 'microphone',
+                  accessibilityLabel: 'Voice search',
+                  onPress: () => console.log('listen'),
+                },
+              ]}
+            />
+            <SearchBar
+              placeholder="Search"
+              trailing={<Avatar size="xSmall" label="JD" />}
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Disabled
+
+<SnackExample
+  name="RootNative SearchBar — Disabled"
+  code={`
+  import { SearchBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
+            <SearchBar placeholder="Search" disabled />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+A disabled bar keeps its container color. Its text, placeholder, and icons change to 38% `onSurface`.
+
+## Specification
+
+| Part | MD3 token | Value |
+|------|-----------|-------|
+| Container | height, shape | 56dp, full corner |
+| Container | color | `surfaceContainerHigh` |
+| Container | elevation | level 0 |
+| Container | maximum width | 720dp — change it with `style={{ maxWidth }}` |
+| Leading icon | color | `onSurface` |
+| Trailing icons | color | `onSurfaceVariant` |
+| Input text | type, color | `bodyLarge`, `onSurface` |
+| Placeholder | type, color | `bodyLarge`, `onSurfaceVariant` |
+| Focus indicator | color | `secondary` |
+
+The bar shows a hover layer. It shows a focus layer and a focus ring for keyboard focus only. A press moves focus into the input and shows no press layer, as MD3 specifies.
+
+MD3 also sets a minimum width of 360dp. The component does not apply it, because the bar would then overflow a phone screen that is narrower than 360dp plus its margins.
+
+## Accessibility
+
+- The bar is a `search` landmark on web, and the input has the `searchbox` role.
+- The placeholder becomes the accessible name of the input. Set `accessibilityLabel` to use a different name.
+- A decorative leading icon stays out of the accessibility tree. When `onLeadingIconPress` makes it a button, name it with `leadingIconAccessibilityLabel`. In development, the component warns when that label is missing.
+- The press wrapper is not a tab stop, so the bar costs a keyboard user one stop, plus one for the clear button while the bar holds text.
+
+## Props
+
+<PropTable name="SearchBar" />

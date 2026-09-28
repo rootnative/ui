@@ -42,6 +42,7 @@ import { Menu } from '../../menu'
 import { NavigationBar } from '../../navigation-bar'
 import { PortalHost } from '../../portal/PortalHost'
 import { Radio } from '../../radio'
+import { SearchBar } from '../../search-bar'
 import { Switch } from '../../switch'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
@@ -328,6 +329,17 @@ describe('TextField suppresses the UA focus outline', () => {
       'none',
     )
   })
+})
+
+/**
+ * The same reset on the SearchBar input: its focus ring and focus layer are
+ * the focus signal, and a UA rectangle inside the pill would be a second one.
+ */
+it('SearchBar suppresses the UA focus outline', () => {
+  renderWeb(<SearchBar placeholder="Search" />)
+  expect(getComputedStyle(screen.getByRole('searchbox')).outlineStyle).toBe(
+    'none',
+  )
 })
 
 /**

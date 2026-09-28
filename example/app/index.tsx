@@ -18,6 +18,7 @@ import {
   ListItem,
   Radio,
   Row,
+  SearchBar,
   Skeleton,
   Slider,
   Switch,
@@ -153,6 +154,12 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       return (
         <View style={previewStyles.fieldWrapper}>
           <TextField label="Email" variant="outlined" />
+        </View>
+      )
+    case 'SearchBar':
+      return (
+        <View style={previewStyles.fieldWrapper}>
+          <SearchBar placeholder="Search" />
         </View>
       )
     case 'Keyboard Wrapper':
@@ -640,18 +647,12 @@ export default function HomeScreen() {
         )}
 
         <Column gap="sm">
-          <TextField
-            label="Search components"
-            variant="outlined"
+          <SearchBar
+            placeholder={`Search ${totalComponents} components`}
             value={query}
             onChangeText={setQuery}
-            leadingIcon="magnify"
-            trailingIcon={trimmedQuery.length > 0 ? 'close' : undefined}
-            onTrailingIconPress={() => setQuery('')}
-            trailingIconAccessibilityLabel="Clear search"
             autoCapitalize="none"
             autoCorrect={false}
-            returnKeyType="search"
           />
           <Row gap="xs" wrap>
             <Chip

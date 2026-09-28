@@ -32,6 +32,7 @@ import { LoadingIndicator } from '../../loading-indicator'
 import { NavigationBar } from '../../navigation-bar'
 import { CircularProgress, LinearProgress } from '../../progress'
 import { Radio } from '../../radio'
+import { SearchBar } from '../../search-bar'
 import { Slider } from '../../slider'
 import { Switch } from '../../switch'
 import { Tabs } from '../../tabs'
@@ -223,6 +224,11 @@ describe('aria-disabled reaches the DOM', () => {
     renderWeb(<TextField label="Name" disabled />)
     expect(aria('textbox', 'aria-disabled')).toBe('true')
   })
+
+  it('SearchBar — the input itself, not a wrapper', () => {
+    renderWeb(<SearchBar placeholder="Search" disabled />)
+    expect(aria('searchbox', 'aria-disabled')).toBe('true')
+  })
 })
 
 /**
@@ -284,5 +290,19 @@ describe('a consumer role reaches the DOM', () => {
       </Card>,
     )
     expect(screen.getByRole('button').tagName).toBe('BUTTON')
+  })
+})
+
+/**
+ * RN's `Role` union has no `search`, so the landmark is set through
+ * `accessibilityRole`. Only the DOM can show that react-native-web turns it
+ * into `role="search"` rather than dropping it.
+ */
+describe('SearchBar roles reach the DOM', () => {
+  it('wraps a searchbox in a search landmark', () => {
+    renderWeb(<SearchBar placeholder="Search mail" />)
+    const input = screen.getByRole('searchbox')
+    expect(input.getAttribute('aria-label')).toBe('Search mail')
+    expect(screen.getByRole('search').contains(input)).toBe(true)
   })
 })

@@ -65,6 +65,9 @@ export type { SwitchProps } from './switch'
 export { TextField } from './text-field'
 export type { TextFieldProps, TextFieldVariant } from './text-field'
 
+export { SearchBar } from './search-bar'
+export type { SearchBarAction, SearchBarProps } from './search-bar'
+
 export { Dialog } from './dialog'
 export type {
   DialogProps,

@@ -1,0 +1,22 @@
+{
+  "name": "search-bar",
+  "description": "MD3 search bar — 56dp pill with a leading search or navigation icon, a clear button, and trailing icon actions or an avatar",
+  "files": [
+    "packages/components/src/search-bar/SearchBar.tsx",
+    "packages/components/src/search-bar/index.ts",
+    "packages/components/src/search-bar/styles.ts",
+    "packages/components/src/search-bar/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts"
+  ],
+  "utils": ["color", "render-icon"],
+  "componentDependencies": ["icon-button"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.19",
+    "@rootnative/inertia": ">=0.0.11",
+    "react-native-reanimated": ">=4.5.0 <4.6.0",
+    "react-native-worklets": ">=0.10.0 <0.11.0"
+  },
+  "optionalDependencies": {}
+}

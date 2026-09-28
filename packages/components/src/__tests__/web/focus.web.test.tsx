@@ -20,6 +20,7 @@ import { Button } from '../../button'
 import { Dialog } from '../../dialog'
 import { Menu } from '../../menu'
 import { PortalHost } from '../../portal/PortalHost'
+import { SearchBar } from '../../search-bar'
 import { TextField } from '../../text-field'
 import { Tooltip } from '../../tooltip'
 import { renderWeb } from './render-web'
@@ -308,6 +309,34 @@ describe('TextField tab order', () => {
     )
     expect(stops).toHaveLength(0)
     expect(screen.getAllByRole('textbox')).toHaveLength(2)
+  })
+})
+
+describe('SearchBar tab order', () => {
+  /**
+   * The same wrapper `Pressable` as TextField, for the same reason: it widens
+   * the press target and catches hover, and must not cost a keyboard stop.
+   */
+  it('gives the input the only stop while the bar is empty', () => {
+    renderWeb(<SearchBar placeholder="Search" />)
+
+    const stops = [...document.querySelectorAll('[tabindex]')].filter(
+      (el) => el.getAttribute('tabindex') !== '-1',
+    )
+    expect(stops).toHaveLength(0)
+    const input = screen.getByRole('searchbox')
+    input.focus()
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('adds the clear button as the one extra stop once there is text', () => {
+    renderWeb(<SearchBar placeholder="Search" value="rain" />)
+
+    const stops = [...document.querySelectorAll('[tabindex]')].filter(
+      (el) => el.getAttribute('tabindex') !== '-1',
+    )
+    expect(stops).toHaveLength(1)
+    expect(stops[0].getAttribute('aria-label')).toBe('Clear search')
   })
 })
 

@@ -1114,6 +1114,55 @@ Props:
 
 ---
 
+### SearchBar
+
+```tsx
+import { SearchBar } from '@rootnative/components/search-bar'
+
+// MD3 search bar: 56dp pill, leading search icon, clear button while it holds text.
+<SearchBar placeholder="Search mail" value={query} onChangeText={setQuery} onSearch={runSearch} />
+
+// Navigation icon as the leading button, plus trailing icon actions.
+<SearchBar
+  placeholder="Search"
+  leadingIcon="menu"
+  onLeadingIconPress={openDrawer}
+  leadingIconAccessibilityLabel="Open menu"
+  actions={[{ icon: 'microphone', accessibilityLabel: 'Voice search', onPress: listen }]}
+/>
+
+// Custom trailing content, such as an avatar.
+<SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
+```
+
+Props:
+- `leadingIcon?: IconSource` — Default: `'magnify'`. Icon rendered at the start of the bar. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `onLeadingIconPress?: () => void` — Makes the leading icon a button — for a navigation icon such as a menu or a back arrow. Label it with `leadingIconAccessibilityLabel`.
+- `leadingIconAccessibilityLabel?: string` — Accessibility label for the leading icon when it is a button.
+- `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
+- `showClearButton?: boolean` — Default: `true`. Shows a clear button while the bar holds text.
+- `clearButtonAccessibilityLabel?: string` — Default: `'Clear search'`. Accessibility label for the clear button.
+- `onClear?: () => void` — Called after the clear button empties the bar.
+- `disabled?: boolean` — Default: `false`. Disables the input and every button in the bar.
+- `containerColor?: string` — Override the container (background) color. Hover and focus state-layer colors are derived from it. Disabled state keeps the standard appearance.
+- `contentColor?: string` — Override the content (input text and icon) color. Disabled state keeps the standard appearance.
+- `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
+- `style?: StyleProp<ViewStyle>` — Style applied to the root container. The MD3 maximum width is 720 dp — set `maxWidth` here to change it.
+- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
+- `actions?: SearchBarAction[]` — Icon buttons rendered in the trailing slot, such as a voice action. Mutually exclusive with `trailing`.
+- `trailing?: ReactNode` — Custom trailing content, such as an `Avatar`. Mutually exclusive with `actions` — the type rejects both together. The clear button is not part of the slot: it shows before either one while the bar holds text.
+- Inherits `TextInputProps` (except `editable`, `style`)
+
+SearchBarAction:
+- `icon: IconSource` — Icon to render. Accepts the same forms as `IconButton.icon` — a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function.
+- `accessibilityLabel: string` — Accessibility label for screen readers (required).
+- `onPress?: () => void` — Called when the action is pressed.
+- `disabled?: boolean` — Default: `false`. Disables the action.
+
+This is the MD3 search **bar** only. The MD3 search **view** (the expanded suggestions panel) is not part of the library yet.
+
+---
+
 ### Layout Components
 
 #### Layout

@@ -17,6 +17,7 @@ import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
 import { Chip } from '../../chip'
 import { IconButton } from '../../icon-button'
+import { SearchBar } from '../../search-bar'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
 
@@ -53,6 +54,11 @@ describe('decorative icons carry aria-hidden in the DOM', () => {
 
   it('Checkbox — the check mark, when checked', () => {
     const { container } = renderWeb(<Checkbox value />)
+    expect(hiddenCount(container)).toBeGreaterThan(0)
+  })
+
+  it('SearchBar — leading icon', () => {
+    const { container } = renderWeb(<SearchBar placeholder="Search" />)
     expect(hiddenCount(container)).toBeGreaterThan(0)
   })
 

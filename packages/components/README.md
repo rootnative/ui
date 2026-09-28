@@ -77,6 +77,7 @@ import { Button, Card } from '@rootnative/components'
 | Progress | `./progress` | linear, circular · determinate, indeterminate |
 | LoadingIndicator | `./loading-indicator` | contained, uncontained · determinate, indeterminate |
 | TextField | `./text-field` | filled, outlined |
+| SearchBar | `./search-bar` | MD3 search bar · clear button · trailing actions or avatar |
 | Layout | `./layout` | Layout, Box, Row, Column, Grid |
 | Dialog | `./dialog` | basic, fullscreen · Icon / Title / Content / Actions slots |
 | Divider | `./divider` | horizontal, vertical · optional leading/trailing insets |

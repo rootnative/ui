@@ -77,6 +77,11 @@
       "react-native": "./dist/text-field/index.js",
       "default": "./dist/text-field/index.js"
     },
+    "./search-bar": {
+      "types": "./dist/search-bar/index.d.ts",
+      "react-native": "./dist/search-bar/index.js",
+      "default": "./dist/search-bar/index.js"
+    },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "react-native": "./dist/dialog/index.js",
@@ -205,6 +210,9 @@
       ],
       "text-field": [
         "dist/text-field/index.d.ts"
+      ],
+      "search-bar": [
+        "dist/search-bar/index.d.ts"
       ],
       "dialog": [
         "dist/dialog/index.d.ts"

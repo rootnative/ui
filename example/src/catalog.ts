@@ -73,7 +73,7 @@ export const sections: CatalogSection[] = [
   {
     title: 'Actions & Inputs',
     shortTitle: 'Actions',
-    description: 'Buttons, chips, and text fields',
+    description: 'Buttons, chips, text fields, and search',
     items: [
       {
         label: 'Button',
@@ -124,6 +124,14 @@ export const sections: CatalogSection[] = [
         add: 'text-field',
         docs: 'components/text-field',
         keywords: 'input form entry textbox placeholder helper error',
+      },
+      {
+        label: 'SearchBar',
+        route: '/search-bar',
+        description: 'MD3 search bar with a clear button and trailing actions',
+        add: 'search-bar',
+        docs: 'components/search-bar',
+        keywords: 'search find query filter lookup magnify',
       },
       {
         label: 'Keyboard Wrapper',

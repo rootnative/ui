@@ -42,6 +42,7 @@ import { IconButton } from '../icon-button'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
 import { PortalHost } from '../portal/PortalHost'
+import { SearchBar } from '../search-bar'
 import { Slider } from '../slider'
 import { Switch } from '../switch'
 import { Tabs } from '../tabs'
@@ -126,6 +127,33 @@ const CASES: Array<{ name: string; render: () => void }> = [
           label="A"
           trailingIcon={PROBE}
           onTrailingIconPress={() => {}}
+        />,
+      ),
+  },
+  {
+    name: 'SearchBar — leadingIcon',
+    render: () =>
+      renderWithTheme(<SearchBar placeholder="A" leadingIcon={PROBE} />),
+  },
+  {
+    name: 'SearchBar — leadingIcon as a button',
+    render: () =>
+      renderWithTheme(
+        <SearchBar
+          placeholder="A"
+          leadingIcon={PROBE}
+          onLeadingIconPress={() => {}}
+          leadingIconAccessibilityLabel="Menu"
+        />,
+      ),
+  },
+  {
+    name: 'SearchBar — action icon',
+    render: () =>
+      renderWithTheme(
+        <SearchBar
+          placeholder="A"
+          actions={[{ icon: PROBE, accessibilityLabel: 'Voice' }]}
         />,
       ),
   },

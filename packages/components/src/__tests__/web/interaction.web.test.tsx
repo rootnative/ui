@@ -32,6 +32,7 @@ import { FAB } from '../../fab'
 import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { Radio } from '../../radio'
+import { SearchBar } from '../../search-bar'
 import { Switch } from '../../switch'
 import { renderWebSettled } from './render-web'
 
@@ -311,5 +312,70 @@ describe('the focus ring follows the same modality rule', () => {
     flush()
 
     expect(opacities(container)).toContain('1')
+  })
+})
+
+/**
+ * The SearchBar splits its gesture handlers across two hosts: hover arrives on
+ * the wrapper `Pressable`, and focus arrives on the `<input>`. Neither host is
+ * the node that paints — that is the pill between them — so these tests read
+ * the pill, not the element the event hits.
+ */
+describe('SearchBar state layer', () => {
+  function parts() {
+    const input = screen.getByRole('searchbox')
+    const pill = input.parentElement as HTMLElement
+    const wrapper = pill.parentElement as HTMLElement
+    return { input, pill, wrapper }
+  }
+
+  it('paints a hover layer on the pill', () => {
+    const { flush } = renderWebSettled(<SearchBar placeholder="Search" />)
+    const rest = parts().pill.style.backgroundColor
+
+    fireEvent.mouseEnter(parts().wrapper)
+    flush()
+
+    expect(parts().pill.style.backgroundColor).not.toBe(rest)
+  })
+
+  it('paints no hover layer while disabled', () => {
+    const { flush } = renderWebSettled(
+      <SearchBar placeholder="Search" disabled />,
+    )
+    const rest = parts().pill.style.backgroundColor
+
+    fireEvent.mouseEnter(parts().wrapper)
+    flush()
+
+    expect(parts().pill.style.backgroundColor).toBe(rest)
+  })
+
+  it('paints nothing when a pointer focuses the input', () => {
+    const { flush } = renderWebSettled(<SearchBar placeholder="Search" />)
+    const rest = parts().pill.style.backgroundColor
+
+    fireEvent.pointerDown(document)
+    fireEvent.focus(parts().input)
+    flush()
+
+    expect(parts().pill.style.backgroundColor).toBe(rest)
+  })
+
+  it('paints a focus layer and a ring when the keyboard focuses the input', () => {
+    const { container, flush } = renderWebSettled(
+      <SearchBar placeholder="Search" />,
+    )
+    const rest = parts().pill.style.backgroundColor
+
+    fireEvent.keyDown(document, { key: 'Tab' })
+    fireEvent.focus(parts().input)
+    flush()
+
+    expect(parts().pill.style.backgroundColor).not.toBe(rest)
+    const opacities = Array.from(
+      container.querySelectorAll<HTMLElement>('*'),
+    ).map((node) => node.style.opacity)
+    expect(opacities).toContain('1')
   })
 })
