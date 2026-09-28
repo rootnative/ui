@@ -9,11 +9,39 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.19 — 2026-09-28
 
-No breaking changes. A selected filter chip reads its pill from the theme. A
+No breaking changes. A new `Badge` component, which a `NavigationBar` item
+can show on its icon. A selected filter chip reads its pill from the theme. A
 `Card` inside a `Link` renders as a link on the web. `core` exports a
 `useWindowDimensions` that is safe in a static web export.
+
+### `Badge`
+
+`Badge` from `@rootnative/components/badge` is the MD3 badge. With no
+`label`, it is a 6dp dot. With a `label`, it is a 16dp pill that holds a
+count or a short word. A number above `max` shows as `{max}+`, and `max` is
+999 by default. Wrap the anchor, usually a 24dp icon, and the badge sits at
+its top-end corner with the MD3 offsets. With no children, the badge renders
+inline. `visible={false}` removes the badge and keeps the anchor, so the
+layout does not move when the badge comes back. The fill is `error` and the
+label is `onError`, and `containerColor` and `contentColor` change them.
+
+```tsx
+<Badge label={3} accessibilityLabel="3 unread messages">
+  <MaterialCommunityIcons name="email-outline" size={24} />
+</Badge>
+```
+
+A small badge has no text, so a screen reader does not announce it unless you
+give it an `accessibilityLabel`.
+
+A `NavigationBarItem` takes a new `badge` field. `true` shows a dot, and a
+number or a string shows a large badge. The badge in the bar is decorative,
+so put the count in the item's `accessibilityLabel`.
+
+`rootnative add badge` installs it, and `rootnative add navigation-bar` now
+installs `badge` as a dependency.
 
 ### `useWindowDimensions` from `@rootnative/core`
 
