@@ -84,10 +84,27 @@ describe('Badge', () => {
       expect(screen.getByText('anchor')).toBeTruthy()
       const style = flatten('badge')
       expect(style.position).toBe('absolute')
-      expect(style.start).toBe('100%')
-      expect(style.marginStart).toBe(-12)
+      expect(style.start).toBe(-12)
       expect(style.top).toBe(-2)
       expect(style.pointerEvents).toBe('none')
+    })
+
+    // A percentage inset or a column container here lets Yoga misplace and
+    // clip the badge on device; see the geometry note in badge/styles.ts.
+    it('holds the badge in a zero-size row at the anchor top-end corner', () => {
+      renderWithTheme(
+        <Badge label={1200} testID="badge">
+          <Text>anchor</Text>
+        </Badge>,
+      )
+      let point = screen.getByTestId('badge').parent
+      while (point && typeof point.type !== 'string') point = point.parent
+      const style = StyleSheet.flatten(point?.props.style)
+      expect(style.position).toBe('absolute')
+      expect(style.top).toBe(0)
+      expect(style.end).toBe(0)
+      expect(style.flexDirection).toBe('row')
+      expect(style.width).toBeUndefined()
     })
 
     it('anchors a small badge with the MD3 6dp offset', () => {
@@ -98,7 +115,7 @@ describe('Badge', () => {
       )
       const style = flatten('badge')
       expect(style.position).toBe('absolute')
-      expect(style.marginStart).toBe(-6)
+      expect(style.start).toBe(-6)
       expect(style.top).toBe(0)
     })
 

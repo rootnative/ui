@@ -82,7 +82,9 @@ export function Badge({
       testID={testID === undefined ? undefined : `${testID}-wrapper`}
     >
       {children}
-      {badge}
+      {badge === null ? null : (
+        <View style={[styles.anchorPoint, pointerEvents.none]}>{badge}</View>
+      )}
     </View>
   )
 }

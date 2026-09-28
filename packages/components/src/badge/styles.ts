@@ -13,9 +13,17 @@ import { StyleSheet } from 'react-native'
  *
  * `BadgedBox` places the badge at
  * `x = anchorWidth - horizontalOffset`, `y = -badgeHeight + verticalOffset`.
- * The same geometry is expressed here without a measure: `start: '100%'`
- * is the anchor's end edge, and a negative `marginStart` pulls the badge
- * back by the offset.
+ * The same geometry is expressed here without a measure: `anchorPoint` is a
+ * zero-size node at the anchor's top-end corner, and the badge inside it
+ * takes a negative `start` equal to the offset.
+ *
+ * Do not put the badge directly in the wrapper with `start: '100%'`. React
+ * Native runs Yoga with its classic errata, which resolves a percentage
+ * inset against the width the parent offers, not the wrapper's final width:
+ * in the 56dp NavigationBar pill the badge landed 32dp to the right of a
+ * 24dp icon. Yoga also caps an absolute child in a column at its containing
+ * block's width, which cut `999+` to `99…` on a 24dp anchor. A trailing inset
+ * resolves against the final width, and a zero-width row imposes no cap.
  */
 export const BADGE_SMALL_SIZE = 6
 export const BADGE_LARGE_SIZE = 16
@@ -43,17 +51,21 @@ export function createStyles(theme: MaterialTheme) {
       height: BADGE_LARGE_SIZE,
       paddingHorizontal: BADGE_LARGE_HORIZONTAL_PADDING,
     },
+    anchorPoint: {
+      position: 'absolute',
+      top: 0,
+      end: 0,
+      flexDirection: 'row',
+    },
     anchoredSmall: {
       position: 'absolute',
       top: 0,
-      start: '100%',
-      marginStart: -BADGE_SMALL_OFFSET,
+      start: -BADGE_SMALL_OFFSET,
     },
     anchoredLarge: {
       position: 'absolute',
       top: -BADGE_LARGE_SIZE + BADGE_LARGE_VERTICAL_OFFSET,
-      start: '100%',
-      marginStart: -BADGE_LARGE_HORIZONTAL_OFFSET,
+      start: -BADGE_LARGE_HORIZONTAL_OFFSET,
     },
     label: {
       ...theme.typography.labelSmall,
