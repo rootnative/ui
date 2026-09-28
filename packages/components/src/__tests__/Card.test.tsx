@@ -62,6 +62,25 @@ describe('Card', () => {
     expect(screen.getByRole('button')).toBeTruthy()
   })
 
+  it('lets a consumer role replace the button role', () => {
+    renderWithTheme(
+      <Card onPress={() => {}} role="link">
+        <Text>Linked card</Text>
+      </Card>,
+    )
+    expect(screen.getByRole('link')).toBeTruthy()
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('passes a consumer role to a non-interactive card', () => {
+    renderWithTheme(
+      <Card role="article" testID="card">
+        <Text>Static card</Text>
+      </Card>,
+    )
+    expect(screen.getByTestId('card').props.role).toBe('article')
+  })
+
   it('calls onPress when pressed', () => {
     const onPress = jest.fn()
     renderWithTheme(

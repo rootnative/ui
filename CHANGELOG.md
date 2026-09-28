@@ -11,7 +11,22 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-No breaking changes. A selected filter chip reads its pill from the theme.
+No breaking changes. A selected filter chip reads its pill from the theme. A
+`Card` inside a `Link` renders as a link on the web.
+
+### A `role` you pass to `Card` replaces `button`
+
+An interactive `Card` set `role="button"` after it spread your props, so the
+role you passed was lost with no warning. Expo Router's `<Link href asChild>`
+passes `role="link"` and `href` to its child. The card then rendered
+`<button href>` on the web, which a crawler does not follow and a middle click
+does not open. Found in the `reelist` app. The card now uses your `role` and
+falls back to `button`, so react-native-web renders an `<a>`. With no `role`,
+the card is a `<button>` as before. `Chip`, `Button`, `IconButton`, `FAB`,
+`ListItem` and `Avatar` already let your `role` win, because they set the
+older `accessibilityRole` and `role` takes precedence over it. If you put a
+`Pressable` between a `Link` and a `Card` to get an anchor, remove it: the
+`Card` gets its state layer and focus ring back.
 
 ### A selected filter `Chip` respects `roundness`
 

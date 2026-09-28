@@ -61,7 +61,13 @@ export interface CardProps extends ViewProps {
    * @default 'elevated'
    */
   variant?: CardVariant
-  /** When provided, the card becomes interactive (Pressable). Omit to render as a plain View. */
+  /**
+   * When provided, the card becomes interactive (Pressable) with
+   * `role="button"`. Omit to render as a plain View.
+   *
+   * A `role` you pass replaces the default. Expo Router's `<Link asChild>`
+   * passes `role="link"` and `href`, so the card renders as an `<a>` on the web.
+   */
   onPress?: () => void
   /**
    * Disables the press interaction and reduces opacity. Only effective when `onPress` is provided.

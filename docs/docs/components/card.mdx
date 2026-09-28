@@ -83,6 +83,24 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
 `}
 />
 
+### A card as a link
+
+An interactive card has `role="button"`. A `role` you pass replaces it. Expo Router's `<Link asChild>` passes `role="link"` and `href` to its child, so a card inside it renders as an `<a>` on the web. A crawler follows that link, and a middle click opens it in a new tab.
+
+```tsx
+import { Link } from 'expo-router'
+
+<Link href="/movie/19404" asChild>
+  <Card onPress={() => {}}>
+    <Card.Content>
+      <Typography>Fight Club</Typography>
+    </Card.Content>
+  </Card>
+</Link>
+```
+
+The card needs an `onPress` to become interactive. `Link` adds its own navigation handler next to it, so the card's `onPress` still runs, then the navigation.
+
 ## Regions
 
 `Card` is a surface and applies no padding of its own. Use the region slots to get the Material Design 3 card spacing without repeating it at every call site.

@@ -20,6 +20,7 @@ export function Card({
   onPress,
   disabled = false,
   containerColor,
+  role,
   ...props
 }: CardProps) {
   const isDisabled = Boolean(disabled)
@@ -96,6 +97,7 @@ export function Card({
     return (
       <View
         {...props}
+        role={role}
         style={[
           styles.container,
           isElevated ? styles.overflowInkElevation : undefined,
@@ -123,7 +125,11 @@ export function Card({
       ) : null}
       <AnimatedPressable
         {...props}
-        role="button"
+        // The consumer's role wins over the default, unlike the other props
+        // after the spread. Expo Router's `<Link asChild>` passes
+        // `role="link"` with `href`, and react-native-web renders an `<a>`
+        // only when no `button` role replaces it.
+        role={role ?? 'button'}
         aria-disabled={isDisabled}
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}

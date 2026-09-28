@@ -224,3 +224,65 @@ describe('aria-disabled reaches the DOM', () => {
     expect(aria('textbox', 'aria-disabled')).toBe('true')
   })
 })
+
+/**
+ * Expo Router's `<Link href asChild>` hands its child `href`, `role="link"`
+ * and a press handler. react-native-web renders an `<a>` for `href` only when
+ * the role maps to no element of its own, and `button` does. So a card that
+ * fixed its role after the props spread rendered `<button href>`, which a
+ * crawler does not follow. The props are spread because `href` is a
+ * react-native-web prop that the React Native types do not declare.
+ */
+describe('a consumer role reaches the DOM', () => {
+  const linkProps = { href: '/movie/19404', role: 'link' as const }
+
+  it('Card — pressable, under a Link', () => {
+    renderWeb(
+      <Card {...linkProps} onPress={() => {}}>
+        <Text>Card</Text>
+      </Card>,
+    )
+    const link = screen.getByRole('link')
+    expect(link.tagName).toBe('A')
+    expect(link.getAttribute('href')).toBe('/movie/19404')
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  // These set `accessibilityRole`, which a `role` prop overrides, so they
+  // were never affected. The cases pin that, so a move to `role` after the
+  // spread fails here.
+  it.each([
+    ['Button', () => <Button {...linkProps}>Open</Button>],
+    [
+      'IconButton',
+      () => (
+        <IconButton
+          {...linkProps}
+          icon="open-in-new"
+          accessibilityLabel="Open"
+        />
+      ),
+    ],
+    ['FAB', () => <FAB {...linkProps} icon="plus" accessibilityLabel="Open" />],
+    [
+      'ListItem',
+      () => <ListItem {...linkProps} headlineText="Open" onPress={() => {}} />,
+    ],
+    ['Avatar', () => <Avatar {...linkProps} label="AB" onPress={() => {}} />],
+    ['Chip', () => <Chip {...linkProps}>Drama</Chip>],
+  ])('%s — under a Link', (_name, element) => {
+    renderWeb(element())
+    const link = screen.getByRole('link')
+    expect(link.tagName).toBe('A')
+    expect(link.getAttribute('href')).toBe('/movie/19404')
+  })
+
+  it('Card — pressable, with no role, stays a button', () => {
+    renderWeb(
+      <Card onPress={() => {}}>
+        <Text>Card</Text>
+      </Card>,
+    )
+    expect(screen.getByRole('button').tagName).toBe('BUTTON')
+  })
+})
