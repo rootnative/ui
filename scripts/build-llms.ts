@@ -2213,13 +2213,26 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 
 Type: \`useBreakpointValue<T>(values: Partial<Record<Breakpoint, T>> & Record<'compact', T>): T\`
 
+### useWindowDimensions()
+
+Returns the window size, the same as \`useWindowDimensions\` from \`react-native\`, but hydration-safe. Use it instead of the \`react-native\` hook when a layout needs a number rather than a size class: a hero height, a carousel slot, a column count.
+
+\`\`\`tsx
+import { useWindowDimensions } from '@rootnative/core'
+
+const { width } = useWindowDimensions()
+const heroHeight = width * 0.56
+\`\`\`
+
+Type: \`useWindowDimensions(): ScaledSize\`
+
 ### Breakpoints and static export (web)
 
-Both hooks are hydration-safe, so **no \`useHydrated\` gate is needed at the call site**.
+The three hooks are hydration-safe, so **no \`useHydrated\` gate is needed at the call site**. The \`useWindowDimensions\` hook from \`react-native\` is **not**: on a static export it keeps the layout of a 0 wide window until the reader resizes the window.
 
 A static export (\`web.output: 'static'\`) renders on a server with no DOM, where react-native-web's \`Dimensions\` is fixed at \`width: 0\` — so every breakpoint resolves to \`compact\` and that is what ships in the HTML. React 19 does **not** repair a \`className\`/\`style\` mismatch during hydration: it adopts the server DOM, keeps it, and fires no recoverable error, so a tablet would silently keep the phone layout.
 
-\`useBreakpoint\` therefore reports \`compact\` for as long as the client is hydrating, matching that markup, and switches to the measured breakpoint on the re-render React schedules once hydration finishes. On native and on a single-page web build there is no hydration, so the measured value is returned from the first render at no cost.
+\`useWindowDimensions\` therefore reports the server's 0 by 0 window for as long as the client is hydrating, matching that markup, and switches to the measured window on the re-render React schedules once hydration finishes. \`useBreakpoint\` reads it, so it reports \`compact\` for the same span, and a breakpoint and a raw width cannot disagree. On native and on a single-page web build there is no hydration, so the measured value is returned from the first render at no cost.
 
 The practical consequence: a breakpoint-dependent layout **starts compact and widens a frame later** on a static export. That is unavoidable — the server cannot know the viewport — so design the compact variant to be the honest first paint. \`Grid\` inherits all of this, which matters because it resolves a \`columns\` map internally and leaves a consumer nowhere to put a gate of their own.
 `

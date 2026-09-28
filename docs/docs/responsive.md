@@ -5,7 +5,7 @@ description: Adapt a layout to the current window width with two hooks built on 
 
 # Responsive
 
-Two hooks from `@rootnative/core` adapt a layout to the current window width, using Material Design 3's [window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes). Both read `useWindowDimensions()` from React Native, so they update on rotation, on a web browser resize, and on split-screen and foldable transitions — anywhere RN reports a new width.
+Two hooks from `@rootnative/core` adapt a layout to the current window width, using Material Design 3's [window size classes](https://m3.material.io/foundations/layout/applying-layout/window-size-classes). A third, [`useWindowDimensions()`](#usewindowdimensions), returns the raw window size. All three read `useWindowDimensions()` from React Native, so they update on rotation, on a web browser resize, and on split-screen and foldable transitions — anywhere RN reports a new width.
 
 Nothing else in the library depends on them. Components size themselves from their own props; these hooks are for *your* layout decisions.
 
@@ -83,6 +83,42 @@ const variant = useBreakpointValue({ compact: 'text', medium: 'outlined' })
 
 Keep the argument cheap to build. It is re-created on every render, and a value like a JSX element or a fresh object will be a new reference each time — fine for a style number, worth a `useMemo` if it feeds a memoized child.
 
+## `useWindowDimensions()`
+
+Returns the window size: `width`, `height`, `scale` and `fontScale`. It is a replacement for the `react-native` hook of the same name, and it is safe in a static web export.
+
+```tsx
+import { useWindowDimensions } from '@rootnative/core'
+
+function Hero() {
+  const { width } = useWindowDimensions()
+  const heroStyle = { height: width * 0.56 }
+
+  return <View style={heroStyle} />
+}
+```
+
+Use it when the layout needs a number rather than a size class: a hero height, a carousel slot, a column count from a card width. When a size class is enough, `useBreakpoint` is less code.
+
+**Do not use the `react-native` hook for a value that reaches a style on a static export.** On the server it measures a 0 by 0 window, and React keeps that style when the client hydrates. The hero above would stay 0 high on a desktop screen until the reader resizes the window. The [static export note](#notes) below explains why. `useBreakpoint` reads this hook, so a breakpoint and a raw width always agree.
+
+To keep a project on this hook, add an ESLint rule:
+
+```js
+'no-restricted-imports': [
+  'error',
+  {
+    paths: [
+      {
+        name: 'react-native',
+        importNames: ['useWindowDimensions'],
+        message: 'Import useWindowDimensions from @rootnative/core.',
+      },
+    ],
+  },
+],
+```
+
 ## Types
 
 ```ts
@@ -110,6 +146,6 @@ function Page() {
 
 ## Notes
 
-- **Window width, not element width.** Both hooks measure the window. A component inside a narrow sidebar on a wide screen still reads `expanded`. For element-relative sizing use `onLayout` or a flex layout.
-- **Static export on web — handled for you.** A static export (`web.output: 'static'`) renders on a server with no DOM, where react-native-web's `Dimensions` is fixed at `width: 0`, so the HTML always ships the `compact` layout. React 19 does *not* repair a `className`/`style` mismatch during hydration — it adopts the server DOM, keeps it, and reports no recoverable error — so a naive hook would leave a tablet on the phone layout with no console signal. `useBreakpoint` is hydration-safe: it reports `compact` while the client hydrates, then switches to the measured breakpoint on the re-render React schedules afterwards. **You do not need a `useHydrated` gate at the call site**, and `Grid` inherits the same safety for its `columns` map. The visible consequence is that a breakpoint-dependent layout starts compact and widens a frame later; the server cannot know the viewport, so make the compact variant an honest first paint. A plain (single-page) web export never hydrates, so it is correct from the first render.
-- **These are not styling hooks.** They return plain values. Nothing recomputes unless the window width crosses a threshold and React re-renders.
+- **Window width, not element width.** All three hooks measure the window. A component inside a narrow sidebar on a wide screen still reads `expanded`. For element-relative sizing use `onLayout` or a flex layout.
+- **Static export on web — handled for you.** A static export (`web.output: 'static'`) renders on a server with no DOM, where react-native-web's `Dimensions` is fixed at `width: 0`, so the HTML always ships the `compact` layout. React 19 does *not* repair a `className`/`style` mismatch during hydration — it adopts the server DOM, keeps it, and reports no recoverable error — so a naive hook would leave a tablet on the phone layout with no console signal. The three hooks are hydration-safe: `useWindowDimensions` reports the server's 0 by 0 window while the client hydrates, then switches to the measured window on the re-render React schedules afterwards, and `useBreakpoint` reports `compact` for the same span. The `react-native` hook is not hydration-safe. **You do not need a `useHydrated` gate at the call site**, and `Grid` inherits the same safety for its `columns` map. The visible consequence is that a breakpoint-dependent layout starts compact and widens a frame later; the server cannot know the viewport, so make the compact variant an honest first paint. A plain (single-page) web export never hydrates, so it is correct from the first render.
+- **These are not styling hooks.** They return plain values. A breakpoint value changes only when the window width crosses a threshold. `useWindowDimensions` changes on every resize, so a component that reads it re-renders on every resize.

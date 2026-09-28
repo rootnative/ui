@@ -175,6 +175,14 @@ Returns a value based on the current breakpoint with cascade fallback.
 const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 ```
 
+### useWindowDimensions()
+
+Returns the window size, the same as the `react-native` hook, but safe in a static web export. Use it when a layout needs the raw width or height.
+
+```tsx
+const { width } = useWindowDimensions()
+```
+
 ## Exports
 
 - `ThemeProvider` — Theme context provider (works with any design system, defaults to MD3)
@@ -186,6 +194,7 @@ const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
 - `material` — MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
 - `useBreakpoint` / `breakpoints` — Current window size class
 - `useBreakpointValue` — Responsive values
+- `useWindowDimensions` — Window size that is safe to hydrate from a static export
 - `lightTheme` / `darkTheme` — Built-in MD3 themes
 - `defaultTopAppBarTokens` — MD3 top app bar defaults
 - `motionTransitions` — The named-transition registry mounted by `ThemeProvider`

@@ -47,7 +47,8 @@
         "useBreakpointValue",
         "useIconResolver",
         "useTheme",
-        "useThemeMode"
+        "useThemeMode",
+        "useWindowDimensions"
       ],
       "./create-theme": [
         "createMaterialTheme"

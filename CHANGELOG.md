@@ -12,7 +12,26 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 No breaking changes. A selected filter chip reads its pill from the theme. A
-`Card` inside a `Link` renders as a link on the web.
+`Card` inside a `Link` renders as a link on the web. `core` exports a
+`useWindowDimensions` that is safe in a static web export.
+
+### `useWindowDimensions` from `@rootnative/core`
+
+`useBreakpoint` was safe in a static web export, but a layout that needs the
+raw width had only the `react-native` hook. On the export server that hook
+measures a 0 by 0 window, and React 19 keeps the server's style when the
+client hydrates, with no error. In the `reelist` app on a 1440 wide screen,
+the home carousel drew each slot -128 wide and the film page drew its
+backdrop 0 high until the reader resized the window.
+
+`useWindowDimensions` from `@rootnative/core` returns the same `ScaledSize`
+as the `react-native` hook. While the client hydrates, it returns the
+server's 0 by 0 window, and then the measured window on the next render. On
+native and on a single-page web build, it returns the measured window from
+the first render. `useBreakpoint` now reads this hook, so a breakpoint and a
+raw width cannot disagree during hydration. Its behaviour does not change.
+If you wrote your own guarded copy of the hook, import this one and remove
+the copy.
 
 ### A `role` you pass to `Card` replaces `button`
 

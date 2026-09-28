@@ -1,5 +1,4 @@
-import { useSyncExternalStore } from 'react'
-import { useWindowDimensions } from 'react-native'
+import { useWindowDimensions } from './useWindowDimensions'
 
 /**
  * Material Design 3 window size classes.
@@ -29,19 +28,6 @@ function getBreakpoint(width: number): Breakpoint {
 }
 
 /**
- * A store that never changes, read only for *when* React reads it.
- *
- * React calls `getServerSnapshot` during server rendering **and** through the
- * hydration pass, then `getSnapshot` for every render after. So this is
- * `true` exactly while the client is reproducing the server's markup, and
- * `false` everywhere else — including the very first render of a client-only
- * tree, which never hydrates.
- */
-const subscribeToNothing = () => () => {}
-const notHydrating = () => false
-const isHydratingOnServer = () => true
-
-/**
  * Returns the current Material Design 3 window size class based on viewport width.
  * Reactively updates when the window is resized.
  *
@@ -58,7 +44,9 @@ const isHydratingOnServer = () => true
  * So this hook reports `compact` for as long as the client is hydrating,
  * matching the markup exactly, and switches to the measured breakpoint on the
  * re-render React schedules once hydration finishes. The correction is an
- * ordinary update, which *does* patch the DOM.
+ * ordinary update, which *does* patch the DOM. The guard lives in this
+ * package's `useWindowDimensions`, which this hook reads. Use that hook, not
+ * the `react-native` one, when a layout needs the raw width.
  *
  * **It costs nothing where there is no hydration.** On native, and on a
  * single-page web build, `getServerSnapshot` is never called, so the measured
@@ -72,14 +60,9 @@ const isHydratingOnServer = () => true
  * const columns = breakpoint === 'compact' ? 2 : 4
  */
 export function useBreakpoint(): Breakpoint {
+  // The hydration width is 0, which resolves through the same table rather
+  // than a hard-coded `'compact'`, so a change to `breakpoints` cannot make
+  // the markup and the hydration pass disagree.
   const { width } = useWindowDimensions()
-  const hydrating = useSyncExternalStore(
-    subscribeToNothing,
-    notHydrating,
-    isHydratingOnServer,
-  )
-  // Width 0 is what the export server measured; resolve it through the same
-  // table rather than hard-coding `'compact'`, so a change to `breakpoints`
-  // cannot make the two disagree.
-  return getBreakpoint(hydrating ? 0 : width)
+  return getBreakpoint(width)
 }

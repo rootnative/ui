@@ -1,5 +1,6 @@
 /**
- * Static-export hydration, for anything that resolves a breakpoint.
+ * Static-export hydration, for anything that resolves a breakpoint or reads
+ * the window size.
  *
  * A static export renders on a server with no DOM, where react-native-web's
  * `Dimensions` is fixed at `width: 0` — so every breakpoint resolves to
@@ -13,16 +14,18 @@
  * a tablet simply keeps the phone layout. That silence is why this file
  * exists rather than a note in the docs.
  *
- * `useBreakpoint` therefore reports `compact` for exactly as long as the
- * client is hydrating, then switches on the re-render React schedules after.
+ * `useWindowDimensions` from `@rootnative/core` therefore reports the
+ * server's 0 by 0 window for exactly as long as the client is hydrating, then
+ * switches on the re-render React schedules after. `useBreakpoint` reads it,
+ * so it reports `compact` for the same span.
  *
  * This is unobservable in the native project: there is no hydration there at
  * all, so `Grid` renders its measured columns and every assertion passes
  * whether or not the hook is safe.
  */
-import { ThemeProvider } from '@rootnative/core'
+import { ThemeProvider, useWindowDimensions } from '@rootnative/core'
 import { act } from 'react'
-import { Text } from 'react-native'
+import { Text, View } from 'react-native'
 import { Grid } from '../../layout/Grid'
 
 /** jsdom supplies none of what `react-dom/server` needs. */
@@ -126,4 +129,41 @@ it('Grid hydrates a tablet against compact markup without stranding it', async (
   // the server value (test one above), and the tablet is stuck at one column.
   expect(errors).toHaveLength(0)
   expect(cellBasis(host)).toBe('25%')
+})
+
+/**
+ * A layout that needs a number rather than a size class, the shape `reelist`
+ * shipped: a hero whose height is a fraction of the window width. With the
+ * `react-native` hook the export kept a 0 high hero on a 1440 wide screen.
+ */
+function Hero() {
+  const { width } = useWindowDimensions()
+  const heroStyle = { height: width / 2 }
+  return <View testID="hero" style={heroStyle} />
+}
+
+it('useWindowDimensions hydrates a wide window against 0 wide markup', async () => {
+  const { renderToString, hydrateRoot } = loadReactDom()
+  const heroHeight = (host: HTMLElement) =>
+    host.querySelector<HTMLElement>('[data-testid="hero"]')?.style.height
+
+  widenViewportTo(0)
+  const host = document.createElement('div')
+  host.innerHTML = renderToString(<Hero />)
+  document.body.appendChild(host)
+  expect(heroHeight(host)).toBe('0px')
+
+  widenViewportTo(1280)
+
+  const errors: unknown[] = []
+  await act(async () => {
+    hydrateRoot(host, <Hero />, {
+      onRecoverableError: (e: unknown) => errors.push(e),
+    })
+  })
+
+  // With the `react-native` hook the client renders 640px against 0px
+  // markup, React keeps the 0px, and the hero stays collapsed.
+  expect(errors).toHaveLength(0)
+  expect(heroHeight(host)).toBe('640px')
 })

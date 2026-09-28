@@ -47,7 +47,12 @@ export type {
   ThemeProviderProps,
 } from './provider'
 
-export { breakpoints, useBreakpoint, useBreakpointValue } from './responsive'
+export {
+  breakpoints,
+  useBreakpoint,
+  useBreakpointValue,
+  useWindowDimensions,
+} from './responsive'
 export type { Breakpoint, BreakpointValues } from './responsive'
 
 export { material } from './presets'
