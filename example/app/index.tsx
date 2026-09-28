@@ -22,6 +22,7 @@ import {
   Skeleton,
   Slider,
   Switch,
+  Tabs,
   TextField,
   Typography,
 } from '@rootnative/components'
@@ -479,6 +480,8 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
   }
 }
 
+const ALL_CATEGORIES = 'all'
+
 const previewMutedText = (theme: MaterialTheme) => ({
   color: theme.colors.onSurfaceVariant,
 })
@@ -552,6 +555,10 @@ export default function HomeScreen() {
     () => ({ color: theme.colors.outlineVariant }),
     [theme.colors.outlineVariant],
   )
+  const eyebrowStyle = useMemo(
+    () => ({ color: theme.colors.primary }),
+    [theme.colors.primary],
+  )
 
   const stats: Array<{ label: string; value: string }> = [
     { value: String(totalComponents), label: 'components' },
@@ -591,20 +598,112 @@ export default function HomeScreen() {
     setCategory(null)
   }, [])
 
+  // Categories are one choice from five, which is a single-select button
+  // group in MD3, not a row of filter chips. The five labels need about
+  // 440dp, so a compact screen gets scrollable tabs instead. From `large` up
+  // the search and the group share one row.
+  const toolbarLayout = useBreakpointValue({
+    compact: 'tabs' as const,
+    medium: 'stacked' as const,
+    large: 'row' as const,
+  })
+  const categoryItems = useMemo(
+    () => [
+      { value: ALL_CATEGORIES, label: 'All' },
+      ...sections.map((section) => ({
+        value: section.title,
+        label: section.shortTitle,
+      })),
+    ],
+    [],
+  )
+  // A single-select group reports `null` when the selected item is pressed
+  // again. That clears the category, the same as pressing "All".
+  const selectCategory = useCallback((value: string | null) => {
+    setCategory(value === null || value === ALL_CATEGORIES ? null : value)
+  }, [])
+
+  const heroSlotStyle = useMemo(() => ({ paddingTop: padding }), [padding])
+  // Negative margins let the opaque band cover the side gutters, so a card
+  // that scrolls under the stuck toolbar does not show at its edges.
+  const toolbarStyle = useMemo(
+    () => ({
+      backgroundColor: theme.colors.surface,
+      marginHorizontal: -padding,
+      paddingHorizontal: padding,
+    }),
+    [padding, theme.colors.surface],
+  )
+  // `marginStart` / `marginEnd`, not `marginHorizontal`: `Divider` sets its
+  // insets with the logical keys, and those win over `marginHorizontal`.
+  const tabsBleedStyle = useMemo(
+    () => ({ marginStart: -padding, marginEnd: -padding }),
+    [padding],
+  )
+
+  const searchBar = (
+    <SearchBar
+      placeholder={`Search ${totalComponents} components`}
+      value={query}
+      onChangeText={setQuery}
+      autoCapitalize="none"
+      autoCorrect={false}
+      style={toolbarLayout === 'row' ? styles.searchInRow : undefined}
+    />
+  )
+  const categoryGroup = (
+    <ButtonGroup
+      variant="connected"
+      selectionMode="single"
+      items={categoryItems}
+      value={category ?? ALL_CATEGORIES}
+      onValueChange={selectCategory}
+      accessibilityLabel="Component category"
+    />
+  )
+  // The divider of a scrollable `Tabs` row starts after `edgePadding`, so it
+  // stops short of the screen edge. The row draws none, and a full-width
+  // `Divider` below it closes the stuck toolbar edge to edge.
+  const categoryTabs = (
+    <View>
+      <Tabs
+        variant="secondary"
+        scrollable
+        edgePadding={padding}
+        showDivider={false}
+        items={categoryItems}
+        value={category ?? ALL_CATEGORIES}
+        onValueChange={selectCategory}
+        accessibilityLabel="Component category"
+        style={tabsBleedStyle}
+      />
+      <Divider style={tabsBleedStyle} />
+    </View>
+  )
+
   return (
     <ScrollView
       contentContainerStyle={[
         styles.scroll,
-        { padding, paddingBottom: padding * 2 },
+        { paddingHorizontal: padding, paddingBottom: padding * 2 },
       ]}
+      // The toolbar is child 1. The hero slot is child 0 and always renders,
+      // even empty in the embed, so the index does not move.
+      stickyHeaderIndices={[1]}
     >
-      <Column style={styles.container} gap="xl">
+      <View style={[styles.container, heroSlotStyle]}>
         {isEmbedded ? null : (
           <Column gap="md" style={styles.hero}>
             <Row gap="xs" align="center">
-              <Chip variant="suggestion" leadingIcon="palette-outline">
+              <MaterialCommunityIcons
+                name="palette-outline"
+                size={18}
+                color={theme.colors.primary}
+                aria-hidden
+              />
+              <Typography variant="labelLarge" style={eyebrowStyle}>
                 Material Design 3
-              </Chip>
+              </Typography>
             </Row>
             <Typography variant={heroVariant}>RootNative UI</Typography>
             <Typography variant={taglineVariant} style={captionStyle}>
@@ -645,44 +744,34 @@ export default function HomeScreen() {
             )}
           </Column>
         )}
+      </View>
 
-        <Column gap="sm">
-          <SearchBar
-            placeholder={`Search ${totalComponents} components`}
-            value={query}
-            onChangeText={setQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Row gap="xs" wrap>
-            <Chip
-              variant="filter"
-              selected={category === null}
-              onPress={() => setCategory(null)}
-            >
-              All
-            </Chip>
-            {sections.map((section) => (
-              <Chip
-                key={section.title}
-                variant="filter"
-                selected={category === section.title}
-                onPress={() =>
-                  setCategory((current) =>
-                    current === section.title ? null : section.title,
-                  )
-                }
-              >
-                {section.shortTitle}
-              </Chip>
-            ))}
-          </Row>
-          {isFiltering ? (
-            <Typography variant="bodySmall" style={captionStyle}>
-              {resultCount === 1 ? '1 component' : `${resultCount} components`}
-            </Typography>
-          ) : null}
-        </Column>
+      <View style={toolbarStyle}>
+        <View style={[styles.container, styles.toolbarContent]}>
+          {toolbarLayout === 'row' ? (
+            <Row gap="md" align="center">
+              {searchBar}
+              {categoryGroup}
+            </Row>
+          ) : (
+            <Column gap="sm">
+              {searchBar}
+              {toolbarLayout === 'tabs' ? categoryTabs : categoryGroup}
+            </Column>
+          )}
+        </View>
+      </View>
+
+      <Column style={styles.container} gap="xl">
+        <Typography
+          variant="bodySmall"
+          style={captionStyle}
+          accessibilityLiveRegion="polite"
+        >
+          {isFiltering
+            ? `${resultCount} of ${totalComponents} components`
+            : `${totalComponents} components`}
+        </Typography>
 
         {visibleSections.length === 0 ? (
           <Column align="center" gap="sm" style={styles.emptyState}>
@@ -750,13 +839,22 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  // No `alignItems: 'center'` here: react-native-web wraps the sticky child in
+  // a View of its own, and centering would shrink that wrapper to the
+  // toolbar's content. Each block centers itself with `alignSelf` instead.
   scroll: {
     flexGrow: 1,
-    alignItems: 'center',
   },
   container: {
     width: '100%',
     maxWidth: 1200,
+    alignSelf: 'center',
+  },
+  toolbarContent: {
+    paddingVertical: 12,
+  },
+  searchInRow: {
+    flex: 1,
   },
   hero: {
     paddingVertical: 16,
