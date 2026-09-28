@@ -70,7 +70,7 @@
     "@react-native/babel-preset": "^0.86.3",
     "@react-native/jest-preset": "^0.86.3",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.13",
+    "@rootnative/inertia": "0.0.14",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "^19.0.0",
