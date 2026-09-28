@@ -9,6 +9,84 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.20 — 2026-09-29
+
+No breaking changes. A new `SearchBar` component. An anchored `Badge` sits at
+the correct corner on iOS and Android. `rootnative create` pins
+`@rootnative/inertia` `0.0.14`.
+
+### `SearchBar`
+
+`SearchBar` from `@rootnative/components/search-bar` is the MD3 search bar: a
+56dp pill with a leading icon, a text input, and a trailing slot. It takes
+every `TextInputProps` except `editable` and `style`, so you control it with
+`value` and `onChangeText` as you do a `TextInput`.
+
+```tsx
+const [query, setQuery] = useState('')
+<SearchBar
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => runSearch(text)}
+/>
+```
+
+- The keyboard shows a **Search** key, and `onSearch` receives the query
+  when the user presses it.
+- A clear button shows while the bar holds text. It calls
+  `onChangeText('')`, then `onClear`, and moves focus back to the input.
+  `showClearButton={false}` removes it.
+- The leading icon is a decorative `magnify` by default. `onLeadingIconPress`
+  makes it a button, such as a menu or a back arrow. Name it with
+  `leadingIconAccessibilityLabel`. In development, the component warns when
+  that label is missing.
+- The trailing slot takes `actions`, a list of icon buttons such as a voice
+  action, or `trailing`, custom content such as an `Avatar`. The two fill
+  the same slot, so the type rejects both together.
+- `ref` reaches the inner `TextInput`, for `focus()`, `blur()` and `clear()`.
+- `disabled` disables the input and every button in the bar.
+  `containerColor` and `contentColor` change the two colors.
+
+The bar is 720dp wide at most. Set `style={{ maxWidth }}` to change it. MD3
+also sets a minimum width of 360dp, which the component does not apply,
+because a bar that wide overflows a narrow phone screen.
+
+On the web, the bar is a `search` landmark and the input has the `searchbox`
+role. The placeholder is the accessible name of the input unless you set
+`accessibilityLabel`. The bar costs a keyboard user one tab stop, plus one
+for the clear button while it shows.
+
+MD3 Search has a second part, the search view that opens from the bar and
+shows suggestions. The library does not have it yet.
+
+`rootnative add search-bar` installs it, with `icon-button` as a dependency.
+
+### An anchored `Badge` sits at its anchor's corner on native
+
+In alpha.19, a `Badge` that wrapped an anchor was in the wrong position on
+iOS and Android. In the 56dp `NavigationBar` pill, the badge was 32dp to the
+right of its 24dp icon. A `999+` label on a 24dp anchor showed as `99…`. The
+web build was correct.
+
+React Native runs Yoga with its classic errata. The badge used
+`start: '100%'`, and Yoga resolved that percentage against the width the
+parent offers, not the final width of the wrapper. Yoga also limited the
+badge to the width of its 24dp containing block, and that cut the label.
+
+The wrapper now puts the badge in a zero-size row at the top-end corner of
+the anchor, and the badge takes a negative `start` equal to the MD3 offset.
+The position on the web does not change. If you moved the badge with a
+`style` offset to correct it on native, remove the offset.
+
+### `rootnative create` pins `@rootnative/inertia` `0.0.14`
+
+The two templates pinned `0.0.13`. inertia `0.0.14` fixes a `layoutId`
+transition that did not run when its source element stayed mounted and did
+not move. That is the usual case for a list card that opens a detail screen.
+The peer range stays `>=0.0.11 <0.1.0`, because no component uses an inertia
+API that is newer than `0.0.11`.
+
 ## 0.0.0-alpha.19 — 2026-09-28
 
 No breaking changes. A new `Badge` component, which a `NavigationBar` item
