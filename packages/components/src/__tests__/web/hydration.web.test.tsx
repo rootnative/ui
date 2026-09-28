@@ -28,11 +28,37 @@ import { act } from 'react'
 import { Text, View } from 'react-native'
 import { Grid } from '../../layout/Grid'
 
+interface NodeChannel {
+  port1: { close(): void }
+  port2: { close(): void }
+}
+
+const openChannels: NodeChannel[] = []
+
+/**
+ * The browser build of `react-dom/server` opens a `MessageChannel` when the
+ * module loads and listens on `port1`. A Node `MessagePort` with a listener
+ * keeps the process alive, so without this a run of this file alone passes
+ * and never exits. The full suite exits only because Jest ends its workers.
+ */
+afterAll(() => {
+  for (const channel of openChannels.splice(0)) {
+    channel.port1.close()
+    channel.port2.close()
+  }
+})
+
 /** jsdom supplies none of what `react-dom/server` needs. */
 function loadReactDom() {
   const g = globalThis as Record<string, unknown>
   /* eslint-disable @typescript-eslint/no-require-imports */
-  g.MessageChannel = require('node:worker_threads').MessageChannel
+  const NodeMessageChannel = require('node:worker_threads').MessageChannel
+  g.MessageChannel = class extends NodeMessageChannel {
+    constructor() {
+      super()
+      openChannels.push(this as unknown as NodeChannel)
+    }
+  }
   const util = require('node:util')
   g.TextEncoder ??= util.TextEncoder
   g.TextDecoder ??= util.TextDecoder
