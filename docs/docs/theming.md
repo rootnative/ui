@@ -52,6 +52,13 @@ export default function App() {
 }
 ```
 
+On a static web export (`web.output: 'static'`), the server cannot read the
+system setting, so it renders the light theme. The provider keeps the light
+theme while the client hydrates, then switches to the system setting on the
+next render. A reader with a dark system setting sees one light frame first.
+You do not need a hydration gate around `mode`. The
+[static export note](./responsive.md#notes) explains why the provider waits.
+
 `createMaterialTheme()` returns a pair already, so rename on destructure:
 
 ```tsx

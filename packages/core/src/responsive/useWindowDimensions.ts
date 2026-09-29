@@ -1,19 +1,6 @@
-import { useSyncExternalStore } from 'react'
 import { useWindowDimensions as useMeasuredWindowDimensions } from 'react-native'
 import type { ScaledSize } from 'react-native'
-
-/**
- * A store that never changes, read only for *when* React reads it.
- *
- * React calls `getServerSnapshot` during server rendering **and** through the
- * hydration pass, then `getSnapshot` for every render after. So this is
- * `true` exactly while the client is reproducing the server's markup, and
- * `false` everywhere else — including the very first render of a client-only
- * tree, which never hydrates.
- */
-const subscribeToNothing = () => () => {}
-const notHydrating = () => false
-const isHydratingOnServer = () => true
+import { useIsHydrating } from '../internal/useIsHydrating'
 
 /**
  * The window react-native-web's `Dimensions` reports on a server with no DOM
@@ -54,10 +41,5 @@ const SERVER_WINDOW: ScaledSize = Object.freeze({
  */
 export function useWindowDimensions(): ScaledSize {
   const measured = useMeasuredWindowDimensions()
-  const hydrating = useSyncExternalStore(
-    subscribeToNothing,
-    notHydrating,
-    isHydratingOnServer,
-  )
-  return hydrating ? SERVER_WINDOW : measured
+  return useIsHydrating() ? SERVER_WINDOW : measured
 }

@@ -1,6 +1,6 @@
 /**
- * Static-export hydration, for anything that resolves a breakpoint or reads
- * the window size.
+ * Static-export hydration, for anything that resolves a breakpoint, reads
+ * the window size, or follows the system color scheme.
  *
  * A static export renders on a server with no DOM, where react-native-web's
  * `Dimensions` is fixed at `width: 0` — so every breakpoint resolves to
@@ -17,13 +17,21 @@
  * `useWindowDimensions` from `@rootnative/core` therefore reports the
  * server's 0 by 0 window for exactly as long as the client is hydrating, then
  * switches on the re-render React schedules after. `useBreakpoint` reads it,
- * so it reports `compact` for the same span.
+ * so it reports `compact` for the same span. `ThemeProvider` reads the same
+ * flag and resolves `mode="system"` to light for that span, because the
+ * server has no `matchMedia` and react-native-web reports light there.
  *
  * This is unobservable in the native project: there is no hydration there at
  * all, so `Grid` renders its measured columns and every assertion passes
  * whether or not the hook is safe.
  */
-import { ThemeProvider, useWindowDimensions } from '@rootnative/core'
+import {
+  ThemeProvider,
+  darkTheme,
+  lightTheme,
+  useTheme,
+  useWindowDimensions,
+} from '@rootnative/core'
 import { act } from 'react'
 import { Text, View } from 'react-native'
 import { Grid } from '../../layout/Grid'
@@ -158,9 +166,9 @@ it('Grid hydrates a tablet against compact markup without stranding it', async (
 })
 
 /**
- * A layout that needs a number rather than a size class, the shape `reelist`
- * shipped: a hero whose height is a fraction of the window width. With the
- * `react-native` hook the export kept a 0 high hero on a 1440 wide screen.
+ * A layout that needs a number rather than a size class: a hero whose height
+ * is a fraction of the window width. With the `react-native` hook the export
+ * kept a 0 high hero on a 1440 wide screen.
  */
 function Hero() {
   const { width } = useWindowDimensions()
@@ -192,4 +200,64 @@ it('useWindowDimensions hydrates a wide window against 0 wide markup', async () 
   // markup, React keeps the 0px, and the hero stays collapsed.
   expect(errors).toHaveLength(0)
   expect(heroHeight(host)).toBe('640px')
+})
+
+const DARK_QUERY = '(prefers-color-scheme: dark)'
+
+/**
+ * Set what react-native-web's `Appearance` reads. The web setup file returns
+ * one shared object per query, and `Appearance` holds the one it got when it
+ * loaded, so this changes the scheme for every later read.
+ */
+function preferDark(dark: boolean) {
+  const query = window.matchMedia(DARK_QUERY) as { matches: boolean }
+  query.matches = dark
+}
+
+afterEach(() => preferDark(false))
+
+/** The color the way the DOM reports it, so a hex token compares equal. */
+function cssColor(color: string): string {
+  const probe = document.createElement('div')
+  probe.style.backgroundColor = color
+  return probe.style.backgroundColor
+}
+
+function Page() {
+  const { colors } = useTheme()
+  const pageStyle = { backgroundColor: colors.background }
+  return <View testID="page" style={pageStyle} />
+}
+
+it("ThemeProvider hydrates mode='system' in a dark browser against light markup", async () => {
+  const { renderToString, hydrateRoot } = loadReactDom()
+  const pageColor = (host: HTMLElement) =>
+    host.querySelector<HTMLElement>('[data-testid="page"]')?.style
+      .backgroundColor
+  const ui = (
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+      <Page />
+    </ThemeProvider>
+  )
+
+  // The export server has no `matchMedia`, so react-native-web reports light.
+  preferDark(false)
+  const host = document.createElement('div')
+  host.innerHTML = renderToString(ui)
+  document.body.appendChild(host)
+  expect(pageColor(host)).toBe(cssColor(lightTheme.colors.background))
+
+  preferDark(true)
+
+  const errors: unknown[] = []
+  await act(async () => {
+    hydrateRoot(host, ui, {
+      onRecoverableError: (e: unknown) => errors.push(e),
+    })
+  })
+
+  // With the `react-native` hook the client renders dark against light
+  // markup, React keeps the light style, and the page stays light.
+  expect(errors).toHaveLength(0)
+  expect(pageColor(host)).toBe(cssColor(darkTheme.colors.background))
 })

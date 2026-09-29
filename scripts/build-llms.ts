@@ -1908,8 +1908,7 @@ render it.`
  * This is the one setup step no `llms.txt` stated, and it is not guessable:
  * the failure is a syntax error inside `node_modules` on a package the reader
  * did not write, and the obvious fix (`transformIgnorePatterns`) does nothing
- * on its own. Reported by the `reelist` validation consumer, which lost a
- * debugging cycle to it, and verified here against the installed presets —
+ * on its own. Verified here against the installed presets —
  * `react-native/jest-preset` transforms `^.+\.(js|ts|tsx)$`, so the 11 `.mjs`
  * files in `@rootnative/inertia/dist` match no transform at all.
  */
@@ -2032,7 +2031,7 @@ const custom: Theme = {
 
 Props:
 - \`theme?: BaseTheme | { light: BaseTheme; dark: BaseTheme }\` — A single theme, or a light/dark pair. A pair enables \`useThemeMode()\`. Default: \`lightTheme\` (MD3)
-- \`mode?: 'system' | 'light' | 'dark'\` — Controlled mode. Leave unset and use \`setMode()\` instead. Pair with \`onModeChange\`
+- \`mode?: 'system' | 'light' | 'dark'\` — Controlled mode. Leave unset and use \`setMode()\` instead. Pair with \`onModeChange\`. On a static web export, \`'system'\` renders light on the server and while the client hydrates, then follows the OS on the next render. No hydration gate is needed around it
 - \`defaultMode?: 'system' | 'light' | 'dark'\` — Initial mode when uncontrolled. Default: \`'system'\`
 - \`onModeChange?: (mode: ThemeMode) => void\`
 - \`storage?: { getItem, setItem }\` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
@@ -2302,6 +2301,8 @@ A static export (\`web.output: 'static'\`) renders on a server with no DOM, wher
 \`useWindowDimensions\` therefore reports the server's 0 by 0 window for as long as the client is hydrating, matching that markup, and switches to the measured window on the re-render React schedules once hydration finishes. \`useBreakpoint\` reads it, so it reports \`compact\` for the same span, and a breakpoint and a raw width cannot disagree. On native and on a single-page web build there is no hydration, so the measured value is returned from the first render at no cost.
 
 The practical consequence: a breakpoint-dependent layout **starts compact and widens a frame later** on a static export. That is unavoidable — the server cannot know the viewport — so design the compact variant to be the honest first paint. \`Grid\` inherits all of this, which matters because it resolves a \`columns\` map internally and leaves a consumer nowhere to put a gate of their own.
+
+\`ThemeProvider\` reads the same hydration flag for \`mode="system"\`. The export server has no \`matchMedia\`, so react-native-web reports \`'light'\` there and the HTML ships the light theme. The provider keeps light while the client hydrates, then switches to the OS scheme on the same re-render as the window size. A reader with a dark system setting sees one light frame first. The \`useColorScheme\` hook from \`react-native\` is **not** hydration-safe: a theme chosen from it stays light in a dark browser.
 `
 }
 

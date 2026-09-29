@@ -8,18 +8,26 @@
 global.__DEV__ = true
 
 // react-native-web's Appearance/useColorScheme reads matchMedia; jsdom has no
-// implementation of it at all.
+// implementation of it at all. Appearance keeps the object it gets when the
+// module loads, so each query returns one shared object. A test sets
+// `window.matchMedia(query).matches` to change what Appearance reads.
 if (!window.matchMedia) {
-  window.matchMedia = (query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => false,
-  })
+  const queries = new Map()
+  window.matchMedia = (query) => {
+    if (!queries.has(query)) {
+      queries.set(query, {
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      })
+    }
+    return queries.get(query)
+  }
 }
 
 // Same reanimated/worklets mock surface the native suite uses. Its

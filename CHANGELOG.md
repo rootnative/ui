@@ -9,6 +9,29 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+No breaking changes. `ThemeProvider` follows a dark system setting in a
+static web export.
+
+### `mode="system"` is safe in a static web export
+
+`ThemeProvider` read the system scheme with the `react-native`
+`useColorScheme`. The export server has no `matchMedia`, so react-native-web
+reports `'light'` there, and the HTML ships the light theme. The client
+reads the real scheme on its hydration render, and React 19 keeps the
+server's light styles with no error. So in a dark browser the page stayed
+light until the reader changed the mode.
+
+`ThemeProvider` now resolves `'system'` to light on the server and while the
+client hydrates, and then to the OS scheme on the next render. It reads the
+same hydration flag as `useWindowDimensions`, so a scheme and a window size
+switch on the same render. On native and on a single-page web build, the
+provider reads the OS scheme from the first render. A reader with a dark
+system setting sees one light frame first on a static export. The server
+cannot know the scheme, so that frame is the first paint. If you wrote your
+own hydration gate around `mode`, remove it.
+
 ## 0.0.0-alpha.20 — 2026-09-29
 
 No breaking changes. A new `SearchBar` component. An anchored `Badge` sits at
@@ -126,9 +149,9 @@ installs `badge` as a dependency.
 `useBreakpoint` was safe in a static web export, but a layout that needs the
 raw width had only the `react-native` hook. On the export server that hook
 measures a 0 by 0 window, and React 19 keeps the server's style when the
-client hydrates, with no error. In the `reelist` app on a 1440 wide screen,
-the home carousel drew each slot -128 wide and the film page drew its
-backdrop 0 high until the reader resized the window.
+client hydrates, with no error. So on a 1440 wide screen, a carousel slot
+sized from the width drew -128 wide, and a hero set as a fraction of the
+width drew 0 high, until the reader resized the window.
 
 `useWindowDimensions` from `@rootnative/core` returns the same `ScaledSize`
 as the `react-native` hook. While the client hydrates, it returns the
@@ -145,7 +168,7 @@ An interactive `Card` set `role="button"` after it spread your props, so the
 role you passed was lost with no warning. Expo Router's `<Link href asChild>`
 passes `role="link"` and `href` to its child. The card then rendered
 `<button href>` on the web, which a crawler does not follow and a middle click
-does not open. Found in the `reelist` app. The card now uses your `role` and
+does not open. The card now uses your `role` and
 falls back to `button`, so react-native-web renders an `<a>`. With no `role`,
 the card is a `<button>` as before. `Chip`, `Button`, `IconButton`, `FAB`,
 `ListItem` and `Avatar` already let your `role` win, because they set the
@@ -158,8 +181,7 @@ older `accessibilityRole` and `role` takes precedence over it. If you put a
 The selected rest radius was a constant, half the chip height, while the
 unselected radius read `theme.shape.cornerMedium`. Under `applyRoundness(0)`
 every surface was square except a selected filter chip, which morphed into a
-16dp pill and could not be themed out of it. Found in `rootnative/ui-example`,
-whose Survey theme is flat by design. The selected radius now reads
+16dp pill and could not be themed out of it. The selected radius now reads
 `theme.shape.cornerLarge`, which is 16dp at the default roundness and scales
 with it, capped at half the chip height so a rounder theme still draws a true
 pill. The default look is unchanged.
@@ -168,8 +190,8 @@ pill. The default look is unchanged.
 
 No breaking changes. `TextField` gains a `ref` prop. Every component that
 applies a safe-area inset reads it from `SafeAreaProvider` when one is
-mounted. The snackbar fits a phone screen on native. All three came from the
-`reelist` app, and each one names the workaround you can now remove.
+mounted. The snackbar fits a phone screen on native. Each entry names the
+workaround you can now remove.
 
 ### `TextField` forwards a ref to its `TextInput`
 
