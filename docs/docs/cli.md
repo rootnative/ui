@@ -407,6 +407,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `progress` | — | Linear and circular progress indicators with determinate and indeterminate modes |
 | `radio` | — | Single-choice selection control with selected/unselected states |
 | `search-bar` | icon-button | MD3 search bar — 56dp pill with a leading search or navigation icon, a clear button, and trailing icon actions or an avatar |
+| `search-view` | divider, icon-button, portal, search-bar | MD3 search view — the panel that opens from a search bar, full screen on a compact window and docked on a wider one, with a focus trap and Android back handling |
 | `skeleton` | — | Pulsing loading placeholder block that matches the shape of the content it stands in for |
 | `slider` | — | Single-thumb or range slider with continuous and discrete (stepped) modes and optional centered origin |
 | `snackbar` | button, icon-button, portal | Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement |

@@ -67,6 +67,12 @@ export type { TextFieldProps, TextFieldVariant } from './text-field'
 
 export { SearchBar } from './search-bar'
 export type { SearchBarAction, SearchBarProps } from './search-bar'
+export { SearchView } from './search-view'
+export type {
+  SearchViewInputProps,
+  SearchViewLayout,
+  SearchViewProps,
+} from './search-view'
 
 export { Dialog } from './dialog'
 export type {

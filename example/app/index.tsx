@@ -163,6 +163,14 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           <SearchBar placeholder="Search" />
         </View>
       )
+    case 'SearchView':
+      return (
+        <MaterialCommunityIcons
+          name="text-box-search-outline"
+          size={48}
+          color={theme.colors.primary}
+        />
+      )
     case 'Keyboard Wrapper':
       return (
         <MaterialCommunityIcons

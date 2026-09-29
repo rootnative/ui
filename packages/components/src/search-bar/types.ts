@@ -48,6 +48,14 @@ interface SearchBarCommonProps extends Omit<
   /** Called with the current query when the user submits from the keyboard. */
   onSearch?: (query: string) => void
   /**
+   * Makes the bar a button, for a bar that opens a `SearchView`. The bar is
+   * then one tab stop with the `button` role, a press or Enter calls this,
+   * and the input is read-only and out of the tab order. It still shows
+   * `value` and the placeholder. The clear button and the trailing actions
+   * stay buttons of their own.
+   */
+  onPress?: () => void
+  /**
    * Shows a clear button while the bar holds text.
    * @default true
    */

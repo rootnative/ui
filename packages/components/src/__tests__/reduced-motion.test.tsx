@@ -24,6 +24,7 @@ import { PortalHost } from '../portal/PortalHost'
 import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
 import { SearchBar } from '../search-bar'
+import { SearchView } from '../search-view'
 import { Skeleton } from '../skeleton'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
@@ -219,6 +220,14 @@ const CASES: readonly ReducedMotionCase[] = [
         <Dialog visible onDismiss={() => {}}>
           <Dialog.Title>Title</Dialog.Title>
         </Dialog>
+      </PortalHost>
+    ),
+  },
+  {
+    name: 'SearchView',
+    render: () => (
+      <PortalHost>
+        <SearchView visible onDismiss={() => {}} placeholder="Search" />
       </PortalHost>
     ),
   },

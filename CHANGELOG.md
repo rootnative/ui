@@ -11,9 +11,50 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-No breaking changes. `ThemeProvider` follows a dark system setting in a
-static web export. The divider of a scrollable `Tabs` row spans the whole
-row.
+No breaking changes. A new `SearchView` component. `ThemeProvider` follows
+a dark system setting in a static web export. The divider of a scrollable
+`Tabs` row spans the whole row.
+
+### `SearchView`
+
+`SearchView` from `@rootnative/components/search-view` is the MD3 search
+view: the panel that opens from a `SearchBar` and shows suggestions or
+results. It renders through `Portal` on the `dialog` layer.
+
+```tsx
+<SearchView
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={barRef}
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => runSearch(text)}
+>
+  <List>{suggestions}</List>
+</SearchView>
+```
+
+- The header is 72dp and holds a back button, the input, a clear button
+  while the input holds text, and `actions`. `children` fills the rest.
+- `layout="auto"` is full screen on a compact window and docked on a wider
+  one. A docked view has the extra-large corner, is 240dp tall at least and
+  two thirds of the window at most, and closes on a press outside it. Pass
+  the bar's `View` as `anchor`, and the docked view opens over the bar.
+- The view asks to close through `onDismiss`: the back button, the Android
+  back button, Escape on web, and a press outside a docked view.
+- On web, focus moves to the input on open, Tab stays inside the view, and
+  focus returns to the trigger on close. On native, the input takes focus on
+  open and `accessibilityViewIsModal` keeps the screen reader inside.
+- `value` and `onChangeText` control the query, `defaultValue` starts an
+  uncontrolled one, `ref` reaches the `TextInput`, and `inputProps` passes
+  the rest of its props.
+
+`SearchBar` gains `onPress` for this. With it, the bar is a button that opens
+the view: one tab stop with the `button` role, a read-only input that still
+shows `value`, and the clear button and actions as buttons of their own. Open
+the view from `onPress`, not from `onFocus`: the view returns focus to the
+bar when it closes, and a bar that opens on focus reopens it at that moment.
 
 ### `mode="system"` is safe in a static web export
 

@@ -3,8 +3,7 @@ import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
-import type { TextInput } from 'react-native'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, TextInput } from 'react-native'
 import type { ReactTestInstance } from 'react-test-renderer'
 import { __resetWarnOnceForTests } from '../internal/warnOnce'
 import { SearchBar } from '../search-bar/SearchBar'
@@ -272,6 +271,79 @@ describe('SearchBar', () => {
         />,
       )
       expect(screen.getByTestId('custom-trailing')).toBeTruthy()
+    })
+  })
+
+  describe('as a trigger', () => {
+    it('is a button named by the placeholder that calls onPress', () => {
+      const onPress = jest.fn()
+      renderWithTheme(<SearchBar placeholder="Search" onPress={onPress} />)
+      const button = screen.getByRole('button', { name: 'Search' })
+      expect(button.props.tabIndex).toBe(0)
+      fireEvent.press(button)
+      expect(onPress).toHaveBeenCalledTimes(1)
+    })
+
+    it('takes an explicit accessibilityLabel as the button name', () => {
+      renderWithTheme(
+        <SearchBar
+          placeholder="Search"
+          accessibilityLabel="Open search"
+          onPress={() => {}}
+        />,
+      )
+      expect(screen.getByRole('button', { name: 'Open search' })).toBeTruthy()
+    })
+
+    it('locks the input out of the tab order and the accessibility tree', () => {
+      renderWithTheme(
+        <SearchBar placeholder="Search" value="rain" onPress={() => {}} />,
+      )
+      const input = screen.UNSAFE_getByType(TextInput)
+      expect(input.props.editable).toBe(false)
+      expect(input.props.focusable).toBe(false)
+      expect(input.props.tabIndex).toBe(-1)
+      expect(input.props['aria-hidden']).toBe(true)
+      expect(input.props.importantForAccessibility).toBe('no-hide-descendants')
+      expect(input.props.value).toBe('rain')
+      // The frame, not the input: Android's text field consumes a touch even
+      // with a `pointerEvents` style, and a `View` does not.
+      expect(StyleSheet.flatten(input.parent?.props.style).pointerEvents).toBe(
+        'none',
+      )
+    })
+
+    it('keeps the clear button and the actions as buttons of their own', () => {
+      const onPress = jest.fn()
+      const onClear = jest.fn()
+      const onVoice = jest.fn()
+      renderWithTheme(
+        <SearchBar
+          placeholder="Search"
+          value="rain"
+          onPress={onPress}
+          onClear={onClear}
+          actions={[
+            {
+              icon: 'microphone',
+              accessibilityLabel: 'Voice',
+              onPress: onVoice,
+            },
+          ]}
+        />,
+      )
+      fireEvent.press(screen.getByLabelText('Clear search'))
+      fireEvent.press(screen.getByLabelText('Voice'))
+      expect(onClear).toHaveBeenCalledTimes(1)
+      expect(onVoice).toHaveBeenCalledTimes(1)
+      expect(onPress).not.toHaveBeenCalled()
+    })
+
+    it('leaves the input editable and the wrapper out of the tree without onPress', () => {
+      renderWithTheme(<SearchBar placeholder="Search" />)
+      expect(screen.queryByRole('button')).toBeNull()
+      expect(screen.getByRole('searchbox').props.editable).toBe(true)
+      expect(screen.getByRole('searchbox').props.focusable).toBeUndefined()
     })
   })
 

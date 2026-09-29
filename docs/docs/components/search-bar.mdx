@@ -8,7 +8,7 @@ description: The search bar lets users enter a query to find content. Follows th
 The search bar lets users enter a query to find content.
 Follows the [Material Design 3 Search](https://m3.material.io/components/search/overview) specification.
 
-MD3 Search has two parts: the **search bar** and the **search view**, the panel that opens from the bar and shows suggestions. This component is the search bar. The search view is not part of the library yet.
+MD3 Search has two parts: the **search bar** and the **search view**, the panel that opens from the bar and shows suggestions. This component is the search bar. [SearchView](./search-view.mdx) is the view.
 
 ## Usage
 
@@ -75,6 +75,16 @@ The leading icon is a search icon by default, and it is decoration. Set `onLeadi
   }
 `}
 />
+
+## Opening a search view
+
+Set `onPress` to make the bar a button that opens a [SearchView](./search-view.mdx). The bar is then one tab stop with the `button` role. A press, Enter, or Space calls `onPress`. The input is read-only and out of the tab order, but it still shows `value` and the placeholder, so the bar shows the query after the view closes. The clear button and the trailing actions stay buttons of their own.
+
+```tsx
+<SearchBar placeholder="Search" value={query} onPress={() => setOpen(true)} />
+```
+
+Use `onPress` rather than `onFocus` for this. The view returns focus to the bar when it closes, and a bar that opens on focus would reopen it.
 
 ## Trailing slot
 
@@ -172,6 +182,7 @@ MD3 also sets a minimum width of 360dp. The component does not apply it, because
 - The placeholder becomes the accessible name of the input. Set `accessibilityLabel` to use a different name.
 - A decorative leading icon stays out of the accessibility tree. When `onLeadingIconPress` makes it a button, name it with `leadingIconAccessibilityLabel`. In development, the component warns when that label is missing.
 - The press wrapper is not a tab stop, so the bar costs a keyboard user one stop, plus one for the clear button while the bar holds text.
+- With `onPress`, the bar is the one stop, a `button` named by the placeholder or `accessibilityLabel`, and the input leaves the accessibility tree.
 
 ## Props
 

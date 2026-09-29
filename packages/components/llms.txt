@@ -618,6 +618,9 @@ import { SearchBar } from '@rootnative/components/search-bar'
 
 // Custom trailing content, such as an avatar.
 <SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
+
+// A bar that opens a SearchView: one button, read-only input.
+<SearchBar placeholder="Search" value={query} onPress={() => setOpen(true)} />
 ```
 
 Props:
@@ -625,6 +628,7 @@ Props:
 - `onLeadingIconPress?: () => void` — Makes the leading icon a button — for a navigation icon such as a menu or a back arrow. Label it with `leadingIconAccessibilityLabel`.
 - `leadingIconAccessibilityLabel?: string` — Accessibility label for the leading icon when it is a button.
 - `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
+- `onPress?: () => void` — Makes the bar a button, for a bar that opens a `SearchView`. The bar is then one tab stop with the `button` role, a press or Enter calls this, and the input is read-only and out of the tab order. It still shows `value` and the placeholder. The clear button and the trailing actions stay buttons of their own.
 - `showClearButton?: boolean` — Default: `true`. Shows a clear button while the bar holds text.
 - `clearButtonAccessibilityLabel?: string` — Default: `'Clear search'`. Accessibility label for the clear button.
 - `onClear?: () => void` — Called after the clear button empties the bar.
@@ -644,7 +648,61 @@ SearchBarAction:
 - `onPress?: () => void` — Called when the action is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the action.
 
-This is the MD3 search **bar** only. The MD3 search **view** (the expanded suggestions panel) is not part of the library yet.
+This is the MD3 search **bar**. `SearchView` is the MD3 search **view**, the panel that opens from the bar.
+
+---
+
+### SearchView
+
+```tsx
+import { SearchView } from '@rootnative/components/search-view'
+
+// MD3 search view: the panel that opens from a SearchBar. Full screen on a
+// compact window, docked on a wider one. Renders through Portal.
+const anchorRef = useRef<View>(null)
+
+<View ref={anchorRef}>
+  <SearchBar placeholder="Search mail" value={query} onPress={() => setOpen(true)} />
+</View>
+<SearchView
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={anchorRef}
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => { runSearch(text); setOpen(false) }}
+>
+  <List>{suggestions.map((s) => <ListItem key={s} headlineText={s} onPress={() => pick(s)} />)}</List>
+</SearchView>
+```
+
+Props:
+- `visible: boolean` — Whether the view is open. The view mounts when this becomes `true`.
+- `onDismiss: () => void` — Called when the view asks to close: the back button, the Android back button, Escape on web, or a press outside a docked view. Set `visible` to `false` in response.
+- `layout?: 'auto' | 'fullscreen' | 'docked'` — Default: `'auto'`. The layout. `'auto'` is full screen on a compact window and docked on a wider one.
+- `anchor?: RefObject<View | null>` — The view the docked layout opens from, usually a `View` around the `SearchBar`. The docked view takes its left edge, top edge and width, so the header covers the bar. Without it, a docked view sits at the top of the screen, centered, 720 dp wide at most.
+- `value?: string` — Controlled query. Pair it with `onChangeText`.
+- `defaultValue?: string` — Initial query for the uncontrolled case.
+- `onChangeText?: (text: string) => void` — Called on every change to the query.
+- `placeholder?: string` — Placeholder of the input, and its accessible name by default.
+- `placeholderTextColor?: string` — Default: `theme.colors.onSurfaceVariant`. Override the placeholder color.
+- `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
+- `backIcon?: IconSource` — Default: `'arrow-left'`. Icon of the back button at the start of the header.
+- `backAccessibilityLabel?: string` — Default: `'Back'`. Accessibility label of the back button.
+- `showClearButton?: boolean` — Default: `true`. Shows a clear button while the input holds text.
+- `clearButtonAccessibilityLabel?: string` — Default: `'Clear search'`. Accessibility label of the clear button.
+- `onClear?: () => void` — Called after the clear button empties the input.
+- `actions?: SearchBarAction[]` — Icon buttons at the end of the header, such as a voice action. The clear button shows before them while the input holds text.
+- `dismissAccessibilityLabel?: string` — Default: `'Close search'`. Accessibility label of the area outside a docked view, which closes the view on press.
+- `containerColor?: string` — Default: `theme.colors.surfaceContainerHigh`. Override the container (background) color of the view.
+- `contentColor?: string` — Override the color of the input text and the header icons.
+- `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
+- `style?: StyleProp<ViewStyle>` — Style applied to the surface. A docked view reads `maxHeight` from it, the default is two thirds of the window height.
+- `inputProps?: Omit<TextInputProps, 'value' | 'defaultValue' | 'onChangeText' | 'placeholder' | 'placeholderTextColor' | 'editable' | 'style' | 'ref' | 'autoFocus'>` — Other props of the `TextInput`, such as `autoCapitalize`.
+- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
+- `children?: ReactNode` — The body below the header: suggestions, recent queries, or results. It fills the rest of the view. Put a scrollable list here when it can grow past the view.
+- Inherits `ViewProps` (except `style`)
 
 ---
 

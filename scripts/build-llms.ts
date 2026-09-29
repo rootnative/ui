@@ -207,6 +207,12 @@ function splitExtendsClause(text: string): string[] {
   return parts
 }
 
+/** Open minus closed angle brackets, with `=>` arrows left out of the count. */
+function angleDepth(text: string): number {
+  const bare = text.replace(/=>/g, '')
+  return (bare.match(/</g)?.length ?? 0) - (bare.match(/>/g)?.length ?? 0)
+}
+
 function parseTypeSource(content: string): ParseResult {
   const result: ParseResult = { interfaces: [], typeAliases: [] }
   const lines = content.split('\n')
@@ -244,7 +250,20 @@ function parseTypeSource(content: string): ParseResult {
         }
         typeValue = typeLines.map((l) => l.replace(/^\|\s*/, '')).join(' | ')
       } else {
+        // A generic that Prettier wrapped past 80 columns opens on this line
+        // and closes on a later one. Follow it until the angle brackets
+        // balance, or the alias renders as `Omit<` and nothing else.
+        let depth = angleDepth(typeValue)
         i++
+        while (depth > 0 && i < lines.length) {
+          typeValue += ' ' + lines[i].trim()
+          depth += angleDepth(lines[i])
+          i++
+        }
+        typeValue = typeValue
+          .replace(/<\s+/g, '<')
+          .replace(/,\s+\|\s*/g, ', ')
+          .replace(/\s+>/g, '>')
       }
 
       result.typeAliases.push({ name, comment: jsDoc.comment, type: typeValue })
@@ -524,6 +543,7 @@ const COMPONENT_ORDER = [
   'switch',
   'text-field',
   'search-bar',
+  'search-view',
   'layout',
   'divider',
   'list',
@@ -558,6 +578,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   switch: 'Switch',
   'text-field': 'TextField',
   'search-bar': 'SearchBar',
+  'search-view': 'SearchView',
   layout: 'Layout Components',
   divider: 'Divider',
   list: 'List',
@@ -736,6 +757,32 @@ import { SearchBar } from '@rootnative/components/search-bar'
 
 // Custom trailing content, such as an avatar.
 <SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
+
+// A bar that opens a SearchView: one button, read-only input.
+<SearchBar placeholder="Search" value={query} onPress={() => setOpen(true)} />
+\`\`\``,
+
+  'search-view': `\`\`\`tsx
+import { SearchView } from '@rootnative/components/search-view'
+
+// MD3 search view: the panel that opens from a SearchBar. Full screen on a
+// compact window, docked on a wider one. Renders through Portal.
+const anchorRef = useRef<View>(null)
+
+<View ref={anchorRef}>
+  <SearchBar placeholder="Search mail" value={query} onPress={() => setOpen(true)} />
+</View>
+<SearchView
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={anchorRef}
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => { runSearch(text); setOpen(false) }}
+>
+  <List>{suggestions.map((s) => <ListItem key={s} headlineText={s} onPress={() => pick(s)} />)}</List>
+</SearchView>
 \`\`\``,
 
   divider: `\`\`\`tsx
@@ -1430,8 +1477,8 @@ import { Grid } from '@rootnative/components/layout'
     }
 
     output +=
-      '\nThis is the MD3 search **bar** only. The MD3 search **view** (the ' +
-      'expanded suggestions panel) is not part of the library yet.\n'
+      '\nThis is the MD3 search **bar**. `SearchView` is the MD3 search ' +
+      '**view**, the panel that opens from the bar.\n'
 
     return output
   }

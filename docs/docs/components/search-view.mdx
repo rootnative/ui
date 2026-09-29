@@ -1,0 +1,137 @@
+---
+sidebar_position: 6
+description: The search view is the panel that opens from a search bar and shows suggestions or results. Follows the Material Design 3 Search specification.
+---
+
+# SearchView
+
+The search view is the panel that opens from a search bar and shows suggestions or results.
+Follows the [Material Design 3 Search](https://m3.material.io/components/search/overview) specification.
+
+MD3 Search has two parts: the **search bar** and the **search view**. [SearchBar](./search-bar.mdx) is the bar. This component is the view. It renders through [Portal](./portal.mdx), so your app must be wrapped in a `PortalHost` once at the root. It claims the `PORTAL_LAYERS.dialog` layer.
+
+## Usage
+
+<SnackExample
+  name="RootNative SearchView — Usage"
+  code={`
+  import { List, ListItem, PortalHost, SearchBar, SearchView } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useRef, useState } from 'react'
+  import { View } from 'react-native'
+
+  const SUGGESTIONS = ['Hiking trails', 'Weekend weather', 'Trail shoes']
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    const [query, setQuery] = useState('')
+    const anchorRef = useRef(null)
+    return (
+      <View style={{ flex: 1, padding: 16 }}>
+        <View ref={anchorRef}>
+          <SearchBar
+            placeholder="Search trails"
+            value={query}
+            onChangeText={setQuery}
+            onPress={() => setOpen(true)}
+          />
+        </View>
+        <SearchView
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          anchor={anchorRef}
+          placeholder="Search trails"
+          value={query}
+          onChangeText={setQuery}
+          onSearch={() => setOpen(false)}
+        >
+          <List>
+            {SUGGESTIONS.filter((s) => s.toLowerCase().includes(query.toLowerCase())).map((s) => (
+              <ListItem key={s} headlineText={s} onPress={() => { setQuery(s); setOpen(false) }} />
+            ))}
+          </List>
+        </SearchView>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The view opens when `visible` becomes `true`, and the input takes focus. The header holds a back button, the input, a clear button while the input holds text, and the `actions`. `children` fills the rest of the view. Put a scrollable list there when it can grow past the view.
+
+The view asks to close through `onDismiss`. It does so from the back button, from the Android back button, from Escape on web, and from a press outside a docked view. Set `visible` to `false` in response. The view does not close itself.
+
+The query is controlled with `value` and `onChangeText`, or uncontrolled with `defaultValue`. Share the state with the bar, as above, so the bar shows the query after the view closes.
+
+Give the bar `onPress`, not `onFocus`, to open the view. With `onPress` the bar is a button, and the view returns focus to it on close. A bar that opens the view on focus reopens it at that moment, because the returned focus fires `onFocus` again.
+
+## Layout
+
+MD3 gives the view two layouts, and `layout="auto"` (the default) picks one from the [breakpoint](../responsive.md):
+
+| Layout | Window | What it is |
+|--------|--------|------------|
+| `fullscreen` | compact | Covers the screen. No corner. Pads the top and bottom safe-area insets. |
+| `docked` | medium and wider | A panel with the extra-large corner. At least 240dp tall, at most two thirds of the window. A press outside it closes it. |
+
+Set `layout` to force one.
+
+### Anchor
+
+A docked view opens over the bar. Pass the bar's wrapping `View` as `anchor`, and the view takes its left edge, top edge and width, so the header covers the bar. Without an anchor, a docked view sits at the top of the screen, centered, 720dp wide at most.
+
+The view measures the anchor when it opens and when the window resizes. The surface mounts after the measurement, so it never shows at the wrong place.
+
+## Colors and overrides
+
+| Prop | What it changes |
+|------|-----------------|
+| `containerColor` | The surface background. Default `surfaceContainerHigh`. |
+| `contentColor` | The input text and the header icons. |
+| `inputStyle` | The `TextInput` element. |
+| `style` | The surface. A docked view reads `maxHeight` from it. |
+| `inputProps` | Other `TextInput` props, such as `autoCapitalize`. |
+
+## Specification
+
+| Part | MD3 token | Value |
+|------|-----------|-------|
+| Container | color | `surfaceContainerHigh` |
+| Container | shape | full screen: none; docked: extra-large corner |
+| Container | elevation | level 0 |
+| Header | height | 72dp |
+| Divider | color | `outline` |
+| Back button | color | `onSurface` |
+| Trailing icons | color | `onSurfaceVariant` |
+| Input text | type, color | `bodyLarge`, `onSurface` |
+| Placeholder | type, color | `bodyLarge`, `onSurfaceVariant` |
+| Docked view | height | 240dp minimum, two thirds of the window maximum |
+| Docked view | width | the anchor, or 720dp maximum |
+
+Values are from Compose `SearchViewTokens` and `SearchBar.kt`. MD3 Expressive adds a "contained" style, which the component does not build.
+
+## Accessibility
+
+- The surface is a modal `dialog`, named by the placeholder. Set `accessibilityLabel` to use a different name.
+- The header is a `search` landmark on web, and the input has the `searchbox` role.
+- On web, focus moves to the input on open, Tab stays inside the view, Escape closes it, and focus returns to the control that opened it on close.
+- On native, `accessibilityViewIsModal` keeps the screen reader inside the view.
+- The back button, the clear button, and each action need a name. The defaults are `Back` and `Clear search`; `actions` entries require an `accessibilityLabel`.
+- The area outside a docked view is a button named `dismissAccessibilityLabel`, `Close search` by default.
+
+## Props
+
+<PropTable name="SearchView" />

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 import { Platform } from 'react-native'
 
 /**
@@ -78,6 +79,13 @@ export interface FocusTrapOptions {
    * belong to whatever control has focus.
    */
   arrowNavigation?: boolean
+  /**
+   * The element that takes focus on entry, in place of the first focusable
+   * descendant. A search view opens on its input, not on the back button
+   * that precedes it in the tree. Read when the surface mounts, so a ref
+   * object is enough.
+   */
+  initialFocus?: RefObject<{ focus(): void } | null>
 }
 
 /**
@@ -89,6 +97,7 @@ export function useFocusTrap({
   active,
   onEscape,
   arrowNavigation = false,
+  initialFocus,
 }: FocusTrapOptions) {
   // The node is tracked in state, not a ref, because these surfaces render
   // through `Portal` — the host mounts them in a later commit, so an effect
@@ -121,8 +130,11 @@ export function useFocusTrap({
 
     const previouslyFocused = document.activeElement as HTMLElement | null
 
+    const preferred = initialFocus?.current
     const [first] = focusableWithin(surface)
-    if (first !== undefined) {
+    if (preferred) {
+      preferred.focus()
+    } else if (first !== undefined) {
       first.focus()
     } else {
       // A surface with nothing focusable inside still has to take focus, or
@@ -147,6 +159,8 @@ export function useFocusTrap({
         previouslyFocused.focus()
       }
     }
+    // `initialFocus` is a ref object, read once on entry.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, surface])
 
   // Containment. Split from entry so a changing `arrowNavigation` re-binds the

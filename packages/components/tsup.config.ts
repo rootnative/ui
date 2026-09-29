@@ -17,6 +17,7 @@ export default defineConfig({
     'src/switch/index.ts',
     'src/text-field/index.ts',
     'src/search-bar/index.ts',
+    'src/search-view/index.ts',
     'src/dialog/index.ts',
     'src/bottom-sheet/index.ts',
     'src/divider/index.ts',

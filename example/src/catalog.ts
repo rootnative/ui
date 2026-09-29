@@ -134,6 +134,15 @@ export const sections: CatalogSection[] = [
         keywords: 'search find query filter lookup magnify',
       },
       {
+        label: 'SearchView',
+        route: '/search-view',
+        description:
+          'MD3 search view: full screen on a phone, docked on a wide window',
+        add: 'search-view',
+        docs: 'components/search-view',
+        keywords: 'search view suggestions results panel docked fullscreen',
+      },
+      {
         label: 'Keyboard Wrapper',
         route: '/keyboard-avoiding-wrapper',
         description: 'Smart keyboard-aware wrapper with platform behavior',

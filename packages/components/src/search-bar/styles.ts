@@ -87,6 +87,12 @@ export function createStyles(theme: MaterialTheme) {
       inputDisabled: {
         color: disabledContent,
       },
+      // Takes the input's place in the row while the bar is a button.
+      triggerFrame: {
+        flex: 1,
+        alignSelf: 'stretch',
+        flexDirection: 'row',
+      },
       focusRing: {
         position: 'absolute',
         top: focusRingInset,

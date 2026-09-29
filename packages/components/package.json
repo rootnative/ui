@@ -82,6 +82,11 @@
       "react-native": "./dist/search-bar/index.js",
       "default": "./dist/search-bar/index.js"
     },
+    "./search-view": {
+      "types": "./dist/search-view/index.d.ts",
+      "react-native": "./dist/search-view/index.js",
+      "default": "./dist/search-view/index.js"
+    },
     "./dialog": {
       "types": "./dist/dialog/index.d.ts",
       "react-native": "./dist/dialog/index.js",
@@ -213,6 +218,9 @@
       ],
       "search-bar": [
         "dist/search-bar/index.d.ts"
+      ],
+      "search-view": [
+        "dist/search-view/index.d.ts"
       ],
       "dialog": [
         "dist/dialog/index.d.ts"

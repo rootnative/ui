@@ -1,0 +1,23 @@
+{
+  "name": "search-view",
+  "description": "MD3 search view — the panel that opens from a search bar, full screen on a compact window and docked on a wider one, with a focus trap and Android back handling",
+  "files": [
+    "packages/components/src/search-view/SearchView.tsx",
+    "packages/components/src/search-view/index.ts",
+    "packages/components/src/search-view/styles.ts",
+    "packages/components/src/search-view/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useFocusTrap.ts",
+    "packages/components/src/safe-area.tsx"
+  ],
+  "utils": ["render-icon"],
+  "componentDependencies": ["divider", "icon-button", "portal", "search-bar"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.20",
+    "react-native-safe-area-context": ">=4.0.0",
+    "@rootnative/inertia": ">=0.0.11",
+    "react-native-reanimated": ">=4.5.0 <4.6.0",
+    "react-native-worklets": ">=0.10.0 <0.11.0"
+  },
+  "optionalDependencies": {}
+}

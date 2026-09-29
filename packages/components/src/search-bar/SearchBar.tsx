@@ -27,6 +27,7 @@ export function SearchBar({
   onLeadingIconPress,
   leadingIconAccessibilityLabel,
   onSearch,
+  onPress,
   showClearButton = true,
   clearButtonAccessibilityLabel = 'Clear search',
   onClear,
@@ -68,6 +69,10 @@ export function SearchBar({
   const isControlled = value !== undefined
   const currentValue = isControlled ? value : internalValue
   const hasValue = currentValue !== ''
+  // With `onPress` the bar is a button that opens a search view, so the
+  // wrapper takes the focus, the role and the press, and the input is a
+  // read-only display of the query.
+  const isTrigger = onPress !== undefined
 
   // MD3 gives the bar hover and focus feedback but no press layer: a press
   // only moves focus into the input (Compose sets `enablePressIndication =
@@ -174,6 +179,14 @@ export function SearchBar({
       inputStyle,
     ],
   )
+  // A read-only input still takes a touch on Android and a mouse focus on
+  // the web, and Android's text field consumes the touch itself, so a
+  // `pointerEvents` style on the input does nothing there. A plain `View`
+  // honours it on every platform, so the press reaches the wrapper button.
+  const triggerFrameStyle = useMemo(
+    () => [styles.triggerFrame, pointerEvents.none],
+    [styles.triggerFrame],
+  )
 
   if (onLeadingIconPress && !leadingIconAccessibilityLabel) {
     warnOnce(
@@ -232,44 +245,95 @@ export function SearchBar({
     // landmark, and react-native-web renders this one as `role="search"`.
     <View accessibilityRole="search" style={rootStyle}>
       <Pressable
-        onPress={focusInput}
+        onPress={isTrigger ? onPress : focusInput}
         onHoverIn={handlers.onHoverIn}
         onHoverOut={handlers.onHoverOut}
+        onFocus={isTrigger ? handleFocus : undefined}
+        onBlur={isTrigger ? handleBlur : undefined}
         disabled={disabled}
-        accessible={false}
-        focusable={false}
+        accessible={isTrigger}
+        focusable={isTrigger}
+        role={isTrigger ? 'button' : undefined}
+        accessibilityLabel={
+          isTrigger ? (accessibilityLabel ?? placeholder) : undefined
+        }
         // react-native-web makes an enabled `Pressable` a tab stop even with
-        // `accessible` and `focusable` off. The wrapper only widens the press
-        // target and catches hover, so it must not cost a keyboard stop.
-        tabIndex={-1}
+        // `accessible` and `focusable` off. Without `onPress` the wrapper only
+        // widens the press target and catches hover, so it must not cost a
+        // keyboard stop. As a trigger it is the one stop the bar costs.
+        tabIndex={isTrigger ? 0 : -1}
         style={styles.pressableReset}
       >
         <Animated.View style={containerStyle}>
           <Animated.View style={focusRingStyleArr} />
           {leadingContent}
-          <TextInput
-            ref={setInputRef}
-            {...textInputProps}
-            value={value}
-            onChangeText={handleChangeText}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onSubmitEditing={handleSubmit}
-            editable={!disabled}
-            placeholder={placeholder}
-            placeholderTextColor={resolvedPlaceholderColor}
-            cursorColor={cursorColor ?? theme.colors.primary}
-            selectionColor={selectionColor ?? theme.colors.primary}
-            returnKeyType={returnKeyType ?? 'search'}
-            role={role ?? 'searchbox'}
-            accessibilityLabel={accessibilityLabel ?? placeholder}
-            // `TextInput` does not normalize `aria-*` into
-            // `accessibilityState`, so both spellings are needed: native
-            // reads the object, react-native-web reads the ARIA one.
-            aria-disabled={disabled}
-            accessibilityState={{ disabled }}
-            style={inputStyleArr}
-          />
+          {isTrigger ? (
+            <View style={triggerFrameStyle}>
+              <TextInput
+                ref={setInputRef}
+                {...textInputProps}
+                value={value}
+                onChangeText={handleChangeText}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                onSubmitEditing={handleSubmit}
+                editable={!disabled && !isTrigger}
+                focusable={isTrigger ? false : undefined}
+                tabIndex={isTrigger ? -1 : undefined}
+                // The wrapper button carries the name, so the read-only input
+                // leaves the accessibility tree on both platforms.
+                aria-hidden={isTrigger}
+                importantForAccessibility={
+                  isTrigger ? 'no-hide-descendants' : undefined
+                }
+                placeholder={placeholder}
+                placeholderTextColor={resolvedPlaceholderColor}
+                cursorColor={cursorColor ?? theme.colors.primary}
+                selectionColor={selectionColor ?? theme.colors.primary}
+                returnKeyType={returnKeyType ?? 'search'}
+                role={role ?? 'searchbox'}
+                accessibilityLabel={accessibilityLabel ?? placeholder}
+                // `TextInput` does not normalize `aria-*` into
+                // `accessibilityState`, so both spellings are needed: native
+                // reads the object, react-native-web reads the ARIA one.
+                aria-disabled={disabled}
+                accessibilityState={{ disabled }}
+                style={inputStyleArr}
+              />
+            </View>
+          ) : (
+            <TextInput
+              ref={setInputRef}
+              {...textInputProps}
+              value={value}
+              onChangeText={handleChangeText}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onSubmitEditing={handleSubmit}
+              editable={!disabled && !isTrigger}
+              focusable={isTrigger ? false : undefined}
+              tabIndex={isTrigger ? -1 : undefined}
+              // The wrapper button carries the name, so the read-only input
+              // leaves the accessibility tree on both platforms.
+              aria-hidden={isTrigger}
+              importantForAccessibility={
+                isTrigger ? 'no-hide-descendants' : undefined
+              }
+              placeholder={placeholder}
+              placeholderTextColor={resolvedPlaceholderColor}
+              cursorColor={cursorColor ?? theme.colors.primary}
+              selectionColor={selectionColor ?? theme.colors.primary}
+              returnKeyType={returnKeyType ?? 'search'}
+              role={role ?? 'searchbox'}
+              accessibilityLabel={accessibilityLabel ?? placeholder}
+              // `TextInput` does not normalize `aria-*` into
+              // `accessibilityState`, so both spellings are needed: native
+              // reads the object, react-native-web reads the ARIA one.
+              aria-disabled={disabled}
+              accessibilityState={{ disabled }}
+              style={inputStyleArr}
+            />
+          )}
           {showClearButton && hasValue && !disabled ? (
             <View style={styles.slot}>
               <IconButton

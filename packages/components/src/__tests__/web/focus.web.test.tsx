@@ -16,11 +16,13 @@
  * in the DOM and keyboard-reachable, which is all these tests read.
  */
 import { act, fireEvent, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { Button } from '../../button'
 import { Dialog } from '../../dialog'
 import { Menu } from '../../menu'
 import { PortalHost } from '../../portal/PortalHost'
 import { SearchBar } from '../../search-bar'
+import { SearchView } from '../../search-view'
 import { TextField } from '../../text-field'
 import { Tooltip } from '../../tooltip'
 import { renderWeb } from './render-web'
@@ -362,5 +364,127 @@ describe('Tooltip description', () => {
     expect(document.getElementById(describedBy as string)?.textContent).toBe(
       'Saves your changes',
     )
+  })
+})
+
+describe('SearchView focus trap', () => {
+  it('moves focus to the input, not to the back button before it', () => {
+    renderWeb(
+      <PortalHost>
+        <SearchView visible onDismiss={() => {}} placeholder="Search" />
+      </PortalHost>,
+    )
+
+    expect(document.activeElement).toBe(screen.getByRole('searchbox'))
+  })
+
+  it('cycles Tab within the view and closes on Escape', () => {
+    const onDismiss = jest.fn()
+    renderWeb(
+      <PortalHost>
+        <Button>Behind</Button>
+        <SearchView
+          visible
+          onDismiss={onDismiss}
+          placeholder="Search"
+          value="rain"
+        />
+      </PortalHost>,
+    )
+
+    // Back button, input, clear button. Shift-Tab from the input lands on
+    // the back button, and Tab from the clear button wraps to it.
+    press('Tab', { shiftKey: true })
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Back')
+    press('Tab')
+    expect(document.activeElement).toBe(screen.getByRole('searchbox'))
+    press('Tab')
+    expect(document.activeElement?.getAttribute('aria-label')).toBe(
+      'Clear search',
+    )
+    press('Tab')
+    expect(document.activeElement?.getAttribute('aria-label')).toBe('Back')
+
+    press('Escape')
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns focus to the trigger on close', () => {
+    function Screen() {
+      const [open, setOpen] = useState(false)
+      return (
+        <PortalHost>
+          <Button onPress={() => setOpen(true)}>Open</Button>
+          <SearchView
+            visible={open}
+            onDismiss={() => setOpen(false)}
+            placeholder="Search"
+          />
+        </PortalHost>
+      )
+    }
+    renderWeb(<Screen />)
+    const trigger = screen.getByRole('button', { name: 'Open' })
+    act(() => {
+      trigger.focus()
+      fireEvent.click(trigger)
+    })
+    expect(document.activeElement).toBe(screen.getByRole('searchbox'))
+
+    act(() => {
+      press('Escape')
+    })
+    expect(document.activeElement).toBe(trigger)
+  })
+})
+
+describe('SearchBar as a trigger', () => {
+  it('is one tab stop, a button, and the input is hidden and read-only', () => {
+    const onPress = jest.fn()
+    renderWeb(<SearchBar placeholder="Search" value="rain" onPress={onPress} />)
+
+    const stops = document.querySelectorAll('[tabindex="0"]')
+    // The bar button and the clear button.
+    expect(stops).toHaveLength(2)
+    const button = screen.getByRole('button', { name: 'Search' })
+    expect(button.getAttribute('tabindex')).toBe('0')
+
+    const input = document.querySelector('input')
+    expect(input?.getAttribute('tabindex')).toBe('-1')
+    expect(input?.getAttribute('aria-hidden')).toBe('true')
+    expect(input?.readOnly).toBe(true)
+
+    fireEvent.click(button)
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not reopen a view that returns focus to it on close', () => {
+    function Screen() {
+      const [open, setOpen] = useState(false)
+      return (
+        <PortalHost>
+          <SearchBar placeholder="Search" onPress={() => setOpen(true)} />
+          <SearchView
+            visible={open}
+            onDismiss={() => setOpen(false)}
+            placeholder="Search"
+          />
+        </PortalHost>
+      )
+    }
+    renderWeb(<Screen />)
+    const trigger = screen.getByRole('button', { name: 'Search' })
+    act(() => {
+      trigger.focus()
+      fireEvent.click(trigger)
+    })
+    expect(document.activeElement).toBe(screen.getByRole('searchbox'))
+
+    act(() => {
+      press('Escape')
+    })
+    // With a bar that opened on focus, the returned focus reopened the view
+    // and moved focus back into it. The trigger holds it now.
+    expect(document.activeElement).toBe(trigger)
   })
 })

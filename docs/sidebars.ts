@@ -39,6 +39,7 @@ const sidebars: SidebarsConfig = {
         'components/icon-button',
         'components/radio',
         'components/search-bar',
+        'components/search-view',
         'components/slider',
         'components/switch',
         'components/text-field',

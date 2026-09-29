@@ -94,6 +94,10 @@
       "description": "MD3 search bar — 56dp pill with a leading search or navigation icon, a clear button, and trailing icon actions or an avatar"
     },
     {
+      "name": "search-view",
+      "description": "MD3 search view — the panel that opens from a search bar, full screen on a compact window and docked on a wider one, with a focus trap and Android back handling"
+    },
+    {
       "name": "skeleton",
       "description": "Pulsing loading placeholder block that matches the shape of the content it stands in for"
     },
