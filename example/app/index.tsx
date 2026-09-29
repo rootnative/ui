@@ -634,8 +634,6 @@ export default function HomeScreen() {
     }),
     [padding, theme.colors.surface],
   )
-  // `marginStart` / `marginEnd`, not `marginHorizontal`: `Divider` sets its
-  // insets with the logical keys, and those win over `marginHorizontal`.
   const tabsBleedStyle = useMemo(
     () => ({ marginStart: -padding, marginEnd: -padding }),
     [padding],
@@ -661,24 +659,17 @@ export default function HomeScreen() {
       accessibilityLabel="Component category"
     />
   )
-  // The divider of a scrollable `Tabs` row starts after `edgePadding`, so it
-  // stops short of the screen edge. The row draws none, and a full-width
-  // `Divider` below it closes the stuck toolbar edge to edge.
   const categoryTabs = (
-    <View>
-      <Tabs
-        variant="secondary"
-        scrollable
-        edgePadding={padding}
-        showDivider={false}
-        items={categoryItems}
-        value={category ?? ALL_CATEGORIES}
-        onValueChange={selectCategory}
-        accessibilityLabel="Component category"
-        style={tabsBleedStyle}
-      />
-      <Divider style={tabsBleedStyle} />
-    </View>
+    <Tabs
+      variant="secondary"
+      scrollable
+      edgePadding={padding}
+      items={categoryItems}
+      value={category ?? ALL_CATEGORIES}
+      onValueChange={selectCategory}
+      accessibilityLabel="Component category"
+      style={tabsBleedStyle}
+    />
   )
 
   return (

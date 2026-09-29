@@ -1,7 +1,7 @@
 import { lightTheme } from '@rootnative/core'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { Tabs } from '../tabs'
 import type { TabItem } from '../tabs'
 
@@ -276,6 +276,44 @@ describe('Tabs — tokens', () => {
     )
     expect(style.minWidth).toBe(90)
     expect(style.flexBasis).toBeUndefined()
+  })
+})
+
+describe('Tabs — scrollable edge padding', () => {
+  /** The row that holds the tabs, the divider and the indicator. */
+  function rowStyle() {
+    let node = screen.getByTestId('tabs-divider').parent
+    while (
+      node &&
+      StyleSheet.flatten(node.props.style)?.flexDirection !== 'row'
+    ) {
+      node = node.parent
+    }
+    return StyleSheet.flatten(node?.props.style)
+  }
+
+  // The divider is absolute inside the row, so it spans the row's padding.
+  // Padding on the scroll content instead starts the divider after it.
+  it('pads the row, not the scroll content, so the divider spans the padding', () => {
+    renderTabs({ scrollable: true, edgePadding: 16 })
+
+    expect(rowStyle()).toMatchObject({ paddingHorizontal: 16, flexGrow: 1 })
+    const content = StyleSheet.flatten(
+      screen.UNSAFE_getByType(ScrollView).props.contentContainerStyle,
+    )
+    expect(content.paddingHorizontal).toBeUndefined()
+    expect(content.flexGrow).toBe(1)
+  })
+
+  it('defaults the edge padding to 52dp', () => {
+    renderTabs({ scrollable: true })
+    expect(rowStyle().paddingHorizontal).toBe(52)
+  })
+
+  it('leaves a fixed row unpadded', () => {
+    renderTabs({ edgePadding: 16 })
+    expect(rowStyle().paddingHorizontal).toBeUndefined()
+    expect(rowStyle().flexGrow).toBeUndefined()
   })
 })
 

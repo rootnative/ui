@@ -112,9 +112,14 @@ export function createTabsStyles(
       flexDirection: 'row',
       alignItems: 'stretch',
     },
-    // `flexGrow` so a short scrollable row still fills the viewport — without
-    // it the divider below would stop where the tabs do.
+    // `flexGrow` on both, so a short scrollable row still fills the viewport —
+    // without it the divider below would stop where the tabs do. The edge
+    // padding goes on the row, not on the scroll content, so the divider spans
+    // it and each tab's measured `x` already includes it.
     scrollContent: {
+      flexGrow: 1,
+    },
+    scrollRow: {
       flexGrow: 1,
       paddingHorizontal: edgePadding,
     },

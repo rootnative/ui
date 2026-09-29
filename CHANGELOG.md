@@ -12,7 +12,8 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 No breaking changes. `ThemeProvider` follows a dark system setting in a
-static web export.
+static web export. The divider of a scrollable `Tabs` row spans the whole
+row.
 
 ### `mode="system"` is safe in a static web export
 
@@ -31,6 +32,22 @@ provider reads the OS scheme from the first render. A reader with a dark
 system setting sees one light frame first on a static export. The server
 cannot know the scheme, so that frame is the first paint. If you wrote your
 own hydration gate around `mode`, remove it.
+
+### The divider of a scrollable `Tabs` row spans the edge padding
+
+A scrollable row put `edgePadding` on the scroll content, and drew its 1dp
+divider inside the tabs. So the divider started after the padding and
+stopped before it: at 390dp wide with `edgePadding={16}`, it ran from x 16,
+not from the screen edge. A row whose tabs did not fill the width drew the
+divider under the tabs only.
+
+The padding is now on the row, and the row fills the scroll view. The
+divider spans the tabs and the edge padding on both sides, and it still
+scrolls with the tabs, as Compose's `ScrollableTabRow` does. The same change
+fixes the scroll position: a selected tab scrolled into view now sits at the
+center of the row. It was `edgePadding` off center. If you set
+`showDivider={false}` and drew a full-width `Divider` under the row, remove
+both.
 
 ## 0.0.0-alpha.20 — 2026-09-29
 

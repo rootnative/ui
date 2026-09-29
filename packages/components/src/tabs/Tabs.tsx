@@ -113,7 +113,7 @@ export function Tabs({
       : active.x
 
   const row = (
-    <View style={styles.row}>
+    <View style={[styles.row, scrollable && styles.scrollRow]}>
       {items.map((item) => (
         <Tab
           key={item.value}
@@ -131,9 +131,9 @@ export function Tabs({
       {/*
         Drawn before the indicator so the indicator sits on top of it, the way
         MD3 shows them overlapping at the bottom edge. Inside the row rather
-        than beside it so it scrolls with the tabs — `flexGrow` on the scroll
-        content is what keeps it spanning the whole viewport when the tabs
-        don't fill it.
+        than beside it so it scrolls with the tabs, and spans the edge padding
+        as Compose's `ScrollableTabRow` does. `flexGrow` on the row keeps it
+        spanning the whole viewport when the tabs don't fill it.
       */}
       {showDivider ? (
         <Divider
