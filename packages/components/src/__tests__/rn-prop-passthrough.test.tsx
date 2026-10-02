@@ -21,9 +21,12 @@ import { AppBar } from '../appbar'
 import { BottomSheet } from '../bottom-sheet'
 import { ButtonGroup } from '../button-group'
 import { Dialog } from '../dialog'
+import { Icon } from '../icon'
 import { KeyboardAvoidingWrapper } from '../keyboard-avoiding-wrapper'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
+import { NavigationDrawer } from '../navigation-drawer'
+import { NavigationRail } from '../navigation-rail'
 import { PortalHost } from '../portal'
 import { Tabs } from '../tabs'
 import { Tooltip } from '../tooltip'
@@ -55,6 +58,45 @@ describe('RN prop passthrough reaches the root node', () => {
       <NavigationBar items={NAV_ITEMS} testID="nav" nativeID="probe" />,
     )
     expect(screen.getByTestId('nav').props.nativeID).toBe('probe')
+  })
+
+  it('NavigationRail', () => {
+    renderWithTheme(
+      <NavigationRail items={NAV_ITEMS} testID="rail" nativeID="probe" />,
+    )
+    expect(screen.getByTestId('rail').props.nativeID).toBe('probe')
+  })
+
+  it('NavigationDrawer — standard surface', () => {
+    renderWithTheme(
+      <NavigationDrawer variant="standard" testID="drawer" nativeID="probe">
+        <NavigationDrawer.Item value="a" label="A" />
+      </NavigationDrawer>,
+    )
+    expect(screen.getByTestId('drawer').props.nativeID).toBe('probe')
+  })
+
+  it('NavigationDrawer — modal surface', async () => {
+    renderHosted(
+      <NavigationDrawer
+        visible
+        onDismiss={() => {}}
+        testID="drawer"
+        nativeID="probe"
+      >
+        <NavigationDrawer.Item value="a" label="A" />
+      </NavigationDrawer>,
+    )
+    expect((await screen.findByTestId('drawer')).props.nativeID).toBe('probe')
+  })
+
+  it('Icon', () => {
+    renderWithTheme(<Icon source="home" testID="icon" nativeID="probe" />)
+    // Decorative, so `aria-hidden` at the root: opt hidden elements in.
+    expect(
+      screen.getByTestId('icon', { includeHiddenElements: true }).props
+        .nativeID,
+    ).toBe('probe')
   })
 
   it('ButtonGroup', () => {

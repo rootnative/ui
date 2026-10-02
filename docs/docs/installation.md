@@ -58,7 +58,7 @@ What each one does, and which two you can leave out:
 |---------|--------|--------|-----------|
 | `react-native-reanimated` | optional | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
 | `react-native-worklets` | optional | Reanimated 4's worklet runtime | You skip Reanimated |
-| `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Never |
+| `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar, NavigationDrawer and Snackbar | Never |
 | `@expo/vector-icons` | **required** | Default resolver for string icon names (`leadingIcon="check"`) | Never. The import is static, so the bundler must resolve it even with a custom `iconResolver`. A bundler without Expo can alias it to a stub — see [Web without Expo](./web-without-expo.md#5-resolve-the-default-icon-set) |
 | `react-native-svg` | **required** | CircularProgress and LoadingIndicator | Never |
 | `@rootnative/inertia` | **required** | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a required peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |

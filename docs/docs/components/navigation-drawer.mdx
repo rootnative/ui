@@ -1,0 +1,184 @@
+---
+sidebar_position: 4
+description: A side panel of destinations, modal over the content or standing beside it.
+---
+
+# NavigationDrawer
+
+Navigation drawers hold an app's destinations in a side panel: modal over the content on a
+compact or medium window, or standing beside it on an expanded one. Follows the
+[Material Design 3 Navigation drawer](https://m3.material.io/components/navigation-drawer/overview)
+specification.
+
+Destinations are 56dp rows with a 24dp icon, a `labelLarge` label, and an optional badge text,
+grouped in sections with a `titleSmall` headline. The active one sits on a full-corner
+`secondaryContainer` indicator. The sheet is 360dp wide.
+
+The modal variant renders through [Portal](./portal.mdx), so your app must be wrapped in a
+`PortalHost` once at the root. It claims the `PORTAL_LAYERS.sheet` layer with the bottom sheet.
+
+## Usage
+
+Compose the drawer from `NavigationDrawer.Section`, `NavigationDrawer.Item` and
+`NavigationDrawer.Divider`. The drawer owns the selection: an item is active when its `value`
+matches the drawer's `value`.
+
+<SnackExample
+  name="RootNative NavigationDrawer — Usage"
+  code={`
+  import { Button, NavigationDrawer, PortalHost, Typography } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    const [destination, setDestination] = useState('inbox')
+    return (
+      <View style={{ flex: 1, padding: 24, gap: 16 }}>
+        <Button variant="tonal" onPress={() => setOpen(true)}>Open drawer</Button>
+        <Text>Active: {destination}</Text>
+        <NavigationDrawer
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          value={destination}
+          onValueChange={setDestination}
+          accessibilityLabel="Main navigation"
+        >
+          <Typography variant="titleLarge" style={{ paddingHorizontal: 16, paddingVertical: 18 }}>
+            Mail
+          </Typography>
+          <NavigationDrawer.Section headline="Mail">
+            <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox-outline" selectedIcon="inbox" badge={24} />
+            <NavigationDrawer.Item value="outbox" label="Outbox" icon="send-outline" />
+            <NavigationDrawer.Item value="trash" label="Trash" icon="trash-can-outline" />
+          </NavigationDrawer.Section>
+          <NavigationDrawer.Divider />
+          <NavigationDrawer.Section headline="Labels">
+            <NavigationDrawer.Item value="family" label="Family" />
+            <NavigationDrawer.Item value="work" label="Work" />
+          </NavigationDrawer.Section>
+        </NavigationDrawer>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+Anything that is not a section, an item or a divider renders as is, so a `Typography` headline
+or an account block goes straight in as a child.
+
+## Variants
+
+| Variant | Where it renders | Container | Dismissal |
+|---------|------------------|-----------|-----------|
+| `'modal'` (default) | Through `Portal`, over the content, from the start edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp end corners | Scrim press, Android back, Escape on web, and a destination press |
+| `'standard'` | In place, as a permanent panel at the start of a row | `surface`, elevation level 0, no rounding | None; it is always open |
+
+A modal drawer takes `visible` and `onDismiss`. A standard drawer takes neither, and the type
+rejects `visible`, `onDismiss`, `dismissable`, `dismissOnSelect`, `hostName`, `scrimStyle` and
+`scrimAccessibilityLabel` on it.
+
+```tsx
+<NavigationDrawer variant="standard" value={destination} onValueChange={setDestination}>
+  <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" />
+</NavigationDrawer>
+```
+
+## Selection
+
+`value` + `onValueChange` is the controlled form; leave `value` off and the drawer tracks the
+selection itself, starting on `defaultValue`. Unlike the bar and the rail, a drawer may have no
+active destination: omit `defaultValue` for that.
+
+A modal drawer calls `onDismiss` after a destination press, because MD3 closes the drawer once a
+destination is chosen. Pass `dismissOnSelect={false}` to keep it open. An item's own `onPress`
+fires after the drawer's `onValueChange`.
+
+## Items, sections and dividers
+
+- **`NavigationDrawer.Item`** — a destination. `icon` is optional; MD3 allows text-only
+  destinations in a label section. `selectedIcon` swaps in while active. `badge` is a trailing
+  text such as an unread count, per the MD3 drawer anatomy — it is not announced, so add it to
+  `accessibilityLabel`.
+- **`NavigationDrawer.Section`** — a group with an optional `headline` in `titleSmall`, 56dp tall
+  and inset 28dp from the sheet edge.
+- **`NavigationDrawer.Divider`** — a `Divider` inset 28dp from both sheet edges, between sections.
+
+## Safe area
+
+A modal drawer spans the full screen height, so by default it pads its content by the top and
+bottom insets while the container color extends under them. A standard drawer defaults both
+off, because the `Layout` around it usually owns the edges. `insetTop` and `insetBottom`
+override either default.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The drawer background |
+| `contentColor` | Icon, label and badge of inactive destinations, and section headlines |
+| `selectedContentColor` | Icon, label and badge of the active destination; the state layers re-derive from it |
+| `indicatorColor` | The active indicator |
+| `labelStyle` | Every destination's label `Text`; an item's own `labelStyle` merges over it |
+| `style` | The drawer surface |
+| `scrimStyle` | The scrim (modal only) |
+
+Disabled destinations always use the MD3 disabled treatment (38% content); no override changes
+that.
+
+When you pass `testID`, a modal drawer's scrim carries `<testID>-scrim`. Each item takes its own
+`testID`, and its indicator carries `<testID>-indicator`.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Sheet | 360dp wide; modal `surfaceContainerLow` at level 1 with 16dp end corners, standard `surface` at level 0 |
+| Scrim | `scrim` at 32% |
+| Item | 56dp tall, 336dp wide (12dp inset each side), full corners, 16dp start and 24dp end padding, 12dp icon-to-label gap |
+| Active indicator | `secondaryContainer` |
+| Icon | 24dp — active `onSecondaryContainer`, inactive `onSurfaceVariant` |
+| Label and badge | `labelLarge` — active `onSecondaryContainer`, inactive `onSurfaceVariant` |
+| Headline | `titleSmall`, `onSurfaceVariant`, 56dp tall, 28dp inset |
+| Divider | 1dp `outlineVariant`, 28dp inset each side |
+
+## Accessibility
+
+- A modal drawer is a `dialog` with `aria-modal`; a standard drawer is `navigation`. Pass
+  `accessibilityLabel` to name it ("Main navigation").
+- The destinations are grouped as a `tablist`; each item reports `role="tab"` with
+  `accessibilityState.selected` and, when disabled, `accessibilityState.disabled`.
+- A section headline is a `heading`.
+- On web, a modal drawer traps keyboard focus: focus moves into it on open, Tab cycles inside
+  it, Escape dismisses it when `dismissable`, and focus returns to the trigger on close.
+- On Android, the hardware back button dismisses a `dismissable` modal drawer.
+
+## Props
+
+<PropTable name="NavigationDrawer" />
+
+### NavigationDrawer.Item
+
+<PropTable name="NavigationDrawerItem" />
+
+### NavigationDrawer.Section
+
+<PropTable name="NavigationDrawerSection" />
+
+### NavigationDrawer.Divider
+
+<PropTable name="NavigationDrawerDivider" />

@@ -55,6 +55,14 @@ export const sections: CatalogSection[] = [
         keywords: 'text type scale font heading title label',
       },
       {
+        label: 'Icon',
+        route: '/icon',
+        description: 'Any icon source rendered through the theme resolver',
+        add: 'icon',
+        docs: 'components/icon',
+        keywords: 'icon glyph symbol material community lucide phosphor',
+      },
+      {
         label: 'Layout',
         route: '/layout',
         description: 'Flexbox primitives for building page structure',
@@ -331,6 +339,24 @@ export const sections: CatalogSection[] = [
         add: 'navigation-bar',
         docs: 'components/navigation-bar',
         keywords: 'bottom navigation destinations bar pill indicator shell',
+      },
+      {
+        label: 'NavigationRail',
+        route: '/navigation-rail',
+        description:
+          '80dp side rail of destinations with an optional menu and FAB header',
+        add: 'navigation-rail',
+        docs: 'components/navigation-rail',
+        keywords: 'side navigation rail destinations tablet desktop sidebar',
+      },
+      {
+        label: 'NavigationDrawer',
+        route: '/navigation-drawer',
+        description:
+          'Modal or standard side panel of destinations with sections and badges',
+        add: 'navigation-drawer',
+        docs: 'components/navigation-drawer',
+        keywords: 'drawer sidebar hamburger menu side sheet destinations',
       },
       {
         label: 'Badge',

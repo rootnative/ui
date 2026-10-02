@@ -42,6 +42,11 @@
       "react-native": "./dist/icon-button/index.js",
       "default": "./dist/icon-button/index.js"
     },
+    "./icon": {
+      "types": "./dist/icon/index.d.ts",
+      "react-native": "./dist/icon/index.js",
+      "default": "./dist/icon/index.js"
+    },
     "./appbar": {
       "types": "./dist/appbar/index.d.ts",
       "react-native": "./dist/appbar/index.js",
@@ -122,6 +127,16 @@
       "react-native": "./dist/navigation-bar/index.js",
       "default": "./dist/navigation-bar/index.js"
     },
+    "./navigation-rail": {
+      "types": "./dist/navigation-rail/index.d.ts",
+      "react-native": "./dist/navigation-rail/index.js",
+      "default": "./dist/navigation-rail/index.js"
+    },
+    "./navigation-drawer": {
+      "types": "./dist/navigation-drawer/index.d.ts",
+      "react-native": "./dist/navigation-drawer/index.js",
+      "default": "./dist/navigation-drawer/index.js"
+    },
     "./list": {
       "types": "./dist/list/index.d.ts",
       "react-native": "./dist/list/index.js",
@@ -195,6 +210,9 @@
       "icon-button": [
         "dist/icon-button/index.d.ts"
       ],
+      "icon": [
+        "dist/icon/index.d.ts"
+      ],
       "appbar": [
         "dist/appbar/index.d.ts"
       ],
@@ -242,6 +260,12 @@
       ],
       "navigation-bar": [
         "dist/navigation-bar/index.d.ts"
+      ],
+      "navigation-rail": [
+        "dist/navigation-rail/index.d.ts"
+      ],
+      "navigation-drawer": [
+        "dist/navigation-drawer/index.d.ts"
       ],
       "list": [
         "dist/list/index.d.ts"

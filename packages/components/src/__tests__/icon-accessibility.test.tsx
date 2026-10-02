@@ -38,9 +38,12 @@ import { Checkbox } from '../checkbox'
 import { Chip } from '../chip'
 import { Dialog } from '../dialog'
 import { FAB } from '../fab'
+import { Icon } from '../icon'
 import { IconButton } from '../icon-button'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
+import { NavigationDrawer } from '../navigation-drawer'
+import { NavigationRail } from '../navigation-rail'
 import { PortalHost } from '../portal/PortalHost'
 import { SearchBar } from '../search-bar'
 import { Slider } from '../slider'
@@ -206,6 +209,31 @@ const CASES: Array<{ name: string; render: () => void }> = [
       renderWithTheme(
         <NavigationBar items={[{ value: 'a', label: 'A', icon: PROBE }]} />,
       ),
+  },
+  {
+    name: 'NavigationRail — item icon',
+    render: () =>
+      renderWithTheme(
+        <NavigationRail items={[{ value: 'a', label: 'A', icon: PROBE }]} />,
+      ),
+  },
+  {
+    name: 'NavigationDrawer.Item — icon',
+    render: () =>
+      renderWithTheme(
+        <NavigationDrawer variant="standard">
+          <NavigationDrawer.Item value="a" label="A" icon={PROBE} />
+        </NavigationDrawer>,
+      ),
+  },
+  {
+    name: 'Icon — decorative',
+    render: () => renderWithTheme(<Icon source={PROBE} />),
+  },
+  {
+    name: 'Icon — labelled, glyph still hidden',
+    render: () =>
+      renderWithTheme(<Icon source={PROBE} accessibilityLabel="Probe" />),
   },
   {
     name: 'Avatar — icon',

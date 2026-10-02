@@ -106,7 +106,7 @@ export function ScreenIntro() {
             {showCopyButton ? (
               <IconButton
                 icon={copied ? 'check' : 'content-copy'}
-                size="xs"
+                size="extraSmall"
                 onPress={handleCopy}
                 accessibilityLabel={
                   copied ? 'Command copied' : `Copy "${command}"`
@@ -119,7 +119,7 @@ export function ScreenIntro() {
         {docsPath ? (
           <Button
             variant="text"
-            size="s"
+            size="small"
             trailingIcon="open-in-new"
             onPress={handleOpenDocs}
             accessibilityLabel={`Open the ${entry.label} documentation`}

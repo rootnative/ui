@@ -11,10 +11,55 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-No breaking changes. The components that apply safe-area insets no longer
-throw on web without a `SafeAreaProvider`. `SearchBar` takes a `density`.
-Every component now uses one size vocabulary, and the old names warn.
-A new docs page covers web without Expo.
+No breaking changes. Three new components: `NavigationRail`,
+`NavigationDrawer` and `Icon`. The components that apply safe-area insets no
+longer throw on web without a `SafeAreaProvider`. `SearchBar` takes a
+`density`. Every component now uses one size vocabulary, and the old names
+warn. A new docs page covers web without Expo.
+
+### `NavigationRail`, `NavigationDrawer` and `Icon`
+
+The library had `NavigationBar` for a compact window and nothing for a wider
+one, so a desktop sidebar was built by hand from `Pressable` and
+`Typography`. Both MD3 side forms now ship.
+
+`NavigationRail` is the 80dp rail: the same `items` array as `NavigationBar`,
+the same 56×32dp `secondaryContainer` pill, and a `header` slot for the menu
+button and the FAB. `align` places the destinations at the top, the centre,
+or the bottom. `labelVisibility="never"` grows the indicator to a 56dp
+circle. Controlled and uncontrolled, like the bar.
+
+`NavigationDrawer` is the 360dp drawer, composed from
+`NavigationDrawer.Section`, `NavigationDrawer.Item` and
+`NavigationDrawer.Divider`. The `'modal'` variant renders through `Portal`
+behind a 32% scrim, slides in from the start edge, traps focus on web,
+closes on Android back, and closes after a destination press
+(`dismissOnSelect`). The `'standard'` variant renders in place for an
+expanded window. A modal drawer takes `visible` and `onDismiss`; the type
+rejects them on a standard one. Items are 56dp rows with an optional icon, a
+`labelLarge` label, and a trailing `badge` text, on a full-corner
+`secondaryContainer` indicator while active.
+
+`Icon` renders an `IconSource` through the theme's `iconResolver`, so a
+custom control draws the same icon set and color as the library. Default
+24dp and `onSurface`. Without `accessibilityLabel` it is decorative and
+hidden; with one it is an image with that name.
+
+```tsx
+<NavigationRail items={items} value={route} onValueChange={go} header={<FAB icon="plus" />} />
+
+<NavigationDrawer visible={open} onDismiss={close} value={route} onValueChange={go}>
+  <NavigationDrawer.Section headline="Mail">
+    <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" badge={24} />
+  </NavigationDrawer.Section>
+</NavigationDrawer>
+
+<Icon source="star" size={32} color={theme.colors.primary} />
+```
+
+`rootnative add navigation-rail`, `rootnative add navigation-drawer` and
+`rootnative add icon` install them. The rail pulls in `navigation-bar`, whose
+destination it reuses; the drawer pulls in `divider` and `portal`.
 
 ### One size vocabulary
 

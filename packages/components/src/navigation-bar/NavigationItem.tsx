@@ -14,7 +14,7 @@ import {
   NAV_ITEM_ICON_SIZE,
   createNavigationItemStyles,
 } from './styles'
-import type { NavigationBarColors } from './styles'
+import type { NavigationBarColors, NavigationItemPlacement } from './styles'
 import type { NavigationBarItem, NavigationBarLabelVisibility } from './types'
 
 interface NavigationItemProps {
@@ -25,12 +25,18 @@ interface NavigationItemProps {
   labelStyle?: StyleProp<TextStyle>
   onPress: (value: string) => void
   testID?: string
+  /**
+   * `'bar'` sizes the destination to share a row; `'rail'` sizes it as an
+   * 80dp-wide block in a column.
+   * @default 'bar'
+   */
+  placement?: NavigationItemPlacement
 }
 
 /**
  * One destination: an indicator pill behind a 24dp icon, with the label
- * below. Factored out of `NavigationBar` so NavigationRail and
- * NavigationDrawer can reuse the item anatomy in 1.x.
+ * below. Shared by `NavigationBar` and `NavigationRail`, which differ only in
+ * how the destination is sized (`placement`).
  */
 export function NavigationItem({
   item,
@@ -40,14 +46,22 @@ export function NavigationItem({
   labelStyle,
   onPress,
   testID,
+  placement = 'bar',
 }: NavigationItemProps) {
   const theme = useTheme()
   const resolver = useIconResolver()
   const disabled = Boolean(item.disabled)
 
   const styles = useMemo(
-    () => createNavigationItemStyles(theme, selected, colors),
-    [theme, selected, colors],
+    () =>
+      createNavigationItemStyles(
+        theme,
+        selected,
+        colors,
+        placement,
+        labelVisibility !== 'never',
+      ),
+    [theme, selected, colors, placement, labelVisibility],
   )
 
   // One progress drives the indicator, and — in 'selected' label mode — the

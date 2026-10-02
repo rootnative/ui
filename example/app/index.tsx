@@ -13,6 +13,7 @@ import {
   Divider,
   FAB,
   Grid,
+  Icon,
   IconButton,
   LinearProgress,
   ListItem,
@@ -451,6 +452,92 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
             />
           </Column>
         </Box>
+      )
+    case 'NavigationRail':
+      return (
+        <Row style={previewStyles.navRailWrapper}>
+          <Box
+            bg={theme.colors.surfaceContainerLow}
+            style={previewStyles.navRail}
+          >
+            <Column align="center" gap="xs">
+              <Box
+                bg={theme.colors.secondaryContainer}
+                style={previewStyles.navBarPill}
+              >
+                <Box
+                  bg={theme.colors.onSecondaryContainer}
+                  style={previewStyles.navBarIcon}
+                />
+              </Box>
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navBarIconMuted}
+              />
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navBarIconMuted}
+              />
+            </Column>
+          </Box>
+          <Box
+            bg={theme.colors.surfaceContainer}
+            style={previewStyles.navRailPanel}
+          />
+        </Row>
+      )
+    case 'NavigationDrawer':
+      return (
+        <Box
+          bg={theme.colors.surfaceContainerLow}
+          style={previewStyles.navDrawer}
+        >
+          <Column gap="xs">
+            <Row
+              align="center"
+              gap="xs"
+              bg={theme.colors.secondaryContainer}
+              style={previewStyles.navDrawerActiveRow}
+            >
+              <Box
+                bg={theme.colors.onSecondaryContainer}
+                style={previewStyles.navBarIcon}
+              />
+              <Box
+                bg={theme.colors.onSecondaryContainer}
+                style={previewStyles.navDrawerLabel}
+              />
+            </Row>
+            <Row align="center" gap="xs" style={previewStyles.navDrawerRow}>
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navBarIconMuted}
+              />
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navDrawerLabelMuted}
+              />
+            </Row>
+            <Row align="center" gap="xs" style={previewStyles.navDrawerRow}>
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navBarIconMuted}
+              />
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.navDrawerLabelMuted}
+              />
+            </Row>
+          </Column>
+        </Box>
+      )
+    case 'Icon':
+      return (
+        <Row gap="md" align="center">
+          <Icon source="star" size={20} />
+          <Icon source="heart" size={28} color={theme.colors.primary} />
+          <Icon source="bell-outline" size={20} color={theme.colors.tertiary} />
+        </Row>
       )
     case 'Tooltip':
       return (
@@ -1068,6 +1155,51 @@ const previewStyles = StyleSheet.create({
   tabsDivider: {
     width: '100%',
     height: 1,
+  },
+  navRailWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 88,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  navRail: {
+    width: 44,
+    height: '100%',
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  navRailPanel: {
+    flex: 1,
+    height: '100%',
+  },
+  navDrawer: {
+    width: '100%',
+    maxWidth: 180,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+  },
+  navDrawerActiveRow: {
+    height: 20,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+  },
+  navDrawerRow: {
+    height: 20,
+    paddingHorizontal: 8,
+  },
+  navDrawerLabel: {
+    width: 48,
+    height: 6,
+    borderRadius: 3,
+  },
+  navDrawerLabelMuted: {
+    width: 40,
+    height: 6,
+    borderRadius: 3,
+    opacity: 0.6,
   },
   navBarWrapper: {
     width: '100%',

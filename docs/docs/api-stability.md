@@ -55,9 +55,10 @@ Two components deliberately don't, because they render no node of their own:
   targets the snackbar surface.
 
 Where "root node" is not obvious, it is the node you would expect to address:
-the surface for overlays (`Dialog`, `Menu`, `Tooltip`, `BottomSheet` — not their
-scrims), the row for `Tabs` / `NavigationBar` / `ButtonGroup`, and the overlay
-layer for a named `PortalHost`.
+the surface for overlays (`Dialog`, `Menu`, `Tooltip`, `BottomSheet`,
+`NavigationDrawer` — not their scrims), the row for `Tabs` / `NavigationBar` /
+`ButtonGroup`, the rail for `NavigationRail`, and the overlay layer for a named
+`PortalHost`.
 
 ## Safe-area insets are opt-in, except on BottomSheet
 
@@ -68,12 +69,16 @@ The defaults are not uniform, and that is intentional:
 | `AppBar` | `insetTop` | `false` |
 | `NavigationBar` | `insetBottom` | `false` |
 | `BottomSheet` | `insetBottom` | **`true`** |
+| `NavigationDrawer` (modal) | `insetTop`, `insetBottom` | **`true`** |
+| `NavigationDrawer` (standard) | `insetTop`, `insetBottom` | `false` |
 
 `AppBar` and `NavigationBar` default off because an ancestor very often already
 applies that edge, and applying it twice is the more common bug. `BottomSheet`
 defaults on because a sheet is flush to the screen edge by construction — a
 sheet that ignores the home indicator is simply wrong, and there is no ancestor
-that could have handled it.
+that could have handled it. A modal `NavigationDrawer` defaults on for the same
+reason: it spans the full screen height through a portal. A standard drawer
+renders in place, so the `Layout` around it owns the edges and it defaults off.
 
 ## What is *not* covered
 

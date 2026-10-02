@@ -57,6 +57,7 @@ const sidebars: SidebarsConfig = {
         'components/divider',
         'components/list',
         'components/loading-indicator',
+        'components/icon',
         'components/progress',
         'components/skeleton',
         'components/typography',
@@ -81,7 +82,12 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Navigation',
       collapsed: false,
-      items: ['components/tabs', 'components/navigation-bar'],
+      items: [
+        'components/tabs',
+        'components/navigation-bar',
+        'components/navigation-rail',
+        'components/navigation-drawer',
+      ],
     },
   ],
 }

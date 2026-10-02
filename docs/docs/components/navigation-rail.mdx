@@ -1,0 +1,166 @@
+---
+sidebar_position: 3
+description: Switch between an app's top-level destinations on medium and expanded screens.
+---
+
+# NavigationRail
+
+Navigation rails let people switch between an app's top-level destinations on medium and
+expanded screens, where a bottom bar would waste width. Follows the
+[Material Design 3 Navigation rail](https://m3.material.io/components/navigation-rail/overview)
+specification.
+
+Each destination is an icon over a label, with the active one marked by a `secondaryContainer`
+pill behind its icon. The rail is 80dp wide on a `surface` background, and an optional header
+above the destinations holds the menu button and the FAB.
+
+:::info NavigationRail is a rail, not a navigator
+`NavigationRail` renders the destinations and tells you which one was pressed. It does not own
+screens or integrate with a navigator. Drive it the same way as
+[NavigationBar](./navigation-bar.mdx#wiring-it-to-a-navigator).
+:::
+
+## Usage
+
+Pass the destinations as `items` and read the selection from `onValueChange`. With no `value`
+prop, the rail tracks the active destination itself and starts on the first item. Place it at
+the start of a row that fills the screen height.
+
+<SnackExample
+  name="RootNative NavigationRail — Usage"
+  code={`
+  import { FAB, IconButton, NavigationRail } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  const DESTINATIONS = [
+    { value: 'home', label: 'Home', icon: 'home-outline', selectedIcon: 'home' },
+    { value: 'search', label: 'Search', icon: 'magnify' },
+    { value: 'library', label: 'Library', icon: 'bookshelf', badge: 3 },
+  ]
+
+  const PANELS = {
+    home: 'Fresh picks for you.',
+    search: 'Type to find anything.',
+    library: 'Everything you saved.',
+  }
+
+  function Screen() {
+    const [destination, setDestination] = useState('home')
+    return (
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <NavigationRail
+          items={DESTINATIONS}
+          value={destination}
+          onValueChange={setDestination}
+          header={
+            <View style={{ alignItems: 'center', gap: 8 }}>
+              <IconButton icon="menu" accessibilityLabel="Open menu" />
+              <FAB icon="pencil-outline" variant="tertiary" accessibilityLabel="Compose" />
+            </View>
+          }
+        />
+        <View style={{ flex: 1, padding: 24 }}>
+          <Text>{PANELS[destination]}</Text>
+        </View>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Screen />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+MD3 recommends 3–7 destinations. An item is the same shape as a `NavigationBarItem`, so one
+array can feed a `NavigationBar` on a compact window and a `NavigationRail` on a wider one —
+see [Responsive](../responsive.md).
+
+## Selection
+
+`value` + `onValueChange` is the controlled form; leave `value` off and the rail tracks the
+selection itself, starting on `defaultValue` or the first item. A rail with nothing active reads
+as broken, which is why there is no "no selection" state.
+
+## Header
+
+`header` renders above the destinations with an 8dp gap below it. MD3 puts the menu
+`IconButton` there, and the screen's `FAB` below it when the screen has one. The header stays at
+the top whatever `align` is.
+
+## Alignment
+
+`align` places the destinations along the rail's height:
+
+| Value | Meaning |
+|-------|---------|
+| `'top'` (default) | Destinations start right below the header |
+| `'center'` | Destinations sit in the middle of the remaining height |
+| `'bottom'` | Destinations sit at the bottom |
+
+## Label visibility
+
+`labelVisibility` controls when destination labels are shown:
+
+| Value | Meaning |
+|-------|---------|
+| `'always'` (default) | Every destination keeps its label |
+| `'selected'` | Only the active destination's label is visible |
+| `'never'` | No labels; the indicator grows to a 56dp circle |
+
+The label stays required on the item either way: it is also the destination's screen-reader name.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The rail background |
+| `contentColor` | Icon and label color of inactive destinations |
+| `selectedContentColor` | Icon and label color of the active destination; the state layers re-derive from it |
+| `indicatorColor` | The active indicator pill |
+| `labelStyle` | Every destination's label `Text` — does not affect the icons |
+| `style` | The rail container |
+
+Disabled destinations always use the MD3 disabled treatment (38% content); no override changes
+that.
+
+When you pass `testID`, the destinations column carries `<testID>-destinations`, each
+destination `<testID>-item-<value>`, and its indicator `<testID>-item-<value>-indicator`.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Container | `surface`, elevation level 0, 80dp wide |
+| Padding | 4dp top and bottom, 4dp between destinations, 8dp below the header |
+| Destination | 80dp wide, at least 56dp tall |
+| Active indicator | 56×32dp pill, `secondaryContainer`, full corners; 56×56dp with no labels |
+| Icon | 24dp — active `onSecondaryContainer`, inactive `onSurfaceVariant` |
+| Label | `labelMedium` — active `secondary`, inactive `onSurfaceVariant` |
+
+The destination tokens are the ones `NavigationBar` paints, so the two components agree on the
+active destination. The Expressive 96dp collapsed wide rail is a possible 1.x variant; this
+rail uses compose's `NavigationRail`.
+
+## Accessibility
+
+- The destinations column reports `role="tablist"` and each destination `role="tab"` with
+  `accessibilityState.selected`. Pass `accessibilityLabel` to name the rail itself
+  ("Main navigation").
+- A destination's screen-reader name falls back to its label, including when `labelVisibility`
+  hides the visible label; set `accessibilityLabel` on the item to override it.
+- Disabled destinations expose `accessibilityState.disabled` and stop responding.
+- On web, destinations show a keyboard focus ring (`secondary`, 3dp) around the indicator pill.
+
+## Props
+
+<PropTable name="NavigationRail" />

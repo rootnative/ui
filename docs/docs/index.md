@@ -60,6 +60,7 @@ Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 57 r
 | [Avatar](./components/avatar) | Image, initials, or icon representation of a person |
 | [Card](./components/card) | Contained surfaces for related content |
 | [Divider](./components/divider) | Thin horizontal or vertical rule that groups content |
+| [Icon](./components/icon) | Any icon source rendered through the theme resolver |
 | [List](./components/list) | Vertically arranged items with text and icons |
 | [LoadingIndicator](./components/loading-indicator) | MD3 Expressive shape-morphing loading indicator |
 | [Progress](./components/progress) | Linear and circular progress indicators (determinate / indeterminate) |
@@ -84,3 +85,5 @@ Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 57 r
 |-----------|-------------|
 | [Tabs](./components/tabs) | Primary and secondary tab rows, fixed or scrollable |
 | [NavigationBar](./components/navigation-bar) | 80dp bottom destination bar with an animated indicator pill |
+| [NavigationRail](./components/navigation-rail) | 80dp side rail of destinations with an optional menu and FAB header |
+| [NavigationDrawer](./components/navigation-drawer) | Modal or standard side panel of destinations with sections and badges |

@@ -50,6 +50,10 @@
       "description": "Floating action button with 4 color variants (primary, secondary, tertiary, surface), 3 sizes (small, medium, large), and optional extended label."
     },
     {
+      "name": "icon",
+      "description": "Any IconSource (name, element, or render function) rendered through the theme's iconResolver, decorative or labelled."
+    },
+    {
       "name": "icon-button",
       "description": "Icon-only button with 4 variants (filled, tonal, outlined, standard) and toggle support."
     },
@@ -76,6 +80,14 @@
     {
       "name": "navigation-bar",
       "description": "MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill"
+    },
+    {
+      "name": "navigation-drawer",
+      "description": "MD3 navigation drawer — modal (scrim, slide from the start edge) and standard variants with sections, headlines, badges, and dividers."
+    },
+    {
+      "name": "navigation-rail",
+      "description": "MD3 navigation rail — 80dp side rail of destinations with an optional header, three alignments, and the NavigationBar indicator pill."
     },
     {
       "name": "portal",

@@ -1,0 +1,16 @@
+{
+  "name": "icon",
+  "description": "Any IconSource (name, element, or render function) rendered through the theme's iconResolver, decorative or labelled.",
+  "files": [
+    "packages/components/src/icon/Icon.tsx",
+    "packages/components/src/icon/index.ts",
+    "packages/components/src/icon/styles.ts",
+    "packages/components/src/icon/types.ts"
+  ],
+  "utils": ["render-icon"],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.21"
+  },
+  "optionalDependencies": {}
+}

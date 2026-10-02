@@ -534,6 +534,7 @@ const COMPONENT_ORDER = [
   'button',
   'button-group',
   'icon-button',
+  'icon',
   'fab',
   'appbar',
   'card',
@@ -556,6 +557,8 @@ const COMPONENT_ORDER = [
   'tooltip',
   'tabs',
   'navigation-bar',
+  'navigation-rail',
+  'navigation-drawer',
   'avatar',
   'badge',
   'slider',
@@ -569,6 +572,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   button: 'Button',
   'button-group': 'ButtonGroup',
   'icon-button': 'IconButton',
+  icon: 'Icon',
   fab: 'FAB',
   appbar: 'AppBar',
   card: 'Card',
@@ -591,6 +595,8 @@ const COMPONENT_NAMES: Record<string, string> = {
   tooltip: 'Tooltip',
   tabs: 'Tabs',
   'navigation-bar': 'NavigationBar',
+  'navigation-rail': 'NavigationRail',
+  'navigation-drawer': 'NavigationDrawer',
   avatar: 'Avatar',
   badge: 'Badge',
   slider: 'Slider',
@@ -658,6 +664,21 @@ import { IconButton } from '@rootnative/components/icon-button'
 
 <IconButton icon="heart" variant="filled" accessibilityLabel="Like" onPress={handleLike} />
 <IconButton icon="heart-outline" selectedIcon="heart" selected={liked} variant="tonal" accessibilityLabel="Like" onPress={toggle} />
+\`\`\``,
+
+  icon: `\`\`\`tsx
+import { Icon } from '@rootnative/components/icon'
+
+// Renders an IconSource through the theme's iconResolver: 24dp, onSurface by default.
+<Icon source="star" />
+<Icon source="heart" size={32} color={theme.colors.primary} />
+
+// Decorative by default (hidden from assistive technology). A label exposes it as an image.
+<Icon source="wifi-strength-4" accessibilityLabel="Wi-Fi connected" />
+
+// An element renders as is; a render function receives { size, color }.
+<Icon source={<MySvg width={24} height={24} />} />
+<Icon size={32} source={({ size, color }) => <MySvg width={size} height={size} fill={color} />} />
 \`\`\``,
 
   fab: `\`\`\`tsx
@@ -1082,6 +1103,70 @@ import { NavigationBar } from '@rootnative/components/navigation-bar'
 // (active icon+label), indicatorColor (pill), labelStyle. Disabled items stay
 // at the MD3 38%.
 <NavigationBar indicatorColor="#FFD8E4" items={items} />
+\`\`\``,
+
+  'navigation-rail': `\`\`\`tsx
+import { NavigationRail } from '@rootnative/components/navigation-rail'
+
+// A rail, not a navigator: it reports the press, you own the screens/routes.
+// Same item shape as NavigationBar, so one array serves both widths.
+// MD3 recommends 3–7 destinations. Place it at the start of a full-height row.
+<NavigationRail
+  items={[
+    { value: 'home', label: 'Home', icon: 'home-outline', selectedIcon: 'home' },
+    { value: 'search', label: 'Search', icon: 'magnify' },
+    { value: 'library', label: 'Library', icon: 'bookshelf', badge: 3 },
+  ]}
+  value={destination}
+  onValueChange={setDestination}
+  header={<FAB icon="pencil-outline" accessibilityLabel="Compose" />} // menu button and/or FAB
+/>
+
+// Uncontrolled, starting on \`defaultValue\` (falls back to the first item).
+<NavigationRail items={items} defaultValue="search" onValueChange={go} />
+
+// \`align\`: 'top' (default) | 'center' | 'bottom'. The header stays at the top.
+// \`labelVisibility\`: 'always' | 'selected' | 'never' (indicator grows to a 56dp circle).
+<NavigationRail items={items} align="center" labelVisibility="never" />
+
+// Overrides: containerColor (rail), contentColor (inactive), selectedContentColor
+// (active icon+label), indicatorColor (pill), labelStyle.
+<NavigationRail indicatorColor="#FFD8E4" items={items} />
+\`\`\``,
+
+  'navigation-drawer': `\`\`\`tsx
+import { NavigationDrawer } from '@rootnative/components/navigation-drawer'
+
+// Modal (default): renders through Portal behind a 32% scrim, slides in from the
+// start edge, closes on scrim press / Android back / Escape, and after a
+// destination press (dismissOnSelect). Needs a root PortalHost.
+<NavigationDrawer
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  value={route}
+  onValueChange={go}
+  accessibilityLabel="Main navigation"
+>
+  <Typography variant="titleLarge" style={{ padding: 16 }}>Mail</Typography>
+  <NavigationDrawer.Section headline="Mail">
+    <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox-outline" selectedIcon="inbox" badge={24} />
+    <NavigationDrawer.Item value="outbox" label="Outbox" icon="send-outline" />
+  </NavigationDrawer.Section>
+  <NavigationDrawer.Divider />
+  <NavigationDrawer.Section headline="Labels">
+    <NavigationDrawer.Item value="family" label="Family" />  {/* icon is optional */}
+    <NavigationDrawer.Item value="work" label="Work" disabled />
+  </NavigationDrawer.Section>
+</NavigationDrawer>
+
+// Standard: renders in place as a permanent 360dp panel. No visible/onDismiss —
+// the type rejects every modal prop on it.
+<NavigationDrawer variant="standard" value={route} onValueChange={go}>
+  <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" />
+</NavigationDrawer>
+
+// Uncontrolled: \`defaultValue\`, or omit it for no active destination.
+<NavigationDrawer visible={open} onDismiss={close} defaultValue="inbox">{items}</NavigationDrawer>
 \`\`\``,
 
   avatar: `\`\`\`tsx
@@ -1657,6 +1742,102 @@ import { Grid } from '@rootnative/components/layout'
         'One destination. `value` is what `onValueChange` reports and what `value` / `defaultValue` match against.',
       )
     }
+
+    return output
+  }
+
+  // --- NavigationRail: rail props; items share NavigationBarItem ---
+  if (dirName === 'navigation-rail') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    const propsIface = interfaces.find((i) => i.name === 'NavigationRailProps')
+    if (propsIface) {
+      output += formatPropsSection(propsIface, typeAliases)
+      output += '\n'
+    }
+
+    output +=
+      '#### NavigationRailItem\n\n' +
+      'The same shape as `NavigationBarItem` (see NavigationBar above): ' +
+      '`value`, `label`, `icon`, `selectedIcon?`, `badge?`, `disabled?`, ' +
+      '`accessibilityLabel?`. One array can feed a `NavigationBar` on a ' +
+      'compact window and a `NavigationRail` on a wider one.\n'
+
+    return output
+  }
+
+  // --- NavigationDrawer: common props + the modal/standard arms + sub-components ---
+  if (dirName === 'navigation-drawer') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    // `NavigationDrawerProps` is a type alias — `NavigationDrawerCommonProps`
+    // intersected with a union that gives the modal variant `visible` /
+    // `onDismiss` and rejects them on the standard one. The parser reads
+    // interfaces, so the shared props come from the common interface and the
+    // arms are described here.
+    const propsIface = interfaces.find(
+      (i) => i.name === 'NavigationDrawerCommonProps',
+    )
+    if (propsIface) {
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine =
+        '- Inherits `ViewProps` (except `children`, `style`)\n'
+      const armProps =
+        "- `variant?: 'modal' | 'standard'` — Default: `'modal'`. `'modal'` " +
+        'slides in over the content from the start edge, behind a scrim, and ' +
+        "renders through `Portal`. `'standard'` renders in place as a " +
+        'permanent side panel.\n' +
+        '- `visible: boolean` — **Modal only, required.** Whether the drawer ' +
+        'is shown. Exit animations run before it unmounts.\n' +
+        '- `onDismiss: () => void` — **Modal only, required.** Called on a ' +
+        'scrim press, Android back, Escape on web, or a destination press ' +
+        'when `dismissOnSelect` is on. Set `visible` to `false` in response.\n' +
+        '- `dismissable?: boolean` — Modal only. Default: `true`. Whether the ' +
+        'scrim press, Android back, and Escape dismiss the drawer.\n' +
+        '- `dismissOnSelect?: boolean` — Modal only. Default: `true`. Whether ' +
+        'a destination press also calls `onDismiss`.\n' +
+        '- `hostName?: string` — Modal only. Render into a named `PortalHost`.\n' +
+        '- `scrimStyle?: StyleProp<ViewStyle>` — Modal only. Style for the scrim.\n' +
+        "- `scrimAccessibilityLabel?: string` — Modal only. Default: `'Close " +
+        "navigation drawer'`.\n" +
+        'The type rejects every modal prop on `variant="standard"`.\n'
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, armProps + inheritsLine)
+        : section + armProps
+      output += '\n'
+    }
+
+    const itemIface = interfaces.find(
+      (i) => i.name === 'NavigationDrawerItemProps',
+    )
+    if (itemIface) {
+      output += formatSubInterface(
+        itemIface,
+        typeAliases,
+        '#### NavigationDrawer.Item',
+        'One destination: a 56dp row with an optional 24dp icon, a `labelLarge` label, and an optional trailing badge text. Active when `value` matches the drawer selection.',
+      )
+      output += '\n'
+    }
+
+    const sectionIface = interfaces.find(
+      (i) => i.name === 'NavigationDrawerSectionProps',
+    )
+    if (sectionIface) {
+      output += formatSubInterface(
+        sectionIface,
+        typeAliases,
+        '#### NavigationDrawer.Section',
+        'A group of destinations with an optional `titleSmall` headline, 56dp tall and inset 28dp from the sheet edge.',
+      )
+      output += '\n'
+    }
+
+    output +=
+      '#### NavigationDrawer.Divider\n\n' +
+      'A `Divider` inset 28dp from both sheet edges, for use between sections. ' +
+      'Takes `DividerProps` except `orientation`, `insetStart` and `insetEnd`, ' +
+      'which are fixed.\n'
 
     return output
   }

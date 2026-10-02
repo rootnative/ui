@@ -379,7 +379,7 @@ The CLI rewrites imports in copied component files so they work in your project:
 
 ## Available components
 
-All 28, with the components each one pulls in automatically. Descriptions match
+All 35, with the components each one pulls in automatically. Descriptions match
 what `npx rootnative list` prints, since both read the same registry.
 
 | Component | Dependencies | Description |
@@ -396,13 +396,16 @@ what `npx rootnative list` prints, since both read the same registry.
 | `dialog` | icon-button, portal | Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling |
 | `divider` | — | Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides |
 | `fab` | — | Floating action button with 4 color variants (primary, secondary, tertiary, surface), 3 sizes (small, medium, large), and optional extended label |
+| `icon` | — | Any IconSource (name, element, or render function) rendered through the theme's iconResolver, decorative or labelled |
 | `icon-button` | — | Icon-only button with 4 variants (filled, tonal, outlined, standard) and toggle support |
 | `keyboard-avoiding-wrapper` | — | Zero-config keyboard-aware wrapper with platform-specific behavior for form layouts |
 | `layout` | — | Layout primitives: Box, Row, Column, Grid (flexbox utilities), and Layout (SafeAreaView wrapper) |
 | `list` | divider | List container with interactive items, supporting headline/trailing text and dividers |
 | `loading-indicator` | — | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
 | `menu` | portal | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility |
+| `navigation-drawer` | divider, portal | MD3 navigation drawer — modal (scrim, slide from the start edge) and standard variants with sections, headlines, badges, and dividers |
 | `navigation-bar` | badge | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
+| `navigation-rail` | navigation-bar | MD3 navigation rail — 80dp side rail of destinations with an optional header, three alignments, and the NavigationBar indicator pill |
 | `portal` | — | Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips |
 | `progress` | — | Linear and circular progress indicators with determinate and indeterminate modes |
 | `radio` | — | Single-choice selection control with selected/unselected states |

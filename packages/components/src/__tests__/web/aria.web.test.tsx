@@ -30,6 +30,8 @@ import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { LoadingIndicator } from '../../loading-indicator'
 import { NavigationBar } from '../../navigation-bar'
+import { NavigationDrawer } from '../../navigation-drawer'
+import { NavigationRail } from '../../navigation-rail'
 import { CircularProgress, LinearProgress } from '../../progress'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
@@ -108,6 +110,23 @@ describe('aria-selected reaches the DOM', () => {
 
   it('NavigationBar', () => {
     renderWeb(<NavigationBar items={NAV_ITEMS} value="search" />)
+    expect(aria('tab', 'aria-selected', { index: 0 })).toBe('false')
+    expect(aria('tab', 'aria-selected', { index: 1 })).toBe('true')
+  })
+
+  it('NavigationRail', () => {
+    renderWeb(<NavigationRail items={NAV_ITEMS} value="search" />)
+    expect(aria('tab', 'aria-selected', { index: 0 })).toBe('false')
+    expect(aria('tab', 'aria-selected', { index: 1 })).toBe('true')
+  })
+
+  it('NavigationDrawer — standard', () => {
+    renderWeb(
+      <NavigationDrawer variant="standard" value="search">
+        <NavigationDrawer.Item value="home" label="Home" icon="home-outline" />
+        <NavigationDrawer.Item value="search" label="Search" icon="magnify" />
+      </NavigationDrawer>,
+    )
     expect(aria('tab', 'aria-selected', { index: 0 })).toBe('false')
     expect(aria('tab', 'aria-selected', { index: 1 })).toBe('true')
   })

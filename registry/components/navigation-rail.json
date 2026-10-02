@@ -1,0 +1,16 @@
+{
+  "name": "navigation-rail",
+  "description": "MD3 navigation rail — 80dp side rail of destinations with an optional header, three alignments, and the NavigationBar indicator pill.",
+  "files": [
+    "packages/components/src/navigation-rail/NavigationRail.tsx",
+    "packages/components/src/navigation-rail/index.ts",
+    "packages/components/src/navigation-rail/styles.ts",
+    "packages/components/src/navigation-rail/types.ts"
+  ],
+  "utils": [],
+  "componentDependencies": ["navigation-bar"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.21"
+  },
+  "optionalDependencies": {}
+}

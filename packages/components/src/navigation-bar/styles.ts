@@ -31,6 +31,22 @@ export const NAV_INDICATOR_HEIGHT = 32
 export const NAV_INDICATOR_LABEL_GAP = 4
 export const NAV_ITEM_HORIZONTAL_PADDING = 8
 
+/**
+ * MD3 navigation rail item metrics, for the same `NavigationItem` placed in a
+ * rail. Source: androidx.compose.material3 NavigationRailTokens +
+ * NavigationRail.kt — `ContainerWidth = 80.dp` (also the item width),
+ * `NoLabelActiveIndicatorHeight = 56.dp` (the item height, and the indicator
+ * size when labels are hidden), `NavigationRailItemVerticalPadding = 4.dp`.
+ * The indicator, icon, and label tokens are the ones above.
+ */
+export const NAV_RAIL_ITEM_WIDTH = 80
+export const NAV_RAIL_ITEM_HEIGHT = 56
+export const NAV_RAIL_ITEM_VERTICAL_PADDING = 4
+export const NAV_RAIL_NO_LABEL_INDICATOR_SIZE = 56
+
+/** Where a `NavigationItem` sits: the horizontal bar or the vertical rail. */
+export type NavigationItemPlacement = 'bar' | 'rail'
+
 /** Focus-ring geometry, matching the rest of the library. */
 const FOCUS_RING_OFFSET = 2
 const FOCUS_RING_WIDTH = 3
@@ -81,18 +97,38 @@ export function createNavigationItemStyles(
   theme: MaterialTheme,
   selected: boolean,
   colors: NavigationBarColors,
+  placement: NavigationItemPlacement = 'bar',
+  labelVisible = true,
 ) {
+  const inRail = placement === 'rail'
+  // A rail with no labels grows the indicator to a 56dp circle
+  // (`NoLabelActiveIndicatorHeight`); the bar keeps its 56×32 pill in every
+  // label mode.
+  const indicatorHeight =
+    inRail && !labelVisible
+      ? NAV_RAIL_NO_LABEL_INDICATOR_SIZE
+      : NAV_INDICATOR_HEIGHT
+
   return StyleSheet.create({
-    // `ItemBetweenSpace` is 0: destinations split the row equally and meet
-    // edge to edge, so the whole 80dp band is pressable.
-    container: {
-      flexGrow: 1,
-      flexShrink: 1,
-      flexBasis: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: NAV_ITEM_HORIZONTAL_PADDING,
-    },
+    // In the bar, `ItemBetweenSpace` is 0: destinations split the row equally
+    // and meet edge to edge, so the whole 80dp band is pressable. In the rail
+    // each destination is an 80dp-wide block, at least 56dp tall.
+    container: inRail
+      ? {
+          width: NAV_RAIL_ITEM_WIDTH,
+          minHeight: NAV_RAIL_ITEM_HEIGHT,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: NAV_RAIL_ITEM_VERTICAL_PADDING,
+        }
+      : {
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: NAV_ITEM_HORIZONTAL_PADDING,
+        },
     interactiveContainer: {
       cursor: 'pointer',
     },
@@ -111,7 +147,7 @@ export function createNavigationItemStyles(
     // so activation never shifts the icon.
     pill: {
       width: NAV_INDICATOR_WIDTH,
-      height: NAV_INDICATOR_HEIGHT,
+      height: indicatorHeight,
       borderRadius: theme.shape.cornerFull,
       alignItems: 'center',
       justifyContent: 'center',

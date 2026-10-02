@@ -1,0 +1,69 @@
+---
+sidebar_position: 4
+description: Render any icon source through the theme's icon resolver.
+---
+
+# Icon
+
+`Icon` renders an `IconSource` the way every other component renders its icons: a string name
+goes through the theme's `iconResolver`, a pre-rendered element renders as is, and a render
+function receives the resolved `{ size, color }`. Use it in a custom control so the icon set and
+the color stay consistent with the library.
+
+## Usage
+
+<SnackExample
+  name="RootNative Icon — Usage"
+  code={`
+  import { Icon, Row, Typography } from '@rootnative/components'
+  import { ThemeProvider, useTheme } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  function Screen() {
+    const theme = useTheme()
+    return (
+      <Row gap="md" align="center" style={{ padding: 24 }}>
+        <Icon source="star" />
+        <Icon source="heart" size={32} color={theme.colors.primary} />
+        <Icon source="wifi-strength-4" accessibilityLabel="Wi-Fi connected" />
+        <Typography variant="bodyMedium">Three icons</Typography>
+      </Row>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <Screen />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The default size is 24dp, the MD3 icon size, and the default color is `onSurface`. The box is
+square at `size`, so it lines up in a row next to text.
+
+## Icon sets
+
+A string name resolves through the theme's `iconResolver` — MaterialCommunityIcons unless you
+installed another set with `@rootnative/icons`. See [Icons](../icons.md) for Lucide, Phosphor
+and `@expo/vector-icons` resolvers. An element or a render function bypasses the resolver:
+
+```tsx
+<Icon source={<MySvg width={24} height={24} />} />
+<Icon size={32} source={({ size, color }) => <MySvg width={size} height={size} fill={color} />} />
+```
+
+## Accessibility
+
+Without `accessibilityLabel` the icon is decorative and hidden from assistive technology, which
+is right next to text that carries the meaning. With a label, the icon is exposed as an image
+with that name, and the glyph underneath stays hidden so a screen reader never announces a
+private-use codepoint.
+
+## Props
+
+<PropTable name="Icon" />

@@ -327,6 +327,33 @@ Props:
 
 ---
 
+### Icon
+
+```tsx
+import { Icon } from '@rootnative/components/icon'
+
+// Renders an IconSource through the theme's iconResolver: 24dp, onSurface by default.
+<Icon source="star" />
+<Icon source="heart" size={32} color={theme.colors.primary} />
+
+// Decorative by default (hidden from assistive technology). A label exposes it as an image.
+<Icon source="wifi-strength-4" accessibilityLabel="Wi-Fi connected" />
+
+// An element renders as is; a render function receives { size, color }.
+<Icon source={<MySvg width={24} height={24} />} />
+<Icon size={32} source={({ size, color }) => <MySvg width={size} height={size} fill={color} />} />
+```
+
+Props:
+- `source: IconSource` — The icon. A string name is resolved through the theme's `iconResolver` (MaterialCommunityIcons by default); a pre-rendered element renders as is; a render function receives `{ size, color }`.
+- `size?: number` — Default: `24`. Icon size in dp. The box is square at this size.
+- `color?: string` — Default: `onSurface`. Icon color.
+- `accessibilityLabel?: string` — Screen-reader label. Without one the icon is decorative and hidden from assistive technology. With one, the icon is exposed as an image with this name.
+- `style?: StyleProp<ViewStyle>` — Style applied to the icon box.
+- Inherits `ViewProps` (except `children`)
+
+---
+
 ### FAB
 
 ```tsx
@@ -1478,6 +1505,156 @@ Props:
 - `badge?: boolean | number | string` — Badge on the icon. `true` renders a small dot. A number or a short string renders a large badge with that content, capped at `999+`. The badge is decorative: put the count in `accessibilityLabel` so a screen reader announces it.
 - `disabled?: boolean` — Greys the destination out at 38% and stops it responding.
 - `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
+
+---
+
+### NavigationRail
+
+```tsx
+import { NavigationRail } from '@rootnative/components/navigation-rail'
+
+// A rail, not a navigator: it reports the press, you own the screens/routes.
+// Same item shape as NavigationBar, so one array serves both widths.
+// MD3 recommends 3–7 destinations. Place it at the start of a full-height row.
+<NavigationRail
+  items={[
+    { value: 'home', label: 'Home', icon: 'home-outline', selectedIcon: 'home' },
+    { value: 'search', label: 'Search', icon: 'magnify' },
+    { value: 'library', label: 'Library', icon: 'bookshelf', badge: 3 },
+  ]}
+  value={destination}
+  onValueChange={setDestination}
+  header={<FAB icon="pencil-outline" accessibilityLabel="Compose" />} // menu button and/or FAB
+/>
+
+// Uncontrolled, starting on `defaultValue` (falls back to the first item).
+<NavigationRail items={items} defaultValue="search" onValueChange={go} />
+
+// `align`: 'top' (default) | 'center' | 'bottom'. The header stays at the top.
+// `labelVisibility`: 'always' | 'selected' | 'never' (indicator grows to a 56dp circle).
+<NavigationRail items={items} align="center" labelVisibility="never" />
+
+// Overrides: containerColor (rail), contentColor (inactive), selectedContentColor
+// (active icon+label), indicatorColor (pill), labelStyle.
+<NavigationRail indicatorColor="#FFD8E4" items={items} />
+```
+
+Props:
+- `items: NavigationRailItem[]` — The destinations to render. MD3 recommends 3–7.
+- `value?: string` — Value of the active destination (controlled).
+- `defaultValue?: string` — Value of the initially active destination (uncontrolled). Defaults to the first item — a rail with nothing active reads as broken.
+- `onValueChange?: (value: string) => void` — Called with the value of the destination that was pressed.
+- `labelVisibility?: NavigationBarLabelVisibility` — Default: `'always'`. When destination labels are shown.
+- `align?: 'top' | 'center' | 'bottom'` — Default: `'top'`. Where the destinations sit along the rail. The header, when given, stays at the top in every mode.
+- `header?: ReactNode` — Content above the destinations: a menu `IconButton`, a `FAB`, or both in a `Column`. MD3 places the FAB here when the screen has one.
+- `containerColor?: string` — Default: `surface`. Override the rail background.
+- `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon and label color of inactive destinations.
+- `selectedContentColor?: string` — Default: `onSecondaryContainer (icon) / secondary (label)`. Override the icon and label color of the active destination. State-layer colors are derived from it automatically.
+- `indicatorColor?: string` — Default: `secondaryContainer`. Override the active indicator pill color.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to every destination's label `Text` — does not affect the icons.
+- `style?: StyleProp<ViewStyle>` — Style applied to the rail container.
+- `accessibilityLabel?: string` — Screen-reader label for the rail itself.
+- `testID?: string` — Test id applied to the rail container. The destinations column carries `<testID>-destinations`, each destination `<testID>-item-<value>`, and its indicator `<testID>-item-<value>-indicator`.
+- Inherits `ViewProps` (except `children`)
+
+#### NavigationRailItem
+
+The same shape as `NavigationBarItem` (see NavigationBar above): `value`, `label`, `icon`, `selectedIcon?`, `badge?`, `disabled?`, `accessibilityLabel?`. One array can feed a `NavigationBar` on a compact window and a `NavigationRail` on a wider one.
+
+---
+
+### NavigationDrawer
+
+```tsx
+import { NavigationDrawer } from '@rootnative/components/navigation-drawer'
+
+// Modal (default): renders through Portal behind a 32% scrim, slides in from the
+// start edge, closes on scrim press / Android back / Escape, and after a
+// destination press (dismissOnSelect). Needs a root PortalHost.
+<NavigationDrawer
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  value={route}
+  onValueChange={go}
+  accessibilityLabel="Main navigation"
+>
+  <Typography variant="titleLarge" style={{ padding: 16 }}>Mail</Typography>
+  <NavigationDrawer.Section headline="Mail">
+    <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox-outline" selectedIcon="inbox" badge={24} />
+    <NavigationDrawer.Item value="outbox" label="Outbox" icon="send-outline" />
+  </NavigationDrawer.Section>
+  <NavigationDrawer.Divider />
+  <NavigationDrawer.Section headline="Labels">
+    <NavigationDrawer.Item value="family" label="Family" />  {/* icon is optional */}
+    <NavigationDrawer.Item value="work" label="Work" disabled />
+  </NavigationDrawer.Section>
+</NavigationDrawer>
+
+// Standard: renders in place as a permanent 360dp panel. No visible/onDismiss —
+// the type rejects every modal prop on it.
+<NavigationDrawer variant="standard" value={route} onValueChange={go}>
+  <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" />
+</NavigationDrawer>
+
+// Uncontrolled: `defaultValue`, or omit it for no active destination.
+<NavigationDrawer visible={open} onDismiss={close} defaultValue="inbox">{items}</NavigationDrawer>
+```
+
+Props:
+- `children?: ReactNode` — `NavigationDrawer.Item`s, grouped with `NavigationDrawer.Section` and separated with `NavigationDrawer.Divider`. Arbitrary content, such as a `Typography` headline at the top, is rendered as is.
+- `value?: string` — Value of the active destination (controlled).
+- `defaultValue?: string` — Value of the initially active destination (uncontrolled). Omit it for a drawer with no active destination.
+- `onValueChange?: (value: string) => void` — Called with the value of the destination that was pressed.
+- `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the drawer's content is padded by the top safe-area inset. The container color still extends under the inset.
+- `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the drawer's content is padded by the bottom safe-area inset.
+- `containerColor?: string` — Default: `surfaceContainerLow for 'modal', surface for 'standard'`. Override the drawer background.
+- `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon, label, and badge color of inactive destinations, and the section headlines.
+- `selectedContentColor?: string` — Default: `onSecondaryContainer`. Override the icon, label, and badge color of the active destination. State-layer colors are derived from it automatically.
+- `indicatorColor?: string` — Default: `secondaryContainer`. Override the active indicator color.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to every destination's label `Text` — does not affect the icons or the badges.
+- `style?: StyleProp<ViewStyle>` — Style applied to the drawer surface.
+- `accessibilityLabel?: string` — Screen-reader label for the drawer. A modal drawer is announced as a dialog, so it needs a name such as "Main navigation".
+- `testID?: string` — Test id applied to the drawer surface. A modal drawer's scrim carries `<testID>-scrim`. Each `NavigationDrawer.Item` takes its own `testID`.
+- `variant?: 'modal' | 'standard'` — Default: `'modal'`. `'modal'` slides in over the content from the start edge, behind a scrim, and renders through `Portal`. `'standard'` renders in place as a permanent side panel.
+- `visible: boolean` — **Modal only, required.** Whether the drawer is shown. Exit animations run before it unmounts.
+- `onDismiss: () => void` — **Modal only, required.** Called on a scrim press, Android back, Escape on web, or a destination press when `dismissOnSelect` is on. Set `visible` to `false` in response.
+- `dismissable?: boolean` — Modal only. Default: `true`. Whether the scrim press, Android back, and Escape dismiss the drawer.
+- `dismissOnSelect?: boolean` — Modal only. Default: `true`. Whether a destination press also calls `onDismiss`.
+- `hostName?: string` — Modal only. Render into a named `PortalHost`.
+- `scrimStyle?: StyleProp<ViewStyle>` — Modal only. Style for the scrim.
+- `scrimAccessibilityLabel?: string` — Modal only. Default: `'Close navigation drawer'`.
+The type rejects every modal prop on `variant="standard"`.
+
+#### NavigationDrawer.Item
+
+One destination: a 56dp row with an optional 24dp icon, a `labelLarge` label, and an optional trailing badge text. Active when `value` matches the drawer selection.
+
+Props:
+- `value: string` — Stable identifier used for selection state and the change callback.
+- `label: string` — Text label. One line — a label that doesn't fit is truncated.
+- `icon?: IconSource` — Leading icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function. MD3 allows a drawer destination with no icon.
+- `selectedIcon?: IconSource` — Icon shown while the destination is active — MD3 pairs an outlined resting icon with its filled counterpart. Falls back to `icon`.
+- `badge?: number | string` — Trailing badge text, such as an unread count. Rendered as text at the end of the row, per the MD3 drawer anatomy. Add it to `accessibilityLabel` so a screen reader announces it.
+- `onPress?: () => void` — Called when the destination is pressed, after the drawer's `onValueChange`.
+- `disabled?: boolean` — Greys the destination out at 38% and stops it responding.
+- `labelStyle?: StyleProp<TextStyle>` — Style applied to this destination's label `Text`. Merged over the drawer's `labelStyle`.
+- `style?: StyleProp<ViewStyle>` — Style applied to the destination row.
+- `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
+- `testID?: string` — Test id applied to the row. The indicator carries `<testID>-indicator`.
+
+#### NavigationDrawer.Section
+
+A group of destinations with an optional `titleSmall` headline, 56dp tall and inset 28dp from the sheet edge.
+
+Props:
+- `headline?: string` — Section headline in `titleSmall`, above the destinations. Omit it for a group with no title.
+- `children?: ReactNode` — The section's `NavigationDrawer.Item`s.
+- `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
+- `style?: StyleProp<ViewStyle>` — Style applied to the section container.
+
+#### NavigationDrawer.Divider
+
+A `Divider` inset 28dp from both sheet edges, for use between sections. Takes `DividerProps` except `orientation`, `insetStart` and `insetEnd`, which are fixed.
 
 ---
 

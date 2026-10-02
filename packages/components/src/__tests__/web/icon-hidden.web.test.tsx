@@ -16,6 +16,7 @@ import { screen } from '@testing-library/react'
 import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
 import { Chip } from '../../chip'
+import { Icon } from '../../icon'
 import { IconButton } from '../../icon-button'
 import { SearchBar } from '../../search-bar'
 import { TextField } from '../../text-field'
@@ -38,6 +39,22 @@ describe('decorative icons carry aria-hidden in the DOM', () => {
   it('Button — no icon, nothing hidden', () => {
     const { container } = renderWeb(<Button>OK</Button>)
     expect(hiddenCount(container)).toBe(0)
+  })
+
+  it('Icon — decorative', () => {
+    const { container } = renderWeb(<Icon source="home" />)
+    expect(hiddenCount(container)).toBeGreaterThan(0)
+  })
+
+  it('Icon — labelled box is exposed, glyph hidden', () => {
+    const { container } = renderWeb(
+      <Icon source="home" accessibilityLabel="Home" />,
+    )
+    expect(container.querySelector('[role="img"]')).not.toBeNull()
+    expect(
+      container.querySelector('[role="img"]')?.getAttribute('aria-hidden'),
+    ).toBeNull()
+    expect(hiddenCount(container)).toBeGreaterThan(0)
   })
 
   it('Chip — leading icon', () => {

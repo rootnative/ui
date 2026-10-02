@@ -31,6 +31,9 @@ export type {
   IconButtonVariant,
 } from './icon-button'
 
+export { Icon } from './icon'
+export type { IconProps } from './icon'
+
 export { AppBar } from './appbar'
 export type {
   AppBarAction,
@@ -118,6 +121,28 @@ export type {
   NavigationBarLabelVisibility,
   NavigationBarProps,
 } from './navigation-bar'
+
+export { NavigationRail } from './navigation-rail'
+export type {
+  NavigationRailAlign,
+  NavigationRailItem,
+  NavigationRailLabelVisibility,
+  NavigationRailProps,
+} from './navigation-rail'
+
+export {
+  NavigationDrawer,
+  NavigationDrawerDivider,
+  NavigationDrawerItem,
+  NavigationDrawerSection,
+} from './navigation-drawer'
+export type {
+  NavigationDrawerDividerProps,
+  NavigationDrawerItemProps,
+  NavigationDrawerProps,
+  NavigationDrawerSectionProps,
+  NavigationDrawerVariant,
+} from './navigation-drawer'
 
 export { List, ListItem, ListDivider } from './list'
 export type {
