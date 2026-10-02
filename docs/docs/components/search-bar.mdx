@@ -139,20 +139,26 @@ pass a negative `density`. Each step on the Material density scale removes 4dp,
 so `-4` gives a 40dp bar. The icon buttons keep their 40dp frame and the text
 keeps `bodyLarge`, so `-4` is the floor.
 
-<RunnableExample
-  height={120}
+<SnackExample
+  name="RootNative SearchBar — Density"
   code={`
-import { SearchBar } from '@rootnative/components/search-bar'
-import { Column } from '@rootnative/components/column'
+  import { SearchBar } from '@rootnative/components'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
 
-export default function Example() {
-  return (
-    <Column gap="md">
-      <SearchBar placeholder="Default, 56dp" />
-      <SearchBar placeholder="Dense, 40dp" density={-4} />
-    </Column>
-  )
-}
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 16 }}>
+            <SearchBar placeholder="Default, 56dp" />
+            <SearchBar placeholder="Dense, 40dp" density={-4} />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
 `}
 />
 
