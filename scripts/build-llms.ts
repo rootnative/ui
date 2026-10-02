@@ -1873,6 +1873,65 @@ Disabled state always uses standard MD3 disabled treatment (38% onSurface) regar
 }
 
 // ============================================================
+// Content: Web without Expo (static template)
+// ============================================================
+
+/**
+ * The config a bundler without Metro needs. Each item was a real failure in
+ * an Electron app built with Vite: the build passed and nothing animated,
+ * `global` was not defined, and the icon import did not resolve.
+ */
+function webWithoutExpoContent(): string {
+  return `Expo and Metro do five things for a web app that Vite, webpack, an
+Electron renderer or a Tauri renderer do not. Each one is a build or runtime
+failure without it. The docs page "Web without Expo" has a full Vite config
+and a full webpack config.
+
+1. **Alias \`react-native\` to \`react-native-web\`**, with an exact match
+   (\`/^react-native$/\`), so \`react-native-svg\` and the other
+   \`react-native-*\` packages keep their names.
+2. **Resolve \`.web.tsx\`, \`.web.ts\`, \`.web.mjs\` and \`.web.js\` before the
+   plain extensions.** The safe-area package, Reanimated and this library ship
+   web variants that Metro picks by platform.
+3. **Run \`react-native-worklets/plugin\` on the app source and on
+   \`node_modules/@rootnative\`, \`node_modules/react-native-reanimated\` and
+   \`node_modules/react-native-worklets\`.** All three ship raw \`'worklet'\`
+   directives. A bundler skips \`node_modules\` by default; the build then
+   succeeds and nothing animates, with no error in production. Inertia logs one
+   \`console.error\` at the first \`Motion\` render when the plugin is missing.
+   An include that covers \`@rootnative\` only logs \`timing easing: the
+   provided easing function is not a worklet\` in a dev build.
+4. **Define \`global\` as \`globalThis\`, plus \`__DEV__\` and
+   \`process.env.NODE_ENV\`.** Reanimated reads \`global\`; a browser and a
+   sandboxed Electron renderer throw \`ReferenceError: global is not defined\`
+   without the define.
+5. **Resolve \`@expo/vector-icons/MaterialCommunityIcons\`.** The import is
+   static. Either install \`@expo/vector-icons\` and \`expo-font\`, which run on
+   web without the rest of Expo, or register an \`iconResolver\` and alias the
+   import to a module that exports \`null\`.
+
+Vite, with \`@rolldown/plugin-babel\`:
+
+\`\`\`ts
+babel({
+  include: [
+    /src\\/.*\\.tsx?$/,
+    /node_modules\\/(@rootnative|react-native-reanimated|react-native-worklets)\\/.*\\.m?js$/,
+  ],
+  exclude: /\\0rolldown\\/runtime\\.js/,
+  plugins: ['react-native-worklets/plugin'],
+})
+\`\`\`
+
+The app root is the same as on Expo, and no \`SafeAreaProvider\` is needed.
+Electron adds three facts: set the bundler base path to \`./\` for a
+\`file://\` page, allow \`'unsafe-inline'\` in \`style-src\` because
+\`react-native-web\` inserts its style sheet at run time, and the \`global\`
+define is required in a sandboxed renderer. Electron is not yet listed as a
+tested host.`
+}
+
+// ============================================================
 // Content: App root setup (static template)
 // ============================================================
 
@@ -1922,7 +1981,9 @@ Why that order:
 - **\`ThemeProvider\`** — above every component, since all of them read the theme.
   Passing the \`{ light, dark }\` pair (rather than one theme) is what enables
   \`useThemeMode()\` in descendants; it then follows the OS setting on its own. Add
-  \`storage={AsyncStorage}\` to remember an explicit choice across launches.
+  \`storage={AsyncStorage}\` to remember an explicit choice across launches. On
+  web, pass \`localStorage\` itself: a \`getItem\` or \`setItem\` that throws is
+  caught and the mode stays at \`defaultMode\`, so no wrapper is needed.
 - **\`PortalHost\`** — inside \`ThemeProvider\`, so portalled overlays are themed
   too, and above your screens, so overlays get the whole window. One host at the
   root; \`Dialog\`, \`BottomSheet\`, \`Menu\`, \`Tooltip\` and \`Snackbar\` all need it.
@@ -2544,7 +2605,7 @@ Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@r
 2. **ReactElement** — a pre-rendered icon (\`leadingIcon={<Check size={18} color="#fff" />}\`). The component does not override size/color.
 3. **Render function** — \`(props: { size: number; color?: string }) => ReactNode\`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. \`@expo/vector-icons\` is only required if you actually pass string icon names without a custom resolver.
+Per-call elements/functions always take precedence over the resolver. \`@expo/vector-icons\` is used at run time only for string icon names without a custom resolver, but the import is static, so the bundler must resolve it in every app. Without Expo, alias \`@expo/vector-icons/MaterialCommunityIcons\` to a module that exports \`null\` (docs page: Web without Expo).
 
 ### When to pick which
 
@@ -2711,7 +2772,7 @@ function generateComponentsLlms(): string {
 
 > Version: ${COMPONENTS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
-> Optional: @expo/vector-icons ${COMPONENTS_VECTOR_ICONS} (only needed for icon props)
+> Required for string icon names: @expo/vector-icons ${COMPONENTS_VECTOR_ICONS}. The import is static, so every bundle must resolve it, even with a custom iconResolver; a bundler without Expo aliases it to a stub (docs: Web without Expo)
 
 ## App root setup
 
@@ -2781,9 +2842,9 @@ function generateFullLlms(): string {
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
-> Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Electron, macOS, Windows, and other React Native hosts are not tested.
+> Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
-> Optional peer deps: \`@expo/vector-icons ${COMPONENTS_VECTOR_ICONS}\` (only needed for icon props)
+> Required for string icon names: \`@expo/vector-icons ${COMPONENTS_VECTOR_ICONS}\`. The import is static, so every bundle must resolve it, even with a custom \`iconResolver\`; a bundler without Expo aliases it to a stub (see Web without Expo below)
 
 ---
 
@@ -2823,6 +2884,12 @@ ${appRootContent()}
 ## Jest setup
 
 ${jestSetupContent()}
+
+---
+
+## Web without Expo
+
+${webWithoutExpoContent()}
 
 ---
 

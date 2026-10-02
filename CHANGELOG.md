@@ -9,6 +9,43 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+No breaking changes. The components that apply safe-area insets no longer
+throw on web without a `SafeAreaProvider`. A new docs page covers web
+without Expo.
+
+### Web without a `SafeAreaProvider`
+
+On web, `react-native-safe-area-context` resolves `SafeAreaView.web`, which
+reads `useSafeAreaInsets()` and throws `No safe area value available` when
+no provider is mounted. The documented root (`ThemeProvider` > `PortalHost`
+> `SnackbarProvider`) therefore rendered a blank page on web, because the
+snackbar layer applies insets. `AppBar`, `Layout`, `NavigationBar`,
+`BottomSheet` and the snackbar layer now render a plain `View` with zero
+insets on web when the context is `null`. Native keeps the package view.
+The web Jest mock of the package now throws without a provider, as the real
+module does, so a test cannot pass by mounting an inset component outside a
+provider.
+
+### Docs
+
+- **Web without Expo.** A new page with a Vite config and a webpack config
+  for a bundler without Metro: the `react-native-web` alias, the `.web.*`
+  extensions, the globals, the worklets Babel plugin on `@rootnative`,
+  `react-native-reanimated` and `react-native-worklets` inside
+  `node_modules`, and the static icon import. Without the plugin on those
+  three packages the build passes and nothing animates. The page also lists
+  the Electron facts: relative asset paths, `'unsafe-inline'` in
+  `style-src`, and the `global` define in a sandboxed renderer. The
+  `llms-full.txt` carries the same section.
+- **`@expo/vector-icons` in the `llms` files.** Both files said the peer is
+  optional. The import is static, so the bundler must resolve it even with a
+  custom `iconResolver`; the files now say so and point at the alias stub.
+- **Theme mode on web.** `storage={localStorage}` works as is: the provider
+  catches a `getItem` or `setItem` that throws. The theming page now says so
+  and shows the guard for a static export.
+
 ## 0.0.0-alpha.21 — 2026-09-30
 
 No breaking changes. A new `SearchView` component. `ThemeProvider` follows

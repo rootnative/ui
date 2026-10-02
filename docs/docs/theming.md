@@ -132,6 +132,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 </ThemeProvider>
 ```
 
+On web, pass `localStorage` itself. The provider catches a `getItem` or
+`setItem` that throws, which `localStorage` does when site data is blocked or
+in some private windows, and keeps `defaultMode`. No wrapper is needed. Guard
+the access only for a static export, where the server has no `window`:
+
+```tsx
+const storage = typeof window === 'undefined' ? undefined : window.localStorage
+
+<ThemeProvider
+  theme={{ light: lightTheme, dark: darkTheme }}
+  storage={storage}
+>
+  {children}
+</ThemeProvider>
+```
+
 Reading storage takes a moment, so the first frame renders with `defaultMode`
 before the saved mode arrives. Gate your splash screen on `isReady` to avoid a
 visible flash:

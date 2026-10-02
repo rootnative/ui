@@ -5,6 +5,7 @@ const sidebars: SidebarsConfig = {
     { type: 'doc', id: 'index', label: 'Introduction' },
     { type: 'doc', id: 'quick-start', label: 'Quick Start' },
     { type: 'doc', id: 'installation', label: 'Installation' },
+    { type: 'doc', id: 'web-without-expo', label: 'Web without Expo' },
     { type: 'doc', id: 'cli', label: 'CLI' },
     { type: 'doc', id: 'theming', label: 'Theming' },
     { type: 'doc', id: 'fonts', label: 'Fonts' },

@@ -17,8 +17,8 @@ description: Install RootNative UI into an existing app — peer dependencies, p
 | --- | --- |
 | iOS | Supported |
 | Android | Supported |
-| Web | Supported through `react-native-web` 0.21 |
-| Electron, macOS, Windows, other hosts | Not tested |
+| Web | Supported through `react-native-web` 0.21. Without Expo, see [Web without Expo](./web-without-expo.md) |
+| Electron, macOS, Windows, other hosts | Not tested. An Electron renderer runs the [Web without Expo](./web-without-expo.md#electron) recipe; the remaining checks are listed there |
 
 For web, install `react-dom` and `react-native-web` too:
 `npx expo install react-dom react-native-web`. Some behavior is different on
@@ -59,7 +59,7 @@ What each one does, and which two you can leave out:
 | `react-native-reanimated` | optional | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
 | `react-native-worklets` | optional | Reanimated 4's worklet runtime | You skip Reanimated |
 | `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, Layout, BottomSheet, NavigationBar and Snackbar | Never |
-| `@expo/vector-icons` | **required** | Default resolver for string icon names (`leadingIcon="check"`) | Never |
+| `@expo/vector-icons` | **required** | Default resolver for string icon names (`leadingIcon="check"`) | Never. The import is static, so the bundler must resolve it even with a custom `iconResolver`. A bundler without Expo can alias it to a stub — see [Web without Expo](./web-without-expo.md#5-resolve-the-default-icon-set) |
 | `react-native-svg` | **required** | CircularProgress and LoadingIndicator | Never |
 | `@rootnative/inertia` | **required** | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a required peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |
 
@@ -72,6 +72,8 @@ What each one does, and which two you can leave out:
 `react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 57 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 
 > **Expo SDK 57 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
+>
+> **Vite, webpack, Electron and other bundlers without Metro** skip `node_modules` by default, so the plugin never reaches the library and nothing animates. [Web without Expo](./web-without-expo.md) has the include list and the full config.
 
 If you pass **string icon names** (e.g. `leadingIcon="check"`) and don't register a custom `iconResolver`, the library resolves them through [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) from `@expo/vector-icons` (installed above). See the [Icons guide](./icons) for details.
 

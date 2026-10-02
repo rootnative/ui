@@ -18,7 +18,7 @@ Every icon prop accepts an `IconSource` (`import type { IconSource } from '@root
 2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
 3. **Render function** — `(props: { size: number; color?: string }) => ReactNode`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is only required if you actually pass string icon names without a custom resolver.
+Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is used at run time only for string icon names without a custom resolver, but the import is static, so the bundler must resolve it in every app. Without Expo, alias `@expo/vector-icons/MaterialCommunityIcons` to a module that exports `null` (docs page: Web without Expo).
 
 ### When to pick which
 
