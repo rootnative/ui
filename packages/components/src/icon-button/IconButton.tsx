@@ -9,6 +9,7 @@ import { useMemo } from 'react'
 import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
+import { resolveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
@@ -73,7 +74,7 @@ export function IconButton({
   disabled = false,
   variant = 'filled',
   selected,
-  size = 's',
+  size: sizeProp = 'small',
   width = 'uniform',
   shape = 'round',
   hitSlop,
@@ -83,6 +84,7 @@ export function IconButton({
   const theme = useTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
+  const size = resolveSize(sizeProp, 'IconButton')
   const sizeTokens = getIconButtonSizeTokens(size)
 
   const isDisabled = Boolean(disabled)

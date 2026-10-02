@@ -116,7 +116,7 @@ function RootLayoutContent() {
                 ? 'format-pilcrow-arrow-left'
                 : 'format-pilcrow-arrow-right'
             }
-            size="s"
+            size="small"
             variant="standard"
             accessibilityLabel={
               I18nManager.isRTL
@@ -129,7 +129,7 @@ function RootLayoutContent() {
         <View style={styles.iconFrame}>
           <IconButton
             icon={isDarkTheme ? 'white-balance-sunny' : 'weather-night'}
-            size="s"
+            size="small"
             variant="standard"
             accessibilityLabel={
               isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'

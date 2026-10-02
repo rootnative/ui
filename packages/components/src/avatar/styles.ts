@@ -32,11 +32,11 @@ export function createStyles(theme: MaterialTheme) {
     disabledContent: {
       opacity: theme.stateLayer.disabledOpacity,
     },
-    sizeXSmall: { width: 24, height: 24 },
+    sizeExtraSmall: { width: 24, height: 24 },
     sizeSmall: { width: 32, height: 32 },
     sizeMedium: { width: 40, height: 40 },
     sizeLarge: { width: 56, height: 56 },
-    sizeXLarge: { width: 112, height: 112 },
+    sizeExtraLarge: { width: 112, height: 112 },
     image: {
       width: '100%',
       height: '100%',

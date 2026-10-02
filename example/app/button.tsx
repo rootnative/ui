@@ -4,7 +4,7 @@ import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
-const sizes = ['xs', 's', 'm', 'l', 'xl'] as const
+const sizes = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const
 
 export default function ButtonScreen() {
   return (

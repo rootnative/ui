@@ -153,11 +153,11 @@ describe('Avatar', () => {
 
   describe('sizes', () => {
     it.each([
-      ['xSmall', 24],
+      ['extraSmall', 24],
       ['small', 32],
       ['medium', 40],
       ['large', 56],
-      ['xLarge', 112],
+      ['extraLarge', 112],
     ] as const)('size "%s" renders with %dpx dimensions', (size, px) => {
       renderWithTheme(<Avatar testID="avatar" size={size} />)
       const avatar = screen.getByTestId('avatar')
@@ -190,11 +190,11 @@ describe('Avatar', () => {
 
   describe('initials typography', () => {
     it.each([
-      ['xSmall', 'labelSmall'],
+      ['extraSmall', 'labelSmall'],
       ['small', 'labelMedium'],
       ['medium', 'titleMedium'],
       ['large', 'headlineSmall'],
-      ['xLarge', 'displaySmall'],
+      ['extraLarge', 'displaySmall'],
     ] as const)('size "%s" uses the %s type role', (size, role) => {
       renderWithTheme(<Avatar label="AB" size={size} />)
       const initials = screen.getByText('AB')

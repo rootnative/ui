@@ -255,7 +255,7 @@ export function AppBar({
       <View style={styles.iconFrame}>
         <IconButton
           icon={navigationButton.icon}
-          size="s"
+          size="small"
           variant="standard"
           iconColor={resolvedContentColor}
           accessibilityLabel={navigationButton.accessibilityLabel}
@@ -307,7 +307,7 @@ export function AppBar({
             >
               <IconButton
                 icon={action.icon}
-                size="s"
+                size="small"
                 variant="standard"
                 iconColor={resolvedContentColor}
                 accessibilityLabel={action.accessibilityLabel}

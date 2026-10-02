@@ -216,7 +216,7 @@ import { Button } from '@rootnative/components/button'
 Props:
 - `children: string` — Text label rendered inside the button.
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
-- `size?: 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'s'`. MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets container height, padding, icon size, and label typography.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
 - `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
@@ -320,7 +320,7 @@ Props:
 - `disabled?: boolean` — Default: `false`. Disables the button.
 - `variant?: 'filled' | 'tonal' | 'outlined' | 'standard'` — Default: `'filled'`. Visual style variant.
 - `selected?: boolean` — Enables toggle mode. The button changes appearance based on selected/unselected state.
-- `size?: 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'s'`. MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets container height and icon size.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height and icon size. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
 - `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
 - `accessibilityLabel: string` — Required — icon-only buttons must have a label for screen readers.
@@ -622,7 +622,7 @@ import { SearchBar } from '@rootnative/components/search-bar'
 />
 
 // Custom trailing content, such as an avatar.
-<SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
+<SearchBar placeholder="Search" trailing={<Avatar size="extraSmall" label="JD" />} />
 
 // A bar that opens a SearchView: one button, read-only input.
 <SearchBar placeholder="Search" value={query} onPress={() => setOpen(true)} />
@@ -1496,7 +1496,7 @@ Props:
 - `imageUri?: string` — URI of the image to display. Takes priority over `icon` and `label`.
 - `icon?: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Takes priority over `label` when `imageUri` is not set.
 - `label?: string` — Text initials to display (1–2 characters recommended). Shown when `imageUri` and `icon` are not set.
-- `size?: 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge'` — Default: `'medium'`. Size of the avatar.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xSmall' | 'xLarge'` — Default: `'medium'`. Size of the avatar.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically when `onPress` is set.
 - `contentColor?: string` — Override the content (icon / initials) color.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.

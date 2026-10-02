@@ -82,7 +82,7 @@ export default function SearchBarScreen() {
         <Typography variant="titleSmall">Avatar</Typography>
         <SearchBar
           placeholder="Search contacts"
-          trailing={<Avatar size="xSmall" label="JD" />}
+          trailing={<Avatar size="extraSmall" label="JD" />}
         />
       </Column>
 

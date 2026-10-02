@@ -756,7 +756,7 @@ import { SearchBar } from '@rootnative/components/search-bar'
 />
 
 // Custom trailing content, such as an avatar.
-<SearchBar placeholder="Search" trailing={<Avatar size="xSmall" label="JD" />} />
+<SearchBar placeholder="Search" trailing={<Avatar size="extraSmall" label="JD" />} />
 
 // A bar that opens a SearchView: one button, read-only input.
 <SearchBar placeholder="Search" value={query} onPress={() => setOpen(true)} />

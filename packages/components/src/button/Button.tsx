@@ -11,6 +11,7 @@ import { Platform, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
+import { resolveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -28,7 +29,7 @@ export function Button({
   children,
   style,
   variant = 'filled',
-  size = 's',
+  size: sizeProp = 'small',
   shape = 'round',
   leadingIcon,
   trailingIcon,
@@ -44,6 +45,9 @@ export function Button({
   const hasTrailing = Boolean(trailingIcon)
   const theme = useTheme()
   const iconResolver = useIconResolver()
+  // Memoized on the prop, so the manual memo below sees a stable `size` and
+  // the React Compiler lint accepts its dependency list.
+  const size = useMemo(() => resolveSize(sizeProp, 'Button'), [sizeProp])
   const sizeTokens = getButtonSizeTokens(size)
   const resolvedIconSize = iconSize ?? sizeTokens.iconSize
 

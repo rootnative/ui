@@ -1,7 +1,8 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
-import type { ButtonShape, ButtonSize, ButtonVariant } from './types'
+import type { ExpressiveSize } from '../internal/size'
+import type { ButtonShape, ButtonVariant } from './types'
 
 export const BUTTON_FOCUS_RING_OFFSET = 2
 export const BUTTON_FOCUS_RING_WIDTH = 3
@@ -28,8 +29,8 @@ export interface ButtonSizeTokens {
   pressedCorner: number
 }
 
-const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
-  xs: {
+const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
+  extraSmall: {
     height: 32,
     iconSize: 20,
     padding: 12,
@@ -39,7 +40,7 @@ const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
     squareCorner: 12,
     pressedCorner: 8,
   },
-  s: {
+  small: {
     height: 40,
     iconSize: 20,
     padding: 16,
@@ -49,7 +50,7 @@ const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
     squareCorner: 12,
     pressedCorner: 8,
   },
-  m: {
+  medium: {
     height: 56,
     iconSize: 24,
     padding: 24,
@@ -59,7 +60,7 @@ const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
     squareCorner: 16,
     pressedCorner: 12,
   },
-  l: {
+  large: {
     height: 96,
     iconSize: 32,
     padding: 48,
@@ -69,7 +70,7 @@ const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
     squareCorner: 28,
     pressedCorner: 16,
   },
-  xl: {
+  extraLarge: {
     height: 136,
     iconSize: 40,
     padding: 64,
@@ -81,7 +82,7 @@ const BUTTON_SIZE_TOKENS: Record<ButtonSize, ButtonSizeTokens> = {
   },
 }
 
-export function getButtonSizeTokens(size: ButtonSize): ButtonSizeTokens {
+export function getButtonSizeTokens(size: ExpressiveSize): ButtonSizeTokens {
   return BUTTON_SIZE_TOKENS[size]
 }
 
@@ -92,7 +93,7 @@ export function getButtonSizeTokens(size: ButtonSize): ButtonSizeTokens {
  * rests at the size's `squareCorner`. Both morph toward `pressedCorner`.
  */
 export function getButtonMorphRadii(
-  size: ButtonSize,
+  size: ExpressiveSize,
   shape: ButtonShape,
 ): { rest: number; pressed: number } {
   const tokens = BUTTON_SIZE_TOKENS[size]
@@ -265,7 +266,7 @@ function getVariantColors(
 function getHorizontalPadding(
   theme: MaterialTheme,
   variant: ButtonVariant,
-  size: ButtonSize,
+  size: ExpressiveSize,
   hasLeadingIcon: boolean,
   hasTrailingIcon: boolean,
 ): { paddingStart: number; paddingEnd: number } {
@@ -282,12 +283,12 @@ function getHorizontalPadding(
   }
 
   // Filled/elevated/tonal/outlined: base horizontal padding is the size
-  // token, and the icon side tightens by one step. `s` keeps the
+  // token, and the icon side tightens by one step. `small` keeps the
   // pre-Expressive 24/16 values (base 24, icon side 16) for back-compat; the
   // Expressive size tokens (12/16/24/48/64) drive the rest, with the icon
   // side tightened proportionally (never below spacing.sm).
   const base =
-    size === 's' ? theme.spacing.lg : getButtonSizeTokens(size).padding
+    size === 'small' ? theme.spacing.lg : getButtonSizeTokens(size).padding
   const iconSide = Math.max(theme.spacing.sm, base - theme.spacing.sm)
   return {
     paddingStart: hasLeadingIcon ? iconSide : base,
@@ -381,7 +382,7 @@ export function getResolvedButtonColors(
 export function createStyles(
   theme: MaterialTheme,
   variant: ButtonVariant,
-  size: ButtonSize,
+  size: ExpressiveSize,
   shape: ButtonShape,
   hasLeadingIcon: boolean,
   hasTrailingIcon: boolean,

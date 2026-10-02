@@ -45,11 +45,11 @@ The avatar renders the first available content in this order:
 
 | Size | Use case |
 |------|----------|
-| `xSmall` | Inline mentions, dense lists |
+| `extraSmall` | Inline mentions, dense lists |
 | `small` | List items, compact layouts |
 | `medium` | Default — profile cards, headers |
 | `large` | Profile screens, detail views |
-| `xLarge` | Hero sections, onboarding |
+| `extraLarge` | Hero sections, onboarding |
 
 <SnackExample
   name="RootNative Avatar — Sizes"
@@ -64,11 +64,11 @@ The avatar renders the first available content in this order:
       <SafeAreaProvider>
         <ThemeProvider>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <Avatar label="AB" size="xSmall" />
+            <Avatar label="AB" size="extraSmall" />
             <Avatar label="AB" size="small" />
             <Avatar label="AB" size="medium" />
             <Avatar label="AB" size="large" />
-            <Avatar label="AB" size="xLarge" />
+            <Avatar label="AB" size="extraLarge" />
           </View>
         </ThemeProvider>
       </SafeAreaProvider>

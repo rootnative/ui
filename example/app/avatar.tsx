@@ -20,11 +20,11 @@ export default function AvatarScreen() {
         <Column gap="sm">
           <Typography variant="titleMedium">Sizes</Typography>
           <Row gap="md" align="center">
-            <Avatar size="xSmall" label="AB" />
+            <Avatar size="extraSmall" label="AB" />
             <Avatar size="small" label="AB" />
             <Avatar size="medium" label="AB" />
             <Avatar size="large" label="AB" />
-            <Avatar size="xLarge" label="AB" />
+            <Avatar size="extraLarge" label="AB" />
           </Row>
         </Column>
 

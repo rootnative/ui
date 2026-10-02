@@ -65,7 +65,13 @@ function target(role: string) {
   }
 }
 
-const BUTTON_SIZES: ButtonSize[] = ['xs', 's', 'm', 'l', 'xl']
+const BUTTON_SIZES: ButtonSize[] = [
+  'extraSmall',
+  'small',
+  'medium',
+  'large',
+  'extraLarge',
+]
 const GROUP_SIZES: ButtonGroupSize[] = [
   'extraSmall',
   'small',
@@ -73,7 +79,13 @@ const GROUP_SIZES: ButtonGroupSize[] = [
   'large',
   'extraLarge',
 ]
-const ICON_SIZES: IconButtonSize[] = ['xs', 's', 'm', 'l', 'xl']
+const ICON_SIZES: IconButtonSize[] = [
+  'extraSmall',
+  'small',
+  'medium',
+  'large',
+  'extraLarge',
+]
 const ICON_WIDTHS: IconButtonWidth[] = ['narrow', 'uniform', 'wide']
 
 describe('every control clears the 48dp touch target', () => {
@@ -143,13 +155,13 @@ describe('every control clears the 48dp touch target', () => {
  */
 describe('the measurement is real', () => {
   it('reads a container height that is already over the floor', () => {
-    renderWithTheme(<Button size="m">OK</Button>)
+    renderWithTheme(<Button size="medium">OK</Button>)
     // 56dp container, so slop contributes nothing.
     expect(target('button').height).toBe(56)
   })
 
   it('reads the slop that carries the smallest sizes', () => {
-    renderWithTheme(<Button size="xs">OK</Button>)
+    renderWithTheme(<Button size="extraSmall">OK</Button>)
     // 32dp container + 8dp a side. Without the slop this is 32, not 48.
     expect(target('button').height).toBe(48)
   })

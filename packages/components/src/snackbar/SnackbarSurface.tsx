@@ -80,7 +80,7 @@ export function SnackbarSurface({
           {showClose ? (
             <IconButton
               variant="standard"
-              size="s"
+              size="small"
               icon={entry.closeIcon ?? 'close'}
               contentColor={closeColor}
               accessibilityLabel={entry.closeAccessibilityLabel ?? 'Dismiss'}

@@ -1,8 +1,19 @@
 import type { IconSource } from '@rootnative/utils'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
-/** Size of the avatar container. */
-export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge'
+/**
+ * Size of the avatar container. `'xSmall'` and `'xLarge'` are the old names
+ * of `'extraSmall'` and `'extraLarge'`. They still work for one release,
+ * warn once in development, and are then removed.
+ */
+export type AvatarSize =
+  | 'extraSmall'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'extraLarge'
+  | 'xSmall'
+  | 'xLarge'
 
 export interface AvatarProps extends Omit<ViewProps, 'style'> {
   /**

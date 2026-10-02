@@ -249,7 +249,7 @@ export function SearchView({
       <View style={styles.slot}>
         <IconButton
           icon={backIcon}
-          size="s"
+          size="small"
           variant="standard"
           iconColor={leadingIconColor}
           accessibilityLabel={backAccessibilityLabel}
@@ -280,7 +280,7 @@ export function SearchView({
         <View style={styles.slot}>
           <IconButton
             icon="close"
-            size="s"
+            size="small"
             variant="standard"
             iconColor={trailingIconColor}
             accessibilityLabel={clearButtonAccessibilityLabel}
@@ -292,7 +292,7 @@ export function SearchView({
         <View key={`${action.accessibilityLabel}-${index}`} style={styles.slot}>
           <IconButton
             icon={action.icon}
-            size="s"
+            size="small"
             variant="standard"
             iconColor={trailingIconColor}
             accessibilityLabel={action.accessibilityLabel}

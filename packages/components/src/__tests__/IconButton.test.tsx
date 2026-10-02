@@ -4,6 +4,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { IconButton } from '../icon-button/IconButton'
+import type { IconButtonSize } from '../icon-button/types'
 
 const DISABLED_ICON_COLOR = alphaColor(
   lightTheme.colors.onSurface,
@@ -186,15 +187,15 @@ describe('IconButton', () => {
 
   describe('size', () => {
     const sizes: Array<{
-      size: 'xs' | 's' | 'm' | 'l' | 'xl'
+      size: IconButtonSize
       height: number
       icon: number
     }> = [
-      { size: 'xs', height: 32, icon: 20 },
-      { size: 's', height: 40, icon: 24 },
-      { size: 'm', height: 56, icon: 24 },
-      { size: 'l', height: 96, icon: 32 },
-      { size: 'xl', height: 136, icon: 40 },
+      { size: 'extraSmall', height: 32, icon: 20 },
+      { size: 'small', height: 40, icon: 24 },
+      { size: 'medium', height: 56, icon: 24 },
+      { size: 'large', height: 96, icon: 32 },
+      { size: 'extraLarge', height: 136, icon: 40 },
     ]
 
     it.each(sizes)(
@@ -232,7 +233,7 @@ describe('IconButton', () => {
           <IconButton
             icon="heart"
             accessibilityLabel="X"
-            size="m"
+            size="medium"
             width={width as 'narrow' | 'uniform' | 'wide'}
           />,
         )
@@ -251,7 +252,7 @@ describe('IconButton', () => {
           icon="heart"
           accessibilityLabel="X"
           variant="outlined"
-          size="l"
+          size="large"
         />,
       )
       const flat = StyleSheet.flatten(screen.getByRole('button').props.style)

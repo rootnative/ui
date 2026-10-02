@@ -6,53 +6,55 @@ import { useMemo } from 'react'
 import { Image, Platform, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { pointerEvents } from '../internal/pointerEvents'
+import type { ExpressiveSize } from '../internal/size'
+import { resolveSize } from '../internal/size'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
-import type { AvatarProps, AvatarSize } from './types'
+import type { AvatarProps } from './types'
 
 // Minimum touch target for interactive avatars (WCAG / MD3).
 const MIN_TOUCH_TARGET = 48
 
-const CONTAINER_PX: Record<AvatarSize, number> = {
-  xSmall: 24,
+const CONTAINER_PX: Record<ExpressiveSize, number> = {
+  extraSmall: 24,
   small: 32,
   medium: 40,
   large: 56,
-  xLarge: 112,
+  extraLarge: 112,
 }
 
-const ICON_PX: Record<AvatarSize, number> = {
-  xSmall: 14,
+const ICON_PX: Record<ExpressiveSize, number> = {
+  extraSmall: 14,
   small: 18,
   medium: 24,
   large: 32,
-  xLarge: 56,
+  extraLarge: 56,
 }
 
 // Initials typography — nearest MD3 type role for each container size.
 const LABEL_TYPE_ROLE: Record<
-  AvatarSize,
+  ExpressiveSize,
   | 'labelSmall'
   | 'labelMedium'
   | 'titleMedium'
   | 'headlineSmall'
   | 'displaySmall'
 > = {
-  xSmall: 'labelSmall',
+  extraSmall: 'labelSmall',
   small: 'labelMedium',
   medium: 'titleMedium',
   large: 'headlineSmall',
-  xLarge: 'displaySmall',
+  extraLarge: 'displaySmall',
 }
 
 function getSizeStyle(
   styles: ReturnType<typeof createStyles>,
-  size: AvatarSize,
+  size: ExpressiveSize,
 ) {
-  if (size === 'xSmall') return styles.sizeXSmall
+  if (size === 'extraSmall') return styles.sizeExtraSmall
   if (size === 'small') return styles.sizeSmall
   if (size === 'large') return styles.sizeLarge
-  if (size === 'xLarge') return styles.sizeXLarge
+  if (size === 'extraLarge') return styles.sizeExtraLarge
   return styles.sizeMedium
 }
 
@@ -60,7 +62,7 @@ export function Avatar({
   imageUri,
   icon,
   label,
-  size = 'medium',
+  size: sizeProp = 'medium',
   containerColor,
   contentColor,
   style,
@@ -77,6 +79,7 @@ export function Avatar({
 
   const bgColor = containerColor ?? theme.colors.primaryContainer
   const fgColor = contentColor ?? theme.colors.onPrimaryContainer
+  const size = resolveSize(sizeProp, 'Avatar')
   const sizeStyle = getSizeStyle(styles, size)
   const iconPx = ICON_PX[size]
   const initials = label ? label.slice(0, 2).toUpperCase() : undefined

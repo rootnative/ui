@@ -11,11 +11,11 @@ const variants = [
 ] as const
 
 const sizes = [
-  { label: 'XS', value: 'xs' },
-  { label: 'S', value: 's' },
-  { label: 'M', value: 'm' },
-  { label: 'L', value: 'l' },
-  { label: 'XL', value: 'xl' },
+  { label: 'XS', value: 'extraSmall' },
+  { label: 'S', value: 'small' },
+  { label: 'M', value: 'medium' },
+  { label: 'L', value: 'large' },
+  { label: 'XL', value: 'extraLarge' },
 ] as const
 
 const widths = [
@@ -68,7 +68,7 @@ export default function IconButtonScreen() {
             <Column key={option.value} align="center" gap="xs">
               <IconButton
                 icon="heart-outline"
-                size="m"
+                size="medium"
                 width={option.value}
                 variant="tonal"
                 accessibilityLabel={`${option.label} heart`}

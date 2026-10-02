@@ -72,9 +72,9 @@ Five MD3 Expressive sizes. `s` is the default.
       <SafeAreaProvider>
         <ThemeProvider>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-            <IconButton icon="star" size="xs" accessibilityLabel="Star" onPress={() => {}} />
-            <IconButton icon="star" size="s" accessibilityLabel="Star" onPress={() => {}} />
-            <IconButton icon="star" size="m" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="extraSmall" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="small" accessibilityLabel="Star" onPress={() => {}} />
+            <IconButton icon="star" size="medium" accessibilityLabel="Star" onPress={() => {}} />
           </View>
         </ThemeProvider>
       </SafeAreaProvider>
@@ -86,7 +86,7 @@ Five MD3 Expressive sizes. `s` is the default.
 ## Width and shape
 
 `width` trades horizontal padding at a fixed height — `'narrow'`, `'uniform'`
-(default), or `'wide'`. At `size="s"` that is 32 / 40 / 52dp wide.
+(default), or `'wide'`. At `size="small"` that is 32 / 40 / 52dp wide.
 
 `shape` controls the resting container: `'round'` (default) rests as a
 circle/pill, `'square'` rests at a size-dependent corner. Toggle buttons invert

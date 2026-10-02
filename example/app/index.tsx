@@ -243,12 +243,12 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       return (
         <Column style={previewStyles.listMini} gap="xs">
           <ListItem
-            leadingContent={<Avatar size="xSmall" label="JD" />}
+            leadingContent={<Avatar size="extraSmall" label="JD" />}
             headlineText="Jane Doe"
             supportingText="Online"
           />
           <ListItem
-            leadingContent={<Avatar size="xSmall" label="AK" />}
+            leadingContent={<Avatar size="extraSmall" label="AK" />}
             headlineText="Alex Kim"
           />
         </Column>

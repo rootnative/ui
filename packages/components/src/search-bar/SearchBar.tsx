@@ -208,7 +208,7 @@ export function SearchBar({
     <View style={styles.slot}>
       <IconButton
         icon={leadingIcon}
-        size="s"
+        size="small"
         variant="standard"
         iconColor={leadingIconColor}
         accessibilityLabel={leadingIconAccessibilityLabel ?? ''}
@@ -233,7 +233,7 @@ export function SearchBar({
       <View key={`${action.accessibilityLabel}-${index}`} style={styles.slot}>
         <IconButton
           icon={action.icon}
-          size="s"
+          size="small"
           variant="standard"
           iconColor={trailingIconColor}
           accessibilityLabel={action.accessibilityLabel}
@@ -342,7 +342,7 @@ export function SearchBar({
             <View style={styles.slot}>
               <IconButton
                 icon="close"
-                size="s"
+                size="small"
                 variant="standard"
                 iconColor={trailingIconColor}
                 accessibilityLabel={clearButtonAccessibilityLabel}

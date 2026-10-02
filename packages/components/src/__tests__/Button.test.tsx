@@ -2,6 +2,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button/Button'
+import type { ButtonSize } from '../button/types'
 
 describe('Button', () => {
   it('renders the label text', () => {
@@ -129,19 +130,17 @@ describe('Button', () => {
 
   describe('size', () => {
     const heights: Record<string, number> = {
-      xs: 32,
-      s: 40,
-      m: 56,
-      l: 96,
-      xl: 136,
+      extraSmall: 32,
+      small: 40,
+      medium: 56,
+      large: 96,
+      extraLarge: 136,
     }
 
     it.each(Object.entries(heights))(
       'size %s sets container minHeight %d',
       (size, height) => {
-        renderWithTheme(
-          <Button size={size as 'xs' | 's' | 'm' | 'l' | 'xl'}>Sized</Button>,
-        )
+        renderWithTheme(<Button size={size as ButtonSize}>Sized</Button>)
         const flatStyle = StyleSheet.flatten(
           screen.getByRole('button').props.style,
         )
@@ -160,7 +159,7 @@ describe('Button', () => {
     it('derives icon size from the button size', () => {
       const renderFn = jest.fn(() => <Text testID="i">x</Text>)
       renderWithTheme(
-        <Button size="l" leadingIcon={renderFn}>
+        <Button size="large" leadingIcon={renderFn}>
           Big
         </Button>,
       )
@@ -172,7 +171,7 @@ describe('Button', () => {
     it('explicit iconSize overrides the size default', () => {
       const renderFn = jest.fn(() => <Text testID="i">x</Text>)
       renderWithTheme(
-        <Button size="l" iconSize={10} leadingIcon={renderFn}>
+        <Button size="large" iconSize={10} leadingIcon={renderFn}>
           Big
         </Button>,
       )
@@ -182,7 +181,7 @@ describe('Button', () => {
     })
 
     it('uses the size-specific label typography role', () => {
-      renderWithTheme(<Button size="xl">Huge</Button>)
+      renderWithTheme(<Button size="extraLarge">Huge</Button>)
       const flatStyle = StyleSheet.flatten(screen.getByText('Huge').props.style)
       // headlineLarge = 32sp
       expect(flatStyle.fontSize).toBe(32)
@@ -191,7 +190,7 @@ describe('Button', () => {
 
   describe('shape', () => {
     it('round (default) rests as a pill (radius = height / 2)', () => {
-      renderWithTheme(<Button size="s">Round</Button>)
+      renderWithTheme(<Button size="small">Round</Button>)
       const flatStyle = StyleSheet.flatten(
         screen.getByRole('button').props.style,
       )
@@ -200,7 +199,7 @@ describe('Button', () => {
 
     it('square rests at the size corner (s = 12dp)', () => {
       renderWithTheme(
-        <Button size="s" shape="square">
+        <Button size="small" shape="square">
           Square
         </Button>,
       )
@@ -212,7 +211,7 @@ describe('Button', () => {
 
     it('square medium rests at 16dp', () => {
       renderWithTheme(
-        <Button size="m" shape="square">
+        <Button size="medium" shape="square">
           Square
         </Button>,
       )
@@ -226,7 +225,7 @@ describe('Button', () => {
   describe('outline width by size', () => {
     it('outlined l uses a 2dp border, xl 3dp', () => {
       renderWithTheme(
-        <Button variant="outlined" size="l">
+        <Button variant="outlined" size="large">
           L
         </Button>,
       )

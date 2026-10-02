@@ -16,10 +16,24 @@ export type ButtonVariant =
 
 /**
  * MD3 Expressive button size. Drives container height, horizontal padding,
- * icon size, and label typography. `'s'` (40 dp) is the default and matches
- * the pre-Expressive button.
+ * icon size, and label typography. `'small'` (40 dp) is the default and
+ * matches the pre-Expressive button.
+ *
+ * `'xs' | 's' | 'm' | 'l' | 'xl'` are the old names. They map to the five
+ * names above, warn once in development, and are removed in the next
+ * release.
  */
-export type ButtonSize = 'xs' | 's' | 'm' | 'l' | 'xl'
+export type ButtonSize =
+  | 'extraSmall'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'extraLarge'
+  | 'xs'
+  | 's'
+  | 'm'
+  | 'l'
+  | 'xl'
 
 /**
  * MD3 Expressive container shape. `'round'` rests as a full pill; `'square'`
@@ -40,9 +54,11 @@ export interface ButtonProps extends Omit<
    */
   variant?: ButtonVariant
   /**
-   * MD3 Expressive size — one of `'xs' | 's' | 'm' | 'l' | 'xl'`. Sets
-   * container height, padding, icon size, and label typography.
-   * @default 's'
+   * MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' |
+   * 'large' | 'extraLarge'`. Sets container height, padding, icon size, and
+   * label typography. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still
+   * work for one release and warn in development.
+   * @default 'small'
    */
   size?: ButtonSize
   /**

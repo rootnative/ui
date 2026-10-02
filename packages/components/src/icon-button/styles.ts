@@ -1,9 +1,9 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ExpressiveSize } from '../internal/size'
 import type {
   IconButtonShape,
-  IconButtonSize,
   IconButtonVariant,
   IconButtonWidth,
 } from './types'
@@ -32,8 +32,8 @@ export interface IconButtonSizeTokens {
   selectedCorner: number
 }
 
-const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
-  xs: {
+const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
+  extraSmall: {
     height: 32,
     narrow: 28,
     uniform: 32,
@@ -44,7 +44,7 @@ const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
     pressedCorner: 8,
     selectedCorner: 12,
   },
-  s: {
+  small: {
     height: 40,
     narrow: 32,
     uniform: 40,
@@ -55,7 +55,7 @@ const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
     pressedCorner: 8,
     selectedCorner: 12,
   },
-  m: {
+  medium: {
     height: 56,
     narrow: 48,
     uniform: 56,
@@ -66,7 +66,7 @@ const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
     pressedCorner: 12,
     selectedCorner: 16,
   },
-  l: {
+  large: {
     height: 96,
     narrow: 64,
     uniform: 96,
@@ -77,7 +77,7 @@ const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
     pressedCorner: 16,
     selectedCorner: 28,
   },
-  xl: {
+  extraLarge: {
     height: 136,
     narrow: 104,
     uniform: 136,
@@ -91,13 +91,13 @@ const ICON_BUTTON_SIZE_TOKENS: Record<IconButtonSize, IconButtonSizeTokens> = {
 }
 
 export function getIconButtonSizeTokens(
-  size: IconButtonSize,
+  size: ExpressiveSize,
 ): IconButtonSizeTokens {
   return ICON_BUTTON_SIZE_TOKENS[size]
 }
 
 export function getIconButtonWidth(
-  size: IconButtonSize,
+  size: ExpressiveSize,
   width: IconButtonWidth,
 ): number {
   return ICON_BUTTON_SIZE_TOKENS[size][width]
@@ -111,7 +111,7 @@ export function getIconButtonWidth(
  * selected, when it inverts to a pill. Both morph toward `pressedCorner`.
  */
 export function getIconButtonMorphRadii(
-  size: IconButtonSize,
+  size: ExpressiveSize,
   shape: IconButtonShape,
   width: IconButtonWidth,
   selected: boolean,

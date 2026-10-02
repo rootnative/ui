@@ -13,7 +13,29 @@ Prior history: these packages were published as `@onlynative/*` through
 
 No breaking changes. The components that apply safe-area insets no longer
 throw on web without a `SafeAreaProvider`. `SearchBar` takes a `density`.
+Every component now uses one size vocabulary, and the old names warn.
 A new docs page covers web without Expo.
+
+### One size vocabulary
+
+`Button`, `IconButton` and `Avatar` now take the MD3 size names that
+`ButtonGroup`, `FAB`, `Badge` and `AppBar` already used: `'extraSmall' |
+'small' | 'medium' | 'large' | 'extraLarge'`. Before, a toolbar with a
+`Button size="xs"` next to a `ButtonGroup size="extraSmall"` needed two
+names for one size, and `Avatar` had a third pair, `'xSmall'` and
+`'xLarge'`.
+
+The old names still work in this release. `'xs' | 's' | 'm' | 'l' | 'xl'`
+on `Button` and `IconButton`, and `'xSmall' | 'xLarge'` on `Avatar`, map to
+the new names and log one development warning per component and name that
+states the new name. **The next release removes them.** The defaults are
+unchanged: `Button` and `IconButton` are `'small'`, `Avatar` is `'medium'`.
+
+```tsx
+<Button size="extraSmall">Save</Button>
+<IconButton icon="star" size="medium" accessibilityLabel="Star" />
+<Avatar size="extraLarge" label="AB" />
+```
 
 ### `SearchBar` density
 
