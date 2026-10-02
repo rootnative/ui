@@ -53,6 +53,17 @@ jest.mock('react-native-safe-area-context', () => {
   // outside a provider and the padding branch inside one — the same split as
   // the real package.
   const SafeAreaInsetsContext = React.createContext(null)
+  // The real `SafeAreaView.web` calls `useSafeAreaInsets()`, and that hook
+  // throws this error without a provider. The mock throws the same way, so a
+  // test that mounts an inset component on web with no provider fails for
+  // the same reason a browser does.
+  const NO_INSETS_ERROR =
+    'No safe area value available. Make sure you are rendering `<SafeAreaProvider>` at the top of your app.'
+  const useSafeAreaInsets = () => {
+    const insets = React.useContext(SafeAreaInsetsContext)
+    if (insets == null) throw new Error(NO_INSETS_ERROR)
+    return insets
+  }
   return {
     SafeAreaInsetsContext,
     SafeAreaProvider: ({ children, initialMetrics }) =>
@@ -61,9 +72,11 @@ jest.mock('react-native-safe-area-context', () => {
         { value: initialMetrics?.insets ?? ZERO },
         children,
       ),
-    SafeAreaView: ({ children, ...props }) =>
-      React.createElement(View, props, children),
-    useSafeAreaInsets: () => React.useContext(SafeAreaInsetsContext) ?? ZERO,
+    SafeAreaView: ({ children, ...props }) => {
+      useSafeAreaInsets()
+      return React.createElement(View, props, children)
+    },
+    useSafeAreaInsets,
     useSafeAreaFrame: () => ({ x: 0, y: 0, width: 320, height: 640 }),
   }
 })

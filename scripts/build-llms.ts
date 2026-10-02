@@ -1909,10 +1909,13 @@ export default function App() {
 
 That is the whole stack — three providers, and **no \`SafeAreaProvider\`**.
 \`react-native-safe-area-context\` is a required peer dep, but the components that
-apply insets (\`Layout\`, \`AppBar\`, \`NavigationBar\`, \`BottomSheet\`, \`Snackbar\`) use
-its native \`SafeAreaView\`, which reads no React context. Only its
-\`useSafeAreaInsets\` hook needs a provider, and nothing here calls it. Adding one
-is harmless if your own code uses that hook.
+apply insets (\`Layout\`, \`AppBar\`, \`NavigationBar\`, \`BottomSheet\`, \`Snackbar\`)
+work without one. Inside a provider they read the insets from its context. On
+native without a provider they use the package's native \`SafeAreaView\`, which
+measures its own insets. On web without a provider they apply zero insets,
+because a browser has no insets to measure there. Add a \`SafeAreaProvider\` on
+web when the page needs the \`env(safe-area-inset-*)\` values of a notched
+device, or when your own code calls \`useSafeAreaInsets\`.
 
 Why that order:
 

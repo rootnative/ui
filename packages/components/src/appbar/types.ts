@@ -104,7 +104,7 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    * When `true`, pads the bar by the top safe-area inset. Inside a
    * `SafeAreaProvider` the inset comes from context, so it is correct on the
    * first paint of a modal route. Without a provider the bar falls back to the
-   * native `SafeAreaView`.
+   * native `SafeAreaView`, and on web it applies no inset.
    * @default false
    */
   insetTop?: boolean

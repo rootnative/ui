@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react'
 import type { ComponentType, Ref } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import {
   SafeAreaInsetsContext,
@@ -73,6 +73,12 @@ function insetPaddingStyle(
 // until the next prop change — the bar sat under the status bar until a theme
 // switch re-rendered it. Without a provider the native view is still the only
 // source, so it stays as the fallback.
+//
+// On web the package has no native view. Its `SafeAreaView.web` calls
+// `useSafeAreaInsets()`, which throws without a provider, so the documented
+// provider-free root was a blank page on web. A browser has no insets to
+// measure outside a provider, so a plain `View` with zero insets is the
+// correct fallback there.
 function SafeAreaView({ edges, style, ...rest }: SafeAreaViewProps) {
   const insets = useContext(SafeAreaInsetsContext)
   const paddedStyle = useMemo(
@@ -84,6 +90,9 @@ function SafeAreaView({ edges, style, ...rest }: SafeAreaViewProps) {
   )
 
   if (!insets) {
+    if (Platform.OS === 'web') {
+      return <View {...rest} style={style} />
+    }
     return <NativeSafeAreaView edges={edges} style={style} {...rest} />
   }
 
