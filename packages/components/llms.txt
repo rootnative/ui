@@ -634,6 +634,7 @@ Props:
 - `leadingIconAccessibilityLabel?: string` — Accessibility label for the leading icon when it is a button.
 - `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
 - `onPress?: () => void` — Makes the bar a button, for a bar that opens a `SearchView`. The bar is then one tab stop with the `button` role, a press or Enter calls this, and the input is read-only and out of the tab order. It still shows `value` and the placeholder. The clear button and the trailing actions stay buttons of their own.
+- `density?: 0 | -1 | -2 | -3 | -4` — Default: `0`. Density of the bar, on the Material density scale. `0` is the MD3 bar at 56dp. Each step below removes 4dp: `-1` is 52dp, `-2` is 48dp, `-3` is 44dp, and `-4` is 40dp, the frame of the icon buttons, so it is the floor. Use a negative density in a desktop toolbar with small controls. Text and icon sizes do not change.
 - `showClearButton?: boolean` — Default: `true`. Shows a clear button while the bar holds text.
 - `clearButtonAccessibilityLabel?: string` — Default: `'Clear search'`. Accessibility label for the clear button.
 - `onClear?: () => void` — Called after the clear button empties the bar.

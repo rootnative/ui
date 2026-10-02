@@ -12,8 +12,20 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 No breaking changes. The components that apply safe-area insets no longer
-throw on web without a `SafeAreaProvider`. A new docs page covers web
-without Expo.
+throw on web without a `SafeAreaProvider`. `SearchBar` takes a `density`.
+A new docs page covers web without Expo.
+
+### `SearchBar` density
+
+`density` takes a step on the Material density scale, `0` to `-4`. Each
+step removes 4dp from the 56dp container, so `-4` is a 40dp bar for a
+desktop toolbar. The icon buttons keep their 40dp frame and the text keeps
+`bodyLarge`, so `-4` is the floor. `style={{ height }}` never did this: the
+`style` prop goes to the root view and the pill kept its own height.
+
+```tsx
+<SearchBar placeholder="Search" density={-4} />
+```
 
 ### Web without a `SafeAreaProvider`
 

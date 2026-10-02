@@ -71,6 +71,14 @@ export default function SearchBarScreen() {
       </Column>
 
       <Column gap="md">
+        <Typography variant="titleSmall">Dense</Typography>
+        <SearchBar placeholder="Search, 40dp" density={-4} />
+        <Typography variant="bodySmall" style={captionStyle}>
+          density -4 for a desktop toolbar. Each step removes 4dp.
+        </Typography>
+      </Column>
+
+      <Column gap="md">
         <Typography variant="titleSmall">Avatar</Typography>
         <SearchBar
           placeholder="Search contacts"

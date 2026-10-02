@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { Platform, StyleSheet } from 'react-native'
+import type { SearchBarDensity } from './types'
 
 // RN-Web only: the focus ring and the focus state layer are the focus signal,
 // so the browser's own rectangle inside the pill is noise. RN's types do not
@@ -9,6 +10,12 @@ const webOutlineReset =
   Platform.OS === 'web' ? { outlineStyle: 'none' as 'solid' } : null
 
 export const SEARCH_BAR_HEIGHT = 56
+export const SEARCH_BAR_DENSITY_STEP = 4
+
+/** The container height for a step on the Material density scale. */
+export function searchBarHeight(density: SearchBarDensity): number {
+  return SEARCH_BAR_HEIGHT + density * SEARCH_BAR_DENSITY_STEP
+}
 export const SEARCH_BAR_MAX_WIDTH = 720
 export const SEARCH_BAR_ICON_SIZE = 24
 export const SEARCH_BAR_FOCUS_RING_OFFSET = 2
@@ -17,7 +24,10 @@ export const SEARCH_BAR_FOCUS_RING_WIDTH = 3
 // frame of the same size, so the text starts at 56 dp in both cases.
 const SLOT_SIZE = 40
 
-export function createStyles(theme: MaterialTheme) {
+export function createStyles(
+  theme: MaterialTheme,
+  density: SearchBarDensity = 0,
+) {
   const bodyLarge = theme.typography.bodyLarge
   const disabledContent = alphaColor(
     theme.colors.onSurface,
@@ -49,7 +59,7 @@ export function createStyles(theme: MaterialTheme) {
       },
       pressableReset: { ...webOutlineReset },
       container: {
-        height: SEARCH_BAR_HEIGHT,
+        height: searchBarHeight(density),
         flexDirection: 'row',
         alignItems: 'center',
         borderRadius: theme.shape.cornerFull,

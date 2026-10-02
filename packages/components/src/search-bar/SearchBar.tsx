@@ -28,6 +28,7 @@ export function SearchBar({
   leadingIconAccessibilityLabel,
   onSearch,
   onPress,
+  density = 0,
   showClearButton = true,
   clearButtonAccessibilityLabel = 'Clear search',
   onClear,
@@ -51,7 +52,10 @@ export function SearchBar({
 }: SearchBarProps) {
   const theme = useTheme()
   const iconResolver = useIconResolver()
-  const { colors, styles } = useMemo(() => createStyles(theme), [theme])
+  const { colors, styles } = useMemo(
+    () => createStyles(theme, density),
+    [theme, density],
+  )
 
   const [internalValue, setInternalValue] = useState(
     () => value ?? textInputProps.defaultValue ?? '',

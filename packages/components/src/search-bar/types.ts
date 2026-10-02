@@ -8,6 +8,12 @@ import type {
   ViewStyle,
 } from 'react-native'
 
+/**
+ * A step on the Material density scale. Each step below 0 removes 4dp from
+ * the 56dp container height, so `-4` gives a 40dp bar.
+ */
+export type SearchBarDensity = 0 | -1 | -2 | -3 | -4
+
 /** An icon-button action in the SearchBar trailing slot. */
 export interface SearchBarAction {
   /**
@@ -55,6 +61,15 @@ interface SearchBarCommonProps extends Omit<
    * stay buttons of their own.
    */
   onPress?: () => void
+  /**
+   * Density of the bar, on the Material density scale. `0` is the MD3 bar at
+   * 56dp. Each step below removes 4dp: `-1` is 52dp, `-2` is 48dp, `-3` is
+   * 44dp, and `-4` is 40dp, the frame of the icon buttons, so it is the
+   * floor. Use a negative density in a desktop toolbar with small controls.
+   * Text and icon sizes do not change.
+   * @default 0
+   */
+  density?: SearchBarDensity
   /**
    * Shows a clear button while the bar holds text.
    * @default true

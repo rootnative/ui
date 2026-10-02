@@ -7,7 +7,11 @@ import { StyleSheet, Text, TextInput } from 'react-native'
 import type { ReactTestInstance } from 'react-test-renderer'
 import { __resetWarnOnceForTests } from '../internal/warnOnce'
 import { SearchBar } from '../search-bar/SearchBar'
-import { SEARCH_BAR_HEIGHT, SEARCH_BAR_MAX_WIDTH } from '../search-bar/styles'
+import {
+  SEARCH_BAR_HEIGHT,
+  SEARCH_BAR_MAX_WIDTH,
+  searchBarHeight,
+} from '../search-bar/styles'
 import { rootOf } from '../test-support/rendered-node'
 
 const disabledContent = alphaColor(
@@ -16,10 +20,13 @@ const disabledContent = alphaColor(
 )
 
 /** The animated pill that carries the container color and the state layer. */
-function containerOf(input: ReactTestInstance): ReactTestInstance {
+function containerOf(
+  input: ReactTestInstance,
+  height: number = SEARCH_BAR_HEIGHT,
+): ReactTestInstance {
   let node: ReactTestInstance | null = input.parent
   while (node) {
-    if (StyleSheet.flatten(node.props.style)?.height === SEARCH_BAR_HEIGHT) {
+    if (StyleSheet.flatten(node.props.style)?.height === height) {
       return node
     }
     node = node.parent
@@ -232,6 +239,44 @@ describe('SearchBar', () => {
         })
       },
     )
+  })
+
+  describe('density', () => {
+    it('is a 56dp bar by default', () => {
+      renderWithTheme(<SearchBar placeholder="Search" />)
+      const container = containerOf(screen.getByRole('searchbox'))
+      expect(styleOf(container).height).toBe(56)
+    })
+
+    it.each([
+      [-1, 52],
+      [-2, 48],
+      [-3, 44],
+      [-4, 40],
+    ] as const)('density %i is a %idp bar', (density, height) => {
+      expect(searchBarHeight(density)).toBe(height)
+      renderWithTheme(<SearchBar placeholder="Search" density={density} />)
+      const container = containerOf(screen.getByRole('searchbox'), height)
+      expect(styleOf(container).height).toBe(height)
+    })
+
+    it('keeps the 40dp icon frames and the bodyLarge input at -4', () => {
+      renderWithTheme(
+        <SearchBar
+          placeholder="Search"
+          density={-4}
+          actions={[{ icon: 'microphone', accessibilityLabel: 'Voice' }]}
+        />,
+      )
+      const input = screen.getByRole('searchbox')
+      expect(styleOf(input).fontSize).toBe(
+        lightTheme.typography.bodyLarge.fontSize,
+      )
+      const button = screen.getByLabelText('Voice')
+      let frame: ReactTestInstance | null = button.parent
+      while (frame && styleOf(frame)?.width !== 40) frame = frame.parent
+      expect(frame && styleOf(frame)).toMatchObject({ width: 40, height: 40 })
+    })
   })
 
   describe('trailing slot', () => {

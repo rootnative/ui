@@ -132,6 +132,33 @@ The two props fill the same slot, so the type rejects both together.
 `}
 />
 
+## Density
+
+The MD3 bar is 56dp high. In a desktop toolbar next to 32dp or 40dp controls,
+pass a negative `density`. Each step on the Material density scale removes 4dp,
+so `-4` gives a 40dp bar. The icon buttons keep their 40dp frame and the text
+keeps `bodyLarge`, so `-4` is the floor.
+
+<RunnableExample
+  height={120}
+  code={`
+import { SearchBar } from '@rootnative/components/search-bar'
+import { Column } from '@rootnative/components/column'
+
+export default function Example() {
+  return (
+    <Column gap="md">
+      <SearchBar placeholder="Default, 56dp" />
+      <SearchBar placeholder="Dense, 40dp" density={-4} />
+    </Column>
+  )
+}
+`}
+/>
+
+`style={{ height }}` does not do this. The `style` prop goes to the root view,
+and the pill inside keeps its own height.
+
 ## Disabled
 
 <SnackExample
@@ -162,7 +189,7 @@ A disabled bar keeps its container color. Its text, placeholder, and icons chang
 
 | Part | MD3 token | Value |
 |------|-----------|-------|
-| Container | height, shape | 56dp, full corner |
+| Container | height, shape | 56dp, full corner. `density` removes 4dp per step, to 40dp at `-4` |
 | Container | color | `surfaceContainerHigh` |
 | Container | elevation | level 0 |
 | Container | maximum width | 720dp — change it with `style={{ maxWidth }}` |
