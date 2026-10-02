@@ -48,7 +48,8 @@ const config: Config = {
   },
 
   title: 'RootNative UI',
-  tagline: 'Design-system agnostic components for React Native',
+  tagline:
+    'Design-system agnostic components for React Native on iOS, Android, and web',
   url: 'https://rootnative.github.io',
   baseUrl,
   onBrokenLinks: 'throw',

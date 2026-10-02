@@ -8,8 +8,25 @@ description: Install RootNative UI into an existing app — peer dependencies, p
 ## Prerequisites
 
 - Expo SDK 57 (if using Expo)
-- React Native 0.86.x
-- React 19.2.3
+- React Native `>=0.83.0 <0.87.0` (developed and tested against 0.86.3)
+- React `>=19.2.3 <20.0.0`
+
+## Platforms
+
+| Platform | Status |
+| --- | --- |
+| iOS | Supported |
+| Android | Supported |
+| Web | Supported through `react-native-web` 0.21 |
+| Electron, macOS, Windows, other hosts | Not tested |
+
+For web, install `react-dom` and `react-native-web` too:
+`npx expo install react-dom react-native-web`. Some behavior is different on
+web — for example, `hitSlop` has no effect, and dialogs, menus and sheets
+contain keyboard focus. See [Accessibility](./accessibility.md) for the full
+list.
+
+## Supported runtime
 
 The library targets **one SDK band, not a floor.** Expo SDK 57 is the whole
 supported range today, so `SDK 57+` is not correct: the peer ranges stop below

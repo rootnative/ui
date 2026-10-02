@@ -2778,6 +2778,7 @@ function generateFullLlms(): string {
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
+> Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
 > Optional peer deps: \`@expo/vector-icons ${COMPONENTS_VECTOR_ICONS}\` (only needed for icon props)
 

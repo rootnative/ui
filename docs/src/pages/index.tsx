@@ -164,8 +164,8 @@ function Hero() {
           </h1>
           <p className={styles.heroTagline}>
             A design-system agnostic component library. Ships with Material
-            Design 3, works with Expo and bare React Native, and stays out of
-            your way when you want to customize.
+            Design 3, runs on iOS, Android, and web, works with Expo and bare
+            React Native, and stays out of your way when you want to customize.
           </p>
           <div className={styles.heroCtas}>
             <Link className={styles.ctaPrimary} to="/introduction">
