@@ -9,7 +9,7 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.22 — 2026-10-03
 
 **One breaking change: a string icon name now needs an `iconResolver` on
 `ThemeProvider`.** Pass `mdiResolver` from `@rootnative/components/mdi` to
@@ -18,7 +18,9 @@ keep the Material Design Icons, now from
 `NavigationDrawer` and `Icon`. The components that apply safe-area insets no
 longer throw on web without a `SafeAreaProvider`. `SearchBar` takes a
 `density`. Every component now uses one size vocabulary, and the old names
-warn. A new docs page covers web without Expo.
+warn. The `@rootnative/inertia` floor moves to `0.0.17`, so a dialog or a
+sheet that holds a progress indicator or a skeleton plays its exit. A new
+docs page covers web without Expo.
 
 ### The MDI default moved behind `@rootnative/components/mdi`, on `@react-native-vector-icons`
 
@@ -184,6 +186,23 @@ insets on web when the context is `null`. Native keeps the package view.
 The web Jest mock of the package now throws without a provider, as the real
 module does, so a test cannot pass by mounting an inset component outside a
 provider.
+
+### `@rootnative/inertia` floor moves to `0.0.17`
+
+A closed `Dialog` disappeared at once, with no exit animation, when it held a
+`LinearProgress`, a `CircularProgress` or a `Skeleton`. The same was true of
+the other overlays that take content and animate out through `<Presence>`:
+`BottomSheet`, `Menu`, `NavigationDrawer`, `SearchView` and `Tooltip`. The
+three content components each render a `Motion.*` with no `exit`. Before
+inertia `0.0.17`, the first `Motion.*` in an exiting child that finished its
+exit removed the whole child. inertia `0.0.17` removes the child only when
+every `Motion.*` in it has finished its exit.
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges
+are now `>=0.0.17 <0.1.0`, the dev, example and template pins are `0.0.17`
+exact, and the registry's derived floor follows. Upgrade
+`@rootnative/inertia` to `0.0.17` in the app with this release. A `Dialog`
+test now holds each of the three components and fails on an older inertia.
 
 ### Docs
 
