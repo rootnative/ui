@@ -54,9 +54,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
     case 'Typography':
       return (
         <Column align="center" gap="xs">
-          <Typography variant="displaySmall" accessibilityRole="none">
-            Aa
-          </Typography>
+          <Typography variant="displaySmall">Aa</Typography>
           <Typography variant="labelSmall" style={previewMutedText(theme)}>
             Type scale
           </Typography>

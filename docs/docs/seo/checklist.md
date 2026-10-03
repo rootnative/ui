@@ -153,23 +153,30 @@ origin in it.
 
 ## 5. Headings and `alt`
 
-A `Text` renders a `<div>`. `Heading` renders `<h1>` to `<h6>` on the web and
-announces a header on native. Pass your own text component through `as` to
-keep the type scale.
+A `Text` renders a `<div>`. In a RootNative UI app, pass `level` to
+`Typography`: it renders `<h1>` to `<h6>` on the web and announces a header
+on native. A display or headline variant with no `level` is a plain element
+on the web, so decorative display text needs nothing.
 
 ```tsx
-import { Typography, type TypographyProps } from '@rootnative/components'
-import { Heading } from '@rootnative/seo/react'
+import { Typography } from '@rootnative/components'
 
-<Heading<TypographyProps> level={2} as={Typography} variant="titleMedium">
-  Cast
-</Heading>
+<Typography variant="titleMedium" level={2}>Cast</Typography>
 ```
 
-One `<h1>` per page. In a RootNative UI app the `AppBar` title carries the
-header role, so put your own headings at level 2 and below. A decorative
-glyph in a `display*` or `headline*` variant passes
-`accessibilityRole="none"`, or it renders as a heading too.
+`Heading` from `@rootnative/seo/react` does the same for an app without
+`@rootnative/components`. Pass your own text component through `as` to keep
+its type scale.
+
+```tsx
+import { Heading } from '@rootnative/seo/react'
+
+<Heading level={2}>Cast</Heading>
+```
+
+One `<h1>` per page. The `AppBar` title is level 1 by default, so put your
+own headings at level 2 and below, or pass `titleLevel={2}` to the bar when a
+heading above it is the page heading.
 
 For images, set both `alt` and `accessibilityLabel` on `expo-image`. The web
 `alt` attribute comes from `accessibilityLabel`. The React Native `Image`

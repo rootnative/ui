@@ -3,7 +3,7 @@ import type { MaterialTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import type { StyleProp, TextProps, TextStyle } from 'react-native'
-import { StyleSheet, Text } from 'react-native'
+import { Platform, StyleSheet, Text } from 'react-native'
 import { createStyles } from './styles'
 import type { TypographyVariant } from './types'
 
@@ -33,6 +33,14 @@ export interface TypographyProps extends Omit<TextProps, 'children' | 'style'> {
    * @default Text
    */
   as?: ComponentType<TextProps>
+  /**
+   * The outline level of a heading. Sets the header role and `aria-level`, so
+   * the web renders `<h1>` to `<h6>` and a crawler reads the outline. Without
+   * it, a display or headline variant announces a header on native only: on
+   * the web a level-less header is always `<h1>`, and a page with five display
+   * texts had five `<h1>`.
+   */
+  level?: 1 | 2 | 3 | 4 | 5 | 6
 }
 
 export function Typography({
@@ -42,13 +50,22 @@ export function Typography({
   style,
   as: Component = Text,
   accessibilityRole,
+  level,
   ...textProps
 }: TypographyProps) {
   const theme = useTheme() as MaterialTheme
   const typographyStyle = theme.typography[variant]
   const styles = useMemo(() => createStyles(theme), [theme])
+  // RN's `TextProps` has no `aria-level`, but react-native-web reads it, and a
+  // wrapper such as `Heading` from `@rootnative/seo` passes it with the header
+  // role. Keep it, or the spread below would reset it to `undefined` and the
+  // web would fall back to `<h1>`.
+  const ariaLevelProp = (textProps as { 'aria-level'?: number })['aria-level']
+  const impliedHeader =
+    level !== undefined ||
+    (HEADING_VARIANTS.has(variant) && Platform.OS !== 'web')
   const resolvedRole =
-    accessibilityRole ?? (HEADING_VARIANTS.has(variant) ? 'header' : undefined)
+    accessibilityRole ?? (impliedHeader ? 'header' : undefined)
 
   // When the consumer overrides fontSize via style, auto-adjust lineHeight
   // proportionally so text isn't clipped inside overflow:hidden containers.
@@ -71,6 +88,7 @@ export function Typography({
     <Component
       {...textProps}
       accessibilityRole={resolvedRole}
+      aria-level={level ?? ariaLevelProp}
       style={[
         styles.base,
         typographyStyle,

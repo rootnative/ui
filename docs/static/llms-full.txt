@@ -780,6 +780,7 @@ Props:
 - `color?: string` — Override the text color. Takes priority over `style.color`. Defaults to the theme's `onSurface` color.
 - `style?: StyleProp<TextStyle>` — Additional text styles. Can override the default theme color via `style.color` when no `color` prop is set.
 - `as?: ComponentType<TextProps>` — Default: `Text`. Override the underlying text component (e.g. Animated.Text).
+- `level?: 1 | 2 | 3 | 4 | 5 | 6` — The outline level of a heading. Sets the header role and `aria-level`, so the web renders `<h1>` to `<h6>` and a crawler reads the outline. Without it, a display or headline variant announces a header on native only: on the web a level-less header is always `<h1>`, and a page with five display texts had five `<h1>`.
 - Inherits `TextProps` (except `children`, `style`)
 
 ---
@@ -991,6 +992,7 @@ Props:
 - `containerColor?: string` — Override the container (background) color. Applied to both normal and elevated states.
 - `contentColor?: string` — Override the content (title and icon) color.
 - `titleStyle?: StyleProp<TextStyle>` — Additional style applied to the title text.
+- `titleLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `1`. The outline level of the title. The bar title is the page heading, so the web renders it as `<h1>`. Pass `2` when a heading above the bar is the page heading.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container.
 - `actions?: AppBarAction[]` — Array of actions rendered in the trailing slot. Each entry is either an icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save"). Mutually exclusive with `trailing`.
 - `trailing?: ReactNode` — Custom trailing content. Use instead of `actions` when the slot needs something `actions` cannot build, such as a `Menu` anchor or a `Tooltip`. Mutually exclusive with `actions` — the type rejects both together.
@@ -2614,7 +2616,7 @@ pnpm add @rootnative/seo
 2. **Links as `Link`.** `Link` from expo-router renders `<a href>`. A `Pressable` with `router.push` renders a `<div>`, and a crawler does not follow it.
 3. **The head on every page.** `defineSite` once, `SeoProvider` at the root, `PageHead` on each screen. A page with no `url` gets no canonical link and no share card, which is correct for a `noindex` overlay.
 4. **Robots and sitemap.** `writeSitemap`, `writeRobots` and `writeManifest` from `@rootnative/seo/node`, in the deploy step after the export. Build the URL list from the exported HTML files. `robots.txt` is read at the origin root only.
-5. **Headings and `alt`.** `Heading` renders `<h1>`..`<h6>`; pass `Typography` through `as`. One `<h1>` per page: the `AppBar` title already carries the header role, so put app headings at level 2 and below. On `expo-image` set both `alt` and `accessibilityLabel`; `imageLabel` builds the text.
+5. **Headings and `alt`.** `Typography` takes `level` (1..6) and renders `<h1>`..`<h6>`; a display or headline variant with no `level` is a plain element on the web. `Heading` from `/react` does the same for an app without `@rootnative/components`. One `<h1>` per page: the `AppBar` title is level 1 by default (`titleLevel` changes it), so put app headings at level 2 and below. On `expo-image` set both `alt` and `accessibilityLabel`; `imageLabel` builds the text.
 6. **JSON-LD.** The builders in `@rootnative/seo/schema`; pass the result in `jsonLd`. An empty field is never written.
 7. **Bundle and preconnect.** `shellTags` in `app/+html.tsx` with a `preconnect` per origin the first paint needs.
 8. **The small tags.** Theme colour, icons and the manifest, through `shellTags` and `writeManifest`.

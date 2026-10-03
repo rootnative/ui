@@ -58,10 +58,13 @@ const titleVariantBySize: Record<AppBarSize, TypographyVariant> = {
   medium: 'headlineSmall',
   large: 'headlineMedium',
 }
+// The header role and the level are set at each use: `Typography` takes
+// `level`, and the collapsing `Animated.Text` takes the two props by hand.
+// A level-less header renders as `<h1>` on the web, so the level is not
+// optional there.
 const APP_BAR_TITLE_TEXT_PROPS = {
   numberOfLines: 1,
   ellipsizeMode: 'tail',
-  accessibilityRole: 'header',
 } as const
 
 function resolveSize(variant: AppBarProps['variant']): AppBarSize {
@@ -118,6 +121,7 @@ export function AppBar({
   containerColor,
   contentColor,
   titleStyle,
+  titleLevel = 1,
   scrollOffset,
   style,
   ...rest
@@ -438,6 +442,8 @@ export function AppBar({
         >
           <Animated.Text
             {...APP_BAR_TITLE_TEXT_PROPS}
+            accessibilityRole="header"
+            aria-level={titleLevel}
             style={[
               expandedTitleType,
               styles.title,
@@ -465,6 +471,7 @@ export function AppBar({
         >
           <Typography
             {...APP_BAR_TITLE_TEXT_PROPS}
+            level={titleLevel}
             variant={titleVariant}
             style={[
               styles.title,
@@ -492,6 +499,7 @@ export function AppBar({
       <View style={[styles.overlayTitleContainer, overlayTitleInsetStyle]}>
         <Typography
           {...APP_BAR_TITLE_TEXT_PROPS}
+          level={titleLevel}
           variant={titleVariant}
           style={[
             styles.title,

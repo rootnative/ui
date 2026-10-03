@@ -160,6 +160,13 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   contentColor?: string
   /** Additional style applied to the title text. */
   titleStyle?: StyleProp<TextStyle>
+  /**
+   * The outline level of the title. The bar title is the page heading, so the
+   * web renders it as `<h1>`. Pass `2` when a heading above the bar is the
+   * page heading.
+   * @default 1
+   */
+  titleLevel?: 1 | 2 | 3 | 4 | 5 | 6
   /** Custom style applied to the root container. */
   style?: StyleProp<ViewStyle>
 }

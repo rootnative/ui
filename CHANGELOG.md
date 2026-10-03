@@ -11,6 +11,28 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `Typography` takes a `level`, and the `AppBar` title is a real `<h1>`
+
+The static export of the example app showed every `display*` and `headline*`
+`Typography` as an `<h1>` on the web, and the `AppBar` title as one more. The
+library gave them the header role with no level, and react-native-web writes
+a level-less header as `<h1>`. A page with a hero, a title bar and a display
+glyph had three `<h1>`, and a crawler read no outline.
+
+`Typography` now takes `level` (1 to 6). It sets the header role and
+`aria-level`, so the web renders `<h1>` to `<h6>`. **A display or headline
+variant with no `level` announces a header on native only.** On the web it
+renders a plain element, because a level-less header there is always `<h1>`.
+An explicit `accessibilityRole` still wins. Pass `level` on every heading
+your page has, and nothing on decorative display text.
+
+`AppBar` takes `titleLevel`, default `1`, and renders the title with it. Pass
+`2` when a heading above the bar is the page heading. On native nothing
+changes: the title still announces a header.
+
+`Heading` from `@rootnative/seo/react` keeps working with `as={Typography}`;
+it passes the same role and level.
+
 ### New package: `@rootnative/seo`
 
 A React Native app that exports to the web starts as one empty page, and

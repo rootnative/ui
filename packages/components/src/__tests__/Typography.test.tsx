@@ -26,6 +26,25 @@ describe('Typography', () => {
     expect(screen.queryByRole('header')).toBeNull()
   })
 
+  it('level sets the header role and aria-level on any variant', () => {
+    renderWithTheme(
+      <Typography variant="titleMedium" level={2}>
+        Cast
+      </Typography>,
+    )
+    const header = screen.getByRole('header')
+    expect(header.props['aria-level']).toBe(2)
+  })
+
+  it('an explicit accessibilityRole still wins over level', () => {
+    renderWithTheme(
+      <Typography variant="headlineSmall" level={2} accessibilityRole="none">
+        Aa
+      </Typography>,
+    )
+    expect(screen.queryByRole('header')).toBeNull()
+  })
+
   describe('overrides', () => {
     it('applies the color prop to the text', () => {
       renderWithTheme(<Typography color="#FF0000">Red text</Typography>)
