@@ -9,6 +9,31 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+### `mdiResolver` no longer breaks hydration on a static export
+
+A static web export with `iconResolver={mdiResolver}` logged React error #418
+on every load. React then discarded the static HTML and rendered the whole
+page again on the client. `@react-native-vector-icons/common` 13 draws the
+glyph on the export server, where it loads no fonts. On the client, its first
+render is an empty string until `expo-font` loads the font, so the text did
+not match.
+
+While the page hydrates, `mdiResolver` now renders the icon with no name.
+The icon set draws an empty string on both sides, and it starts the font load
+during hydration. The next render passes the name, and the glyph shows when
+the font loads. In a static export the icons are empty in the HTML. Native
+and a single-page web build do not change. A web test in
+`hydration.web.test.tsx` models the font state of the icon set and fails on
+the old resolver.
+
+If you copied the four-line resolver from the CLI page into a static export,
+render the icon without a name while the page hydrates, as `mdiResolver`
+does. An icon that the app renders directly from the icon package has the
+same mismatch. Render it through `Icon` from `@rootnative/components/icon`,
+which uses the theme's resolver.
+
 ## 0.0.0-alpha.22 — 2026-10-03
 
 **One breaking change: a string icon name now needs an `iconResolver` on

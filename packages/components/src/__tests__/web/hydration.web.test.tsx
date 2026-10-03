@@ -34,7 +34,54 @@ import {
 } from '@rootnative/core'
 import { act } from 'react'
 import { Text, View } from 'react-native'
+import { Icon } from '../../icon'
 import { Grid } from '../../layout/Grid'
+import { mdiResolver } from '../../mdi'
+
+/**
+ * Whether the icon font counts as loaded when an icon mounts. The export
+ * server does no dynamic font loading, so it counts as loaded there; the
+ * client starts without it.
+ */
+const mockFont = { loaded: true }
+
+/**
+ * Replaces the setup-file mock for this file only. It keeps the font state
+ * logic of `createIconSet` in `@react-native-vector-icons/common` 13.0.3
+ * (`lib/module/create-icon-set.js`): the glyph is `''` until the font loads,
+ * and a missing name is `''` too. The real package cannot show the mismatch
+ * under jsdom, because it has no Expo modules there and never loads a font.
+ */
+jest.mock('@react-native-vector-icons/material-design-icons', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react')
+  const { Text: RNText } = require('react-native')
+  /* eslint-enable @typescript-eslint/no-require-imports */
+  function MaterialDesignIcons({
+    name,
+    size,
+    color,
+  }: {
+    name?: string
+    size?: number
+    color?: string
+  }) {
+    const [isFontLoaded, setIsFontLoaded] = React.useState(mockFont.loaded)
+    React.useEffect(() => {
+      if (!isFontLoaded) {
+        Promise.resolve().then(() => setIsFontLoaded(true))
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+    const glyph = isFontLoaded && name ? `glyph:${name}` : ''
+    return React.createElement(
+      RNText,
+      { testID: 'mdi', style: { fontSize: size, color } },
+      glyph,
+    )
+  }
+  return { __esModule: true, MaterialDesignIcons }
+})
 
 interface NodeChannel {
   port1: { close(): void }
@@ -260,4 +307,42 @@ it("ThemeProvider hydrates mode='system' in a dark browser against light markup"
   // markup, React keeps the light style, and the page stays light.
   expect(errors).toHaveLength(0)
   expect(pageColor(host)).toBe(cssColor(darkTheme.colors.background))
+})
+
+afterEach(() => {
+  mockFont.loaded = true
+})
+
+it('mdiResolver hydrates an icon whose font is not loaded on the client', async () => {
+  const { renderToString, hydrateRoot } = loadReactDom()
+  const glyph = (host: HTMLElement) =>
+    host.querySelector('[data-testid="mdi"]')?.textContent
+  const ui = (
+    <ThemeProvider iconResolver={mdiResolver}>
+      <Icon source="star" />
+    </ThemeProvider>
+  )
+
+  mockFont.loaded = true
+  const host = document.createElement('div')
+  host.innerHTML = renderToString(ui)
+  document.body.appendChild(host)
+  expect(glyph(host)).toBe('')
+
+  mockFont.loaded = false
+
+  const errors: unknown[] = []
+  await act(async () => {
+    hydrateRoot(host, ui, {
+      onRecoverableError: (e: unknown) => errors.push(e),
+    })
+  })
+  // The font load resolves after the render that follows hydration.
+  await act(async () => {})
+
+  // With the name passed on the server the HTML holds the glyph, the client
+  // renders '' until the font loads, and React renders the tree again
+  // (error #418).
+  expect(errors).toHaveLength(0)
+  expect(glyph(host)).toBe('glyph:star')
 })

@@ -99,6 +99,12 @@ const mdiResolver: IconResolver = (name, { size, color }) => (
 Install `@react-native-vector-icons/material-design-icons`, and `expo-font` on
 Expo, next to it. See the [Icons guide](./icons) for other icon sets.
 
+In a static web export (`web.output: 'static'`), this resolver causes a
+hydration mismatch. The icon set draws the glyph on the server, but on the
+client it draws nothing until the font loads. Render the icon with no name
+while the page hydrates, as `mdiResolver` from `@rootnative/components/mdi`
+does.
+
 ## Commands
 
 ### `create`
