@@ -17,7 +17,7 @@
   "utils": ["elevation", "render-icon"],
   "componentDependencies": ["button", "icon-button", "portal"],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.21",
+    "@rootnative/core": ">=0.0.0-alpha.22",
     "react-native-safe-area-context": ">=4.0.0",
     "@rootnative/inertia": ">=0.0.17",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
