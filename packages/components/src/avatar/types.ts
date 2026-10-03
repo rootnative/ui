@@ -23,7 +23,7 @@ export interface AvatarProps extends Omit<ViewProps, 'style'> {
   imageUri?: string
   /**
    * Icon to display. Accepts a string name (resolved via the theme's
-   * `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered
+   * `iconResolver`, for example `mdiResolver`), a pre-rendered
    * element, or a render function that receives `{ size, color }`.
    * Takes priority over `label` when `imageUri` is not set.
    */

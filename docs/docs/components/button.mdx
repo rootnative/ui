@@ -14,6 +14,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
   name="RootNative Button — Usage"
   code={`
   import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -21,7 +22,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
             <Button variant="filled" onPress={() => console.log('pressed')}>
               Save
@@ -48,6 +49,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
   name="RootNative Button — Variants"
   code={`
   import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -55,7 +57,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 12 }}>
             <Button variant="filled" onPress={() => {}}>Filled</Button>
             <Button variant="elevated" onPress={() => {}}>Elevated</Button>
@@ -72,12 +74,13 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 
 ## With Icons
 
-`leadingIcon` and `trailingIcon` accept three forms — a string name (resolved via [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) by default), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
+`leadingIcon` and `trailingIcon` accept three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
 
 <SnackExample
   name="RootNative Button — Icons"
   code={`
   import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -85,7 +88,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 12 }}>
             <Button leadingIcon="plus" onPress={() => {}}>Add Item</Button>
             <Button trailingIcon="arrow-right" onPress={() => {}}>Continue</Button>
@@ -138,6 +141,7 @@ to depart from the resolved values:
   name="RootNative Button — Disabled"
   code={`
   import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -145,7 +149,7 @@ to depart from the resolved values:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
             <Button disabled onPress={() => {}}>Disabled</Button>
           </View>

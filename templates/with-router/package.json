@@ -10,7 +10,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/vector-icons": "^15.0.3",
+    "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@rootnative/components": "latest",
     "@rootnative/core": "latest",
     "@rootnative/inertia": "0.0.14",

@@ -8,7 +8,7 @@ description: Icon buttons take supplementary actions with a single tap. Follows 
 Icon buttons help people take supplementary actions with a single tap.
 Follows the [Material Design 3 Icon Button](https://m3.material.io/components/icon-buttons/overview) specification.
 
-The `icon` and `selectedIcon` props accept three forms — a string name (resolved via [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) by default), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
+The `icon` and `selectedIcon` props accept three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
 
 ## Usage
 
@@ -16,6 +16,7 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
   name="RootNative IconButton — Usage"
   code={`
   import { IconButton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -23,7 +24,7 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <IconButton
               icon="heart-outline"
@@ -63,6 +64,7 @@ Five MD3 Expressive sizes. `s` is the default.
   name="RootNative IconButton — Sizes"
   code={`
   import { IconButton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -70,7 +72,7 @@ Five MD3 Expressive sizes. `s` is the default.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <IconButton icon="star" size="extraSmall" accessibilityLabel="Star" onPress={() => {}} />
             <IconButton icon="star" size="small" accessibilityLabel="Star" onPress={() => {}} />
@@ -119,6 +121,7 @@ Use `selected` and `selectedIcon` for toggle behavior:
   name="RootNative IconButton — Toggle"
   code={`
   import { IconButton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -128,7 +131,7 @@ Use `selected` and `selectedIcon` for toggle behavior:
     const [liked, setLiked] = useState(false)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <IconButton
               icon="heart-outline"

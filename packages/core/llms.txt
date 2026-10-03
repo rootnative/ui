@@ -79,7 +79,7 @@ Props:
 - `defaultMode?: 'system' | 'light' | 'dark'` — Initial mode when uncontrolled. Default: `'system'`
 - `onModeChange?: (mode: ThemeMode) => void`
 - `storage?: { getItem, setItem }` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
-- `iconResolver?: IconResolver`
+- `iconResolver?: IconResolver` — Renders string icon names. Pass `mdiResolver` from `@rootnative/components/mdi` for MaterialDesignIcons, or your own. Without it a string name renders nothing and logs one warning
 - `children: ReactNode`
 
 ### useThemeMode()

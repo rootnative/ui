@@ -1,4 +1,5 @@
 import { AppBar, IconButton, Layout, PortalHost } from '@rootnative/components'
+import { mdiResolver } from '@rootnative/components/mdi'
 import {
   ThemeProvider,
   darkTheme,
@@ -191,7 +192,10 @@ const styles = StyleSheet.create({
 
 export default function RootLayout() {
   return (
-    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+    <ThemeProvider
+      theme={{ light: lightTheme, dark: darkTheme }}
+      iconResolver={mdiResolver}
+    >
       <RootLayoutContent />
     </ThemeProvider>
   )

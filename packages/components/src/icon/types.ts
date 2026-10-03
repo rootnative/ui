@@ -4,7 +4,7 @@ import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 export interface IconProps extends Omit<ViewProps, 'children'> {
   /**
    * The icon. A string name is resolved through the theme's `iconResolver`
-   * (MaterialCommunityIcons by default); a pre-rendered element renders as
+   * (`mdiResolver` for MaterialDesignIcons); a pre-rendered element renders as
    * is; a render function receives `{ size, color }`.
    */
   source: IconSource

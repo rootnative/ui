@@ -14,6 +14,7 @@ Zero-config wrapper that keeps form content visible when the keyboard opens. Use
   platform="ios"
   code={`
   import { KeyboardAvoidingWrapper, TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -23,7 +24,7 @@ Zero-config wrapper that keeps form content visible when the keyboard opens. Use
     const [email, setEmail] = useState('')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <KeyboardAvoidingWrapper>
             <TextField label="Name" value={name} onChangeText={setName} />
             <TextField label="Email" value={email} onChangeText={setEmail} />
@@ -53,6 +54,7 @@ Listen to keyboard show/hide events:
   platform="ios"
   code={`
   import { KeyboardAvoidingWrapper, TextField, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -61,7 +63,7 @@ Listen to keyboard show/hide events:
     const [status, setStatus] = useState('idle')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <KeyboardAvoidingWrapper
             onKeyboardShow={(e) => setStatus(\`shown @ \${e.endCoordinates.height}\`)}
             onKeyboardHide={() => setStatus('hidden')}

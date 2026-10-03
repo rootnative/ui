@@ -16,6 +16,7 @@ the color stay consistent with the library.
   name="RootNative Icon — Usage"
   code={`
   import { Icon, Row, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider, useTheme } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -34,7 +35,7 @@ the color stay consistent with the library.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Screen />
         </ThemeProvider>
       </SafeAreaProvider>
@@ -48,9 +49,9 @@ square at `size`, so it lines up in a row next to text.
 
 ## Icon sets
 
-A string name resolves through the theme's `iconResolver` — MaterialCommunityIcons unless you
-installed another set with `@rootnative/icons`. See [Icons](../icons.md) for Lucide, Phosphor
-and `@expo/vector-icons` resolvers. An element or a render function bypasses the resolver:
+A string name resolves through the theme's `iconResolver` — `mdiResolver` from
+`@rootnative/components/mdi` for MaterialDesignIcons, or a resolver from `@rootnative/icons`.
+See [Icons](../icons.md) for Lucide, Phosphor and `@react-native-vector-icons/*` resolvers. An element or a render function bypasses the resolver:
 
 ```tsx
 <Icon source={<MySvg width={24} height={24} />} />

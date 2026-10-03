@@ -22,6 +22,7 @@ press, or the Android back button.
   name="RootNative Menu — Usage"
   code={`
   import { IconButton, Menu, PortalHost } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -47,7 +48,7 @@ press, or the Android back button.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
@@ -72,6 +73,7 @@ and Android back.
   name="RootNative Menu — Controlled"
   code={`
   import { Button, Divider, Menu, PortalHost } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -112,7 +114,7 @@ and Android back.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

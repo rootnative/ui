@@ -52,8 +52,8 @@ interface AppBarActionBase {
 export interface AppBarIconAction extends AppBarActionBase {
   /**
    * Icon to render. Accepts the same forms as `IconButton.icon` — a string
-   * name (resolved via the theme's `iconResolver`, defaulting to
-   * `MaterialCommunityIcons`), a pre-rendered element, or a render function.
+   * name (resolved via the theme's `iconResolver`, for example
+   * `mdiResolver`), a pre-rendered element, or a render function.
    */
   icon: IconButtonProps['icon']
   label?: never

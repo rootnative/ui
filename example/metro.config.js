@@ -33,7 +33,7 @@ config.resolver.disableHierarchicalLookup = true
 //     to process files that use Reanimated worklet hooks.
 //  2. The published dists (built by tsup) use the esbuild `__require` shim for
 //     dynamic CJS lookups, which Metro can't statically follow — so packages
-//     like `@expo/vector-icons` resolved via `__require` aren't bundled.
+//     like an icon font resolved via `__require` aren't bundled.
 const WORKSPACE_PACKAGES = {
   '@rootnative/components': path.resolve(
     workspaceRoot,

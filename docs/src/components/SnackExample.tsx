@@ -18,7 +18,8 @@ interface SnackVersions {
 /** Versioned outside the RootNative release cycle, so pinned by hand. */
 const EXTERNAL_DEPENDENCIES = [
   '@material/material-color-utilities@^0.4.0',
-  '@expo/vector-icons@^15.0.3',
+  '@react-native-vector-icons/material-design-icons@^13.1.4',
+  'expo-font@~57.0.3',
   'react-native-safe-area-context@~5.6.0',
   // CircularProgress and LoadingIndicator need this at runtime. Declared
   // rather than relying on Snack preloading it with the Expo SDK — those two

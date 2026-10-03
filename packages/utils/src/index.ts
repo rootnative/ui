@@ -1,7 +1,6 @@
 export { alphaColor, blendColor } from './color'
 export { elevationStyle } from './elevation'
 export { useFocusVisible, isFocusVisible } from './focus-visible'
-export { getMaterialCommunityIcons } from './icon'
 export { resolvePressableStyle, resolveColorFromStyle } from './pressable'
 export type { PressableState, PressableStyleProp } from './pressable'
 export { renderIcon } from './render-icon'

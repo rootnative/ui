@@ -31,7 +31,7 @@ Scan the QR code with the [Expo Go](https://expo.dev/go) app to preview componen
 - Material Design 3 Expressive motion — spring-physics transitions and shape-morph-on-press interactions, expressive by default
 - Light and dark themes out of the box
 - Responsive breakpoint utilities (`useBreakpoint`, `useBreakpointValue`)
-- Pluggable icon system — MaterialCommunityIcons by default, or wire up Lucide, Phosphor, SF Symbols, or custom SVGs via the theme's `iconResolver` (adapters in `@rootnative/icons`)
+- Pluggable icon system — MaterialDesignIcons with one prop, or wire up Lucide, Phosphor, SF Symbols, or custom SVGs via the theme's `iconResolver` (adapters in `@rootnative/icons`)
 - Subpath exports for tree-shaking (`@rootnative/components/button`, etc.)
 - Accessible by default (`role`, `accessibilityLabel`, `accessibilityState`)
 - State-layer press/hover/focus feedback
@@ -65,13 +65,13 @@ yarn add @rootnative/components
 npx expo install react react-native react-native-safe-area-context
 ```
 
-**Optional** — only needed if you plan to use icons in your app:
+**Optional** — only needed if you pass string icon names (`leadingIcon="check"`) and want MaterialDesignIcons to render them:
 
 ```bash
-npx expo install @expo/vector-icons
+npx expo install @react-native-vector-icons/material-design-icons expo-font
 ```
 
-Prefer Lucide, Phosphor, SF Symbols, or your own SVGs? Add [`@rootnative/icons`](packages/icons) and pass a resolver to `ThemeProvider` — see the [icons guide](https://rootnative.github.io/ui/icons).
+Then pass `iconResolver={mdiResolver}` from `@rootnative/components/mdi` to `ThemeProvider`. Only that subpath imports the icon package, so an app with another icon set never needs it. It is the package Expo recommends in place of `@expo/vector-icons`. Prefer Lucide, Phosphor, SF Symbols, or your own SVGs? Add [`@rootnative/icons`](packages/icons) and pass a resolver to `ThemeProvider` — see the [icons guide](https://rootnative.github.io/ui/icons).
 
 Wrap your app with `ThemeProvider` and start using components:
 
@@ -116,7 +116,7 @@ RootNative UI ships [llms.txt](https://llmstxt.org/) documentation for AI coding
 | --- | --- | --- |
 | [`@rootnative/core`](packages/core) | ![install size](https://packagephobia.com/badge?p=@rootnative/core) | Theme engine, theme contracts, built-in Material Design You theme, `ThemeProvider`, `useTheme` hook, responsive utilities. |
 | [`@rootnative/components`](packages/components) | ![install size](https://packagephobia.com/badge?p=@rootnative/components) | UI components with subpath exports for tree-shaking. |
-| [`@rootnative/icons`](packages/icons) | ![install size](https://packagephobia.com/badge?p=@rootnative/icons) | Icon-resolver adapters for Lucide, Phosphor, and `@expo/vector-icons`, with MDI-name compatibility helpers. |
+| [`@rootnative/icons`](packages/icons) | ![install size](https://packagephobia.com/badge?p=@rootnative/icons) | Icon-resolver adapters for Lucide, Phosphor, and `@react-native-vector-icons/*`, with MDI-name compatibility helpers. |
 | [`@rootnative/cli`](packages/cli) | ![install size](https://packagephobia.com/badge?p=@rootnative/cli) | CLI to scaffold components into your project (shadcn/ui-style). |
 | [`rootnative`](packages/rootnative) | — | Shorthand wrapper for `@rootnative/cli`. |
 | [`@rootnative/utils`](packages/utils) | — | Internal utilities used by components (not published). |

@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   BottomSheet,
   Button,
@@ -19,7 +19,7 @@ type OpenSheet = 'basic' | 'snap' | 'standard' | 'persistent' | null
 function Icon({ name }: { name: string }) {
   const theme = useTheme()
   return (
-    <MaterialCommunityIcons
+    <MaterialDesignIcons
       name={name as never}
       size={24}
       color={theme.colors.onSurfaceVariant}

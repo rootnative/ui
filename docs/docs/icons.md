@@ -5,9 +5,9 @@ description: Pass icons as a string name, a React element, or a render function 
 
 # Icons
 
-RootNative components accept icons in three forms — a string name, a pre-rendered React element, or a render function. By default, string names resolve through `@expo/vector-icons/MaterialCommunityIcons`, but you can plug in **any** icon library (Lucide, SF Symbols, custom SVGs) globally via the theme's `iconResolver`, or per-call by passing an element/function.
+RootNative components accept icons in three forms — a string name, a pre-rendered React element, or a render function. A string name resolves through the theme's `iconResolver`. Pass `mdiResolver` from `@rootnative/components/mdi` for MaterialDesignIcons, or plug in **any** icon library (Lucide, SF Symbols, custom SVGs) globally via the same prop, or per-call by passing an element/function.
 
-This makes the library design-system agnostic: an Apple HIG app can use SF Symbols, a brand-driven app can ship custom SVGs, and an MD3 app gets MaterialCommunityIcons out of the box without any extra setup.
+This makes the library design-system agnostic: an Apple HIG app can use SF Symbols, a brand-driven app can ship custom SVGs, and an MD3 app gets MaterialDesignIcons with one prop.
 
 ## The `IconSource` type
 
@@ -17,7 +17,7 @@ Every icon prop on every component (`leadingIcon`, `trailingIcon`, `icon`, `sele
 import type { IconSource } from '@rootnative/core'
 
 type IconSource =
-  | string                                    // resolved via iconResolver (MCI by default)
+  | string                                    // resolved via the theme's iconResolver (e.g. mdiResolver)
   | ReactElement                              // pre-rendered icon — caller sizes/colors it
   | ((props: { size: number; color?: string }) => ReactNode) // render function
 ```
@@ -26,22 +26,37 @@ Pick the form that matches your situation:
 
 | Form | When to use |
 |------|-------------|
-| **String** (`"check"`) | You're using MCI, or you've configured a global `iconResolver` that maps names. Easiest, theme-aware. |
+| **String** (`"check"`) | You pass `mdiResolver`, or your own global `iconResolver` that maps names. Easiest, theme-aware. |
 | **ReactElement** (`<Check size={18} color="#fff" />`) | One-off icon from any library. You pass size and color yourself. |
 | **Render function** (`({ size, color }) => <Check {...} />`) | Reusable wrapper that needs the component's resolved size and color. |
 
-## Default — MaterialCommunityIcons
+## MaterialDesignIcons — `mdiResolver`
 
-With no resolver configured, string names resolve to MaterialCommunityIcons. This is the zero-config path — install `@expo/vector-icons` and pass any [MCI name](https://pictogrammers.com/library/mdi/):
+Install `@react-native-vector-icons/material-design-icons` (and `expo-font` on Expo), pass `mdiResolver` to `ThemeProvider`, and every string icon name resolves to an [MDI glyph](https://pictogrammers.com/library/mdi/):
 
 ```tsx
 import { Button, IconButton } from '@rootnative/components'
+import { mdiResolver } from '@rootnative/components/mdi'
+import { ThemeProvider } from '@rootnative/core'
 
-<Button leadingIcon="plus">Add</Button>
-<IconButton icon="heart-outline" accessibilityLabel="Favorite" />
+<ThemeProvider iconResolver={mdiResolver}>
+  <Button leadingIcon="plus">Add</Button>
+  <IconButton icon="heart-outline" accessibilityLabel="Favorite" />
+</ThemeProvider>
 ```
 
-`@expo/vector-icons` is only required if you actually pass a string icon. The library imports it lazily — components render fine without it as long as you don't pass string icons.
+`@rootnative/components/mdi` is the only module in the library that imports `@react-native-vector-icons/material-design-icons`, and the root entry never loads it. So the package is an optional peer: an app that passes another resolver, or no string icon names, does not install it, and a bundler without Expo needs no alias for it.
+
+The package is the one Expo recommends in place of `@expo/vector-icons` ([Expo blog](https://expo.dev/blog/moving-away-from-expo-vector-icons)). The root import loads the font at run time through `expo-font`, which works in Expo Go, in a development build and on web. A development build can embed the font instead: pass the `/static` export to `createVectorIconsResolver` from `@rootnative/icons`, and add the package to the `plugins` array of `app.json`. Do not keep `@expo/vector-icons` installed next to it: both register the same font, and the glyphs render as `?` or as empty squares. `npx @react-native-vector-icons/codemod` rewrites app code that still imports the old package.
+
+```tsx
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons/static'
+import { createVectorIconsResolver } from '@rootnative/icons'
+
+const resolver = createVectorIconsResolver({ IconSet: MaterialDesignIcons })
+```
+
+Without a resolver, a string icon name renders nothing, and the library logs one warning per process that names this subpath. The library ships no default in the shared code on purpose, because a static import there would reach every app.
 
 ## Per-call: pass any icon as a ReactElement
 
@@ -85,7 +100,7 @@ If you'd rather keep using string names but route them to a different library, r
 
 You have two paths:
 
-1. **Use a built-in adapter from `@rootnative/icons`.** Recommended for Lucide, Phosphor, and `@expo/vector-icons` — handles sizing, coloring, MDI-name compatibility, and missing-icon warnings for you.
+1. **Use a built-in adapter from `@rootnative/icons`.** Recommended for Lucide, Phosphor, and `@react-native-vector-icons/*` — handles sizing, coloring, MDI-name compatibility, and missing-icon warnings for you.
 2. **Hand-roll a resolver.** A plain `(name, { size, color }) => ReactNode` function. Use this for SF Symbols, custom SVG sprites, or any other source.
 
 ### Library adapters: `@rootnative/icons`
@@ -100,7 +115,7 @@ npm install @rootnative/icons
 |--------|-----|
 | `createLucideResolver({ icons })` | [Lucide](https://lucide.dev) (`lucide-react-native`) |
 | `createPhosphorResolver({ icons })` | [Phosphor](https://phosphoricons.com) (`phosphor-react-native`) |
-| `createVectorIconsResolver({ IconSet })` | Any `@expo/vector-icons` set (`Ionicons`, `FontAwesome`, …) |
+| `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …), or the MDI `/static` export |
 | `withLegacyMdiFallback(resolver)` | Wrap any custom resolver to add MDI-name compatibility |
 
 Each adapter accepts the icons it can render and returns an `IconResolver` you pass straight to `ThemeProvider`. Lucide and Phosphor adapters declare `lucide-react-native` / `phosphor-react-native` as **optional** peer deps — install only the one you actually use.
@@ -154,12 +169,12 @@ const resolver = createPhosphorResolver({
 
 Phosphor exports each glyph in PascalCase (e.g. `MagnifyingGlass`, `DotsThreeVertical`). The built-in MDI map maps `magnify` → `MagnifyingGlass`, `dots-vertical` → `DotsThreeVertical`, `delete` → `Trash`, etc.
 
-#### `@expo/vector-icons`
+#### `@react-native-vector-icons/*`
 
-Use this when you want a different vector-icon set than the default `MaterialCommunityIcons`, or when you want to register a small alias map at the resolver level:
+Use this for a vector-icon set other than `mdiResolver`, or to register a small alias map at the resolver level. An `@expo/vector-icons` set has the same shape and works too, but Expo is retiring that package:
 
 ```tsx
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@react-native-vector-icons/ionicons'
 import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
@@ -265,7 +280,7 @@ function Badge({ icon, label }: { icon: string; label: string }) {
 }
 ```
 
-`null` means "no resolver configured", which is a real state and not an error — the library's own components fall back to `@expo/vector-icons/MaterialCommunityIcons` at that point. Decide what your component does: fall back the same way, render nothing, or require a resolver. A resolver can also return `null` for a name it doesn't know, so handle both.
+`null` means "no resolver configured", which is a real state and not an error — the library's own components render nothing for a string name at that point and log one warning. Decide what your component does: render nothing the same way, or require a resolver. A resolver can also return `null` for a name it doesn't know, so handle both.
 
 ### SF Symbols on iOS (Apple HIG)
 

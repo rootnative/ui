@@ -25,8 +25,8 @@ export type IconResolver = (
  * Anything a component will accept for an icon prop:
  *
  * - **string** — a name resolved via the `iconResolver` registered on
- *   `ThemeProvider`. Falls back to `MaterialCommunityIcons` when no
- *   resolver is set, preserving the legacy default.
+ *   `ThemeProvider`. Renders nothing, with one warning, when no
+ *   resolver is set.
  * - **ReactElement** — a pre-rendered icon. The caller is responsible for
  *   passing size and color; the component will not override them.
  * - **(props) => ReactNode** — a render function that receives the

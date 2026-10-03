@@ -16,6 +16,7 @@ MD3 Search has two parts: the **search bar** and the **search view**. [SearchBar
   name="RootNative SearchView — Usage"
   code={`
   import { List, ListItem, PortalHost, SearchBar, SearchView } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useRef, useState } from 'react'
@@ -59,7 +60,7 @@ MD3 Search has two parts: the **search bar** and the **search view**. [SearchBar
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

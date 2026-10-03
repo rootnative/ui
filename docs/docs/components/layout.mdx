@@ -13,13 +13,14 @@ Layout provides a safe area wrapper with the theme background color applied auto
   name="RootNative Layout — Usage"
   code={`
   import { Layout, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Layout>
             <Typography variant="headlineSmall">Inside safe area</Typography>
             <Typography variant="bodyMedium">Theme background applied automatically.</Typography>
@@ -39,13 +40,14 @@ For full-screen layouts that extend behind the status bar:
   name="RootNative Layout — Immersive"
   code={`
   import { Layout, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Layout immersive>
             <Typography variant="headlineSmall">Immersive content</Typography>
             <Typography variant="bodyMedium">No safe area insets applied.</Typography>
@@ -65,13 +67,14 @@ Control which safe area edges are applied:
   name="RootNative Layout — Custom Edges"
   code={`
   import { Layout, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Layout edges={['top', 'bottom']}>
             <Typography variant="headlineSmall">Top + Bottom insets</Typography>
           </Layout>

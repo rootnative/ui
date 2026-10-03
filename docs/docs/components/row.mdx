@@ -13,6 +13,7 @@ Lays children out horizontally. Extends [Box](./box) with all spacing, alignment
   name="RootNative Row — Usage"
   code={`
   import { Button, Row } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ Lays children out horizontally. Extends [Box](./box) with all spacing, alignment
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Row gap="sm" align="center">
               <Button variant="filled" onPress={() => {}}>Save</Button>
@@ -42,6 +43,7 @@ Enable `wrap` to let children flow onto the next line when they overflow:
   name="RootNative Row — Wrapping"
   code={`
   import { Chip, Row } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -51,7 +53,7 @@ Enable `wrap` to let children flow onto the next line when they overflow:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Row wrap gap="sm">
               {tags.map((tag) => (
@@ -74,6 +76,7 @@ Reverse the layout direction with `inverted`:
   name="RootNative Row — Inverted"
   code={`
   import { Row, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -81,7 +84,7 @@ Reverse the layout direction with `inverted`:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Row inverted gap="sm">
               <Typography>First</Typography>

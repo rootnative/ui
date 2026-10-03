@@ -25,6 +25,12 @@ export default function App() {
 }
 ```
 
+`ThemeProvider` also takes `iconResolver`, which renders string icon names
+such as `leadingIcon="check"`. Pass `mdiResolver` from
+`@rootnative/components/mdi` for MaterialDesignIcons, or your own resolver.
+See the [Icons guide](./icons). The examples on this page leave it out
+because they show the theme props only.
+
 ### Dark mode
 
 Pass the built-in dark theme:

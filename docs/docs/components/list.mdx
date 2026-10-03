@@ -14,13 +14,14 @@ Follows the [Material Design 3 Lists](https://m3.material.io/components/lists/ov
   name="RootNative List — Usage"
   code={`
   import { List, ListItem, ListDivider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <List>
             <ListItem headlineText="Photos" supportingText="Jan 9, 2024" />
             <ListDivider />
@@ -53,19 +54,20 @@ Pass any `ReactNode` as `leadingContent` or `trailingContent`:
   name="RootNative List — Leading & Trailing"
   code={`
   import { List, ListItem } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
-  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <List>
             <ListItem
               headlineText="Wi-Fi"
               supportingText="Connected"
-              leadingContent={<MaterialCommunityIcons name="wifi" size={24} />}
+              leadingContent={<MaterialDesignIcons name="wifi" size={24} />}
               trailingSupportingText="On"
             />
           </List>
@@ -84,6 +86,7 @@ When `onPress` is provided, the item renders as a `Pressable` with state-layer f
   name="RootNative List — Interactive"
   code={`
   import { List, ListItem } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert } from 'react-native'
@@ -91,7 +94,7 @@ When `onPress` is provided, the item renders as a `Pressable` with state-layer f
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <List>
             <ListItem
               headlineText="Settings"
@@ -113,23 +116,24 @@ Use `insetStart` to align the divider with text that follows a leading icon:
   name="RootNative List — Inset Dividers"
   code={`
   import { List, ListItem, ListDivider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
-  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <List>
             <ListItem
               headlineText="Item 1"
-              leadingContent={<MaterialCommunityIcons name="folder" size={24} />}
+              leadingContent={<MaterialDesignIcons name="folder" size={24} />}
             />
             <ListDivider insetStart />
             <ListItem
               headlineText="Item 2"
-              leadingContent={<MaterialCommunityIcons name="folder" size={24} />}
+              leadingContent={<MaterialDesignIcons name="folder" size={24} />}
             />
           </List>
         </ThemeProvider>

@@ -94,7 +94,7 @@ export interface ThemeProviderProps {
   /**
    * Resolves string icon names (e.g. `leadingIcon="check"`) to icon nodes.
    * Set this once at the app root to use SF Symbols, Lucide, custom SVGs,
-   * etc. instead of the default `MaterialCommunityIcons`.
+   * etc. `mdiResolver` from `@rootnative/components/mdi` gives MaterialDesignIcons.
    *
    * @example
    * import { Check, ArrowRight } from 'lucide-react-native'

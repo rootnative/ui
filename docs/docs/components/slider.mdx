@@ -21,6 +21,7 @@ The component supports four MD3 configurations from a single API:
   name="RootNative Slider — Usage"
   code={`
   import { Slider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -30,7 +31,7 @@ The component supports four MD3 configurations from a single API:
     const [value, setValue] = useState(0.4)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <Slider value={value} onValueChange={(v) => setValue(v as number)} />
           </View>
@@ -49,6 +50,7 @@ Set `step` to a positive number to snap to fixed increments. Tick marks are rend
   name="RootNative Slider — Discrete"
   code={`
   import { Slider, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -58,7 +60,7 @@ Set `step` to a positive number to snap to fixed increments. Tick marks are rend
     const [value, setValue] = useState(40)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 12 }}>
             <Slider
               value={value}
@@ -84,6 +86,7 @@ Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `st
   name="RootNative Slider — Range"
   code={`
   import { Slider, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -93,7 +96,7 @@ Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `st
     const [range, setRange] = useState([25, 75])
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 12 }}>
             <Slider
               value={range}
@@ -121,6 +124,7 @@ Pass `centered` for a slider where the active track fills outward from the midpo
   name="RootNative Slider — Centered"
   code={`
   import { Slider, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -130,7 +134,7 @@ Pass `centered` for a slider where the active track fills outward from the midpo
     const [balance, setBalance] = useState(0)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 12 }}>
             <Slider
               value={balance}
@@ -158,6 +162,7 @@ Decorate either side of the track with `startIcon` and `endIcon` — useful for 
   name="RootNative Slider — Icons"
   code={`
   import { Slider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -167,7 +172,7 @@ Decorate either side of the track with `startIcon` and `endIcon` — useful for 
     const [volume, setVolume] = useState(0.6)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <Slider
               value={volume}
@@ -208,6 +213,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
   name="RootNative Slider — Custom colors"
   code={`
   import { Slider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -217,7 +223,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
     const [value, setValue] = useState(0.5)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <Slider
               value={value}
@@ -240,6 +246,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
   name="RootNative Slider — Disabled"
   code={`
   import { Slider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -247,7 +254,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <Slider value={0.7} disabled />
           </View>

@@ -20,7 +20,7 @@ export interface SwitchProps extends Omit<
   onValueChange?: (value: boolean) => void
   /**
    * Icon shown on the thumb when selected. Accepts a string name (resolved
-   * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
+   * via the theme's `iconResolver`, for example `mdiResolver`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.
    *
    * Opt-in: the MD3 default switch renders no icons — pass `'check'` for the

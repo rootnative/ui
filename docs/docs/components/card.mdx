@@ -14,6 +14,7 @@ Follows the [Material Design 3 Card](https://m3.material.io/components/cards/ove
   name="RootNative Card — Usage"
   code={`
   import { Card, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -21,7 +22,7 @@ Follows the [Material Design 3 Card](https://m3.material.io/components/cards/ove
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Card variant="elevated">
               <Card.Content>
@@ -61,6 +62,7 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
   name="RootNative Card — Interactive"
   code={`
   import { Card, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert, View } from 'react-native'
@@ -68,7 +70,7 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Card variant="filled" onPress={() => Alert.alert('Tapped')}>
               <Card.Content>
@@ -115,6 +117,7 @@ The card needs an `onPress` to become interactive. `Link` adds its own navigatio
   name="RootNative Card — Regions"
   code={`
   import { Button, Card, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert, Image, View } from 'react-native'
@@ -122,7 +125,7 @@ The card needs an `onPress` to become interactive. `Link` adds its own navigatio
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Card variant="elevated">
               <Card.Media height={160}>

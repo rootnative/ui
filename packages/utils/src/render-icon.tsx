@@ -4,8 +4,7 @@ import type {
   IconSource,
 } from '@rootnative/core'
 import { isValidElement } from 'react'
-import type { ComponentProps, ReactNode } from 'react'
-import { getMaterialCommunityIcons } from './icon'
+import type { ReactNode } from 'react'
 
 // The canonical `IconSource` definition lives in `@rootnative/core` next to
 // `IconResolver` (core is the published package; this one is private).
@@ -13,18 +12,40 @@ import { getMaterialCommunityIcons } from './icon'
 // it from utils unchanged.
 export type { IconSource } from '@rootnative/core'
 
+let warnedMissingResolver = false
+
+// Logged in production too. A string icon that renders as nothing has no
+// other trace, and a silent production build is how a missing-plugin defect
+// stayed hidden in a consumer for a day.
+function warnMissingResolver(name: string) {
+  if (warnedMissingResolver) return
+  warnedMissingResolver = true
+  console.warn(
+    `[rootnative] The icon "${name}" is a string name, and no iconResolver ` +
+      'is set on ThemeProvider, so it renders as nothing. For the Material ' +
+      'Community Icons default, pass iconResolver={mdiResolver} from ' +
+      "'@rootnative/components/mdi'. For another icon set, pass your own " +
+      "resolver or one from '@rootnative/icons'.",
+  )
+}
+
 /**
  * Render any `IconSource` to a node. Components should call this with the
- * size/color they would have passed to `MaterialCommunityIcons` and the
- * resolver from `useIconResolver()`.
+ * size/color they would pass to the icon set and the resolver from
+ * `useIconResolver()`.
+ *
+ * A string name needs a resolver. Without one it renders `null` and logs one
+ * warning per process; the library ships no default resolver in the shared
+ * code, so that an app with its own icon set never imports an icon font
+ * package. The MDI default lives behind `@rootnative/components/mdi`.
  *
  * **Every call site must place the result inside a node marked `aria-hidden`.**
- * The default resolver renders a `<Text>` holding a private-use-area glyph
- * (`MaterialCommunityIcons` maps names onto U+F0000+). React Native merges the
+ * The MDI resolver renders a `<Text>` holding a private-use-area glyph
+ * (`MaterialDesignIcons` maps names onto U+F0000+). React Native merges the
  * text of descendant nodes into an accessible ancestor's Android
  * `contentDescription`, so an unhidden icon lands *inside the accessible name*
  * — `<Button leadingIcon="plus">Add Item</Button>` announced as
- * "5, Add Item", and a checked `Checkbox` announced as the check glyph
+ * "5, Add Item", and a checked `Checkbox` announced as the check glyph
  * alone. A screen reader reads a private-use codepoint as nothing or as an
  * unknown symbol.
  *
@@ -43,14 +64,8 @@ export function renderIcon(
 
   if (typeof source === 'string') {
     if (resolver) return resolver(source, props)
-    const MCI = getMaterialCommunityIcons()
-    // `IconSource` is a plain `string` by design — the public API accepts any
-    // glyph name, and narrowing it to the vendored union would be a breaking
-    // change that also couples consumers to the icon package's typings. The
-    // static import now brings those typings along, so the cast absorbs the
-    // difference at the one place the two meet.
-    const name = source as ComponentProps<typeof MCI>['name']
-    return <MCI name={name} size={props.size} color={props.color} />
+    warnMissingResolver(source)
+    return null
   }
 
   if (typeof source === 'function') {

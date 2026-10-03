@@ -27,6 +27,7 @@ tracks the active tab itself and starts on the first item.
   name="RootNative Tabs — Usage"
   code={`
   import { Tabs } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -59,7 +60,7 @@ tracks the active tab itself and starts on the first item.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Screen />
         </ThemeProvider>
       </SafeAreaProvider>
@@ -74,6 +75,7 @@ tracks the active tab itself and starts on the first item.
   name="RootNative Tabs — Variants"
   code={`
   import { Tabs } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -95,7 +97,7 @@ tracks the active tab itself and starts on the first item.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, gap: 24, paddingTop: 24 }}>
             {/* Primary: icon above the label, 64dp tall */}
             <Tabs items={TRAVEL} />

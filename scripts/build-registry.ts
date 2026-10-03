@@ -98,7 +98,6 @@ const UTIL_EXPORTS: Record<string, string[]> = {
   color: ['alphaColor', 'blendColor'],
   elevation: ['elevationStyle'],
   'focus-visible': ['useFocusVisible', 'isFocusVisible'],
-  icon: ['getMaterialCommunityIcons'],
   pressable: ['resolvePressableStyle', 'resolveColorFromStyle'],
   'render-icon': ['renderIcon'],
   rtl: ['transformOrigin', 'selectRTL', 'isRTLDirection'],
@@ -120,9 +119,8 @@ const UTIL_DEPS: Record<string, Record<string, string>> = {
   color: {},
   elevation: {},
   'focus-visible': {},
-  icon: { '@expo/vector-icons': '>=14.0.0' },
   pressable: {},
-  'render-icon': { '@expo/vector-icons': '>=14.0.0' },
+  'render-icon': {},
   rtl: {},
 }
 
@@ -144,7 +142,9 @@ for (const [util, exports] of Object.entries(UTIL_TYPE_EXPORTS)) {
 // files, not as standalone registry components.
 // 'test-support' holds helpers the test suite imports. It is not shipped —
 // tsup has no entry for it — so scaffolding it at a consumer would be wrong.
-const SKIP_DIRS = new Set(['__tests__', 'internal', 'test-support'])
+// `mdi` is a resolver behind a subpath, not a component. A CLI project that
+// wants the MDI default writes the four-line resolver from the docs.
+const SKIP_DIRS = new Set(['__tests__', 'internal', 'test-support', 'mdi'])
 
 interface ComponentEntry {
   name: string
@@ -319,11 +319,8 @@ function analyzeImports(componentDir: string): {
     if (content.includes('react-native-safe-area-context')) {
       externalDeps.add('react-native-safe-area-context')
     }
-    if (
-      content.includes('@expo/vector-icons') ||
-      content.includes('getMaterialCommunityIcons')
-    ) {
-      externalDeps.add('@expo/vector-icons')
+    if (content.includes('@react-native-vector-icons/material-design-icons')) {
+      externalDeps.add('@react-native-vector-icons/material-design-icons')
     }
     if (content.includes('react-native-svg')) {
       externalDeps.add('react-native-svg')
@@ -379,10 +376,11 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
     )
   }
 
-  // Required for the same reason: packages/utils/src/icon.ts imports
-  // `@expo/vector-icons/MaterialCommunityIcons` statically.
-  if (externalDeps.has('@expo/vector-icons')) {
-    dependencies['@expo/vector-icons'] = peerRange('@expo/vector-icons')
+  // Only `mdi` imports the icon package, and the registry skips it, so no
+  // component reaches this branch today. It stays as a guard.
+  if (externalDeps.has('@react-native-vector-icons/material-design-icons')) {
+    dependencies['@react-native-vector-icons/material-design-icons'] =
+      peerRange('@react-native-vector-icons/material-design-icons')
   }
 
   if (externalDeps.has('react-native-svg')) {

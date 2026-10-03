@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import { Card, Column, Divider, Row, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { usePathname, useRouter } from 'expo-router'
@@ -16,13 +16,13 @@ function NavCard({ entry, direction }: NavCardProps) {
   const theme = useTheme()
   const router = useRouter()
   const isPrevious = direction === 'previous'
-  // MaterialCommunityIcons chevrons are physical, not logical — flip them
+  // MaterialDesignIcons chevrons are physical, not logical — flip them
   // by hand so "previous" still points backwards under the RTL toggle.
   const pointsLeft = isPrevious !== I18nManager.isRTL
   const icon = pointsLeft ? 'chevron-left' : 'chevron-right'
 
   const chevron = (
-    <MaterialCommunityIcons
+    <MaterialDesignIcons
       name={icon}
       size={10}
       color={theme.colors.onSurfaceVariant}

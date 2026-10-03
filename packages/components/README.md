@@ -8,13 +8,20 @@ Material Design 3 UI components for React Native, part of [RootNative UI](https:
 ## Install
 
 ```bash
-pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-native-safe-area-context @expo/vector-icons react-native-svg
+pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-native-safe-area-context react-native-svg
 ```
 
 Everything in that line is a **required** peer. `@rootnative/inertia` runs every
-animation in the library, and `react-native-safe-area-context`,
-`@expo/vector-icons` and `react-native-svg` are imported statically, so the
-bundle fails to resolve without them however little of the library you use.
+animation in the library, and `react-native-safe-area-context` and
+`react-native-svg` are imported statically, so the bundle fails to resolve
+without them however little of the library you use.
+
+`@react-native-vector-icons/material-design-icons` is an **optional** peer. Only the
+`@rootnative/components/mdi` subpath imports it. Install it, with `expo-font`
+on Expo, and pass `iconResolver={mdiResolver}` to `ThemeProvider` to render
+string icon names with MaterialDesignIcons. An app with its own `iconResolver`
+never imports it. Expo is retiring `@expo/vector-icons` in favour of this
+package, so the library does not use the old one.
 
 > An earlier release marked the last three optional. They were imported
 > statically all the same, so Metro failed on `Unable to resolve module` before
@@ -137,7 +144,7 @@ All interactive components support a 3-tier override system (theme → variant �
 
 Every icon prop (`leadingIcon`, `trailingIcon`, `icon`, …) accepts an `IconSource` — one of three forms:
 
-- **String name** (`"check"`) — resolves through the theme's `iconResolver`. By default this is [MaterialCommunityIcons](https://pictogrammers.com/library/mdi/) from `@expo/vector-icons`.
+- **String name** (`"check"`) — resolves through the theme's `iconResolver`. Pass `mdiResolver` from `@rootnative/components/mdi` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/), or your own resolver. Without a resolver a string name renders nothing and logs one warning.
 - **ReactElement** (`<Check size={18} color="#fff" />`) — one-off icon from any library; you control size and color.
 - **Render function** (`({ size, color }) => <Check ... />`) — receives the component's resolved size and color.
 

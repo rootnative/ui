@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   Box,
   Button,
@@ -33,7 +33,7 @@ function SectionTitle({ children }: { children: string }) {
 function Icon({ name }: { name: string }) {
   const { colors } = useTheme()
   return (
-    <MaterialCommunityIcons
+    <MaterialDesignIcons
       name={name as never}
       size={24}
       color={colors.onSurfaceVariant}

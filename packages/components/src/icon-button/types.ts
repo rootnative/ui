@@ -46,7 +46,7 @@ export interface IconButtonProps extends Omit<
 > {
   /**
    * Icon to display. Accepts a string name (resolved via the theme's
-   * `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered
+   * `iconResolver`, for example `mdiResolver`), a pre-rendered
    * element, or a render function that receives `{ size, color }`.
    */
   icon: IconSource

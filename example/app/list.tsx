@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   List,
   ListItem,
@@ -18,7 +18,7 @@ const longSupporting =
 function Icon({ name }: { name: string }) {
   const theme = useTheme()
   return (
-    <MaterialCommunityIcons
+    <MaterialDesignIcons
       name={name as never}
       size={24}
       color={theme.colors.onSurfaceVariant}

@@ -76,6 +76,7 @@
       "./layout",
       "./list",
       "./loading-indicator",
+      "./mdi",
       "./menu",
       "./navigation-bar",
       "./navigation-drawer",

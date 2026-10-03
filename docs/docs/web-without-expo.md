@@ -71,30 +71,24 @@ a sandboxed Electron renderer have only `globalThis`, so the page throws
 `ReferenceError: global is not defined` without a define. The library also
 reads `__DEV__` and `process.env.NODE_ENV`, which Metro defines.
 
-### 5. Resolve the default icon set
+### 5. Choose an icon set
 
-The components import `@expo/vector-icons/MaterialCommunityIcons` with a
-static import, so every bundle must resolve it, even one that never renders an
-MDI glyph. See [Installation](./installation.md#peer-dependencies) for why
-the import is static.
+A string icon name needs an `iconResolver` on `ThemeProvider`. Only the
+`@rootnative/components/mdi` subpath imports an icon font package, so the
+choice is yours and no alias is needed:
 
-You have two options:
-
-- **Keep the default icons.** Install `@expo/vector-icons` and `expo-font`.
-  Both work on web without the rest of Expo.
-- **Bring your own icons.** Register an `iconResolver` on `ThemeProvider` (see
-  [Icons](./icons.md#global-configure-an-iconresolver)) and alias the import
-  to a stub that exports `null`. The library calls your resolver first and
-  reads the import only when no resolver is set, so the stub is never reached.
-
-```ts title="src/no-vector-icons.ts"
-export default null
-```
+- **MaterialDesignIcons.** Install `@react-native-vector-icons/material-design-icons` and
+  `expo-font`. Both work on web without the rest of Expo; the package loads
+  its font through `expo-font` when `globalThis.expo` exists, and embeds it
+  from its `/static` export otherwise. Pass `mdiResolver` from
+  `@rootnative/components/mdi`.
+- **Your own icons.** Register an `iconResolver` on `ThemeProvider` (see
+  [Icons](./icons.md#global-configure-an-iconresolver)) and do not install
+  the icon package. No module in the bundle imports it.
 
 ## Vite
 
 ```ts title="vite.config.ts"
-import { fileURLToPath } from 'node:url'
 import babel from '@rolldown/plugin-babel'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -118,13 +112,6 @@ export default defineConfig({
     alias: [
       // 1. Exact match, so react-native-svg and friends keep their names.
       { find: /^react-native$/, replacement: 'react-native-web' },
-      // 5. Only when you register your own iconResolver.
-      {
-        find: '@expo/vector-icons/MaterialCommunityIcons',
-        replacement: fileURLToPath(
-          new URL('src/no-vector-icons.ts', import.meta.url),
-        ),
-      },
     ],
     // 2. Web variants first.
     extensions: [
@@ -185,11 +172,6 @@ module.exports = {
     alias: {
       // 1. The `$` makes the alias exact.
       'react-native$': 'react-native-web',
-      // 5. Only when you register your own iconResolver.
-      '@expo/vector-icons/MaterialCommunityIcons': path.resolve(
-        __dirname,
-        'src/no-vector-icons.ts',
-      ),
     },
     // 2. Web variants first.
     extensions: [
@@ -271,6 +253,8 @@ drag regions, keyboard focus, Reduce motion, and the packaged build.
 | `[inertia] The Reanimated worklets babel plugin is not configured` | Same as above, reported by the library | Step 3 |
 | `timing easing: the provided easing function is not a worklet` | The include covers `@rootnative` but not `react-native-reanimated` | Step 3: add `react-native-reanimated` |
 | `ReferenceError: global is not defined` | No define for `global` | Step 4 |
-| `Unable to resolve @expo/vector-icons` or `expo-font` | The static icon import | Step 5: install the two packages, or alias the import to a stub |
+| `Unable to resolve @react-native-vector-icons/material-design-icons` | The app imports `@rootnative/components/mdi` | Step 5: install the package, or pass your own `iconResolver` and drop the import |
+| MDI glyphs render as `?` or as empty squares | `@expo/vector-icons` and `@react-native-vector-icons/*` both register the font | Remove `@expo/vector-icons`; run `npx @react-native-vector-icons/codemod` on app code that imports it |
+| A string icon renders nothing, and the console shows `no iconResolver is set` | `ThemeProvider` has no `iconResolver` | Step 5 |
 | `No safe area value available` on a blank page | A version before the web fallback | Update `@rootnative/components`; alpha.21 and earlier threw on web without a `SafeAreaProvider` |
 | Native-only props such as `hitSlop` do nothing | Expected on `react-native-web` | See [Accessibility](./accessibility.md) for the web differences |

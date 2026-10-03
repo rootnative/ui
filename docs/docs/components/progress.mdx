@@ -24,6 +24,7 @@ Both indicators have two modes:
   name="RootNative LinearProgress — Usage"
   code={`
   import { LinearProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useEffect, useState } from 'react'
@@ -41,7 +42,7 @@ Both indicators have two modes:
 
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
             <LinearProgress progress={value} />
           </View>
@@ -60,6 +61,7 @@ In determinate mode the bar is split into three parts: the **active indicator** 
   name="RootNative CircularProgress — Usage"
   code={`
   import { CircularProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useEffect, useState } from 'react'
@@ -77,7 +79,7 @@ In determinate mode the bar is split into three parts: the **active indicator** 
 
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
             <CircularProgress progress={value} />
           </View>
@@ -98,6 +100,7 @@ When the duration of an operation is unknown, omit `progress` to show a continuo
   name="RootNative Progress — Indeterminate"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -105,7 +108,7 @@ When the duration of an operation is unknown, omit `progress` to show a continuo
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 24 }}>
             <LinearProgress />
             <View style={{ alignItems: 'center' }}>
@@ -131,6 +134,7 @@ They also stop entirely when the OS reduce-motion setting is on — that's the p
   name="RootNative Progress — Sizing"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -138,7 +142,7 @@ They also stop entirely when the OS reduce-motion setting is on — that's the p
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 20 }}>
             <LinearProgress progress={0.4} />
             <LinearProgress progress={0.4} thickness={8} />
@@ -176,6 +180,7 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
   name="RootNative Progress — Custom colors"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -183,7 +188,7 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 20 }}>
             <LinearProgress
               progress={0.6}

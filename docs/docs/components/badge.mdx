@@ -15,24 +15,25 @@ Wrap the anchor, usually a 24dp icon, and the badge sits at the anchor's top-end
   name="RootNative Badge — Usage"
   code={`
   import { Badge } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
-  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
             <Badge accessibilityLabel="New activity">
-              <MaterialCommunityIcons name="bell-outline" size={24} color="#49454F" />
+              <MaterialDesignIcons name="bell-outline" size={24} color="#49454F" />
             </Badge>
             <Badge label={3}>
-              <MaterialCommunityIcons name="email-outline" size={24} color="#49454F" />
+              <MaterialDesignIcons name="email-outline" size={24} color="#49454F" />
             </Badge>
             <Badge label={1200}>
-              <MaterialCommunityIcons name="message-outline" size={24} color="#49454F" />
+              <MaterialDesignIcons name="message-outline" size={24} color="#49454F" />
             </Badge>
           </View>
         </ThemeProvider>
@@ -59,21 +60,22 @@ A number above `max` renders as `{max}+`. The default `max` is 999, so `1200` re
   name="RootNative Badge — Max"
   code={`
   import { Badge } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
-  import { MaterialCommunityIcons } from '@expo/vector-icons'
+  import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
             <Badge label={120} max={99}>
-              <MaterialCommunityIcons name="message-outline" size={24} color="#49454F" />
+              <MaterialDesignIcons name="message-outline" size={24} color="#49454F" />
             </Badge>
             <Badge label="NEW">
-              <MaterialCommunityIcons name="star-outline" size={24} color="#49454F" />
+              <MaterialDesignIcons name="star-outline" size={24} color="#49454F" />
             </Badge>
           </View>
         </ThemeProvider>
@@ -89,7 +91,7 @@ Set `visible={false}` to hide the badge. The anchor keeps its layout, so the bad
 
 ```tsx
 <Badge label={count} visible={count > 0}>
-  <MaterialCommunityIcons name="cart-outline" size={24} color="#49454F" />
+  <MaterialDesignIcons name="cart-outline" size={24} color="#49454F" />
 </Badge>
 ```
 
@@ -139,7 +141,7 @@ Override the fill with `containerColor` and the text with `contentColor`. The de
 
 ```tsx
 <Badge label={5} containerColor="#6750A4" contentColor="#FFFFFF">
-  <MaterialCommunityIcons name="bell-outline" size={24} color="#49454F" />
+  <MaterialDesignIcons name="bell-outline" size={24} color="#49454F" />
 </Badge>
 ```
 

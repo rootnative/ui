@@ -14,6 +14,7 @@ Follows the [Material Design 3 Radio button](https://m3.material.io/components/r
   name="RootNative Radio — Usage"
   code={`
   import { Radio } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -23,7 +24,7 @@ Follows the [Material Design 3 Radio button](https://m3.material.io/components/r
     const [selected, setSelected] = useState('a')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Radio value={selected === 'a'} onValueChange={() => setSelected('a')} />
             <Radio value={selected === 'b'} onValueChange={() => setSelected('b')} />
@@ -62,6 +63,7 @@ Build a radio group by controlling which Radio has `value={true}`:
   name="RootNative Radio — Group"
   code={`
   import { Radio } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -71,7 +73,7 @@ Build a radio group by controlling which Radio has `value={true}`:
     const [choice, setChoice] = useState('option1')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Radio value={choice === 'option1'} onValueChange={() => setChoice('option1')} />
             <Radio value={choice === 'option2'} onValueChange={() => setChoice('option2')} />
@@ -90,6 +92,7 @@ Build a radio group by controlling which Radio has `value={true}`:
   name="RootNative Radio — Disabled"
   code={`
   import { Radio } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -97,7 +100,7 @@ Build a radio group by controlling which Radio has `value={true}`:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Radio value={false} onValueChange={() => {}} disabled />
             <Radio value onValueChange={() => {}} disabled />

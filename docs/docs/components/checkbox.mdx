@@ -14,6 +14,7 @@ Follows the [Material Design 3 Checkbox](https://m3.material.io/components/check
   name="RootNative Checkbox — Usage"
   code={`
   import { Checkbox } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -23,7 +24,7 @@ Follows the [Material Design 3 Checkbox](https://m3.material.io/components/check
     const [isChecked, setIsChecked] = useState(false)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Checkbox value={isChecked} onValueChange={setIsChecked} />
           </View>
@@ -55,6 +56,7 @@ the control never moved. See the changelog if you are upgrading.
   name="RootNative Checkbox — Multiple"
   code={`
   import { Checkbox } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -66,7 +68,7 @@ the control never moved. See the changelog if you are upgrading.
     const [c, setC] = useState(false)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Checkbox value={a} onValueChange={setA} />
             <Checkbox value={b} onValueChange={setB} />
@@ -85,6 +87,7 @@ the control never moved. See the changelog if you are upgrading.
   name="RootNative Checkbox — Disabled"
   code={`
   import { Checkbox } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -92,7 +95,7 @@ the control never moved. See the changelog if you are upgrading.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Checkbox value={false} onValueChange={() => {}} disabled />
             <Checkbox value onValueChange={() => {}} disabled />

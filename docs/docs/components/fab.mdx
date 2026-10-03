@@ -8,7 +8,7 @@ description: The floating action button represents a screen's primary action, pi
 Floating action buttons (FABs) represent the screen's primary action. They appear in front of all other content, typically pinned to a corner.
 Follows the [Material Design 3 Floating Action Button](https://m3.material.io/components/floating-action-button/overview) specification.
 
-The `icon` prop accepts three forms — a string name (resolved via [`MaterialCommunityIcons`](https://pictogrammers.com/library/mdi/) by default), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for details.
+The `icon` prop accepts three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for details.
 
 ## Usage
 
@@ -16,6 +16,7 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
   name="RootNative FAB — Usage"
   code={`
   import { FAB } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -23,7 +24,7 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <FAB
               icon="plus"
@@ -53,6 +54,7 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
   name="RootNative FAB — Sizes"
   code={`
   import { FAB } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -60,7 +62,7 @@ The `icon` prop accepts three forms — a string name (resolved via [`MaterialCo
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <FAB icon="plus" size="small" accessibilityLabel="Add (small)" onPress={() => {}} />
             <FAB icon="plus" size="medium" accessibilityLabel="Add (medium)" onPress={() => {}} />
@@ -87,6 +89,7 @@ Pass a `label` to render an extended FAB. Extended FABs are always 56dp tall —
   name="RootNative FAB — Extended"
   code={`
   import { FAB } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -94,7 +97,7 @@ Pass a `label` to render an extended FAB. Extended FABs are always 56dp tall —
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <FAB icon="plus" label="Compose" onPress={() => {}} />
             <FAB icon="pencil-outline" label="Edit" variant="surface" onPress={() => {}} />
@@ -128,6 +131,7 @@ Override `containerColor` and `contentColor` to bypass the variant defaults. Sta
   name="RootNative FAB — Custom Colors"
   code={`
   import { FAB } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -135,7 +139,7 @@ Override `containerColor` and `contentColor` to bypass the variant defaults. Sta
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <FAB
               icon="heart"

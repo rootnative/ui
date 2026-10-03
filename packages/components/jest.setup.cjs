@@ -20,11 +20,11 @@
 // through reanimated's animated style.
 require('@rootnative/inertia/jest-setup')
 
-jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons', () => {
   const React = require('react')
   return {
     __esModule: true,
-    default: ({ name, style, ...props }) =>
+    MaterialDesignIcons: ({ name, style, ...props }) =>
       React.createElement('RCTText', { ...props, style }, name),
   }
 })

@@ -20,13 +20,14 @@ the loading state on the container instead (for example with `aria-busy`).
   name="RootNative Skeleton — Usage"
   code={`
   import { Column, Skeleton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Column gap="md" style={{ padding: 24 }}>
             <Skeleton />
             <Skeleton width="80%" />
@@ -53,13 +54,14 @@ the loading state on the container instead (for example with `aria-busy`).
   name="RootNative Skeleton — Shapes"
   code={`
   import { Column, Row, Skeleton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Row gap="md" align="center" style={{ padding: 24 }}>
             <Skeleton shape="circle" width={48} height={48} />
             <Column gap="sm" style={{ flex: 1 }}>
@@ -83,13 +85,14 @@ content when it arrives:
   name="RootNative Skeleton — Card"
   code={`
   import { Card, Column, Row, Skeleton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Column style={{ padding: 24 }}>
             <Card variant="outlined">
               <Column p="md" gap="md">
@@ -122,6 +125,7 @@ overrides the block color.
   name="RootNative Skeleton — Static & Color"
   code={`
   import { Column, Skeleton } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider, useTheme } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -138,7 +142,7 @@ overrides the block color.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Demo />
         </ThemeProvider>
       </SafeAreaProvider>

@@ -1,3 +1,4 @@
+import { mdiResolver } from '@rootnative/components/mdi'
 import { PortalHost } from '@rootnative/components/portal'
 import {
   ThemeProvider,
@@ -23,7 +24,12 @@ export default function RootLayout() {
   return (
     // Follows the OS light/dark setting. Call `setMode()` from `useThemeMode()`
     // to override it, and pass `storage={AsyncStorage}` to remember the choice.
-    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+    // `mdiResolver` renders string icon names (`leadingIcon="check"`) with
+    // MaterialCommunityIcons. Replace it to use another icon set.
+    <ThemeProvider
+      theme={{ light: lightTheme, dark: darkTheme }}
+      iconResolver={mdiResolver}
+    >
       {/*
         PortalHost is required by BottomSheet, Dialog, Snackbar, Menu and
         Tooltip — without it they render nothing at all. It wraps the

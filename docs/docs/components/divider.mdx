@@ -14,13 +14,14 @@ Follows the [Material Design 3 Divider](https://m3.material.io/components/divide
   name="RootNative Divider — Usage"
   code={`
   import { Column, Divider, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Column gap="md" style={{ padding: 24 }}>
             <Typography variant="bodyLarge">Above</Typography>
             <Divider />
@@ -50,13 +51,14 @@ aligns a divider with list text that follows a 24dp leading icon.
   name="RootNative Divider — Insets"
   code={`
   import { Column, Divider, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Column gap="lg" style={{ padding: 24 }}>
             <Typography variant="labelSmall">Full-bleed</Typography>
             <Divider />
@@ -83,13 +85,14 @@ the top and bottom edges.
   name="RootNative Divider — Vertical"
   code={`
   import { Divider, Row, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Row gap="md" align="center" style={{ padding: 24, height: 80 }}>
             <Typography variant="bodyLarge">Drafts</Typography>
             <Divider orientation="vertical" />
@@ -114,6 +117,7 @@ rules, not for ordinary content separation.
   name="RootNative Divider — Thickness & Color"
   code={`
   import { Column, Divider } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider, useTheme } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
 
@@ -131,7 +135,7 @@ rules, not for ordinary content separation.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Demo />
         </ThemeProvider>
       </SafeAreaProvider>

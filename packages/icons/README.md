@@ -3,7 +3,7 @@
 
 # @rootnative/icons
 
-Icon-library adapters for [RootNative UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice — Lucide, Phosphor, any `@expo/vector-icons` set, or your own resolver.
+Icon-library adapters for [RootNative UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice — Lucide, Phosphor, any `@react-native-vector-icons/*` set, or your own resolver.
 
 ## Install
 
@@ -16,7 +16,7 @@ Then install the icon library you actually use — each is an **optional** peer 
 ```bash
 pnpm add lucide-react-native      # for createLucideResolver
 pnpm add phosphor-react-native    # for createPhosphorResolver
-pnpm add @expo/vector-icons       # for createVectorIconsResolver
+pnpm add @react-native-vector-icons/ionicons   # or any set, for createVectorIconsResolver
 ```
 
 ## Adapters
@@ -25,7 +25,7 @@ pnpm add @expo/vector-icons       # for createVectorIconsResolver
 |--------|-----|
 | `createLucideResolver({ icons })` | [Lucide](https://lucide.dev) (`lucide-react-native`) |
 | `createPhosphorResolver({ icons })` | [Phosphor](https://phosphoricons.com) (`phosphor-react-native`) |
-| `createVectorIconsResolver({ IconSet })` | Any `@expo/vector-icons` set (`Ionicons`, `FontAwesome`, …) |
+| `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …), or the MDI `/static` export |
 | `withLegacyMdiFallback(resolver)` | Wrap any custom resolver to add MDI-name compatibility |
 
 Each adapter returns an `IconResolver` you pass straight to `ThemeProvider` from `@rootnative/core`.
@@ -70,12 +70,12 @@ const resolver = createPhosphorResolver({
 })
 ```
 
-## @expo/vector-icons
+## @react-native-vector-icons
 
-Use a different vector-icon set than the default `MaterialCommunityIcons`, with an optional alias map:
+Use a vector-icon set other than `mdiResolver`, with an optional alias map. Expo recommends these packages in place of `@expo/vector-icons`:
 
 ```tsx
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@react-native-vector-icons/ionicons'
 import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({

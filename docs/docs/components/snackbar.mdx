@@ -22,6 +22,7 @@ Snackbars render into the `PORTAL_LAYERS.snackbar` layer, which puts them above 
   name="RootNative Snackbar — Usage"
   code={`
   import { Button, PortalHost, SnackbarProvider, useSnackbar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -40,7 +41,7 @@ Snackbars render into the `PORTAL_LAYERS.snackbar` layer, which puts them above 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <SnackbarProvider>
               <Screen />
@@ -63,6 +64,7 @@ A snackbar takes a single action. Pressing it runs `onAction` and then dismisses
   name="RootNative Snackbar — Action"
   code={`
   import { Button, PortalHost, SnackbarProvider, useSnackbar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -90,7 +92,7 @@ A snackbar takes a single action. Pressing it runs `onAction` and then dismisses
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <SnackbarProvider>
               <Screen />

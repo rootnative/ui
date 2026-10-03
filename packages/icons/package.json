@@ -1,7 +1,7 @@
 {
   "name": "@rootnative/icons",
   "version": "0.0.0-alpha.21",
-  "description": "Icon library adapters for RootNative — Lucide, Phosphor, and @expo/vector-icons resolvers with MDI-name compatibility.",
+  "description": "Icon library adapters for RootNative — Lucide, Phosphor, and vector-icons resolvers with MDI-name compatibility.",
   "private": false,
   "sideEffects": false,
   "main": "dist/index.mjs",
@@ -42,13 +42,12 @@
     "md3"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm --outDir dist --clean --external @rootnative/core --external lucide-react-native --external phosphor-react-native --external @expo/vector-icons --external react --external react-native",
+    "build": "tsup src/index.ts --dts --format esm --outDir dist --clean --external @rootnative/core --external lucide-react-native --external phosphor-react-native --external @react-native-vector-icons/common --external react --external react-native",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@expo/vector-icons": ">=14.0.0",
     "@rootnative/core": ">=0.0.0-alpha.21",
     "lucide-react-native": ">=0.400.0",
     "phosphor-react-native": ">=2.0.0",
@@ -60,9 +59,6 @@
       "optional": true
     },
     "phosphor-react-native": {
-      "optional": true
-    },
-    "@expo/vector-icons": {
       "optional": true
     }
   },

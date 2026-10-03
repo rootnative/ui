@@ -31,6 +31,7 @@ And two modes, matching the rest of the library:
   name="RootNative LoadingIndicator — Usage"
   code={`
   import { LoadingIndicator } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -38,7 +39,7 @@ And two modes, matching the rest of the library:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <LoadingIndicator accessibilityLabel="Loading" />
           </View>
@@ -62,6 +63,7 @@ against busy or image-backed surfaces. Colors default to
   name="RootNative LoadingIndicator — Contained"
   code={`
   import { LoadingIndicator } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -69,7 +71,7 @@ against busy or image-backed surfaces. Colors default to
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
             <LoadingIndicator accessibilityLabel="Loading" />
             <LoadingIndicator contained accessibilityLabel="Loading" />
@@ -92,6 +94,7 @@ determinate mode.
   name="RootNative LoadingIndicator — Determinate"
   code={`
   import { LoadingIndicator } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useEffect, useState } from 'react'
@@ -109,7 +112,7 @@ determinate mode.
 
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
             <LoadingIndicator progress={value} accessibilityLabel="Loading" />
             <LoadingIndicator contained progress={value} accessibilityLabel="Loading" />
@@ -133,6 +136,7 @@ The morphing shape scales with it, always filling about 79% of the container
   name="RootNative LoadingIndicator — Size"
   code={`
   import { LoadingIndicator } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -140,7 +144,7 @@ The morphing shape scales with it, always filling about 79% of the container
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20 }}>
             <LoadingIndicator size={24} accessibilityLabel="Loading" />
             <LoadingIndicator accessibilityLabel="Loading" />
@@ -163,6 +167,7 @@ uncontained container is always transparent.
   name="RootNative LoadingIndicator — Custom colors"
   code={`
   import { LoadingIndicator } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -170,7 +175,7 @@ uncontained container is always transparent.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
             <LoadingIndicator
               contentColor="#00796B"

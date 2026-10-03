@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@rootnative/core'
+import { testMdiResolver } from '@rootnative/utils/test'
 import { act, render } from '@testing-library/react'
 import { cloneElement, type ReactElement, type ReactNode } from 'react'
 
@@ -10,7 +11,7 @@ import { cloneElement, type ReactElement, type ReactNode } from 'react'
  */
 export function renderWeb(ui: ReactElement) {
   const wrapper = ({ children }: { children: ReactNode }) => (
-    <ThemeProvider>{children}</ThemeProvider>
+    <ThemeProvider iconResolver={testMdiResolver}>{children}</ThemeProvider>
   )
   return render(ui, { wrapper })
 }

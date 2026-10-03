@@ -241,14 +241,21 @@ export async function doctorCommand(cwd: string): Promise<void> {
   }
 
   const vectorIconsInstalled = await fs.pathExists(
-    path.join(nodeModules, '@expo', 'vector-icons'),
+    path.join(
+      nodeModules,
+      '@react-native-vector-icons',
+      'material-design-icons',
+    ),
   )
   if (vectorIconsInstalled) {
-    logCheck('pass', '@expo/vector-icons installed')
+    logCheck(
+      'pass',
+      '@react-native-vector-icons/material-design-icons installed',
+    )
   } else {
     logCheck(
       'warn',
-      '@expo/vector-icons not installed (needed for icon support)',
+      '@react-native-vector-icons/material-design-icons not installed (needed by mdiResolver for string icon names)',
     )
   }
 

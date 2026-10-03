@@ -13,6 +13,7 @@ Avatars represent a user or entity with an image, icon, or text initials.
   name="RootNative Avatar — Usage"
   code={`
   import { Avatar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ Avatars represent a user or entity with an image, icon, or text initials.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <Avatar imageUri="https://i.pravatar.cc/80" />
             <Avatar icon="account" />
@@ -38,7 +39,7 @@ Avatars represent a user or entity with an image, icon, or text initials.
 The avatar renders the first available content in this order:
 
 1. `imageUri` — displays the image
-2. `icon` — displays a MaterialCommunityIcons icon (defaults to `account`)
+2. `icon` — displays an icon by name through the theme's `iconResolver` (defaults to `account`)
 3. `label` — displays up to 2 uppercase initials
 
 ## Sizes
@@ -55,6 +56,7 @@ The avatar renders the first available content in this order:
   name="RootNative Avatar — Sizes"
   code={`
   import { Avatar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -62,7 +64,7 @@ The avatar renders the first available content in this order:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <Avatar label="AB" size="extraSmall" />
             <Avatar label="AB" size="small" />
@@ -85,6 +87,7 @@ When `onPress` is provided, the avatar renders as a `Pressable` with automatic s
   name="RootNative Avatar — Interactive"
   code={`
   import { Avatar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert, View } from 'react-native'
@@ -92,7 +95,7 @@ When `onPress` is provided, the avatar renders as a `Pressable` with automatic s
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Avatar
               imageUri="https://i.pravatar.cc/80"
@@ -115,6 +118,7 @@ Override the container and content colors:
   name="RootNative Avatar — Custom Colors"
   code={`
   import { Avatar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -122,7 +126,7 @@ Override the container and content colors:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Avatar label="AB" containerColor="#E8DEF8" contentColor="#1D1B20" />
           </View>

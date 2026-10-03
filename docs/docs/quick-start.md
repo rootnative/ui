@@ -78,16 +78,19 @@ much of the splash square your mark fills.
 ### Where ThemeProvider lives
 
 Every component reads the theme through context, so `ThemeProvider` is wrapped
-around your app for you. In `blank` that's `App.tsx`:
+around your app for you. The `iconResolver` prop renders string icon names
+such as `leadingIcon="check"` with MaterialDesignIcons; both templates install
+the icon package and pass it. In `blank` that's `App.tsx`:
 
 ```tsx
 // App.tsx
+import { mdiResolver } from '@rootnative/components/mdi'
 import { ThemeProvider } from '@rootnative/core'
 import { StatusBar } from 'expo-status-bar'
 
 export default function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider iconResolver={mdiResolver}>
       <HomeScreen />
       <StatusBar style="auto" />
     </ThemeProvider>
@@ -99,13 +102,14 @@ In `with-router` it's `app/_layout.tsx`, wrapping the `Stack`:
 
 ```tsx
 // app/_layout.tsx
+import { mdiResolver } from '@rootnative/components/mdi'
 import { ThemeProvider } from '@rootnative/core'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
+    <ThemeProvider iconResolver={mdiResolver}>
       <Stack screenOptions={{ headerShown: false }} />
       <StatusBar style="auto" />
     </ThemeProvider>

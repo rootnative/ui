@@ -16,6 +16,7 @@ MD3 Search has two parts: the **search bar** and the **search view**, the panel 
   name="RootNative SearchBar — Usage"
   code={`
   import { SearchBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -25,7 +26,7 @@ MD3 Search has two parts: the **search bar** and the **search view**, the panel 
     const [query, setQuery] = useState('')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <SearchBar
               placeholder="Search mail"
@@ -53,6 +54,7 @@ The leading icon is a search icon by default, and it is decoration. Set `onLeadi
   name="RootNative SearchBar — Navigation icon"
   code={`
   import { SearchBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -60,7 +62,7 @@ The leading icon is a search icon by default, and it is decoration. Set `onLeadi
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <SearchBar
               placeholder="Search"
@@ -101,6 +103,7 @@ The two props fill the same slot, so the type rejects both together.
   name="RootNative SearchBar — Trailing slot"
   code={`
   import { Avatar, SearchBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -108,7 +111,7 @@ The two props fill the same slot, so the type rejects both together.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 16 }}>
             <SearchBar
               placeholder="Search"
@@ -143,6 +146,7 @@ keeps `bodyLarge`, so `-4` is the floor.
   name="RootNative SearchBar — Density"
   code={`
   import { SearchBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -150,7 +154,7 @@ keeps `bodyLarge`, so `-4` is the floor.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 16 }}>
             <SearchBar placeholder="Default, 56dp" />
             <SearchBar placeholder="Dense, 40dp" density={-4} />
@@ -171,6 +175,7 @@ and the pill inside keeps its own height.
   name="RootNative SearchBar — Disabled"
   code={`
   import { SearchBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -178,7 +183,7 @@ and the pill inside keeps its own height.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <SearchBar placeholder="Search" disabled />
           </View>

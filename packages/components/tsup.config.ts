@@ -39,6 +39,7 @@ export default defineConfig({
     'src/loading-indicator/index.ts',
     'src/skeleton/index.ts',
     'src/fab/index.ts',
+    'src/mdi/index.ts',
   ],
   // `@rootnative/utils` is private/unpublished and bundled into the JS via
   // `noExternal` below. `dts.resolve` makes the declaration bundler inline its
@@ -83,7 +84,7 @@ export default defineConfig({
   clean: true,
   noExternal: ['@rootnative/utils'],
   external: [
-    '@expo/vector-icons',
+    '@react-native-vector-icons/material-design-icons',
     'react-native-reanimated',
     'react-native-safe-area-context',
     'react-native-svg',

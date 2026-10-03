@@ -13,6 +13,7 @@ Typography renders text using the Material Design 3 type scale.
   name="RootNative Typography — Usage"
   code={`
   import { Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ Typography renders text using the Material Design 3 type scale.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 8 }}>
             <Typography variant="headlineMedium">Hello World</Typography>
             <Typography variant="bodyLarge">Body text content.</Typography>
@@ -74,6 +75,7 @@ Display and headline variants receive `accessibilityRole="header"` for screen re
   name="RootNative Typography — Custom Styles"
   code={`
   import { Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -81,7 +83,7 @@ Display and headline variants receive `accessibilityRole="header"` for screen re
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Typography variant="bodyMedium" style={{ color: 'red' }}>
               Custom colored text
@@ -102,6 +104,7 @@ Use the `as` prop to render with a custom text component:
   name="RootNative Typography — Custom Component"
   code={`
   import { Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Animated } from '@rootnative/inertia/reanimated'
@@ -110,7 +113,7 @@ Use the `as` prop to render with a custom text component:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Typography variant="titleLarge" as={Animated.Text}>
               Animated text

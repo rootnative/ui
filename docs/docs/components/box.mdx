@@ -13,6 +13,7 @@ A theme-aware replacement for `View` with shorthand props for padding, margin, g
   name="RootNative Box — Usage"
   code={`
   import { Box, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ A theme-aware replacement for `View` with shorthand props for padding, margin, g
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Box p="md" bg="#f5f5f5">
               <Typography variant="bodyMedium">Padded content</Typography>
@@ -49,6 +50,7 @@ You can also pass a raw number:
   name="RootNative Box — Raw spacing"
   code={`
   import { Box, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -56,7 +58,7 @@ You can also pass a raw number:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Box p={20} mx={12} bg="#e0e0e0">
               <Typography>20dp padding, 12dp horizontal margin</Typography>
@@ -75,6 +77,7 @@ You can also pass a raw number:
   name="RootNative Box — Padding & Margin"
   code={`
   import { Box, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -82,7 +85,7 @@ You can also pass a raw number:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, padding: 16, gap: 12 }}>
             <Box p="md" m="sm" bg="#fce4ec">
               <Typography>p="md" m="sm"</Typography>
@@ -109,6 +112,7 @@ You can also pass a raw number:
   name="RootNative Box — Gap"
   code={`
   import { Box, Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -116,7 +120,7 @@ You can also pass a raw number:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Box gap="sm">
               <Button variant="filled" onPress={() => {}}>First</Button>
@@ -138,6 +142,7 @@ You can also pass a raw number:
   name="RootNative Box — Alignment"
   code={`
   import { Box, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -145,7 +150,7 @@ You can also pass a raw number:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, padding: 16 }}>
             <Box align="center" justify="space-between" style={{ height: 200, backgroundColor: '#f5f5f5' }}>
               <Typography>Top</Typography>

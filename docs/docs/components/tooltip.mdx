@@ -24,6 +24,7 @@ Pass the control as `anchor` and the text as children.
   name="RootNative Tooltip — Usage"
   code={`
   import { IconButton, PortalHost, Tooltip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -50,7 +51,7 @@ Pass the control as `anchor` and the text as children.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
@@ -93,6 +94,7 @@ surface takes touches, unlike a plain tooltip.
   name="RootNative Tooltip — Rich"
   code={`
   import { Button, IconButton, PortalHost, Tooltip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -128,7 +130,7 @@ surface takes touches, unlike a plain tooltip.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

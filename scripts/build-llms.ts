@@ -89,7 +89,7 @@ const COMPONENTS_WORKLETS: string = peerOf(
 )
 const COMPONENTS_VECTOR_ICONS: string = peerOf(
   'components',
-  '@expo/vector-icons',
+  '@react-native-vector-icons/material-design-icons',
 )
 
 const ICONS_REACT: string = peerOf('icons', 'react')
@@ -172,10 +172,7 @@ function parseJsDoc(raw: string): JsDoc {
 
 function simplifyType(type: string): string {
   return type
-    .replace(
-      /ComponentProps<typeof MaterialCommunityIcons>\['name'\]/g,
-      'string',
-    )
+    .replace(/ComponentProps<typeof MaterialDesignIcons>\['name'\]/g, 'string')
     .replace(/IconButtonProps\['icon'\]/g, 'string')
     .replace(
       /KeyboardAvoidingViewProps\['behavior'\]/g,
@@ -1183,15 +1180,15 @@ import { Badge } from '@rootnative/components/badge'
 
 // No label: a 6dp dot. Give it a label for screen readers.
 <Badge accessibilityLabel="New activity">
-  <MaterialCommunityIcons name="bell-outline" size={24} />
+  <MaterialDesignIcons name="bell-outline" size={24} />
 </Badge>
 
 // Label: a 16dp pill. Numbers above max (default 999) render as "999+".
 <Badge label={3}>
-  <MaterialCommunityIcons name="email-outline" size={24} />
+  <MaterialDesignIcons name="email-outline" size={24} />
 </Badge>
 <Badge label={1200} max={99}>
-  <MaterialCommunityIcons name="message-outline" size={24} />
+  <MaterialDesignIcons name="message-outline" size={24} />
 </Badge>
 
 // Hidden badge keeps the anchor layout. No children renders inline.
@@ -2060,7 +2057,8 @@ Disabled state always uses standard MD3 disabled treatment (38% onSurface) regar
 /**
  * The config a bundler without Metro needs. Each item was a real failure in
  * an Electron app built with Vite: the build passed and nothing animated,
- * `global` was not defined, and the icon import did not resolve.
+ * `global` was not defined, and the icon import did not resolve. The icon
+ * import now sits behind the `mdi` subpath, so step 5 is a choice, not an alias.
  */
 function webWithoutExpoContent(): string {
   return `Expo and Metro do five things for a web app that Vite, webpack, an
@@ -2086,10 +2084,13 @@ and a full webpack config.
    \`process.env.NODE_ENV\`.** Reanimated reads \`global\`; a browser and a
    sandboxed Electron renderer throw \`ReferenceError: global is not defined\`
    without the define.
-5. **Resolve \`@expo/vector-icons/MaterialCommunityIcons\`.** The import is
-   static. Either install \`@expo/vector-icons\` and \`expo-font\`, which run on
-   web without the rest of Expo, or register an \`iconResolver\` and alias the
-   import to a module that exports \`null\`.
+5. **Choose an icon set.** A string icon name needs an \`iconResolver\` on
+   \`ThemeProvider\`. For MaterialDesignIcons, install
+   \`@react-native-vector-icons/material-design-icons\` and \`expo-font\`, which run on
+   web without the rest of Expo, and pass \`mdiResolver\` from
+   \`@rootnative/components/mdi\`. For your own icons, register your resolver
+   and skip the install: only the \`mdi\` subpath imports the icon package,
+   so no alias is needed.
 
 Vite, with \`@rolldown/plugin-babel\`:
 
@@ -2130,13 +2131,17 @@ function appRootContent(): string {
 below is also documented on its own; this is the assembled result.
 
 \`\`\`tsx
+import { mdiResolver } from '@rootnative/components/mdi'
 import { PortalHost } from '@rootnative/components/portal'
 import { SnackbarProvider } from '@rootnative/components/snackbar'
 import { ThemeProvider, darkTheme, lightTheme } from '@rootnative/core'
 
 export default function App() {
   return (
-    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+    <ThemeProvider
+      theme={{ light: lightTheme, dark: darkTheme }}
+      iconResolver={mdiResolver}
+    >
       <PortalHost>
         <SnackbarProvider>
           {/* Your app */}
@@ -2165,6 +2170,10 @@ Why that order:
   \`storage={AsyncStorage}\` to remember an explicit choice across launches. On
   web, pass \`localStorage\` itself: a \`getItem\` or \`setItem\` that throws is
   caught and the mode stays at \`defaultMode\`, so no wrapper is needed.
+  \`iconResolver\` renders string icon names; \`mdiResolver\` is the
+  MaterialDesignIcons one and the only module that imports
+  \`@react-native-vector-icons/material-design-icons\`. Pass your own resolver
+  instead to drop that peer.
 - **\`PortalHost\`** — inside \`ThemeProvider\`, so portalled overlays are themed
   too, and above your screens, so overlays get the whole window. One host at the
   root; \`Dialog\`, \`BottomSheet\`, \`Menu\`, \`Tooltip\` and \`Snackbar\` all need it.
@@ -2327,7 +2336,7 @@ Props:
 - \`defaultMode?: 'system' | 'light' | 'dark'\` — Initial mode when uncontrolled. Default: \`'system'\`
 - \`onModeChange?: (mode: ThemeMode) => void\`
 - \`storage?: { getItem, setItem }\` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
-- \`iconResolver?: IconResolver\`
+- \`iconResolver?: IconResolver\` — Renders string icon names. Pass \`mdiResolver\` from \`@rootnative/components/mdi\` for MaterialDesignIcons, or your own. Without it a string name renders nothing and logs one warning
 - \`children: ReactNode\`
 
 ### useThemeMode()
@@ -2740,7 +2749,7 @@ Shared utilities used by \`@rootnative/components\` and available for custom com
 > the package name. The import below shows the API as it exists inside this repo.
 
 \`\`\`tsx
-import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, transformOrigin, selectRTL } from '@rootnative/utils'
+import { alphaColor, blendColor, elevationStyle, renderIcon, transformOrigin, selectRTL } from '@rootnative/utils'
 \`\`\`
 
 ### Color helpers
@@ -2759,9 +2768,9 @@ import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, tran
 - \`transformOrigin(vertical?: 'top' | 'center' | 'bottom'): string\` — Returns \`"left top"\` or \`"right top"\` based on RTL layout direction. Used for label animations.
 - \`selectRTL<T>(ltr: T, rtl: T): T\` — Picks a value based on layout direction.
 
-### Icon resolver
+### Icon rendering
 
-- \`getMaterialCommunityIcons()\` — Lazily resolves \`MaterialCommunityIcons\` from \`@expo/vector-icons\` at render time. Throws with install instructions if the package is missing.
+- \`renderIcon(source: IconSource | null | undefined, props: IconRenderProps, resolver: IconResolver | null | undefined): ReactNode\` — Renders any \`IconSource\`. A string name goes to the resolver; without one it renders \`null\` and logs one warning per process. An element is returned as is; a function is called with \`props\`. Place the result under an \`aria-hidden\` node.
 
 ### Test helper (subpath export)
 
@@ -2782,26 +2791,26 @@ function iconsContent(): string {
 
 Every icon prop accepts an \`IconSource\` (\`import type { IconSource } from '@rootnative/core'\`) — one of three forms:
 
-1. **String name** — resolved through the theme's \`iconResolver\`. Defaults to \`MaterialCommunityIcons\` from \`@expo/vector-icons\`. Browse names at https://pictogrammers.com/library/mdi/.
+1. **String name** — resolved through the theme's \`iconResolver\`. Pass \`mdiResolver\` from \`@rootnative/components/mdi\` for \`MaterialDesignIcons\` (browse names at https://pictogrammers.com/library/mdi/), or another resolver. Without a resolver a string name renders nothing and logs one warning.
 2. **ReactElement** — a pre-rendered icon (\`leadingIcon={<Check size={18} color="#fff" />}\`). The component does not override size/color.
 3. **Render function** — \`(props: { size: number; color?: string }) => ReactNode\`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. \`@expo/vector-icons\` is used at run time only for string icon names without a custom resolver, but the import is static, so the bundler must resolve it in every app. Without Expo, alias \`@expo/vector-icons/MaterialCommunityIcons\` to a module that exports \`null\` (docs page: Web without Expo).
+Per-call elements/functions always take precedence over the resolver. Only \`@rootnative/components/mdi\` imports \`@react-native-vector-icons/material-design-icons\`; the root entry and every other subpath do not. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
 
 ### When to pick which
 
 | Situation | Reach for |
 | --- | --- |
-| \`@expo/vector-icons\` is installed and MDI names are fine | Nothing — the built-in resolver already works |
+| MaterialDesignIcons names (\`@react-native-vector-icons/material-design-icons\`) | \`mdiResolver\` from \`@rootnative/components/mdi\` |
 | Lucide icons | \`createLucideResolver\` |
 | Phosphor icons | \`createPhosphorResolver\` |
-| Any other \`@expo/vector-icons\` set (Ionicons, FontAwesome, …) | \`createVectorIconsResolver\` |
+| Any other \`@react-native-vector-icons/*\` set (Ionicons, FontAwesome, …), or the MDI \`/static\` export | \`createVectorIconsResolver\` |
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual \`IconResolver\` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | \`withLegacyMdiFallback(resolver)\` |
 
 ### \`@rootnative/icons\` adapter package (v${ICONS_VERSION})
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / \`@expo/vector-icons\` are declared as optional peer deps.
+Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / \`@react-native-vector-icons/*\` are declared as optional peer deps.
 
 \`\`\`bash
 pnpm add @rootnative/icons
@@ -2811,7 +2820,7 @@ pnpm add @rootnative/icons
 |--------|-----|
 | \`createLucideResolver({ icons })\` | [Lucide](https://lucide.dev) (\`lucide-react-native\`) |
 | \`createPhosphorResolver({ icons })\` | [Phosphor](https://phosphoricons.com) (\`phosphor-react-native\`) |
-| \`createVectorIconsResolver({ IconSet })\` | Any \`@expo/vector-icons\` set (\`Ionicons\`, \`FontAwesome\`, …) |
+| \`createVectorIconsResolver({ IconSet })\` | Any \`@react-native-vector-icons/*\` set (\`Ionicons\`, \`FontAwesome7\`, …), or an \`@expo/vector-icons\` set |
 | \`withLegacyMdiFallback(resolver)\` | Wrap any custom resolver to add MDI-name compatibility |
 
 #### Lucide
@@ -2844,10 +2853,10 @@ const resolver = createPhosphorResolver({
 })
 \`\`\`
 
-#### \`@expo/vector-icons\`
+#### \`@react-native-vector-icons/*\`
 
 \`\`\`tsx
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@react-native-vector-icons/ionicons'
 import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
@@ -2858,7 +2867,7 @@ const resolver = createVectorIconsResolver({
 
 #### Custom resolver + MDI compatibility
 
-\`withLegacyMdiFallback\` wraps any \`IconResolver\` so that legacy MaterialCommunityIcons names (\`magnify\`, \`pencil\`, \`dots-vertical\`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns \`null\`.
+\`withLegacyMdiFallback\` wraps any \`IconResolver\` so that legacy MaterialDesignIcons names (\`magnify\`, \`pencil\`, \`dots-vertical\`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns \`null\`.
 
 \`\`\`tsx
 import { withLegacyMdiFallback } from '@rootnative/icons'
@@ -2953,7 +2962,7 @@ function generateComponentsLlms(): string {
 
 > Version: ${COMPONENTS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
-> Required for string icon names: @expo/vector-icons ${COMPONENTS_VECTOR_ICONS}. The import is static, so every bundle must resolve it, even with a custom iconResolver; a bundler without Expo aliases it to a stub (docs: Web without Expo)
+> Optional peer: @react-native-vector-icons/material-design-icons ${COMPONENTS_VECTOR_ICONS} (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver does not install it
 
 ## App root setup
 
@@ -3006,7 +3015,7 @@ function generateIconsLlms(): string {
 
 > Version: ${ICONS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, react ${ICONS_REACT}, react-native ${ICONS_RN}
-> Optional peer deps: lucide-react-native, phosphor-react-native, @expo/vector-icons
+> Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* or @expo/vector-icons set you install
 
 Pre-built resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
@@ -3025,7 +3034,7 @@ function generateFullLlms(): string {
 > Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
 > Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
-> Required for string icon names: \`@expo/vector-icons ${COMPONENTS_VECTOR_ICONS}\`. The import is static, so every bundle must resolve it, even with a custom \`iconResolver\`; a bundler without Expo aliases it to a stub (see Web without Expo below)
+> Optional peer: \`@react-native-vector-icons/material-design-icons ${COMPONENTS_VECTOR_ICONS}\` (plus \`expo-font\` on Expo), imported only by the \`@rootnative/components/mdi\` subpath (\`mdiResolver\`, the MaterialDesignIcons resolver for string icon names). An app with its own \`iconResolver\` does not install it
 
 ---
 
@@ -3049,7 +3058,7 @@ Pass name directly: \`npx rootnative create my-app\`
 ## Installation (existing project)
 
 \`\`\`bash
-pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated react-native-worklets
+pnpm add @rootnative/core @rootnative/components @react-native-vector-icons/material-design-icons expo-font react-native-safe-area-context react-native-reanimated react-native-worklets
 \`\`\`
 
 Reanimated 4 runs on \`react-native-worklets\` (installed above). Expo SDK ${EXPO_SDK} bundles its Babel plugin — nothing to configure. On bare React Native, add \`'react-native-worklets/plugin'\` last in \`babel.config.js\` plugins.

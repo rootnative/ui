@@ -69,13 +69,13 @@ export interface ButtonProps extends Omit<
   shape?: ButtonShape
   /**
    * Icon rendered before the label. Accepts a string name (resolved via the
-   * theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a
+   * theme's `iconResolver`, for example `mdiResolver`), a
    * pre-rendered element, or a render function that receives `{ size, color }`.
    */
   leadingIcon?: IconSource
   /**
    * Icon rendered after the label. Accepts a string name (resolved via the
-   * theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a
+   * theme's `iconResolver`, for example `mdiResolver`), a
    * pre-rendered element, or a render function that receives `{ size, color }`.
    */
   trailingIcon?: IconSource

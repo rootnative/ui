@@ -37,7 +37,7 @@ export interface TextFieldProps extends Omit<
   disabled?: boolean
   /**
    * Icon rendered at the start of the field. Accepts a string name (resolved
-   * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
+   * via the theme's `iconResolver`, for example `mdiResolver`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.
    */
   leadingIcon?: IconSource

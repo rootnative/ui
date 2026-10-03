@@ -5,7 +5,7 @@
 > Requirements: react-native >=0.83.0 <0.87.0, react >=19.2.3 <20.0.0, Expo SDK 57
 > Platforms: iOS, Android, and web through `react-native-web` (web also needs `react-dom`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: `react-native-safe-area-context >=4.0.0`, `react-native-reanimated >=4.5.0 <4.6.0`, `react-native-worklets >=0.10.0 <0.11.0` (Reanimated 4 runtime — Expo SDK 57 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
-> Required for string icon names: `@expo/vector-icons >=14.0.0`. The import is static, so every bundle must resolve it, even with a custom `iconResolver`; a bundler without Expo aliases it to a stub (see Web without Expo below)
+> Optional peer: `@react-native-vector-icons/material-design-icons >=13.0.0` (plus `expo-font` on Expo), imported only by the `@rootnative/components/mdi` subpath (`mdiResolver`, the MaterialDesignIcons resolver for string icon names). An app with its own `iconResolver` does not install it
 
 ---
 
@@ -29,7 +29,7 @@ Pass name directly: `npx rootnative create my-app`
 ## Installation (existing project)
 
 ```bash
-pnpm add @rootnative/core @rootnative/components @expo/vector-icons react-native-safe-area-context react-native-reanimated react-native-worklets
+pnpm add @rootnative/core @rootnative/components @react-native-vector-icons/material-design-icons expo-font react-native-safe-area-context react-native-reanimated react-native-worklets
 ```
 
 Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 57 bundles its Babel plugin — nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` last in `babel.config.js` plugins.
@@ -42,13 +42,17 @@ Mount the providers once, at the app root, in this order. Each provider
 below is also documented on its own; this is the assembled result.
 
 ```tsx
+import { mdiResolver } from '@rootnative/components/mdi'
 import { PortalHost } from '@rootnative/components/portal'
 import { SnackbarProvider } from '@rootnative/components/snackbar'
 import { ThemeProvider, darkTheme, lightTheme } from '@rootnative/core'
 
 export default function App() {
   return (
-    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+    <ThemeProvider
+      theme={{ light: lightTheme, dark: darkTheme }}
+      iconResolver={mdiResolver}
+    >
       <PortalHost>
         <SnackbarProvider>
           {/* Your app */}
@@ -77,6 +81,10 @@ Why that order:
   `storage={AsyncStorage}` to remember an explicit choice across launches. On
   web, pass `localStorage` itself: a `getItem` or `setItem` that throws is
   caught and the mode stays at `defaultMode`, so no wrapper is needed.
+  `iconResolver` renders string icon names; `mdiResolver` is the
+  MaterialDesignIcons one and the only module that imports
+  `@react-native-vector-icons/material-design-icons`. Pass your own resolver
+  instead to drop that peer.
 - **`PortalHost`** — inside `ThemeProvider`, so portalled overlays are themed
   too, and above your screens, so overlays get the whole window. One host at the
   root; `Dialog`, `BottomSheet`, `Menu`, `Tooltip` and `Snackbar` all need it.
@@ -189,10 +197,13 @@ and a full webpack config.
    `process.env.NODE_ENV`.** Reanimated reads `global`; a browser and a
    sandboxed Electron renderer throw `ReferenceError: global is not defined`
    without the define.
-5. **Resolve `@expo/vector-icons/MaterialCommunityIcons`.** The import is
-   static. Either install `@expo/vector-icons` and `expo-font`, which run on
-   web without the rest of Expo, or register an `iconResolver` and alias the
-   import to a module that exports `null`.
+5. **Choose an icon set.** A string icon name needs an `iconResolver` on
+   `ThemeProvider`. For MaterialDesignIcons, install
+   `@react-native-vector-icons/material-design-icons` and `expo-font`, which run on
+   web without the rest of Expo, and pass `mdiResolver` from
+   `@rootnative/components/mdi`. For your own icons, register your resolver
+   and skip the install: only the `mdi` subpath imports the icon package,
+   so no alias is needed.
 
 Vite, with `@rolldown/plugin-babel`:
 
@@ -350,7 +361,7 @@ Shared utilities used by `@rootnative/components` and available for custom compo
 > the package name. The import below shows the API as it exists inside this repo.
 
 ```tsx
-import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, transformOrigin, selectRTL } from '@rootnative/utils'
+import { alphaColor, blendColor, elevationStyle, renderIcon, transformOrigin, selectRTL } from '@rootnative/utils'
 ```
 
 ### Color helpers
@@ -369,9 +380,9 @@ import { alphaColor, blendColor, elevationStyle, getMaterialCommunityIcons, tran
 - `transformOrigin(vertical?: 'top' | 'center' | 'bottom'): string` — Returns `"left top"` or `"right top"` based on RTL layout direction. Used for label animations.
 - `selectRTL<T>(ltr: T, rtl: T): T` — Picks a value based on layout direction.
 
-### Icon resolver
+### Icon rendering
 
-- `getMaterialCommunityIcons()` — Lazily resolves `MaterialCommunityIcons` from `@expo/vector-icons` at render time. Throws with install instructions if the package is missing.
+- `renderIcon(source: IconSource | null | undefined, props: IconRenderProps, resolver: IconResolver | null | undefined): ReactNode` — Renders any `IconSource`. A string name goes to the resolver; without one it renders `null` and logs one warning per process. An element is returned as is; a function is called with `props`. Place the result under an `aria-hidden` node.
 
 ### Test helper (subpath export)
 
@@ -444,7 +455,7 @@ Props:
 - `defaultMode?: 'system' | 'light' | 'dark'` — Initial mode when uncontrolled. Default: `'system'`
 - `onModeChange?: (mode: ThemeMode) => void`
 - `storage?: { getItem, setItem }` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
-- `iconResolver?: IconResolver`
+- `iconResolver?: IconResolver` — Renders string icon names. Pass `mdiResolver` from `@rootnative/components/mdi` for MaterialDesignIcons, or your own. Without it a string name renders nothing and logs one warning
 - `children: ReactNode`
 
 ### useThemeMode()
@@ -788,8 +799,8 @@ Props:
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
-- `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
-- `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `iconSize?: number` — Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized. Defaults to the icon size for the current `size` (20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`).
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set.
@@ -880,7 +891,7 @@ import { IconButton } from '@rootnative/components/icon-button'
 ```
 
 Props:
-- `icon: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `icon: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `selectedIcon?: IconSource` — Icon to display when `selected` is `true` (toggle mode).
 - `iconColor?: string` — Overrides the automatic icon color derived from the variant and state.
 - `contentColor?: string` — Override the content (icon) color. Takes precedence over `iconColor` when both are provided.
@@ -915,7 +926,7 @@ import { Icon } from '@rootnative/components/icon'
 ```
 
 Props:
-- `source: IconSource` — The icon. A string name is resolved through the theme's `iconResolver` (MaterialCommunityIcons by default); a pre-rendered element renders as is; a render function receives `{ size, color }`.
+- `source: IconSource` — The icon. A string name is resolved through the theme's `iconResolver` (`mdiResolver` for MaterialDesignIcons); a pre-rendered element renders as is; a render function receives `{ size, color }`.
 - `size?: number` — Default: `24`. Icon size in dp. The box is square at this size.
 - `color?: string` — Default: `onSurface`. Icon color.
 - `accessibilityLabel?: string` — Screen-reader label. Without one the icon is decorative and hidden from assistive technology. With one, the icon is exposed as an image with this name.
@@ -938,7 +949,7 @@ import { FAB } from '@rootnative/components/fab'
 ```
 
 Props:
-- `icon: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `icon: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `label?: string` — Optional text label. When provided, renders an extended FAB (56dp tall) and `size` is ignored. The label is also used as the accessible name unless `accessibilityLabel` is also set.
 - `variant?: 'primary' | 'secondary' | 'tertiary' | 'surface'` — Default: `'primary'`. Color variant. Controls container and content colors.
 - `size?: 'small' | 'medium' | 'large'` — Default: `'medium'`. Physical size. Ignored when `label` is set.
@@ -1077,7 +1088,7 @@ Smart, contextual actions related to the surrounding content.
 Props:
 - `variant?: 'assist'`
 - `elevated?: boolean` — Default: `false`. Whether the chip uses an elevated surface instead of an outline border.
-- `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 
 #### Filter
 
@@ -1125,7 +1136,7 @@ Props:
 - `onValueChange?: (value: boolean) => void` — Callback fired when the checkbox is toggled. Receives the new value.
 - `indeterminate?: boolean` — Default: `false`. Render the MD3 indeterminate ("mixed") state — a dash mark on the selected container colors. Wins over `value` visually, and reports `checked: 'mixed'` to accessibility.
 - `error?: boolean` — Default: `false`. Render the MD3 error state: `error`-colored outline when unchecked, and an `error` container with `onError` mark when checked or indeterminate. State-layer (hover, focus, press) colors also use `error`. The standard disabled treatment wins over the error state.
-- `checkIcon?: IconSource` — Default: `'check'`. Icon shown when the checkbox is checked. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Override this when your `iconResolver` doesn't map the default `'check'` name (e.g. a Lucide-only resolver).
+- `checkIcon?: IconSource` — Default: `'check'`. Icon shown when the checkbox is checked. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Override this when your `iconResolver` doesn't map the default `'check'` name (e.g. a Lucide-only resolver).
 - `containerColor?: string` — Override the container (box) color when checked. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the checkmark icon color.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
@@ -1164,7 +1175,7 @@ Props:
 - `value?: boolean` — Whether the switch is toggled on (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
 - `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed.
 - `onValueChange?: (value: boolean) => void` — Callback fired when the switch is toggled. Receives the new value.
-- `selectedIcon?: IconSource` — Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Opt-in: the MD3 default switch renders no icons — pass `'check'` for the spec's "switch with icon" variant.
+- `selectedIcon?: IconSource` — Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Opt-in: the MD3 default switch renders no icons — pass `'check'` for the spec's "switch with icon" variant.
 - `unselectedIcon?: IconSource` — Icon shown on the thumb when unselected. When provided, the thumb renders at the larger selected size. Same accepted forms as `selectedIcon`.
 - `containerColor?: string` — Override the track color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the thumb and icon color.
@@ -1189,7 +1200,7 @@ Props:
 - `errorText?: string` — Error message. When provided, implicitly sets `error` to `true` and replaces `supportingText`.
 - `error?: boolean` — Default: `false`. When `true`, renders the field in error state with error colors.
 - `disabled?: boolean` — Default: `false`. Disables text input and reduces opacity.
-- `leadingIcon?: IconSource` — Icon rendered at the start of the field. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `leadingIcon?: IconSource` — Icon rendered at the start of the field. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered at the end of the field. Same accepted forms as `leadingIcon`.
 - `onTrailingIconPress?: () => void` — Called when the trailing icon is pressed.
 - `trailingIconAccessibilityLabel?: string` — Accessibility label announced by screen readers for the trailing icon pressable (e.g. "Show password").
@@ -1226,7 +1237,7 @@ import { SearchBar } from '@rootnative/components/search-bar'
 ```
 
 Props:
-- `leadingIcon?: IconSource` — Default: `'magnify'`. Icon rendered at the start of the bar. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`.
+- `leadingIcon?: IconSource` — Default: `'magnify'`. Icon rendered at the start of the bar. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `onLeadingIconPress?: () => void` — Makes the leading icon a button — for a navigation icon such as a menu or a back arrow. Label it with `leadingIconAccessibilityLabel`.
 - `leadingIconAccessibilityLabel?: string` — Accessibility label for the leading icon when it is a button.
 - `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
@@ -1246,7 +1257,7 @@ Props:
 - Inherits `TextInputProps` (except `editable`, `style`)
 
 SearchBarAction:
-- `icon: IconSource` — Icon to render. Accepts the same forms as `IconButton.icon` — a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function.
+- `icon: IconSource` — Icon to render. Accepts the same forms as `IconButton.icon` — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function.
 - `accessibilityLabel: string` — Accessibility label for screen readers (required).
 - `onPress?: () => void` — Called when the action is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the action.
@@ -2241,7 +2252,7 @@ import { Avatar } from '@rootnative/components/avatar'
 
 Props:
 - `imageUri?: string` — URI of the image to display. Takes priority over `icon` and `label`.
-- `icon?: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`), a pre-rendered element, or a render function that receives `{ size, color }`. Takes priority over `label` when `imageUri` is not set.
+- `icon?: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Takes priority over `label` when `imageUri` is not set.
 - `label?: string` — Text initials to display (1–2 characters recommended). Shown when `imageUri` and `icon` are not set.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xSmall' | 'xLarge'` — Default: `'medium'`. Size of the avatar.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically when `onPress` is set.
@@ -2261,15 +2272,15 @@ import { Badge } from '@rootnative/components/badge'
 
 // No label: a 6dp dot. Give it a label for screen readers.
 <Badge accessibilityLabel="New activity">
-  <MaterialCommunityIcons name="bell-outline" size={24} />
+  <MaterialDesignIcons name="bell-outline" size={24} />
 </Badge>
 
 // Label: a 16dp pill. Numbers above max (default 999) render as "999+".
 <Badge label={3}>
-  <MaterialCommunityIcons name="email-outline" size={24} />
+  <MaterialDesignIcons name="email-outline" size={24} />
 </Badge>
 <Badge label={1200} max={99}>
-  <MaterialCommunityIcons name="message-outline" size={24} />
+  <MaterialDesignIcons name="message-outline" size={24} />
 </Badge>
 
 // Hidden badge keeps the anchor layout. No children renders inline.
@@ -2463,26 +2474,26 @@ Props:
 
 Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/core'`) — one of three forms:
 
-1. **String name** — resolved through the theme's `iconResolver`. Defaults to `MaterialCommunityIcons` from `@expo/vector-icons`. Browse names at https://pictogrammers.com/library/mdi/.
+1. **String name** — resolved through the theme's `iconResolver`. Pass `mdiResolver` from `@rootnative/components/mdi` for `MaterialDesignIcons` (browse names at https://pictogrammers.com/library/mdi/), or another resolver. Without a resolver a string name renders nothing and logs one warning.
 2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
 3. **Render function** — `(props: { size: number; color?: string }) => ReactNode`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. `@expo/vector-icons` is used at run time only for string icon names without a custom resolver, but the import is static, so the bundler must resolve it in every app. Without Expo, alias `@expo/vector-icons/MaterialCommunityIcons` to a module that exports `null` (docs page: Web without Expo).
+Per-call elements/functions always take precedence over the resolver. Only `@rootnative/components/mdi` imports `@react-native-vector-icons/material-design-icons`; the root entry and every other subpath do not. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
 
 ### When to pick which
 
 | Situation | Reach for |
 | --- | --- |
-| `@expo/vector-icons` is installed and MDI names are fine | Nothing — the built-in resolver already works |
+| MaterialDesignIcons names (`@react-native-vector-icons/material-design-icons`) | `mdiResolver` from `@rootnative/components/mdi` |
 | Lucide icons | `createLucideResolver` |
 | Phosphor icons | `createPhosphorResolver` |
-| Any other `@expo/vector-icons` set (Ionicons, FontAwesome, …) | `createVectorIconsResolver` |
+| Any other `@react-native-vector-icons/*` set (Ionicons, FontAwesome, …), or the MDI `/static` export | `createVectorIconsResolver` |
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
 
 ### `@rootnative/icons` adapter package (v0.0.0-alpha.21)
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@expo/vector-icons` are declared as optional peer deps.
+Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@react-native-vector-icons/*` are declared as optional peer deps.
 
 ```bash
 pnpm add @rootnative/icons
@@ -2492,7 +2503,7 @@ pnpm add @rootnative/icons
 |--------|-----|
 | `createLucideResolver({ icons })` | [Lucide](https://lucide.dev) (`lucide-react-native`) |
 | `createPhosphorResolver({ icons })` | [Phosphor](https://phosphoricons.com) (`phosphor-react-native`) |
-| `createVectorIconsResolver({ IconSet })` | Any `@expo/vector-icons` set (`Ionicons`, `FontAwesome`, …) |
+| `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …), or an `@expo/vector-icons` set |
 | `withLegacyMdiFallback(resolver)` | Wrap any custom resolver to add MDI-name compatibility |
 
 #### Lucide
@@ -2525,10 +2536,10 @@ const resolver = createPhosphorResolver({
 })
 ```
 
-#### `@expo/vector-icons`
+#### `@react-native-vector-icons/*`
 
 ```tsx
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@react-native-vector-icons/ionicons'
 import { createVectorIconsResolver } from '@rootnative/icons'
 
 const resolver = createVectorIconsResolver({
@@ -2539,7 +2550,7 @@ const resolver = createVectorIconsResolver({
 
 #### Custom resolver + MDI compatibility
 
-`withLegacyMdiFallback` wraps any `IconResolver` so that legacy MaterialCommunityIcons names (`magnify`, `pencil`, `dots-vertical`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns `null`.
+`withLegacyMdiFallback` wraps any `IconResolver` so that legacy MaterialDesignIcons names (`magnify`, `pencil`, `dots-vertical`, …) are rewritten to the wrapped resolver's vocabulary. The base resolver is always tried first; the alias map is consulted only when the base returns `null`.
 
 ```tsx
 import { withLegacyMdiFallback } from '@rootnative/icons'

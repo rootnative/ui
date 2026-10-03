@@ -199,7 +199,7 @@ Checks include:
 - React Native version compatibility
 - Installed component file integrity
 - `@rootnative/inertia` — a hard failure when missing, since every animated component needs it
-- Optional peer dependencies (`react-native-safe-area-context`, `@expo/vector-icons`) — reported as warnings
+- Optional peer dependencies (`react-native-safe-area-context`, and `@react-native-vector-icons/material-design-icons` for `mdiResolver`) — reported as warnings
 
 ## Configuration
 

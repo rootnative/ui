@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   Avatar,
   Badge,
@@ -78,17 +78,17 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
     case 'RTL':
       return (
         <Row gap="md" align="center">
-          <MaterialCommunityIcons
+          <MaterialDesignIcons
             name="format-pilcrow-arrow-left"
             size={32}
             color={theme.colors.primary}
           />
-          <MaterialCommunityIcons
+          <MaterialDesignIcons
             name="swap-horizontal"
             size={20}
             color={theme.colors.onSurfaceVariant}
           />
-          <MaterialCommunityIcons
+          <MaterialDesignIcons
             name="format-pilcrow-arrow-right"
             size={32}
             color={theme.colors.tertiary}
@@ -166,7 +166,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       )
     case 'SearchView':
       return (
-        <MaterialCommunityIcons
+        <MaterialDesignIcons
           name="text-box-search-outline"
           size={48}
           color={theme.colors.primary}
@@ -174,7 +174,7 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       )
     case 'Keyboard Wrapper':
       return (
-        <MaterialCommunityIcons
+        <MaterialDesignIcons
           name="keyboard-outline"
           size={48}
           color={theme.colors.primary}
@@ -284,21 +284,21 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       return (
         <Row gap="lg" align="center">
           <Badge>
-            <MaterialCommunityIcons
+            <MaterialDesignIcons
               name="bell-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
             />
           </Badge>
           <Badge label={3}>
-            <MaterialCommunityIcons
+            <MaterialDesignIcons
               name="email-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
             />
           </Badge>
           <Badge label={1200}>
-            <MaterialCommunityIcons
+            <MaterialDesignIcons
               name="message-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
@@ -781,7 +781,7 @@ export default function HomeScreen() {
         {isEmbedded ? null : (
           <Column gap="md" style={styles.hero}>
             <Row gap="xs" align="center">
-              <MaterialCommunityIcons
+              <MaterialDesignIcons
                 name="palette-outline"
                 size={18}
                 color={theme.colors.primary}
@@ -861,7 +861,7 @@ export default function HomeScreen() {
 
         {visibleSections.length === 0 ? (
           <Column align="center" gap="sm" style={styles.emptyState}>
-            <MaterialCommunityIcons
+            <MaterialDesignIcons
               name="magnify-close"
               size={48}
               color={theme.colors.onSurfaceVariant}

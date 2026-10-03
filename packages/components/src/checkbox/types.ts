@@ -35,7 +35,7 @@ export interface CheckboxProps extends Omit<
   error?: boolean
   /**
    * Icon shown when the checkbox is checked. Accepts a string name (resolved
-   * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
+   * via the theme's `iconResolver`, for example `mdiResolver`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.
    *
    * Override this when your `iconResolver` doesn't map the default `'check'`

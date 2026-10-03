@@ -14,6 +14,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
   name="RootNative TextField — Usage"
   code={`
   import { TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -23,7 +24,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
     const [value, setValue] = useState('')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <TextField
               label="Email"
@@ -49,6 +50,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
   name="RootNative TextField — Variants"
   code={`
   import { TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -59,7 +61,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
     const [b, setB] = useState('')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 16 }}>
             <TextField label="Filled" variant="filled" value={a} onChangeText={setA} />
             <TextField label="Outlined" variant="outlined" value={b} onChangeText={setB} />
@@ -77,6 +79,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
   name="RootNative TextField — Icons"
   code={`
   import { TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -86,7 +89,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
     const [value, setValue] = useState('')
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <TextField
               label="Search"
@@ -110,6 +113,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
   name="RootNative TextField — Validation"
   code={`
   import { TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -120,7 +124,7 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
     const isValid = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <TextField
               label="Email"

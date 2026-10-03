@@ -20,6 +20,7 @@ gives the sheet the whole window.
   name="RootNative BottomSheet — Usage"
   code={`
   import { BottomSheet, Button, PortalHost, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -47,7 +48,7 @@ gives the sheet the whole window.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
@@ -75,6 +76,7 @@ so `0` is always the lowest.
   name="RootNative BottomSheet — Snap points"
   code={`
   import { BottomSheet, Button, PortalHost, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -106,7 +108,7 @@ so `0` is always the lowest.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

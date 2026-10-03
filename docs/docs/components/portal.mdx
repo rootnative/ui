@@ -15,6 +15,7 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
   name="RootNative Portal — Setup"
   code={`
   import { PortalHost, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -22,7 +23,7 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
               <Typography variant="bodyLarge">App content lives here.</Typography>
@@ -41,6 +42,7 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
   name="RootNative Portal — Usage"
   code={`
   import { Button, Portal, PortalHost, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -71,7 +73,7 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

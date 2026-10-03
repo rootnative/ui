@@ -14,6 +14,7 @@ Follows the [Material Design 3 Chip](https://m3.material.io/components/chips/ove
   name="RootNative Chip — Usage"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert, View } from 'react-native'
@@ -21,7 +22,7 @@ Follows the [Material Design 3 Chip](https://m3.material.io/components/chips/ove
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Chip variant="assist" onPress={() => Alert.alert('Pressed')}>
               Assist
@@ -51,6 +52,7 @@ Available on `assist`, `filter`, and `suggestion` variants. Input chips are alwa
   name="RootNative Chip — Elevated"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -58,7 +60,7 @@ Available on `assist`, `filter`, and `suggestion` variants. Input chips are alwa
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Chip variant="assist" elevated onPress={() => {}}>Elevated Assist</Chip>
           </View>
@@ -77,6 +79,7 @@ Filter chips support a `selected` state. When selected, a checkmark icon appears
   name="RootNative Chip — Filter"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -87,7 +90,7 @@ Filter chips support a `selected` state. When selected, a checkmark icon appears
     const [inactive, setInactive] = useState(false)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Chip variant="filter" selected={active} onPress={() => setActive(!active)}>Active</Chip>
             <Chip variant="filter" selected={inactive} onPress={() => setInactive(!inactive)}>Inactive</Chip>
@@ -109,6 +112,7 @@ The close icon is a separate accessibility target from the chip itself, so it na
   name="RootNative Chip — Close"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Alert, View } from 'react-native'
@@ -116,7 +120,7 @@ The close icon is a separate accessibility target from the chip itself, so it na
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Chip variant="input" onClose={() => Alert.alert('Closed')}>Tag</Chip>
             <Chip variant="filter" selected onClose={() => Alert.alert('Closed')}>Active</Chip>
@@ -134,6 +138,7 @@ The close icon is a separate accessibility target from the chip itself, so it na
   name="RootNative Chip — Icons"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -141,7 +146,7 @@ The close icon is a separate accessibility target from the chip itself, so it na
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Chip leadingIcon="calendar" onPress={() => {}}>Schedule</Chip>
             <Chip variant="input" leadingIcon="tag" onClose={() => {}}>Tagged</Chip>
@@ -161,6 +166,7 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
   name="RootNative Chip — Avatar"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { Image, View } from 'react-native'
@@ -168,7 +174,7 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Chip
               variant="input"
@@ -196,6 +202,7 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
   name="RootNative Chip — Disabled"
   code={`
   import { Chip } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -203,7 +210,7 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Chip disabled onPress={() => {}}>Disabled</Chip>
           </View>

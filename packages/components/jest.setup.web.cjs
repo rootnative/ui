@@ -35,12 +35,12 @@ if (!window.matchMedia) {
 // so `Animated.View` wraps react-native-web's `View` and renders to a real div.
 require('@rootnative/inertia/jest-setup')
 
-jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => {
+jest.mock('@react-native-vector-icons/material-design-icons', () => {
   const React = require('react')
   const { Text } = require('react-native')
   return {
     __esModule: true,
-    default: ({ name, style, ...props }) =>
+    MaterialDesignIcons: ({ name, style, ...props }) =>
       React.createElement(Text, { ...props, style }, name),
   }
 })

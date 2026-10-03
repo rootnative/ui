@@ -18,8 +18,8 @@ export type SearchBarDensity = 0 | -1 | -2 | -3 | -4
 export interface SearchBarAction {
   /**
    * Icon to render. Accepts the same forms as `IconButton.icon` — a string
-   * name (resolved via the theme's `iconResolver`, defaulting to
-   * `MaterialCommunityIcons`), a pre-rendered element, or a render function.
+   * name (resolved via the theme's `iconResolver`, for example
+   * `mdiResolver`), a pre-rendered element, or a render function.
    */
   icon: IconSource
   /** Accessibility label for screen readers (required). */
@@ -39,7 +39,7 @@ interface SearchBarCommonProps extends Omit<
 > {
   /**
    * Icon rendered at the start of the bar. Accepts a string name (resolved
-   * via the theme's `iconResolver`, defaulting to `MaterialCommunityIcons`),
+   * via the theme's `iconResolver`, for example `mdiResolver`),
    * a pre-rendered element, or a render function that receives `{ size, color }`.
    * @default 'magnify'
    */

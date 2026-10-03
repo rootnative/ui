@@ -27,6 +27,7 @@ prop, the bar tracks the active destination itself and starts on the first item.
   name="RootNative NavigationBar — Usage"
   code={`
   import { NavigationBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -64,7 +65,7 @@ prop, the bar tracks the active destination itself and starts on the first item.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <Screen />
         </ThemeProvider>
       </SafeAreaProvider>

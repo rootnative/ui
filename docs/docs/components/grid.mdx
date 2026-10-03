@@ -13,6 +13,7 @@ A multi-column grid that wraps children into equal-width columns. Built on top o
   name="RootNative Grid — Usage"
   code={`
   import { Card, Grid, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ A multi-column grid that wraps children into equal-width columns. Built on top o
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Grid columns={2} gap="sm">
               <Card variant="outlined"><Typography>Item 1</Typography></Card>
@@ -46,6 +47,7 @@ Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all colu
   name="RootNative Grid — Column Counts"
   code={`
   import { Button, Grid, IconButton, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -53,7 +55,7 @@ Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all colu
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 24 }}>
             <Typography variant="titleSmall">Two columns</Typography>
             <Grid columns={2} gap="md">
@@ -86,6 +88,7 @@ changes.
   name="RootNative Grid — Responsive Columns"
   code={`
   import { Card, Grid, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -93,7 +96,7 @@ changes.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Grid columns={{ compact: 1, medium: 2, expanded: 4 }} gap="sm">
               <Card variant="outlined"><Typography>Item 1</Typography></Card>
@@ -124,6 +127,7 @@ the column count, so it fills the row instead of overflowing it.
   name="RootNative Grid — Spanning Cells"
   code={`
   import { Card, Grid, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -131,7 +135,7 @@ the column count, so it fills the row instead of overflowing it.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Grid columns={12} gap="sm">
               <Grid.Cell span={8}>

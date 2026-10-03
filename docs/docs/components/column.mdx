@@ -13,6 +13,7 @@ Lays children out vertically. Extends [Box](./box) with all spacing, alignment, 
   name="RootNative Column — Usage"
   code={`
   import { Button, Column, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -20,7 +21,7 @@ Lays children out vertically. Extends [Box](./box) with all spacing, alignment, 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center' }}>
             <Column gap="md" p="lg">
               <Typography variant="headlineSmall">Title</Typography>
@@ -43,6 +44,7 @@ Reverse the layout direction with `inverted`:
   name="RootNative Column — Inverted"
   code={`
   import { Column, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -50,7 +52,7 @@ Reverse the layout direction with `inverted`:
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, justifyContent: 'center', padding: 16 }}>
             <Column inverted gap="sm">
               <Typography>First</Typography>

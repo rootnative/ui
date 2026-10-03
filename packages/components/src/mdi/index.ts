@@ -1,0 +1,1 @@
+export { mdiResolver } from './mdiResolver'

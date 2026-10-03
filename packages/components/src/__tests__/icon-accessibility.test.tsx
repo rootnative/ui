@@ -10,7 +10,7 @@
  * private-use codepoint as nothing, or as an unknown symbol.
  *
  * **Why this asserts tree shape rather than the announced string.** The
- * `MaterialCommunityIcons` mock in `jest.setup.js` renders the icon *name*
+ * `MaterialDesignIcons` mock in `jest.setup.cjs` renders the icon *name*
  * ("check"), never a glyph, so a test that scanned for private-use codepoints
  * would be green no matter what the component did. The structural precondition
  * is the thing jest can actually see: an `aria-hidden` ancestor is what stops

@@ -14,13 +14,6 @@
     "exports": ["useFocusVisible", "isFocusVisible"],
     "dependencies": {}
   },
-  "icon": {
-    "file": "packages/utils/src/icon.ts",
-    "exports": ["getMaterialCommunityIcons"],
-    "dependencies": {
-      "@expo/vector-icons": ">=14.0.0"
-    }
-  },
   "pressable": {
     "file": "packages/utils/src/pressable.ts",
     "exports": ["resolvePressableStyle", "resolveColorFromStyle"],
@@ -30,9 +23,7 @@
   "render-icon": {
     "file": "packages/utils/src/render-icon.tsx",
     "exports": ["renderIcon"],
-    "dependencies": {
-      "@expo/vector-icons": ">=14.0.0"
-    },
+    "dependencies": {},
     "typeExports": ["IconSource"]
   },
   "rtl": {

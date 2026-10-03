@@ -5,7 +5,7 @@ const workspaceAliases = {
 }
 
 const transformIgnorePatterns = [
-  'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@expo/vector-icons|react-native-safe-area-context|@material/material-color-utilities|@rootnative/inertia|react-native-worklets)/)',
+  'node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-native-vector-icons|react-native-safe-area-context|@material/material-color-utilities|@rootnative/inertia|react-native-worklets)/)',
 ]
 
 // Two projects, because a react-native-preset suite is structurally blind to

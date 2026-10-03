@@ -191,6 +191,11 @@
       "types": "./dist/fab/index.d.ts",
       "react-native": "./dist/fab/index.js",
       "default": "./dist/fab/index.js"
+    },
+    "./mdi": {
+      "types": "./dist/mdi/index.d.ts",
+      "react-native": "./dist/mdi/index.js",
+      "default": "./dist/mdi/index.js"
     }
   },
   "typesVersions": {
@@ -299,6 +304,9 @@
       ],
       "fab": [
         "dist/fab/index.d.ts"
+      ],
+      "mdi": [
+        "dist/mdi/index.d.ts"
       ]
     }
   },
@@ -330,7 +338,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@expo/vector-icons": ">=14.0.0",
+    "@react-native-vector-icons/material-design-icons": ">=13.0.0",
     "@rootnative/core": ">=0.0.0-alpha.21",
     "@rootnative/inertia": ">=0.0.11 <0.1.0",
     "react": ">=19.2.3 <20.0.0",
@@ -346,9 +354,13 @@
     },
     "react-native-worklets": {
       "optional": true
+    },
+    "@react-native-vector-icons/material-design-icons": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@react-native/babel-preset": "^0.86.3",
     "@react-native/jest-preset": "^0.86.3",
     "@rootnative/core": "workspace:*",

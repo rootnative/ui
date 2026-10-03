@@ -11,11 +11,89 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-No breaking changes. Three new components: `NavigationRail`,
+**One breaking change: a string icon name now needs an `iconResolver` on
+`ThemeProvider`.** Pass `mdiResolver` from `@rootnative/components/mdi` to
+keep the Material Design Icons, now from
+`@react-native-vector-icons/material-design-icons`. Three new components: `NavigationRail`,
 `NavigationDrawer` and `Icon`. The components that apply safe-area insets no
 longer throw on web without a `SafeAreaProvider`. `SearchBar` takes a
 `density`. Every component now uses one size vocabulary, and the old names
 warn. A new docs page covers web without Expo.
+
+### The MDI default moved behind `@rootnative/components/mdi`, on `@react-native-vector-icons`
+
+**Breaking.** The shared icon code imported
+`@expo/vector-icons/MaterialCommunityIcons` with a static import, so every
+bundle had to resolve it, even in an app with its own `iconResolver` that
+never rendered an MDI glyph. A Vite app without Expo failed to resolve the
+package, because it needs `expo-font`, and the only way out was an alias to
+an empty module.
+
+The resolver now lives behind its own subpath, and nothing else imports an
+icon font. The font comes from `@react-native-vector-icons/material-design-icons`,
+the package Expo recommends in place of `@expo/vector-icons`
+(https://expo.dev/blog/moving-away-from-expo-vector-icons). The glyph names
+are the same MDI set, so no icon name changes:
+
+```tsx
+import { mdiResolver } from '@rootnative/components/mdi'
+
+<ThemeProvider iconResolver={mdiResolver}>{children}</ThemeProvider>
+```
+
+To upgrade an app that uses string icon names:
+
+1. Install `@react-native-vector-icons/material-design-icons`, and
+   `expo-font` on Expo: `npx expo install
+   @react-native-vector-icons/material-design-icons expo-font`.
+2. Remove `@expo/vector-icons` from `package.json`, and run
+   `npx @react-native-vector-icons/codemod` if the app imports it directly.
+3. Pass `iconResolver={mdiResolver}` to `ThemeProvider`, as above.
+4. On a bundler without Metro, delete the `@expo/vector-icons` alias stub
+   from the bundler config.
+5. In a Jest suite that renders the library with its own wrapper, pass the
+   same resolver, or use `renderWithTheme` from `@rootnative/utils/test`,
+   which installs it.
+
+An app that already passes its own `iconResolver` changes nothing, and can
+now uninstall `@expo/vector-icons`.
+
+What changes on upgrade, in detail:
+
+- **Every app that passes string icon names and no `iconResolver` adds the
+  prop above.** Without it a string name renders nothing and the library
+  logs one warning per process, in development and in production, that
+  names the subpath. The example app and both `rootnative create` templates
+  pass it.
+- `@react-native-vector-icons/material-design-icons` replaces
+  `@expo/vector-icons` as the icon peer of `@rootnative/components`, and it
+  is **optional**. On Expo it needs `expo-font`, which loads the font at run
+  time in Expo Go, in a development build and on web. An app with its own
+  resolver installs neither, and the alias stub in the Web without Expo page
+  is gone.
+- **Remove `@expo/vector-icons` from the app.** Both packages register the
+  same font, and the glyphs then render as `?` or as empty squares.
+  `npx @react-native-vector-icons/codemod` rewrites the app's own imports;
+  `npx expo doctor` reports a leftover. The example app and both templates
+  made that move.
+- `createVectorIconsResolver` from `@rootnative/icons` accepts any
+  `@react-native-vector-icons/*` set, including the MDI `/static` export for
+  a development build that embeds the font. Its `VectorIconSet` type now
+  takes a set whose `name` is a glyph union, which every generated set is.
+  An `@expo/vector-icons` set still fits, and `@rootnative/icons` no longer
+  lists that package as a peer.
+- `getMaterialCommunityIcons` is removed from the CLI registry, with the
+  `icon` util file. `render-icon` no longer declares an icon dependency. A
+  CLI project that wants the MDI default writes the resolver itself; it is
+  the function above, four lines around `MaterialDesignIcons`.
+- `renderWithTheme` from `@rootnative/utils/test` installs the MDI resolver
+  by default, so the suite renders string icons the way an Expo app does.
+  Pass `iconResolver: null` to render without one.
+
+Not a lazy load and not an auto-registration. A lazy `require()` does not
+survive tsup's ESM splitting, and Metro cannot see it. A side-effect import
+that registers a default would be dropped by a bundler that honours
+`sideEffects: false`. An explicit prop is what every bundler keeps.
 
 ### `NavigationRail`, `NavigationDrawer` and `Icon`
 
@@ -113,14 +191,14 @@ provider.
   for a bundler without Metro: the `react-native-web` alias, the `.web.*`
   extensions, the globals, the worklets Babel plugin on `@rootnative`,
   `react-native-reanimated` and `react-native-worklets` inside
-  `node_modules`, and the static icon import. Without the plugin on those
+  `node_modules`, and the icon set choice. Without the plugin on those
   three packages the build passes and nothing animates. The page also lists
   the Electron facts: relative asset paths, `'unsafe-inline'` in
   `style-src`, and the `global` define in a sandboxed renderer. The
   `llms-full.txt` carries the same section.
-- **`@expo/vector-icons` in the `llms` files.** Both files said the peer is
-  optional. The import is static, so the bundler must resolve it even with a
-  custom `iconResolver`; the files now say so and point at the alias stub.
+- **`@expo/vector-icons` in the `llms` files.** Both files disagreed on
+  whether the peer is optional. It is, and both files, the installation page
+  and the icons page now say where the one import of it lives.
 - **Theme mode on web.** `storage={localStorage}` works as is: the provider
   catches a `getItem` or `setItem` that throws. The theming page now says so
   and shows the guard for a static export.

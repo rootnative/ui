@@ -27,6 +27,7 @@ matches the drawer's `value`.
   name="RootNative NavigationDrawer — Usage"
   code={`
   import { Button, NavigationDrawer, PortalHost, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -67,7 +68,7 @@ matches the drawer's `value`.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>

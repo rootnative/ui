@@ -14,6 +14,7 @@ Follows the [Material Design 3 Switch](https://m3.material.io/components/switch/
   name="RootNative Switch — Usage"
   code={`
   import { Switch } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -23,7 +24,7 @@ Follows the [Material Design 3 Switch](https://m3.material.io/components/switch/
     const [isOn, setIsOn] = useState(false)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Switch value={isOn} onValueChange={setIsOn} />
           </View>
@@ -57,6 +58,7 @@ Icons are opt-in — the MD3 default switch renders none. Pass `selectedIcon` (a
   name="RootNative Switch — Icons"
   code={`
   import { Switch } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -67,7 +69,7 @@ Icons are opt-in — the MD3 default switch renders none. Pass `selectedIcon` (a
     const [b, setB] = useState(true)
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <Switch value={a} onValueChange={setA} selectedIcon="check" />
             <Switch
@@ -92,6 +94,7 @@ When `unselectedIcon` is provided, the thumb renders at the larger selected size
   name="RootNative Switch — Disabled"
   code={`
   import { Switch } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { View } from 'react-native'
@@ -99,7 +102,7 @@ When `unselectedIcon` is provided, the thumb renders at the larger selected size
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
             <Switch value={false} onValueChange={() => {}} disabled />
             <Switch value onValueChange={() => {}} disabled />

@@ -32,8 +32,10 @@ function Items() {
   )
 }
 
+type DrawerProps = React.ComponentProps<typeof NavigationDrawer>
+
 function renderModal(
-  props?: Partial<React.ComponentProps<typeof NavigationDrawer>>,
+  props?: Partial<Exclude<DrawerProps, { variant: 'standard' }>>,
 ) {
   return renderWithTheme(
     <PortalHost>
@@ -51,7 +53,7 @@ function renderModal(
 }
 
 function renderStandard(
-  props?: Partial<React.ComponentProps<typeof NavigationDrawer>>,
+  props?: Partial<Extract<DrawerProps, { variant: 'standard' }>>,
 ) {
   return renderWithTheme(
     <NavigationDrawer

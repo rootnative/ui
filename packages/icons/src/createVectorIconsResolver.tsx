@@ -2,21 +2,24 @@ import type { IconResolver, IconRenderProps } from '@rootnative/core'
 import * as React from 'react'
 
 /**
- * Structural shape of an `@expo/vector-icons` icon set component
- * (`MaterialCommunityIcons`, `Ionicons`, `FontAwesome`, …). Each set
- * accepts `name`, `size`, `color`, and forwards extra props to the
- * underlying glyph.
+ * Structural shape of a vector-icons icon set component: any
+ * `@react-native-vector-icons/*` set (`MaterialDesignIcons`, `Ionicons`,
+ * `FontAwesome7`, …) or an `@expo/vector-icons` set. Each set accepts `name`,
+ * `size` and `color`. A set types `name` as its own glyph union, so the shape
+ * asks for `never` there: every union is assignable to it, and the resolver
+ * casts the string name at the one call site.
  */
 export type VectorIconSet = React.ComponentType<{
-  name: string
+  name: never
   size?: number
   color?: string
 }>
 
 export interface VectorIconsResolverOptions {
   /**
-   * The icon set component, e.g. `MaterialCommunityIcons` or
-   * `Ionicons`, imported from `@expo/vector-icons`.
+   * The icon set component, e.g. `MaterialDesignIcons` from
+   * `@react-native-vector-icons/material-design-icons` or `Ionicons` from
+   * `@react-native-vector-icons/ionicons`.
    */
   IconSet: VectorIconSet
   /**
@@ -29,15 +32,15 @@ export interface VectorIconsResolverOptions {
 }
 
 /**
- * Build an `IconResolver` backed by an `@expo/vector-icons` icon set.
+ * Build an `IconResolver` backed by a vector-icons icon set.
  *
- * Most apps don't need this — the default resolver already uses
- * `MaterialCommunityIcons` directly. Use this when you want to switch
- * the default set to `Ionicons`, `FontAwesome`, etc., or pre-register
+ * `mdiResolver` from `@rootnative/components/mdi` covers the common case.
+ * Use this to switch to `Ionicons`, `FontAwesome7`, etc., to embed the MDI
+ * font with the `/static` export in a development build, or to pre-register
  * a small alias map.
  *
  * @example
- * import { Ionicons } from '@expo/vector-icons'
+ * import { Ionicons } from '@react-native-vector-icons/ionicons'
  * import { createVectorIconsResolver } from '@rootnative/icons'
  *
  * const resolver = createVectorIconsResolver({
@@ -57,6 +60,8 @@ export function createVectorIconsResolver(
     props: IconRenderProps,
   ): React.ReactNode {
     const resolved = aliases?.[name] ?? name
-    return <IconSet name={resolved} size={props.size} color={props.color} />
+    return (
+      <IconSet name={resolved as never} size={props.size} color={props.color} />
+    )
   }
 }

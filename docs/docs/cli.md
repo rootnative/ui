@@ -77,6 +77,28 @@ export default function App() {
 }
 ```
 
+A string icon name such as `leadingIcon="check"` needs an `iconResolver` on
+`ThemeProvider`. A copy-paste project does not install `@rootnative/components`,
+so it does not get `mdiResolver` from the npm package. Write the resolver in the
+project instead:
+
+```tsx
+import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
+import type { IconResolver } from '@rootnative/core'
+import type { ComponentProps } from 'react'
+
+type MdiName = ComponentProps<typeof MaterialDesignIcons>['name']
+
+const mdiResolver: IconResolver = (name, { size, color }) => (
+  <MaterialDesignIcons name={name as MdiName} size={size} color={color} />
+)
+
+<ThemeProvider iconResolver={mdiResolver}>{/* ... */}</ThemeProvider>
+```
+
+Install `@react-native-vector-icons/material-design-icons`, and `expo-font` on
+Expo, next to it. See the [Icons guide](./icons) for other icon sets.
+
 ## Commands
 
 ### `create`
@@ -245,7 +267,7 @@ Checks performed:
 | Utility barrel | `rootnative-utils.ts` exists. Skipped without a config | warn |
 | Animation engine | `@rootnative/inertia` is installed — every animated component imports it | fail |
 | Required peers | `react-native-svg` is installed — the `@rootnative/components` barrel requires it at load time | fail |
-| Optional peers | `react-native-safe-area-context` and `@expo/vector-icons` status | warn |
+| Optional peers | `react-native-safe-area-context` status, and `@react-native-vector-icons/material-design-icons` status (needed only by `mdiResolver`) | warn |
 
 Only `fail` rows count toward the issue total in the summary line. `info` rows never do,
 so `doctor` runs and exits zero on a project straight out of `create`.

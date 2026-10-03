@@ -16,6 +16,7 @@ Dialog renders through [Portal](./portal.mdx), so your app must be wrapped in a 
   name="RootNative Dialog — Usage"
   code={`
   import { Button, Dialog, PortalHost } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -43,7 +44,7 @@ Dialog renders through [Portal](./portal.mdx), so your app must be wrapped in a 
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
@@ -78,6 +79,7 @@ in `secondary`, and the headline centers with it.
   name="RootNative Dialog — Icon"
   code={`
   import { Button, Dialog, PortalHost } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -106,7 +108,7 @@ in `secondary`, and the headline centers with it.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
@@ -128,6 +130,7 @@ confirming action. `Dialog.Content` scrolls below it. There is no scrim.
   name="RootNative Dialog — Full-screen"
   code={`
   import { Button, Column, Dialog, PortalHost, TextField } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
   import { ThemeProvider } from '@rootnative/core'
   import { SafeAreaProvider } from 'react-native-safe-area-context'
   import { useState } from 'react'
@@ -157,7 +160,7 @@ confirming action. `Dialog.Content` scrolls below it. There is no scrim.
   export default function App() {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
           <PortalHost>
             <Screen />
           </PortalHost>
