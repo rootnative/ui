@@ -35,6 +35,13 @@ indexes it.
 A dynamic route needs `generateStaticParams`, or the export writes no file
 for it.
 
+The static output renders your `app/+html.tsx`. The single-page output used
+Expo's own template, so a custom shell that worked before may lack
+`ScrollViewStyleReset` from `expo-router/html`. Without it `#root` has no
+height, a Stack screen that fills its parent fills nothing, and the page
+shows the top bar over an empty area while the DOM holds every node. Keep
+the reset in the shell, as the example in step 7 does.
+
 ## 2. Links as `Link`
 
 Use `Link` from `expo-router` for every navigation. It renders an `<a href>`

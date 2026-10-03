@@ -1,4 +1,3 @@
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   Avatar,
   Badge,
@@ -44,6 +43,7 @@ import {
 } from 'react-native'
 import { matchesQuery, sections, totalComponents } from '../src/catalog'
 import { site } from '../src/site'
+import { useHydrated } from '../src/use-hydrated'
 
 const HOME_DESCRIPTION =
   'Material Design 3 components for React Native — copy, paste, ship. Browse every component of RootNative UI in the browser.'
@@ -87,18 +87,18 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
     case 'RTL':
       return (
         <Row gap="md" align="center">
-          <MaterialDesignIcons
-            name="format-pilcrow-arrow-left"
+          <Icon
+            source="format-pilcrow-arrow-left"
             size={32}
             color={theme.colors.primary}
           />
-          <MaterialDesignIcons
-            name="swap-horizontal"
+          <Icon
+            source="swap-horizontal"
             size={20}
             color={theme.colors.onSurfaceVariant}
           />
-          <MaterialDesignIcons
-            name="format-pilcrow-arrow-right"
+          <Icon
+            source="format-pilcrow-arrow-right"
             size={32}
             color={theme.colors.tertiary}
           />
@@ -175,16 +175,16 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       )
     case 'SearchView':
       return (
-        <MaterialDesignIcons
-          name="text-box-search-outline"
+        <Icon
+          source="text-box-search-outline"
           size={48}
           color={theme.colors.primary}
         />
       )
     case 'Keyboard Wrapper':
       return (
-        <MaterialDesignIcons
-          name="keyboard-outline"
+        <Icon
+          source="keyboard-outline"
           size={48}
           color={theme.colors.primary}
         />
@@ -293,22 +293,22 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
       return (
         <Row gap="lg" align="center">
           <Badge>
-            <MaterialDesignIcons
-              name="bell-outline"
+            <Icon
+              source="bell-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
             />
           </Badge>
           <Badge label={3}>
-            <MaterialDesignIcons
-              name="email-outline"
+            <Icon
+              source="email-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
             />
           </Badge>
           <Badge label={1200}>
-            <MaterialDesignIcons
-              name="message-outline"
+            <Icon
+              source="message-outline"
               size={24}
               color={theme.colors.onSurfaceVariant}
             />
@@ -594,6 +594,7 @@ export default function HomeScreen() {
   const router = useRouter()
   const theme = useTheme()
   const { width } = useWindowDimensions()
+  const hydrated = useHydrated()
   // The docs homepage embeds this app in a phone frame with `?embed=1`. Its own
   // hero already carries the same name, tagline and stats, so repeating them
   // inside the frame just pushes every component below the fold.
@@ -606,8 +607,11 @@ export default function HomeScreen() {
     large: 4,
   })
   // Two 128px-preview cards need ~190dp each before their contents start
-  // truncating — under ~400dp wide the grid drops to a single column.
-  const columns = width < 400 ? 1 : columnsForBreakpoint
+  // truncating — under ~400dp wide the grid drops to a single column. The
+  // export server has a 0 wide window, so the rule waits for hydration; the
+  // static HTML holds the compact column count and the client agrees with it
+  // on its first render.
+  const columns = hydrated && width < 400 ? 1 : columnsForBreakpoint
   const padding = useBreakpointValue({
     compact: 16,
     medium: 24,
@@ -796,8 +800,8 @@ export default function HomeScreen() {
         {isEmbedded ? null : (
           <Column gap="md" style={styles.hero}>
             <Row gap="xs" align="center">
-              <MaterialDesignIcons
-                name="palette-outline"
+              <Icon
+                source="palette-outline"
                 size={18}
                 color={theme.colors.primary}
                 aria-hidden
@@ -882,8 +886,8 @@ export default function HomeScreen() {
 
         {visibleSections.length === 0 ? (
           <Column align="center" gap="sm" style={styles.emptyState}>
-            <MaterialDesignIcons
-              name="magnify-close"
+            <Icon
+              source="magnify-close"
               size={48}
               color={theme.colors.onSurfaceVariant}
             />

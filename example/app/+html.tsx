@@ -1,4 +1,5 @@
 import { shellTags } from '@rootnative/seo/expo-router'
+import { ScrollViewStyleReset } from 'expo-router/html'
 import type { PropsWithChildren } from 'react'
 
 export default function Root({ children }: PropsWithChildren) {
@@ -11,6 +12,13 @@ export default function Root({ children }: PropsWithChildren) {
           manifest: '/manifest.webmanifest',
         })}
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        {/*
+          Gives `#root` and `body` their height and disables body scrolling,
+          so a Stack screen that fills its parent has a parent to fill. The
+          static output uses this shell; the single-page output used Expo's
+          own template, which carries the same reset.
+        */}
+        <ScrollViewStyleReset />
         {/*
           SPA redirect handler for GitHub Pages.
           The custom 404.html stores the original path in sessionStorage

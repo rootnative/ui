@@ -94,6 +94,14 @@ for (const page of pages) {
     )
   }
 
+  // `ScrollViewStyleReset` gives `#root` its height. Without it the Stack
+  // screen, which fills its parent, has no parent to fill, and the page shows
+  // the AppBar over an empty area while the DOM holds every node.
+  if (!html.includes('<style id="expo-reset">')) {
+    problems.push(
+      `${where}: missing the expo-reset style. Render <ScrollViewStyleReset /> in app/+html.tsx.`,
+    )
+  }
   if (count(html, /<meta[^>]*name="description"/g) !== 1) {
     problems.push(`${where}: expected one meta description`)
   }
