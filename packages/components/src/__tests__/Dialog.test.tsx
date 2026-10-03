@@ -9,6 +9,8 @@ import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button'
 import { Dialog } from '../dialog'
 import { PortalHost } from '../portal/PortalHost'
+import { CircularProgress, LinearProgress } from '../progress'
+import { Skeleton } from '../skeleton'
 
 function renderDialog(ui: React.ReactElement) {
   return renderWithTheme(<PortalHost>{ui}</PortalHost>)
@@ -325,5 +327,27 @@ describe('Dialog — settled entrance', () => {
     await screen.findByText('Delete file?')
     expect(screen.queryByTestId('undefined-layer')).toBeNull()
     expect(screen.queryByTestId('undefined-scrim')).toBeNull()
+  })
+})
+
+// A component that animates on its own renders a `Motion.*` with no `exit`.
+// Before `@rootnative/inertia` 0.0.17, that removed the closing dialog on the
+// first frame of its exit, so the dialog's own exit did not play.
+describe('Dialog — exit with self-animating content', () => {
+  it.each([
+    ['LinearProgress', <LinearProgress key="linear" />],
+    ['CircularProgress', <CircularProgress key="circular" />],
+    ['Skeleton', <Skeleton key="skeleton" width={40} height={10} />],
+  ])('keeps its layer for the exit when it holds a %s', (_, content) => {
+    const ui = (visible: boolean) => (
+      <PortalHost>
+        <Dialog visible={visible} onDismiss={jest.fn()} testID="dialog">
+          {content}
+        </Dialog>
+      </PortalHost>
+    )
+    const { rerender } = renderWithTheme(ui(true))
+    rerender(ui(false))
+    expect(screen.queryByTestId('dialog-layer')).not.toBeNull()
   })
 })

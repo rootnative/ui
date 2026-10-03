@@ -13,7 +13,7 @@
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@rootnative/components": "latest",
     "@rootnative/core": "latest",
-    "@rootnative/inertia": "0.0.14",
+    "@rootnative/inertia": "0.0.17",
     "expo": "~57.0.20",
     "expo-font": "~57.0.3",
     "expo-splash-screen": "~57.0.8",

@@ -16,7 +16,7 @@
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@rootnative/components": "workspace:*",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.14",
+    "@rootnative/inertia": "0.0.17",
     "@rootnative/utils": "workspace:*",
     "expo": "~57.0.20",
     "expo-font": "~57.0.3",

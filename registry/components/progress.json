@@ -13,7 +13,7 @@
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.21",
     "react-native-svg": ">=15.0.0",
-    "@rootnative/inertia": ">=0.0.11",
+    "@rootnative/inertia": ">=0.0.17",
     "react-native-reanimated": ">=4.5.0 <4.6.0",
     "react-native-worklets": ">=0.10.0 <0.11.0"
   },
