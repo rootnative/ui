@@ -31,7 +31,8 @@
       ]
     ],
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "output": "static"
     },
     "experiments": {
       "baseUrl": "/ui/demo"
@@ -43,7 +44,9 @@
       "url": "https://u.expo.dev/e13d4a03-0fe8-4f7f-97bb-5092bec13c51"
     },
     "extra": {
-      "router": {},
+      "router": {
+        "sitemap": false
+      },
       "eas": {
         "projectId": "e13d4a03-0fe8-4f7f-97bb-5092bec13c51"
       }

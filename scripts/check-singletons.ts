@@ -42,25 +42,46 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
-const DIST = path.join(ROOT, 'packages/components/dist')
 
-/**
- * Values that must exist exactly once in the built output.
- *
- * A React context belongs here whenever a provider and its consumer can be
- * imported from *different* entry points — that is what makes a duplicate
- * observable. All four currently qualify: `Portal`/`PortalHost`,
- * `SnackbarProvider`/`useSnackbar`, and the Dialog and Menu compound
- * components each split a provider from its children across subpaths.
- *
- * Add a new context here as soon as it is created. The cost of a wrong entry
- * is a loud failure; the cost of a missing one is the silent bug above.
- */
-const SINGLETONS = [
-  'PortalContext',
-  'SnackbarContext',
-  'DialogContext',
-  'MenuContext',
+interface PackageSpec {
+  /** The built output, relative to the repo root. */
+  dist: string
+  /** The tsup config that owns the `splitting` setting for that output. */
+  tsupConfig: string
+  /**
+   * Values that must exist exactly once in the built output.
+   *
+   * A React context belongs here whenever a provider and its consumer can be
+   * imported from *different* entry points — that is what makes a duplicate
+   * observable. In `components` all four qualify: `Portal`/`PortalHost`,
+   * `SnackbarProvider`/`useSnackbar`, and the Dialog and Menu compound
+   * components each split a provider from its children across subpaths. In
+   * `seo`, `SeoProvider` ships from `/react` and `PageHead` reads the same
+   * context from `/expo-router`.
+   *
+   * Add a new context here as soon as it is created. The cost of a wrong
+   * entry is a loud failure; the cost of a missing one is the silent bug
+   * above.
+   */
+  singletons: string[]
+}
+
+const PACKAGES: PackageSpec[] = [
+  {
+    dist: 'packages/components/dist',
+    tsupConfig: 'packages/components/tsup.config.ts',
+    singletons: [
+      'PortalContext',
+      'SnackbarContext',
+      'DialogContext',
+      'MenuContext',
+    ],
+  },
+  {
+    dist: 'packages/seo/dist',
+    tsupConfig: 'packages/seo/tsup.config.ts',
+    singletons: ['SeoContext'],
+  },
 ]
 
 const problems: string[] = []
@@ -71,56 +92,63 @@ function bundles(dir: string): string[] {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) out.push(...bundles(full))
-    else if (entry.name.endsWith('.js')) out.push(full)
+    else if (/\.(m?js)$/.test(entry.name)) out.push(full)
   }
   return out
 }
 
-if (!fs.existsSync(DIST)) {
-  console.error(
-    'packages/components/dist not found — run `pnpm run build` first.',
-  )
-  process.exit(1)
-}
+let checkedFiles = 0
+let checkedNames = 0
 
-const files = bundles(DIST)
+for (const pkg of PACKAGES) {
+  const dist = path.join(ROOT, pkg.dist)
+  if (!fs.existsSync(dist)) {
+    console.error(`${pkg.dist} not found — run \`pnpm run build\` first.`)
+    process.exit(1)
+  }
 
-for (const name of SINGLETONS) {
-  // Match the declaration, not a reference to it — every duplicate is a fresh
-  // definition, so definitions are what count.
-  //
-  // The bundler rewrites the call in more than one shape, and the exact shape
-  // depends on settings this script exists to police, so match all of them:
-  //
-  //   (0, import_react.createContext)(null)       esbuild, no splitting
-  //   _react.createContext.call(void 0, null)     esbuild, splitting on
-  //   createContext(null)                         unwrapped
-  //
-  // Hence: an optional `(0, ` prefix, an optional namespace, and an optional
-  // `.call` suffix. Written loosely on purpose — a shape this misses reads as
-  // "defined in no bundle", which fails loudly rather than passing silently.
-  const declaration = new RegExp(
-    `\\b${name}\\s*=\\s*\\(?\\s*(?:0\\s*,\\s*)?(?:\\w+\\.)?createContext\\b`,
-  )
-  const owners = files.filter((f) =>
-    declaration.test(fs.readFileSync(f, 'utf8')),
-  )
+  const files = bundles(dist)
+  checkedFiles += files.length
+  checkedNames += pkg.singletons.length
 
-  const where = owners.map((f) => path.relative(DIST, f))
-
-  if (owners.length === 0) {
-    problems.push(
-      `${name}: defined in no bundle — renamed or removed? ` +
-        'Update SINGLETONS in this script.',
+  for (const name of pkg.singletons) {
+    // Match the declaration, not a reference to it — every duplicate is a
+    // fresh definition, so definitions are what count.
+    //
+    // The bundler rewrites the call in more than one shape, and the exact
+    // shape depends on settings this script exists to police, so match all
+    // of them:
+    //
+    //   (0, import_react.createContext)(null)       esbuild, no splitting
+    //   _react.createContext.call(void 0, null)     esbuild, splitting on
+    //   createContext(null)                         unwrapped
+    //
+    // Hence: an optional `(0, ` prefix, an optional namespace, and an
+    // optional `.call` suffix. Written loosely on purpose — a shape this
+    // misses reads as "defined in no bundle", which fails loudly rather than
+    // passing silently.
+    const declaration = new RegExp(
+      `\\b${name}\\s*=\\s*\\(?\\s*(?:0\\s*,\\s*)?(?:\\w+\\.)?createContext\\b`,
     )
-  } else if (owners.length > 1) {
-    problems.push(
-      `${name}: defined ${owners.length} times (${where.join(', ')}) — ` +
-        'each copy is a separate React context, so a provider imported from ' +
-        'one entry point cannot be seen by a consumer imported from another. ' +
-        'Check that `splitting: true` is still set in ' +
-        'packages/components/tsup.config.ts.',
+    const owners = files.filter((f) =>
+      declaration.test(fs.readFileSync(f, 'utf8')),
     )
+
+    const where = owners.map((f) => path.relative(dist, f))
+
+    if (owners.length === 0) {
+      problems.push(
+        `${name}: defined in no bundle under ${pkg.dist} — renamed or ` +
+          'removed? Update PACKAGES in this script.',
+      )
+    } else if (owners.length > 1) {
+      problems.push(
+        `${name}: defined ${owners.length} times (${where.join(', ')}) — ` +
+          'each copy is a separate React context, so a provider imported ' +
+          'from one entry point cannot be seen by a consumer imported from ' +
+          `another. Check that \`splitting: true\` is still set in ${pkg.tsupConfig}.`,
+      )
+    }
   }
 }
 
@@ -128,8 +156,8 @@ for (const name of SINGLETONS) {
 
 if (problems.length === 0) {
   console.log(
-    `Every singleton is defined once across ${files.length} bundles ` +
-      `(${SINGLETONS.length} checked).`,
+    `Every singleton is defined once across ${checkedFiles} bundles ` +
+      `(${checkedNames} checked).`,
   )
 } else {
   console.error('\nDuplicated singletons in the built output\n')

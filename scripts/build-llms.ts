@@ -31,6 +31,7 @@ const COMPONENTS_VERSION: string = readPkg(
 ).version
 const CLI_VERSION: string = readPkg('packages/cli/package.json').version
 const ICONS_VERSION: string = readPkg('packages/icons/package.json').version
+const SEO_VERSION: string = readPkg('packages/seo/package.json').version
 // Read the inertia peer range rather than hard-coding it. A literal here
 // drifted two releases behind (it still said `>=0.0.4` at 0.0.6), because a
 // version bump has no reason to bring anyone to this file.
@@ -94,6 +95,10 @@ const COMPONENTS_VECTOR_ICONS: string = peerOf(
 
 const ICONS_REACT: string = peerOf('icons', 'react')
 const ICONS_RN: string = peerOf('icons', 'react-native')
+
+const SEO_REACT: string = peerOf('seo', 'react')
+const SEO_RN: string = peerOf('seo', 'react-native')
+const SEO_EXPO_ROUTER: string = peerOf('seo', 'expo-router')
 
 const CLI_NODE: string = readPkg('packages/cli/package.json').engines.node
 
@@ -3026,11 +3031,142 @@ pnpm add @rootnative/icons
 ${iconsContent()}`
 }
 
+// ============================================================
+// @rootnative/seo
+// ============================================================
+
+/**
+ * The checklist in short form. The docs page `seo/checklist.md` carries the
+ * long form; an agent that sets up a new app follows the same order.
+ */
+function seoChecklist(): string {
+  return `## The checklist, in order
+
+1. **Static output.** \`web.output: 'static'\` in app.json, and \`extra.router.sitemap: false\` so \`_sitemap.html\` is not exported. A dynamic route needs \`generateStaticParams\`.
+2. **Links as \`Link\`.** \`Link\` from expo-router renders \`<a href>\`. A \`Pressable\` with \`router.push\` renders a \`<div>\`, and a crawler does not follow it.
+3. **The head on every page.** \`defineSite\` once, \`SeoProvider\` at the root, \`PageHead\` on each screen. A page with no \`url\` gets no canonical link and no share card, which is correct for a \`noindex\` overlay.
+4. **Robots and sitemap.** \`writeSitemap\`, \`writeRobots\` and \`writeManifest\` from \`@rootnative/seo/node\`, in the deploy step after the export. Build the URL list from the exported HTML files. \`robots.txt\` is read at the origin root only.
+5. **Headings and \`alt\`.** \`Heading\` renders \`<h1>\`..\`<h6>\`; pass \`Typography\` through \`as\`. One \`<h1>\` per page: the \`AppBar\` title already carries the header role, so put app headings at level 2 and below. On \`expo-image\` set both \`alt\` and \`accessibilityLabel\`; \`imageLabel\` builds the text.
+6. **JSON-LD.** The builders in \`@rootnative/seo/schema\`; pass the result in \`jsonLd\`. An empty field is never written.
+7. **Bundle and preconnect.** \`shellTags\` in \`app/+html.tsx\` with a \`preconnect\` per origin the first paint needs.
+8. **The small tags.** Theme colour, icons and the manifest, through \`shellTags\` and \`writeManifest\`.
+
+Check the export before you deploy: read one page and assert the title, the canonical link, one \`<h1>\`, and one JSON-LD script. Lighthouse and Search Console on the live host are the only checks that count.`
+}
+
+function seoApiContent(): string {
+  return `## \`@rootnative/seo\` — core (no dependency)
+
+\`\`\`ts
+import { defineSite, toHeadTags, clipDescription, isoDuration, serializeJsonLd, resolveUrl } from '@rootnative/seo'
+import type { PageMeta, SiteConfig, Site, HeadTag, JsonLd, OpenGraphType } from '@rootnative/seo'
+\`\`\`
+
+- \`defineSite(config: SiteConfig): Site\` — fills the defaults. Throws on an empty \`name\` or a relative \`url\`. Strips a trailing slash from \`url\`.
+  - \`SiteConfig\`: \`name\`, \`url\` (absolute origin + base path), \`locale?\`, \`titleTemplate?: (title) => string\` (default \`"<title> | <name>"\`, and the bare name when the title equals it), \`twitterSite?\` (\`@handle\`), \`descriptionLimit?\` (default 160).
+- \`toHeadTags(site, meta: PageMeta): HeadTag[]\` — tag records, not elements. Any head renderer can write them.
+  - \`PageMeta\`: \`title\`, \`description?\`, \`url?\` (absolute or relative to the site), \`image?: string | null\`, \`imageSize?: { width, height }\`, \`imageAlt?\`, \`type?: 'website' | 'article' | 'profile' | 'video.movie' | 'product'\`, \`locale?\`, \`noindex?\`, \`twitterCard?: 'summary' | 'summary_large_image'\`, \`jsonLd?: JsonLd[]\`.
+  - \`HeadTag\`: \`{ tag: 'title', text }\` | \`{ tag: 'meta', name, content }\` | \`{ tag: 'meta', property, content }\` | \`{ tag: 'link', rel, href }\` | \`{ tag: 'script', type: 'application/ld+json', text }\`.
+  - Rules: the tab title uses the template, \`og:title\` does not. No \`url\` → no canonical link and no og/twitter tags. \`og:image:width\`/\`height\` only with an image and an \`imageSize\`. Twitter card \`summary_large_image\` with an image, \`summary\` without, unless \`twitterCard\` forces one. \`noindex\` writes \`<meta name="robots" content="noindex">\`. Each tag is written once.
+- \`clipDescription(text, limit = 160)\` — collapses whitespace, clips at a word boundary, adds one \`…\`.
+- \`isoDuration(minutes)\` — \`150\` → \`'PT2H30M'\`. Returns \`null\` for \`0\`, a negative, or a non-finite number.
+- \`serializeJsonLd(value)\` — \`JSON.stringify\` with every \`<\` as \`\\\\u003c\`, so \`</script>\` in a title cannot end the tag.
+- \`resolveUrl(site, pathOrUrl)\` — joins a path under the site; an absolute URL passes through.
+
+## \`@rootnative/seo/schema\` — JSON-LD builders (no dependency)
+
+Each returns a \`JsonLd\` with \`@context: 'https://schema.org'\` and \`@type\` set. Every empty field (\`undefined\`, \`null\`, \`""\`, \`[]\`, \`{}\`) is removed at every depth.
+
+- \`webSite({ name, url, searchUrlTemplate? })\` — adds a \`SearchAction\` with \`query-input: 'required name=search_term_string'\` when the template is set.
+- \`breadcrumbList(trail: { name, url }[])\` — \`ListItem\`s with \`position\` from 1.
+- \`organization({ name, url, logo?, sameAs? })\`
+- \`article({ headline, url, image?, description?, datePublished?, dateModified?, author? })\` — \`author\` is a string or \`{ name, url? }\`, written as a \`Person\`. Sets \`mainEntityOfPage\` to \`url\`.
+- \`product({ name, url, image?, description?, brand?, sku?, offers?, aggregateRating? })\` — \`brand\` becomes \`Brand\`; \`offers: { price, priceCurrency, availability?, url? }\` becomes \`Offer\` with \`availability\` as \`https://schema.org/<name>\`.
+- \`movie({ name, url, image?, description?, datePublished?, genre?, durationMinutes?, actors?, director?, rating? })\` — \`duration\` through \`isoDuration\`; \`actors\` and \`director\` as \`Person\`.
+- \`person({ name, url, image?, description?, birthDate?, deathDate?, birthPlace?, jobTitle?, sameAs? })\` — \`birthPlace\` as \`Place\`.
+- \`event({ name, url, startDate, endDate?, location?, image?, description? })\` — \`location\` is a string or \`{ name, address? }\`, as \`Place\`.
+- \`faqPage(questions: { question, answer }[])\` — \`Question\` + \`Answer\` under \`mainEntity\`.
+- \`RatingInput\`: \`{ ratingValue, ratingCount?, reviewCount?, bestRating? (5), worstRating? (1) }\`. A rating with no count is left out.
+
+## \`@rootnative/seo/react\` — peers: react \`${SEO_REACT}\`, react-native \`${SEO_RN}\`
+
+- \`<SeoProvider site={site}>\` — gives every \`PageHead\` below it the site.
+- \`useSite(site?)\` — the site for the tree. A \`site\` argument wins. Throws with no provider and no argument.
+- \`<Heading level={1..6} as={Component}>\` — renders the given text component (default RN \`Text\`) with \`accessibilityRole="header"\` and \`aria-level\`. On the web react-native-web writes \`<h1>\`..\`<h6>\`. Generic: \`<Heading<TypographyProps> level={2} as={Typography} variant="titleMedium">\`. The wrapped component's own \`as\`, \`role\`, \`accessibilityRole\` and \`aria-level\` props are omitted.
+- \`imageLabel(kind, subject?)\` — \`imageLabel('Poster', 'Dune')\` → \`'Dune poster'\`. Set the result as both \`alt\` and \`accessibilityLabel\` on \`expo-image\` (its web \`alt\` comes from \`accessibilityLabel\`).
+
+## \`@rootnative/seo/expo-router\` — optional peer: expo-router \`${SEO_EXPO_ROUTER}\`
+
+- \`<PageHead {...meta} site?>\` — \`PageMeta\` as props, plus an optional \`site\` that wins over the provider. Writes the tags through \`expo-router/head\`. Renders \`null\` on native.
+- \`renderHeadTag(tag, index)\` — one \`HeadTag\` as the element \`expo-router/head\` expects. A JSON-LD script is written as a string child, not \`dangerouslySetInnerHTML\` (react-helmet-async drops the latter).
+- \`shellTags(options): ReactElement[]\` — for \`app/+html.tsx\`: charset, viewport (default \`width=device-width, initial-scale=1, shrink-to-fit=no\`), \`themeColor\`, \`favicon\`, \`appleTouchIcon\`, \`manifest\`, \`preconnect: { href, crossOrigin? }[]\`. \`basePath\` (pass \`process.env.EXPO_BASE_URL\`) prefixes every relative \`href\`. No router dependency: works in a Vite template through \`renderToStaticMarkup\`.
+
+## \`@rootnative/seo/node\` — Node only, no peer
+
+Each \`write*\` creates \`outDir\`, writes the file and resolves to its path. Each has a pure sibling that returns the text.
+
+- \`writeSitemap({ outDir, siteUrl, urls, fileName? })\` / \`sitemapXml({ siteUrl, urls })\` — \`urls: { loc, lastmod?, changefreq?, priority? }[]\`. A relative \`loc\` is joined under \`siteUrl\`. Every value is XML-escaped. \`priority\` is clamped to 0..1.
+- \`writeRobots({ outDir, sitemapUrl, disallow?, allow?, userAgent?, fileName? })\` / \`robotsTxt(...)\` — \`sitemapUrl\` is one URL or a list. With no \`disallow\` the file allows everything. The file carries a comment that says why an overlay route is not disallowed: a crawler reads \`noindex\` only on a page it may fetch.
+- \`writeManifest({ outDir, name, shortName?, description?, startUrl? ('./'), scope? ('./'), display? ('standalone'), themeColor?, backgroundColor?, lang?, icons?, fileName? })\` / \`manifestJson(...)\` — relative paths, so it works under a subpath host. The icon \`type\` is inferred from the file extension.`
+}
+
+function seoContent(): string {
+  return `## SEO for the web export (\`@rootnative/seo\` v${SEO_VERSION})
+
+A React Native web export starts as one empty page. \`@rootnative/seo\` holds the parts of the fix that do not depend on the app's data: the head of a page as tag records, the JSON-LD builders, the heading role, the HTML shell, the sitemap, the robots file and the manifest. The app keeps the mapping from its data to the meta. Docs: https://rootnative.github.io/ui/seo/why
+
+\`\`\`bash
+pnpm add @rootnative/seo
+\`\`\`
+
+${seoChecklist()}
+
+${seoApiContent()}`
+}
+
+function generateSeoLlms(): string {
+  return `# @rootnative/seo — SEO for a React Native web export
+
+> Version: ${SEO_VERSION}
+> Peer deps (/react and /expo-router only): react ${SEO_REACT}, react-native ${SEO_RN}
+> Optional peer dep (/expo-router only): expo-router ${SEO_EXPO_ROUTER}
+> The core and /schema entries have no dependency; /node runs in Node only.
+
+What a search engine and a link preview read from a React Native web app: the document head, the structured data, the heading outline, the image text, the HTML shell, the sitemap, and the robots file. Docs: https://rootnative.github.io/ui/seo/why
+
+\`\`\`bash
+pnpm add @rootnative/seo
+\`\`\`
+
+${seoChecklist()}
+
+${seoApiContent()}
+`
+}
+
+/** The docs API page is generated from the same source as llms.txt, so the two cannot drift. */
+function generateSeoApiDoc(): string {
+  return `---
+sidebar_position: 3
+sidebar_label: API reference
+description: The API of @rootnative/seo — the core, the schema builders, the React and Expo Router entries, and the Node functions.
+---
+
+{/* Generated by scripts/build-llms.ts. Edit seoApiContent() there, then run pnpm run build:llms. */}
+
+# API reference
+
+The package has five entries. The core and \`/schema\` have no dependency and run in Node and in a browser. \`/react\` and \`/expo-router\` need React Native. \`/node\` runs in Node only.
+
+${seoApiContent()}
+`
+}
+
 function generateFullLlms(): string {
   return `# RootNative UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
-> Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
+> Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/seo\` ${SEO_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
 > Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
@@ -3105,6 +3241,10 @@ ${componentsContent()}
 ${iconsContent()}
 ---
 
+${seoContent()}
+
+---
+
 ${codeStyleContent()}`
 }
 
@@ -3119,6 +3259,8 @@ const outputs = [
   { file: 'packages/components/llms.txt', content: generateComponentsLlms() },
   { file: 'packages/cli/llms.txt', content: generateCliLlms() },
   { file: 'packages/icons/llms.txt', content: generateIconsLlms() },
+  { file: 'packages/seo/llms.txt', content: generateSeoLlms() },
+  { file: 'docs/docs/seo/api.md', content: generateSeoApiDoc() },
   { file: 'docs/static/llms-full.txt', content: generateFullLlms() },
 ]
 

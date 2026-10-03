@@ -7,6 +7,7 @@ import {
   useTheme,
   useThemeMode,
 } from '@rootnative/core'
+import { SeoProvider } from '@rootnative/seo/react'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
@@ -14,6 +15,7 @@ import { useMemo } from 'react'
 import { Alert, I18nManager, Platform, StyleSheet, View } from 'react-native'
 import { findEntry } from '../src/catalog'
 import { JumpMenu } from '../src/JumpMenu'
+import { site } from '../src/site'
 
 // Restore persisted RTL preference on web before first render
 if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
@@ -196,7 +198,9 @@ export default function RootLayout() {
       theme={{ light: lightTheme, dark: darkTheme }}
       iconResolver={mdiResolver}
     >
-      <RootLayoutContent />
+      <SeoProvider site={site}>
+        <RootLayoutContent />
+      </SeoProvider>
     </ThemeProvider>
   )
 }

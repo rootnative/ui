@@ -9,14 +9,16 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "export:web": "expo export --platform web",
-    "lint": "eslint . --max-warnings 0"
+    "export:web": "expo export --platform web && node scripts/write-seo.mjs",
+    "lint": "eslint . --max-warnings 0",
+    "check:export": "expo export --platform web && node scripts/write-seo.mjs && node scripts/check-export.mjs"
   },
   "dependencies": {
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@rootnative/components": "workspace:*",
     "@rootnative/core": "workspace:*",
     "@rootnative/inertia": "0.0.17",
+    "@rootnative/seo": "workspace:*",
     "@rootnative/utils": "workspace:*",
     "expo": "~57.0.20",
     "expo-font": "~57.0.3",

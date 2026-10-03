@@ -117,6 +117,7 @@ RootNative UI ships [llms.txt](https://llmstxt.org/) documentation for AI coding
 | [`@rootnative/core`](packages/core) | ![install size](https://packagephobia.com/badge?p=@rootnative/core) | Theme engine, theme contracts, built-in Material Design You theme, `ThemeProvider`, `useTheme` hook, responsive utilities. |
 | [`@rootnative/components`](packages/components) | ![install size](https://packagephobia.com/badge?p=@rootnative/components) | UI components with subpath exports for tree-shaking. |
 | [`@rootnative/icons`](packages/icons) | ![install size](https://packagephobia.com/badge?p=@rootnative/icons) | Icon-resolver adapters for Lucide, Phosphor, and `@react-native-vector-icons/*`, with MDI-name compatibility helpers. |
+| [`@rootnative/seo`](packages/seo) | ![install size](https://packagephobia.com/badge?p=@rootnative/seo) | What a crawler reads from a web export: the head of each page, JSON-LD builders, headings, the HTML shell, the sitemap and the robots file. |
 | [`@rootnative/cli`](packages/cli) | ![install size](https://packagephobia.com/badge?p=@rootnative/cli) | CLI to scaffold components into your project (shadcn/ui-style). |
 | [`rootnative`](packages/rootnative) | — | Shorthand wrapper for `@rootnative/cli`. |
 | [`@rootnative/utils`](packages/utils) | — | Internal utilities used by components (not published). |
@@ -133,6 +134,7 @@ RootNative UI ships [llms.txt](https://llmstxt.org/) documentation for AI coding
 │   ├── core/              # Theme + provider primitives
 │   ├── components/        # Reusable UI component library
 │   ├── icons/             # Icon-library adapters for the iconResolver
+│   ├── seo/               # Head, JSON-LD, headings, shell, sitemap for the web export
 │   ├── cli/               # CLI for scaffolding components into projects
 │   ├── rootnative/        # Shorthand CLI wrapper
 │   └── utils/             # Internal utilities (not published)

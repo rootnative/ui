@@ -25,6 +25,7 @@ Every published package ships its own `llms.txt`, matching the **exact installed
 | `node_modules/@rootnative/components/llms.txt` | All component props |
 | `node_modules/@rootnative/core/llms.txt` | Theme system API and types |
 | `node_modules/@rootnative/icons/llms.txt` | Icon-library adapters (Lucide, Phosphor, react-native-vector-icons) |
+| `node_modules/@rootnative/seo/llms.txt` | The SEO checklist and the head, schema, react, expo-router and node APIs |
 | `node_modules/@rootnative/cli/llms.txt` | CLI commands |
 
 Prefer these over the hosted files when suggesting code — they can't drift from the version your project actually uses.

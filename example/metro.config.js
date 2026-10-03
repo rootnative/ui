@@ -40,6 +40,7 @@ const WORKSPACE_PACKAGES = {
     'packages/components/src',
   ),
   '@rootnative/utils': path.resolve(workspaceRoot, 'packages/utils/src'),
+  '@rootnative/seo': path.resolve(workspaceRoot, 'packages/seo/src'),
 }
 const previousResolveRequest = config.resolver.resolveRequest
 config.resolver.resolveRequest = (context, moduleName, platform) => {

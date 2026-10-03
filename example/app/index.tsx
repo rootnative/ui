@@ -27,8 +27,12 @@ import {
   TextField,
   Typography,
 } from '@rootnative/components'
+import type { TypographyProps } from '@rootnative/components'
 import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
+import { PageHead } from '@rootnative/seo/expo-router'
+import { Heading } from '@rootnative/seo/react'
+import { webSite } from '@rootnative/seo/schema'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import {
@@ -39,13 +43,20 @@ import {
   View,
 } from 'react-native'
 import { matchesQuery, sections, totalComponents } from '../src/catalog'
+import { site } from '../src/site'
+
+const HOME_DESCRIPTION =
+  'Material Design 3 components for React Native — copy, paste, ship. Browse every component of RootNative UI in the browser.'
+const HOME_JSON_LD = [webSite({ name: site.name, url: site.url })]
 
 function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
   switch (label) {
     case 'Typography':
       return (
         <Column align="center" gap="xs">
-          <Typography variant="displaySmall">Aa</Typography>
+          <Typography variant="displaySmall" accessibilityRole="none">
+            Aa
+          </Typography>
           <Typography variant="labelSmall" style={previewMutedText(theme)}>
             Type scale
           </Typography>
@@ -777,6 +788,12 @@ export default function HomeScreen() {
       // even empty in the embed, so the index does not move.
       stickyHeaderIndices={[1]}
     >
+      <PageHead
+        title={site.name}
+        description={HOME_DESCRIPTION}
+        url="/"
+        jsonLd={HOME_JSON_LD}
+      />
       <View style={[styles.container, heroSlotStyle]}>
         {isEmbedded ? null : (
           <Column gap="md" style={styles.hero}>
@@ -791,7 +808,13 @@ export default function HomeScreen() {
                 Material Design 3
               </Typography>
             </Row>
-            <Typography variant={heroVariant}>RootNative UI</Typography>
+            <Heading<TypographyProps>
+              level={2}
+              as={Typography}
+              variant={heroVariant}
+            >
+              RootNative UI
+            </Heading>
             <Typography variant={taglineVariant} style={captionStyle}>
               Beautiful Material Design 3 components for React Native — copy,
               paste, ship.

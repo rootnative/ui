@@ -17,6 +17,12 @@ const sidebars: SidebarsConfig = {
     { type: 'doc', id: 'llms', label: 'For AI Agents' },
     {
       type: 'category',
+      label: 'SEO for the web export',
+      collapsed: true,
+      items: ['seo/why', 'seo/checklist', 'seo/api', 'seo/limits'],
+    },
+    {
+      type: 'category',
       label: 'Layout',
       collapsed: false,
       items: [

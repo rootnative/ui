@@ -11,6 +11,7 @@ RootNative UI (`@rootnative`) is a React Native component library with a pluggab
 - `@rootnative/components`: UI components (AppBar, Avatar, BottomSheet, Button, ButtonGroup, Card, Checkbox, Chip, Dialog, Divider, FAB, IconButton, KeyboardAvoidingWrapper, Layout, List, LoadingIndicator, Menu, NavigationBar, Portal, Progress, Radio, SearchBar, Slider, Snackbar, Switch, Tabs, TextField, Tooltip, Typography)
 - `@rootnative/inertia`: Animation engine. Required peer of `core` and `components` — every animation in the library routes through it, and it honors the OS reduce-motion setting by default. Docs: https://rootnative.github.io/inertia/
 - `@rootnative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide / Phosphor / `@expo/vector-icons` are optional peer deps.
+- `@rootnative/seo`: What a crawler reads from a web export — `defineSite` + `PageHead` for the head of each page, JSON-LD builders under `/schema`, `Heading` for the outline, `shellTags` for `+html.tsx`, and `writeSitemap` / `writeRobots` / `writeManifest` under `/node`. The core has no dependency. Docs: https://rootnative.github.io/ui/seo/why
 
 ## Quick start
 
@@ -77,6 +78,7 @@ Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 57 bund
 - Motion & reduced motion: https://rootnative.github.io/ui/motion
 - Responsive (`useBreakpoint`, `useBreakpointValue`, MD3 window size classes): https://rootnative.github.io/ui/responsive
 - Accessibility (aria on both platforms, labels you must supply, web focus containment): https://rootnative.github.io/ui/accessibility
+- SEO for the web export (the checklist, the API, the limits): https://rootnative.github.io/ui/seo/checklist
 - Components: https://rootnative.github.io/ui/components/button
 
 ## CLI
@@ -109,4 +111,5 @@ Each published npm package ships its own `llms.txt` for AI tools to read from `n
 - `@rootnative/core` → `node_modules/@rootnative/core/llms.txt` (theme system API + types)
 - `@rootnative/components` → `node_modules/@rootnative/components/llms.txt` (all component props)
 - `@rootnative/icons` → `node_modules/@rootnative/icons/llms.txt` (Lucide / Phosphor / vector-icons adapters)
+- `@rootnative/seo` → `node_modules/@rootnative/seo/llms.txt` (the SEO checklist and the head, schema, react, expo-router and node APIs)
 - `@rootnative/cli` → `node_modules/@rootnative/cli/llms.txt` (CLI commands)

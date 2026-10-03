@@ -29,6 +29,12 @@ if (!existsSync(distDir)) {
   process.exit(1)
 }
 
+console.log('[prepare-demo] writing sitemap.xml and manifest.webmanifest…')
+execSync('node scripts/write-seo.mjs', {
+  cwd: exampleDir,
+  stdio: 'inherit',
+})
+
 console.log('[prepare-demo] copying example/dist → docs/static/demo…')
 rmSync(outDir, { recursive: true, force: true })
 cpSync(distDir, outDir, { recursive: true })

@@ -292,5 +292,85 @@
         "withLegacyMdiFallback"
       ]
     }
+  },
+  "@rootnative/seo": {
+    "subpaths": [
+      ".",
+      "./expo-router",
+      "./node",
+      "./react",
+      "./schema"
+    ],
+    "exports": {
+      ".": [
+        "HeadTag",
+        "JsonLd",
+        "OpenGraphType",
+        "PageMeta",
+        "Site",
+        "SiteConfig",
+        "clipDescription",
+        "defineSite",
+        "isoDuration",
+        "resolveUrl",
+        "serializeJsonLd",
+        "toHeadTags"
+      ],
+      "./schema": [
+        "ArticleInput",
+        "Breadcrumb",
+        "EventInput",
+        "Faq",
+        "JsonLd",
+        "MovieInput",
+        "OfferInput",
+        "OrganizationInput",
+        "PersonInput",
+        "ProductInput",
+        "RatingInput",
+        "WebSiteInput",
+        "article",
+        "breadcrumbList",
+        "event",
+        "faqPage",
+        "movie",
+        "organization",
+        "person",
+        "product",
+        "webSite"
+      ],
+      "./react": [
+        "Heading",
+        "HeadingLevel",
+        "HeadingProps",
+        "SeoProvider",
+        "SeoProviderProps",
+        "imageLabel",
+        "useSite"
+      ],
+      "./expo-router": [
+        "PageHead",
+        "PageHeadProps",
+        "ShellTagsOptions",
+        "renderHeadTag",
+        "shellTags"
+      ],
+      "./node": [
+        "ManifestIcon",
+        "ManifestOptions",
+        "RobotsOptions",
+        "SitemapOptions",
+        "SitemapUrl",
+        "WriteManifestOptions",
+        "WriteRobotsOptions",
+        "WriteSitemapOptions",
+        "manifestJson",
+        "robotsTxt",
+        "sitemapXml",
+        "writeManifest",
+        "writeRobots",
+        "writeSitemap"
+      ]
+    }
   }
 }

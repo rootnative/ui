@@ -47,6 +47,17 @@ const PACKAGES: PackageSpec[] = [
     dir: 'packages/icons',
     entries: { '.': 'dist/index.d.mts' },
   },
+  {
+    name: '@rootnative/seo',
+    dir: 'packages/seo',
+    entries: {
+      '.': 'dist/index.d.mts',
+      './schema': 'dist/schema/index.d.mts',
+      './react': 'dist/react/index.d.mts',
+      './expo-router': 'dist/expo-router/index.d.mts',
+      './node': 'dist/node/index.d.mts',
+    },
+  },
 ]
 
 function exportedNames(entry: string): string[] {

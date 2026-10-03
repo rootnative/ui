@@ -93,3 +93,10 @@ jobs:
       # while typecheck, 957 tests and the API snapshot all stayed green.
       - name: Worklet check
         run: pnpm run check:worklets
+
+      # Exports the example app for web and reads the HTML a crawler reads.
+      # The `@rootnative/seo` unit tests mock `expo-router/head`, so only a
+      # real export can show that the title, the canonical link, the heading
+      # outline and the JSON-LD reach the file. Needs the packages built.
+      - name: Static export check
+        run: pnpm --filter example check:export

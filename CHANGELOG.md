@@ -11,6 +11,54 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### New package: `@rootnative/seo`
+
+A React Native app that exports to the web starts as one empty page, and
+every app wrote the same fix by hand. `@rootnative/seo` holds the parts that
+do not depend on the app's data. The app keeps the mapping from its data to
+the meta.
+
+Five entries. The core and `/schema` have no dependency and run in Node and
+in a browser. `/react` and `/expo-router` need React Native. `/node` runs in
+Node only.
+
+- `defineSite` and `toHeadTags` turn a `PageMeta` into tag records any head
+  renderer can write. The tab title uses the site template and the Open Graph
+  title does not. A page with no `url` gets no canonical link and no share
+  card. `og:image:width` and `og:image:height` are written only with an
+  image. Each tag is written once.
+- The JSON-LD builders under `/schema` cover `WebSite`, `BreadcrumbList`,
+  `Organization`, `Article`, `Product`, `Movie`, `Person`, `Event` and
+  `FAQPage`. An empty field is left out at every depth, a rating with no
+  votes is left out, and a duration of `0` is left out. The script text
+  escapes `<`, so a `</script>` in a title cannot end the tag.
+- `SeoProvider`, `Heading` and `imageLabel` under `/react`. `Heading` renders
+  `<h1>` to `<h6>` on the web through the text component you pass in `as`.
+- `PageHead` and `shellTags` under `/expo-router`. `PageHead` writes the head
+  through `expo-router/head` and renders nothing on native. `shellTags`
+  writes the head of `+html.tsx` and prefixes every relative `href` with the
+  base path of a subpath host.
+- `writeSitemap`, `writeRobots` and `writeManifest` under `/node`, for the
+  deploy step. Each has a pure sibling that returns the text.
+
+The example app is the first consumer: a static export, a `PageHead` on every
+screen, `shellTags` in the shell, and `sitemap.xml` and
+`manifest.webmanifest` written after the export. A new CI step exports the
+app and reads two pages, which is the test that catches a head renderer
+change in Expo Router. It found that the vendored `react-helmet-async` drops
+a script that uses `dangerouslySetInnerHTML`; `renderHeadTag` writes the text
+as a string child instead.
+
+The export also showed that the `AppBar` title and every `display*` or
+`headline*` `Typography` render as `<h1>` on the web, because the library
+gives them the header role with no level. Nothing in the library changes in
+this release. Put your own headings at level 2 and below, and give a
+decorative display glyph `accessibilityRole="none"`.
+
+A new docs section, "SEO for the web export", carries the blockers, the
+checklist, the API reference and the limits. The API page is generated from
+the same source as the package `llms.txt`.
+
 ### `mdiResolver` no longer breaks hydration on a static export
 
 A static web export with `iconResolver={mdiResolver}` logged React error #418
