@@ -66,7 +66,8 @@ export function elevationBoxShadowForFabric(level: ElevationLevel): string {
  * Convert a theme elevation level into one endpoint of a `useShadow` tween.
  *
  * ```tsx
- * const progress = useSpring(hovered ? 1 : 0)
+ * // `useAnimation` gates on reduced motion; `useSpring` does not.
+ * const progress = useAnimation(hovered ? 1 : 0)
  * const shadowStyle = useShadow({
  *   from: elevationShadowConfig(theme.elevation.level1),
  *   to: elevationShadowConfig(theme.elevation.level2),

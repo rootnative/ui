@@ -11,6 +11,20 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### The agent-facing docs tell the truth again
+
+`docs/static/llms.txt` is the file an AI agent is told to trust over the
+hosted docs, and it was wrong in four places. It named 29 components (there
+are 35), it told the agent to install `@expo/vector-icons` and
+`@material/material-color-utilities` (the library uses the first only behind
+the `/mdi` subpath through a different package, and bundles the second), it
+gave `@rootnative/inertia >=0.0.11` as the floor (it is `>=0.0.17`), and it
+listed `Layout` as having no animated value (`Grid` animates). The generated
+core `llms.txt` also said `cornerFull` is 9999; the token is 999. The public
+doc example on `elevationShadowConfig` drove `useShadow` from `useSpring`,
+which the library bans because it is not gated on reduced motion; it uses
+`useAnimation` now.
+
 ### Filled and tonal buttons, filled and outlined cards rise on hover
 
 MD3 raises a filled or tonal button from level 0 to level 1 on hover, and a

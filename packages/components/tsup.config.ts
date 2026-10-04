@@ -64,7 +64,7 @@ export default defineConfig({
   // definition per singleton. `pnpm run check:worklets` guards the first,
   // `pnpm run check:singletons` the second.
   format: 'esm',
-  // Load-bearing. Without it every one of the 30 entries above is a
+  // Load-bearing. Without it every entry above is a
   // self-contained bundle that inlines each module it reaches, so a
   // module-level singleton is emitted once *per entry*. `PortalContext` shipped
   // as 7 separate contexts that way, which silently broke every overlay
