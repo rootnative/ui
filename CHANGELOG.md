@@ -11,6 +11,30 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Filled and tonal buttons, filled and outlined cards rise on hover
+
+MD3 raises a filled or tonal button from level 0 to level 1 on hover, and a
+filled or outlined card the same way. The library applied the hover rise to
+the elevated variants only. Every interactive card and every filled or tonal
+button now carries the same shadow carrier the elevated ones had, resting at
+level 0 so nothing changes at rest. Outlined and text buttons stay flat.
+
+### One back handler, one halo, one focus ring
+
+Three pieces of code that every overlay or selection control copied by hand
+now live once under `internal/`:
+
+- `useBackHandlerDismiss` replaces the six copies of the Android back-button
+  effect in Dialog, Menu, Tooltip, BottomSheet, NavigationDrawer and
+  SearchView. A new table test drives every one of them on Android and checks
+  that a closed, locked, or plain surface does not swallow the back press.
+- `useHaloLayer` replaces the three identical state-layer halo blocks in
+  Switch, Checkbox and Radio.
+- `useStateLayer` and `useHaloLayer` return the focus-ring opacity style, so
+  the twelve components that derived it by hand no longer do.
+
+No visible behaviour changes from the three extractions.
+
 ### Toggle `IconButton` and filter `Chip` work uncontrolled
 
 Both had `selected` and nothing else, so a consumer who forgot to flip

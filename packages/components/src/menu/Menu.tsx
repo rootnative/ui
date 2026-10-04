@@ -4,21 +4,15 @@ import {
   cloneElement,
   isValidElement,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react'
 import type { ReactElement } from 'react'
 import type { GestureResponderEvent } from 'react-native'
-import {
-  BackHandler,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
@@ -134,18 +128,7 @@ export function Menu({
     })
   }, [anchor, isControlled, open])
 
-  // Android hardware back closes the menu before it pops the navigation stack.
-  useEffect(() => {
-    if (!open || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        dismiss()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [open, dismiss])
+  useBackHandlerDismiss(open, dismiss)
 
   // The height cap lands on the surface, which is the view being positioned —
   // see the note on `styles.list` for why capping the ScrollView alone lets the

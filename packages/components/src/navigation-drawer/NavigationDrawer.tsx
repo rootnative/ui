@@ -1,15 +1,10 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { isRTLDirection } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  BackHandler,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from 'react-native'
+import { useCallback, useMemo, useState } from 'react'
+import { Pressable, ScrollView, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -106,19 +101,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     onEscape: dismissable ? onDismiss : undefined,
   })
 
-  // Android hardware back closes a dismissable drawer before it pops the
-  // navigation stack.
-  useEffect(() => {
-    if (!open || !dismissable || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        onDismiss?.()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [open, dismissable, onDismiss])
+  useBackHandlerDismiss(open && dismissable, onDismiss)
 
   const content = (
     <SafeAreaView edges={edges} style={styles.safeArea}>

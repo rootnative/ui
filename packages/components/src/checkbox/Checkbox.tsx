@@ -1,9 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useColorTransition, useInterpolatedStyle } from '@rootnative/inertia'
-import {
-  useGestureLayer,
-  type GestureLayerStates,
-} from '@rootnative/inertia/gesture-layer'
+import { useColorTransition } from '@rootnative/inertia'
+import {} from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
@@ -12,6 +9,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useHaloLayer } from '../internal/useHaloLayer'
 import {
   CHECKBOX_ICON_SIZE,
   createStyles,
@@ -81,38 +79,11 @@ export function Checkbox({
   const progress = useBooleanProgress(isActive, 'spring-default-spatial')
   const colorProgress = useBooleanProgress(isActive, 'spring-default-effects')
 
-  // State-layer halo opacity: solid base color, view opacity carries the
-  // alpha. The gesture layer composes the strongest active interaction via
-  // clamped-max, which keeps the token values intact; the `disabled` layer
-  // pins the halo off while disabled regardless of gesture state. Focus
-  // feedback rides `focusVisible`, so it appears for keyboard focus only.
-  const haloLayers = useMemo<GestureLayerStates>(
-    () => ({
-      rest: { opacity: 0 },
-      hovered: { opacity: theme.stateLayer.hoveredOpacity },
-      focusVisible: { opacity: theme.stateLayer.focusedOpacity },
-      pressed: { opacity: theme.stateLayer.pressedOpacity },
-      disabled: { opacity: 0 },
-    }),
-    [theme.stateLayer],
-  )
-  const gestureOptions = useMemo(
-    () => ({
-      disabled: isDisabled,
-      transition: {
-        hovered: 'state-hover',
-        pressed: 'state-press',
-        focused: 'state-focus',
-        focusVisible: 'state-focus',
-      } as const,
-    }),
-    [isDisabled],
-  )
   const {
     style: haloOpacityStyle,
     handlers,
-    states,
-  } = useGestureLayer(haloLayers, gestureOptions)
+    focusRingStyle: animatedFocusRingStyle,
+  } = useHaloLayer(isDisabled)
 
   // The halo color crossfades with the selection color progress.
   const haloColorStyle = useColorTransition(colorProgress, [
@@ -148,12 +119,6 @@ export function Checkbox({
     opacity: progress.value,
     transform: [{ scale: Math.max(0, progress.value) }],
   }))
-
-  // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
-  })
 
   const handlePress = useCallback(() => {
     if (isDisabled) return

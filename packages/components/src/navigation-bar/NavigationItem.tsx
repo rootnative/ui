@@ -73,15 +73,11 @@ export function NavigationItem({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: 'transparent',
     content: contentColor,
     disabled,
-  })
-
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   // The pill fades in while expanding from its centre, per the MD3 indicator

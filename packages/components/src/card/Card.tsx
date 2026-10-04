@@ -1,5 +1,5 @@
 import { useTheme } from '@rootnative/core'
-import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
+import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, View } from 'react-native'
@@ -47,31 +47,30 @@ export function Card({
     style: stateLayerStyle,
     handlers,
     states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: colors.backgroundColor,
     content: theme.colors.onSurface,
     disabled: isDisabled,
   })
 
-  // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
-  })
-
   const isElevated = variant === 'elevated'
-  const showElevationLayer = isInteractive && isElevated && !isDisabled
-
-  // Elevation moves level 1 (rest) → level 2 (hover) per MD3 as one
-  // interpolated shadow on a single unclipped carrier View behind the
-  // container, driven by the gesture layer's hover progress.
+  // Every interactive card raises one level on hover (Compose
+  // `ElevatedCardTokens` 1 → 2, `FilledCardTokens` and `OutlinedCardTokens`
+  // 0 → 1). The shadow is one interpolated surface on a single unclipped
+  // carrier View behind the container, driven by the hover progress.
+  const showElevationLayer = isInteractive && !isDisabled
+  const restLevel = isElevated ? theme.elevation.level1 : theme.elevation.level0
+  const hoverLevel = isElevated
+    ? theme.elevation.level2
+    : theme.elevation.level1
   const restShadow = useMemo(
-    () => elevationShadowConfig(theme.elevation.level1),
-    [theme.elevation.level1],
+    () => elevationShadowConfig(restLevel),
+    [restLevel],
   )
   const hoveredShadow = useMemo(
-    () => elevationShadowConfig(theme.elevation.level2),
-    [theme.elevation.level2],
+    () => elevationShadowConfig(hoverLevel),
+    [hoverLevel],
   )
   const elevationShadowStyle = useShadow({
     from: restShadow,

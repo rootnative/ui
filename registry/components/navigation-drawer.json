@@ -12,6 +12,7 @@
     "packages/components/src/navigation-drawer/types.ts",
     "packages/components/src/internal/composeHandlers.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useStateLayer.ts",

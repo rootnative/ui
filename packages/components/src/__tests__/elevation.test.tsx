@@ -23,8 +23,8 @@
  * deliberately paints outside the clip. Its own block below asserts that shape.
  */
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
-import { screen } from '@testing-library/react-native'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
+import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button'
 import { Card } from '../card'
@@ -110,6 +110,62 @@ describe.each(CASES)('$name elevation', ({ ui, rest }) => {
       expect(style.boxShadow).toBeUndefined()
     }
   })
+})
+
+/**
+ * The flat variants rest at level 0 and rise to level 1 on hover (Compose
+ * `FilledButtonTokens`, `FilledTonalButtonTokens`, `FilledCardTokens`,
+ * `OutlinedCardTokens`). At rest nothing paints, so the "exactly one shadow
+ * node" rule above is not disturbed; after a hover the carrier is that node.
+ */
+const HOVER_CASES = [
+  { name: 'filled Button', ui: <Button>Filled</Button> },
+  { name: 'tonal Button', ui: <Button variant="tonal">Tonal</Button> },
+  {
+    name: 'filled Card',
+    ui: (
+      <Card variant="filled" onPress={() => {}}>
+        <Text>Body</Text>
+      </Card>
+    ),
+  },
+  {
+    name: 'outlined Card',
+    ui: (
+      <Card variant="outlined" onPress={() => {}}>
+        <Text>Body</Text>
+      </Card>
+    ),
+  },
+] as const
+
+describe.each(HOVER_CASES)('$name hover elevation', ({ ui }) => {
+  it('paints no shadow at rest and one level-1 shadow on hover', () => {
+    const { flush } = renderSettled(ui)
+    expect(shadowed()).toHaveLength(0)
+
+    fireEvent(screen.getByRole('button'), 'hoverIn')
+    flush()
+
+    const layers = shadowed()
+    expect(layers).toHaveLength(1)
+    expect(layers[0].overflow).not.toBe('hidden')
+    expect(layers[0]).toMatchObject({
+      shadowOpacity: lightTheme.elevation.level1.shadowOpacity,
+      shadowRadius: lightTheme.elevation.level1.shadowRadius,
+      elevation: lightTheme.elevation.level1.elevation,
+    })
+  })
+})
+
+it.each([
+  { name: 'outlined Button', ui: <Button variant="outlined">Outlined</Button> },
+  { name: 'text Button', ui: <Button variant="text">Text</Button> },
+])('$name stays flat on hover', ({ ui }) => {
+  const { flush } = renderSettled(ui)
+  fireEvent(screen.getByRole('button'), 'hoverIn')
+  flush()
+  expect(shadowed()).toHaveLength(0)
 })
 
 // The non-interactive elevated Card satisfies the same invariant by swapping the

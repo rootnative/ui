@@ -1,5 +1,4 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useRef, useState } from 'react'
@@ -84,15 +83,12 @@ export function SearchBar({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle,
   } = useStateLayer({
     rest: colors.container,
     content: contentColor ?? colors.stateLayerContent,
     containerColor,
     disabled,
-  })
-  const focusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   const handleChangeText = useCallback(

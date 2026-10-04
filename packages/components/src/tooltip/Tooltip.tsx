@@ -12,9 +12,10 @@ import {
 } from 'react'
 import type { ReactElement } from 'react'
 import type { GestureResponderEvent } from 'react-native'
-import { BackHandler, Platform, Pressable, Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -172,20 +173,9 @@ export function Tooltip({
     return () => clearTimeout(timeout)
   }, [open, isRich, duration])
 
-  // Android hardware back closes a persistent tooltip before it pops the
-  // navigation stack. Plain tooltips take themselves down, so they never
-  // swallow a back press.
-  useEffect(() => {
-    if (!open || !isRich || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        dismiss()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [open, isRich, dismiss])
+  // Plain tooltips take themselves down, so only the persistent variant
+  // answers the Android back button.
+  useBackHandlerDismiss(open && isRich, dismiss)
 
   const positionStyle = useMemo(
     () =>

@@ -7,10 +7,7 @@ import {
   useNamedTransitions,
   useShouldReduceMotion,
 } from '@rootnative/inertia'
-import {
-  useGestureLayer,
-  type GestureLayerStates,
-} from '@rootnative/inertia/gesture-layer'
+import {} from '@rootnative/inertia/gesture-layer'
 import {
   Animated,
   interpolate,
@@ -24,6 +21,7 @@ import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useHaloLayer } from '../internal/useHaloLayer'
 import { composePressHandlers } from '../internal/usePressMorph'
 import {
   SWITCH_STATE_LAYER_SIZE,
@@ -88,37 +86,11 @@ export function Switch({
   // 0.6 damping ratio), driving thumb travel and size per Compose's Switch.
   const progress = useBooleanProgress(isSelected, 'spring-fast-spatial')
 
-  // State-layer halo opacity: solid base color, view opacity carries the
-  // alpha. The gesture layer composes the strongest active interaction via
-  // clamped-max; the `disabled` layer pins the halo off while disabled.
-  // Focus feedback rides `focusVisible` (keyboard focus only).
-  const haloLayers = useMemo<GestureLayerStates>(
-    () => ({
-      rest: { opacity: 0 },
-      hovered: { opacity: theme.stateLayer.hoveredOpacity },
-      focusVisible: { opacity: theme.stateLayer.focusedOpacity },
-      pressed: { opacity: theme.stateLayer.pressedOpacity },
-      disabled: { opacity: 0 },
-    }),
-    [theme.stateLayer],
-  )
-  const gestureOptions = useMemo(
-    () => ({
-      disabled: isDisabled,
-      transition: {
-        hovered: 'state-hover' as const,
-        focused: 'state-focus' as const,
-        focusVisible: 'state-focus' as const,
-        pressed: 'state-press' as const,
-      },
-    }),
-    [isDisabled],
-  )
   const {
     style: haloOpacityStyle,
     handlers: layerHandlers,
-    states,
-  } = useGestureLayer(haloLayers, gestureOptions)
+    focusRingStyle: animatedFocusRingStyle,
+  } = useHaloLayer(isDisabled)
 
   // Thumb press-grow per Expressive Switch: the grow to 28dp is a *snap*
   // (Compose uses SnapSpec while pressed) and the release springs back on
@@ -239,12 +211,6 @@ export function Switch({
         },
       ],
     }
-  })
-
-  // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   // The two icons cross-fade on one progress value: the selected icon follows

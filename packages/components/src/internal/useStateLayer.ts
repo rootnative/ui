@@ -1,4 +1,5 @@
 import { useTheme } from '@rootnative/core'
+import { useInterpolatedStyle } from '@rootnative/inertia'
 import {
   useGestureLayer,
   type GestureLayerStates,
@@ -62,9 +63,24 @@ export interface UseStateLayerOptions {
  *
  * Internal — not exported from the package.
  */
+/**
+ * Opacity of the focus ring, 0 to 1 off the `focusVisible` progress, so the
+ * ring appears for keyboard focus only. Put it on the ring node beside the
+ * component's static ring style.
+ */
+export function useFocusRingStyle(
+  focusVisible: UseGestureLayerResult['states']['focusVisible'],
+) {
+  return useInterpolatedStyle(focusVisible, { opacity: [0, 1] })
+}
+
+export interface UseStateLayerResult extends UseGestureLayerResult {
+  focusRingStyle: ReturnType<typeof useFocusRingStyle>
+}
+
 export function useStateLayer(
   options: UseStateLayerOptions,
-): UseGestureLayerResult {
+): UseStateLayerResult {
   const {
     rest,
     content,
@@ -107,5 +123,7 @@ export function useStateLayer(
     [disabled],
   )
 
-  return useGestureLayer(layers, gestureOptions)
+  const layer = useGestureLayer(layers, gestureOptions)
+  const focusRingStyle = useFocusRingStyle(layer.states.focusVisible)
+  return { ...layer, focusRingStyle }
 }

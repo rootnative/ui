@@ -1,5 +1,4 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
@@ -67,15 +66,11 @@ export function Tab({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: 'transparent',
     content: contentColor,
     disabled,
-  })
-
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   const iconProps = useMemo(

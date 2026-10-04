@@ -1,5 +1,4 @@
 import { useTheme } from '@rootnative/core'
-import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
@@ -62,18 +61,12 @@ export function ListItem({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: 'transparent',
     content: theme.colors.onSurface,
     containerColor,
     disabled: isDisabled,
-  })
-
-  // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   const content = (

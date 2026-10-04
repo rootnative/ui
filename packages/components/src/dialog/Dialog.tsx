@@ -1,17 +1,12 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
-import { Children, isValidElement, useEffect, useMemo } from 'react'
+import { Children, isValidElement, useMemo } from 'react'
 import type { ReactNode, Ref } from 'react'
-import {
-  BackHandler,
-  Platform,
-  Pressable,
-  ScrollView,
-  View,
-} from 'react-native'
+import { Pressable, ScrollView, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -200,19 +195,7 @@ export function Dialog({
     onEscape: dismissable ? onDismiss : undefined,
   })
 
-  // Android hardware back closes a dismissable dialog before it pops the
-  // navigation stack.
-  useEffect(() => {
-    if (!visible || !dismissable || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        onDismiss()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [visible, dismissable, onDismiss])
+  useBackHandlerDismiss(visible && dismissable, onDismiss)
 
   return (
     <Portal priority={PORTAL_LAYERS.dialog}>

@@ -1,5 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useInterpolatedStyle, useShadow } from '@rootnative/inertia'
+import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
@@ -86,16 +86,11 @@ export function FAB({
     style: stateLayerStyle,
     handlers,
     states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: colors.backgroundColor,
     content: colors.contentColor,
     disabled: isDisabled,
-  })
-
-  // Interop escape hatch: the focus ring derives its opacity from the same
-  // keyboard-focus progress the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   const showElevationLayer = !isDisabled

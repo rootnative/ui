@@ -134,19 +134,29 @@ export function Button({
     ),
   }))
 
-  const showElevationLayer = variant === 'elevated' && !isDisabled
+  // MD3 raises an elevated button from level 1 to 2 on hover, and a filled
+  // or tonal one from level 0 to 1 (Compose `FilledButtonTokens` /
+  // `FilledTonalButtonTokens`, `HoverContainerElevation`). Outlined and text
+  // buttons stay flat.
+  const isElevated = variant === 'elevated'
+  const raisesOnHover =
+    isElevated || variant === 'filled' || variant === 'tonal'
+  const showElevationLayer = raisesOnHover && !isDisabled
 
-  // Elevation moves level 1 (rest) → level 2 (hover) per MD3 as one
-  // interpolated shadow on a single unclipped carrier View behind the
-  // container, driven by the gesture layer's hover progress. See Card.tsx for
-  // why the shadow rides its own node.
+  // The shadow is one interpolated surface on a single unclipped carrier View
+  // behind the container, driven by the gesture layer's hover progress. See
+  // Card.tsx for why the shadow rides its own node.
+  const restLevel = isElevated ? theme.elevation.level1 : theme.elevation.level0
+  const hoverLevel = isElevated
+    ? theme.elevation.level2
+    : theme.elevation.level1
   const restShadow = useMemo(
-    () => elevationShadowConfig(theme.elevation.level1),
-    [theme.elevation.level1],
+    () => elevationShadowConfig(restLevel),
+    [restLevel],
   )
   const hoveredShadow = useMemo(
-    () => elevationShadowConfig(theme.elevation.level2),
-    [theme.elevation.level2],
+    () => elevationShadowConfig(hoverLevel),
+    [hoverLevel],
   )
   const elevationShadowStyle = useShadow({
     from: restShadow,

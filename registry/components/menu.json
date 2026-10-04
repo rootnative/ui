@@ -11,6 +11,7 @@
     "packages/components/src/internal/AnimatedPressable.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
+    "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useStateLayer.ts",
     "packages/components/src/internal/warnOnce.ts"

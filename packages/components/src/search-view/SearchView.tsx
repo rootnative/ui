@@ -1,11 +1,12 @@
 import { useBreakpoint, useTheme, useWindowDimensions } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BackHandler, Platform, Pressable, TextInput, View } from 'react-native'
+import { Platform, Pressable, TextInput, View } from 'react-native'
 import type { TextInputProps } from 'react-native'
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -126,19 +127,7 @@ export function SearchView({
     initialFocus: inputRef,
   })
 
-  // Android hardware back closes the view before it pops the navigation
-  // stack.
-  useEffect(() => {
-    if (!visible || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        onDismiss()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [visible, onDismiss])
+  useBackHandlerDismiss(visible, onDismiss)
 
   // A docked view with an anchor opens over it: same left edge, same top
   // edge, same width, so the header covers the bar. Both are measured in

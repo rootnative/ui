@@ -73,13 +73,16 @@ it('renders the non-interactive elevated Card shadow as a CSS box-shadow', () =>
   expect(computed).toEqual(['0px 1px 2px rgba(0, 0, 0, 0.16)'])
 })
 
-it('does not paint a shadow for a filled Card', () => {
+// A filled card rests at level 0 and rises to level 1 on hover, so its carrier
+// is mounted from the start. At rest the only shadow it paints is the level-0
+// token, which is fully transparent.
+it('paints only a transparent level-0 shadow for a filled Card at rest', () => {
   const { container } = renderWeb(
     <Card onPress={() => {}} variant="filled">
       <Text>Filled</Text>
     </Card>,
   )
-  expect(boxShadows(container)).toHaveLength(0)
+  expect(boxShadows(container)).toEqual(['0px 0px 0px 0px rgba(0, 0, 0, 0)'])
 })
 
 // The other three components on the same mechanism. Levels differ (the FAB

@@ -8,6 +8,7 @@
     "packages/components/src/tooltip/types.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
+    "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["elevation", "rtl"],

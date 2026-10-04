@@ -52,16 +52,13 @@ export function NavigationDrawerItem({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: 'transparent',
     content: contentColor,
     disabled,
   })
 
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
-  })
   // The drawer indicator fades, with no scale: MD3 gives it no motion of its
   // own beyond the state change.
   const animatedIndicatorStyle = useInterpolatedStyle(progress, {

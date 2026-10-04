@@ -1,5 +1,4 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
-import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
@@ -36,18 +35,12 @@ export function MenuItem({
   const {
     style: stateLayerStyle,
     handlers,
-    states,
+    focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
     rest: 'transparent',
     content: contentColor ?? theme.colors.onSurface,
     containerColor,
     disabled,
-  })
-
-  // Interop escape hatch: the focus ring rides the same keyboard-focus progress
-  // the state layer runs on.
-  const animatedFocusRingStyle = useInterpolatedStyle(states.focusVisible, {
-    opacity: [0, 1],
   })
 
   // Icon color derives from the item's content color, not from `labelStyle` —

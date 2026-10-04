@@ -13,8 +13,9 @@ import type {
 } from '@rootnative/inertia/touch'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AccessibilityActionEvent, LayoutChangeEvent } from 'react-native'
-import { BackHandler, Platform, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -278,19 +279,7 @@ export function BottomSheet({
     onEscape: dismissable ? onDismiss : undefined,
   })
 
-  // Android hardware back closes a dismissable modal sheet before it pops
-  // the navigation stack.
-  useEffect(() => {
-    if (!open || !isModal || !dismissable || Platform.OS !== 'android') return
-    const subscription = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        onDismiss()
-        return true
-      },
-    )
-    return () => subscription.remove()
-  }, [open, isModal, dismissable, onDismiss])
+  useBackHandlerDismiss(open && isModal && dismissable, onDismiss)
 
   const onLayerLayout = useCallback((event: LayoutChangeEvent) => {
     const height = event.nativeEvent.layout.height
