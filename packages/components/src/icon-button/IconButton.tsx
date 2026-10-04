@@ -5,7 +5,7 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -76,6 +76,8 @@ export function IconButton({
   disabled = false,
   variant = 'filled',
   selected,
+  defaultSelected,
+  onSelectedChange,
   size: sizeProp = 'small',
   width = 'uniform',
   shape = 'round',
@@ -90,8 +92,19 @@ export function IconButton({
   const sizeTokens = getIconButtonSizeTokens(size)
 
   const isDisabled = Boolean(disabled)
-  const isToggle = selected !== undefined
-  const isSelected = Boolean(selected)
+  // Controlled and uncontrolled, the same idiom as Checkbox and Switch.
+  const isControlledToggle = selected !== undefined
+  const isToggle = isControlledToggle || defaultSelected !== undefined
+  const [selfSelected, setSelfSelected] = useState(Boolean(defaultSelected))
+  const isSelected = isControlledToggle ? Boolean(selected) : selfSelected
+  const handlePress = useCallback(() => {
+    if (isToggle) {
+      const next = !isSelected
+      if (!isControlledToggle) setSelfSelected(next)
+      onSelectedChange?.(next)
+    }
+    onPress?.()
+  }, [isToggle, isSelected, isControlledToggle, onSelectedChange, onPress])
   // Disabled always renders 38% onSurface — contentColor/iconColor never
   // override the MD3 disabled treatment.
   const resolvedIconColor = isDisabled
@@ -142,13 +155,8 @@ export function IconButton({
   const colors = useMemo(() => {
     const base = getIconButtonColors(theme, variant, isToggle, isSelected)
     if (!containerColor) return base
-    return applyContainerColorOverride(
-      theme,
-      base,
-      containerColor,
-      resolvedIconColor,
-    )
-  }, [theme, variant, isToggle, isSelected, containerColor, resolvedIconColor])
+    return applyContainerColorOverride(theme, base, containerColor)
+  }, [theme, variant, isToggle, isSelected, containerColor])
 
   // State-layer crossfade (rest → focus → hover → press, press wins) with
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
@@ -260,7 +268,7 @@ export function IconButton({
         {...ariaState}
         disabled={isDisabled}
         hitSlop={hitSlop ?? defaultHitSlop}
-        onPress={onPress}
+        onPress={handlePress}
         {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
         style={[
           styles.container,

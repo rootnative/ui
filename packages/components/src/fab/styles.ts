@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
+import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { FABSize, FABVariant } from './types'
 
@@ -32,9 +32,6 @@ export const FAB_ICON_SIZES = {
 export interface FABColors {
   backgroundColor: string
   contentColor: string
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
   disabledBackgroundColor: string
   disabledContentColor: string
 }
@@ -70,34 +67,6 @@ function getVariantColors(
   }
 }
 
-function deriveStateLayers(
-  theme: MaterialTheme,
-  backgroundColor: string,
-  overlay: string,
-): {
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
-} {
-  return {
-    hoveredBackgroundColor: blendColor(
-      backgroundColor,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendColor(
-      backgroundColor,
-      overlay,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendColor(
-      backgroundColor,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    ),
-  }
-}
-
 export function getResolvedFABColors(
   theme: MaterialTheme,
   variant: FABVariant,
@@ -112,7 +81,6 @@ export function getResolvedFABColors(
   return {
     backgroundColor,
     contentColor,
-    ...deriveStateLayers(theme, backgroundColor, contentColor),
     // Per MD3: DisabledContainerOpacity = 0.12, DisabledContentOpacity = 0.38
     disabledBackgroundColor: alphaColor(
       theme.colors.onSurface,

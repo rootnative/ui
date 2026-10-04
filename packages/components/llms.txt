@@ -328,7 +328,9 @@ Props:
 - `onPress?: () => void` — Called when the button is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the button.
 - `variant?: 'filled' | 'tonal' | 'outlined' | 'standard'` — Default: `'filled'`. Visual style variant.
-- `selected?: boolean` — Enables toggle mode. The button changes appearance based on selected/unselected state.
+- `selected?: boolean` — Enables toggle mode and controls it. The button changes appearance based on the selected/unselected state. Pair with `onSelectedChange`, or use `defaultSelected` for an uncontrolled toggle.
+- `defaultSelected?: boolean` — Enables toggle mode without controlling it: the button flips its own state on press and reports it through `onSelectedChange`.
+- `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a toggle button is pressed.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height and icon size. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
 - `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
@@ -526,7 +528,9 @@ Toggleable chip used to refine or narrow content. Supports a `selected` state an
 Props:
 - `variant: 'filter'`
 - `elevated?: boolean` — Default: `false`. Whether the chip uses an elevated surface instead of an outline border.
-- `selected?: boolean` — Whether the chip is in a selected (toggled-on) state.
+- `selected?: boolean` — Whether the chip is selected (toggled on). Pair with `onSelectedChange`, or use `defaultSelected` for an uncontrolled filter chip.
+- `defaultSelected?: boolean` — Initial selection for an uncontrolled filter chip. The chip flips its own state on press and reports it through `onSelectedChange`.
+- `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a filter chip is pressed.
 - `leadingIcon?: IconSource` — Icon rendered before the label. When the chip is selected and no `leadingIcon` is provided, a checkmark is shown automatically.
 - `onClose?: () => void` — Callback fired when the close icon is pressed. The close icon only renders when the chip is selected.
 

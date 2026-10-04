@@ -81,8 +81,18 @@ export interface FilterChipProps extends ChipCommonProps {
    * @default false
    */
   elevated?: boolean
-  /** Whether the chip is in a selected (toggled-on) state. */
+  /**
+   * Whether the chip is selected (toggled on). Pair with `onSelectedChange`,
+   * or use `defaultSelected` for an uncontrolled filter chip.
+   */
   selected?: boolean
+  /**
+   * Initial selection for an uncontrolled filter chip. The chip flips its
+   * own state on press and reports it through `onSelectedChange`.
+   */
+  defaultSelected?: boolean
+  /** Called with the next state when a filter chip is pressed. */
+  onSelectedChange?: (selected: boolean) => void
   /**
    * Icon rendered before the label. When the chip is selected and no
    * `leadingIcon` is provided, a checkmark is shown automatically.

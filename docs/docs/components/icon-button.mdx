@@ -115,7 +115,10 @@ The render-function form receives the size and color the IconButton would have g
 
 ## Toggle Mode
 
-Use `selected` and `selectedIcon` for toggle behavior:
+Use `selected` and `selectedIcon` for toggle behavior. `selected` with
+`onSelectedChange` is the controlled form. `defaultSelected` is the
+uncontrolled form: the button flips its own state on press and reports the
+new state through `onSelectedChange`.
 
 <SnackExample
   name="RootNative IconButton — Toggle"
@@ -137,7 +140,7 @@ Use `selected` and `selectedIcon` for toggle behavior:
               icon="heart-outline"
               selectedIcon="heart"
               selected={liked}
-              onPress={() => setLiked(!liked)}
+              onSelectedChange={setLiked}
               accessibilityLabel={liked ? 'Unlike' : 'Like'}
             />
           </View>

@@ -1,5 +1,5 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
-import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
+import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ExpressiveSize } from '../internal/size'
 import type { ButtonShape, ButtonVariant } from './types'
@@ -108,9 +108,6 @@ export interface VariantColors {
   textColor: string
   borderColor: string
   borderWidth: number
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
   disabledBackgroundColor: string
   disabledTextColor: string
   disabledBorderColor: string
@@ -140,18 +137,6 @@ function getVariantColors(
       textColor: theme.colors.primary,
       borderColor: theme.colors.outline,
       borderWidth: 1,
-      hoveredBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: 'transparent',
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: disabledOutlineColor,
@@ -164,18 +149,6 @@ function getVariantColors(
       textColor: theme.colors.primary,
       borderColor: 'transparent',
       borderWidth: 0,
-      hoveredBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: alphaColor(
-        theme.colors.primary,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: 'transparent',
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: 'transparent',
@@ -188,21 +161,6 @@ function getVariantColors(
       textColor: theme.colors.primary,
       borderColor: theme.colors.surfaceContainerLow,
       borderWidth: 0,
-      hoveredBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        theme.colors.primary,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        theme.colors.primary,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        theme.colors.primary,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: disabledContainerColor,
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: disabledContainerColor,
@@ -215,21 +173,6 @@ function getVariantColors(
       textColor: theme.colors.onSecondaryContainer,
       borderColor: theme.colors.secondaryContainer,
       borderWidth: 0,
-      hoveredBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: disabledContainerColor,
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: disabledContainerColor,
@@ -242,21 +185,6 @@ function getVariantColors(
     textColor: theme.colors.onPrimary,
     borderColor: theme.colors.primary,
     borderWidth: 0,
-    hoveredBackgroundColor: blendColor(
-      theme.colors.primary,
-      theme.colors.onPrimary,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendColor(
-      theme.colors.primary,
-      theme.colors.onPrimary,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendColor(
-      theme.colors.primary,
-      theme.colors.onPrimary,
-      theme.stateLayer.pressedOpacity,
-    ),
     disabledBackgroundColor: disabledContainerColor,
     disabledTextColor: disabledLabelColor,
     disabledBorderColor: disabledContainerColor,
@@ -311,55 +239,8 @@ function applyColorOverrides(
   }
 
   if (containerColor) {
-    const overlay = contentColor ?? colors.textColor
     result.backgroundColor = containerColor
     result.borderColor = containerColor
-    result.hoveredBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    )
-    result.focusedBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.focusedOpacity,
-    )
-    result.pressedBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    )
-  } else if (contentColor) {
-    if (colors.backgroundColor === 'transparent') {
-      result.hoveredBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.hoveredOpacity,
-      )
-      result.focusedBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.focusedOpacity,
-      )
-      result.pressedBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.pressedOpacity,
-      )
-    } else {
-      result.hoveredBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.hoveredOpacity,
-      )
-      result.focusedBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.focusedOpacity,
-      )
-      result.pressedBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.pressedOpacity,
-      )
-    }
   }
 
   return result

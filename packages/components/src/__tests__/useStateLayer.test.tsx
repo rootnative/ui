@@ -1,7 +1,17 @@
 import { ThemeProvider } from '@rootnative/core'
-import { renderHook } from '@testing-library/react-native'
+import { Animated } from '@rootnative/inertia/reanimated'
+import { getStyle, renderSettled } from '@rootnative/utils/test'
+import { renderHook, screen } from '@testing-library/react-native'
 import type { ReactNode } from 'react'
+import type { StyleProp, ViewStyle } from 'react-native'
 import { useStateLayer } from '../internal/useStateLayer'
+import type { UseStateLayerOptions } from '../internal/useStateLayer'
+
+/** The layer's settled style on a node, so the disabled colour can be read. */
+function Probe(props: UseStateLayerOptions) {
+  const { style } = useStateLayer(props)
+  return <Animated.View testID="probe" style={style as StyleProp<ViewStyle>} />
+}
 
 function wrapper({ children }: { children: ReactNode }) {
   return <ThemeProvider>{children}</ThemeProvider>
@@ -37,6 +47,30 @@ describe('useStateLayer', () => {
       { wrapper },
     )
     expect(result.current.style).toMatchObject({ backgroundColor: '#ff0000' })
+  })
+
+  it('drops the containerColor override while disabled', () => {
+    const base = { rest: '#6750a4', content: '#ffffff', disabled: true }
+    renderSettled(
+      <ThemeProvider>
+        <Probe {...base} />
+      </ThemeProvider>,
+    )
+    const withoutOverride = getStyle(
+      screen.getByTestId('probe'),
+    ).backgroundColor
+    screen.unmount()
+
+    renderSettled(
+      <ThemeProvider>
+        <Probe {...base} containerColor="#ff0000" />
+      </ThemeProvider>,
+    )
+    // Disabled treatment is not overridable: the layer settles on the
+    // variant's own colour, the same as with no override at all.
+    expect(getStyle(screen.getByTestId('probe')).backgroundColor).toBe(
+      withoutOverride,
+    )
   })
 
   it('exposes the per-state progress shared values at rest', () => {

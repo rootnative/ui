@@ -20,6 +20,8 @@ import { ListItem } from '../list'
 import { LoadingIndicator } from '../loading-indicator'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
+import { NavigationDrawer } from '../navigation-drawer'
+import { NavigationRail } from '../navigation-rail'
 import { PortalHost } from '../portal/PortalHost'
 import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
@@ -299,6 +301,53 @@ const CASES: readonly ReducedMotionCase[] = [
     settle: () => {
       fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
     },
+  },
+  {
+    name: 'NavigationRail',
+    render: () => (
+      <NavigationRail
+        items={[
+          { value: 'home', label: 'Home', icon: 'home-outline' },
+          { value: 'search', label: 'Search', icon: 'magnify' },
+        ]}
+      />
+    ),
+    // Same seeded indicator as NavigationBar: the transition starts when
+    // the selection moves.
+    settle: () => {
+      fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
+    },
+  },
+  {
+    name: 'NavigationDrawer (standard)',
+    render: () => (
+      <NavigationDrawer variant="standard" defaultValue="home">
+        <NavigationDrawer.Item value="home" label="Home" icon="home-outline" />
+        <NavigationDrawer.Item value="search" label="Search" icon="magnify" />
+      </NavigationDrawer>
+    ),
+    settle: () => {
+      fireEvent.press(screen.getByRole('tab', { name: 'Search' }))
+    },
+  },
+  {
+    name: 'NavigationDrawer (modal)',
+    render: () => (
+      <PortalHost>
+        <NavigationDrawer
+          variant="modal"
+          visible
+          onDismiss={() => {}}
+          defaultValue="home"
+        >
+          <NavigationDrawer.Item
+            value="home"
+            label="Home"
+            icon="home-outline"
+          />
+        </NavigationDrawer>
+      </PortalHost>
+    ),
   },
   {
     name: 'BottomSheet',

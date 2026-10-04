@@ -12,11 +12,12 @@ import {
   resolveColorFromStyle,
 } from '@rootnative/utils'
 import type { IconSource } from '@rootnative/utils'
-import { useMemo, type ReactNode } from 'react'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import {
   Platform,
   Text,
   View,
+  type GestureResponderEvent,
   type PressableProps,
   type StyleProp,
   type TextStyle,
@@ -43,6 +44,8 @@ type ChipImplProps = Omit<PressableProps, 'children'> & {
   variant?: ChipVariant
   elevated?: boolean
   selected?: boolean
+  defaultSelected?: boolean
+  onSelectedChange?: (selected: boolean) => void
   leadingIcon?: IconSource
   iconSize?: number
   avatar?: ReactNode
@@ -59,7 +62,10 @@ export function Chip(props: ChipProps) {
     style,
     variant = 'assist',
     elevated = false,
-    selected = false,
+    selected,
+    defaultSelected,
+    onSelectedChange,
+    onPress,
     leadingIcon,
     iconSize = 18,
     avatar,
@@ -73,7 +79,27 @@ export function Chip(props: ChipProps) {
     ...rest
   } = props as ChipImplProps
   const isDisabled = Boolean(disabled)
-  const isSelected = variant === 'filter' ? Boolean(selected) : false
+  // A filter chip is controlled through `selected` or uncontrolled through
+  // `defaultSelected`, the same idiom as Checkbox and Switch.
+  const isControlledSelection = selected !== undefined
+  const [selfSelected, setSelfSelected] = useState(Boolean(defaultSelected))
+  const isSelected =
+    variant === 'filter'
+      ? isControlledSelection
+        ? Boolean(selected)
+        : selfSelected
+      : false
+  const handlePress = useCallback(
+    (event: GestureResponderEvent) => {
+      if (variant === 'filter') {
+        const next = !isSelected
+        if (!isControlledSelection) setSelfSelected(next)
+        onSelectedChange?.(next)
+      }
+      onPress?.(event)
+    },
+    [variant, isSelected, isControlledSelection, onSelectedChange, onPress],
+  )
 
   const showCloseIcon =
     onClose !== undefined &&
@@ -353,6 +379,7 @@ export function Chip(props: ChipProps) {
         // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
         hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
         disabled={isDisabled}
+        onPress={handlePress}
         {...(isDisabled ? undefined : composeHandlers(composedHandlers, rest))}
         style={[
           styles.container,

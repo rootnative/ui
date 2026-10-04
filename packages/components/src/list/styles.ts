@@ -1,5 +1,4 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ListItemLines } from './types'
 
@@ -24,9 +23,6 @@ export function createListStyles(theme: MaterialTheme) {
 
 export interface ListItemColors {
   backgroundColor: string
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
 }
 
 export function getResolvedListItemColors(
@@ -36,38 +32,11 @@ export function getResolvedListItemColors(
   if (containerColor) {
     return {
       backgroundColor: containerColor,
-      hoveredBackgroundColor: blendColor(
-        containerColor,
-        theme.colors.onSurface,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        containerColor,
-        theme.colors.onSurface,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        containerColor,
-        theme.colors.onSurface,
-        theme.stateLayer.pressedOpacity,
-      ),
     }
   }
 
   return {
     backgroundColor: 'transparent',
-    hoveredBackgroundColor: alphaColor(
-      theme.colors.onSurface,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: alphaColor(
-      theme.colors.onSurface,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: alphaColor(
-      theme.colors.onSurface,
-      theme.stateLayer.pressedOpacity,
-    ),
   }
 }
 

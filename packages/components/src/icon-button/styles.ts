@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor } from '@rootnative/utils'
+import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ExpressiveSize } from '../internal/size'
 import type {
@@ -129,24 +129,10 @@ export function getIconButtonMorphRadii(
 
 export interface IconButtonColors {
   backgroundColor: string
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
   borderColor: string
   borderWidth: number
   disabledBackgroundColor: string
   disabledBorderColor: string
-}
-
-function blendStateLayer(
-  base: string,
-  overlay: string,
-  opacity: number,
-): string {
-  if (base === 'transparent') {
-    return alphaColor(overlay, opacity)
-  }
-  return blendColor(base, overlay, opacity)
 }
 
 export function getIconButtonColors(
@@ -167,7 +153,6 @@ export function getIconButtonColors(
   const toggleUnselectedBg = theme.colors.surfaceContainerHighest
 
   let baseBg: string
-  let overlay: string
   let borderColor: string = 'transparent'
   let borderWidth = 0
   let disabledBg = disabledContainerColor
@@ -176,30 +161,24 @@ export function getIconButtonColors(
   if (variant === 'filled') {
     if (isToggle && !selected) {
       baseBg = toggleUnselectedBg
-      overlay = theme.colors.primary
     } else {
       baseBg = theme.colors.primary
-      overlay = theme.colors.onPrimary
     }
     borderColor = baseBg
   } else if (variant === 'tonal') {
     if (isToggle && !selected) {
       baseBg = toggleUnselectedBg
-      overlay = theme.colors.onSurfaceVariant
     } else {
       baseBg = theme.colors.secondaryContainer
-      overlay = theme.colors.onSecondaryContainer
     }
     borderColor = baseBg
   } else if (variant === 'outlined') {
     if (isToggle && selected) {
       baseBg = theme.colors.inverseSurface
-      overlay = theme.colors.inverseOnSurface
       borderColor = baseBg
       borderWidth = 0
     } else {
       baseBg = 'transparent'
-      overlay = theme.colors.onSurfaceVariant
       borderColor = theme.colors.outline
       borderWidth = 1
       disabledBg = 'transparent'
@@ -208,31 +187,12 @@ export function getIconButtonColors(
   } else {
     // standard
     baseBg = 'transparent'
-    overlay =
-      isToggle && selected
-        ? theme.colors.primary
-        : theme.colors.onSurfaceVariant
     disabledBg = 'transparent'
     disabledBorderColor = 'transparent'
   }
 
   return {
     backgroundColor: baseBg,
-    hoveredBackgroundColor: blendStateLayer(
-      baseBg,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendStateLayer(
-      baseBg,
-      overlay,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendStateLayer(
-      baseBg,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    ),
     borderColor,
     borderWidth,
     disabledBackgroundColor: disabledBg,
@@ -244,28 +204,12 @@ export function applyContainerColorOverride(
   theme: MaterialTheme,
   colors: IconButtonColors,
   containerColor: string,
-  overlay: string,
 ): IconButtonColors {
   return {
     ...colors,
     backgroundColor: containerColor,
     borderColor: containerColor,
     borderWidth: 0,
-    hoveredBackgroundColor: blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    ),
   }
 }
 

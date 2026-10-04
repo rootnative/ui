@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
+import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { Platform, StyleSheet } from 'react-native'
 import { elevationBoxShadowForFabric } from '../elevation-shadow'
 import type { CardVariant } from './types'
@@ -11,22 +11,8 @@ export interface CardColors {
   backgroundColor: string
   borderColor: string
   borderWidth: number
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
   disabledBackgroundColor: string
   disabledBorderColor: string
-}
-
-function blendStateLayer(
-  base: string,
-  overlay: string,
-  opacity: number,
-): string {
-  if (base === 'transparent') {
-    return alphaColor(overlay, opacity)
-  }
-  return blendColor(base, overlay, opacity)
 }
 
 function getVariantColors(
@@ -47,21 +33,6 @@ function getVariantColors(
       backgroundColor: theme.colors.surface,
       borderColor: theme.colors.outlineVariant,
       borderWidth: 1,
-      hoveredBackgroundColor: blendStateLayer(
-        theme.colors.surface,
-        theme.colors.onSurface,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendStateLayer(
-        theme.colors.surface,
-        theme.colors.onSurface,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendStateLayer(
-        theme.colors.surface,
-        theme.colors.onSurface,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: theme.colors.surface,
       disabledBorderColor: disabledOutlineColor,
     }
@@ -72,21 +43,6 @@ function getVariantColors(
       backgroundColor: theme.colors.surfaceContainerHighest,
       borderColor: 'transparent',
       borderWidth: 0,
-      hoveredBackgroundColor: blendColor(
-        theme.colors.surfaceContainerHighest,
-        theme.colors.onSurface,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerHighest,
-        theme.colors.onSurface,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerHighest,
-        theme.colors.onSurface,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: disabledContainerColor,
       disabledBorderColor: 'transparent',
     }
@@ -97,21 +53,6 @@ function getVariantColors(
     backgroundColor: theme.colors.surfaceContainerLow,
     borderColor: 'transparent',
     borderWidth: 0,
-    hoveredBackgroundColor: blendColor(
-      theme.colors.surfaceContainerLow,
-      theme.colors.onSurface,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendColor(
-      theme.colors.surfaceContainerLow,
-      theme.colors.onSurface,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendColor(
-      theme.colors.surfaceContainerLow,
-      theme.colors.onSurface,
-      theme.stateLayer.pressedOpacity,
-    ),
     disabledBackgroundColor: disabledContainerColor,
     disabledBorderColor: 'transparent',
   }
@@ -129,21 +70,6 @@ function applyContainerColorOverride(
     backgroundColor: containerColor,
     borderColor: containerColor,
     borderWidth: 0,
-    hoveredBackgroundColor: blendColor(
-      containerColor,
-      theme.colors.onSurface,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: blendColor(
-      containerColor,
-      theme.colors.onSurface,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: blendColor(
-      containerColor,
-      theme.colors.onSurface,
-      theme.stateLayer.pressedOpacity,
-    ),
   }
 }
 

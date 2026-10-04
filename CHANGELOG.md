@@ -11,6 +11,36 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Toggle `IconButton` and filter `Chip` work uncontrolled
+
+Both had `selected` and nothing else, so a consumer who forgot to flip
+`selected` in `onPress` got a control that never toggled. Both now follow the
+Checkbox idiom: `selected` with `onSelectedChange` is the controlled form,
+and `defaultSelected` is the uncontrolled form, where the control flips its
+own state and reports the new state through `onSelectedChange`. `onPress`
+still fires either way.
+
+### Disabled is not overridable, for every component
+
+`useStateLayer` fell back to the consumer's `containerColor` while disabled
+when a component passed no `disabledContainerColor`. ListItem, Menu.Item,
+Avatar and SearchBar kept the override colour in their disabled state. The
+disabled layer now rests on the variant's own colour.
+
+### Dead colour derivation removed from six style files
+
+Button, Chip, FAB, IconButton, Card and ListItem each computed hover, focus
+and press colours in `styles.ts` that nothing read, because `useStateLayer`
+derives the layers itself. About 200 lines are gone, and the one place the
+layers are derived is the only place now.
+
+### Test tables cover more of the catalog
+
+NavigationRail and NavigationDrawer join the reduced-motion table, the
+pressable Avatar joins the touch-target table, and the SearchBar trigger joins
+the web cursor table. The Avatar also reads its hit slop from the shared
+helper instead of its own copy.
+
 ### Consumer handlers and `hitSlop` survive the props spread
 
 Every `Pressable`-based component spreads its state-layer handlers after the

@@ -83,8 +83,19 @@ export interface IconButtonProps extends Omit<
    * @default 'filled'
    */
   variant?: IconButtonVariant
-  /** Enables toggle mode. The button changes appearance based on selected/unselected state. */
+  /**
+   * Enables toggle mode and controls it. The button changes appearance based
+   * on the selected/unselected state. Pair with `onSelectedChange`, or use
+   * `defaultSelected` for an uncontrolled toggle.
+   */
   selected?: boolean
+  /**
+   * Enables toggle mode without controlling it: the button flips its own
+   * state on press and reports it through `onSelectedChange`.
+   */
+  defaultSelected?: boolean
+  /** Called with the next state when a toggle button is pressed. */
+  onSelectedChange?: (selected: boolean) => void
   /**
    * MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' |
    * 'large' | 'extraLarge'`. Sets container height and icon size. The old

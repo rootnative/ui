@@ -449,6 +449,52 @@ describe('Chip', () => {
     })
   })
 
+  describe('filter selection', () => {
+    it('flips its own state and reports it when uncontrolled', () => {
+      const onSelectedChange = jest.fn()
+      const onPress = jest.fn()
+      renderWithTheme(
+        <Chip
+          variant="filter"
+          defaultSelected={false}
+          onSelectedChange={onSelectedChange}
+          onPress={onPress}
+        >
+          Drama
+        </Chip>,
+      )
+      const chip = screen.getByRole('button')
+      expect(chip.props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: false }),
+      )
+
+      fireEvent.press(chip)
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(onPress).toHaveBeenCalledTimes(1)
+      expect(screen.getByRole('button').props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: true }),
+      )
+    })
+
+    it('reports but does not flip when controlled', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <Chip
+          variant="filter"
+          selected={false}
+          onSelectedChange={onSelectedChange}
+        >
+          Drama
+        </Chip>,
+      )
+      fireEvent.press(screen.getByRole('button'))
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(screen.getByRole('button').props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: false }),
+      )
+    })
+  })
+
   describe('accessibility', () => {
     it('reports selected state for filter variant', () => {
       renderWithTheme(

@@ -29,8 +29,8 @@ export interface UseStateLayerOptions {
   disabled?: boolean
   /**
    * Container background while disabled — MD3's 12% `onSurface` for filled
-   * variants. Omit for variants whose disabled container is transparent (the
-   * layer then falls back to `rest`). Never derived from `containerColor`:
+   * variants. Omit for variants whose disabled container is their own rest
+   * color (the layer then falls back to `rest`, not to `containerColor`):
    * disabled treatment is not overridable.
    */
   disabledContainerColor?: string
@@ -88,9 +88,9 @@ export function useStateLayer(
       },
       pressed: { backgroundColor: layerColor(stateLayer.pressedOpacity) },
     }
-    if (disabledContainerColor) {
-      states.disabled = { backgroundColor: disabledContainerColor }
-    }
+    // The disabled layer never reads `containerColor`. Without this line
+    // `useGestureLayer` falls back to `rest`, which is the override.
+    states.disabled = { backgroundColor: disabledContainerColor ?? rest }
     return states
   }, [containerColor, rest, content, stateLayer, disabledContainerColor])
 

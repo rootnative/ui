@@ -185,6 +185,70 @@ describe('IconButton', () => {
     })
   })
 
+  describe('toggle mode', () => {
+    it('flips its own state and reports it when uncontrolled', () => {
+      const onSelectedChange = jest.fn()
+      const onPress = jest.fn()
+      renderWithTheme(
+        <IconButton
+          icon="heart-outline"
+          selectedIcon={<Text testID="on-icon">on</Text>}
+          defaultSelected={false}
+          onSelectedChange={onSelectedChange}
+          onPress={onPress}
+          accessibilityLabel="Like"
+        />,
+      )
+      expect(
+        screen.queryByTestId('on-icon', { includeHiddenElements: true }),
+      ).toBeNull()
+
+      fireEvent.press(screen.getByRole('button'))
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(onPress).toHaveBeenCalledTimes(1)
+      expect(
+        screen.getByTestId('on-icon', { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(screen.getByRole('button').props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: true }),
+      )
+    })
+
+    it('reports but does not flip when controlled', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <IconButton
+          icon="heart-outline"
+          selectedIcon={<Text testID="on-icon">on</Text>}
+          selected={false}
+          onSelectedChange={onSelectedChange}
+          accessibilityLabel="Like"
+        />,
+      )
+      fireEvent.press(screen.getByRole('button'))
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(
+        screen.queryByTestId('on-icon', { includeHiddenElements: true }),
+      ).toBeNull()
+    })
+
+    it('is not a toggle without selected or defaultSelected', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          onSelectedChange={onSelectedChange}
+          accessibilityLabel="Like"
+        />,
+      )
+      fireEvent.press(screen.getByRole('button'))
+      expect(onSelectedChange).not.toHaveBeenCalled()
+      expect(
+        screen.getByRole('button').props.accessibilityState?.selected,
+      ).toBeUndefined()
+    })
+  })
+
   describe('size', () => {
     const sizes: Array<{
       size: IconButtonSize

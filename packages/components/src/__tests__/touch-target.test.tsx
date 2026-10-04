@@ -26,6 +26,7 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
+import { Avatar } from '../avatar'
 import { Button } from '../button'
 import type { ButtonSize } from '../button/types'
 import { ButtonGroup } from '../button-group'
@@ -137,6 +138,23 @@ describe('every control clears the 48dp touch target', () => {
     renderWithTheme(<Chip>Tag</Chip>)
     expect(target('button').height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET)
   })
+
+  it.each(['extraSmall', 'small', 'medium'] as const)(
+    'Avatar — pressable, size %s',
+    (size) => {
+      renderWithTheme(
+        <Avatar
+          label="AB"
+          size={size}
+          onPress={() => {}}
+          accessibilityLabel="Profile"
+        />,
+      )
+      const { height, width } = target('button')
+      expect(height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET)
+      expect(width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET)
+    },
+  )
 
   it.each(['small', 'medium', 'large'] as const)('FAB — size %s', (size) => {
     renderWithTheme(<FAB icon="plus" size={size} accessibilityLabel="Add" />)

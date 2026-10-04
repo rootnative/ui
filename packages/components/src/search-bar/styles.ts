@@ -62,7 +62,11 @@ export function createStyles(
       triggerPress: {
         ...StyleSheet.absoluteFill,
         borderRadius: theme.shape.cornerFull,
+        cursor: 'pointer',
         ...webOutlineReset,
+      },
+      triggerPressDisabled: {
+        cursor: 'auto',
       },
       container: {
         height: searchBarHeight(density),

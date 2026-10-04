@@ -193,6 +193,13 @@ export function SearchBar({
   )
   // As a trigger, the static leading icon sits above the press target, so it
   // must let the press through too.
+  const triggerPressStyle = useMemo(
+    () => [
+      styles.triggerPress,
+      disabled ? styles.triggerPressDisabled : undefined,
+    ],
+    [styles.triggerPress, styles.triggerPressDisabled, disabled],
+  )
   const leadingSlotStyle = useMemo(
     () => [styles.slot, isTrigger ? pointerEvents.none : undefined],
     [styles.slot, isTrigger],
@@ -329,7 +336,7 @@ export function SearchBar({
             role={role ?? 'button'}
             accessibilityLabel={accessibilityLabel ?? placeholder}
             tabIndex={0}
-            style={styles.triggerPress}
+            style={triggerPressStyle}
           />
           {content}
         </Animated.View>

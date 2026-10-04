@@ -9,12 +9,10 @@ import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { ExpressiveSize } from '../internal/size'
 import { resolveSize } from '../internal/size'
+import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
 import type { AvatarProps } from './types'
-
-// Minimum touch target for interactive avatars (WCAG / MD3).
-const MIN_TOUCH_TARGET = 48
 
 const CONTAINER_PX: Record<ExpressiveSize, number> = {
   extraSmall: 24,
@@ -151,9 +149,7 @@ export function Avatar({
 
   // Bring the touch target up to the 48dp minimum on native.
   const hitSlop =
-    Platform.OS === 'web'
-      ? undefined
-      : Math.max(0, (MIN_TOUCH_TARGET - CONTAINER_PX[size]) / 2)
+    Platform.OS === 'web' ? undefined : getDefaultHitSlop(CONTAINER_PX[size])
 
   return (
     <AnimatedPressable

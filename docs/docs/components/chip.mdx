@@ -73,7 +73,10 @@ Available on `assist`, `filter`, and `suggestion` variants. Input chips are alwa
 
 ## Filter Chips
 
-Filter chips support a `selected` state. When selected, a checkmark icon appears automatically.
+Filter chips support a `selected` state. When selected, a checkmark icon
+appears automatically. `selected` with `onSelectedChange` is the controlled
+form. `defaultSelected` is the uncontrolled form: the chip flips its own state
+on press and reports the new state through `onSelectedChange`.
 
 <SnackExample
   name="RootNative Chip — Filter"
@@ -92,8 +95,8 @@ Filter chips support a `selected` state. When selected, a checkmark icon appears
       <SafeAreaProvider>
         <ThemeProvider iconResolver={mdiResolver}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            <Chip variant="filter" selected={active} onPress={() => setActive(!active)}>Active</Chip>
-            <Chip variant="filter" selected={inactive} onPress={() => setInactive(!inactive)}>Inactive</Chip>
+            <Chip variant="filter" selected={active} onSelectedChange={setActive}>Active</Chip>
+            <Chip variant="filter" selected={inactive} onSelectedChange={setInactive}>Inactive</Chip>
           </View>
         </ThemeProvider>
       </SafeAreaProvider>

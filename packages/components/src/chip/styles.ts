@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, blendColor, elevationStyle } from '@rootnative/utils'
+import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import type { ChipVariant } from './types'
 
@@ -40,9 +40,6 @@ export interface VariantColors {
   textColor: string
   borderColor: string
   borderWidth: number
-  hoveredBackgroundColor: string
-  focusedBackgroundColor: string
-  pressedBackgroundColor: string
   disabledBackgroundColor: string
   disabledTextColor: string
   disabledBorderColor: string
@@ -74,21 +71,6 @@ function getVariantColors(
       textColor: theme.colors.onSecondaryContainer,
       borderColor: 'transparent',
       borderWidth: 0,
-      hoveredBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        theme.colors.secondaryContainer,
-        theme.colors.onSecondaryContainer,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: disabledContainerColor,
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: 'transparent',
@@ -107,21 +89,6 @@ function getVariantColors(
       textColor,
       borderColor: 'transparent',
       borderWidth: 0,
-      hoveredBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        textColor,
-        theme.stateLayer.hoveredOpacity,
-      ),
-      focusedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        textColor,
-        theme.stateLayer.focusedOpacity,
-      ),
-      pressedBackgroundColor: blendColor(
-        theme.colors.surfaceContainerLow,
-        textColor,
-        theme.stateLayer.pressedOpacity,
-      ),
       disabledBackgroundColor: disabledContainerColor,
       disabledTextColor: disabledLabelColor,
       disabledBorderColor: 'transparent',
@@ -143,18 +110,6 @@ function getVariantColors(
     textColor,
     borderColor: theme.colors.outline,
     borderWidth: 1,
-    hoveredBackgroundColor: alphaColor(
-      textColor,
-      theme.stateLayer.hoveredOpacity,
-    ),
-    focusedBackgroundColor: alphaColor(
-      textColor,
-      theme.stateLayer.focusedOpacity,
-    ),
-    pressedBackgroundColor: alphaColor(
-      textColor,
-      theme.stateLayer.pressedOpacity,
-    ),
     disabledBackgroundColor: 'transparent',
     disabledTextColor: disabledLabelColor,
     disabledBorderColor: disabledOutlineColor,
@@ -176,55 +131,8 @@ function applyColorOverrides(
   }
 
   if (containerColor) {
-    const overlay = contentColor ?? colors.textColor
     result.backgroundColor = containerColor
     result.borderColor = containerColor
-    result.hoveredBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.hoveredOpacity,
-    )
-    result.focusedBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.focusedOpacity,
-    )
-    result.pressedBackgroundColor = blendColor(
-      containerColor,
-      overlay,
-      theme.stateLayer.pressedOpacity,
-    )
-  } else if (contentColor) {
-    if (colors.backgroundColor === 'transparent') {
-      result.hoveredBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.hoveredOpacity,
-      )
-      result.focusedBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.focusedOpacity,
-      )
-      result.pressedBackgroundColor = alphaColor(
-        contentColor,
-        theme.stateLayer.pressedOpacity,
-      )
-    } else {
-      result.hoveredBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.hoveredOpacity,
-      )
-      result.focusedBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.focusedOpacity,
-      )
-      result.pressedBackgroundColor = blendColor(
-        colors.backgroundColor,
-        contentColor,
-        theme.stateLayer.pressedOpacity,
-      )
-    }
   }
 
   return result

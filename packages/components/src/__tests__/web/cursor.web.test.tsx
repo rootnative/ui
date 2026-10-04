@@ -173,6 +173,12 @@ const CURSOR_CASES: {
     ),
   },
   {
+    name: 'SearchBar — trigger',
+    role: 'button',
+    enabled: <SearchBar placeholder="Search" onPress={() => {}} />,
+    disabled: <SearchBar placeholder="Search" onPress={() => {}} disabled />,
+  },
+  {
     // No `selectionMode`, so the items are plain buttons — the
     // `radio`/`checkbox` roles only appear under an explicit selection mode
     // (covered in `aria.web.test.tsx`). The cursor pair is the same either
