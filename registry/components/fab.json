@@ -7,6 +7,7 @@
     "packages/components/src/fab/styles.ts",
     "packages/components/src/fab/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
+    "packages/components/src/internal/composeHandlers.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useStateLayer.ts",
     "packages/components/src/elevation-shadow.ts"

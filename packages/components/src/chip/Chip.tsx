@@ -23,7 +23,9 @@ import {
 } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
+import { pressedState } from '../internal/pressedState'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -67,6 +69,7 @@ export function Chip(props: ChipProps) {
     labelStyle: labelStyleOverride,
     closeAccessibilityLabel,
     disabled = false,
+    hitSlop,
     ...rest
   } = props as ChipImplProps
   const isDisabled = Boolean(disabled)
@@ -346,13 +349,11 @@ export function Chip(props: ChipProps) {
         {...rest}
         accessibilityRole="button"
         aria-disabled={isDisabled}
-        {...(variant === 'filter'
-          ? { 'aria-selected': isSelected }
-          : undefined)}
+        {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
         // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
-        hitSlop={Platform.OS === 'web' ? undefined : 8}
+        hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
         disabled={isDisabled}
-        {...(isDisabled ? undefined : composedHandlers)}
+        {...(isDisabled ? undefined : composeHandlers(composedHandlers, rest))}
         style={[
           styles.container,
           // The gesture-layer style owns backgroundColor while enabled; when

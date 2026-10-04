@@ -7,6 +7,7 @@
     "packages/components/src/checkbox/styles.ts",
     "packages/components/src/checkbox/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
+    "packages/components/src/internal/composeHandlers.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useBooleanProgress.ts"
   ],

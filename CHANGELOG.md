@@ -11,6 +11,37 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Consumer handlers and `hitSlop` survive the props spread
+
+Every `Pressable`-based component spreads its state-layer handlers after the
+consumer's props, so a consumer `onPressIn`, `onPressOut`, `onHoverIn`,
+`onHoverOut`, `onFocus` or `onBlur` type-checked and then never ran. Avatar,
+Button, Card, Checkbox, Chip, FAB, IconButton, ListItem, NavigationDrawer.Item,
+Radio and Switch now merge the two through one internal helper: the
+consumer's handler runs first, then the component's.
+
+`hitSlop` had the same problem on Button, Chip, Switch, Checkbox and Radio. A
+consumer value wins now, as it already did on IconButton and FAB. Checkbox and
+Radio also drop their default slop of 4dp: their container is already 48dp,
+and slop on a control that clears the floor only overlaps its neighbours.
+
+### Toggles announce their state
+
+A toggle `IconButton` and a filter `Chip` set `aria-selected` on a `button`,
+and a single-select `ButtonGroup` set it on a `radio`. ARIA defines neither,
+so a web screen reader announced no state. The web now gets `aria-pressed` on
+the two buttons and `aria-checked` on the radio. Native keeps
+`accessibilityState.selected` for the buttons, which is what TalkBack and
+VoiceOver read for a toggle, and moves the radio to
+`accessibilityState.checked`.
+
+### Four components read the disabled opacity tokens now
+
+Switch, Checkbox, Radio and Slider wrote `0.38` and `0.12` as literals. They
+read `theme.stateLayer.disabledOpacity` and `disabledContainerOpacity` now,
+like every other component, so a theme that changes the disabled treatment
+reaches them.
+
 ### `containerColor` accepts every colour React Native accepts
 
 `blendColor` and `alphaColor` in `@rootnative/utils` read 6 and 8 digit hex

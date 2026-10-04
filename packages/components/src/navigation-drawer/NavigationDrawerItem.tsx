@@ -4,6 +4,7 @@ import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -107,7 +108,7 @@ export function NavigationDrawerItem({
         onPress?.()
       }}
       testID={testID}
-      {...handlers}
+      {...composeHandlers(handlers, rest)}
       style={containerStyle}
     >
       <Animated.View

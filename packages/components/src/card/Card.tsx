@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { Platform, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { CardActions } from './CardActions'
@@ -134,7 +135,7 @@ export function Card({
         hitSlop={Platform.OS === 'web' ? undefined : 4}
         disabled={isDisabled}
         onPress={onPress}
-        {...(isDisabled ? undefined : handlers)}
+        {...(isDisabled ? undefined : composeHandlers(handlers, props))}
         style={[
           styles.container,
           styles.interactiveContainer,

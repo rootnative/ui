@@ -7,8 +7,9 @@ import {
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
@@ -29,6 +30,7 @@ export function Checkbox({
   containerColor,
   contentColor,
   disabled = false,
+  hitSlop,
   ...props
 }: CheckboxProps) {
   const isDisabled = Boolean(disabled)
@@ -190,10 +192,12 @@ export function Checkbox({
       accessibilityRole="checkbox"
       aria-disabled={isDisabled}
       aria-checked={isIndeterminate ? 'mixed' : isChecked}
-      hitSlop={Platform.OS === 'web' ? undefined : 4}
+      // The container is already 48dp, so there is no default slop: extra
+      // slop on a control that clears the floor only overlaps its neighbours.
+      hitSlop={hitSlop}
       disabled={isDisabled}
       onPress={handlePress}
-      {...handlers}
+      {...composeHandlers(handlers, props)}
       style={[
         styles.container,
         isDisabled ? styles.disabledContainer : undefined,

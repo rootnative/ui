@@ -130,32 +130,43 @@ describe('aria-selected reaches the DOM', () => {
     expect(aria('tab', 'aria-selected', { index: 0 })).toBe('false')
     expect(aria('tab', 'aria-selected', { index: 1 })).toBe('true')
   })
+})
 
-  it('Chip — filter variant only', () => {
+/**
+ * A toggle `button` carries `aria-pressed`, and a radio carries
+ * `aria-checked`. `aria-selected` is defined on neither, so a reader
+ * announced no state from it.
+ */
+describe('toggle states reach the DOM with the right attribute', () => {
+  it('Chip — filter variant is a pressed button', () => {
     renderWeb(
       <Chip variant="filter" selected>
         Filter
       </Chip>,
     )
-    expect(aria('button', 'aria-selected')).toBe('true')
-  })
-
-  it('Chip — a non-filter variant emits no selected state at all', () => {
-    renderWeb(<Chip variant="assist">Assist</Chip>)
+    expect(aria('button', 'aria-pressed')).toBe('true')
     expect(aria('button', 'aria-selected')).toBeNull()
   })
 
-  it('IconButton — toggle only', () => {
-    renderWeb(<IconButton icon="heart" selected accessibilityLabel="Like" />)
-    expect(aria('button', 'aria-selected')).toBe('true')
+  it('Chip — a non-filter variant emits no toggle state at all', () => {
+    renderWeb(<Chip variant="assist">Assist</Chip>)
+    expect(aria('button', 'aria-pressed')).toBeNull()
+    expect(aria('button', 'aria-selected')).toBeNull()
   })
 
-  it('ButtonGroup — single selection announces selected', () => {
+  it('IconButton — toggle is a pressed button', () => {
+    renderWeb(<IconButton icon="heart" selected accessibilityLabel="Like" />)
+    expect(aria('button', 'aria-pressed')).toBe('true')
+    expect(aria('button', 'aria-selected')).toBeNull()
+  })
+
+  it('ButtonGroup — single selection is a checked radio', () => {
     renderWeb(
       <ButtonGroup items={GROUP_ITEMS} selectionMode="single" value="week" />,
     )
-    expect(aria('radio', 'aria-selected', { index: 0 })).toBe('false')
-    expect(aria('radio', 'aria-selected', { index: 1 })).toBe('true')
+    expect(aria('radio', 'aria-checked', { index: 0 })).toBe('false')
+    expect(aria('radio', 'aria-checked', { index: 1 })).toBe('true')
+    expect(aria('radio', 'aria-selected', { index: 1 })).toBeNull()
   })
 })
 

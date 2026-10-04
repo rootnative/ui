@@ -35,7 +35,10 @@ function getColors(
   checked: boolean,
   error: boolean,
 ): CheckboxColors {
-  const disabledOnSurface38 = alphaColor(theme.colors.onSurface, 0.38)
+  const disabledOnSurface38 = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
 
   if (checked) {
     return {

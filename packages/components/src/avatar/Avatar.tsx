@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Image, Platform, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { ExpressiveSize } from '../internal/size'
 import { resolveSize } from '../internal/size'
@@ -163,7 +164,7 @@ export function Avatar({
       hitSlop={hitSlop}
       disabled={isDisabled}
       onPress={onPress}
-      {...handlers}
+      {...composeHandlers(handlers, props)}
       style={[
         styles.container,
         sizeStyle,

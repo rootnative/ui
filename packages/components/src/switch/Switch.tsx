@@ -20,6 +20,7 @@ import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -53,6 +54,7 @@ export function Switch({
   containerColor,
   contentColor,
   disabled = false,
+  hitSlop,
   ...props
 }: SwitchProps) {
   const isDisabled = Boolean(disabled)
@@ -284,13 +286,14 @@ export function Switch({
           // The track is the pressable, and MD3 makes it 32dp tall — a flat 4
           // left the control at 40dp, under the 48dp WCAG/MD3 floor. Web is
           // excluded because react-native-web does not implement `hitSlop`.
-          Platform.OS === 'web'
+          hitSlop ??
+          (Platform.OS === 'web'
             ? undefined
-            : getDefaultHitSlop(SWITCH_TRACK_HEIGHT)
+            : getDefaultHitSlop(SWITCH_TRACK_HEIGHT))
         }
         disabled={isDisabled}
         onPress={handlePress}
-        {...handlers}
+        {...composeHandlers(handlers, props)}
         style={[
           styles.track,
           trackColorStyle,

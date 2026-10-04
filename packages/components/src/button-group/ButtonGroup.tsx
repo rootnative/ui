@@ -437,12 +437,12 @@ function ButtonGroupItemImpl({
   // longer reads the nested state object, so it was silently dropping every
   // state on web. RN normalizes `aria-*` back into `accessibilityState` for
   // native, so this spelling serves both platforms.
+  // A radio and a checkbox both carry `aria-checked`; `aria-selected` is not
+  // a state ARIA defines on a radio, so a reader announced nothing from it.
   const ariaState =
-    selectionMode === 'single'
-      ? { 'aria-disabled': isDisabled, 'aria-selected': isSelected }
-      : selectionMode === 'multiple'
-        ? { 'aria-disabled': isDisabled, 'aria-checked': isSelected }
-        : { 'aria-disabled': isDisabled }
+    selectionMode === 'single' || selectionMode === 'multiple'
+      ? { 'aria-disabled': isDisabled, 'aria-checked': isSelected }
+      : { 'aria-disabled': isDisabled }
 
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 

@@ -233,4 +233,26 @@ describe('Button', () => {
       expect(l.borderWidth).toBe(2)
     })
   })
+
+  describe('consumer props survive the spread', () => {
+    it('runs a consumer onPressIn and onHoverIn beside the state layer', () => {
+      const onPressIn = jest.fn()
+      const onHoverIn = jest.fn()
+      renderWithTheme(
+        <Button onPressIn={onPressIn} onHoverIn={onHoverIn}>
+          Save
+        </Button>,
+      )
+      const button = screen.getByRole('button')
+      fireEvent(button, 'pressIn')
+      fireEvent(button, 'hoverIn')
+      expect(onPressIn).toHaveBeenCalledTimes(1)
+      expect(onHoverIn).toHaveBeenCalledTimes(1)
+    })
+
+    it('lets a consumer hitSlop win over the default', () => {
+      renderWithTheme(<Button hitSlop={20}>Save</Button>)
+      expect(screen.getByRole('button').props.hitSlop).toBe(20)
+    })
+  })
 })

@@ -24,8 +24,14 @@ export interface TrackColors {
 }
 
 function getColors(theme: MaterialTheme, selected: boolean): TrackColors {
-  const disabledOnSurface12 = alphaColor(theme.colors.onSurface, 0.12)
-  const disabledOnSurface38 = alphaColor(theme.colors.onSurface, 0.38)
+  const disabledOnSurface12 = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const disabledOnSurface38 = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
 
   if (selected) {
     return {
@@ -173,7 +179,10 @@ export function createStyles(
       justifyContent: 'center' as const,
     },
     disabledIconColor: {
-      color: alphaColor(theme.colors.onSurface, 0.38),
+      color: alphaColor(
+        theme.colors.onSurface,
+        theme.stateLayer.disabledOpacity,
+      ),
     },
   })
 }

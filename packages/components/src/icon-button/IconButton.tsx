@@ -8,7 +8,9 @@ import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
+import { pressedState } from '../internal/pressedState'
 import { resolveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -134,7 +136,7 @@ export function IconButton({
   // state on web. RN normalizes `aria-*` back into `accessibilityState` for
   // native, so this spelling serves both platforms.
   const ariaState = isToggle
-    ? { 'aria-disabled': isDisabled, 'aria-selected': isSelected }
+    ? { 'aria-disabled': isDisabled, ...pressedState(isSelected) }
     : { 'aria-disabled': isDisabled }
 
   const colors = useMemo(() => {
@@ -259,7 +261,7 @@ export function IconButton({
         disabled={isDisabled}
         hitSlop={hitSlop ?? defaultHitSlop}
         onPress={onPress}
-        {...(isDisabled ? undefined : composedHandlers)}
+        {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
         style={[
           styles.container,
           sizeStyle,

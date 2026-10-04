@@ -10,6 +10,7 @@ import { useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { resolveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
@@ -38,6 +39,7 @@ export function Button({
   contentColor,
   labelStyle: labelStyleOverride,
   disabled = false,
+  hitSlop,
   ...props
 }: ButtonProps) {
   const isDisabled = Boolean(disabled)
@@ -203,12 +205,13 @@ export function Button({
           // Sized per token, not a flat 4: `xs` is 32dp tall, so a constant
           // slop left it at 40dp — under the 48dp WCAG/MD3 floor. Web is
           // excluded because react-native-web does not implement `hitSlop`.
-          Platform.OS === 'web'
+          hitSlop ??
+          (Platform.OS === 'web'
             ? undefined
-            : getDefaultHitSlop(sizeTokens.height)
+            : getDefaultHitSlop(sizeTokens.height))
         }
         disabled={isDisabled}
-        {...(isDisabled ? undefined : composedHandlers)}
+        {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
         style={[
           styles.container,
           // The gesture-layer style owns backgroundColor while enabled; when

@@ -6,8 +6,8 @@ import {
 } from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { createStyles, getResolvedRadioColors } from './styles'
@@ -21,6 +21,7 @@ export function Radio({
   containerColor,
   contentColor,
   disabled = false,
+  hitSlop,
   ...props
 }: RadioProps) {
   const isDisabled = Boolean(disabled)
@@ -149,10 +150,12 @@ export function Radio({
       accessibilityRole="radio"
       aria-disabled={isDisabled}
       aria-checked={isSelected}
-      hitSlop={Platform.OS === 'web' ? undefined : 4}
+      // The container is already 48dp, so there is no default slop: extra
+      // slop on a control that clears the floor only overlaps its neighbours.
+      hitSlop={hitSlop}
       disabled={isDisabled}
       onPress={handlePress}
-      {...handlers}
+      {...composeHandlers(handlers, props)}
       style={[
         styles.container,
         isDisabled ? styles.disabledContainer : undefined,

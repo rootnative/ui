@@ -98,11 +98,11 @@ describe('ButtonGroup', () => {
       )
       const two = screen.getByRole('radio', { name: 'Two' })
       expect(two.props.accessibilityState).toEqual(
-        expect.objectContaining({ selected: true }),
+        expect.objectContaining({ checked: true }),
       )
       const one = screen.getByRole('radio', { name: 'One' })
       expect(one.props.accessibilityState).toEqual(
-        expect.objectContaining({ selected: false }),
+        expect.objectContaining({ checked: false }),
       )
     })
 
@@ -156,7 +156,7 @@ describe('ButtonGroup', () => {
       )
       const three = screen.getByRole('radio', { name: 'Three' })
       expect(three.props.accessibilityState).toEqual(
-        expect.objectContaining({ selected: true }),
+        expect.objectContaining({ checked: true }),
       )
     })
   })

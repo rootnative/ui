@@ -63,8 +63,14 @@ function getColors(
   const thumb = contentColor ?? theme.colors.primary
   const inactiveTrack =
     inactiveTrackColor ?? theme.colors.surfaceContainerHighest
-  const onSurface12 = alphaColor(theme.colors.onSurface, 0.12)
-  const onSurface38 = alphaColor(theme.colors.onSurface, 0.38)
+  const onSurface12 = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledContainerOpacity,
+  )
+  const onSurface38 = alphaColor(
+    theme.colors.onSurface,
+    theme.stateLayer.disabledOpacity,
+  )
 
   return {
     activeTrack,

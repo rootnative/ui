@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -160,7 +161,7 @@ export function FAB({
         disabled={isDisabled}
         hitSlop={resolvedHitSlop}
         onPress={onPress}
-        {...(isDisabled ? undefined : handlers)}
+        {...(isDisabled ? undefined : composeHandlers(handlers, rest))}
         style={[
           styles.container,
           isExtended
