@@ -14,7 +14,7 @@
     "packages/components/src/internal/useHaloLayer.ts",
     "packages/components/src/internal/usePressMorph.ts"
   ],
-  "utils": ["color", "pressable", "render-icon"],
+  "utils": ["color", "pressable", "render-icon", "rtl"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.22",

@@ -98,8 +98,18 @@ export function createStyles(
       flexDirection: 'row',
       alignItems: 'center',
     },
+    // Its own layer over the whole container, not a row under the top row:
+    // the medium title (32dp line) plus its 24dp bottom padding is 56dp, and
+    // the 112dp container leaves only 48dp under the 64dp top row, so a row
+    // clipped the title's descenders. The layer lets the title rise to the
+    // Compose geometry (112 - 24 - 32 = 56dp from the top), which is where
+    // the top row's icons end.
     expandedTitleContainer: {
-      flex: 1,
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      start: 0,
+      end: 0,
       justifyContent: 'flex-end',
       minWidth: 0,
       paddingEnd: theme.spacing.md,
@@ -150,6 +160,16 @@ export function createStyles(
     },
     centeredTitle: {
       textAlign: 'center',
+    },
+    // The centred title is a row so the title node keeps its natural width
+    // and a start margin can place it at the screen's centre.
+    centeredTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    centeredTitleNode: {
+      flexShrink: 1,
+      minWidth: 0,
     },
     startAlignedTitle: {
       textAlign: 'auto',

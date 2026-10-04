@@ -1,8 +1,12 @@
 import { lightTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
-import { renderWithTheme } from '@rootnative/utils/test'
+import {
+  getStyle,
+  renderSettled,
+  renderWithTheme,
+} from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { I18nManager, StyleSheet, Text } from 'react-native'
 import { Switch } from '../switch/Switch'
 
 describe('Switch', () => {
@@ -171,6 +175,36 @@ describe('Switch — uncontrolled', () => {
     fireEvent.press(screen.getByRole('switch'))
     expect(screen.getByRole('switch').props.accessibilityState).toMatchObject({
       checked: false,
+    })
+  })
+
+  describe('RTL', () => {
+    const original = I18nManager.isRTL
+    afterEach(() => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: original,
+        configurable: true,
+      })
+    })
+
+    function thumbTranslateX() {
+      const transform = getStyle(screen.getByTestId('switch-thumb'))
+        .transform as { translateX?: number }[] | undefined
+      return transform?.find((t) => t.translateX !== undefined)?.translateX
+    }
+
+    it('moves the thumb toward the end, which is negative x in RTL', () => {
+      renderSettled(<Switch value onValueChange={() => {}} />)
+      const ltr = thumbTranslateX()
+      expect(ltr).toBeGreaterThan(0)
+      screen.unmount()
+
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      renderSettled(<Switch value onValueChange={() => {}} />)
+      expect(thumbTranslateX()).toBe(-(ltr as number))
     })
   })
 })

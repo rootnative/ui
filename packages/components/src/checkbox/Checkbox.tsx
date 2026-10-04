@@ -1,6 +1,5 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useColorTransition } from '@rootnative/inertia'
-import {} from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'

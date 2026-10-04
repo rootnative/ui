@@ -70,7 +70,9 @@ function titleInsets(node: RenderedNode) {
   const host = collectFlattenedStyles(node).find(
     (s) => s.start !== undefined || s.paddingStart !== undefined,
   )
-  return { start: host?.start ?? host?.paddingStart, end: host?.end }
+  // The expanded title layer spans the container (`start: 0`) and carries the
+  // inset as padding, so the padding is the inset when both are present.
+  return { start: host?.paddingStart ?? host?.start, end: host?.end }
 }
 
 describe('AppBar', () => {
@@ -172,6 +174,102 @@ describe('AppBar', () => {
       )
       layoutSideSlots(48, 48)
       expect(titleInsets(rootOf(toJSON()))).toEqual({ start: 56, end: 56 })
+    })
+
+    it('gives an expanded title its own layer over the whole container', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar title="Medium" variant="medium" />,
+      )
+      // The medium title (32dp line) plus 24dp bottom padding is 56dp, and a
+      // row under the 64dp top row had only 48dp, so the descenders clipped.
+      const layer = collectFlattenedStyles(rootOf(toJSON())).find(
+        (s) =>
+          s.paddingBottom === defaultTopAppBarTokens.mediumTitleBottomPadding,
+      )
+      expect(layer).toMatchObject({
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        start: 0,
+        end: 0,
+        justifyContent: 'flex-end',
+      })
+    })
+
+    describe('center-aligned title placement', () => {
+      // Jest fires no layout events, so the bar and the title report their
+      // widths here, the way `layoutSideSlots` does for the slots.
+      function layoutBarAndTitle(barWidth: number, titleWidth: number) {
+        const hosts = screen.UNSAFE_root.findAll(
+          (node) =>
+            typeof node.type === 'string' &&
+            Boolean(node.props.onLayout) &&
+            node.props.collapsable !== false,
+        )
+        const flat = (node: (typeof hosts)[number]) =>
+          StyleSheet.flatten(node.props.style) as ViewStyle
+        const bar = hosts.find(
+          (node) =>
+            flat(node).height === defaultTopAppBarTokens.smallContainerHeight,
+        )
+        const titleHost = hosts.find(
+          (node) => flat(node).marginStart !== undefined,
+        )
+        fireEvent(bar!, 'layout', {
+          nativeEvent: { layout: { x: 0, y: 0, width: barWidth, height: 64 } },
+        })
+        fireEvent(titleHost!, 'layout', {
+          nativeEvent: {
+            layout: { x: 0, y: 0, width: titleWidth, height: 28 },
+          },
+        })
+        return () => flat(titleHost!).marginStart
+      }
+
+      function renderCentered() {
+        return renderWithTheme(
+          <AppBar
+            title="Centered"
+            variant="center-aligned"
+            canGoBack
+            actions={[
+              { icon: 'magnify', accessibilityLabel: 'Search' },
+              { icon: 'dots-vertical', accessibilityLabel: 'More' },
+            ]}
+          />,
+        )
+      }
+
+      it('keeps the whole width between the slots', () => {
+        const { toJSON } = renderCentered()
+        layoutSideSlots(48, 96)
+        expect(titleInsets(rootOf(toJSON()))).toEqual({ start: 56, end: 104 })
+      })
+
+      it('sits at the screen centre while it fits there', () => {
+        renderCentered()
+        layoutSideSlots(48, 96)
+        const marginStart = layoutBarAndTitle(400, 100)
+        // (400 - 100) / 2 = 150 from the edge, which is 94 past the 56dp start.
+        expect(marginStart()).toBe(94)
+      })
+
+      it('shifts off centre instead of running under the actions', () => {
+        renderCentered()
+        layoutSideSlots(48, 96)
+        const marginStart = layoutBarAndTitle(400, 220)
+        // Centred would start at 90, but 90 + 220 runs past the 296dp end of
+        // the free width, so the title starts at 296 - 220 = 76, i.e. 20 past
+        // the start inset.
+        expect(marginStart()).toBe(20)
+      })
+
+      it('fills the free width when it cannot fit at all', () => {
+        renderCentered()
+        layoutSideSlots(48, 96)
+        const marginStart = layoutBarAndTitle(400, 300)
+        expect(marginStart()).toBe(0)
+      })
     })
 
     it('aligns an expanded title under the navigation icon', () => {

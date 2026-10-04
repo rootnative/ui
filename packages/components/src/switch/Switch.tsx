@@ -7,13 +7,16 @@ import {
   useNamedTransitions,
   useShouldReduceMotion,
 } from '@rootnative/inertia'
-import {} from '@rootnative/inertia/gesture-layer'
 import {
   Animated,
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import {
+  isRTLDirection,
+  renderIcon,
+  resolveColorFromStyle,
+} from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
@@ -85,6 +88,12 @@ export function Switch({
   // Toggle progress — the theme's fast-spatial spring (Expressive bounce,
   // 0.6 damping ratio), driving thumb travel and size per Compose's Switch.
   const progress = useBooleanProgress(isSelected, 'spring-fast-spatial')
+
+  // The thumb rests at the start edge (`marginStart`) and `translateX` is a
+  // physical offset, so in RTL it has to travel toward negative x or the
+  // thumb leaves the track on the right.
+  const travelSign = isRTLDirection() ? -1 : 1
+  const thumbTravel = travelSign * THUMB_TRANSLATE_X
 
   const {
     style: haloOpacityStyle,
@@ -161,23 +170,20 @@ export function Switch({
       borderRadius: size / 2,
       transform: [
         {
-          translateX: interpolate(
-            progress.value,
-            [0, 1],
-            [0, THUMB_TRANSLATE_X],
-          ),
+          translateX: interpolate(progress.value, [0, 1], [0, thumbTravel]),
         },
       ],
     }
   })
 
-  // Halo center should track the thumb's center. Static `left` is calibrated
-  // for the off position; `translateX` adds (a) the toggle progress shift and
-  // (b) any thumb-grow shift on press (since the thumb's left edge is fixed,
-  // its center moves right by half the size delta).
+  // Halo center should track the thumb's center. The static `start` is
+  // calibrated for the off position; `translateX` adds (a) the toggle
+  // progress shift and (b) any thumb-grow shift on press (the thumb's start
+  // edge is fixed, so its center moves toward the end by half the size
+  // delta). Both follow `thumbTravel`'s sign, so the halo mirrors in RTL too.
   const haloPositionStyle = useMemo(
     () => ({
-      left:
+      start:
         SWITCH_TRACK_PADDING -
         SWITCH_TRACK_BORDER_WIDTH +
         offThumbSize / 2 -
@@ -207,7 +213,8 @@ export function Switch({
       transform: [
         {
           translateX:
-            progress.value * THUMB_TRANSLATE_X + (size - offThumbSize) / 2,
+            progress.value * thumbTravel +
+            (travelSign * (size - offThumbSize)) / 2,
         },
       ],
     }

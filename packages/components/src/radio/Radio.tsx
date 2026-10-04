@@ -1,6 +1,5 @@
 import { useTheme } from '@rootnative/core'
 import { useColorTransition } from '@rootnative/inertia'
-import {} from '@rootnative/inertia/gesture-layer'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
 import { AnimatedPressable } from '../internal/AnimatedPressable'

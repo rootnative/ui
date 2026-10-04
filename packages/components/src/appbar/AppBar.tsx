@@ -139,6 +139,8 @@ export function AppBar({
   )
   const [leadingWidth, setLeadingWidth] = useState(0)
   const [actionsWidth, setActionsWidth] = useState(0)
+  const [barWidth, setBarWidth] = useState(0)
+  const [titleWidth, setTitleWidth] = useState(0)
   const titleColorStyle = useMemo(
     () => ({ color: resolvedContentColor }),
     [resolvedContentColor],
@@ -156,7 +158,28 @@ export function AppBar({
       topAppBar.horizontalPadding + leadingWidth,
     ) + topAppBar.horizontalPadding
   const compactTitleEndInset = 2 * topAppBar.horizontalPadding + actionsWidth
-  const centeredSideInset = Math.max(titleStartInset, compactTitleEndInset)
+  // Compose `TopAppBarLayout` centring: the title keeps the whole width
+  // between the two slots and sits at the screen's centre while it fits
+  // there; a title that would run under a slot shifts off centre instead of
+  // losing width to a symmetric inset. Both widths come from `onLayout`, so
+  // the first frame starts at the leading slot.
+  const centeredTitleOffset = Math.max(
+    0,
+    Math.min(
+      (barWidth - titleWidth) / 2 - titleStartInset,
+      barWidth - titleStartInset - compactTitleEndInset - titleWidth,
+    ),
+  )
+  const centeredTitleOffsetStyle = useMemo<ViewStyle>(
+    () => ({ marginStart: centeredTitleOffset }),
+    [centeredTitleOffset],
+  )
+  const onBarLayout = useCallback((event: LayoutChangeEvent) => {
+    setBarWidth(event.nativeEvent.layout.width)
+  }, [])
+  const onTitleLayout = useCallback((event: LayoutChangeEvent) => {
+    setTitleWidth(event.nativeEvent.layout.width)
+  }, [])
   // The expanded row of a medium or large bar has no leading content in
   // MD3, so its title aligns under the navigation icon.
   const expandedTitleStartInset =
@@ -166,11 +189,8 @@ export function AppBar({
     [expandedTitleStartInset],
   )
   const overlayTitleInsetStyle = useMemo<ViewStyle>(
-    () =>
-      isCenterAligned
-        ? { start: centeredSideInset, end: centeredSideInset }
-        : { start: titleStartInset, end: compactTitleEndInset },
-    [centeredSideInset, compactTitleEndInset, isCenterAligned, titleStartInset],
+    () => ({ start: titleStartInset, end: compactTitleEndInset }),
+    [compactTitleEndInset, titleStartInset],
   )
 
   // MD3 collapse-on-scroll (medium/large only): the bar collapses to the
@@ -493,23 +513,42 @@ export function AppBar({
     )
   }
 
+  const titleNode = (
+    <Typography
+      {...APP_BAR_TITLE_TEXT_PROPS}
+      level={titleLevel}
+      variant={titleVariant}
+      style={[
+        styles.title,
+        titleColorStyle,
+        isCenterAligned ? styles.centeredTitle : styles.startAlignedTitle,
+        titleStyle,
+      ]}
+    >
+      {title}
+    </Typography>
+  )
+
   const content = (
-    <View style={styles.smallContainer}>
+    <View style={styles.smallContainer} onLayout={onBarLayout}>
       {topRow}
-      <View style={[styles.overlayTitleContainer, overlayTitleInsetStyle]}>
-        <Typography
-          {...APP_BAR_TITLE_TEXT_PROPS}
-          level={titleLevel}
-          variant={titleVariant}
-          style={[
-            styles.title,
-            titleColorStyle,
-            isCenterAligned ? styles.centeredTitle : styles.startAlignedTitle,
-            titleStyle,
-          ]}
-        >
-          {title}
-        </Typography>
+      <View
+        style={[
+          styles.overlayTitleContainer,
+          overlayTitleInsetStyle,
+          isCenterAligned ? styles.centeredTitleRow : undefined,
+        ]}
+      >
+        {isCenterAligned ? (
+          <View
+            style={[styles.centeredTitleNode, centeredTitleOffsetStyle]}
+            onLayout={onTitleLayout}
+          >
+            {titleNode}
+          </View>
+        ) : (
+          titleNode
+        )}
       </View>
     </View>
   )

@@ -1,6 +1,7 @@
 import { useInterpolatedStyle, useMotionValue } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
+import { I18nManager } from 'react-native'
 import { PRESSED_HALF, REST_HALF } from '../slider/geometry'
 import { Slider } from '../slider/Slider'
 import { ThumbSlot } from '../slider/slots'
@@ -236,5 +237,36 @@ describe('Slider thumb extrapolation', () => {
       THUMB_CENTER_X - REST_HALF,
       THUMB_CENTER_X - PRESSED_HALF,
     ])
+  })
+
+  describe('accessibility actions in RTL', () => {
+    const original = I18nManager.isRTL
+    afterEach(() => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: original,
+        configurable: true,
+      })
+    })
+
+    it('increment still raises the value', () => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      const onValueChange = jest.fn()
+      renderWithTheme(
+        <Slider
+          minimumValue={0}
+          maximumValue={100}
+          step={1}
+          defaultValue={50}
+          onValueChange={onValueChange}
+        />,
+      )
+      fireEvent(screen.getByRole('adjustable'), 'accessibilityAction', {
+        nativeEvent: { actionName: 'increment' },
+      })
+      expect(onValueChange).toHaveBeenLastCalledWith(51)
+    })
   })
 })

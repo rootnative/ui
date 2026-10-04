@@ -11,6 +11,29 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Three defects seen on the iOS simulator
+
+- **Medium and large app bars clipped the title.** The title sat in a row
+  under the 64dp top row, and a 32dp headline plus its 24dp bottom padding
+  does not fit in the 48dp a 112dp medium bar leaves there, so the
+  descenders were cut off. The title has its own layer over the whole
+  container now and sits at the Compose geometry.
+- **A centre-aligned app bar truncated its title next to two actions.** The
+  title was centred inside a symmetric inset equal to the wider of the two
+  slots, which left 144dp on a 400dp phone. It now keeps the whole width
+  between the slots, sits at the screen's centre while it fits there, and
+  shifts off centre instead of truncating when it does not, the same as
+  Compose `TopAppBarLayout`.
+- **The Switch thumb left the track in RTL.** The thumb rests at the start
+  edge and moved by a physical `translateX`, so in RTL it slid off the right
+  end and the halo stayed behind. The travel follows the layout direction now.
+- **The Slider filled from the wrong side in RTL.** The slots position with
+  `left`, which React Native already mirrors in RTL, and the slider mirrored
+  the value once more, so the fill came back to the left. Native now leaves
+  the mirroring to the platform and the web keeps its own. The `increment`
+  and `decrement` accessibility actions also stop reversing in RTL: a larger
+  value is a larger value in every writing direction.
+
 ### Every elevated surface has an elevation test
 
 The native and web elevation tables covered the four components that move

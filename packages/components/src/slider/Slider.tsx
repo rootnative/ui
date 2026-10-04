@@ -14,7 +14,7 @@ import type {
   GestureResponderEvent,
   LayoutChangeEvent,
 } from 'react-native'
-import { PanResponder, Pressable, View } from 'react-native'
+import { PanResponder, Platform, Pressable, View } from 'react-native'
 // Sanctioned escape hatch: the slider's hover/focus/label progress is routed
 // imperatively between two thumbs from one Pressable (`keyboardThumb`), a
 // shape inertia's gesture hooks don't express. `useAnimator` drives the raw
@@ -162,14 +162,21 @@ export function Slider({
   // extends past the track edges.
   const THUMB_INSET = SLIDER_THUMB_WIDTH / 2
 
+  // Slots position with `left`. React Native swaps `left` to `start` in RTL
+  // (`I18nManager.doLeftAndRightSwapInRTL`), so on native the platform
+  // mirrors the rendered position and mirroring it here as well put the fill
+  // back on the left. react-native-web never swaps, so the web keeps the
+  // manual mirror. Gesture coordinates are physical on both, so
+  // `positionToValue` always mirrors.
+  const mirrorRenderedPosition = isRTL && Platform.OS === 'web'
   const valueToPosition = useCallback(
     (v: number) => {
       const ratio = (v - minimumValue) / range
       const usable = Math.max(0, trackWidth - 2 * THUMB_INSET)
       const px = THUMB_INSET + ratio * usable
-      return isRTL ? trackWidth - px : px
+      return mirrorRenderedPosition ? trackWidth - px : px
     },
-    [THUMB_INSET, minimumValue, range, trackWidth, isRTL],
+    [THUMB_INSET, minimumValue, range, trackWidth, mirrorRenderedPosition],
   )
 
   const positionToValue = useCallback(
@@ -500,13 +507,15 @@ export function Slider({
   const handleAccessibilityAction = useCallback(
     (e: AccessibilityActionEvent) => {
       if (isDisabled) return
+      // "Increment" means a larger value in every writing direction. Only
+      // the arrow keys below follow the layout direction.
       if (e.nativeEvent.actionName === 'increment') {
-        adjustValue(isRTL ? -keyStep : keyStep)
+        adjustValue(keyStep)
       } else if (e.nativeEvent.actionName === 'decrement') {
-        adjustValue(isRTL ? keyStep : -keyStep)
+        adjustValue(-keyStep)
       }
     },
-    [adjustValue, isDisabled, isRTL, keyStep],
+    [adjustValue, isDisabled, keyStep],
   )
 
   // Web keyboard support. RN web forwards onKeyDown on Pressable to the
