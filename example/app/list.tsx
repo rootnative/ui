@@ -1,10 +1,10 @@
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
-  List,
-  ListItem,
-  ListDivider,
-  Typography,
   Column,
+  Icon,
+  List,
+  ListDivider,
+  ListItem,
+  Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
@@ -15,15 +15,9 @@ const longSupporting =
   'Ali Connors — I will be in your neighborhood doing errands this weekend, ' +
   'so let me know if you want to grab brunch somewhere near the park.'
 
-function Icon({ name }: { name: string }) {
+function DemoIcon({ name }: { name: string }) {
   const theme = useTheme()
-  return (
-    <MaterialDesignIcons
-      name={name as never}
-      size={24}
-      color={theme.colors.onSurfaceVariant}
-    />
-  )
+  return <Icon source={name} size={24} color={theme.colors.onSurfaceVariant} />
 }
 
 function Avatar({ label }: { label: string }) {
@@ -89,19 +83,19 @@ export default function ListScreen() {
           <ListItem
             headlineText="Photos"
             supportingText="Jan 9, 2024"
-            leadingContent={<Icon name="image" />}
+            leadingContent={<DemoIcon name="image" />}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Recipes"
             supportingText="Jan 17, 2024"
-            leadingContent={<Icon name="book-open-variant" />}
+            leadingContent={<DemoIcon name="book-open-variant" />}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Work"
             supportingText="Jan 28, 2024"
-            leadingContent={<Icon name="briefcase" />}
+            leadingContent={<DemoIcon name="briefcase" />}
           />
         </List>
       </Column>
@@ -133,21 +127,21 @@ export default function ListScreen() {
           <ListItem
             headlineText="One line (default)"
             supportingText={longSupporting}
-            leadingContent={<Icon name="email-outline" />}
+            leadingContent={<DemoIcon name="email-outline" />}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Two lines"
             supportingText={longSupporting}
             supportingTextNumberOfLines={2}
-            leadingContent={<Icon name="email-outline" />}
+            leadingContent={<DemoIcon name="email-outline" />}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Three lines"
             supportingText={longSupporting}
             supportingTextNumberOfLines={3}
-            leadingContent={<Icon name="email-outline" />}
+            leadingContent={<DemoIcon name="email-outline" />}
           />
         </List>
       </Column>
@@ -158,21 +152,21 @@ export default function ListScreen() {
           <ListItem
             headlineText="Wi-Fi"
             supportingText="Connected"
-            leadingContent={<Icon name="wifi" />}
+            leadingContent={<DemoIcon name="wifi" />}
             onPress={() => Alert.alert('Wi-Fi tapped')}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Bluetooth"
             supportingText="Nearby devices"
-            leadingContent={<Icon name="bluetooth" />}
+            leadingContent={<DemoIcon name="bluetooth" />}
             onPress={() => Alert.alert('Bluetooth tapped')}
           />
           <ListDivider insetStart />
           <ListItem
             headlineText="Airplane mode"
             supportingText="Off"
-            leadingContent={<Icon name="airplane" />}
+            leadingContent={<DemoIcon name="airplane" />}
             onPress={() => Alert.alert('Airplane tapped')}
           />
         </List>
@@ -184,14 +178,14 @@ export default function ListScreen() {
           <ListItem
             headlineText="Disabled item"
             supportingText="Cannot interact"
-            leadingContent={<Icon name="lock" />}
+            leadingContent={<DemoIcon name="lock" />}
             onPress={() => {}}
             disabled
           />
           <ListItem
             headlineText="Enabled item"
             supportingText="Can interact"
-            leadingContent={<Icon name="lock-open" />}
+            leadingContent={<DemoIcon name="lock-open" />}
             onPress={() => Alert.alert('Pressed')}
           />
         </List>

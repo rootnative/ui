@@ -596,8 +596,10 @@ export default function HomeScreen() {
   // The docs homepage embeds this app in a phone frame with `?embed=1`. Its own
   // hero already carries the same name, tagline and stats, so repeating them
   // inside the frame just pushes every component below the fold.
+  // The export has no query, so the static HTML holds the hero. The hydrating
+  // render must hold it too, and the embed drops it on the next render.
   const { embed } = useLocalSearchParams<{ embed?: string }>()
-  const isEmbedded = embed === '1'
+  const isEmbedded = hydrated && embed === '1'
   const columnsForBreakpoint = useBreakpointValue({
     compact: 2,
     medium: 3,

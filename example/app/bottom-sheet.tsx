@@ -1,9 +1,9 @@
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   BottomSheet,
   Button,
   Card,
   Column,
+  Icon,
   ListItem,
   Row,
   Typography,
@@ -16,15 +16,9 @@ import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 type OpenSheet = 'basic' | 'snap' | 'standard' | 'persistent' | null
 
-function Icon({ name }: { name: string }) {
+function DemoIcon({ name }: { name: string }) {
   const theme = useTheme()
-  return (
-    <MaterialDesignIcons
-      name={name as never}
-      size={24}
-      color={theme.colors.onSurfaceVariant}
-    />
-  )
+  return <Icon source={name} size={24} color={theme.colors.onSurfaceVariant} />
 }
 
 export default function BottomSheetScreen() {
@@ -132,17 +126,17 @@ export default function BottomSheetScreen() {
           <Typography variant="titleMedium">Share file</Typography>
           <ListItem
             headlineText="Copy link"
-            leadingContent={<Icon name="link-variant" />}
+            leadingContent={<DemoIcon name="link-variant" />}
             onPress={close}
           />
           <ListItem
             headlineText="Send by email"
-            leadingContent={<Icon name="email-outline" />}
+            leadingContent={<DemoIcon name="email-outline" />}
             onPress={close}
           />
           <ListItem
             headlineText="Save to device"
-            leadingContent={<Icon name="download-outline" />}
+            leadingContent={<DemoIcon name="download-outline" />}
             onPress={close}
           />
           <Button variant="text" onPress={close}>
@@ -170,7 +164,7 @@ export default function BottomSheetScreen() {
                 key={i}
                 headlineText={`Place ${i + 1}`}
                 supportingText="2.4 km away"
-                leadingContent={<Icon name="map-marker-outline" />}
+                leadingContent={<DemoIcon name="map-marker-outline" />}
               />
             ))}
           </Column>

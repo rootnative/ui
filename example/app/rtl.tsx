@@ -1,10 +1,10 @@
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   Box,
   Button,
   Chip,
   Column,
   Grid,
+  Icon,
   List,
   ListDivider,
   ListItem,
@@ -30,15 +30,9 @@ function SectionTitle({ children }: { children: string }) {
   )
 }
 
-function Icon({ name }: { name: string }) {
+function DemoIcon({ name }: { name: string }) {
   const { colors } = useTheme()
-  return (
-    <MaterialDesignIcons
-      name={name as never}
-      size={24}
-      color={colors.onSurfaceVariant}
-    />
-  )
+  return <Icon source={name} size={24} color={colors.onSurfaceVariant} />
 }
 
 function Cell({ label }: { label: string }) {
@@ -127,22 +121,22 @@ export default function RTLScreen() {
       <List>
         <ListItem
           headlineText="Leading icon"
-          leadingContent={<Icon name="account-circle" />}
+          leadingContent={<DemoIcon name="account-circle" />}
           trailingSupportingText="Detail"
         />
         <ListItem
           headlineText="Leading icon + trailing icon"
-          leadingContent={<Icon name="bell-outline" />}
-          trailingContent={<Icon name="chevron-right" />}
+          leadingContent={<DemoIcon name="bell-outline" />}
+          trailingContent={<DemoIcon name="chevron-right" />}
         />
         <ListItem
           headlineText="Inset divider below"
-          leadingContent={<Icon name="folder-outline" />}
+          leadingContent={<DemoIcon name="folder-outline" />}
         />
         <ListDivider insetStart />
         <ListItem
           headlineText="Last item"
-          leadingContent={<Icon name="star-outline" />}
+          leadingContent={<DemoIcon name="star-outline" />}
         />
       </List>
 

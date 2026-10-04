@@ -1,7 +1,7 @@
-import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons'
 import {
   Badge,
   Column,
+  Icon,
   IconButton,
   NavigationBar,
   Row,
@@ -36,29 +36,29 @@ export default function BadgeScreen() {
           </Typography>
           <Row gap="xl" align="center">
             <Badge accessibilityLabel="New activity">
-              <MaterialDesignIcons
-                name="bell-outline"
+              <Icon
+                source="bell-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge label={3}>
-              <MaterialDesignIcons
-                name="bell-outline"
+              <Icon
+                source="bell-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge label={42}>
-              <MaterialDesignIcons
-                name="email-outline"
+              <Icon
+                source="email-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge label={1200}>
-              <MaterialDesignIcons
-                name="email-outline"
+              <Icon
+                source="email-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
@@ -70,22 +70,22 @@ export default function BadgeScreen() {
           <Typography variant="titleMedium">Max</Typography>
           <Row gap="xl" align="center">
             <Badge label={120} max={99}>
-              <MaterialDesignIcons
-                name="message-outline"
+              <Icon
+                source="message-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge label={9} max={9}>
-              <MaterialDesignIcons
-                name="message-outline"
+              <Icon
+                source="message-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge label="NEW">
-              <MaterialDesignIcons
-                name="star-outline"
+              <Icon
+                source="star-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
@@ -100,8 +100,8 @@ export default function BadgeScreen() {
           </Typography>
           <Row gap="md" align="center">
             <Badge label={count} visible={count > 0}>
-              <MaterialDesignIcons
-                name="cart-outline"
+              <Icon
+                source="cart-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
@@ -136,15 +136,15 @@ export default function BadgeScreen() {
               containerColor={theme.colors.primary}
               contentColor={theme.colors.onPrimary}
             >
-              <MaterialDesignIcons
-                name="bell-outline"
+              <Icon
+                source="bell-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />
             </Badge>
             <Badge containerColor={theme.colors.tertiary}>
-              <MaterialDesignIcons
-                name="bell-outline"
+              <Icon
+                source="bell-outline"
                 size={24}
                 color={theme.colors.onSurfaceVariant}
               />

@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Linking, Platform, StyleSheet } from 'react-native'
 import { DOCS_BASE_URL, findEntry } from './catalog'
 import { canCopy, copyToClipboard } from './clipboard'
+import { useHydrated } from './use-hydrated'
 
 const COPIED_RESET_MS = 1600
 
@@ -33,6 +34,7 @@ const monoFontFamily = Platform.select({
 export function ScreenIntro() {
   const theme = useTheme()
   const pathname = usePathname()
+  const hydrated = useHydrated()
   const entry = useMemo(() => findEntry(pathname), [pathname])
   const [copied, setCopied] = useState(false)
   const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -62,7 +64,9 @@ export function ScreenIntro() {
     }
   }, [docsPath])
 
-  const showCopyButton = canCopy()
+  // `canCopy` reads `navigator`, which the export server does not have. The
+  // static HTML holds no button, so the hydrating render must agree with it.
+  const showCopyButton = hydrated && canCopy()
   const commandSurfaceStyle = useMemo(
     () => ({ backgroundColor: theme.colors.surfaceContainerHigh }),
     [theme.colors.surfaceContainerHigh],
