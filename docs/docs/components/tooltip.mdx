@@ -71,15 +71,17 @@ supporting-text styling; anything else renders as given.
 | Input | Behaviour |
 |-------|-----------|
 | Hover in | Shows the tooltip. Hover out hides a plain tooltip. A rich tooltip stays up, so the pointer can reach its actions |
+| Focus | Shows the tooltip on web, so a Tab stop reads the same as a hover. Blur hides a plain tooltip. A rich tooltip stays up, so Tab can reach its actions |
+| Escape | Hides the tooltip while the anchor has focus. The key stops there, so an enclosing dialog does not close on the same press |
 | Long press | Shows the tooltip. This is how touch devices reach it |
 | Press | Hides the tooltip — a tap is the control doing its job, not a request for help text |
 | Timeout | Hides a plain tooltip after `duration` (1500ms). Rich tooltips never time out |
 | Outside press / Android back | Hides a rich tooltip. A plain one has no dismiss region to press |
 
-The long press has to be injected into the anchor itself, so the anchor must accept
-`onLongPress` — every RootNative pressable does, and its own `onLongPress` still fires. Hover is
-caught on the wrapper instead, because every RootNative pressable drives its state layer from
-`onHoverIn`/`onHoverOut` and would overwrite an injected pair.
+The long press and the focus pair are injected into the anchor itself, so the anchor must accept
+`onLongPress`, `onFocus` and `onBlur` — every RootNative pressable does, and its own handlers still
+fire. Hover is caught on the wrapper instead, because every RootNative pressable drives its state
+layer from `onHoverIn`/`onHoverOut` and would overwrite an injected pair.
 
 MD3 takes a plain tooltip down 1.5s after it appears, whether or not the pointer is still on the
 anchor. Pass `duration={0}` to keep it up until a hover out or a press instead.
@@ -230,7 +232,10 @@ what decides which side it lands on, so it has to be laid out before it can be p
 - The wrapper around the anchor stays out of the accessibility tree, so the anchor's own role and
   label are the only thing a screen reader sees. A tooltip is supplementary: an icon-only button
   still needs its `accessibilityLabel`, and the tooltip text should add to it rather than repeat it.
-- Hover and long press are both pointer gestures. Anything a user must read to operate the control
+- **On web**, keyboard focus on the anchor shows the tooltip and Escape hides it, so a keyboard
+  user reaches the same text a pointer does. Focus inside a rich tooltip's own actions does not
+  close it.
+- Hover, focus and long press are supplementary. Anything a user must read to operate the control
   belongs in the UI or in the anchor's label, not only in a tooltip.
 
 ## Props

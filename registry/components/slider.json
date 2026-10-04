@@ -9,6 +9,7 @@
     "packages/components/src/slider/styles.ts",
     "packages/components/src/slider/types.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/pressableKeyDown.ts",
     "packages/components/src/internal/useBooleanProgress.ts"
   ],
   "utils": ["color", "focus-visible", "render-icon", "rtl"],

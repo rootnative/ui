@@ -29,10 +29,17 @@
  * in this file. What these tests do cover is the part that was actually broken:
  * the JS branches that pick an icon, an edge, or a direction sign.
  */
-import { isRTLDirection, selectRTL, transformOrigin } from '@rootnative/utils'
+import {
+  isRTLDirection,
+  resolveLogical,
+  resolveLogicalKey,
+  selectRTL,
+  transformOrigin,
+} from '@rootnative/utils'
 import { screen } from '@testing-library/react'
 import { AppBar } from '../../appbar'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
+import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
 
 /**
@@ -126,6 +133,59 @@ describe('AppBar back affordance points the right way', () => {
     renderBackBar()
     // The icon mirrors; the accessible name must not.
     expect(screen.getByLabelText('Go back')).toBeTruthy()
+  })
+})
+
+/**
+ * A style from `StyleSheet.create` mirrors through CSS, but react-native-web
+ * resolves the logical keys of an *inline* style object in JavaScript, from a
+ * locale context that defaults to LTR and that `dir` never updates. So an
+ * inline `{ start: 56 }` is `left: 56px` under `dir="rtl"`. `resolveLogical`
+ * writes the physical key for the document direction instead. jsdom cannot
+ * show the mirroring, but it does show which key reached the element.
+ */
+describe('resolveLogical writes the physical key for the document direction', () => {
+  it('resolves to the left edge in LTR', () => {
+    expect(resolveLogicalKey('start')).toBe('left')
+    expect(resolveLogical('end', 8)).toEqual({ right: 8 })
+    expect(resolveLogical('marginStart', 8)).toEqual({ marginLeft: 8 })
+    expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingRight: 8 })
+  })
+
+  it('resolves to the right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    expect(resolveLogicalKey('start')).toBe('right')
+    expect(resolveLogical('end', 8)).toEqual({ left: 8 })
+    expect(resolveLogical('marginStart', 8)).toEqual({ marginRight: 8 })
+    expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingLeft: 8 })
+  })
+
+  /**
+   * jsdom reports no layout, so the insets are the no-slot values rather than
+   * the 56dp a back button gives on a device. What matters here is the swap:
+   * the two insets change edges with the direction.
+   */
+  it('swaps the small app bar title insets between the edges under dir="rtl"', () => {
+    const ltr = renderWeb(<AppBar title="Settings" />)
+    const ltrLayer = screen.getByText('Settings').parentElement as HTMLElement
+    const { left, right } = ltrLayer.style
+    expect(left).not.toBe('')
+    expect(right).not.toBe('')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(<AppBar title="Settings" />)
+    const rtlLayer = screen.getByText('Settings').parentElement as HTMLElement
+    expect(rtlLayer.style.right).toBe(left)
+    expect(rtlLayer.style.left).toBe(right)
+  })
+
+  it('places the text field label from the right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(<TextField label="Name" />)
+    const label = screen.getByText('Name').parentElement as HTMLElement
+    expect(label.style.right).toBe('16px')
+    expect(label.style.left).toBe('')
   })
 })
 

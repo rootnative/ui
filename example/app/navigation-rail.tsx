@@ -75,6 +75,7 @@ function NavigationRailScreenContent() {
                 value={destination}
                 onValueChange={setDestination}
                 header={header}
+                accessibilityLabel="Main navigation"
               />
               <Column p="md" gap="xs" style={panelStyle}>
                 <Typography variant="bodyMedium">
@@ -101,6 +102,7 @@ function NavigationRailScreenContent() {
                 defaultValue="search"
                 align="center"
                 labelVisibility="selected"
+                accessibilityLabel="Centred, selected label only"
               />
               <View style={panelStyle} />
             </Row>
@@ -117,6 +119,7 @@ function NavigationRailScreenContent() {
                 items={DESTINATIONS}
                 align="bottom"
                 labelVisibility="never"
+                accessibilityLabel="Bottom-aligned, no labels"
               />
               <View style={panelStyle} />
             </Row>
@@ -131,6 +134,7 @@ function NavigationRailScreenContent() {
                 containerColor={theme.colors.surfaceContainerLow}
                 indicatorColor={theme.colors.tertiaryContainer}
                 selectedContentColor={theme.colors.onTertiaryContainer}
+                accessibilityLabel="Disabled and overrides"
                 items={[
                   DESTINATIONS[0],
                   DESTINATIONS[1],

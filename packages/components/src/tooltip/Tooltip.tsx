@@ -11,9 +11,14 @@ import {
   useState,
 } from 'react'
 import type { ReactElement } from 'react'
-import type { GestureResponderEvent } from 'react-native'
+import type {
+  GestureResponderEvent,
+  NativeSyntheticEvent,
+  TargetedEvent,
+} from 'react-native'
 import { Pressable, Text, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { warnOnce } from '../internal/warnOnce'
@@ -42,9 +47,13 @@ const SHOWN = { opacity: 1 }
  * the surface renders in a portal, far from the anchor in the DOM, so without
  * the pointer nothing connects them.
  */
+type AnchorFocusEvent = NativeSyntheticEvent<TargetedEvent>
+
 interface AnchorTriggerProps {
   onPress?: (event: GestureResponderEvent) => void
   onLongPress?: (event: GestureResponderEvent) => void
+  onFocus?: (event: AnchorFocusEvent) => void
+  onBlur?: (event: AnchorFocusEvent) => void
   'aria-describedby'?: string
 }
 
@@ -109,9 +118,22 @@ export function Tooltip({
   }, [open, dismiss])
 
   // A rich tooltip is persistent: it has actions, and a mouse has to leave the
-  // anchor to reach them. Only the outside press, an action, or the Android
-  // back button take it down. A plain tooltip hides on hover out.
+  // anchor to reach them. Only the outside press, an action, Escape, or the
+  // Android back button take it down. A plain tooltip hides on hover out and
+  // on blur.
   const hideOnHoverOut = isRich ? undefined : hide
+
+  // Escape on the anchor, with the key stopped so an enclosing Dialog does
+  // not close on the same press.
+  const handleKeyDown = useCallback(
+    (event: PressableKeyDownEvent) => {
+      if (event.nativeEvent.key !== 'Escape' || !open) return
+      event.preventDefault?.()
+      event.stopPropagation?.()
+      dismiss()
+    },
+    [open, dismiss],
+  )
 
   const { anchorRef, layerRef, measure, onOverlayLayout, position } =
     useAnchorPosition({
@@ -133,9 +155,12 @@ export function Tooltip({
 
   // Touch opens a tooltip with a long press, which has to come from the anchor
   // itself: wrapping it in a second pressable would lose the gesture to the
-  // anchor's own press handling. Hover is caught on the wrapper below, because
-  // every RootNative pressable drives its state layer from `onHoverIn` /
-  // `onHoverOut` and would overwrite an injected pair.
+  // anchor's own press handling. Focus comes from the anchor too: on web a
+  // Pressable reports only its own focus, not one that bubbles up from a
+  // child, so the wrapper never sees the anchor take a Tab stop. Hover is
+  // caught on the wrapper below, because every RootNative pressable drives
+  // its state layer from `onHoverIn` / `onHoverOut` and would overwrite an
+  // injected pair.
   // The description is pointed at only while the tooltip is mounted — an
   // `aria-describedby` naming an absent id is announced as nothing at best.
   const trigger = useMemo(() => {
@@ -154,8 +179,16 @@ export function Tooltip({
         element.props.onPress?.(event)
         hide()
       },
+      onFocus: (event: AnchorFocusEvent) => {
+        element.props.onFocus?.(event)
+        show()
+      },
+      onBlur: (event: AnchorFocusEvent) => {
+        element.props.onBlur?.(event)
+        hideOnHoverOut?.()
+      },
     })
-  }, [anchor, isControlled, show, hide, open, tooltipId])
+  }, [anchor, isControlled, show, hide, hideOnHoverOut, open, tooltipId])
 
   // Read through a ref so an inline `onDismiss` (a new function every render)
   // cannot restart the timeout on each render and keep the tooltip up forever.
@@ -223,6 +256,8 @@ export function Tooltip({
         tabIndex={-1}
         onHoverIn={isControlled ? undefined : show}
         onHoverOut={isControlled ? undefined : hideOnHoverOut}
+        // A key press on the anchor bubbles up to the wrapper, unlike focus.
+        onKeyDown={handleKeyDown}
         onLongPress={isControlled ? undefined : show}
       >
         {trigger}

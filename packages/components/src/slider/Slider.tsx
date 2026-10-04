@@ -22,6 +22,7 @@ import { PanResponder, Platform, Pressable, View } from 'react-native'
 // / 'state-focus'), resolving them through `<MotionConfig>` and honouring
 // reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
+import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
   clamp,
@@ -46,15 +47,6 @@ import {
   createStyles,
 } from './styles'
 import type { SliderProps, SliderValue } from './types'
-
-// RN-Web's Pressable forwards `onKeyDown` to the underlying DOM element, but
-// the upstream `PressableProps` type doesn't include it. Augmenting locally
-// keeps the prop typed at the call site without an `as object` cast.
-declare module 'react-native' {
-  interface PressableProps {
-    onKeyDown?: (event: { nativeEvent: { key?: string } }) => void
-  }
-}
 
 const ICON_SIZE = 18
 
@@ -520,13 +512,16 @@ export function Slider({
 
   // Web keyboard support. RN web forwards onKeyDown on Pressable to the
   // underlying DOM element; native platforms ignore it (a11y actions cover
-  // VoiceOver/TalkBack adjustments).
+  // VoiceOver/TalkBack adjustments). A handled key is claimed with
+  // `preventDefault`, or the browser also scrolls the page on End, Home,
+  // Page Up/Down and the arrows.
   const handleKeyDown = useCallback(
-    (e: { nativeEvent: { key?: string } }) => {
+    (e: PressableKeyDownEvent) => {
       if (isDisabled) return
       const key = e.nativeEvent.key
       if (!key) return
       const bigStep = Math.max(keyStep * 10, range / 10)
+      let handled = true
       switch (key) {
         case 'ArrowRight':
           adjustValue(isRTL ? -keyStep : keyStep)
@@ -572,9 +567,14 @@ export function Slider({
           // single-thumb sliders.
           if (arrValue) {
             setKeyboardThumb((t) => (t === 'low' ? 'high' : 'low'))
+          } else {
+            handled = false
           }
           break
+        default:
+          handled = false
       }
+      if (handled) e.preventDefault?.()
     },
     [
       adjustValue,
@@ -590,17 +590,19 @@ export function Slider({
     ],
   )
 
+  // Not rounded: a 0 to 1 slider at 0.4 reported `now: 0`, which a screen
+  // reader turns into "0 percent".
   const accessibilityValue = arrValue
     ? {
-        min: Math.round(minimumValue),
-        max: Math.round(maximumValue),
-        now: Math.round(arrValue[0]),
+        min: minimumValue,
+        max: maximumValue,
+        now: arrValue[0],
         text: `${formatLabel(arrValue[0])} to ${formatLabel(arrValue[1])}`,
       }
     : {
-        min: Math.round(minimumValue),
-        max: Math.round(maximumValue),
-        now: Math.round(lowValue),
+        min: minimumValue,
+        max: maximumValue,
+        now: lowValue,
         text: formatLabel(lowValue),
       }
   // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only

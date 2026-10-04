@@ -213,6 +213,9 @@ React Native has no concept of one view describing another, and on touch a
 tooltip is a long-press affordance rather than something a screen reader
 narrates.
 
+On web a tooltip also opens when its anchor takes keyboard focus and closes on
+Escape, so a keyboard user reads the same text a pointer user does.
+
 ## Reduced motion
 
 Handled by the theme, not by you — see [Motion](./motion.md). Every animated

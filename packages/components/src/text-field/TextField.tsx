@@ -11,7 +11,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { renderIcon } from '@rootnative/utils'
+import { renderIcon, resolveLogical } from '@rootnative/utils'
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
@@ -175,10 +175,11 @@ export function TextField({
   )
 
   // Filled active indicator: 1 dp resting → 2 dp focus or error, color
-  // crossfade. Colour is a rest → error → focus cascade; the 1 → 2 dp height
-  // is a plain numeric interpolate kept in its own worklet (a mixed
+  // crossfade. Colour is a rest → hover → error → focus cascade; the 1 → 2 dp
+  // height is a plain numeric interpolate kept in its own worklet (a mixed
   // numeric+colour cascade doesn't collapse into `useColorCascade`).
   const animatedIndicatorColorStyle = useColorCascade(borderRestColor, [
+    { progress: hovered, color: borderHoverColor },
     { progress: errored, color: borderErrorColor },
     { progress: focused, color: borderFocusColor },
   ])
@@ -332,10 +333,12 @@ export function TextField({
     [styles.hoverLayer, animatedHoverLayerStyle],
   )
 
+  // An inline `start` resolves to the left edge on web in RTL, see
+  // `resolveLogical`.
   const labelStaticPos = useMemo(
     () => ({
       top: labelStaticTop,
-      start: labelStart,
+      ...resolveLogical('start', labelStart),
     }),
     [labelStaticTop, labelStart],
   )

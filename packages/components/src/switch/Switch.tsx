@@ -16,6 +16,7 @@ import {
   isRTLDirection,
   renderIcon,
   resolveColorFromStyle,
+  resolveLogical,
 } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
@@ -181,14 +182,16 @@ export function Switch({
   // progress shift and (b) any thumb-grow shift on press (the thumb's start
   // edge is fixed, so its center moves toward the end by half the size
   // delta). Both follow `thumbTravel`'s sign, so the halo mirrors in RTL too.
+  // The inset is an inline style, so it goes through `resolveLogical`.
   const haloPositionStyle = useMemo(
-    () => ({
-      start:
+    () =>
+      resolveLogical(
+        'start',
         SWITCH_TRACK_PADDING -
-        SWITCH_TRACK_BORDER_WIDTH +
-        offThumbSize / 2 -
-        SWITCH_STATE_LAYER_SIZE / 2,
-    }),
+          SWITCH_TRACK_BORDER_WIDTH +
+          offThumbSize / 2 -
+          SWITCH_STATE_LAYER_SIZE / 2,
+      ),
     [offThumbSize],
   )
 

@@ -81,3 +81,72 @@ export function selectRTL<T>(ltr: T, rtl: T): T {
 export function isRTLDirection(): boolean {
   return isRTL()
 }
+
+/**
+ * The logical style keys that an inline style object cannot carry on web.
+ */
+export type LogicalStyleKey =
+  | 'start'
+  | 'end'
+  | 'marginStart'
+  | 'marginEnd'
+  | 'paddingStart'
+  | 'paddingEnd'
+
+type PhysicalStyleKey =
+  | 'left'
+  | 'right'
+  | 'marginLeft'
+  | 'marginRight'
+  | 'paddingLeft'
+  | 'paddingRight'
+
+const PHYSICAL_KEYS: Record<
+  LogicalStyleKey,
+  readonly [ltr: PhysicalStyleKey, rtl: PhysicalStyleKey]
+> = {
+  start: ['left', 'right'],
+  end: ['right', 'left'],
+  marginStart: ['marginLeft', 'marginRight'],
+  marginEnd: ['marginRight', 'marginLeft'],
+  paddingStart: ['paddingLeft', 'paddingRight'],
+  paddingEnd: ['paddingRight', 'paddingLeft'],
+}
+
+/**
+ * The key to write for a logical inset in an inline style object.
+ *
+ * A style from `StyleSheet.create` mirrors on web through CSS: react-native-web
+ * compiles `start` into one rule for `[dir="ltr"]` and one for `[dir="rtl"]`,
+ * and the browser picks. An inline style object, which is any object built
+ * during render, takes a different path: react-native-web resolves its logical
+ * keys in JavaScript from a locale context that defaults to LTR and that no
+ * `dir` attribute updates. So `{ start: 56 }` in an inline style is
+ * `left: 56px` under `<html dir="rtl">`, and the element sits at the wrong
+ * edge.
+ *
+ * This returns the physical key for the document direction on web, and the
+ * logical key itself on native, where inline logical keys work.
+ */
+export function resolveLogicalKey(key: LogicalStyleKey): string {
+  if (Platform.OS !== 'web') return key
+  const [ltr, rtl] = PHYSICAL_KEYS[key]
+  return isRTL() ? rtl : ltr
+}
+
+/**
+ * An inline style fragment for one logical inset, resolved with
+ * `resolveLogicalKey`. Spread it into the style object.
+ *
+ * @example
+ * const titleInset = useMemo(
+ *   () => ({ ...resolveLogical('start', 56), ...resolveLogical('end', 104) }),
+ *   [],
+ * )
+ */
+export function resolveLogical<T extends number | undefined>(
+  key: LogicalStyleKey,
+  value: T,
+): Record<string, T> {
+  return { [resolveLogicalKey(key)]: value }
+}

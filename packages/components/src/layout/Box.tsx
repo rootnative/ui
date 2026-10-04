@@ -1,4 +1,5 @@
 import { useTheme } from '@rootnative/core'
+import { resolveLogical } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
@@ -32,6 +33,9 @@ export function Box({
 }: BoxProps) {
   const { spacing } = useTheme()
 
+  // The one-sided insets go through `resolveLogical`: this object is an
+  // inline style, and react-native-web resolves an inline `paddingStart` to
+  // the left edge under `dir="rtl"`. The two-sided ones are symmetric.
   const layoutStyle = useMemo<ViewStyle>(() => {
     const s = (v: SpacingValue | undefined) => resolveSpacing(spacing, v)
     return {
@@ -46,8 +50,8 @@ export function Box({
       }),
       ...(pt !== undefined && { paddingTop: s(pt) }),
       ...(pb !== undefined && { paddingBottom: s(pb) }),
-      ...(ps !== undefined && { paddingStart: s(ps) }),
-      ...(pe !== undefined && { paddingEnd: s(pe) }),
+      ...(ps !== undefined && resolveLogical('paddingStart', s(ps))),
+      ...(pe !== undefined && resolveLogical('paddingEnd', s(pe))),
       ...(m !== undefined && { margin: s(m) }),
       ...(mx !== undefined && {
         marginStart: s(mx),
@@ -59,8 +63,8 @@ export function Box({
       }),
       ...(mt !== undefined && { marginTop: s(mt) }),
       ...(mb !== undefined && { marginBottom: s(mb) }),
-      ...(ms !== undefined && { marginStart: s(ms) }),
-      ...(me !== undefined && { marginEnd: s(me) }),
+      ...(ms !== undefined && resolveLogical('marginStart', s(ms))),
+      ...(me !== undefined && resolveLogical('marginEnd', s(me))),
       ...(gap !== undefined && { gap: s(gap) }),
       ...(rowGap !== undefined && { rowGap: s(rowGap) }),
       ...(columnGap !== undefined && { columnGap: s(columnGap) }),

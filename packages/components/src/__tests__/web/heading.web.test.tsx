@@ -11,6 +11,7 @@
 import { screen } from '@testing-library/react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
+import { NavigationDrawer } from '../../navigation-drawer'
 import { Typography } from '../../typography'
 import { renderWeb } from './render-web'
 
@@ -53,6 +54,28 @@ describe('Typography heading level on the web', () => {
       </Typography>,
     )
     expect(screen.getByText('Dune').tagName).toBe('H1')
+  })
+})
+
+describe('NavigationDrawer section headline level on the web', () => {
+  function renderSection(headingLevel?: 2 | 3) {
+    renderWeb(
+      <NavigationDrawer variant="standard" defaultValue="inbox">
+        <NavigationDrawer.Section headline="Mail" headingLevel={headingLevel}>
+          <NavigationDrawer.Item value="inbox" label="Inbox" />
+        </NavigationDrawer.Section>
+      </NavigationDrawer>,
+    )
+  }
+
+  it('is <h2> by default, not one <h1> per section', () => {
+    renderSection()
+    expect(screen.getByText('Mail').tagName).toBe('H2')
+  })
+
+  it('follows headingLevel', () => {
+    renderSection(3)
+    expect(screen.getByText('Mail').tagName).toBe('H3')
   })
 })
 

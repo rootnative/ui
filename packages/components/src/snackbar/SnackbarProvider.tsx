@@ -1,6 +1,13 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
-import { useEffect, useMemo, useSyncExternalStore } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import { pointerEvents } from '../internal/pointerEvents'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -9,7 +16,7 @@ import { SnackbarContext } from './context'
 import { SnackbarSurface } from './SnackbarSurface'
 import { SnackbarStore } from './store'
 import { SNACKBAR_SLIDE, createSnackbarStyles } from './styles'
-import type { SnackbarProviderProps } from './types'
+import type { SnackbarId, SnackbarProviderProps } from './types'
 
 interface SnackbarHostProps {
   store: SnackbarStore
@@ -44,12 +51,35 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
   const entryId = entry?.id
 
   // Auto-dismiss. Keyed on the id so a replacement restarts the clock, and
-  // skipped entirely for indefinite snackbars.
+  // skipped entirely for indefinite snackbars. The clock pauses while a
+  // pointer is over the surface, so a message is not pulled away from a
+  // reader who moved to it. The pause is keyed on the entry too, so a
+  // replacement starts unpaused, and the time left carries over in the ref.
+  const [pausedEntryId, setPausedEntryId] = useState<SnackbarId>()
+  const paused = pausedEntryId !== undefined && pausedEntryId === entryId
+  const remainingRef = useRef<
+    { id: SnackbarId; remaining: number } | undefined
+  >(undefined)
   useEffect(() => {
-    if (entryId === undefined || durationMs === null) return
-    const timer = setTimeout(() => store.hide(entryId, 'timeout'), durationMs)
-    return () => clearTimeout(timer)
-  }, [store, entryId, durationMs])
+    if (entryId === undefined || durationMs === null || paused) return
+    if (remainingRef.current?.id !== entryId) {
+      remainingRef.current = { id: entryId, remaining: durationMs }
+    }
+    const { remaining } = remainingRef.current
+    const startedAt = Date.now()
+    const timer = setTimeout(() => store.hide(entryId, 'timeout'), remaining)
+    return () => {
+      clearTimeout(timer)
+      remainingRef.current = {
+        id: entryId,
+        remaining: Math.max(0, remaining - (Date.now() - startedAt)),
+      }
+    }
+  }, [store, entryId, durationMs, paused])
+  const onHoverChange = useCallback(
+    (hovered: boolean) => setPausedEntryId(hovered ? entryId : undefined),
+    [entryId],
+  )
 
   return (
     <Portal priority={PORTAL_LAYERS.snackbar}>
@@ -89,6 +119,7 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
                   store.hide(entry.id, 'action')
                 }}
                 onClose={() => store.hide(entry.id, 'close')}
+                onHoverChange={onHoverChange}
               />
             </Motion.View>
           ) : null}

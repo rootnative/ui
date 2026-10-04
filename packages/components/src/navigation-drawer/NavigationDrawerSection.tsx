@@ -10,6 +10,7 @@ import type { NavigationDrawerSectionProps } from './types'
  */
 export function NavigationDrawerSection({
   headline,
+  headingLevel = 2,
   children,
   headlineStyle,
   style,
@@ -29,7 +30,14 @@ export function NavigationDrawerSection({
   return (
     <View {...rest} style={style}>
       {headline !== undefined ? (
-        <Text style={resolvedHeadlineStyle} role="heading" numberOfLines={1}>
+        <Text
+          style={resolvedHeadlineStyle}
+          role="heading"
+          // react-native-web writes a level-less heading as `<h1>`, one per
+          // section. React Native has no `aria-level`, so it is web-only.
+          aria-level={headingLevel}
+          numberOfLines={1}
+        >
           {headline}
         </Text>
       ) : null}

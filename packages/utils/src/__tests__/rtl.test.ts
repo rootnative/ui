@@ -1,5 +1,10 @@
 import { I18nManager } from 'react-native'
-import { selectRTL, transformOrigin } from '../rtl'
+import {
+  resolveLogical,
+  resolveLogicalKey,
+  selectRTL,
+  transformOrigin,
+} from '../rtl'
 
 function withRTL(isRTL: boolean, fn: () => void) {
   const original = I18nManager.isRTL
@@ -67,6 +72,25 @@ describe('transformOrigin', () => {
       expect(transformOrigin('top')).toBe('right top')
       expect(transformOrigin('center')).toBe('right center')
       expect(transformOrigin('bottom')).toBe('right bottom')
+    })
+  })
+})
+
+describe('resolveLogical on native', () => {
+  // Native resolves a logical key in an inline style itself, in either
+  // direction, so the key passes through. The web half, where the key turns
+  // physical, is in `packages/components/src/__tests__/web/rtl.web.test.tsx`.
+  it('keeps the logical key in LTR', () => {
+    withRTL(false, () => {
+      expect(resolveLogicalKey('start')).toBe('start')
+      expect(resolveLogical('marginStart', 8)).toEqual({ marginStart: 8 })
+    })
+  })
+
+  it('keeps the logical key in RTL', () => {
+    withRTL(true, () => {
+      expect(resolveLogicalKey('end')).toBe('end')
+      expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingEnd: 8 })
     })
   })
 })

@@ -15,7 +15,8 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
-import { I18nManager, ScrollView, StyleSheet } from 'react-native'
+import { isRTLDirection } from '@rootnative/utils'
+import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -52,7 +53,7 @@ function Cell({ label }: { label: string }) {
 
 export default function RTLScreen() {
   const { colors } = useTheme()
-  const direction = I18nManager.isRTL ? 'RTL' : 'LTR'
+  const direction = isRTLDirection() ? 'RTL' : 'LTR'
 
   return (
     <ScrollView style={styles.container}>

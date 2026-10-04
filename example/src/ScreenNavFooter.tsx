@@ -7,9 +7,10 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { isRTLDirection } from '@rootnative/utils'
 import { usePathname, useRouter } from 'expo-router'
 import { useMemo } from 'react'
-import { I18nManager, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import type { CatalogEntry } from './catalog'
 import { findNeighbors } from './catalog'
 
@@ -24,7 +25,7 @@ function NavCard({ entry, direction }: NavCardProps) {
   const isPrevious = direction === 'previous'
   // The chevron glyphs are physical, not logical — flip them
   // by hand so "previous" still points backwards under the RTL toggle.
-  const pointsLeft = isPrevious !== I18nManager.isRTL
+  const pointsLeft = isPrevious !== isRTLDirection()
   const icon = pointsLeft ? 'chevron-left' : 'chevron-right'
 
   const chevron = (

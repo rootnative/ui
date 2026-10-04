@@ -11,6 +11,36 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Defects seen in the web pass
+
+- **Inline logical insets sat at the wrong edge in RTL on web.** A style from
+  `StyleSheet.create` mirrors through CSS, but react-native-web resolves the
+  logical keys of an inline style object in JavaScript, from a locale context
+  that defaults to LTR and that `dir="rtl"` never updates. The small app bar
+  title drew over the trailing actions, the text field label sat over the
+  trailing icon, the Switch halo left the thumb, and `Box` one-sided insets
+  (`ps`, `pe`, `ms`, `me`) went to the left. The new `resolveLogical` helper
+  in `@rootnative/utils` writes the physical key for the document direction
+  on web and the logical key on native.
+- **Slider arrow, Home, End and Page keys also scrolled the page.** The
+  handled keys are claimed with `preventDefault` now.
+- **Slider reported a rounded `aria-valuenow`.** A 0 to 1 slider at 0.4 said
+  `0`, which a screen reader reads as "0 percent". The value is unrounded on
+  every platform.
+- **Tooltip never opened from the keyboard.** On web, focus on the anchor
+  shows the tooltip, blur hides a plain one, and Escape hides either. The
+  key stops at the anchor, so an enclosing dialog does not close too.
+- **Filled TextField indicator did not change on hover.** The indicator
+  colour cascade has the hover step the outlined border already had.
+- **Snackbar timer ran on under the pointer.** The clock pauses while a
+  pointer is over the surface and continues from where it stopped.
+- **NavigationDrawer section headlines rendered as `<h1>` on web.** Each
+  section headline is `<h2>` now, with a `headingLevel` prop to fit the page
+  outline.
+- **NavigationRail put its `accessibilityLabel` on a plain view.** It names
+  the tablist now, the same as NavigationBar, so the rail has an accessible
+  name on web.
+
 ### Three defects seen on the iOS simulator
 
 - **Medium and large app bars clipped the title.** The title sat in a row

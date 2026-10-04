@@ -117,6 +117,9 @@ A snackbar takes a single action. Pressing it runs `onAction` and then dismisses
 **A snackbar with an `actionLabel` defaults to `'indefinite'`**, not `'short'`. An undo the
 user never sees is worse than one that waits. A snackbar without an action defaults to `'short'`.
 
+The clock pauses while a pointer is over the snackbar and continues from where it stopped when the
+pointer leaves, so a message is not pulled away from a reader who moved to it.
+
 Set `showCloseIcon` to add a trailing close button. RootNative warns in development if an
 indefinite snackbar has neither an action nor a close button — that combination is
 undismissable and stalls everything queued behind it.

@@ -55,18 +55,16 @@ export function NavigationRail({
   )
 
   return (
-    <View
-      {...rest}
-      testID={testID}
-      style={[styles.root, style]}
-      accessibilityLabel={accessibilityLabel}
-    >
+    <View {...rest} testID={testID} style={[styles.root, style]}>
       {header !== undefined && header !== null ? (
         <View style={styles.header}>{header}</View>
       ) : null}
+      {/* The name goes on the tablist, the node with a role: a label on a
+          plain view is not read on web. Same as NavigationBar. */}
       <View
         style={styles.destinations}
         role="tablist"
+        accessibilityLabel={accessibilityLabel}
         testID={testID === undefined ? undefined : `${testID}-destinations`}
       >
         {items.map((item) => (

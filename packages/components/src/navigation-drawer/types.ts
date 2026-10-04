@@ -195,6 +195,12 @@ export interface NavigationDrawerSectionProps extends Omit<
    * group with no title.
    */
   headline?: string
+  /**
+   * The outline level of the headline on web, where it renders as `<hN>`.
+   * Native has no heading levels and ignores it.
+   * @default 2
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   /** The section's `NavigationDrawer.Item`s. */
   children?: ReactNode
   /** Style applied to the headline `Text`. */

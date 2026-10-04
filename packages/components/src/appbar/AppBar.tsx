@@ -12,7 +12,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { selectRTL } from '@rootnative/utils'
+import { resolveLogical, resolveLogicalKey, selectRTL } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
 import type { LayoutChangeEvent, ViewStyle } from 'react-native'
@@ -170,8 +170,11 @@ export function AppBar({
       barWidth - titleStartInset - compactTitleEndInset - titleWidth,
     ),
   )
+  // Inline logical insets go through `resolveLogical`: react-native-web
+  // resolves them in JavaScript from a locale context that defaults to LTR,
+  // so a plain `{ start }` object sits at the left edge under `dir="rtl"`.
   const centeredTitleOffsetStyle = useMemo<ViewStyle>(
-    () => ({ marginStart: centeredTitleOffset }),
+    () => resolveLogical('marginStart', centeredTitleOffset),
     [centeredTitleOffset],
   )
   const onBarLayout = useCallback((event: LayoutChangeEvent) => {
@@ -185,11 +188,14 @@ export function AppBar({
   const expandedTitleStartInset =
     topAppBar.titleStartInset + topAppBar.horizontalPadding
   const expandedTitleInsetStyle = useMemo<ViewStyle>(
-    () => ({ paddingStart: expandedTitleStartInset }),
+    () => resolveLogical('paddingStart', expandedTitleStartInset),
     [expandedTitleStartInset],
   )
   const overlayTitleInsetStyle = useMemo<ViewStyle>(
-    () => ({ start: titleStartInset, end: compactTitleEndInset }),
+    () => ({
+      ...resolveLogical('start', titleStartInset),
+      ...resolveLogical('end', compactTitleEndInset),
+    }),
     [compactTitleEndInset, titleStartInset],
   )
 
@@ -236,9 +242,12 @@ export function AppBar({
     height: [expandedHeight, topAppBar.smallContainerHeight],
   })
   // Stays hand-rolled: `start` and `end` are logical (RTL-aware) insets,
-  // which aren't among `useInterpolatedStyle`'s numeric keys.
+  // which aren't among `useInterpolatedStyle`'s numeric keys. The keys are
+  // resolved outside the worklet, see `resolveLogical` above.
+  const collapseStartKey = resolveLogicalKey('start')
+  const collapseEndKey = resolveLogicalKey('end')
   const titleContainerCollapseStyle = useAnimatedStyle(() => ({
-    start: interpolate(
+    [collapseStartKey]: interpolate(
       collapseProgress.value,
       [0, 1],
       [expandedTitleStartInset, titleStartInset],
@@ -253,7 +262,7 @@ export function AppBar({
       [0, 1],
       [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
     ),
-    end: interpolate(
+    [collapseEndKey]: interpolate(
       collapseProgress.value,
       [0, 1],
       [expandedTitleEndInset, compactTitleEndInset],

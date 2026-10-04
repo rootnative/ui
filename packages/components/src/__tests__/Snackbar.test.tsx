@@ -91,6 +91,32 @@ describe('useSnackbar', () => {
     expect(onDismiss).toHaveBeenCalledWith('timeout')
   })
 
+  it('pauses the clock while a pointer is over it', () => {
+    renderProvider()
+    const onDismiss = jest.fn()
+    show({ message: 'Saved', onDismiss })
+
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+    fireEvent(screen.getByText('Saved'), 'pointerEnter')
+    act(() => {
+      jest.advanceTimersByTime(10000)
+    })
+    expect(onDismiss).not.toHaveBeenCalled()
+
+    fireEvent(screen.getByText('Saved'), 'pointerLeave')
+    act(() => {
+      jest.advanceTimersByTime(1999)
+    })
+    expect(onDismiss).not.toHaveBeenCalled()
+
+    act(() => {
+      jest.advanceTimersByTime(1)
+    })
+    expect(onDismiss).toHaveBeenCalledWith('timeout')
+  })
+
   it('uses the 10s long duration when asked', () => {
     renderProvider()
     const onDismiss = jest.fn()

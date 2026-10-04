@@ -70,6 +70,7 @@ function NavigationBarScreenContent() {
                 items={DESTINATIONS}
                 value={destination}
                 onValueChange={setDestination}
+                accessibilityLabel="Main navigation"
               />
             </Column>
           </Card>
@@ -89,6 +90,7 @@ function NavigationBarScreenContent() {
                 labelVisibility="selected"
                 defaultValue="search"
                 items={DESTINATIONS}
+                accessibilityLabel="Selected labels only"
               />
             </Column>
           </Card>
@@ -97,7 +99,11 @@ function NavigationBarScreenContent() {
         <Column gap="sm">
           <Typography variant="titleMedium">No labels</Typography>
           <Card variant="outlined">
-            <NavigationBar labelVisibility="never" items={DESTINATIONS} />
+            <NavigationBar
+              labelVisibility="never"
+              items={DESTINATIONS}
+              accessibilityLabel="No labels"
+            />
           </Card>
         </Column>
 
@@ -116,6 +122,7 @@ function NavigationBarScreenContent() {
                 containerColor={theme.colors.surfaceContainerHigh}
                 indicatorColor={theme.colors.tertiaryContainer}
                 selectedContentColor={theme.colors.onTertiaryContainer}
+                accessibilityLabel="Disabled and overrides"
                 items={[
                   DESTINATIONS[0],
                   DESTINATIONS[1],

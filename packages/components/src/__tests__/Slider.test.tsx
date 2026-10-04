@@ -26,12 +26,37 @@ describe('Slider', () => {
     expect(screen.getByRole('adjustable')).toBeTruthy()
   })
 
-  it('reports current value via accessibilityValue', () => {
+  it('reports the current value unrounded via accessibilityValue', () => {
     renderWithTheme(<Slider defaultValue={0.42} />)
     const slider = screen.getByRole('adjustable')
     expect(slider.props.accessibilityValue).toEqual(
-      expect.objectContaining({ min: 0, max: 1, now: 0 }),
+      expect.objectContaining({ min: 0, max: 1, now: 0.42 }),
     )
+  })
+
+  it('claims the keys it handles so the page does not scroll', () => {
+    const onValueChange = jest.fn()
+    renderWithTheme(
+      <Slider
+        minimumValue={0}
+        maximumValue={100}
+        defaultValue={50}
+        onValueChange={onValueChange}
+      />,
+    )
+    const slider = screen.getByRole('adjustable')
+    const preventDefault = jest.fn()
+
+    fireEvent(slider, 'keyDown', {
+      nativeEvent: { key: 'End' },
+      preventDefault,
+    })
+    expect(onValueChange).toHaveBeenCalledWith(100)
+    expect(preventDefault).toHaveBeenCalledTimes(1)
+
+    fireEvent(slider, 'keyDown', { nativeEvent: { key: ' ' }, preventDefault })
+    fireEvent(slider, 'keyDown', { nativeEvent: { key: 'a' }, preventDefault })
+    expect(preventDefault).toHaveBeenCalledTimes(1)
   })
 
   it('uses integer-bound min/max from props', () => {

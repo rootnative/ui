@@ -17,6 +17,7 @@ interface SnackbarSurfaceProps {
   style?: StyleProp<ViewStyle>
   onAction: () => void
   onClose: () => void
+  onHoverChange: (hovered: boolean) => void
 }
 
 export function SnackbarSurface({
@@ -25,6 +26,7 @@ export function SnackbarSurface({
   style,
   onAction,
   onClose,
+  onHoverChange,
 }: SnackbarSurfaceProps) {
   const theme = useTheme()
   const actionLabel = entry.actionLabel
@@ -70,6 +72,8 @@ export function SnackbarSurface({
       // a snackbar — it informs, it does not interrupt.
       role="alert"
       accessibilityLiveRegion="polite"
+      onPointerEnter={() => onHoverChange(true)}
+      onPointerLeave={() => onHoverChange(false)}
     >
       <Text style={styles.message} numberOfLines={2}>
         {entry.message}

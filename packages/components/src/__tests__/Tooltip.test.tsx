@@ -88,6 +88,38 @@ describe('Tooltip', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
+  it('shows on focus and hides on blur', () => {
+    const onDismiss = jest.fn()
+    renderTooltip(<TextAnchor onDismiss={onDismiss} />)
+
+    fireEvent(screen.getByText('Info'), 'focus')
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+
+    fireEvent(screen.getByText('Info'), 'blur')
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('hides on Escape and stops the key there', () => {
+    const onDismiss = jest.fn()
+    renderTooltip(<TextAnchor onDismiss={onDismiss} />)
+    const stopPropagation = jest.fn()
+
+    fireEvent(screen.getByText('Info'), 'keyDown', {
+      nativeEvent: { key: 'Escape' },
+      stopPropagation,
+    })
+    expect(onDismiss).not.toHaveBeenCalled()
+    expect(stopPropagation).not.toHaveBeenCalled()
+
+    fireEvent(screen.getByText('Info'), 'focus')
+    fireEvent(screen.getByText('Info'), 'keyDown', {
+      nativeEvent: { key: 'Escape' },
+      stopPropagation,
+    })
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+    expect(stopPropagation).toHaveBeenCalledTimes(1)
+  })
+
   it('does not report a dismissal for a hover that never showed anything', () => {
     const onDismiss = jest.fn()
     renderTooltip(<TextAnchor onDismiss={onDismiss} />)
@@ -248,6 +280,28 @@ describe('Tooltip — rich', () => {
     fireEvent(screen.getByText('Info'), 'hoverOut')
     expect(onDismiss).not.toHaveBeenCalled()
     expect(screen.getByTestId('tooltip')).toBeTruthy()
+  })
+
+  it('shows on focus and stays up on blur, so Tab can reach its actions', () => {
+    const onDismiss = jest.fn()
+    renderTooltip(
+      <TextAnchor
+        variant="rich"
+        actions={<Button variant="text">Got it</Button>}
+        onDismiss={onDismiss}
+      />,
+    )
+
+    fireEvent(screen.getByText('Info'), 'focus')
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+
+    fireEvent(screen.getByText('Info'), 'blur')
+    expect(onDismiss).not.toHaveBeenCalled()
+
+    fireEvent(screen.getByText('Info'), 'keyDown', {
+      nativeEvent: { key: 'Escape' },
+    })
+    expect(onDismiss).toHaveBeenCalledTimes(1)
   })
 
   it('dismisses on an outside press', () => {

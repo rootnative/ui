@@ -8,6 +8,7 @@ import {
   useThemeMode,
 } from '@rootnative/core'
 import { SeoProvider } from '@rootnative/seo/react'
+import { isRTLDirection } from '@rootnative/utils'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import * as Updates from 'expo-updates'
@@ -17,13 +18,16 @@ import { findEntry } from '../src/catalog'
 import { JumpMenu } from '../src/JumpMenu'
 import { site } from '../src/site'
 
-// Restore persisted RTL preference on web before first render
+// Restore the persisted RTL preference on web before the first render.
+// react-native-web ships `I18nManager` as a stub, so the document `dir`
+// attribute is the one switch the browser and the library both read. The
+// bundle runs after the HTML is parsed, so the attribute is in place before
+// React mounts.
 if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
   try {
     const stored = localStorage.getItem('forceRTL')
     if (stored === 'true') {
-      I18nManager.allowRTL(true)
-      I18nManager.forceRTL(true)
+      document.documentElement.setAttribute('dir', 'rtl')
     }
   } catch {
     // Ignore storage errors (SSR, private browsing, etc.)
@@ -60,9 +64,7 @@ function resolveTitle(routeName: string): string {
 }
 
 async function toggleRTL() {
-  const nextIsRTL = !I18nManager.isRTL
-  I18nManager.allowRTL(true)
-  I18nManager.forceRTL(nextIsRTL)
+  const nextIsRTL = !isRTLDirection()
 
   if (Platform.OS === 'web') {
     try {
@@ -72,6 +74,8 @@ async function toggleRTL() {
     }
     window.location.reload()
   } else {
+    I18nManager.allowRTL(true)
+    I18nManager.forceRTL(nextIsRTL)
     try {
       await Updates.reloadAsync()
     } catch {
@@ -115,16 +119,14 @@ function RootLayoutContent() {
         <View style={styles.iconFrame}>
           <IconButton
             icon={
-              I18nManager.isRTL
+              isRTLDirection()
                 ? 'format-pilcrow-arrow-left'
                 : 'format-pilcrow-arrow-right'
             }
             size="small"
             variant="standard"
             accessibilityLabel={
-              I18nManager.isRTL
-                ? 'Switch to LTR layout'
-                : 'Switch to RTL layout'
+              isRTLDirection() ? 'Switch to LTR layout' : 'Switch to RTL layout'
             }
             onPress={toggleRTL}
           />

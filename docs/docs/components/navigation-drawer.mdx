@@ -116,7 +116,8 @@ fires after the drawer's `onValueChange`.
   text such as an unread count, per the MD3 drawer anatomy — it is not announced, so add it to
   `accessibilityLabel`.
 - **`NavigationDrawer.Section`** — a group with an optional `headline` in `titleSmall`, 56dp tall
-  and inset 28dp from the sheet edge.
+  and inset 28dp from the sheet edge. On web the headline renders as `<h2>`; set `headingLevel`
+  to fit the page outline.
 - **`NavigationDrawer.Divider`** — a `Divider` inset 28dp from both sheet edges, between sections.
 
 ## Safe area
