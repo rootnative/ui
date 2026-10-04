@@ -25,16 +25,25 @@
 import { lightTheme } from '@rootnative/core'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
+import { useEffect } from 'react'
 import { StyleSheet, Text } from 'react-native'
+import { BottomSheet } from '../bottom-sheet'
 import { Button } from '../button'
 import { Card } from '../card'
 import { Chip } from '../chip'
+import { Dialog } from '../dialog'
 import {
   elevationBoxShadow,
   elevationBoxShadowForFabric,
   elevationShadowConfig,
 } from '../elevation-shadow'
 import { FAB } from '../fab'
+import { Menu } from '../menu'
+import { NavigationBar } from '../navigation-bar'
+import { NavigationDrawer } from '../navigation-drawer'
+import { PortalHost } from '../portal/PortalHost'
+import { SnackbarProvider, useSnackbar } from '../snackbar'
+import { Tooltip } from '../tooltip'
 
 type Style = Record<string, unknown>
 
@@ -166,6 +175,127 @@ it.each([
   fireEvent(screen.getByRole('button'), 'hoverIn')
   flush()
   expect(shadowed()).toHaveLength(0)
+})
+
+function SnackbarOnMount() {
+  const snackbar = useSnackbar()
+  useEffect(() => {
+    snackbar.show({ message: 'Saved', duration: 'indefinite' })
+  }, [snackbar])
+  return null
+}
+
+/**
+ * The surfaces that take their elevation statically through `elevationStyle`
+ * and never move it. They share the two invariants above: one shadow node that
+ * does not clip, and no `boxShadow` beside the native keys.
+ */
+const STATIC_CASES = [
+  {
+    name: 'Menu',
+    ui: (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}}>
+          <Menu.Item label="Edit" />
+        </Menu>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level2,
+  },
+  {
+    name: 'Dialog',
+    ui: (
+      <PortalHost>
+        <Dialog visible onDismiss={() => {}}>
+          <Dialog.Title>Title</Dialog.Title>
+        </Dialog>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level3,
+  },
+  {
+    name: 'Snackbar',
+    ui: (
+      <PortalHost>
+        <SnackbarProvider>
+          <SnackbarOnMount />
+        </SnackbarProvider>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level3,
+  },
+  {
+    name: 'Tooltip (rich)',
+    ui: (
+      <PortalHost>
+        <Tooltip visible variant="rich" anchor={null} onDismiss={() => {}}>
+          Rich
+        </Tooltip>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level2,
+  },
+  {
+    name: 'BottomSheet',
+    ui: (
+      <PortalHost>
+        <BottomSheet visible onDismiss={() => {}}>
+          <Text>Sheet</Text>
+        </BottomSheet>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level1,
+  },
+  {
+    name: 'NavigationDrawer (modal)',
+    ui: (
+      <PortalHost>
+        <NavigationDrawer variant="modal" visible onDismiss={() => {}}>
+          <NavigationDrawer.Item value="home" label="Home" />
+        </NavigationDrawer>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level1,
+  },
+  {
+    name: 'NavigationBar',
+    ui: (
+      <NavigationBar
+        items={[
+          { value: 'home', label: 'Home', icon: 'home-outline' },
+          { value: 'search', label: 'Search', icon: 'magnify' },
+        ]}
+      />
+    ),
+    rest: lightTheme.elevation.level2,
+  },
+] as const
+
+describe.each(STATIC_CASES)('$name elevation', ({ ui, rest }) => {
+  it('paints its shadow on exactly one node, and that node does not clip', () => {
+    renderWithTheme(ui)
+    const layers = shadowed()
+    expect(layers).toHaveLength(1)
+    expect(layers[0].overflow).not.toBe('hidden')
+  })
+
+  it('sits on its MD3 elevation token', () => {
+    renderWithTheme(ui)
+    expect(shadowed()[0]).toMatchObject({
+      shadowColor: rest.shadowColor,
+      shadowOffset: rest.shadowOffset,
+      shadowOpacity: rest.shadowOpacity,
+      shadowRadius: rest.shadowRadius,
+      elevation: rest.elevation,
+    })
+  })
+
+  it('emits no boxShadow alongside the native shadow keys', () => {
+    renderWithTheme(ui)
+    for (const style of styles(screen.toJSON())) {
+      expect(style.boxShadow).toBeUndefined()
+    }
+  })
 })
 
 // The non-interactive elevated Card satisfies the same invariant by swapping the

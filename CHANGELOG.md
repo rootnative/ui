@@ -11,6 +11,15 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Every elevated surface has an elevation test
+
+The native and web elevation tables covered the four components that move
+their shadow on hover. The seven that take a static elevation had no witness:
+Menu (level 2), Dialog (3), Snackbar (3), the rich Tooltip (2), BottomSheet
+(1), the modal NavigationDrawer (1) and NavigationBar (2). All seven are in
+both tables now and pass the same two invariants: one shadow node that does
+not clip, and no `boxShadow` beside the native keys.
+
 ### The agent-facing docs tell the truth again
 
 `docs/static/llms.txt` is the file an AI agent is told to trust over the

@@ -12,15 +12,24 @@
  * `box-shadow` declaration on a real element.
  */
 import { lightTheme } from '@rootnative/core'
+import { useEffect } from 'react'
 import { Text } from 'react-native'
+import { BottomSheet } from '../../bottom-sheet'
 import { Button } from '../../button'
 import { Card } from '../../card'
 import { Chip } from '../../chip'
+import { Dialog } from '../../dialog'
 import {
   elevationBoxShadow,
   elevationShadowConfig,
 } from '../../elevation-shadow'
 import { FAB } from '../../fab'
+import { Menu } from '../../menu'
+import { NavigationBar } from '../../navigation-bar'
+import { NavigationDrawer } from '../../navigation-drawer'
+import { PortalHost } from '../../portal/PortalHost'
+import { SnackbarProvider, useSnackbar } from '../../snackbar'
+import { Tooltip } from '../../tooltip'
 import { renderWeb } from './render-web'
 
 /** Every element carrying a non-empty inline `box-shadow`. */
@@ -108,6 +117,108 @@ it.each([
   const shadows = boxShadows(container)
   expect(shadows).toHaveLength(1)
   expect(shadows[0]).toMatch(shadow)
+})
+
+function SnackbarOnMount() {
+  const snackbar = useSnackbar()
+  useEffect(() => {
+    snackbar.show({ message: 'Saved', duration: 'indefinite' })
+  }, [snackbar])
+  return null
+}
+
+/** Class-based shadows resolve only through the computed style. */
+function computedBoxShadows(root: HTMLElement) {
+  return Array.from(root.querySelectorAll<HTMLElement>('*'))
+    .map((node) => getComputedStyle(node).boxShadow)
+    .filter((value) => value !== '' && value !== 'none')
+}
+
+// The surfaces that take their elevation statically through `elevationStyle`.
+// `StyleSheet.create` compiles the shadow into an atomic class, so this reads
+// the computed style, as the non-interactive Card test above does.
+it.each([
+  {
+    name: 'Menu',
+    ui: (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}}>
+          <Menu.Item label="Edit" />
+        </Menu>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level2,
+  },
+  {
+    name: 'Dialog',
+    ui: (
+      <PortalHost>
+        <Dialog visible onDismiss={() => {}}>
+          <Dialog.Title>Title</Dialog.Title>
+        </Dialog>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level3,
+  },
+  {
+    name: 'Snackbar',
+    ui: (
+      <PortalHost>
+        <SnackbarProvider>
+          <SnackbarOnMount />
+        </SnackbarProvider>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level3,
+  },
+  {
+    name: 'Tooltip (rich)',
+    ui: (
+      <PortalHost>
+        <Tooltip visible variant="rich" anchor={null} onDismiss={() => {}}>
+          Rich
+        </Tooltip>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level2,
+  },
+  {
+    name: 'BottomSheet',
+    ui: (
+      <PortalHost>
+        <BottomSheet visible onDismiss={() => {}}>
+          <Text>Sheet</Text>
+        </BottomSheet>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level1,
+  },
+  {
+    name: 'NavigationDrawer (modal)',
+    ui: (
+      <PortalHost>
+        <NavigationDrawer variant="modal" visible onDismiss={() => {}}>
+          <NavigationDrawer.Item value="home" label="Home" />
+        </NavigationDrawer>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level1,
+  },
+  {
+    name: 'NavigationBar',
+    ui: (
+      <NavigationBar
+        items={[
+          { value: 'home', label: 'Home', icon: 'home-outline' },
+          { value: 'search', label: 'Search', icon: 'magnify' },
+        ]}
+      />
+    ),
+    level: lightTheme.elevation.level2,
+  },
+])('renders the $name elevation as a CSS box-shadow', ({ ui, level }) => {
+  const { container } = renderWeb(ui)
+  expect(computedBoxShadows(container)).toEqual([elevationBoxShadow(level)])
 })
 
 /**
