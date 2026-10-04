@@ -2,3 +2,7 @@ packages:
   - 'example'
   - 'packages/*'
   - 'docs'
+
+# Metro sets disableHierarchicalLookup, so it needs a flat node_modules.
+# pnpm 10+ reads this setting here; .npmrc keeps the same pin for pnpm 9.
+nodeLinker: hoisted

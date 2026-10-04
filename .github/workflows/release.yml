@@ -62,7 +62,7 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      # `pnpm --filter <pkg> pack` needs pnpm 10; this repo is on pnpm 9.
+      # Pack from the package directory; it works the same on every pnpm version.
       - name: Pack components
         working-directory: packages/components
         run: pnpm pack --pack-destination ../../pack

@@ -54,9 +54,8 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      # `pnpm --filter <pkg> pack` is a pnpm 10 feature; this repo is on
-      # pnpm 9, where it fails with "Unknown option: 'recursive'". Pack from
-      # the package directory instead.
+      # Pack from the package directory so the step does not depend on the
+      # pnpm version: `pnpm --filter <pkg> pack` only exists in pnpm 10+.
       - name: Pack components
         working-directory: packages/components
         run: pnpm pack --pack-destination ../../pack
