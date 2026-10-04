@@ -11,6 +11,70 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `containerColor` accepts every colour React Native accepts
+
+`blendColor` and `alphaColor` in `@rootnative/utils` read 6 and 8 digit hex
+only. Any other form, `#f00`, `rgb()`, `hsl()` or a named colour, fell back
+to the overlay at its alpha, so a filled component with
+`containerColor="red"` lost its container under the hover and press layers
+and showed a 10% tint of its content colour instead. Both functions now parse
+through React Native's `processColor`, which reads every colour form the
+platform does, on native and on the web. A base that is not opaque still
+returns the overlay at its alpha, because the colour behind it is unknown.
+
+### SearchBar: the trigger no longer nests buttons
+
+With `onPress` the whole bar was one `Pressable` with the `button` role, and
+it wrapped the clear button and the trailing actions. On the web that is a
+`<button>` inside a `<button>`, which the test run logged as invalid DOM and
+which a screen reader reads unreliably. The trigger is now a sibling behind
+the content, the same shape the `Chip` close target uses. The bar is still
+one tab stop, the input is still read-only and hidden, and the clear button
+and the actions are still buttons of their own. A consumer `role` now names
+the bar, so `<Link asChild>` can make it a link.
+
+### Three props a consumer passed were thrown away
+
+- `TextField` wrote `accessibilityLabel`, `accessibilityHint` and
+  `accessibilityState` after the rest spread, so a consumer value never
+  reached the input. A field with no visible label had no accessible name
+  even when the consumer gave it one. The consumer value wins now, and
+  `aria-label` is read as a name too. The visible `label` stays the default.
+- `LinearProgress` replaced a consumer `onLayout` with its own width
+  measurement. Both run now.
+- A rich `Tooltip` closed on hover out, which is before a mouse can reach its
+  actions. A rich tooltip is persistent and now stays up until the outside
+  press, an action, or the Android back button. A plain tooltip still hides on
+  hover out.
+
+### Snackbar: VoiceOver hears it now
+
+The surface carried `role="alert"` and `accessibilityLiveRegion="polite"`,
+and the docs said screen readers announce the message. TalkBack and web
+readers did. VoiceOver did not: iOS has no live region, and nothing asked it
+to speak. The snackbar now calls `AccessibilityInfo.announceForAccessibility`
+on iOS when it mounts and when a replacement arrives. Android and web are
+unchanged, so nothing is announced twice.
+
+### Dialog: one scrim, a scrolling body, and a safe area
+
+Three defects in `Dialog`, each one visible on a device.
+
+- **The scrim was twice as dark as the token.** The press target inside the
+  scrim layer carried the same 32% `scrim` colour as the layer itself, and
+  the two composited to about 54%. The press target is transparent now, which
+  is the same fix `BottomSheet` carries. A test pins the layer at 32% and the
+  press target at no colour.
+- **A basic dialog grew past the screen.** The surface had no height cap and
+  the content did not scroll, so long supporting content pushed the actions
+  off screen. With `dismissable={false}` that trapped the user. The surface
+  now stops at the screen height and `Dialog.Content` scrolls under a fixed
+  headline and above fixed actions.
+- **The full-screen dialog sat under the status bar.** The surface filled the
+  portal layer from the top edge of the screen. It now pads itself by the
+  safe-area insets on every edge, the same way `BottomSheet` and `Snackbar`
+  do.
+
 ### `Container`: one content column for every screen
 
 A screen on a wide window had no way to cap its content width except a

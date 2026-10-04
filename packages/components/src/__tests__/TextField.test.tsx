@@ -24,6 +24,36 @@ describe('TextField', () => {
     expect(screen.getByLabelText('Email')).toBeTruthy()
   })
 
+  it('prefers a consumer accessibilityLabel over the visible label', () => {
+    renderWithTheme(
+      <TextField label="Email" accessibilityLabel="Work email address" />,
+    )
+    expect(screen.getByLabelText('Work email address')).toBeTruthy()
+    expect(screen.queryByLabelText('Email')).toBeNull()
+  })
+
+  it('takes aria-label as the accessible name too', () => {
+    renderWithTheme(<TextField aria-label="Search" testID="input" />)
+    expect(screen.getByTestId('input').props.accessibilityLabel).toBe('Search')
+  })
+
+  it('keeps a consumer accessibilityHint and accessibilityState', () => {
+    renderWithTheme(
+      <TextField
+        label="Email"
+        supportingText="We never share it"
+        accessibilityHint="Required"
+        accessibilityState={{ busy: true }}
+      />,
+    )
+    const input = screen.getByLabelText('Email')
+    expect(input.props.accessibilityHint).toBe('Required')
+    expect(input.props.accessibilityState).toEqual({
+      busy: true,
+      disabled: false,
+    })
+  })
+
   it('renders without a label', () => {
     renderWithTheme(<TextField testID="bare-input" />)
     expect(screen.getByTestId('bare-input')).toBeTruthy()

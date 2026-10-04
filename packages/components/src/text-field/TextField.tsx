@@ -60,6 +60,10 @@ export function TextField({
   cursorColor,
   selectionColor,
   ref,
+  accessibilityLabel,
+  'aria-label': ariaLabel,
+  accessibilityHint,
+  accessibilityState,
   ...textInputProps
 }: TextFieldProps) {
   const theme = useTheme()
@@ -467,20 +471,27 @@ export function TextField({
               placeholderTextColor={colors.placeholderColor}
               multiline={multiline}
               style={inputStyleArr}
-              accessibilityLabel={label || undefined}
+              // The visible label is the default name. A consumer label wins,
+              // which is what a field with no visible label needs.
+              accessibilityLabel={
+                accessibilityLabel ?? ariaLabel ?? (label || undefined)
+              }
               // Both spellings here, unlike the Pressable-based components:
               // TextInput does not normalize `aria-*` into
               // `accessibilityState` the way View/Pressable do, so dropping
               // the nested object would lose the state on native — while
               // react-native-web 0.21 only reads the ARIA one.
               aria-disabled={isDisabled}
-              accessibilityState={{ disabled: isDisabled }}
+              accessibilityState={{
+                ...accessibilityState,
+                disabled: isDisabled,
+              }}
               // Supporting text — the error message when there is one — is
               // rendered as a sibling, so nothing connects it to the input
               // unless it's spelled out. Web reads the association off
               // `aria-describedby`; native has no equivalent and takes the
               // text as a hint instead.
-              accessibilityHint={displaySupportingText}
+              accessibilityHint={accessibilityHint ?? displaySupportingText}
               aria-describedby={
                 displaySupportingText ? supportingTextId : undefined
               }

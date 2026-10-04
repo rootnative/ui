@@ -58,6 +58,12 @@ export function createStyles(
         maxWidth: SEARCH_BAR_MAX_WIDTH,
       },
       pressableReset: { ...webOutlineReset },
+      // The trigger button fills the pill from behind the content.
+      triggerPress: {
+        ...StyleSheet.absoluteFill,
+        borderRadius: theme.shape.cornerFull,
+        ...webOutlineReset,
+      },
       container: {
         height: searchBarHeight(density),
         flexDirection: 'row',

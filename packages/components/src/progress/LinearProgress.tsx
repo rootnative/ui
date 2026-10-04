@@ -38,6 +38,7 @@ export function LinearProgress({
   thickness = PROGRESS_TRACK_HEIGHT,
   style,
   accessibilityLabel,
+  onLayout: onLayoutProp,
   ...rest
 }: LinearProgressProps) {
   const theme = useTheme()
@@ -64,6 +65,7 @@ export function LinearProgress({
   const onLayout = (e: LayoutChangeEvent) => {
     const w = e.nativeEvent.layout.width
     setWidth((prev) => (prev === w ? prev : w))
+    onLayoutProp?.(e)
   }
 
   // Determinate value, smoothly tweened to the latest prop.

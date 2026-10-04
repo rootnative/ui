@@ -5,7 +5,7 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { act, fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { AccessibilityInfo, StyleSheet, Text } from 'react-native'
 import { FAB } from '../fab'
 import { FAB_SIZES } from '../fab/styles'
 import { PortalHost } from '../portal/PortalHost'
@@ -153,6 +153,27 @@ describe('useSnackbar', () => {
 
     fireEvent.press(screen.getByLabelText('Dismiss'))
     expect(onDismiss).toHaveBeenCalledWith('close')
+  })
+
+  it('announces the message to VoiceOver on iOS', () => {
+    // The react-native preset runs as iOS, where `accessibilityLiveRegion`
+    // does nothing and only an explicit announcement reaches the reader.
+    // The react-native preset already stubs this method with a shared
+    // `jest.fn`, so clear what other tests left in it.
+    const announce = jest
+      .spyOn(AccessibilityInfo, 'announceForAccessibility')
+      .mockImplementation(() => {})
+    announce.mockClear()
+    renderProvider()
+
+    show({ message: 'Saved' })
+    expect(announce).toHaveBeenCalledWith('Saved')
+
+    // A replacement is a new message, so it speaks again.
+    show({ message: 'Undone', replace: true })
+    expect(announce).toHaveBeenLastCalledWith('Undone')
+    expect(announce).toHaveBeenCalledTimes(2)
+    announce.mockRestore()
   })
 
   it('warns about an indefinite snackbar with no way out', () => {

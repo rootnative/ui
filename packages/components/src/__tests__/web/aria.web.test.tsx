@@ -302,6 +302,29 @@ describe('a consumer role reaches the DOM', () => {
     expect(link.getAttribute('href')).toBe('/movie/19404')
   })
 
+  it('SearchBar — as a trigger, the consumer role names the bar', () => {
+    renderWeb(<SearchBar role="link" placeholder="Search" onPress={() => {}} />)
+    expect(screen.getByRole('link', { name: 'Search' })).toBeTruthy()
+    expect(screen.queryByRole('button')).toBeNull()
+  })
+
+  it('SearchBar — as a trigger, its buttons are siblings, not nested', () => {
+    renderWeb(
+      <SearchBar
+        placeholder="Search"
+        value="rain"
+        onPress={() => {}}
+        actions={[
+          { icon: 'microphone', accessibilityLabel: 'Voice', onPress() {} },
+        ]}
+      />,
+    )
+    // A <button> inside a <button> is invalid DOM. The trigger, the clear
+    // button and the action must each stand alone.
+    expect(document.querySelector('button button')).toBeNull()
+    expect(screen.getAllByRole('button')).toHaveLength(3)
+  })
+
   it('Card — pressable, with no role, stays a button', () => {
     renderWeb(
       <Card onPress={() => {}}>

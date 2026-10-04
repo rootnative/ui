@@ -107,6 +107,11 @@ export function Tooltip({
     if (open) dismiss()
   }, [open, dismiss])
 
+  // A rich tooltip is persistent: it has actions, and a mouse has to leave the
+  // anchor to reach them. Only the outside press, an action, or the Android
+  // back button take it down. A plain tooltip hides on hover out.
+  const hideOnHoverOut = isRich ? undefined : hide
+
   const { anchorRef, layerRef, measure, onOverlayLayout, position } =
     useAnchorPosition({
       active: open,
@@ -227,7 +232,7 @@ export function Tooltip({
         importantForAccessibility="no"
         tabIndex={-1}
         onHoverIn={isControlled ? undefined : show}
-        onHoverOut={isControlled ? undefined : hide}
+        onHoverOut={isControlled ? undefined : hideOnHoverOut}
         onLongPress={isControlled ? undefined : show}
       >
         {trigger}

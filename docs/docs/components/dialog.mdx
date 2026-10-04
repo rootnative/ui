@@ -70,6 +70,10 @@ fullscreen variant move the title and actions into its header.
 
 Any child that isn't one of these is treated as content, so `<Dialog><MyForm /></Dialog>` works without ceremony.
 
+The surface never grows past the screen. Content taller than the space left
+under the headline scrolls, and the headline and the actions stay in place, so
+the actions of a `dismissable={false}` dialog are always reachable.
+
 ## With an icon
 
 An icon makes the dialog a hero dialog: the icon sits centered above the headline
@@ -124,7 +128,9 @@ in `secondary`, and the headline centers with it.
 `variant="fullscreen"` fills the screen instead of centering a card. Dialog builds
 the MD3 header for you: a leading close button wired to `onDismiss`, the
 `Dialog.Title` as a `titleLarge` headline, and `Dialog.Actions` as the trailing
-confirming action. `Dialog.Content` scrolls below it. There is no scrim.
+confirming action. `Dialog.Content` scrolls below it. There is no scrim. The
+surface pads itself by the safe-area insets on every edge, so the header clears
+the status bar and the body clears the home indicator.
 
 <SnackExample
   name="RootNative Dialog — Full-screen"

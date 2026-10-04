@@ -1,6 +1,6 @@
 import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
-import { screen } from '@testing-library/react-native'
+import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
 import { Circle } from 'react-native-svg'
 import { CircularProgress } from '../progress/CircularProgress'
@@ -41,6 +41,16 @@ describe('LinearProgress', () => {
       <LinearProgress progress={0.5} accessibilityLabel="Loading" />,
     )
     expect(screen.getByLabelText('Loading')).toBeTruthy()
+  })
+
+  it('keeps a consumer onLayout beside its own width measurement', () => {
+    const onLayout = jest.fn()
+    renderWithTheme(<LinearProgress progress={0.5} onLayout={onLayout} />)
+    fireEvent(screen.getByRole('progressbar'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 240, height: 4 } },
+    })
+    expect(onLayout).toHaveBeenCalledTimes(1)
+    expect(onLayout.mock.calls[0][0].nativeEvent.layout.width).toBe(240)
   })
 })
 

@@ -15,6 +15,8 @@ import { pointerEvents } from '../internal/pointerEvents'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
+import { SafeAreaView } from '../safe-area'
+import type { Edge } from '../safe-area'
 import { DialogContext } from './context'
 import type { DialogContextValue } from './context'
 import {
@@ -26,6 +28,8 @@ import {
 } from './slots'
 import { FULLSCREEN_SLIDE, createDialogStyles } from './styles'
 import type { DialogProps } from './types'
+
+const FULLSCREEN_EDGES: Edge[] = ['top', 'right', 'bottom', 'left']
 
 interface Slots {
   icon: ReactNode[]
@@ -92,7 +96,7 @@ function DialogBasic({
     >
       {slots.icon}
       {slots.title}
-      {slots.content}
+      <ScrollView style={styles.body}>{slots.content}</ScrollView>
       {slots.actions}
     </View>
   )
@@ -120,9 +124,10 @@ function DialogFullscreen({
   surfaceRef: Ref<View>
 }) {
   return (
-    <View
+    <SafeAreaView
       {...rest}
       ref={surfaceRef}
+      edges={FULLSCREEN_EDGES}
       testID={testID}
       style={[styles.fullscreenContainer, style]}
       role={role ?? 'dialog'}
@@ -145,7 +150,7 @@ function DialogFullscreen({
         {slots.icon}
         {slots.content}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -224,7 +229,7 @@ export function Dialog({
               transition="spring-fast-effects"
             >
               <Pressable
-                style={styles.scrim}
+                style={styles.scrimPressArea}
                 onPress={dismissable ? onDismiss : undefined}
                 disabled={!dismissable}
                 accessibilityLabel={scrimAccessibilityLabel}

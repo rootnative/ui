@@ -232,6 +232,24 @@ describe('Tooltip — rich', () => {
     expect(screen.getByText('Got it')).toBeTruthy()
   })
 
+  it('stays up on hover out so the pointer can reach its actions', () => {
+    const onDismiss = jest.fn()
+    renderTooltip(
+      <TextAnchor
+        variant="rich"
+        actions={<Button variant="text">Got it</Button>}
+        onDismiss={onDismiss}
+      />,
+    )
+
+    fireEvent(screen.getByText('Info'), 'hoverIn')
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+
+    fireEvent(screen.getByText('Info'), 'hoverOut')
+    expect(onDismiss).not.toHaveBeenCalled()
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+  })
+
   it('dismisses on an outside press', () => {
     const onDismiss = jest.fn()
     renderRich({ onDismiss })

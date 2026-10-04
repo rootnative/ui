@@ -211,9 +211,12 @@ Both collapse to a hard cut under reduced motion — see [Motion](../motion.md).
 
 ## Accessibility
 
-The surface reports `role="alert"` with `accessibilityLiveRegion="polite"`, so screen
-readers announce the message without stealing focus. The close button is labelled
-"Dismiss" — override with `closeAccessibilityLabel`.
+The surface reports `role="alert"` with `accessibilityLiveRegion="polite"`, so
+TalkBack and web screen readers announce the message without stealing focus.
+iOS has no live region, so the snackbar also calls
+`AccessibilityInfo.announceForAccessibility` for VoiceOver when it mounts and
+when a replacement arrives. The close button is labelled "Dismiss" — override
+with `closeAccessibilityLabel`.
 
 ## SnackbarProvider Props
 

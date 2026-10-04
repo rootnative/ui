@@ -1,33 +1,36 @@
-interface RgbChannels {
+import { processColor } from 'react-native'
+
+interface Channels {
   r: number
   g: number
   b: number
+  a: number
 }
 
-function parseHexColor(color: string): RgbChannels | null {
-  const normalized = color.replace('#', '')
-
-  if (normalized.length !== 6 && normalized.length !== 8) {
-    return null
+/**
+ * Every colour form React Native accepts: 3, 4, 6 and 8 digit hex, `rgb()`,
+ * `rgba()`, `hsl()`, `hsla()`, `hwb()`, and the named colours.
+ * `processColor` returns an ARGB integer on every platform, so one parser
+ * serves native and web.
+ */
+function parseColor(color: string): Channels | null {
+  const argb = processColor(color)
+  if (typeof argb !== 'number') return null
+  return {
+    a: (argb >>> 24) & 0xff,
+    r: (argb >>> 16) & 0xff,
+    g: (argb >>> 8) & 0xff,
+    b: argb & 0xff,
   }
-
-  const r = Number.parseInt(normalized.slice(0, 2), 16)
-  const g = Number.parseInt(normalized.slice(2, 4), 16)
-  const b = Number.parseInt(normalized.slice(4, 6), 16)
-
-  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) {
-    return null
-  }
-
-  return { r, g, b }
 }
 
 function clampAlpha(alpha: number): number {
   return Math.max(0, Math.min(1, alpha))
 }
 
+/** The colour at the given alpha. An alpha the colour already had is replaced. */
 export function alphaColor(color: string, alpha: number): string {
-  const channels = parseHexColor(color)
+  const channels = parseColor(color)
   const boundedAlpha = clampAlpha(alpha)
 
   if (!channels) {
@@ -37,16 +40,21 @@ export function alphaColor(color: string, alpha: number): string {
   return `rgba(${channels.r}, ${channels.g}, ${channels.b}, ${boundedAlpha})`
 }
 
+/**
+ * The opaque result of `overlay` at `overlayAlpha` on top of `base`. A base
+ * that is not fully opaque has no single result, because the colour behind it
+ * is unknown, so the overlay is returned at its alpha instead.
+ */
 export function blendColor(
   base: string,
   overlay: string,
   overlayAlpha: number,
 ): string {
-  const baseChannels = parseHexColor(base)
-  const overlayChannels = parseHexColor(overlay)
+  const baseChannels = parseColor(base)
+  const overlayChannels = parseColor(overlay)
   const boundedAlpha = clampAlpha(overlayAlpha)
 
-  if (!baseChannels || !overlayChannels) {
+  if (!baseChannels || !overlayChannels || baseChannels.a < 0xff) {
     return alphaColor(overlay, boundedAlpha)
   }
 

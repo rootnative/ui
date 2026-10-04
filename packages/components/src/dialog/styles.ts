@@ -42,6 +42,11 @@ export function createDialogStyles(
       ...StyleSheet.absoluteFill,
       backgroundColor: alphaColor(theme.colors.scrim, DIALOG_SCRIM_OPACITY),
     },
+    // The press target inside the scrim stays transparent. A second 32% layer
+    // on top of the first composites to about 54%.
+    scrimPressArea: {
+      ...StyleSheet.absoluteFill,
+    },
     // Centering layer for the basic variant. `box-none` so taps on the empty
     // area fall through to the scrim below and dismiss.
     centerLayer: {
@@ -57,10 +62,20 @@ export function createDialogStyles(
       minWidth: DIALOG_MIN_WIDTH,
       maxWidth: DIALOG_MAX_WIDTH,
       width: '100%',
+      // The center layer pads the screen, so 100% here is the screen minus
+      // that padding. The body below shrinks first, so icon, headline and
+      // actions keep their height and only the supporting content scrolls.
+      maxHeight: '100%',
       padding: DIALOG_PADDING,
       borderRadius: theme.shape.cornerExtraLarge,
       backgroundColor: surfaceColor,
       ...elevationStyle(theme.elevation.level3),
+    },
+    // Scrolls the supporting content of a basic dialog. `flexGrow: 0` so a
+    // short body does not stretch the surface.
+    body: {
+      flexGrow: 0,
+      flexShrink: 1,
     },
     fullscreenContainer: {
       flex: 1,

@@ -1,11 +1,13 @@
 import { lightTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import {
   getStyle,
   renderSettled,
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { fireEvent, screen, within } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Button } from '../button'
 import { Dialog } from '../dialog'
 import { PortalHost } from '../portal/PortalHost'
@@ -197,6 +199,49 @@ describe('Dialog', () => {
     expect(onDismiss).not.toHaveBeenCalled()
   })
 
+  it('paints the scrim once, at 32%', async () => {
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>Title</Dialog.Title>
+      </Dialog>,
+    )
+    const layer = await screen.findByTestId('dialog-scrim')
+    expect(getStyle(layer).backgroundColor).toBe(
+      alphaColor(lightTheme.colors.scrim, 0.32),
+    )
+
+    // The press target inside the layer must stay transparent. A second 32%
+    // layer composites to about 54%.
+    const pressArea = screen.getByLabelText('Close dialog')
+    expect(StyleSheet.flatten(pressArea.props.style).backgroundColor).toBe(
+      undefined,
+    )
+  })
+
+  it('caps the surface height and scrolls the content', async () => {
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>Title</Dialog.Title>
+        <Dialog.Content>body</Dialog.Content>
+        <Dialog.Actions>
+          <Text>action</Text>
+        </Dialog.Actions>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(getStyle(surface).maxHeight).toBe('100%')
+
+    const body = surface.findByType(ScrollView)
+    expect(within(body).getByText('body')).toBeTruthy()
+    // Headline and actions stay outside the scrolling body.
+    expect(within(body).queryByText('Title')).toBeNull()
+    expect(within(body).queryByText('action')).toBeNull()
+    expect(StyleSheet.flatten(body.props.style)).toMatchObject({
+      flexGrow: 0,
+      flexShrink: 1,
+    })
+  })
+
   it('throws when a slot is used outside a Dialog', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => renderWithTheme(<Dialog.Title>orphan</Dialog.Title>)).toThrow(
@@ -232,6 +277,34 @@ describe('Dialog — fullscreen', () => {
 
     fireEvent.press(screen.getByLabelText('Close'))
     expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('pads the surface by the safe-area insets', async () => {
+    const insets = { top: 47, right: 0, bottom: 34, left: 0 }
+    renderWithTheme(
+      <SafeAreaProvider
+        initialMetrics={{
+          insets,
+          frame: { x: 0, y: 0, width: 402, height: 874 },
+        }}
+      >
+        <PortalHost>
+          <Dialog
+            visible
+            variant="fullscreen"
+            onDismiss={jest.fn()}
+            testID="dialog"
+          >
+            <Dialog.Title>Title</Dialog.Title>
+          </Dialog>
+        </PortalHost>
+      </SafeAreaProvider>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(getStyle(surface)).toMatchObject({
+      paddingTop: 47,
+      paddingBottom: 34,
+    })
   })
 
   it('renders no scrim', async () => {
