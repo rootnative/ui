@@ -1,4 +1,11 @@
-import { Card, Column, Icon, Row, Typography } from '@rootnative/components'
+import {
+  Card,
+  Column,
+  Container,
+  Icon,
+  Row,
+  Typography,
+} from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
@@ -21,7 +28,7 @@ function IconScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Sizes</Typography>
@@ -101,7 +108,7 @@ function IconScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -113,11 +120,5 @@ export default function IconScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
 })

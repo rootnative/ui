@@ -1,6 +1,7 @@
 import {
   CircularProgress,
   Column,
+  Container,
   LinearProgress,
   Row,
   Typography,
@@ -26,89 +27,95 @@ export default function ProgressScreen() {
   const captionStyle = { color: theme.colors.onSurfaceVariant }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — determinate</Typography>
-        <LinearProgress progress={value} />
-        <Typography variant="bodySmall" style={captionStyle}>
-          {Math.round(value * 100)}%
-        </Typography>
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — fixed values</Typography>
-        <LinearProgress progress={0} />
-        <LinearProgress progress={0.35} />
-        <LinearProgress progress={0.7} />
-        <LinearProgress progress={1} />
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — indeterminate</Typography>
-        <LinearProgress />
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — no stop indicator</Typography>
-        <LinearProgress progress={value} stopIndicator={false} />
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — custom thickness</Typography>
-        <LinearProgress progress={value} thickness={8} />
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Linear — custom colors</Typography>
-        <LinearProgress
-          progress={value}
-          containerColor="#C8E6C9"
-          contentColor="#2E7D32"
-        />
-      </Column>
-
-      <Column gap="md">
-        <Typography variant="titleSmall">Circular — determinate</Typography>
-        <Row gap="lg" align="center">
-          <CircularProgress progress={value} />
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="md">
+          <Typography variant="titleSmall">Linear — determinate</Typography>
+          <LinearProgress progress={value} />
           <Typography variant="bodySmall" style={captionStyle}>
             {Math.round(value * 100)}%
           </Typography>
-        </Row>
-      </Column>
+        </Column>
 
-      <Column gap="md">
-        <Typography variant="titleSmall">Circular — sizes</Typography>
-        <Row gap="lg" align="center">
-          <CircularProgress progress={value} size={24} thickness={3} />
-          <CircularProgress progress={value} size={40} />
-          <CircularProgress progress={value} size={56} thickness={5} />
-          <CircularProgress progress={value} size={72} thickness={6} />
-        </Row>
-      </Column>
+        <Column gap="md">
+          <Typography variant="titleSmall">Linear — fixed values</Typography>
+          <LinearProgress progress={0} />
+          <LinearProgress progress={0.35} />
+          <LinearProgress progress={0.7} />
+          <LinearProgress progress={1} />
+        </Column>
 
-      <Column gap="md">
-        <Typography variant="titleSmall">Circular — indeterminate</Typography>
-        <Row gap="lg" align="center">
-          <CircularProgress size={24} thickness={3} />
-          <CircularProgress />
-          <CircularProgress size={56} thickness={5} />
-        </Row>
-      </Column>
+        <Column gap="md">
+          <Typography variant="titleSmall">Linear — indeterminate</Typography>
+          <LinearProgress />
+        </Column>
 
-      <Column gap="md">
-        <Typography variant="titleSmall">Circular — custom colors</Typography>
-        <Row gap="lg" align="center">
-          <CircularProgress
+        <Column gap="md">
+          <Typography variant="titleSmall">
+            Linear — no stop indicator
+          </Typography>
+          <LinearProgress progress={value} stopIndicator={false} />
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">
+            Linear — custom thickness
+          </Typography>
+          <LinearProgress progress={value} thickness={8} />
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Linear — custom colors</Typography>
+          <LinearProgress
             progress={value}
-            containerColor="#FFCDD2"
-            contentColor="#D32F2F"
+            containerColor="#C8E6C9"
+            contentColor="#2E7D32"
           />
-          <CircularProgress containerColor="#BBDEFB" contentColor="#1976D2" />
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Circular — determinate</Typography>
+          <Row gap="lg" align="center">
+            <CircularProgress progress={value} />
+            <Typography variant="bodySmall" style={captionStyle}>
+              {Math.round(value * 100)}%
+            </Typography>
+          </Row>
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Circular — sizes</Typography>
+          <Row gap="lg" align="center">
+            <CircularProgress progress={value} size={24} thickness={3} />
+            <CircularProgress progress={value} size={40} />
+            <CircularProgress progress={value} size={56} thickness={5} />
+            <CircularProgress progress={value} size={72} thickness={6} />
+          </Row>
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Circular — indeterminate</Typography>
+          <Row gap="lg" align="center">
+            <CircularProgress size={24} thickness={3} />
+            <CircularProgress />
+            <CircularProgress size={56} thickness={5} />
+          </Row>
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Circular — custom colors</Typography>
+          <Row gap="lg" align="center">
+            <CircularProgress
+              progress={value}
+              containerColor="#FFCDD2"
+              contentColor="#D32F2F"
+            />
+            <CircularProgress containerColor="#BBDEFB" contentColor="#1976D2" />
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -116,9 +123,5 @@ export default function ProgressScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
 })

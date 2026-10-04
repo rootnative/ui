@@ -1,4 +1,10 @@
-import { Button, Column, Row, Typography } from '@rootnative/components'
+import {
+  Button,
+  Column,
+  Container,
+  Row,
+  Typography,
+} from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -8,126 +14,128 @@ const sizes = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const
 
 export default function ButtonScreen() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Variants</Typography>
-        <Row wrap gap="sm">
-          {variants.map((variant) => (
-            <Button key={variant} variant={variant}>
-              {`${variant} button`}
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Variants</Typography>
+          <Row wrap gap="sm">
+            {variants.map((variant) => (
+              <Button key={variant} variant={variant}>
+                {`${variant} button`}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Disabled Variants</Typography>
+          <Row wrap gap="sm">
+            {variants.map((variant) => (
+              <Button key={`disabled-${variant}`} variant={variant} disabled>
+                {`${variant} button`}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Buttons: With Icons</Typography>
+          <Row wrap gap="sm">
+            <Button variant="filled" leadingIcon="plus">
+              Add Item
             </Button>
-          ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Disabled Variants</Typography>
-        <Row wrap gap="sm">
-          {variants.map((variant) => (
-            <Button key={`disabled-${variant}`} variant={variant} disabled>
-              {`${variant} button`}
+            <Button variant="outlined" trailingIcon="arrow-right">
+              Continue
             </Button>
-          ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Buttons: With Icons</Typography>
-        <Row wrap gap="sm">
-          <Button variant="filled" leadingIcon="plus">
-            Add Item
-          </Button>
-          <Button variant="outlined" trailingIcon="arrow-right">
-            Continue
-          </Button>
-          <Button
-            variant="tonal"
-            leadingIcon="heart-outline"
-            trailingIcon="share-variant"
-          >
-            Favorite
-          </Button>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
-        <Row wrap gap="sm" align="center">
-          {sizes.map((size) => (
-            <Button key={size} size={size} leadingIcon="plus">
-              {size.toUpperCase()}
+            <Button
+              variant="tonal"
+              leadingIcon="heart-outline"
+              trailingIcon="share-variant"
+            >
+              Favorite
             </Button>
-          ))}
-        </Row>
-      </Column>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Square Shape</Typography>
-        <Row wrap gap="sm" align="center">
-          {sizes.map((size) => (
-            <Button key={size} size={size} shape="square">
-              {size.toUpperCase()}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
+          <Row wrap gap="sm" align="center">
+            {sizes.map((size) => (
+              <Button key={size} size={size} leadingIcon="plus">
+                {size.toUpperCase()}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Square Shape</Typography>
+          <Row wrap gap="sm" align="center">
+            {sizes.map((size) => (
+              <Button key={size} size={size} shape="square">
+                {size.toUpperCase()}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Icon Size</Typography>
+          <Typography variant="bodySmall" style={styles.muted}>
+            iconSize overrides the size-derived icon size (20 dp at size s).
+          </Typography>
+          <Row wrap gap="sm" align="center">
+            <Button leadingIcon="plus" iconSize={14}>
+              14 dp
             </Button>
-          ))}
-        </Row>
-      </Column>
+            <Button leadingIcon="plus">Default</Button>
+            <Button leadingIcon="plus" iconSize={28}>
+              28 dp
+            </Button>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Icon Size</Typography>
-        <Typography variant="bodySmall" style={styles.muted}>
-          iconSize overrides the size-derived icon size (20 dp at size s).
-        </Typography>
-        <Row wrap gap="sm" align="center">
-          <Button leadingIcon="plus" iconSize={14}>
-            14 dp
-          </Button>
-          <Button leadingIcon="plus">Default</Button>
-          <Button leadingIcon="plus" iconSize={28}>
-            28 dp
-          </Button>
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Label Style</Typography>
+          <Typography variant="bodySmall" style={styles.muted}>
+            labelStyle affects the text only — icons keep the size and color
+            derived from the variant.
+          </Typography>
+          <Row wrap gap="sm" align="center">
+            <Button
+              variant="tonal"
+              leadingIcon="rocket-launch-outline"
+              labelStyle={styles.brandLabel}
+            >
+              Launch
+            </Button>
+            <Button variant="outlined" labelStyle={styles.italicLabel}>
+              Read more
+            </Button>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Label Style</Typography>
-        <Typography variant="bodySmall" style={styles.muted}>
-          labelStyle affects the text only — icons keep the size and color
-          derived from the variant.
-        </Typography>
-        <Row wrap gap="sm" align="center">
-          <Button
-            variant="tonal"
-            leadingIcon="rocket-launch-outline"
-            labelStyle={styles.brandLabel}
-          >
-            Launch
-          </Button>
-          <Button variant="outlined" labelStyle={styles.italicLabel}>
-            Read more
-          </Button>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Colors</Typography>
-        <Row wrap gap="sm">
-          <Button containerColor="#B00020" contentColor="#FFFFFF">
-            Danger
-          </Button>
-          <Button variant="outlined" contentColor="#00796B">
-            Teal Bold
-          </Button>
-          <Button
-            variant="tonal"
-            containerColor="#E8DEF8"
-            contentColor="#4A148C"
-          >
-            Custom Tonal
-          </Button>
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Colors</Typography>
+          <Row wrap gap="sm">
+            <Button containerColor="#B00020" contentColor="#FFFFFF">
+              Danger
+            </Button>
+            <Button variant="outlined" contentColor="#00796B">
+              Teal Bold
+            </Button>
+            <Button
+              variant="tonal"
+              containerColor="#E8DEF8"
+              contentColor="#4A148C"
+            >
+              Custom Tonal
+            </Button>
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -135,10 +143,6 @@ export default function ButtonScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
   muted: {
     opacity: 0.7,

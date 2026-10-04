@@ -1,9 +1,10 @@
 import {
   Card,
   Column,
+  Container,
   NavigationBar,
-  Typography,
   type NavigationBarItem,
+  Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
@@ -49,7 +50,7 @@ function NavigationBarScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Default</Typography>
@@ -125,7 +126,7 @@ function NavigationBarScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -137,11 +138,5 @@ export default function NavigationBarScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
 })

@@ -1,4 +1,9 @@
-import { ButtonGroup, Column, Typography } from '@rootnative/components'
+import {
+  ButtonGroup,
+  Column,
+  Container,
+  Typography,
+} from '@rootnative/components'
 import type { ButtonGroupItem, ButtonGroupSize } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
@@ -48,175 +53,182 @@ export default function ButtonGroupScreen() {
   ])
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Typography variant="bodyMedium" style={styles.muted}>
-        MD3 Expressive Button Groups — replaces the deprecated Segmented Button.
-      </Typography>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Standard · single select</Typography>
-        <ButtonGroup
-          variant="standard"
-          selectionMode="single"
-          value={alignment}
-          onValueChange={setAlignment}
-          items={alignmentItems}
-        />
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Standard · multiple select</Typography>
-        <ButtonGroup
-          variant="standard"
-          selectionMode="multiple"
-          value={formatting}
-          onValueChange={setFormatting}
-          items={formattingItems}
-        />
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Connected · single select</Typography>
-        <ButtonGroup
-          variant="connected"
-          selectionMode="single"
-          value={connectedAlignment}
-          onValueChange={setConnectedAlignment}
-          items={alignmentItems}
-        />
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">
-          Connected · multiple select
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap="lg">
+        <ScreenIntro />
+        <Typography variant="bodyMedium" style={styles.muted}>
+          MD3 Expressive Button Groups — replaces the deprecated Segmented
+          Button.
         </Typography>
-        <ButtonGroup
-          variant="connected"
-          selectionMode="multiple"
-          value={connectedFormatting}
-          onValueChange={setConnectedFormatting}
-          items={formattingItems}
-        />
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Standard · actions only</Typography>
-        <Typography variant="bodySmall" style={styles.muted}>
-          selectionMode=&quot;none&quot; — items act as standalone buttons.
-        </Typography>
-        <ButtonGroup
-          variant="standard"
-          selectionMode="none"
-          items={actionItems}
-          onItemPress={() => {}}
-        />
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Standard · single select</Typography>
+          <ButtonGroup
+            variant="standard"
+            selectionMode="single"
+            value={alignment}
+            onValueChange={setAlignment}
+            items={alignmentItems}
+          />
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Sizes</Typography>
-        {sizes.map((size) => (
-          <Column key={size} gap="xs">
-            <Typography variant="labelSmall" style={styles.muted}>
-              {size}
-            </Typography>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.sizeScrollContent}
-            >
-              <ButtonGroup
-                variant="connected"
-                selectionMode="single"
-                size={size}
-                defaultValue="center"
-                items={[
-                  {
-                    value: 'left',
-                    leadingIcon: 'format-align-left',
-                    accessibilityLabel: 'Align left',
-                  },
-                  {
-                    value: 'center',
-                    leadingIcon: 'format-align-center',
-                    accessibilityLabel: 'Align center',
-                  },
-                  {
-                    value: 'right',
-                    leadingIcon: 'format-align-right',
-                    accessibilityLabel: 'Align right',
-                  },
-                ]}
-              />
-            </ScrollView>
-          </Column>
-        ))}
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            Standard · multiple select
+          </Typography>
+          <ButtonGroup
+            variant="standard"
+            selectionMode="multiple"
+            value={formatting}
+            onValueChange={setFormatting}
+            items={formattingItems}
+          />
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Disabled</Typography>
-        <ButtonGroup
-          variant="connected"
-          selectionMode="single"
-          defaultValue="b"
-          disabled
-          items={[
-            { value: 'a', label: 'One' },
-            { value: 'b', label: 'Two' },
-            { value: 'c', label: 'Three' },
-          ]}
-        />
-        <Typography variant="bodySmall" style={styles.muted}>
-          Per-item disabled
-        </Typography>
-        <ButtonGroup
-          variant="standard"
-          selectionMode="single"
-          defaultValue="a"
-          items={[
-            { value: 'a', label: 'Available' },
-            { value: 'b', label: 'Locked', disabled: true },
-            { value: 'c', label: 'Available' },
-          ]}
-        />
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            Connected · single select
+          </Typography>
+          <ButtonGroup
+            variant="connected"
+            selectionMode="single"
+            value={connectedAlignment}
+            onValueChange={setConnectedAlignment}
+            items={alignmentItems}
+          />
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">
-          Icon size &amp; label style
-        </Typography>
-        <Typography variant="bodySmall" style={styles.muted}>
-          iconSize overrides the size-derived icon size for every item;
-          labelStyle applies to every item label.
-        </Typography>
-        <ButtonGroup
-          variant="standard"
-          selectionMode="single"
-          defaultValue="center"
-          iconSize={28}
-          labelStyle={styles.brandLabel}
-          items={alignmentItems}
-        />
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            Connected · multiple select
+          </Typography>
+          <ButtonGroup
+            variant="connected"
+            selectionMode="multiple"
+            value={connectedFormatting}
+            onValueChange={setConnectedFormatting}
+            items={formattingItems}
+          />
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom colors</Typography>
-        <ButtonGroup
-          variant="connected"
-          selectionMode="single"
-          defaultValue="b"
-          containerColor="#E8DEF8"
-          contentColor="#4A148C"
-          selectedContainerColor="#6750A4"
-          selectedContentColor="#FFFFFF"
-          items={[
-            { value: 'a', label: 'Day', leadingIcon: 'weather-sunny' },
-            { value: 'b', label: 'Night', leadingIcon: 'weather-night' },
-            { value: 'c', label: 'Auto', leadingIcon: 'theme-light-dark' },
-          ]}
-        />
-      </Column>
-      <ScreenNavFooter />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Standard · actions only</Typography>
+          <Typography variant="bodySmall" style={styles.muted}>
+            selectionMode=&quot;none&quot; — items act as standalone buttons.
+          </Typography>
+          <ButtonGroup
+            variant="standard"
+            selectionMode="none"
+            items={actionItems}
+            onItemPress={() => {}}
+          />
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Sizes</Typography>
+          {sizes.map((size) => (
+            <Column key={size} gap="xs">
+              <Typography variant="labelSmall" style={styles.muted}>
+                {size}
+              </Typography>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.sizeScrollContent}
+              >
+                <ButtonGroup
+                  variant="connected"
+                  selectionMode="single"
+                  size={size}
+                  defaultValue="center"
+                  items={[
+                    {
+                      value: 'left',
+                      leadingIcon: 'format-align-left',
+                      accessibilityLabel: 'Align left',
+                    },
+                    {
+                      value: 'center',
+                      leadingIcon: 'format-align-center',
+                      accessibilityLabel: 'Align center',
+                    },
+                    {
+                      value: 'right',
+                      leadingIcon: 'format-align-right',
+                      accessibilityLabel: 'Align right',
+                    },
+                  ]}
+                />
+              </ScrollView>
+            </Column>
+          ))}
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Disabled</Typography>
+          <ButtonGroup
+            variant="connected"
+            selectionMode="single"
+            defaultValue="b"
+            disabled
+            items={[
+              { value: 'a', label: 'One' },
+              { value: 'b', label: 'Two' },
+              { value: 'c', label: 'Three' },
+            ]}
+          />
+          <Typography variant="bodySmall" style={styles.muted}>
+            Per-item disabled
+          </Typography>
+          <ButtonGroup
+            variant="standard"
+            selectionMode="single"
+            defaultValue="a"
+            items={[
+              { value: 'a', label: 'Available' },
+              { value: 'b', label: 'Locked', disabled: true },
+              { value: 'c', label: 'Available' },
+            ]}
+          />
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            Icon size &amp; label style
+          </Typography>
+          <Typography variant="bodySmall" style={styles.muted}>
+            iconSize overrides the size-derived icon size for every item;
+            labelStyle applies to every item label.
+          </Typography>
+          <ButtonGroup
+            variant="standard"
+            selectionMode="single"
+            defaultValue="center"
+            iconSize={28}
+            labelStyle={styles.brandLabel}
+            items={alignmentItems}
+          />
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom colors</Typography>
+          <ButtonGroup
+            variant="connected"
+            selectionMode="single"
+            defaultValue="b"
+            containerColor="#E8DEF8"
+            contentColor="#4A148C"
+            selectedContainerColor="#6750A4"
+            selectedContentColor="#FFFFFF"
+            items={[
+              { value: 'a', label: 'Day', leadingIcon: 'weather-sunny' },
+              { value: 'b', label: 'Night', leadingIcon: 'weather-night' },
+              { value: 'c', label: 'Auto', leadingIcon: 'theme-light-dark' },
+            ]}
+          />
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -224,10 +236,6 @@ export default function ButtonGroupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 24,
   },
   muted: {
     opacity: 0.7,

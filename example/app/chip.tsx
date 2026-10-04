@@ -1,4 +1,10 @@
-import { Chip, Column, Row, Typography } from '@rootnative/components'
+import {
+  Chip,
+  Column,
+  Container,
+  Row,
+  Typography,
+} from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
@@ -17,161 +23,163 @@ export default function ChipScreen() {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }))
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Variants</Typography>
-        <Row wrap gap="sm">
-          <Chip variant="assist">assist</Chip>
-          <Chip variant="filter">filter</Chip>
-          <Chip variant="input">input</Chip>
-          <Chip variant="suggestion">suggestion</Chip>
-        </Row>
-      </Column>
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Variants</Typography>
+          <Row wrap gap="sm">
+            <Chip variant="assist">assist</Chip>
+            <Chip variant="filter">filter</Chip>
+            <Chip variant="input">input</Chip>
+            <Chip variant="suggestion">suggestion</Chip>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Elevated</Typography>
-        <Row wrap gap="sm">
-          <Chip variant="assist" elevated>
-            Assist
-          </Chip>
-          <Chip variant="filter" elevated>
-            Filter
-          </Chip>
-          <Chip variant="filter" elevated selected>
-            Selected
-          </Chip>
-          <Chip variant="suggestion" elevated>
-            Suggestion
-          </Chip>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Filter Chips (Toggle)</Typography>
-        <Row wrap gap="sm">
-          {Object.entries(filters).map(([label, active]) => (
-            <Chip
-              key={label}
-              variant="filter"
-              selected={active}
-              onPress={() => toggleFilter(label)}
-              onClose={active ? () => toggleFilter(label) : undefined}
-            >
-              {label}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Elevated</Typography>
+          <Row wrap gap="sm">
+            <Chip variant="assist" elevated>
+              Assist
             </Chip>
-          ))}
-        </Row>
-      </Column>
+            <Chip variant="filter" elevated>
+              Filter
+            </Chip>
+            <Chip variant="filter" elevated selected>
+              Selected
+            </Chip>
+            <Chip variant="suggestion" elevated>
+              Suggestion
+            </Chip>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">With Leading Icons</Typography>
-        <Row wrap gap="sm">
-          <Chip variant="assist" leadingIcon="calendar">
-            Schedule
-          </Chip>
-          <Chip variant="suggestion" leadingIcon="lightbulb-outline">
-            Idea
-          </Chip>
-          <Chip variant="input" leadingIcon="tag">
-            Tagged
-          </Chip>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Input Chips with Close</Typography>
-        <Row wrap gap="sm">
-          <Chip
-            variant="input"
-            onClose={() => Alert.alert('Removed', 'React Native')}
-          >
-            React Native
-          </Chip>
-          <Chip
-            variant="input"
-            leadingIcon="language-typescript"
-            onClose={() => Alert.alert('Removed', 'TypeScript')}
-          >
-            TypeScript
-          </Chip>
-          <Chip
-            variant="input"
-            avatar={
-              <View
-                style={[
-                  styles.avatar,
-                  { backgroundColor: theme.colors.secondaryContainer },
-                ]}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Filter Chips (Toggle)</Typography>
+          <Row wrap gap="sm">
+            {Object.entries(filters).map(([label, active]) => (
+              <Chip
+                key={label}
+                variant="filter"
+                selected={active}
+                onPress={() => toggleFilter(label)}
+                onClose={active ? () => toggleFilter(label) : undefined}
               >
-                <Typography variant="labelSmall">JD</Typography>
-              </View>
-            }
-            onClose={() => Alert.alert('Removed', 'John Doe')}
-          >
-            John Doe
-          </Chip>
-        </Row>
-      </Column>
+                {label}
+              </Chip>
+            ))}
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Disabled</Typography>
-        <Row wrap gap="sm">
-          <Chip variant="assist" disabled>
-            assist
-          </Chip>
-          <Chip variant="filter" disabled>
-            filter
-          </Chip>
-          <Chip variant="input" disabled>
-            input
-          </Chip>
-          <Chip variant="suggestion" disabled>
-            suggestion
-          </Chip>
-          <Chip variant="filter" selected disabled>
-            Selected
-          </Chip>
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">With Leading Icons</Typography>
+          <Row wrap gap="sm">
+            <Chip variant="assist" leadingIcon="calendar">
+              Schedule
+            </Chip>
+            <Chip variant="suggestion" leadingIcon="lightbulb-outline">
+              Idea
+            </Chip>
+            <Chip variant="input" leadingIcon="tag">
+              Tagged
+            </Chip>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">
-          Icon Size &amp; Label Style
-        </Typography>
-        <Row wrap gap="sm" align="center">
-          <Chip variant="assist" leadingIcon="calendar" iconSize={14}>
-            iconSize 14
-          </Chip>
-          <Chip variant="assist" leadingIcon="calendar">
-            Default 18
-          </Chip>
-          <Chip variant="assist" leadingIcon="calendar" iconSize={24}>
-            iconSize 24
-          </Chip>
-          <Chip
-            variant="suggestion"
-            leadingIcon="lightbulb-outline"
-            labelStyle={styles.brandLabel}
-          >
-            labelStyle
-          </Chip>
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Input Chips with Close</Typography>
+          <Row wrap gap="sm">
+            <Chip
+              variant="input"
+              onClose={() => Alert.alert('Removed', 'React Native')}
+            >
+              React Native
+            </Chip>
+            <Chip
+              variant="input"
+              leadingIcon="language-typescript"
+              onClose={() => Alert.alert('Removed', 'TypeScript')}
+            >
+              TypeScript
+            </Chip>
+            <Chip
+              variant="input"
+              avatar={
+                <View
+                  style={[
+                    styles.avatar,
+                    { backgroundColor: theme.colors.secondaryContainer },
+                  ]}
+                >
+                  <Typography variant="labelSmall">JD</Typography>
+                </View>
+              }
+              onClose={() => Alert.alert('Removed', 'John Doe')}
+            >
+              John Doe
+            </Chip>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Colors</Typography>
-        <Row wrap gap="sm">
-          <Chip containerColor="#B00020" contentColor="#FFFFFF">
-            Danger
-          </Chip>
-          <Chip containerColor="#E8F5E9" contentColor="#2E7D32">
-            Success
-          </Chip>
-          <Chip contentColor="#00796B">Teal</Chip>
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Disabled</Typography>
+          <Row wrap gap="sm">
+            <Chip variant="assist" disabled>
+              assist
+            </Chip>
+            <Chip variant="filter" disabled>
+              filter
+            </Chip>
+            <Chip variant="input" disabled>
+              input
+            </Chip>
+            <Chip variant="suggestion" disabled>
+              suggestion
+            </Chip>
+            <Chip variant="filter" selected disabled>
+              Selected
+            </Chip>
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            Icon Size &amp; Label Style
+          </Typography>
+          <Row wrap gap="sm" align="center">
+            <Chip variant="assist" leadingIcon="calendar" iconSize={14}>
+              iconSize 14
+            </Chip>
+            <Chip variant="assist" leadingIcon="calendar">
+              Default 18
+            </Chip>
+            <Chip variant="assist" leadingIcon="calendar" iconSize={24}>
+              iconSize 24
+            </Chip>
+            <Chip
+              variant="suggestion"
+              leadingIcon="lightbulb-outline"
+              labelStyle={styles.brandLabel}
+            >
+              labelStyle
+            </Chip>
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Colors</Typography>
+          <Row wrap gap="sm">
+            <Chip containerColor="#B00020" contentColor="#FFFFFF">
+              Danger
+            </Chip>
+            <Chip containerColor="#E8F5E9" contentColor="#2E7D32">
+              Success
+            </Chip>
+            <Chip contentColor="#00796B">Teal</Chip>
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -179,10 +187,6 @@ export default function ChipScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
   avatar: {
     width: 24,

@@ -1,4 +1,4 @@
-import { Column, FAB, Row, Typography } from '@rootnative/components'
+import { Column, Container, FAB, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -18,79 +18,81 @@ const sizes = [
 
 export default function FABScreen() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Variants</Typography>
-        <Row gap="lg" wrap>
-          {variants.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
-              <FAB
-                icon="plus"
-                variant={option.value}
-                accessibilityLabel={`${option.label} FAB`}
-              />
-              <Typography variant="labelSmall">{option.label}</Typography>
-            </Column>
-          ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Sizes</Typography>
-        <Row gap="lg" align="center">
-          {sizes.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
-              <FAB
-                icon="plus"
-                size={option.value}
-                accessibilityLabel={`${option.label} FAB`}
-              />
-              <Typography variant="labelSmall">{option.label}</Typography>
-            </Column>
-          ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Extended</Typography>
-        <Column gap="md" align="flex-start">
-          <FAB icon="plus" label="Compose" />
-          <FAB
-            icon="map-marker-outline"
-            label="Add location"
-            variant="tertiary"
-          />
-          <FAB icon="pencil-outline" label="Edit" variant="surface" />
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Variants</Typography>
+          <Row gap="lg" wrap>
+            {variants.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <FAB
+                  icon="plus"
+                  variant={option.value}
+                  accessibilityLabel={`${option.label} FAB`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Colors</Typography>
-        <Row gap="md" align="center">
-          <FAB
-            icon="heart"
-            containerColor="#B00020"
-            contentColor="#FFFFFF"
-            accessibilityLabel="Favorite"
-          />
-          <FAB
-            icon="star"
-            label="Star"
-            containerColor="#FFB300"
-            contentColor="#1F1300"
-          />
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Sizes</Typography>
+          <Row gap="lg" align="center">
+            {sizes.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <FAB
+                  icon="plus"
+                  size={option.value}
+                  accessibilityLabel={`${option.label} FAB`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Disabled</Typography>
-        <Row gap="md" align="center">
-          <FAB icon="plus" disabled accessibilityLabel="Add" />
-          <FAB icon="plus" label="Compose" disabled />
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Extended</Typography>
+          <Column gap="md" align="flex-start">
+            <FAB icon="plus" label="Compose" />
+            <FAB
+              icon="map-marker-outline"
+              label="Add location"
+              variant="tertiary"
+            />
+            <FAB icon="pencil-outline" label="Edit" variant="surface" />
+          </Column>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Colors</Typography>
+          <Row gap="md" align="center">
+            <FAB
+              icon="heart"
+              containerColor="#B00020"
+              contentColor="#FFFFFF"
+              accessibilityLabel="Favorite"
+            />
+            <FAB
+              icon="star"
+              label="Star"
+              containerColor="#FFB300"
+              contentColor="#1F1300"
+            />
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Disabled</Typography>
+          <Row gap="md" align="center">
+            <FAB icon="plus" disabled accessibilityLabel="Add" />
+            <FAB icon="plus" label="Compose" disabled />
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -98,9 +100,5 @@ export default function FABScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
 })

@@ -427,7 +427,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `icon` | — | Any IconSource (name, element, or render function) rendered through the theme's iconResolver, decorative or labelled |
 | `icon-button` | — | Icon-only button with 4 variants (filled, tonal, outlined, standard) and toggle support |
 | `keyboard-avoiding-wrapper` | — | Zero-config keyboard-aware wrapper with platform-specific behavior for form layouts |
-| `layout` | — | Layout primitives: Box, Row, Column, Grid (flexbox utilities), and Layout (SafeAreaView wrapper) |
+| `layout` | — | Layout primitives: Box, Row, Column, Container (a centred column with a maximum width), Grid (flexbox utilities), and Layout (SafeAreaView wrapper) |
 | `list` | divider | List container with interactive items, supporting headline/trailing text and dividers |
 | `loading-indicator` | — | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
 | `menu` | portal | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility |

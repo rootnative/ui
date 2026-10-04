@@ -1,5 +1,6 @@
 import {
   Column,
+  Container,
   List,
   ListItem,
   SearchBar,
@@ -8,7 +9,7 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useMemo, useRef, useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -44,66 +45,60 @@ export default function SearchViewScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <ScreenIntro />
+    <ScrollView>
+      <Container width="expanded" p="lg" gap={28} pb={120}>
+        <ScreenIntro />
 
-      <Column gap="md">
-        <Typography variant="titleSmall">Opens from a bar</Typography>
-        <View ref={anchorRef}>
-          <SearchBar
-            placeholder="Search trails"
-            value={query}
-            onChangeText={setQuery}
-            onPress={() => setOpen(true)}
-          />
-        </View>
-        <Typography variant="bodySmall" style={captionStyle}>
-          {lastSearch === null
-            ? 'Press the bar to open the view. It is full screen on a phone and docked on a wider window.'
-            : `Last search: "${lastSearch}"`}
-        </Typography>
-      </Column>
-
-      <SearchView
-        visible={open}
-        onDismiss={() => setOpen(false)}
-        anchor={anchorRef}
-        placeholder="Search trails"
-        value={query}
-        onChangeText={setQuery}
-        onSearch={search}
-        actions={[
-          {
-            icon: 'microphone',
-            accessibilityLabel: 'Voice search',
-            onPress: () => setQuery('hiking'),
-          },
-        ]}
-        testID="search-view"
-      >
-        <List>
-          {matches.map((item) => (
-            <ListItem
-              key={item}
-              headlineText={item}
-              onPress={() => {
-                setQuery(item)
-                search(item)
-              }}
+        <Column gap="md">
+          <Typography variant="titleSmall">Opens from a bar</Typography>
+          <View ref={anchorRef}>
+            <SearchBar
+              placeholder="Search trails"
+              value={query}
+              onChangeText={setQuery}
+              onPress={() => setOpen(true)}
             />
-          ))}
-        </List>
-      </SearchView>
+          </View>
+          <Typography variant="bodySmall" style={captionStyle}>
+            {lastSearch === null
+              ? 'Press the bar to open the view. It is full screen on a phone and docked on a wider window.'
+              : `Last search: "${lastSearch}"`}
+          </Typography>
+        </Column>
 
-      <ScreenNavFooter />
+        <SearchView
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          anchor={anchorRef}
+          placeholder="Search trails"
+          value={query}
+          onChangeText={setQuery}
+          onSearch={search}
+          actions={[
+            {
+              icon: 'microphone',
+              accessibilityLabel: 'Voice search',
+              onPress: () => setQuery('hiking'),
+            },
+          ]}
+          testID="search-view"
+        >
+          <List>
+            {matches.map((item) => (
+              <ListItem
+                key={item}
+                headlineText={item}
+                onPress={() => {
+                  setQuery(item)
+                  search(item)
+                }}
+              />
+            ))}
+          </List>
+        </SearchView>
+
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
-
-const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    paddingBottom: 120,
-    rowGap: 28,
-  },
-})

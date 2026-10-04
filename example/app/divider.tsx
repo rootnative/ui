@@ -1,5 +1,6 @@
 import {
   Column,
+  Container,
   Divider,
   List,
   ListItem,
@@ -40,7 +41,7 @@ export default function DividerScreen() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         {/* Horizontal */}
         <Column gap="sm">
@@ -131,7 +132,7 @@ export default function DividerScreen() {
           </View>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -139,12 +140,6 @@ export default function DividerScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
   verticalRow: {
     height: 56,

@@ -1,13 +1,14 @@
 import {
-  KeyboardAvoidingWrapper,
-  TextField,
-  Typography,
+  Box,
   ButtonGroup,
   Column,
+  Container,
+  KeyboardAvoidingWrapper,
   Row,
   Slider,
   Switch,
-  Box,
+  TextField,
+  Typography,
 } from '@rootnative/components'
 import type { ButtonGroupItem, SliderValue } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
@@ -83,99 +84,99 @@ export default function KeyboardAvoidingWrapperScreen() {
       onKeyboardShow={() => setKeyboardVisible(true)}
       onKeyboardHide={() => setKeyboardVisible(false)}
       scrollViewProps={{ bounces: false }}
-      contentContainerStyle={styles.content}
     >
-      <ScreenIntro />
-      <Column gap="lg">
-        <Typography variant="titleSmall">Settings</Typography>
+      <Container width="expanded" p="lg" gap={28} pb={120}>
+        <ScreenIntro />
+        <Column gap="lg">
+          <Typography variant="titleSmall">Settings</Typography>
 
-        <Row justify="space-between" align="center">
-          <Column>
-            <Typography variant="bodyMedium">enabled</Typography>
+          <Row justify="space-between" align="center">
+            <Column>
+              <Typography variant="bodyMedium">enabled</Typography>
+              <Typography variant="bodySmall" style={subtleStyle}>
+                Toggle keyboard avoidance on/off
+              </Typography>
+            </Column>
+            <Switch value={enabled} onValueChange={setEnabled} />
+          </Row>
+
+          <Column gap="xs">
+            <Typography variant="bodyMedium">behavior</Typography>
             <Typography variant="bodySmall" style={subtleStyle}>
-              Toggle keyboard avoidance on/off
+              Avoidance strategy — iOS honors all three, Android generally
+              resizes the window on its own.
             </Typography>
+            <ButtonGroup
+              variant="connected"
+              selectionMode="single"
+              size="extraSmall"
+              value={behavior}
+              onValueChange={handleBehaviorChange}
+              items={behaviorItems}
+            />
           </Column>
-          <Switch value={enabled} onValueChange={setEnabled} />
-        </Row>
 
-        <Column gap="xs">
-          <Typography variant="bodyMedium">behavior</Typography>
-          <Typography variant="bodySmall" style={subtleStyle}>
-            Avoidance strategy — iOS honors all three, Android generally resizes
-            the window on its own.
-          </Typography>
-          <ButtonGroup
-            variant="connected"
-            selectionMode="single"
-            size="extraSmall"
-            value={behavior}
-            onValueChange={handleBehaviorChange}
-            items={behaviorItems}
-          />
+          <Column gap="xs">
+            <Typography variant="bodyMedium">
+              keyboardVerticalOffset: {verticalOffset}
+            </Typography>
+            <Typography variant="bodySmall" style={subtleStyle}>
+              Extra space added on top of the keyboard height — use it to
+              account for a header or tab bar.
+            </Typography>
+            <Slider
+              value={verticalOffset}
+              onValueChange={handleOffsetChange}
+              minimumValue={0}
+              maximumValue={120}
+              step={12}
+            />
+          </Column>
         </Column>
 
-        <Column gap="xs">
-          <Typography variant="bodyMedium">
-            keyboardVerticalOffset: {verticalOffset}
+        <Box px="md" py="sm" style={[styles.statusBadge, badgeStyle]}>
+          <Typography variant="labelMedium" style={badgeLabelStyle}>
+            Keyboard: {keyboardVisible ? 'visible' : 'hidden'}
           </Typography>
-          <Typography variant="bodySmall" style={subtleStyle}>
-            Extra space added on top of the keyboard height — use it to account
-            for a header or tab bar.
-          </Typography>
-          <Slider
-            value={verticalOffset}
-            onValueChange={handleOffsetChange}
-            minimumValue={0}
-            maximumValue={120}
-            step={12}
+        </Box>
+
+        <Column gap="lg">
+          <Typography variant="titleSmall">Form Demo</Typography>
+          <TextField label="Name" value={name} onChangeText={setName} />
+          <TextField
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextField
+            label="Phone"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+          />
+          <TextField
+            label="Address"
+            value={address}
+            onChangeText={setAddress}
+          />
+          <TextField label="City" value={city} onChangeText={setCity} />
+          <TextField
+            label="Notes"
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+            numberOfLines={4}
           />
         </Column>
-      </Column>
-
-      <Box px="md" py="sm" style={[styles.statusBadge, badgeStyle]}>
-        <Typography variant="labelMedium" style={badgeLabelStyle}>
-          Keyboard: {keyboardVisible ? 'visible' : 'hidden'}
-        </Typography>
-      </Box>
-
-      <Column gap="lg">
-        <Typography variant="titleSmall">Form Demo</Typography>
-        <TextField label="Name" value={name} onChangeText={setName} />
-        <TextField
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextField
-          label="Phone"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-        />
-        <TextField label="Address" value={address} onChangeText={setAddress} />
-        <TextField label="City" value={city} onChangeText={setCity} />
-        <TextField
-          label="Notes"
-          value={notes}
-          onChangeText={setNotes}
-          multiline
-          numberOfLines={4}
-        />
-      </Column>
-      <ScreenNavFooter />
+        <ScreenNavFooter />
+      </Container>
     </KeyboardAvoidingWrapper>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    paddingBottom: 120,
-    rowGap: 28,
-  },
   statusBadge: {
     alignSelf: 'flex-start',
     borderRadius: 8,

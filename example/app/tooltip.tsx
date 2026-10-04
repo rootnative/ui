@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Column,
+  Container,
   IconButton,
   Row,
   Tooltip,
@@ -28,7 +29,7 @@ function TooltipScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Plain</Typography>
@@ -198,7 +199,7 @@ function TooltipScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -212,11 +213,5 @@ export default function TooltipScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
 })

@@ -1,6 +1,7 @@
 import {
   Badge,
   Column,
+  Container,
   Icon,
   IconButton,
   NavigationBar,
@@ -25,7 +26,7 @@ export default function BadgeScreen() {
         { backgroundColor: theme.colors.surface },
       ]}
     >
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
 
         <Column gap="sm">
@@ -192,7 +193,7 @@ export default function BadgeScreen() {
         </Column>
 
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -200,11 +201,5 @@ export default function BadgeScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
 })

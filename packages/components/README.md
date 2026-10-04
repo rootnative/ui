@@ -85,7 +85,7 @@ import { Button, Card } from '@rootnative/components'
 | LoadingIndicator | `./loading-indicator` | contained, uncontained · determinate, indeterminate |
 | TextField | `./text-field` | filled, outlined |
 | SearchBar | `./search-bar` | MD3 search bar · clear button · trailing actions or avatar |
-| Layout | `./layout` | Layout, Box, Row, Column, Grid |
+| Layout | `./layout` | Layout, Box, Row, Column, Container, Grid |
 | Dialog | `./dialog` | basic, fullscreen · Icon / Title / Content / Actions slots |
 | Divider | `./divider` | horizontal, vertical · optional leading/trailing insets |
 | List | `./list` | List, ListItem, ListDivider (alias of Divider) |

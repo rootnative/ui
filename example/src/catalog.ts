@@ -68,7 +68,8 @@ export const sections: CatalogSection[] = [
         description: 'Flexbox primitives for building page structure',
         add: 'layout',
         docs: 'components/layout',
-        keywords: 'box row column grid stack flex spacing safe area',
+        keywords:
+          'box row column container grid stack flex spacing safe area max width',
       },
       {
         label: 'RTL',

@@ -1,4 +1,10 @@
-import { Column, Row, Switch, Typography } from '@rootnative/components'
+import {
+  Column,
+  Container,
+  Row,
+  Switch,
+  Typography,
+} from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
@@ -11,69 +17,75 @@ export default function SwitchScreen() {
   const [greenSwitch, setGreenSwitch] = useState(true)
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Basic</Typography>
-        <Row gap="md" align="center">
-          <Switch
-            value={basic}
-            onValueChange={setBasic}
-            accessibilityLabel="Basic switch"
-          />
-          <Typography variant="bodyMedium">{basic ? 'On' : 'Off'}</Typography>
-        </Row>
-        <Row gap="md" align="center">
-          <Switch
-            value={withIcon}
-            onValueChange={setWithIcon}
-            selectedIcon="check"
-            accessibilityLabel="With check icon"
-          />
-          <Typography variant="bodyMedium">With check icon</Typography>
-        </Row>
-      </Column>
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Basic</Typography>
+          <Row gap="md" align="center">
+            <Switch
+              value={basic}
+              onValueChange={setBasic}
+              accessibilityLabel="Basic switch"
+            />
+            <Typography variant="bodyMedium">{basic ? 'On' : 'Off'}</Typography>
+          </Row>
+          <Row gap="md" align="center">
+            <Switch
+              value={withIcon}
+              onValueChange={setWithIcon}
+              selectedIcon="check"
+              accessibilityLabel="With check icon"
+            />
+            <Typography variant="bodyMedium">With check icon</Typography>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Icons</Typography>
-        <Row gap="md" align="center">
-          <Switch
-            value={customIcon}
-            onValueChange={setCustomIcon}
-            selectedIcon="bell"
-            unselectedIcon="bell-off"
-            accessibilityLabel="Bell / Bell-off"
-          />
-          <Typography variant="bodyMedium">Bell / Bell-off</Typography>
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Icons</Typography>
+          <Row gap="md" align="center">
+            <Switch
+              value={customIcon}
+              onValueChange={setCustomIcon}
+              selectedIcon="bell"
+              unselectedIcon="bell-off"
+              accessibilityLabel="Bell / Bell-off"
+            />
+            <Typography variant="bodyMedium">Bell / Bell-off</Typography>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Disabled</Typography>
-        <Row gap="md" align="center">
-          <Switch value={false} disabled accessibilityLabel="Off (disabled)" />
-          <Typography variant="bodyMedium">Off (disabled)</Typography>
-        </Row>
-        <Row gap="md" align="center">
-          <Switch value disabled accessibilityLabel="On (disabled)" />
-          <Typography variant="bodyMedium">On (disabled)</Typography>
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Disabled</Typography>
+          <Row gap="md" align="center">
+            <Switch
+              value={false}
+              disabled
+              accessibilityLabel="Off (disabled)"
+            />
+            <Typography variant="bodyMedium">Off (disabled)</Typography>
+          </Row>
+          <Row gap="md" align="center">
+            <Switch value disabled accessibilityLabel="On (disabled)" />
+            <Typography variant="bodyMedium">On (disabled)</Typography>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Colors</Typography>
-        <Row gap="md" align="center">
-          <Switch
-            value={greenSwitch}
-            onValueChange={setGreenSwitch}
-            containerColor="#2E7D32"
-            contentColor="#C8E6C9"
-            accessibilityLabel="Green switch"
-          />
-          <Typography variant="bodyMedium">Green switch</Typography>
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Colors</Typography>
+          <Row gap="md" align="center">
+            <Switch
+              value={greenSwitch}
+              onValueChange={setGreenSwitch}
+              containerColor="#2E7D32"
+              contentColor="#C8E6C9"
+              accessibilityLabel="Green switch"
+            />
+            <Typography variant="bodyMedium">Green switch</Typography>
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -81,9 +93,5 @@ export default function SwitchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
 })

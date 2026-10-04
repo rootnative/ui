@@ -9,6 +9,7 @@ import {
   Chip,
   CircularProgress,
   Column,
+  Container,
   Divider,
   FAB,
   Grid,
@@ -765,6 +766,7 @@ export default function HomeScreen() {
       value={category ?? ALL_CATEGORIES}
       onValueChange={selectCategory}
       accessibilityLabel="Component category"
+      style={toolbarLayout === 'row' ? styles.groupInRow : undefined}
     />
   )
   const categoryTabs = (
@@ -781,47 +783,72 @@ export default function HomeScreen() {
   )
 
   return (
-    <ScrollView
-      contentContainerStyle={[
-        styles.scroll,
-        { paddingHorizontal: padding, paddingBottom: padding * 2 },
-      ]}
-      // The toolbar is child 1. The hero slot is child 0 and always renders,
-      // even empty in the embed, so the index does not move.
-      stickyHeaderIndices={[1]}
-    >
+    <>
+      {/*
+        The head sits outside the ScrollView on purpose. It renders no view,
+        but it still counts as a child, and a child before the hero moves the
+        sticky index onto the hero.
+      */}
       <PageHead
         title={site.name}
         description={HOME_DESCRIPTION}
         url="/"
         jsonLd={HOME_JSON_LD}
       />
-      <View style={[styles.container, heroSlotStyle]}>
-        {isEmbedded ? null : (
-          <Column gap="md" style={styles.hero}>
-            <Row gap="xs" align="center">
-              <Icon
-                source="palette-outline"
-                size={18}
-                color={theme.colors.primary}
-                aria-hidden
-              />
-              <Typography variant="labelLarge" style={eyebrowStyle}>
-                Material Design 3
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingHorizontal: padding, paddingBottom: padding * 2 },
+        ]}
+        // The toolbar is child 1. The hero slot is child 0 and always renders,
+        // even empty in the embed, so the index does not move.
+        stickyHeaderIndices={[1]}
+      >
+        <Container width="large" style={heroSlotStyle}>
+          {isEmbedded ? null : (
+            <Column gap="md" style={styles.hero}>
+              <Row gap="xs" align="center">
+                <Icon
+                  source="palette-outline"
+                  size={18}
+                  color={theme.colors.primary}
+                  aria-hidden
+                />
+                <Typography variant="labelLarge" style={eyebrowStyle}>
+                  Material Design 3
+                </Typography>
+              </Row>
+              <Typography level={2} variant={heroVariant}>
+                RootNative UI
               </Typography>
-            </Row>
-            <Typography level={2} variant={heroVariant}>
-              RootNative UI
-            </Typography>
-            <Typography variant={taglineVariant} style={captionStyle}>
-              Beautiful Material Design 3 components for React Native — copy,
-              paste, ship.
-            </Typography>
-            {statsInline ? (
-              <Row gap="md" align="center" style={styles.statsRow}>
-                {stats.map((stat, idx) => (
-                  <Row gap="md" align="center" key={stat.label}>
-                    <Column>
+              <Typography variant={taglineVariant} style={captionStyle}>
+                Beautiful Material Design 3 components for React Native — copy,
+                paste, ship.
+              </Typography>
+              {statsInline ? (
+                <Row gap="md" align="center" style={styles.statsRow}>
+                  {stats.map((stat, idx) => (
+                    <Row gap="md" align="center" key={stat.label}>
+                      <Column>
+                        <Typography variant="titleMedium">
+                          {stat.value}
+                        </Typography>
+                        <Typography variant="labelSmall" style={captionStyle}>
+                          {stat.label}
+                        </Typography>
+                      </Column>
+                      {idx < stats.length - 1 ? (
+                        <Typography variant="titleMedium" style={dotStyle}>
+                          ·
+                        </Typography>
+                      ) : null}
+                    </Row>
+                  ))}
+                </Row>
+              ) : (
+                <Grid columns={2} gap="md" style={styles.statsRow}>
+                  {stats.map((stat) => (
+                    <Column key={stat.label}>
                       <Typography variant="titleMedium">
                         {stat.value}
                       </Typography>
@@ -829,119 +856,109 @@ export default function HomeScreen() {
                         {stat.label}
                       </Typography>
                     </Column>
-                    {idx < stats.length - 1 ? (
-                      <Typography variant="titleMedium" style={dotStyle}>
-                        ·
-                      </Typography>
-                    ) : null}
-                  </Row>
-                ))}
-              </Row>
-            ) : (
-              <Grid columns={2} gap="md" style={styles.statsRow}>
-                {stats.map((stat) => (
-                  <Column key={stat.label}>
-                    <Typography variant="titleMedium">{stat.value}</Typography>
-                    <Typography variant="labelSmall" style={captionStyle}>
-                      {stat.label}
-                    </Typography>
-                  </Column>
-                ))}
-              </Grid>
-            )}
-          </Column>
-        )}
-      </View>
-
-      <View style={toolbarStyle}>
-        <View style={[styles.container, styles.toolbarContent]}>
-          {toolbarLayout === 'row' ? (
-            <Row gap="md" align="center">
-              {searchBar}
-              {categoryGroup}
-            </Row>
-          ) : (
-            <Column gap="sm">
-              {searchBar}
-              {toolbarLayout === 'tabs' ? categoryTabs : categoryGroup}
+                  ))}
+                </Grid>
+              )}
             </Column>
           )}
+        </Container>
+
+        <View style={toolbarStyle}>
+          <Container width="large" style={styles.toolbarContent}>
+            {toolbarLayout === 'row' ? (
+              <Row gap="md" align="center">
+                {searchBar}
+                {categoryGroup}
+              </Row>
+            ) : (
+              <Column gap="sm">
+                {searchBar}
+                {toolbarLayout === 'tabs' ? categoryTabs : categoryGroup}
+              </Column>
+            )}
+          </Container>
         </View>
-      </View>
 
-      <Column style={styles.container} gap="xl">
-        <Typography
-          variant="bodySmall"
-          style={captionStyle}
-          accessibilityLiveRegion="polite"
-        >
-          {isFiltering
-            ? `${resultCount} of ${totalComponents} components`
-            : `${totalComponents} components`}
-        </Typography>
+        <Container width="large" gap="xl">
+          <Typography
+            variant="bodySmall"
+            style={captionStyle}
+            accessibilityLiveRegion="polite"
+          >
+            {isFiltering
+              ? `${resultCount} of ${totalComponents} components`
+              : `${totalComponents} components`}
+          </Typography>
 
-        {visibleSections.length === 0 ? (
-          <Column align="center" gap="sm" style={styles.emptyState}>
-            <Icon
-              source="magnify-close"
-              size={48}
-              color={theme.colors.onSurfaceVariant}
-            />
-            <Typography variant="titleMedium">No components found</Typography>
-            <Typography variant="bodySmall" style={captionStyle}>
-              {`Nothing matches "${trimmedQuery}"${category ? ` in ${category}` : ''}.`}
-            </Typography>
-            <Button variant="text" onPress={clearFilters}>
-              Clear filters
-            </Button>
-          </Column>
-        ) : null}
-
-        {visibleSections.map((section) => (
-          <Column gap="md" key={section.title}>
-            <Column gap="xs">
-              <Typography variant={sectionTitleVariant}>
-                {section.title}
-              </Typography>
+          {visibleSections.length === 0 ? (
+            <Column align="center" gap="sm" style={styles.emptyState}>
+              <Icon
+                source="magnify-close"
+                size={48}
+                color={theme.colors.onSurfaceVariant}
+              />
+              <Typography variant="titleMedium">No components found</Typography>
               <Typography variant="bodySmall" style={captionStyle}>
-                {section.description}
+                {`Nothing matches "${trimmedQuery}"${category ? ` in ${category}` : ''}.`}
               </Typography>
+              <Button variant="text" onPress={clearFilters}>
+                Clear filters
+              </Button>
             </Column>
-            <Grid columns={columns} gap="md">
-              {section.items.map((item) => (
-                <Card key={item.route} variant="outlined" style={styles.card}>
-                  <Box align="center" justify="center" style={previewBoxStyle}>
-                    <View
-                      style={styles.previewInner}
-                      accessibilityElementsHidden
-                      importantForAccessibility="no-hide-descendants"
+          ) : null}
+
+          {visibleSections.map((section) => (
+            <Column gap="md" key={section.title}>
+              <Column gap="xs">
+                <Typography variant={sectionTitleVariant}>
+                  {section.title}
+                </Typography>
+                <Typography variant="bodySmall" style={captionStyle}>
+                  {section.description}
+                </Typography>
+              </Column>
+              <Grid columns={columns} gap="md">
+                {section.items.map((item) => (
+                  <Card key={item.route} variant="outlined" style={styles.card}>
+                    <Box
+                      align="center"
+                      justify="center"
+                      style={previewBoxStyle}
                     >
-                      <Preview label={item.label} theme={theme} />
-                    </View>
-                  </Box>
-                  <Column px="md" py="sm" gap="xs">
-                    <Typography variant="titleMedium">{item.label}</Typography>
-                    <Typography
-                      variant="bodySmall"
-                      style={descriptionStyle}
-                      numberOfLines={2}
-                    >
-                      {item.description}
-                    </Typography>
-                  </Column>
-                  <Pressable
-                    onPress={() => router.push(item.route)}
-                    accessibilityRole="button"
-                    accessibilityLabel={item.label}
-                    style={styles.pressOverlay}
-                  />
-                </Card>
-              ))}
-            </Grid>
-          </Column>
-        ))}
-      </Column>
-    </ScrollView>
+                      <View
+                        style={styles.previewInner}
+                        accessibilityElementsHidden
+                        importantForAccessibility="no-hide-descendants"
+                      >
+                        <Preview label={item.label} theme={theme} />
+                      </View>
+                    </Box>
+                    <Column px="md" py="sm" gap="xs">
+                      <Typography variant="titleMedium">
+                        {item.label}
+                      </Typography>
+                      <Typography
+                        variant="bodySmall"
+                        style={descriptionStyle}
+                        numberOfLines={2}
+                      >
+                        {item.description}
+                      </Typography>
+                    </Column>
+                    <Pressable
+                      onPress={() => router.push(item.route)}
+                      accessibilityRole="button"
+                      accessibilityLabel={item.label}
+                      style={styles.pressOverlay}
+                    />
+                  </Card>
+                ))}
+              </Grid>
+            </Column>
+          ))}
+        </Container>
+      </ScrollView>
+    </>
   )
 }
 
@@ -952,16 +969,16 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
   },
-  container: {
-    width: '100%',
-    maxWidth: 1200,
-    alignSelf: 'center',
-  },
   toolbarContent: {
     paddingVertical: 12,
   },
   searchInRow: {
     flex: 1,
+  },
+  // ButtonGroup pins itself to the start of its parent. Next to the taller
+  // search bar it has to sit on the centre line instead.
+  groupInRow: {
+    alignSelf: 'center',
   },
   hero: {
     paddingVertical: 16,

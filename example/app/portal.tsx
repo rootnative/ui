@@ -3,8 +3,9 @@ import {
   Button,
   Card,
   Column,
-  PORTAL_LAYERS,
+  Container,
   Portal,
+  PORTAL_LAYERS,
   PortalHost,
   Row,
   Typography,
@@ -250,8 +251,8 @@ export default function PortalScreen() {
 
   return (
     <PortalHost style={styles.host}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Column gap="lg">
+      <ScrollView>
+        <Container width="expanded" p="lg" gap="lg">
           <ScreenIntro />
           <Typography variant="bodyMedium" style={mutedTextStyle}>
             Portals render their children into a host higher in the tree, so
@@ -328,7 +329,7 @@ export default function PortalScreen() {
             </Box>
           </Column>
           <ScreenNavFooter />
-        </Column>
+        </Container>
       </ScrollView>
     </PortalHost>
   )
@@ -337,9 +338,6 @@ export default function PortalScreen() {
 const styles = StyleSheet.create({
   host: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
   },
   constrainedDemo: {
     padding: 16,

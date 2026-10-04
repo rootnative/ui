@@ -1,4 +1,10 @@
-import { Column, IconButton, Row, Typography } from '@rootnative/components'
+import {
+  Column,
+  Container,
+  IconButton,
+  Row,
+  Typography,
+} from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -26,190 +32,194 @@ const widths = [
 
 export default function IconButtonScreen() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Variants</Typography>
-        <Row gap="lg">
-          {variants.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
-              <IconButton
-                icon="heart-outline"
-                variant={option.value}
-                accessibilityLabel={`${option.label} heart`}
-              />
-              <Typography variant="labelSmall">{option.label}</Typography>
-            </Column>
-          ))}
-        </Row>
-      </Column>
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Variants</Typography>
+          <Row gap="lg">
+            {variants.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <IconButton
+                  icon="heart-outline"
+                  variant={option.value}
+                  accessibilityLabel={`${option.label} heart`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
-        <Row gap="lg" align="center" wrap>
-          {sizes.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
-              <IconButton
-                icon="heart-outline"
-                size={option.value}
-                variant="filled"
-                accessibilityLabel={`${option.label} heart`}
-              />
-              <Typography variant="labelSmall">{option.label}</Typography>
-            </Column>
-          ))}
-        </Row>
-      </Column>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Sizes (XS–XL)</Typography>
+          <Row gap="lg" align="center" wrap>
+            {sizes.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <IconButton
+                  icon="heart-outline"
+                  size={option.value}
+                  variant="filled"
+                  accessibilityLabel={`${option.label} heart`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Width (size M)</Typography>
-        <Row gap="lg" align="center" wrap>
-          {widths.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
+        <Column gap="sm">
+          <Typography variant="titleSmall">Width (size M)</Typography>
+          <Row gap="lg" align="center" wrap>
+            {widths.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <IconButton
+                  icon="heart-outline"
+                  size="medium"
+                  width={option.value}
+                  variant="tonal"
+                  accessibilityLabel={`${option.label} heart`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Square Shape + Toggle</Typography>
+          <Row gap="lg" align="center" wrap>
+            {sizes.map((option) => (
+              <Column key={option.value} align="center" gap="xs">
+                <IconButton
+                  icon="heart-outline"
+                  selectedIcon="heart"
+                  size={option.value}
+                  shape="square"
+                  selected
+                  variant="filled"
+                  accessibilityLabel={`${option.label} square`}
+                />
+                <Typography variant="labelSmall">{option.label}</Typography>
+              </Column>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">
+            iconColor vs contentColor
+          </Typography>
+          <Typography variant="labelSmall">
+            Both tint the icon; contentColor wins when they disagree.
+          </Typography>
+          <Row gap="lg" align="center" wrap>
+            <Column align="center" gap="xs">
               <IconButton
-                icon="heart-outline"
-                size="medium"
-                width={option.value}
+                icon="bell-outline"
                 variant="tonal"
-                accessibilityLabel={`${option.label} heart`}
+                accessibilityLabel="Alerts, default color"
               />
-              <Typography variant="labelSmall">{option.label}</Typography>
+              <Typography variant="labelSmall">Default</Typography>
             </Column>
-          ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Square Shape + Toggle</Typography>
-        <Row gap="lg" align="center" wrap>
-          {sizes.map((option) => (
-            <Column key={option.value} align="center" gap="xs">
+            <Column align="center" gap="xs">
               <IconButton
-                icon="heart-outline"
-                selectedIcon="heart"
-                size={option.value}
-                shape="square"
-                selected
-                variant="filled"
-                accessibilityLabel={`${option.label} square`}
+                icon="bell-outline"
+                variant="tonal"
+                iconColor="#C62828"
+                accessibilityLabel="Alerts, iconColor red"
               />
+              <Typography variant="labelSmall">iconColor</Typography>
+            </Column>
+            <Column align="center" gap="xs">
+              <IconButton
+                icon="bell-outline"
+                variant="tonal"
+                iconColor="#C62828"
+                contentColor="#1565C0"
+                accessibilityLabel="Alerts, contentColor takes precedence"
+              />
+              <Typography variant="labelSmall">Both</Typography>
+            </Column>
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Colors</Typography>
+          <Row gap="sm">
+            <IconButton
+              icon="delete"
+              containerColor="#B00020"
+              contentColor="#FFFFFF"
+              accessibilityLabel="Delete"
+            />
+            <IconButton
+              icon="star"
+              variant="outlined"
+              contentColor="#FF8F00"
+              accessibilityLabel="Star"
+            />
+            <IconButton
+              icon="leaf"
+              containerColor="#E8F5E9"
+              contentColor="#2E7D32"
+              accessibilityLabel="Eco"
+            />
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Toggle States</Typography>
+          {variants.map((option) => (
+            <Column key={`state-${option.value}`} gap="xs">
               <Typography variant="labelSmall">{option.label}</Typography>
+              <Row gap="lg">
+                <Column align="center" gap="xs">
+                  <IconButton
+                    icon="heart-outline"
+                    selected={false}
+                    variant={option.value}
+                    accessibilityLabel="Like"
+                  />
+                  <Typography variant="labelSmall">Default</Typography>
+                </Column>
+                <Column align="center" gap="xs">
+                  <IconButton
+                    icon="heart-outline"
+                    selectedIcon="heart"
+                    selected
+                    variant={option.value}
+                    accessibilityLabel="Like"
+                  />
+                  <Typography variant="labelSmall">Selected</Typography>
+                </Column>
+                <Column align="center" gap="xs">
+                  <IconButton
+                    icon="heart-outline"
+                    selected={false}
+                    variant={option.value}
+                    disabled
+                    accessibilityLabel="Like"
+                  />
+                  <Typography variant="labelSmall">Disabled</Typography>
+                </Column>
+                <Column align="center" gap="xs">
+                  <IconButton
+                    icon="heart-outline"
+                    selectedIcon="heart"
+                    selected
+                    variant={option.value}
+                    disabled
+                    accessibilityLabel="Like"
+                  />
+                  <Typography variant="labelSmall">Sel + Dis</Typography>
+                </Column>
+              </Row>
             </Column>
           ))}
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">iconColor vs contentColor</Typography>
-        <Typography variant="labelSmall">
-          Both tint the icon; contentColor wins when they disagree.
-        </Typography>
-        <Row gap="lg" align="center" wrap>
-          <Column align="center" gap="xs">
-            <IconButton
-              icon="bell-outline"
-              variant="tonal"
-              accessibilityLabel="Alerts, default color"
-            />
-            <Typography variant="labelSmall">Default</Typography>
-          </Column>
-          <Column align="center" gap="xs">
-            <IconButton
-              icon="bell-outline"
-              variant="tonal"
-              iconColor="#C62828"
-              accessibilityLabel="Alerts, iconColor red"
-            />
-            <Typography variant="labelSmall">iconColor</Typography>
-          </Column>
-          <Column align="center" gap="xs">
-            <IconButton
-              icon="bell-outline"
-              variant="tonal"
-              iconColor="#C62828"
-              contentColor="#1565C0"
-              accessibilityLabel="Alerts, contentColor takes precedence"
-            />
-            <Typography variant="labelSmall">Both</Typography>
-          </Column>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Colors</Typography>
-        <Row gap="sm">
-          <IconButton
-            icon="delete"
-            containerColor="#B00020"
-            contentColor="#FFFFFF"
-            accessibilityLabel="Delete"
-          />
-          <IconButton
-            icon="star"
-            variant="outlined"
-            contentColor="#FF8F00"
-            accessibilityLabel="Star"
-          />
-          <IconButton
-            icon="leaf"
-            containerColor="#E8F5E9"
-            contentColor="#2E7D32"
-            accessibilityLabel="Eco"
-          />
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Toggle States</Typography>
-        {variants.map((option) => (
-          <Column key={`state-${option.value}`} gap="xs">
-            <Typography variant="labelSmall">{option.label}</Typography>
-            <Row gap="lg">
-              <Column align="center" gap="xs">
-                <IconButton
-                  icon="heart-outline"
-                  selected={false}
-                  variant={option.value}
-                  accessibilityLabel="Like"
-                />
-                <Typography variant="labelSmall">Default</Typography>
-              </Column>
-              <Column align="center" gap="xs">
-                <IconButton
-                  icon="heart-outline"
-                  selectedIcon="heart"
-                  selected
-                  variant={option.value}
-                  accessibilityLabel="Like"
-                />
-                <Typography variant="labelSmall">Selected</Typography>
-              </Column>
-              <Column align="center" gap="xs">
-                <IconButton
-                  icon="heart-outline"
-                  selected={false}
-                  variant={option.value}
-                  disabled
-                  accessibilityLabel="Like"
-                />
-                <Typography variant="labelSmall">Disabled</Typography>
-              </Column>
-              <Column align="center" gap="xs">
-                <IconButton
-                  icon="heart-outline"
-                  selectedIcon="heart"
-                  selected
-                  variant={option.value}
-                  disabled
-                  accessibilityLabel="Like"
-                />
-                <Typography variant="labelSmall">Sel + Dis</Typography>
-              </Column>
-            </Row>
-          </Column>
-        ))}
-      </Column>
-      <ScreenNavFooter />
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -217,9 +227,5 @@ export default function IconButtonScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
 })

@@ -3,6 +3,7 @@ import {
   Button,
   Chip,
   Column,
+  Container,
   Grid,
   Icon,
   List,
@@ -54,104 +55,110 @@ export default function RTLScreen() {
   const direction = I18nManager.isRTL ? 'RTL' : 'LTR'
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Box
-        p="md"
-        style={[styles.badge, { backgroundColor: colors.tertiaryContainer }]}
-      >
-        <Typography
-          variant="bodyMedium"
-          style={{ color: colors.onTertiaryContainer }}
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="md" gap={12} pb={40}>
+        <ScreenIntro />
+        <Box
+          p="md"
+          style={[styles.badge, { backgroundColor: colors.tertiaryContainer }]}
         >
-          Current direction:{' '}
-          <Typography variant="labelLarge">{direction}</Typography>
-          {'\n'}Use the pilcrow icon in the AppBar to toggle RTL.
-        </Typography>
-      </Box>
+          <Typography
+            variant="bodyMedium"
+            style={{ color: colors.onTertiaryContainer }}
+          >
+            Current direction:{' '}
+            <Typography variant="labelLarge">{direction}</Typography>
+            {'\n'}Use the pilcrow icon in the AppBar to toggle RTL.
+          </Typography>
+        </Box>
 
-      <SectionTitle>Grid (3 columns)</SectionTitle>
-      <Grid columns={3} gap="sm">
-        <Cell label="1" />
-        <Cell label="2" />
-        <Cell label="3" />
-        <Cell label="4" />
-        <Cell label="5" />
-        <Cell label="6" />
-      </Grid>
+        <SectionTitle>Grid (3 columns)</SectionTitle>
+        <Grid columns={3} gap="sm">
+          <Cell label="1" />
+          <Cell label="2" />
+          <Cell label="3" />
+          <Cell label="4" />
+          <Cell label="5" />
+          <Cell label="6" />
+        </Grid>
 
-      <SectionTitle>Grid (2 columns)</SectionTitle>
-      <Grid columns={2} gap="md">
-        <Cell label="A" />
-        <Cell label="B" />
-        <Cell label="C" />
-        <Cell label="D" />
-      </Grid>
+        <SectionTitle>Grid (2 columns)</SectionTitle>
+        <Grid columns={2} gap="md">
+          <Cell label="A" />
+          <Cell label="B" />
+          <Cell label="C" />
+          <Cell label="D" />
+        </Grid>
 
-      <SectionTitle>Row — leading / trailing icons</SectionTitle>
-      <Column gap="sm">
-        <Button variant="filled" trailingIcon="arrow-right">
-          Leading icon
-        </Button>
-        <Button variant="outlined" leadingIcon="arrow-left">
-          Trailing icon
-        </Button>
-      </Column>
+        <SectionTitle>Row — leading / trailing icons</SectionTitle>
+        <Column gap="sm">
+          <Button variant="filled" trailingIcon="arrow-right">
+            Leading icon
+          </Button>
+          <Button variant="outlined" leadingIcon="arrow-left">
+            Trailing icon
+          </Button>
+        </Column>
 
-      <SectionTitle>Chips</SectionTitle>
-      <Row gap="sm" wrap>
-        <Chip leadingIcon="check">Selected</Chip>
-        <Chip leadingIcon="close">Dismiss</Chip>
-        <Chip>No icon</Chip>
-      </Row>
-
-      <SectionTitle>TextField</SectionTitle>
-      <Column gap="sm">
-        <TextField label="Filled (label animates from start)" />
-        <TextField variant="outlined" label="Outlined" leadingIcon="magnify" />
-        <TextField
-          variant="outlined"
-          label="With both icons"
-          leadingIcon="magnify"
-          trailingIcon="close"
-        />
-      </Column>
-
-      <SectionTitle>List — leading &amp; trailing content</SectionTitle>
-      <List>
-        <ListItem
-          headlineText="Leading icon"
-          leadingContent={<DemoIcon name="account-circle" />}
-          trailingSupportingText="Detail"
-        />
-        <ListItem
-          headlineText="Leading icon + trailing icon"
-          leadingContent={<DemoIcon name="bell-outline" />}
-          trailingContent={<DemoIcon name="chevron-right" />}
-        />
-        <ListItem
-          headlineText="Inset divider below"
-          leadingContent={<DemoIcon name="folder-outline" />}
-        />
-        <ListDivider insetStart />
-        <ListItem
-          headlineText="Last item"
-          leadingContent={<DemoIcon name="star-outline" />}
-        />
-      </List>
-
-      <SectionTitle>Switch</SectionTitle>
-      <Column gap="sm">
-        <Row gap="md" align="center">
-          <Switch value={true} onValueChange={() => {}} />
-          <Typography variant="bodyMedium">On</Typography>
+        <SectionTitle>Chips</SectionTitle>
+        <Row gap="sm" wrap>
+          <Chip leadingIcon="check">Selected</Chip>
+          <Chip leadingIcon="close">Dismiss</Chip>
+          <Chip>No icon</Chip>
         </Row>
-        <Row gap="md" align="center">
-          <Switch value={false} onValueChange={() => {}} />
-          <Typography variant="bodyMedium">Off</Typography>
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+
+        <SectionTitle>TextField</SectionTitle>
+        <Column gap="sm">
+          <TextField label="Filled (label animates from start)" />
+          <TextField
+            variant="outlined"
+            label="Outlined"
+            leadingIcon="magnify"
+          />
+          <TextField
+            variant="outlined"
+            label="With both icons"
+            leadingIcon="magnify"
+            trailingIcon="close"
+          />
+        </Column>
+
+        <SectionTitle>List — leading &amp; trailing content</SectionTitle>
+        <List>
+          <ListItem
+            headlineText="Leading icon"
+            leadingContent={<DemoIcon name="account-circle" />}
+            trailingSupportingText="Detail"
+          />
+          <ListItem
+            headlineText="Leading icon + trailing icon"
+            leadingContent={<DemoIcon name="bell-outline" />}
+            trailingContent={<DemoIcon name="chevron-right" />}
+          />
+          <ListItem
+            headlineText="Inset divider below"
+            leadingContent={<DemoIcon name="folder-outline" />}
+          />
+          <ListDivider insetStart />
+          <ListItem
+            headlineText="Last item"
+            leadingContent={<DemoIcon name="star-outline" />}
+          />
+        </List>
+
+        <SectionTitle>Switch</SectionTitle>
+        <Column gap="sm">
+          <Row gap="md" align="center">
+            <Switch value={true} onValueChange={() => {}} />
+            <Typography variant="bodyMedium">On</Typography>
+          </Row>
+          <Row gap="md" align="center">
+            <Switch value={false} onValueChange={() => {}} />
+            <Typography variant="bodyMedium">Off</Typography>
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -159,11 +166,6 @@ export default function RTLScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 16,
-    rowGap: 12,
-    paddingBottom: 40,
   },
   badge: {
     borderRadius: 8,

@@ -10,7 +10,7 @@ import { useTheme } from '@rootnative/core'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { usePathname } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Linking, Platform, StyleSheet } from 'react-native'
+import { Linking, Platform, StyleSheet, View } from 'react-native'
 import { DOCS_BASE_URL, findEntry } from './catalog'
 import { canCopy, copyToClipboard } from './clipboard'
 import { useHydrated } from './use-hydrated'
@@ -96,7 +96,7 @@ export function ScreenIntro() {
       <Row gap="sm" align="center" wrap>
         {command ? (
           <Row
-            gap="xs"
+            gap="sm"
             align="center"
             style={[
               styles.commandSurface,
@@ -116,14 +116,20 @@ export function ScreenIntro() {
               {command}
             </Typography>
             {showCopyButton ? (
-              <IconButton
-                icon={copied ? 'check' : 'content-copy'}
-                size="extraSmall"
-                onPress={handleCopy}
-                accessibilityLabel={
-                  copied ? 'Command copied' : `Copy "${command}"`
-                }
-              />
+              // IconButton pins its own wrapper to the start of its parent,
+              // and its `style` prop lands inside that wrapper. The View has
+              // no such rule, so the pill centres it.
+              <View style={styles.copyFrame}>
+                <IconButton
+                  icon={copied ? 'check' : 'content-copy'}
+                  variant="standard"
+                  size="extraSmall"
+                  onPress={handleCopy}
+                  accessibilityLabel={
+                    copied ? 'Command copied' : `Copy "${command}"`
+                  }
+                />
+              </View>
             ) : null}
           </Row>
         ) : null}
@@ -159,5 +165,8 @@ const styles = StyleSheet.create({
   },
   commandSurfacePlain: {
     paddingEnd: 12,
+  },
+  copyFrame: {
+    justifyContent: 'center',
   },
 })

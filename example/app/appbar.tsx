@@ -2,6 +2,7 @@ import {
   AppBar,
   Box,
   Column,
+  Container,
   IconButton,
   Typography,
 } from '@rootnative/components'
@@ -119,194 +120,196 @@ export default function AppBarScreen() {
   )
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Variants</Typography>
-        <Column gap="md">
-          {variants.map((item) => (
-            <Column key={`base-${item.key}`} gap="sm">
-              <Typography variant="labelMedium">{item.label}</Typography>
-              <Box style={previewStyle}>
-                <AppBar
-                  title={item.title}
-                  variant={item.variant}
-                  actions={actions}
-                />
-              </Box>
-            </Column>
-          ))}
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Variants</Typography>
+          <Column gap="md">
+            {variants.map((item) => (
+              <Column key={`base-${item.key}`} gap="sm">
+                <Typography variant="labelMedium">{item.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={item.title}
+                    variant={item.variant}
+                    actions={actions}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">With Back Button</Typography>
-        <Column gap="md">
-          {variants.map((item) => (
-            <Column key={`back-${item.key}`} gap="sm">
-              <Typography variant="labelMedium">{item.label}</Typography>
-              <Box style={previewStyle}>
-                <AppBar
-                  title={item.title}
-                  variant={item.variant}
-                  canGoBack
-                  actions={actions}
-                  onBackPress={() => router.back()}
-                />
-              </Box>
-            </Column>
-          ))}
+        <Column gap="sm">
+          <Typography variant="titleSmall">With Back Button</Typography>
+          <Column gap="md">
+            {variants.map((item) => (
+              <Column key={`back-${item.key}`} gap="sm">
+                <Typography variant="labelMedium">{item.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={item.title}
+                    variant={item.variant}
+                    canGoBack
+                    actions={actions}
+                    onBackPress={() => router.back()}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Close Button</Typography>
-        <Typography variant="bodySmall">
-          navigationIcon=&quot;close&quot; for a modal. The second bar passes an
-          IconButton to leading and trailing; both sit on the title line.
-        </Typography>
-        <Column gap="md">
-          <Box style={previewStyle}>
-            <AppBar
-              title="About"
-              canGoBack
-              navigationIcon="close"
-              onBackPress={() => router.back()}
-            />
-          </Box>
-          <Box style={previewStyle}>
-            <AppBar
-              title="About"
-              leading={
-                <IconButton
-                  icon="close"
-                  variant="standard"
-                  accessibilityLabel="Close"
-                  onPress={() => router.back()}
-                />
-              }
-              trailing={
-                <IconButton
-                  icon="share-variant"
-                  variant="standard"
-                  accessibilityLabel="Share"
-                />
-              }
-            />
-          </Box>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Close Button</Typography>
+          <Typography variant="bodySmall">
+            navigationIcon=&quot;close&quot; for a modal. The second bar passes
+            an IconButton to leading and trailing; both sit on the title line.
+          </Typography>
+          <Column gap="md">
+            <Box style={previewStyle}>
+              <AppBar
+                title="About"
+                canGoBack
+                navigationIcon="close"
+                onBackPress={() => router.back()}
+              />
+            </Box>
+            <Box style={previewStyle}>
+              <AppBar
+                title="About"
+                leading={
+                  <IconButton
+                    icon="close"
+                    variant="standard"
+                    accessibilityLabel="Close"
+                    onPress={() => router.back()}
+                  />
+                }
+                trailing={
+                  <IconButton
+                    icon="share-variant"
+                    variant="standard"
+                    accessibilityLabel="Share"
+                  />
+                }
+              />
+            </Box>
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Elevated</Typography>
-        <Column gap="md">
-          {variants.map((item) => (
-            <Column key={`elevated-${item.key}`} gap="sm">
-              <Typography variant="labelMedium">{item.label}</Typography>
-              <Box style={previewStyle}>
-                <AppBar
-                  title={item.title}
-                  variant={item.variant}
-                  elevated
-                  canGoBack
-                  actions={actions}
-                  onBackPress={() => router.back()}
-                />
-              </Box>
-            </Column>
-          ))}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Elevated</Typography>
+          <Column gap="md">
+            {variants.map((item) => (
+              <Column key={`elevated-${item.key}`} gap="sm">
+                <Typography variant="labelMedium">{item.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={item.title}
+                    variant={item.variant}
+                    elevated
+                    canGoBack
+                    actions={actions}
+                    onBackPress={() => router.back()}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Collapse on Scroll</Typography>
-        <Typography variant="bodySmall">
-          Medium and large bars collapse to the small form as the content
-          scrolls, driven by `scrollOffset` from inertia&apos;s useScroll().
-        </Typography>
-        <Column gap="md">
-          {(['medium', 'large'] as const).map((variant) => (
-            <Column key={`collapse-${variant}`} gap="sm">
-              <Typography variant="labelMedium">
-                {variant === 'large' ? 'Large' : 'Medium'}
-              </Typography>
-              <Box style={[previewStyle, styles.collapseFrame]}>
-                <CollapseDemo variant={variant} />
-              </Box>
-            </Column>
-          ))}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Collapse on Scroll</Typography>
+          <Typography variant="bodySmall">
+            Medium and large bars collapse to the small form as the content
+            scrolls, driven by `scrollOffset` from inertia&apos;s useScroll().
+          </Typography>
+          <Column gap="md">
+            {(['medium', 'large'] as const).map((variant) => (
+              <Column key={`collapse-${variant}`} gap="sm">
+                <Typography variant="labelMedium">
+                  {variant === 'large' ? 'Large' : 'Medium'}
+                </Typography>
+                <Box style={[previewStyle, styles.collapseFrame]}>
+                  <CollapseDemo variant={variant} />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Color Schemes</Typography>
-        <Column gap="md">
-          {colorSchemes.map((scheme) => (
-            <Column key={scheme.key} gap="sm">
-              <Typography variant="labelMedium">{scheme.label}</Typography>
-              <Box style={previewStyle}>
-                <AppBar
-                  title={scheme.label}
-                  colorScheme={scheme.key}
-                  canGoBack
-                  actions={actions}
-                  onBackPress={() => router.back()}
-                />
-              </Box>
-            </Column>
-          ))}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Color Schemes</Typography>
+          <Column gap="md">
+            {colorSchemes.map((scheme) => (
+              <Column key={scheme.key} gap="sm">
+                <Typography variant="labelMedium">{scheme.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={scheme.label}
+                    colorScheme={scheme.key}
+                    canGoBack
+                    actions={actions}
+                    onBackPress={() => router.back()}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Title Style</Typography>
-        <Typography variant="bodySmall">
-          titleStyle merges over the variant&apos;s type scale — the back button
-          and actions are unaffected.
-        </Typography>
-        <Column gap="md">
-          <Box style={previewStyle}>
-            <AppBar
-              title="Rootnative"
-              canGoBack
-              actions={actions}
-              onBackPress={() => router.back()}
-              titleStyle={styles.brandTitle}
-            />
-          </Box>
-          <Box style={previewStyle}>
-            <AppBar
-              title="Rootnative"
-              variant="large"
-              canGoBack
-              actions={actions}
-              onBackPress={() => router.back()}
-              titleStyle={styles.brandTitle}
-            />
-          </Box>
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Title Style</Typography>
+          <Typography variant="bodySmall">
+            titleStyle merges over the variant&apos;s type scale — the back
+            button and actions are unaffected.
+          </Typography>
+          <Column gap="md">
+            <Box style={previewStyle}>
+              <AppBar
+                title="Rootnative"
+                canGoBack
+                actions={actions}
+                onBackPress={() => router.back()}
+                titleStyle={styles.brandTitle}
+              />
+            </Box>
+            <Box style={previewStyle}>
+              <AppBar
+                title="Rootnative"
+                variant="large"
+                canGoBack
+                actions={actions}
+                onBackPress={() => router.back()}
+                titleStyle={styles.brandTitle}
+              />
+            </Box>
+          </Column>
         </Column>
-      </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Long Title</Typography>
-        <Column gap="md">
-          {variants.map((item) => (
-            <Column key={`long-${item.key}`} gap="sm">
-              <Typography variant="labelMedium">{item.label}</Typography>
-              <Box style={previewStyle}>
-                <AppBar
-                  title={longTitle}
-                  variant={item.variant}
-                  canGoBack
-                  actions={actions}
-                  onBackPress={() => router.back()}
-                />
-              </Box>
-            </Column>
-          ))}
+        <Column gap="sm">
+          <Typography variant="titleSmall">Long Title</Typography>
+          <Column gap="md">
+            {variants.map((item) => (
+              <Column key={`long-${item.key}`} gap="sm">
+                <Typography variant="labelMedium">{item.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={longTitle}
+                    variant={item.variant}
+                    canGoBack
+                    actions={actions}
+                    onBackPress={() => router.back()}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
         </Column>
-      </Column>
-      <ScreenNavFooter />
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -314,10 +317,6 @@ export default function AppBarScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
   brandTitle: {
     fontWeight: '700',

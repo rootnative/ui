@@ -1,4 +1,10 @@
-import { Avatar, Column, Row, Typography } from '@rootnative/components'
+import {
+  Avatar,
+  Column,
+  Container,
+  Row,
+  Typography,
+} from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
@@ -14,7 +20,7 @@ export default function AvatarScreen() {
         { backgroundColor: theme.colors.surface },
       ]}
     >
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         {/* Sizes */}
         <Column gap="sm">
@@ -160,7 +166,7 @@ export default function AvatarScreen() {
           </Column>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -168,12 +174,6 @@ export default function AvatarScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
   chatRow: {
     flexDirection: 'row',

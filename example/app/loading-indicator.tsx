@@ -1,5 +1,6 @@
 import {
   Column,
+  Container,
   LoadingIndicator,
   Row,
   Typography,
@@ -25,73 +26,75 @@ export default function LoadingIndicatorScreen() {
   const captionStyle = { color: theme.colors.onSurfaceVariant }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <Column gap="sm">
-        <Typography variant="titleSmall">Indeterminate</Typography>
-        <Row gap="lg" align="center">
-          <Column align="center" gap="xs">
-            <LoadingIndicator accessibilityLabel="Loading" />
-            <Typography variant="labelSmall" style={captionStyle}>
-              Uncontained
-            </Typography>
-          </Column>
-          <Column align="center" gap="xs">
-            <LoadingIndicator contained accessibilityLabel="Loading" />
-            <Typography variant="labelSmall" style={captionStyle}>
-              Contained
-            </Typography>
-          </Column>
-          <Column align="center" gap="xs">
-            <LoadingIndicator size={72} accessibilityLabel="Loading" />
-            <Typography variant="labelSmall" style={captionStyle}>
-              72dp
-            </Typography>
-          </Column>
-        </Row>
-      </Column>
+    <ScrollView style={styles.container}>
+      <Container width="expanded" p="lg" gap={20}>
+        <ScreenIntro />
+        <Column gap="sm">
+          <Typography variant="titleSmall">Indeterminate</Typography>
+          <Row gap="lg" align="center">
+            <Column align="center" gap="xs">
+              <LoadingIndicator accessibilityLabel="Loading" />
+              <Typography variant="labelSmall" style={captionStyle}>
+                Uncontained
+              </Typography>
+            </Column>
+            <Column align="center" gap="xs">
+              <LoadingIndicator contained accessibilityLabel="Loading" />
+              <Typography variant="labelSmall" style={captionStyle}>
+                Contained
+              </Typography>
+            </Column>
+            <Column align="center" gap="xs">
+              <LoadingIndicator size={72} accessibilityLabel="Loading" />
+              <Typography variant="labelSmall" style={captionStyle}>
+                72dp
+              </Typography>
+            </Column>
+          </Row>
+        </Column>
 
-      <Column gap="sm">
-        <Typography variant="titleSmall">Determinate</Typography>
-        <Row gap="lg" align="center">
-          <Column align="center" gap="xs">
+        <Column gap="sm">
+          <Typography variant="titleSmall">Determinate</Typography>
+          <Row gap="lg" align="center">
+            <Column align="center" gap="xs">
+              <LoadingIndicator
+                progress={value}
+                accessibilityLabel="Loading progress"
+              />
+              <Typography variant="labelSmall" style={captionStyle}>
+                {`${Math.round(value * 100)}%`}
+              </Typography>
+            </Column>
+            <Column align="center" gap="xs">
+              <LoadingIndicator
+                contained
+                progress={value}
+                accessibilityLabel="Loading progress"
+              />
+              <Typography variant="labelSmall" style={captionStyle}>
+                Contained
+              </Typography>
+            </Column>
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Custom Color</Typography>
+          <Row gap="lg" align="center">
             <LoadingIndicator
-              progress={value}
-              accessibilityLabel="Loading progress"
+              contentColor="#00796B"
+              accessibilityLabel="Loading"
             />
-            <Typography variant="labelSmall" style={captionStyle}>
-              {`${Math.round(value * 100)}%`}
-            </Typography>
-          </Column>
-          <Column align="center" gap="xs">
             <LoadingIndicator
               contained
-              progress={value}
-              accessibilityLabel="Loading progress"
+              contentColor="#FFFFFF"
+              containerColor="#B00020"
+              accessibilityLabel="Loading"
             />
-            <Typography variant="labelSmall" style={captionStyle}>
-              Contained
-            </Typography>
-          </Column>
-        </Row>
-      </Column>
-
-      <Column gap="sm">
-        <Typography variant="titleSmall">Custom Color</Typography>
-        <Row gap="lg" align="center">
-          <LoadingIndicator
-            contentColor="#00796B"
-            accessibilityLabel="Loading"
-          />
-          <LoadingIndicator
-            contained
-            contentColor="#FFFFFF"
-            containerColor="#B00020"
-            accessibilityLabel="Loading"
-          />
-        </Row>
-      </Column>
-      <ScreenNavFooter />
+          </Row>
+        </Column>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
@@ -99,9 +102,5 @@ export default function LoadingIndicatorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    padding: 24,
-    rowGap: 20,
   },
 })

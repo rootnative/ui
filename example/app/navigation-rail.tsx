@@ -1,12 +1,13 @@
 import {
   Card,
   Column,
+  Container,
   FAB,
   IconButton,
   NavigationRail,
   Row,
-  Typography,
   type NavigationRailItem,
+  Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
@@ -63,7 +64,7 @@ function NavigationRailScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">With a header</Typography>
@@ -146,7 +147,7 @@ function NavigationRailScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -158,12 +159,6 @@ export default function NavigationRailScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
   frame: {
     height: 420,

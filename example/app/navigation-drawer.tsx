@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Column,
+  Container,
   NavigationDrawer,
   Row,
   Typography,
@@ -74,7 +75,7 @@ function NavigationDrawerScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Modal</Typography>
@@ -122,7 +123,7 @@ function NavigationDrawerScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
 
       <NavigationDrawer
         visible={open}
@@ -147,12 +148,6 @@ export default function NavigationDrawerScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
   frame: {
     height: 520,

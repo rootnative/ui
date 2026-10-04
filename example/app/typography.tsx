@@ -1,4 +1,4 @@
-import { Typography } from '@rootnative/components'
+import { Container, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
@@ -34,66 +34,69 @@ export default function TypographyScreen() {
   const theme = useTheme()
 
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <ScreenIntro />
-      <View style={styles.section}>
-        <Typography variant="headlineSmall">All Variants</Typography>
-        {variants.map((variant) => (
-          <Typography key={variant} variant={variant}>
-            {toSentenceCase(variant)}
+    <ScrollView>
+      <Container width="expanded" p="lg" gap="xl">
+        <ScreenIntro />
+        <View style={styles.section}>
+          <Typography variant="headlineSmall">All Variants</Typography>
+          {variants.map((variant) => (
+            <Typography key={variant} variant={variant}>
+              {toSentenceCase(variant)}
+            </Typography>
+          ))}
+        </View>
+
+        <View style={styles.section}>
+          <Typography variant="headlineSmall">
+            Single-Line Truncation
           </Typography>
-        ))}
-      </View>
+          <Typography
+            variant="titleMedium"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {longText}
+          </Typography>
+        </View>
 
-      <View style={styles.section}>
-        <Typography variant="headlineSmall">Single-Line Truncation</Typography>
-        <Typography
-          variant="titleMedium"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {longText}
-        </Typography>
-      </View>
+        <View style={styles.section}>
+          <Typography variant="headlineSmall">Color Overrides</Typography>
+          <Typography
+            variant="bodyLarge"
+            style={{ color: theme.colors.primary }}
+          >
+            Primary color text
+          </Typography>
+          <Typography variant="bodyLarge" style={{ color: theme.colors.error }}>
+            Error color text
+          </Typography>
+          <Typography
+            variant="bodyLarge"
+            style={{ color: theme.colors.tertiary }}
+          >
+            Tertiary color text
+          </Typography>
+        </View>
 
-      <View style={styles.section}>
-        <Typography variant="headlineSmall">Color Overrides</Typography>
-        <Typography variant="bodyLarge" style={{ color: theme.colors.primary }}>
-          Primary color text
-        </Typography>
-        <Typography variant="bodyLarge" style={{ color: theme.colors.error }}>
-          Error color text
-        </Typography>
-        <Typography
-          variant="bodyLarge"
-          style={{ color: theme.colors.tertiary }}
-        >
-          Tertiary color text
-        </Typography>
-      </View>
-
-      <View style={styles.section}>
-        <Typography variant="headlineSmall">Custom Styles</Typography>
-        <Typography variant="bodyMedium" style={styles.italic}>
-          Italic text using custom style
-        </Typography>
-        <Typography variant="bodyMedium" style={styles.underline}>
-          Underlined text
-        </Typography>
-        <Typography variant="bodyMedium" style={styles.uppercase}>
-          Uppercase text
-        </Typography>
-      </View>
-      <ScreenNavFooter />
+        <View style={styles.section}>
+          <Typography variant="headlineSmall">Custom Styles</Typography>
+          <Typography variant="bodyMedium" style={styles.italic}>
+            Italic text using custom style
+          </Typography>
+          <Typography variant="bodyMedium" style={styles.underline}>
+            Underlined text
+          </Typography>
+          <Typography variant="bodyMedium" style={styles.uppercase}>
+            Uppercase text
+          </Typography>
+        </View>
+        <ScreenNavFooter />
+      </Container>
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    rowGap: 32,
-  },
   section: {
     rowGap: 8,
   },

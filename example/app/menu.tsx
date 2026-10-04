@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Column,
+  Container,
   Divider,
   IconButton,
   Menu,
@@ -34,7 +35,7 @@ function MenuScreenContent() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <Column gap="xl" style={styles.container}>
+      <Container width="expanded" p="lg" gap="xl">
         <ScreenIntro />
         <Column gap="sm">
           <Typography variant="titleMedium">Self-managing</Typography>
@@ -261,7 +262,7 @@ function MenuScreenContent() {
           </Card>
         </Column>
         <ScreenNavFooter />
-      </Column>
+      </Container>
     </ScrollView>
   )
 }
@@ -275,11 +276,5 @@ export default function MenuScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
-    padding: 24,
-  },
-  container: {
-    maxWidth: 600,
-    width: '100%',
-    alignSelf: 'center',
   },
 })
