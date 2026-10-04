@@ -11,6 +11,38 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `Container`: one content column for every screen
+
+A screen on a wide window had no way to cap its content width except a
+hand-written `maxWidth` on each screen. The example app had 23 copies of
+that rule with three different numbers, and nothing in the library said
+which one was right.
+
+`Container` is a centred `Column` with a maximum width. The `width` prop
+names a breakpoint band, and the Container stops growing at the lower bound
+of that band: `medium` (the default) is 600dp, `expanded` 840, `large` 1200,
+and `extraLarge` 1600. Below that width it fills its parent, so a phone sees
+no change. The limit includes the padding. Put it as the one child of a
+`ScrollView` with the screen padding on it, and every screen shares one
+column. It ships from the `layout` subpath and the package root.
+
+The example app uses it on every screen: `medium` on the component screens
+and `large` on the home page.
+
+### The example app hydrates clean on the web
+
+Lighthouse reported React error #418 on the docs home. Two things in the
+example read the browser during the hydrating render: the `?embed=1` flag
+that the docs iframe passes, and the copy button that checks for the
+clipboard API. Four screens also drew `MaterialDesignIcons` directly, past
+the hydration guard the `mdi` resolver added in the last release, so every
+component route had a glyph that the server wrote and the client did not.
+All of them now wait for hydration or go through the resolver.
+
+The home page also kept its hero pinned instead of its toolbar: the
+`PageHead` element counted as the first child of the `ScrollView` and moved
+the sticky index. The head now sits outside the `ScrollView`.
+
 ### `Typography` takes a `level`, and the `AppBar` title is a real `<h1>`
 
 The static export of the example app showed every `display*` and `headline*`

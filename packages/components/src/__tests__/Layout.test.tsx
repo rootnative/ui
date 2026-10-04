@@ -5,6 +5,7 @@ import { Dimensions, StyleSheet, Text } from 'react-native'
 import * as Reanimated from 'react-native-reanimated'
 import { Box } from '../layout/Box'
 import { Column } from '../layout/Column'
+import { Container } from '../layout/Container'
 import { Grid } from '../layout/Grid'
 import { GridCell } from '../layout/GridCell'
 import { Layout } from '../layout/Layout'
@@ -258,6 +259,53 @@ describe('Column', () => {
     const flatStyle = StyleSheet.flatten(screen.getByTestId('col').props.style)
     expect(flatStyle.padding).toBe(24)
     expect(flatStyle.gap).toBe(4)
+  })
+})
+
+describe('Container', () => {
+  it('caps the width at the medium band by default and centres itself', () => {
+    renderWithTheme(
+      <Container testID="container">
+        <Text>A</Text>
+      </Container>,
+    )
+    const flatStyle = StyleSheet.flatten(
+      screen.getByTestId('container').props.style,
+    )
+    expect(flatStyle.maxWidth).toBe(600)
+    expect(flatStyle.width).toBe('100%')
+    expect(flatStyle.alignSelf).toBe('center')
+    expect(flatStyle.flexDirection).toBe('column')
+  })
+
+  it.each([
+    ['expanded', 840],
+    ['large', 1200],
+    ['extraLarge', 1600],
+  ] as const)('maps width %s to %i', (width, expected) => {
+    renderWithTheme(
+      <Container testID="container" width={width}>
+        <Text>A</Text>
+      </Container>,
+    )
+    const flatStyle = StyleSheet.flatten(
+      screen.getByTestId('container').props.style,
+    )
+    expect(flatStyle.maxWidth).toBe(expected)
+  })
+
+  it('passes Column props through and keeps the width rule under style', () => {
+    renderWithTheme(
+      <Container testID="container" p="lg" gap="md" style={{ maxWidth: 400 }}>
+        <Text>A</Text>
+      </Container>,
+    )
+    const flatStyle = StyleSheet.flatten(
+      screen.getByTestId('container').props.style,
+    )
+    expect(flatStyle.padding).toBe(24)
+    expect(flatStyle.gap).toBe(16)
+    expect(flatStyle.maxWidth).toBe(400)
   })
 })
 

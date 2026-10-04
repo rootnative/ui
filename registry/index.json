@@ -63,7 +63,7 @@
     },
     {
       "name": "layout",
-      "description": "Layout primitives: Box, Row, Column, Grid with responsive columns and spanning cells, and Layout (SafeAreaView wrapper)."
+      "description": "Layout primitives: Box, Row, Column, Container (a centred column with a maximum width), Grid with responsive columns and spanning cells, and Layout (SafeAreaView wrapper)."
     },
     {
       "name": "list",

@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         'components/box',
         'components/row',
         'components/column',
+        'components/container',
         'components/grid',
         'components/layout',
       ],

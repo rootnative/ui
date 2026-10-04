@@ -1,4 +1,8 @@
-import type { BreakpointValues, MaterialTheme } from '@rootnative/core'
+import type {
+  Breakpoint,
+  BreakpointValues,
+  MaterialTheme,
+} from '@rootnative/core'
 import type { FlexAlignType, ViewProps } from 'react-native'
 
 /** A theme spacing token name or a raw numeric value in dp. */
@@ -74,6 +78,22 @@ export interface ColumnProps extends BoxProps {
    * @default false
    */
   inverted?: boolean
+}
+
+/**
+ * A content width, named after the breakpoint band it fills. The value is the
+ * lower bound of that band in dp: `medium` is 600, `expanded` 840, `large`
+ * 1200, and `extraLarge` 1600.
+ */
+export type ContainerWidth = Exclude<Breakpoint, 'compact'>
+
+export interface ContainerProps extends ColumnProps {
+  /**
+   * The widest the Container grows, padding included. Below that width it
+   * fills its parent.
+   * @default 'medium'
+   */
+  width?: ContainerWidth
 }
 
 export interface GridProps extends RowProps {

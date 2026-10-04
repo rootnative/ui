@@ -1361,6 +1361,19 @@ import { Column } from '@rootnative/components/layout'
         ifaceName: 'ColumnProps',
       },
       {
+        title: '#### Container',
+        desc: 'Centred Column with a maximum width (extends Column). `width` names a breakpoint band, and the Container stops growing at the lower bound of that band: `medium` (default) 600dp, `expanded` 840, `large` 1200, `extraLarge` 1600. Below that width it fills its parent. The limit includes the padding. Use it as the one child of a ScrollView, with the screen padding on it, so every screen shares one content column.',
+        example: `\`\`\`tsx
+import { Container } from '@rootnative/components/layout'
+
+<ScrollView>
+  <Container p="lg" gap="md">{children}</Container>
+</ScrollView>
+<Container width="large" p="lg">{dashboard}</Container>
+\`\`\``,
+        ifaceName: 'ContainerProps',
+      },
+      {
         title: '#### Grid',
         desc: 'Equal-width column grid (extends Row).',
         example: `\`\`\`tsx

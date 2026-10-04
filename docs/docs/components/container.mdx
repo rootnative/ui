@@ -1,0 +1,89 @@
+---
+sidebar_position: 4
+description: A centred column with a maximum width, so a screen keeps one content column on a wide window.
+---
+
+# Container
+
+A centred [Column](./column) with a maximum width. Below that width it fills its parent, so a phone sees no change. On a tablet or a browser window the content stops at the width you name and sits in the middle.
+
+Use it as the one child of a `ScrollView`, with the screen padding on it. Every screen then shares one content column, and no screen writes its own `maxWidth`.
+
+## Usage
+
+<SnackExample
+  name="RootNative Container — Usage"
+  code={`
+  import { Container, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { ScrollView } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <ScrollView>
+            <Container p="lg" gap="md">
+              <Typography variant="headlineSmall">Settings</Typography>
+              <Typography variant="bodyMedium">
+                This column is at most 600dp wide and sits in the middle of a
+                wide window. On a phone it fills the screen.
+              </Typography>
+            </Container>
+          </ScrollView>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Widths
+
+The `width` prop names a breakpoint band. The Container grows to the lower bound of that band and no further. The limit includes the padding.
+
+| `width` | Maximum width | Use for |
+|---------|---------------|---------|
+| `medium` (default) | 600dp | Reading content, forms, a settings list |
+| `expanded` | 840dp | A list with a detail pane, a wide form |
+| `large` | 1200dp | A dashboard, a card grid |
+| `extraLarge` | 1600dp | A full-width canvas with margins |
+
+```tsx
+<ScrollView>
+  <Container width="large" p="lg">
+    <Grid columns={{ compact: 1, medium: 2, expanded: 4 }} gap="md">
+      {cards}
+    </Grid>
+  </Container>
+</ScrollView>
+```
+
+The values are the same as the `breakpoints` export of `@rootnative/core`, so a `Grid` inside a Container changes its column count at the same widths the Container stops growing.
+
+## Padding goes on the Container
+
+Put the screen padding on the Container, not on the `ScrollView`. The limit then applies to the padded box, and the content column lines up from screen to screen.
+
+```tsx
+// Both screens show their text at the same x on a wide window.
+<ScrollView>
+  <Container p="lg" gap="xl">
+    <Typography variant="headlineSmall">First screen</Typography>
+  </Container>
+</ScrollView>
+
+<ScrollView>
+  <Container p="lg" gap="xl">
+    <Typography variant="headlineSmall">Second screen</Typography>
+  </Container>
+</ScrollView>
+```
+
+A `style` prop wins over the width rule, so `style={{ maxWidth: 400 }}` narrows one screen without a new band.
+
+## Props
+
+<PropTable name="Container" />
