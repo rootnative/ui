@@ -18,9 +18,9 @@ const dist = resolve(here, '..', 'dist')
 
 const SITE_URL = 'https://rootnative.github.io/ui/demo'
 
-// The AppBar title is the `<h1>` of every page: the library gives it the
-// header role and react-native-web writes a level-less header as `<h1>`. The
-// screen intro and the home hero sit under it as `<h2>`.
+// The AppBar title is the `<h1>` of every page: `titleLevel` defaults to 1.
+// The screen intro and the home hero pass `level={2}` to `Typography`, so
+// they sit under it as `<h2>`.
 const pages = [
   {
     file: 'index.html',

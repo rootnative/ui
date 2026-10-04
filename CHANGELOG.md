@@ -73,9 +73,8 @@ as a string child instead.
 
 The export also showed that the `AppBar` title and every `display*` or
 `headline*` `Typography` render as `<h1>` on the web, because the library
-gives them the header role with no level. Nothing in the library changes in
-this release. Put your own headings at level 2 and below, and give a
-decorative display glyph `accessibilityRole="none"`.
+gave them the header role with no level. The entry above fixes that:
+`Typography` takes `level`, and `AppBar` takes `titleLevel`.
 
 A new docs section, "SEO for the web export", carries the blockers, the
 checklist, the API reference and the limits. The API page is generated from

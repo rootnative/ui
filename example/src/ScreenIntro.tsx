@@ -6,10 +6,8 @@ import {
   Row,
   Typography,
 } from '@rootnative/components'
-import type { TypographyProps } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { PageHead } from '@rootnative/seo/expo-router'
-import { Heading } from '@rootnative/seo/react'
 import { usePathname } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Linking, Platform, StyleSheet } from 'react-native'
@@ -83,13 +81,9 @@ export function ScreenIntro() {
         url={entry.route}
       />
       <Column gap="xs">
-        <Heading<TypographyProps>
-          level={2}
-          as={Typography}
-          variant="headlineSmall"
-        >
+        <Typography level={2} variant="headlineSmall">
           {entry.label}
-        </Heading>
+        </Typography>
         <Typography variant="bodyMedium" color={theme.colors.onSurfaceVariant}>
           {entry.description}
         </Typography>

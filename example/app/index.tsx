@@ -26,11 +26,9 @@ import {
   TextField,
   Typography,
 } from '@rootnative/components'
-import type { TypographyProps } from '@rootnative/components'
 import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { PageHead } from '@rootnative/seo/expo-router'
-import { Heading } from '@rootnative/seo/react'
 import { webSite } from '@rootnative/seo/schema'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
@@ -810,13 +808,9 @@ export default function HomeScreen() {
                 Material Design 3
               </Typography>
             </Row>
-            <Heading<TypographyProps>
-              level={2}
-              as={Typography}
-              variant={heroVariant}
-            >
+            <Typography level={2} variant={heroVariant}>
               RootNative UI
-            </Heading>
+            </Typography>
             <Typography variant={taglineVariant} style={captionStyle}>
               Beautiful Material Design 3 components for React Native — copy,
               paste, ship.
