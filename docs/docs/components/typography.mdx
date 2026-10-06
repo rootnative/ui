@@ -67,7 +67,7 @@ does not.
 
 ## Accessibility
 
-Pass `level` (1 to 6) on a heading. It sets the header role and `aria-level`, so the web renders `<h1>` to `<h6>` and a crawler reads the outline. A display or headline variant with no `level` announces a header on native only: on the web a level-less header is always `<h1>`, so it renders a plain element there. An explicit `accessibilityRole` always wins.
+Pass `level` (1 to 6) on a heading. It sets the header role and `aria-level`, so the web renders `<h1>` to `<h6>` and a crawler reads the outline. A display or headline variant with no `level`, plain or `Emphasized`, announces a header on native only: on the web a level-less header is always `<h1>`, so it renders a plain element there. An explicit `accessibilityRole` always wins.
 
 ```tsx
 <Typography variant="headlineSmall" level={1}>Dune</Typography>

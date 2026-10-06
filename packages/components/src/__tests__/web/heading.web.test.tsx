@@ -27,11 +27,23 @@ describe('Typography heading level on the web', () => {
     expect(node.getAttribute('aria-level')).toBe('2')
   })
 
-  it('renders a plain element for a headline variant with no level', () => {
-    renderWeb(<Typography variant="headlineSmall">Aa</Typography>)
-    const node = screen.getByText('Aa')
-    expect(node.tagName).not.toMatch(/^H[1-6]$/)
-    expect(node.getAttribute('role')).toBeNull()
+  it.each(['headlineSmall', 'headlineLargeEmphasized'] as const)(
+    'renders a plain element for %s with no level',
+    (variant) => {
+      renderWeb(<Typography variant={variant}>Aa</Typography>)
+      const node = screen.getByText('Aa')
+      expect(node.tagName).not.toMatch(/^H[1-6]$/)
+      expect(node.getAttribute('role')).toBeNull()
+    },
+  )
+
+  it('renders <h1> for an emphasized headline with level 1', () => {
+    renderWeb(
+      <Typography variant="headlineLargeEmphasized" level={1}>
+        Dune
+      </Typography>,
+    )
+    expect(screen.getByText('Dune').tagName).toBe('H1')
   })
 
   it('keeps an aria-level passed by a wrapper, as Heading from @rootnative/seo does', () => {

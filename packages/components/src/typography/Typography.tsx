@@ -7,14 +7,11 @@ import { Platform, StyleSheet, Text } from 'react-native'
 import { createStyles } from './styles'
 import type { TypographyVariant } from './types'
 
-const HEADING_VARIANTS: ReadonlySet<TypographyVariant> = new Set([
-  'displayLarge',
-  'displayMedium',
-  'displaySmall',
-  'headlineLarge',
-  'headlineMedium',
-  'headlineSmall',
-])
+// Read from the name, not from a list: a list of the six plain names missed
+// the `*Emphasized` variants, which are headings too.
+function isHeadingVariant(variant: TypographyVariant): boolean {
+  return variant.startsWith('display') || variant.startsWith('headline')
+}
 
 export interface TypographyProps extends Omit<TextProps, 'children' | 'style'> {
   /** Content to display. Accepts strings, numbers, or nested elements. */
@@ -36,9 +33,9 @@ export interface TypographyProps extends Omit<TextProps, 'children' | 'style'> {
   /**
    * The outline level of a heading. Sets the header role and `aria-level`, so
    * the web renders `<h1>` to `<h6>` and a crawler reads the outline. Without
-   * it, a display or headline variant announces a header on native only: on
-   * the web a level-less header is always `<h1>`, and a page with five display
-   * texts had five `<h1>`.
+   * it, a display or headline variant, plain or `Emphasized`, announces a
+   * header on native only: on the web a level-less header is always `<h1>`,
+   * and a page with five display texts had five `<h1>`.
    */
   level?: 1 | 2 | 3 | 4 | 5 | 6
 }
@@ -62,8 +59,7 @@ export function Typography({
   // web would fall back to `<h1>`.
   const ariaLevelProp = (textProps as { 'aria-level'?: number })['aria-level']
   const impliedHeader =
-    level !== undefined ||
-    (HEADING_VARIANTS.has(variant) && Platform.OS !== 'web')
+    level !== undefined || (isHeadingVariant(variant) && Platform.OS !== 'web')
   const resolvedRole =
     accessibilityRole ?? (impliedHeader ? 'header' : undefined)
 

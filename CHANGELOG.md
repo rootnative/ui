@@ -57,6 +57,21 @@ Nine new tests cover the rule, and five of them fail on the old code.
 `getByRole('button')` now finds nothing. Give the chip an `onPress`, or query
 it by its text.
 
+### An emphasized headline is a header on native
+
+On iOS and Android, `Typography` gives a display or headline variant with no
+`level` the header role. It read the variants from a list of the six plain
+names, so the 6 `display*Emphasized` and `headline*Emphasized` variants got no
+role, and a screen reader did not announce an emphasized page title as a
+header. The docs said that every display and headline variant is a header.
+
+`Typography` now reads the role from the variant name: a name that starts
+with `display` or `headline` is a heading, with or without `Emphasized`.
+`title*` and the other roles stay plain text. The web does not change: with
+no `level`, no variant gets the role there. New native tests cover four
+emphasized headings and two emphasized non-headings, and a web test pins
+`<h1>` for an emphasized headline with `level={1}`.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

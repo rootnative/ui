@@ -16,6 +16,24 @@ describe('Typography', () => {
     expect(screen.getByRole('header')).toBeTruthy()
   })
 
+  it.each([
+    'displayLargeEmphasized',
+    'displaySmallEmphasized',
+    'headlineLargeEmphasized',
+    'headlineMediumEmphasized',
+  ] as const)('assigns header role for the emphasized %s', (variant) => {
+    renderWithTheme(<Typography variant={variant}>Dune</Typography>)
+    expect(screen.getByRole('header')).toBeTruthy()
+  })
+
+  it.each(['titleLargeEmphasized', 'bodyLargeEmphasized'] as const)(
+    'does not assign header role for the emphasized %s',
+    (variant) => {
+      renderWithTheme(<Typography variant={variant}>Cast</Typography>)
+      expect(screen.queryByRole('header')).toBeNull()
+    },
+  )
+
   it('does not assign header role for body variants', () => {
     renderWithTheme(<Typography variant="bodyMedium">Body text</Typography>)
     expect(screen.queryByRole('header')).toBeNull()
