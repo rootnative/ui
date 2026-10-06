@@ -58,7 +58,11 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 
 ## `@rootnative/seo/node` — Node only, no peer
 
-Each `write*` creates `outDir`, writes the file and resolves to its path. Each has a pure sibling that returns the text.
+- `rootnative-seo <outDir> [--site-url <url>] [--sitemap <url>]... [--no-robots]` — the command for the deploy step, after the export. It runs `writeSeoFiles`, prints each page it leaves out with the reason, and exits with 1 on an error. `--sitemap` replaces the sitemap list in `robots.txt`; repeat it for more than one.
+- `writeSeoFiles({ outDir, siteUrl?, robots? })` — reads every `.html` file under `outDir` and writes `sitemap.xml` and `robots.txt`. A page goes in the sitemap with its canonical link, when the link is under the site and the page has no `noindex`. Left out, with a `reason`: a special route (a `+` or `_` segment, or a root `404.html`), a dynamic route template (`[id].html`), `noindex`, no canonical link, a canonical link outside the site, and a second page with the same link. `siteUrl` defaults to the canonical link of `index.html`. `robots: false` writes no `robots.txt`; an object passes options to `writeRobots`. Resolves to `{ siteUrl, sitemap, robots?, urls, skipped: { file, reason }[] }`. Throws when no page can go in the sitemap, because an empty sitemap fails with no other signal.
+- `readExport(outDir)` — `{ file, route, canonical?, noindex }[]` for every exported HTML file, sorted by path. Use it to build a URL list of your own.
+
+The three functions below write one file each. Each creates `outDir`, writes the file and resolves to its path. Each has a pure sibling that returns the text.
 
 - `writeSitemap({ outDir, siteUrl, urls, fileName? })` / `sitemapXml({ siteUrl, urls })` — `urls: { loc, lastmod?, changefreq?, priority? }[]`. A relative `loc` is joined under `siteUrl`. Every value is XML-escaped. `priority` is clamped to 0..1.
 - `writeRobots({ outDir, sitemapUrl, disallow?, allow?, userAgent?, fileName? })` / `robotsTxt(...)` — `sitemapUrl` is one URL or a list. With no `disallow` the file allows everything. The file carries a comment that says why an overlay route is not disallowed: a crawler reads `noindex` only on a page it may fetch.

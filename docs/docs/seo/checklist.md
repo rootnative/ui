@@ -152,27 +152,45 @@ may fetch.
 
 ## 4. Robots and sitemap
 
-Write both in the deploy step, after the export. The routes come from the
-exported files, so the sitemap cannot drift from the app.
+Run `rootnative-seo` in the deploy step, after the export. It reads the
+canonical link of every exported page and writes `sitemap.xml` and
+`robots.txt` into the export folder.
 
-```js title="scripts/write-seo.mjs"
-import { readdirSync } from 'node:fs'
-import { writeManifest, writeRobots, writeSitemap } from '@rootnative/seo/node'
-
-const siteUrl = 'https://example.com/app'
-const urls = readdirSync('dist')
-  .filter((file) => file.endsWith('.html') && file !== '+not-found.html')
-  .map((file) => ({
-    loc: file === 'index.html' ? '/' : `/${file.replace(/\.html$/, '')}`,
-  }))
-
-await writeSitemap({ outDir: 'dist', siteUrl, urls })
-await writeRobots({ outDir: 'dist', sitemapUrl: `${siteUrl}/sitemap.xml` })
+```json title="package.json"
+{
+  "scripts": {
+    "export:web": "expo export --platform web",
+    "seo": "rootnative-seo dist"
+  }
+}
 ```
+
+A page goes in the sitemap with its canonical link, when that link is under
+the site and the page has no `noindex`. So the sitemap lists the address each
+page declares, and a route the export did not write is never listed. The
+command prints each page it leaves out, with the reason:
+
+```text
+[rootnative-seo] dist/sitemap.xml: 2 pages under https://example.com/app
+[rootnative-seo] dist/robots.txt
+[rootnative-seo] 3 pages stay out of the sitemap:
+  +not-found.html: a special route (+, _, or the host 404 page)
+  items/[id].html: a dynamic route template
+  search.html: noindex
+```
+
+The site URL comes from the canonical link of `index.html`. Pass
+`--site-url` when the home page has none. The command fails when no page can
+go in the sitemap, because an empty sitemap on a live host fails with no
+other signal.
 
 A crawler reads `robots.txt` at the origin root only. A site on a subpath
 host writes the file from the root deploy, and lists every sitemap of the
-origin in it.
+origin in it: repeat `--sitemap <url>` once for each. Pass `--no-robots` when
+another deploy owns the file.
+
+`writeSeoFiles` from `@rootnative/seo/node` does the same in a script, and
+`readExport` returns the pages for a URL list of your own.
 
 ## 5. Headings and `alt`
 

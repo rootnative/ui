@@ -359,19 +359,25 @@
         "shellTags"
       ],
       "./node": [
+        "ExportedPage",
         "ManifestIcon",
         "ManifestOptions",
         "RobotsOptions",
+        "SeoFilesResult",
         "SitemapOptions",
         "SitemapUrl",
+        "SkipReason",
         "WriteManifestOptions",
         "WriteRobotsOptions",
+        "WriteSeoFilesOptions",
         "WriteSitemapOptions",
         "manifestJson",
+        "readExport",
         "robotsTxt",
         "sitemapXml",
         "writeManifest",
         "writeRobots",
+        "writeSeoFiles",
         "writeSitemap"
       ]
     }

@@ -19,7 +19,7 @@ pnpm add @rootnative/seo
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
 | `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `shellTags` |
-| `@rootnative/seo/node` | Node | `writeSitemap`, `writeRobots`, `writeManifest` |
+| `@rootnative/seo/node` | Node | `writeSeoFiles` and the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
 
 ## Quick start (Expo Router)
 
@@ -64,6 +64,14 @@ import { movie } from '@rootnative/seo/schema'
 ```
 
 Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time.
+
+After the export, write the sitemap and `robots.txt` from the exported pages:
+
+```bash
+expo export --platform web && rootnative-seo dist
+```
+
+A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason.
 
 ## The rules the head follows
 

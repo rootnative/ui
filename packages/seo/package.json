@@ -9,6 +9,9 @@
   "types": "dist/index.d.mts",
   "react-native": "dist/index.mjs",
   "source": "src/index.ts",
+  "bin": {
+    "rootnative-seo": "dist/node/bin.mjs"
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {

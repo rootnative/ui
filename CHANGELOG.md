@@ -98,6 +98,40 @@ one of these components now takes effect. A margin moves the button as before,
 and now the focus ring and the shadow move with it. If you added a `Row` or a
 wrapper `View` only to centre a button, you can remove it.
 
+### `rootnative-seo` writes the sitemap and `robots.txt` from the export
+
+Every app wrote the same deploy script: list the exported HTML files, drop
+the `+not-found` page, turn each file name into a route, and pass the list to
+`writeSitemap` and `writeRobots`. That script had two faults. It listed a
+page by its file name, not by the address the page declares, so a page with
+a query in its canonical link got the wrong URL. And it did not read the
+page, so an overlay with `noindex` went into the sitemap.
+
+`writeSeoFiles({ outDir })` in `@rootnative/seo/node` now does the step. It
+reads every `.html` file under `outDir`, nested folders too, and lists a page
+with its canonical link when that link is under the site and the page has no
+`noindex`. It leaves out a special route (a `+` or `_` segment, or a root
+`404.html`), a dynamic route template such as `[id].html`, a page with no
+canonical link, a canonical link outside the site, and a second page with the
+same link, and it returns each page it leaves out with the reason. The site
+URL comes from the canonical link of `index.html`, or from `siteUrl`. It
+writes `robots.txt` too, unless you pass `robots: false`. It throws when no
+page can go in the sitemap, because an empty sitemap on a live host fails
+with no other signal.
+
+The new `rootnative-seo` command runs it from a `package.json` script:
+`rootnative-seo dist`, with `--site-url`, `--sitemap` (once per sitemap URL)
+and `--no-robots`. It prints each page it leaves out, with the reason.
+`readExport(outDir)` returns the canonical link and the `noindex` rule of
+each page, for a URL list of your own.
+
+The example app uses it. Its sitemap lists the same 37 URLs as before.
+
+**Check your deploy script.** If it builds the sitemap from the file names,
+replace it with `rootnative-seo dist` and read the list of pages it leaves
+out. A page that must be in the sitemap needs a canonical link: pass `url` to
+its `PageHead`.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

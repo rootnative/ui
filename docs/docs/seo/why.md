@@ -56,8 +56,9 @@ No package can fix this one. The docs say so, and the
   the outline.
 - JSON-LD builders for the common schema.org types. An empty field is left
   out.
-- `shellTags` for the HTML shell, and `writeSitemap`, `writeRobots`, and
-  `writeManifest` for the deploy step.
+- `shellTags` for the HTML shell, the `rootnative-seo` command that writes
+  the sitemap and `robots.txt` from the export, and `writeManifest` for the
+  deploy step.
 
 The app keeps the mapping from its data to the meta. The package knows
 schema.org, not your API. It does not prerender, it does not configure the
