@@ -14,6 +14,14 @@ interface ChipCommonProps extends Omit<PressableProps, 'children' | 'style'> {
   /** Text label rendered inside the chip. */
   children: string
   /**
+   * Called when the chip is pressed. With no `onPress`, `onLongPress` or
+   * `href`, an assist, suggestion or input chip is a static label: no button
+   * role and no tab stop. A filter chip is always a button, because a press
+   * toggles it. Expo Router's `<Link asChild>` passes `role="link"` and
+   * `href`, so the chip renders as an `<a>` on the web.
+   */
+  onPress?: PressableProps['onPress']
+  /**
    * Size of the leading icon in dp.
    * @default 18
    */

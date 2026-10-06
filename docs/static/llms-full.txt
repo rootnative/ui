@@ -1085,6 +1085,7 @@ import { Chip } from '@rootnative/components/chip'
 
 Common props (every variant):
 - `children: string` — Text label rendered inside the chip.
+- `onPress?: (event: GestureResponderEvent) => void` — Called when the chip is pressed. With no `onPress`, `onLongPress` or `href`, an assist, suggestion or input chip is a static label: no button role and no tab stop. A filter chip is always a button, because a press toggles it. Expo Router's `<Link asChild>` passes `role="link"` and `href`, so the chip renders as an `<a>` on the web.
 - `iconSize?: number` — Default: `18`. Size of the leading icon in dp.
 - `containerColor?: string` — Override the container (background) color. State-layer colors auto-derived.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors auto-derived when no `containerColor` is set.

@@ -149,9 +149,21 @@ describe('toggle states reach the DOM with the right attribute', () => {
   })
 
   it('Chip — a non-filter variant emits no toggle state at all', () => {
-    renderWeb(<Chip variant="assist">Assist</Chip>)
+    renderWeb(
+      <Chip variant="assist" onPress={() => {}}>
+        Assist
+      </Chip>,
+    )
     expect(aria('button', 'aria-pressed')).toBeNull()
     expect(aria('button', 'aria-selected')).toBeNull()
+  })
+
+  it('Chip — with no action, renders no button and no tab stop', () => {
+    const { container } = renderWeb(<Chip>MIT licensed</Chip>)
+    expect(screen.getByText('MIT licensed')).toBeTruthy()
+    expect(container.querySelector('button')).toBeNull()
+    expect(container.querySelector('[role="button"]')).toBeNull()
+    expect(container.querySelector('[tabindex]')).toBeNull()
   })
 
   it('IconButton — toggle is a pressed button', () => {

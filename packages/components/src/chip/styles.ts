@@ -201,6 +201,12 @@ export function createStyles(
       cursor: 'auto',
       ...elevationLevel0,
     },
+    // A chip with no action has no state layer, so the rest colour that the
+    // layer gives an interactive chip goes here.
+    staticContainer: {
+      backgroundColor: colors.backgroundColor,
+      cursor: 'auto',
+    },
     // Absolutely-positioned shadow carrier behind the container: `useShadow`
     // interpolates it from level 1 (rest) → level 2 (hover) per MD3 while the
     // selection and press morphs drive its radius, so the shadow keeps the

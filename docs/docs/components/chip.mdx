@@ -224,6 +224,24 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
 `}
 />
 
+## A chip with no action
+
+A chip is a button only when a press does something. An assist, suggestion or
+input chip with no `onPress`, no `onLongPress` and no `href` renders as a
+static label. It has no button role, no tab stop, no hover layer and no
+pointer cursor. A screen reader reads its text, and a keyboard user does not
+stop on it. An input chip with only `onClose` keeps its close button.
+
+```tsx
+<Chip leadingIcon="language-typescript">TypeScript-first</Chip>
+```
+
+A filter chip is always a button, because a press toggles it.
+
+A chip inside Expo Router's `<Link asChild>` stays a button with no `onPress`
+of its own. `Link` gives it an `href`, and on the web the chip renders as an
+`<a href>`.
+
 ## Props
 
 <PropTable name="Chip" />

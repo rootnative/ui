@@ -101,6 +101,14 @@ export function Chip(props: ChipProps) {
     [variant, isSelected, isControlledSelection, onSelectedChange, onPress],
   )
 
+  // On web, Expo Router's `<Link asChild>` gives the chip an `href` and an
+  // `onClick`, not an `onPress`, so an `href` counts as an action too.
+  const isInteractive =
+    variant === 'filter' ||
+    onPress != null ||
+    rest.onLongPress != null ||
+    (rest as { href?: string }).href != null
+
   const showCloseIcon =
     onClose !== undefined &&
     (variant === 'input' || (variant === 'filter' && isSelected))
@@ -356,11 +364,21 @@ export function Chip(props: ChipProps) {
     return null
   }
 
+  const content = (
+    <>
+      {renderLeadingContent()}
+      <Text style={computedLabelStyle}>{children}</Text>
+      {showCloseIcon ? <View style={styles.closeSpacer} /> : null}
+    </>
+  )
+
   return (
     <View style={styles.wrapper}>
-      <Animated.View
-        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
-      />
+      {isInteractive ? (
+        <Animated.View
+          style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
+        />
+      ) : null}
       {showElevationLayer ? (
         <Animated.View
           style={[
@@ -371,38 +389,55 @@ export function Chip(props: ChipProps) {
           ]}
         />
       ) : null}
-      <AnimatedPressable
-        {...rest}
-        accessibilityRole="button"
-        aria-disabled={isDisabled}
-        {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
-        // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
-        hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
-        disabled={isDisabled}
-        onPress={handlePress}
-        {...(isDisabled ? undefined : composeHandlers(composedHandlers, rest))}
-        style={[
-          styles.container,
-          // The gesture-layer style owns backgroundColor while enabled; when
-          // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it). The radius
-          // morph stays applied while disabled — a selected filter chip
-          // keeps its pill resting shape (the press progress is pinned).
-          animatedRadiusStyle,
-          isDisabled ? undefined : stateLayerStyle,
-          isDisabled ? styles.disabledContainer : undefined,
-          // Function-form `style` is intentionally dropped on animated
-          // components — wrapping the whole `style` array in a function would
-          // hide the animated container style from Reanimated's prop diff and
-          // break the state-layer transitions. Use `containerColor` /
-          // `contentColor` for state-aware styling instead.
-          typeof style === 'function' ? undefined : style,
-        ]}
-      >
-        {renderLeadingContent()}
-        <Text style={computedLabelStyle}>{children}</Text>
-        {showCloseIcon ? <View style={styles.closeSpacer} /> : null}
-      </AnimatedPressable>
+      {isInteractive ? (
+        <AnimatedPressable
+          {...rest}
+          accessibilityRole="button"
+          aria-disabled={isDisabled}
+          {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
+          // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
+          hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
+          disabled={isDisabled}
+          onPress={handlePress}
+          {...(isDisabled
+            ? undefined
+            : composeHandlers(composedHandlers, rest))}
+          style={[
+            styles.container,
+            // The gesture-layer style owns backgroundColor while enabled; when
+            // disabled it is dropped entirely so the static disabled background
+            // applies instantly (no animated layer to fight it). The radius
+            // morph stays applied while disabled — a selected filter chip
+            // keeps its pill resting shape (the press progress is pinned).
+            animatedRadiusStyle,
+            isDisabled ? undefined : stateLayerStyle,
+            isDisabled ? styles.disabledContainer : undefined,
+            // Function-form `style` is intentionally dropped on animated
+            // components — wrapping the whole `style` array in a function would
+            // hide the animated container style from Reanimated's prop diff and
+            // break the state-layer transitions. Use `containerColor` /
+            // `contentColor` for state-aware styling instead.
+            typeof style === 'function' ? undefined : style,
+          ]}
+        >
+          {content}
+        </AnimatedPressable>
+      ) : (
+        // A chip with no action is a label, as a `Card` with no `onPress` is:
+        // no button role, no tab stop, and no state layer.
+        <Animated.View
+          {...rest}
+          style={[
+            styles.container,
+            animatedRadiusStyle,
+            styles.staticContainer,
+            isDisabled ? styles.disabledContainer : undefined,
+            typeof style === 'function' ? undefined : style,
+          ]}
+        >
+          {content}
+        </Animated.View>
+      )}
       {showCloseIcon ? (
         // Sibling of the chip's Pressable (overlaying `closeSpacer`), not a
         // child — a nested Pressable renders <button> inside <button> on

@@ -10,8 +10,8 @@ describe('Chip', () => {
     expect(screen.getByText('Tag')).toBeTruthy()
   })
 
-  it('has the button accessibility role', () => {
-    renderWithTheme(<Chip>Action</Chip>)
+  it('has the button accessibility role when it has an action', () => {
+    renderWithTheme(<Chip onPress={jest.fn()}>Action</Chip>)
     expect(screen.getByRole('button')).toBeTruthy()
   })
 
@@ -146,7 +146,7 @@ describe('Chip', () => {
     it('exposes the close target as a sibling of the chip pressable, not a child', () => {
       // Nesting would render <button> inside <button> on web (invalid DOM).
       renderWithTheme(
-        <Chip variant="input" onClose={jest.fn()}>
+        <Chip variant="input" onPress={jest.fn()} onClose={jest.fn()}>
           Tag
         </Chip>,
       )
@@ -189,7 +189,7 @@ describe('Chip', () => {
 
   describe('container colors', () => {
     it('flat chips have a transparent container with a 1dp outline', () => {
-      renderWithTheme(<Chip>Flat</Chip>)
+      renderWithTheme(<Chip onPress={jest.fn()}>Flat</Chip>)
       const chip = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(chip.props.style)
       expect(flatStyle.backgroundColor).toBe('transparent')
@@ -198,7 +198,11 @@ describe('Chip', () => {
     })
 
     it('disabled flat chips stay transparent with a 12% onSurface outline', () => {
-      renderWithTheme(<Chip disabled>Flat disabled</Chip>)
+      renderWithTheme(
+        <Chip onPress={jest.fn()} disabled>
+          Flat disabled
+        </Chip>,
+      )
       const chip = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(chip.props.style)
       expect(flatStyle.backgroundColor).toBe('transparent')
@@ -207,7 +211,7 @@ describe('Chip', () => {
 
     it('disabled elevated chips get the 12% onSurface container fill', () => {
       renderWithTheme(
-        <Chip elevated disabled>
+        <Chip elevated onPress={jest.fn()} disabled>
           Elevated disabled
         </Chip>,
       )
@@ -350,7 +354,11 @@ describe('Chip', () => {
 
   describe('overrides', () => {
     it('applies containerColor to the container background', () => {
-      renderWithTheme(<Chip containerColor="#FF0000">Custom</Chip>)
+      renderWithTheme(
+        <Chip containerColor="#FF0000" onPress={jest.fn()}>
+          Custom
+        </Chip>,
+      )
       const chip = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(chip.props.style)
       expect(flatStyle.backgroundColor).toBe('#FF0000')
@@ -517,11 +525,73 @@ describe('Chip', () => {
     })
 
     it('reports disabled state', () => {
-      renderWithTheme(<Chip disabled>Disabled</Chip>)
+      renderWithTheme(
+        <Chip onPress={jest.fn()} disabled>
+          Disabled
+        </Chip>,
+      )
       const chip = screen.getByRole('button')
       expect(chip.props.accessibilityState).toEqual(
         expect.objectContaining({ disabled: true }),
       )
+    })
+  })
+
+  // A chip with nothing to do was a focusable button that did nothing: a dead
+  // tab stop for a keyboard user, and a "button" for a screen reader.
+  describe('a chip with no action', () => {
+    it.each([
+      ['assist', () => <Chip>Tag</Chip>],
+      ['suggestion', () => <Chip variant="suggestion">Tag</Chip>],
+      ['input', () => <Chip variant="input">Tag</Chip>],
+    ])('an %s chip with no onPress is a label, not a button', (_, ui) => {
+      renderWithTheme(ui())
+      expect(screen.getByText('Tag')).toBeTruthy()
+      expect(screen.queryByRole('button')).toBeNull()
+    })
+
+    it('a filter chip with no onPress stays a button, because a press toggles it', () => {
+      renderWithTheme(<Chip variant="filter">Tag</Chip>)
+      expect(screen.getByRole('button', { name: 'Tag' })).toBeTruthy()
+    })
+
+    it('onLongPress alone makes the chip a button', () => {
+      renderWithTheme(<Chip onLongPress={jest.fn()}>Tag</Chip>)
+      expect(screen.getByRole('button', { name: 'Tag' })).toBeTruthy()
+    })
+
+    it('an input chip keeps its close button', () => {
+      const onClose = jest.fn()
+      renderWithTheme(
+        <Chip variant="input" onClose={onClose}>
+          Tag
+        </Chip>,
+      )
+      expect(screen.getAllByRole('button')).toHaveLength(1)
+      fireEvent.press(screen.getByLabelText('Remove Tag'))
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps the flat container: transparent with a 1dp outline', () => {
+      renderWithTheme(<Chip testID="chip">Tag</Chip>)
+      const flatStyle = StyleSheet.flatten(
+        screen.getByTestId('chip').props.style,
+      )
+      expect(flatStyle.backgroundColor).toBe('transparent')
+      expect(flatStyle.borderWidth).toBe(1)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outline)
+    })
+
+    it('keeps the containerColor override', () => {
+      renderWithTheme(
+        <Chip testID="chip" containerColor="#FF0000">
+          Tag
+        </Chip>,
+      )
+      const flatStyle = StyleSheet.flatten(
+        screen.getByTestId('chip').props.style,
+      )
+      expect(flatStyle.backgroundColor).toBe('#FF0000')
     })
   })
 })

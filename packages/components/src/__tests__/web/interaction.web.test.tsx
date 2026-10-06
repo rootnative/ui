@@ -59,7 +59,11 @@ describe('hover paints a state layer', () => {
       role: 'button',
       ui: <IconButton icon="heart" accessibilityLabel="Like" />,
     },
-    { name: 'Chip', role: 'button', ui: <Chip>Assist</Chip> },
+    {
+      name: 'Chip',
+      role: 'button',
+      ui: <Chip onPress={() => {}}>Assist</Chip>,
+    },
     {
       name: 'FAB',
       role: 'button',
@@ -299,7 +303,7 @@ describe('the focus ring follows the same modality rule', () => {
 
   it.each([
     { name: 'Card', ui: <Card onPress={() => {}}>{null}</Card> },
-    { name: 'Chip', ui: <Chip>Assist</Chip> },
+    { name: 'Chip', ui: <Chip onPress={() => {}}>Assist</Chip> },
     {
       name: 'FAB',
       ui: <FAB icon="plus" accessibilityLabel="Add" />,

@@ -103,8 +103,12 @@ const CURSOR_CASES: {
   {
     name: 'Chip',
     role: 'button',
-    enabled: <Chip>Assist</Chip>,
-    disabled: <Chip disabled>Assist</Chip>,
+    enabled: <Chip onPress={() => {}}>Assist</Chip>,
+    disabled: (
+      <Chip onPress={() => {}} disabled>
+        Assist
+      </Chip>
+    ),
   },
   {
     name: 'Card — pressable',

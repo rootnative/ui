@@ -135,7 +135,7 @@ describe('every control clears the 48dp touch target', () => {
   })
 
   it('Chip', () => {
-    renderWithTheme(<Chip>Tag</Chip>)
+    renderWithTheme(<Chip onPress={() => {}}>Tag</Chip>)
     expect(target('button').height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET)
   })
 

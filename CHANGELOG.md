@@ -38,6 +38,25 @@ the rel on the anchor.
 type fails with TS2717, "Subsequent property declarations must have the same
 type".
 
+### A `Chip` with no action is a label, not a button
+
+An assist, suggestion or input chip with no `onPress` rendered a focusable
+`<button>` that did nothing. Three static chips in a page hero gave a keyboard
+user three dead tab stops, and a screen reader announced three buttons.
+
+`Chip` now follows the `Card` rule. With no `onPress`, no `onLongPress` and
+no `href`, an assist, suggestion or input chip renders a plain view: no button
+role, no tab stop, no hover or press layer, and the default cursor. It keeps
+its colours, its outline, its elevation at rest, and an input chip keeps its
+close button. A filter chip is always a button, because a press toggles it.
+An `href` counts as an action, because on the web Expo Router's
+`<Link asChild>` gives the chip an `href` and an `onClick`, not an `onPress`.
+Nine new tests cover the rule, and five of them fail on the old code.
+
+**Check your tests.** A test that finds an action-less chip with
+`getByRole('button')` now finds nothing. Give the chip an `onPress`, or query
+it by its text.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole
