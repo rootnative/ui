@@ -110,12 +110,12 @@ describe('IconButton', () => {
         <IconButton
           icon="heart"
           accessibilityLabel="Like"
-          style={{ margin: 10 }}
+          style={{ opacity: 0.5 }}
         />,
       )
       const button = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(button.props.style)
-      expect(flatStyle.margin).toBe(10)
+      expect(flatStyle.opacity).toBe(0.5)
     })
   })
 

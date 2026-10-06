@@ -72,6 +72,32 @@ no `level`, no variant gets the role there. New native tests cover four
 emphasized headings and two emphasized non-headings, and a web test pins
 `<h1>` for an emphasized headline with `level={1}`.
 
+### Layout keys in `style` place `Button`, `IconButton`, `FAB` and `Chip`
+
+These four components wrap their pressable in a `View` that holds the focus
+ring and the shadow. The wrapper sets `alignSelf: 'flex-start'`, so it hugs
+the button and does not stretch across a column. The consumer `style` went to
+the pressable inside the wrapper, and three things broke:
+
+- `alignSelf` did nothing. A `Button` in `<Column align="center">` stayed at
+  the start edge next to centred text.
+- A margin moved the button away from its own focus ring and shadow.
+- `flex: 1` in a row did not grow the button, and `position: 'absolute'`
+  placed the button against a wrapper of no size.
+
+Now the keys that place a component in its parent go to the wrapper:
+`alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins,
+`position`, the insets and `zIndex`. When `flex` or `flexGrow` moves, the
+pressable fills the wrapper. Every other key styles the container, as before.
+A Reanimated animated style stays on the pressable whole, because Reanimated
+finds it by identity. A web test per component reads the wrapper and the
+button from the DOM, and 16 of its 20 cases fail on the old code.
+
+**Check your layout.** An `alignSelf`, a `flex` or a `position` that you set on
+one of these components now takes effect. A margin moves the button as before,
+and now the focus ring and the shadow move with it. If you added a `Row` or a
+wrapper `View` only to centre a button, you can remove it.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

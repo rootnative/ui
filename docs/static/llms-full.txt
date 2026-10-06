@@ -813,7 +813,7 @@ Props:
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
-- `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- `style?: StyleProp<ViewStyle>` — Style for the component. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
 
 ---
 
@@ -904,7 +904,7 @@ Props:
 - `iconColor?: string` — Overrides the automatic icon color derived from the variant and state.
 - `contentColor?: string` — Override the content (icon) color. Takes precedence over `iconColor` when both are provided.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
-- `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- `style?: StyleProp<ViewStyle>` — Style for the component. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
 - `onPress?: () => void` — Called when the button is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the button.
 - `variant?: 'filled' | 'tonal' | 'outlined' | 'standard'` — Default: `'filled'`. Visual style variant.
@@ -966,7 +966,7 @@ Props:
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the content (icon + label) color. State-layer colors are derived automatically when no `containerColor` is set.
 - `labelStyle?: StyleProp<TextStyle>` — Style applied to the label text. Only used when `label` is set.
-- `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- `style?: StyleProp<ViewStyle>` — Style for the component. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
 - `onPress?: () => void` — Called when the FAB is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the FAB.
 - `accessibilityLabel?: string` — Accessible name for screen readers. Required for icon-only FABs. When `label` is set, defaults to the label and may be omitted (override only if you need a more descriptive name).
@@ -1091,6 +1091,7 @@ Common props (every variant):
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors auto-derived when no `containerColor` is set.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
 - `closeAccessibilityLabel?: string` — Default: `` `Remove ${children}` ``. Accessible name for the trailing close affordance, which is a separate a11y target from the chip itself.
+- `style?: StyleProp<ViewStyle>` — Style for the chip. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only.
 - Inherits `PressableProps` (except `children`)
 
 #### Assist (default)

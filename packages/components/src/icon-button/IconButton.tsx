@@ -12,6 +12,7 @@ import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { resolveSize } from '../internal/size'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
@@ -256,8 +257,13 @@ export function IconButton({
       variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth,
   }
 
+  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+    () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
+    [style],
+  )
+
   return (
-    <Animated.View style={styles.wrapper}>
+    <Animated.View style={[styles.wrapper, layoutStyle]}>
       <Animated.View
         style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
@@ -287,7 +293,7 @@ export function IconButton({
           // hide the animated container style from Reanimated's prop diff and
           // break the state-layer transitions. Use `containerColor` /
           // `contentColor` for state-aware styling instead.
-          typeof style === 'function' ? undefined : style,
+          containerStyle,
         ]}
       >
         <View aria-hidden>

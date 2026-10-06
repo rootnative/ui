@@ -13,6 +13,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { resolveSize } from '../internal/size'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -190,10 +191,15 @@ export function Button({
     [isDisabled, styles.disabledLabel, styles.label, labelStyleOverride],
   )
 
+  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+    () => splitLayoutStyle(style),
+    [style],
+  )
+
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, layoutStyle]}>
       <Animated.View
         style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
@@ -232,7 +238,7 @@ export function Button({
           isDisabled ? undefined : stateLayerStyle,
           isDisabled ? undefined : morph.style,
           isDisabled ? styles.disabledContainer : undefined,
-          style,
+          containerStyle,
         ]}
       >
         {leadingIcon ? (

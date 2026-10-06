@@ -57,11 +57,11 @@ describe('FAB', () => {
 
     it('applies the style prop to the container', () => {
       renderWithTheme(
-        <FAB icon="plus" accessibilityLabel="Add" style={{ margin: 10 }} />,
+        <FAB icon="plus" accessibilityLabel="Add" style={{ opacity: 0.5 }} />,
       )
       const button = screen.getByRole('button')
       const flatStyle = StyleSheet.flatten(button.props.style)
-      expect(flatStyle.margin).toBe(10)
+      expect(flatStyle.opacity).toBe(0.5)
     })
   })
 

@@ -8,6 +8,7 @@ import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   createStyles,
@@ -127,8 +128,13 @@ export function FAB({
     ? { backgroundColor: colors.disabledBackgroundColor }
     : undefined
 
+  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+    () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
+    [style],
+  )
+
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, layoutStyle]}>
       <Animated.View
         style={[
           styles.focusRing,
@@ -173,7 +179,7 @@ export function FAB({
           // hide the animated container style from Reanimated's prop diff and
           // break the state-layer transitions. Use `containerColor` /
           // `contentColor` for state-aware styling instead.
-          typeof style === 'function' ? undefined : style,
+          containerStyle,
         ]}
       >
         {icon ? (

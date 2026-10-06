@@ -65,10 +65,14 @@ export interface IconButtonProps extends Omit<
    */
   containerColor?: string
   /**
-   * Style applied to the root container. Static form only — the function
-   * form `(state) => style` is not supported because the component drives
-   * its container background through Reanimated. Use `containerColor` /
-   * `contentColor` for state-aware styling.
+   * Style for the component. The keys that place it in its parent —
+   * `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins,
+   * `position`, the insets and `zIndex` — go to the outer wrapper, so the
+   * focus ring and the shadow move with it. Every other key styles the
+   * container. Static form only — the function form `(state) => style` is
+   * not supported because the component drives its container background
+   * through Reanimated. Use `containerColor` / `contentColor` for
+   * state-aware styling.
    */
   style?: StyleProp<ViewStyle>
   /** Called when the button is pressed. */

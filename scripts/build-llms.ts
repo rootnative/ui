@@ -1610,6 +1610,8 @@ import { Grid } from '@rootnative/components/layout'
       '- `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.\n'
     output +=
       '- `closeAccessibilityLabel?: string` — Default: `` `Remove ${children}` ``. Accessible name for the trailing close affordance, which is a separate a11y target from the chip itself.\n'
+    output +=
+      '- `style?: StyleProp<ViewStyle>` — Style for the chip. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only.\n'
     output += '- Inherits `PressableProps` (except `children`)\n\n'
 
     const interfaceVariants: {

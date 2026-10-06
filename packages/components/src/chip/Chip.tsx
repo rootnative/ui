@@ -27,6 +27,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -364,6 +365,11 @@ export function Chip(props: ChipProps) {
     return null
   }
 
+  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+    () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
+    [style],
+  )
+
   const content = (
     <>
       {renderLeadingContent()}
@@ -373,7 +379,7 @@ export function Chip(props: ChipProps) {
   )
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, layoutStyle]}>
       {isInteractive ? (
         <Animated.View
           style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
@@ -417,7 +423,7 @@ export function Chip(props: ChipProps) {
             // hide the animated container style from Reanimated's prop diff and
             // break the state-layer transitions. Use `containerColor` /
             // `contentColor` for state-aware styling instead.
-            typeof style === 'function' ? undefined : style,
+            containerStyle,
           ]}
         >
           {content}
@@ -432,7 +438,7 @@ export function Chip(props: ChipProps) {
             animatedRadiusStyle,
             styles.staticContainer,
             isDisabled ? styles.disabledContainer : undefined,
-            typeof style === 'function' ? undefined : style,
+            containerStyle,
           ]}
         >
           {content}
