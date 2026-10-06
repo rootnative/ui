@@ -46,7 +46,23 @@ the reset in the shell, as the example in step 7 does.
 
 Use `Link` from `expo-router` for every navigation. It renders an `<a href>`
 on the web. A `Pressable` with `router.push` renders a `<div>`, and a crawler
-does not follow it.
+does not follow it. An external URL has the same trap: a `Button` with
+`Linking.openURL` renders a `<button>`.
+
+To make a component a link, put it inside `<Link asChild>`:
+
+```tsx
+import { Button } from '@rootnative/components'
+import { Link } from 'expo-router'
+
+<Link href="https://github.com/rootnative" asChild>
+  <Button hrefAttrs={{ target: '_blank', rel: 'noopener' }}>GitHub</Button>
+</Link>
+```
+
+On the web, `Link` opens an external URL in the same tab. `hrefAttrs` opens it
+in a new tab. `<Link target="_blank">` does not work under `asChild`. See
+[A button as a link](../components/button.mdx#a-button-as-a-link).
 
 ## 3. The head on every page
 

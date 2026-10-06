@@ -9,6 +9,35 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+### A `Button` link: the docs give the recipe, and `hrefAttrs` is typed
+
+A landing page that linked out with `Button` and `Linking.openURL` exported
+no `<a>` element at all, so a crawler found no link from the page. The SEO
+checklist named `router.push` as the trap, but not `Linking.openURL`, and the
+`Button` page did not say how to make a button a link.
+
+The `Button` page has a new section, "A button as a link": put the button
+inside Expo Router's `<Link asChild>`, and the web renders an `<a href>`. The
+SEO checklist and the "Why" page name `Linking.openURL` next to
+`router.push`, and the `llms` files carry the same rule.
+
+On the web, `Link` opens an external URL in the same tab, and
+`<Link target="_blank">` does not help under `asChild`: `Link` gives `target`
+to the child as a plain prop, and react-native-web drops it. The fix is
+`hrefAttrs={{ target: '_blank', rel: 'noopener' }}` on the button, which
+react-native-web writes onto the `<a>`. The React Native types do not declare
+`hrefAttrs`, so `@rootnative/components` now declares it on `ViewProps`, as it
+does for `aria-invalid` on `TextInputProps`. A web test pins the target and
+the rel on the anchor.
+
+**Check your own augmentation.** If your app declares `hrefAttrs` on
+`ViewProps`, remove that declaration, or make its type exactly
+`{ target?: string; rel?: string; download?: boolean | string }`. A different
+type fails with TS2717, "Subsequent property declarations must have the same
+type".
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

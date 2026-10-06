@@ -313,6 +313,19 @@ describe('a consumer role reaches the DOM', () => {
     expect(link.getAttribute('href')).toBe('/movie/19404')
   })
 
+  // Under `asChild`, `<Link target>` reaches the child as a plain prop that
+  // react-native-web drops, so a new tab needs `hrefAttrs` on the child.
+  it('Button — hrefAttrs sets the target and rel of the anchor', () => {
+    renderWeb(
+      <Button {...linkProps} hrefAttrs={{ target: '_blank', rel: 'noopener' }}>
+        Open
+      </Button>,
+    )
+    const link = screen.getByRole('link')
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener')
+  })
+
   it('SearchBar — as a trigger, the consumer role names the bar', () => {
     renderWeb(<SearchBar role="link" placeholder="Search" onPress={() => {}} />)
     expect(screen.getByRole('link', { name: 'Search' })).toBeTruthy()

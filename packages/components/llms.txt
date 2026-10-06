@@ -216,10 +216,17 @@ Props:
 
 ```tsx
 import { Button } from '@rootnative/components/button'
+import { Link } from 'expo-router'
 
 <Button variant="filled" leadingIcon="plus" onPress={handlePress}>Create</Button>
 <Button variant="outlined">Cancel</Button>
 <Button variant="tonal" containerColor="#E8DEF8" contentColor="#1D192B">Custom</Button>
+
+// A link: Link from expo-router gives the button role="link" and href, so the
+// web renders <a href>, which a crawler follows. hrefAttrs opens a new tab.
+<Link href="https://github.com/rootnative" asChild>
+  <Button variant="text" hrefAttrs={{ target: '_blank', rel: 'noopener' }}>GitHub</Button>
+</Link>
 ```
 
 Props:

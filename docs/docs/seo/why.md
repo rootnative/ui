@@ -28,11 +28,13 @@ that file at export time.
 ### 2. No links
 
 A `Pressable` that calls `router.push` renders a `<div>` with a click handler.
-A crawler does not click. It follows `<a href>` elements, and it finds none,
-so it never reaches the second page.
+A `Button` that calls `Linking.openURL` renders a `<button>`. A crawler does
+not click. It follows `<a href>` elements, and it finds none, so it never
+reaches the second page.
 
 The fix is `Link` from Expo Router for every navigation. It renders an
-`<a href>` on the web and a pressable on native.
+`<a href>` on the web and a pressable on native. Put a component such as
+`Button` inside `<Link asChild>`.
 
 ### 3. A 404 for a deep link
 

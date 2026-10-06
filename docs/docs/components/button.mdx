@@ -160,6 +160,45 @@ to depart from the resolved values:
 `}
 />
 
+## A button as a link
+
+A button that opens a page must be a link on the web. A `Button` with an
+`onPress` that calls `router.push` or `Linking.openURL` renders a `<button>`.
+A crawler does not click a `<button>`, so it does not find the page.
+
+Put the button inside Expo Router's `<Link asChild>`. `Link` gives the button
+`role="link"` and `href`. That `role` replaces the button role, so the button
+renders an `<a href>` on the web. A crawler follows it, and a visitor can copy
+it or open it with a modifier key. On native, `Link` handles the press: it
+navigates to a route, or opens an external URL with `Linking`.
+
+```tsx
+import { Button } from '@rootnative/components'
+import { Link } from 'expo-router'
+
+<Link href="/docs" asChild>
+  <Button variant="text">Docs</Button>
+</Link>
+```
+
+### Open a link in a new tab
+
+On the web, `Link` opens an external URL in the same tab. Do not use
+`<Link target="_blank">` for a new tab: under `asChild`, `Link` gives `target`
+to the button as a plain prop, and react-native-web drops it. Give the button
+`hrefAttrs`. react-native-web writes it onto the `<a>`, and Expo Router then
+lets the browser open the new tab.
+
+```tsx
+<Link href="https://github.com/rootnative" asChild>
+  <Button hrefAttrs={{ target: '_blank', rel: 'noopener' }}>GitHub</Button>
+</Link>
+```
+
+`hrefAttrs` is web only, and native ignores it. `@rootnative/components`
+declares it on the React Native `ViewProps` type, so you do not need a type
+augmentation.
+
 ## Props
 
 <PropTable name="Button" />

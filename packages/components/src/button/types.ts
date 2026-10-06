@@ -6,6 +6,22 @@ import type {
   ViewStyle,
 } from 'react-native'
 
+// react-native-web reads `hrefAttrs` on a `View` that has an `href`, but the
+// upstream `ViewProps` type does not declare it. Keep this block in a module
+// that an exported type reaches: the declaration bundler drops an augmentation
+// from any other module, as it does with `internal/pressableKeyDown.ts`.
+declare module 'react-native' {
+  interface ViewProps {
+    /**
+     * Web only. The `target`, `rel` and `download` of the `<a>` that a view
+     * with an `href` renders, for example under Expo Router's
+     * `<Link asChild>`. `target: '_blank'` opens the link in a new tab.
+     * Native ignores it.
+     */
+    hrefAttrs?: { target?: string; rel?: string; download?: boolean | string }
+  }
+}
+
 /** Visual style variant of the button following Material Design 3 roles. */
 export type ButtonVariant =
   | 'filled'
