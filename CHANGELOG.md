@@ -132,6 +132,23 @@ replace it with `rootnative-seo dist` and read the list of pages it leaves
 out. A page that must be in the sitemap needs a canonical link: pass `url` to
 its `PageHead`.
 
+### `PageHead` needs no `SeoProvider` on native
+
+`PageHead` read the site before it checked the platform. On iOS and Android
+it renders nothing, but it still threw with no `SeoProvider` above it. So
+every native test that rendered a screen with a `PageHead` had to wrap the
+screen in a provider, for a component that draws nothing there.
+
+On native, `PageHead` now returns `null` before it reads the site. A native
+tree and a native test need no provider. The web does not change: with no
+provider and no `site` prop, `PageHead` throws, and the static export fails
+on the first page that has the fault. A native test pins the new rule, and
+the web test for the throw stays.
+
+**Check your test setup.** If you added `SeoProvider` to a native test
+wrapper only for `PageHead`, you can remove it. Keep the provider at the
+root of the app.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

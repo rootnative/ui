@@ -52,7 +52,7 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 
 ## `@rootnative/seo/expo-router` — optional peer: expo-router `>=57.0.0`
 
-- `<PageHead {...meta} site?>` — `PageMeta` as props, plus an optional `site` that wins over the provider. Writes the tags through `expo-router/head`. Renders `null` on native.
+- `<PageHead {...meta} site?>` — `PageMeta` as props, plus an optional `site` that wins over the provider. Writes the tags through `expo-router/head`. On native it renders `null` and reads no site, so a native tree or test needs no `SeoProvider`. On the web a missing site throws, and the static export fails.
 - `renderHeadTag(tag, index)` — one `HeadTag` as the element `expo-router/head` expects. A JSON-LD script is written as a string child, not `dangerouslySetInnerHTML` (react-helmet-async drops the latter).
 - `shellTags(options): ReactElement[]` — for `app/+html.tsx`: charset, viewport (default `width=device-width, initial-scale=1, shrink-to-fit=no`), `themeColor`, `favicon`, `appleTouchIcon`, `manifest`, `preconnect: { href, crossOrigin? }[]`. `basePath` (pass `process.env.EXPO_BASE_URL`) prefixes every relative `href`. No router dependency: works in a Vite template through `renderToStaticMarkup`.
 

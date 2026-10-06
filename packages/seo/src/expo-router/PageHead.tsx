@@ -50,10 +50,16 @@ export function renderHeadTag(tag: HeadTag, index: number) {
 
 /**
  * Writes the head of one page through `expo-router/head`. Renders nothing on
- * native, where no document exists.
+ * native, where no document exists, and reads no site there, so a native tree
+ * and a native test need no `SeoProvider`. On the web a missing site throws,
+ * and the static export fails on the first page that has one.
  */
-export function PageHead({ site, ...meta }: PageHeadProps) {
-  const resolved = useSite(site)
+export function PageHead(props: PageHeadProps) {
   if (Platform.OS !== 'web') return null
+  return <WebPageHead {...props} />
+}
+
+function WebPageHead({ site, ...meta }: PageHeadProps) {
+  const resolved = useSite(site)
   return <Head>{toHeadTags(resolved, meta).map(renderHeadTag)}</Head>
 }

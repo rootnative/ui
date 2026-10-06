@@ -36,9 +36,8 @@ describe('PageHead on native', () => {
     expect(toJSON()).toBeNull()
   })
 
-  it('still needs a site, so a missing provider fails on every platform', () => {
-    const error = jest.spyOn(console, 'error').mockImplementation(() => {})
-    expect(() => render(<PageHead title="Dune" />)).toThrow(/SeoProvider/)
-    error.mockRestore()
+  it('reads no site, so a native tree needs no provider', () => {
+    const { toJSON } = render(<PageHead title="Dune" url="/m/1" />)
+    expect(toJSON()).toBeNull()
   })
 })
