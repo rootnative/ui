@@ -9,7 +9,19 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.23 — 2026-10-06
+
+**No breaking change.** This release is the structural audit of the whole
+catalog plus three device passes: iOS simulator, web, and Android emulator.
+The new `@rootnative/seo` package ships here with `Container`, a `level` on
+`Typography`, and a clean hydration of the static export. Every overlay has
+one back handler and one scrim, Dialog scrolls and respects the safe area,
+Snackbar speaks on iOS and pauses under a pointer, and Tooltip opens from the
+keyboard. Toggle `IconButton` and filter `Chip` work uncontrolled, toggles
+announce their state, filled and tonal buttons rise on hover, and
+`containerColor` takes any colour React Native accepts. Inline logical
+insets mirror on web now through `resolveLogical`, and the app bar,
+Switch and Slider hold their geometry in RTL on every platform.
 
 ### Defects seen in the web pass
 
