@@ -178,7 +178,8 @@ The example app uses it. Its sitemap lists the same 37 URLs as before.
 **Check your deploy script.** If it builds the sitemap from the file names,
 replace it with `rootnative-seo dist` and read the list of pages it leaves
 out. A page that must be in the sitemap needs a canonical link: pass `url` to
-its `PageHead`.
+its `PageHead`. Each sitemap entry holds `<loc>` only, so a script that set
+`changefreq` or `priority` loses them; Google ignores both.
 
 ### `PageHead` needs no `SeoProvider` on native
 

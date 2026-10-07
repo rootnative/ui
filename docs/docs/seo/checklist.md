@@ -192,6 +192,13 @@ another deploy owns the file.
 `writeSeoFiles` from `@rootnative/seo/node` does the same in a script, and
 `readExport` returns the pages for a URL list of your own.
 
+Each sitemap entry holds `<loc>` only. Google ignores `<changefreq>` and
+`<priority>`
+([Google Search Central](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)),
+and an export does not know when a page last changed, so the command writes
+no `<lastmod>` either. A deploy script that set these values can drop them
+when it moves to `rootnative-seo`.
+
 ## 5. Headings and `alt`
 
 A `Text` renders a `<div>`. In a RootNative UI app, pass `level` to
