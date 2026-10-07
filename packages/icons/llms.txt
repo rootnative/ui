@@ -1,7 +1,7 @@
 # @rootnative/icons — Icon Library Adapters for RootNative UI
 
-> Version: 0.0.0-alpha.22
-> Peer deps: @rootnative/core >=0.0.0-alpha.22, react >=19.2.3 <20.0.0, react-native >=0.83.0 <0.87.0
+> Version: 0.0.0-alpha.24
+> Peer deps: @rootnative/core >=0.0.0-alpha.24, react >=19.2.3 <20.0.0, react-native >=0.83.0 <0.87.0
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* or @expo/vector-icons set you install
 
 Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
@@ -31,7 +31,7 @@ Per-call elements/functions always take precedence over the resolver. Only `@roo
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.22)
+### `@rootnative/icons` adapter package (v0.0.0-alpha.24)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@react-native-vector-icons/*` are declared as optional peer deps.
 

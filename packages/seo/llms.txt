@@ -1,6 +1,6 @@
 # @rootnative/seo — SEO for a React Native web export
 
-> Version: 0.0.0-alpha.23
+> Version: 0.0.0-alpha.24
 > Peer deps (/react and /expo-router only): react >=19.2.3 <20.0.0, react-native >=0.83.0 <0.87.0
 > Optional peer dep (/expo-router only): expo-router >=57.0.0
 > The core and /schema entries have no dependency; /node runs in Node only.
