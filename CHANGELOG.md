@@ -11,6 +11,34 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `AppBar` takes a subtitle
+
+The MD3 Expressive app bar shows one line of supporting text under the title.
+`AppBar` had only `title`, so an app built a page header by hand from a `View`
+and two `Typography` elements.
+
+`AppBar` now takes `subtitle` and `subtitleStyle`. The subtitle color is
+`onSurfaceVariant`, and on the `primary` and `primaryContainer` schemes it is
+the scheme's content color. `contentColor` does not change it. The type role
+follows the variant: `labelMedium` on `small` and `center-aligned`,
+`labelLarge` on `medium`, and `titleMedium` on `large`. The values are from
+the Compose Material 3 tokens.
+
+A `small` or `center-aligned` bar keeps its 64dp height. The spec gives a
+subtitle only to the flexible medium and large bars, which also use a larger
+title. The `medium` and `large` bars here keep their baseline title, take the
+flexible subtitle, and grow by the same amount as the flexible bars: `medium`
+from 112 to 136dp, `large` from 152 to 184dp. With `scrollOffset`, the
+subtitle collapses to `labelMedium` with the title, and the scroll distance
+grows by the same amount. An empty string adds no line and no height.
+
+The subtitle is not a heading. On the web the `<h1>` holds the title only.
+Sixteen new tests cover it: 14 native and 2 web. Seven faults put into the
+source on purpose each made at least one of them fail. Measured in Chromium
+on a web export of the example app at 390px: every bar has the heights and
+positions above, and a medium bar scrolled 36px is 100dp high with a 13px
+subtitle, halfway through its 72px collapse. Not checked on iOS or Android.
+
 ### A `Button` link: the docs give the recipe, and `hrefAttrs` is typed
 
 A landing page that linked out with `Button` and `Linking.openURL` exported

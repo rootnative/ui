@@ -1,4 +1,4 @@
-import { defaultTopAppBarTokens } from '@rootnative/core'
+import { defaultTopAppBarTokens, lightTheme } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
@@ -64,6 +64,39 @@ function layoutSideSlots(leadingWidth: number, actionsWidth: number) {
   })
   fireEvent(leadingSlot, 'layout', layout(leadingWidth))
   fireEvent(actionsSlot, 'layout', layout(actionsWidth))
+}
+
+// `Typography` renders an `RCTText` host under the Jest `Text` mock, and an
+// `Animated.Text` renders a `Text` host.
+function isTextHost(node: RenderedNode) {
+  return node.type === 'Text' || node.type === 'RCTText'
+}
+
+function parentOfText(
+  node: RenderedNode,
+  text: string,
+): RenderedNode | undefined {
+  const holdsText = childrenOf(node).some(
+    (child) => isTextHost(child) && child.children?.join('') === text,
+  )
+  if (holdsText) return node
+  for (const child of childrenOf(node)) {
+    const found = parentOfText(child, text)
+    if (found) return found
+  }
+  return undefined
+}
+
+function textsBeside(node: RenderedNode, text: string): string[] {
+  const parent = parentOfText(node, text)
+  if (!parent) throw new Error(`no node holds the text "${text}"`)
+  return childrenOf(parent)
+    .filter(isTextHost)
+    .map((child) => child.children?.join('') ?? '')
+}
+
+function textStyleOf(text: string) {
+  return StyleSheet.flatten(screen.getByText(text).props.style) as TextStyle
 }
 
 function titleInsets(node: RenderedNode) {
@@ -583,6 +616,185 @@ describe('AppBar', () => {
       ) as TextStyle
       expect(title.fontSize).toBe(22)
     })
+  })
+
+  // The type roles are Compose `AppBarSmallTokens`,
+  // `AppBarMediumFlexibleTokens` and `AppBarLargeFlexibleTokens`, and the
+  // color is `AppBarTokens.SubtitleColor`. The baseline medium and large
+  // bars have no subtitle in the spec; they take the flexible roles and grow
+  // by the flexible bars' growth (+24dp and +32dp).
+  describe('subtitle', () => {
+    const { typography, colors } = lightTheme
+
+    function expectTypeRole(text: string, role: keyof typeof typography) {
+      const style = textStyleOf(text)
+      expect(style.fontSize).toBe(typography[role].fontSize)
+      expect(style.lineHeight).toBe(typography[role].lineHeight)
+      expect(style.letterSpacing).toBe(typography[role].letterSpacing)
+    }
+
+    function heightsOf(node: RenderedNode) {
+      return collectFlattenedStyles(node).map((s) => s.height)
+    }
+
+    // The collapsing title block is the absolute layer whose start, top,
+    // height and end the scroll drives.
+    function collapsingBlock(node: RenderedNode) {
+      const block = collectFlattenedStyles(node).find(
+        (s) =>
+          s.position === 'absolute' &&
+          s.top !== undefined &&
+          s.height !== undefined,
+      )
+      if (!block) throw new Error('no collapsing title block rendered')
+      return { top: block.top, height: block.height }
+    }
+
+    it('puts a labelMedium line under a small title and keeps 64dp', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar title="Inbox" subtitle="3 unread" />,
+      )
+      const root = rootOf(toJSON())
+      expect(textsBeside(root, '3 unread')).toEqual(['Inbox', '3 unread'])
+      expectTypeRole('3 unread', 'labelMedium')
+      expect(textStyleOf('3 unread').color).toBe(colors.onSurfaceVariant)
+      expect(heightsOf(root)).toContain(64)
+    })
+
+    it('centres the subtitle with the title in the measured title node', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Centered"
+          subtitle="Subtitle"
+          variant="center-aligned"
+        />,
+      )
+      const parent = parentOfText(rootOf(toJSON()), 'Subtitle')
+      const parentStyle = StyleSheet.flatten(parent?.props.style) as ViewStyle
+      expect(parentStyle.marginStart).toBeDefined()
+      expect(textsBeside(rootOf(toJSON()), 'Subtitle')).toEqual([
+        'Centered',
+        'Subtitle',
+      ])
+      expect(textStyleOf('Subtitle').textAlign).toBe('center')
+      expectTypeRole('Subtitle', 'labelMedium')
+    })
+
+    it.each([
+      ['medium', 136, 'labelLarge'],
+      ['large', 184, 'titleMedium'],
+    ] as const)(
+      'grows a %s bar to %ddp and sets the subtitle in %s',
+      (variant, height, role) => {
+        const { toJSON } = renderWithTheme(
+          <AppBar title="Title" subtitle="Subtitle" variant={variant} />,
+        )
+        const root = rootOf(toJSON())
+        expect(heightsOf(root)).toContain(height)
+        expect(textsBeside(root, 'Subtitle')).toEqual(['Title', 'Subtitle'])
+        expectTypeRole('Subtitle', role)
+      },
+    )
+
+    it('adds no line and no height for an empty subtitle', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar title="Title" subtitle="" variant="medium" />,
+      )
+      const root = rootOf(toJSON())
+      expect(heightsOf(root)).toContain(112)
+      expect(heightsOf(root)).not.toContain(136)
+      expect(textsBeside(root, 'Title')).toEqual(['Title'])
+    })
+
+    it('rests a collapsible medium bar at the grown geometry', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Title"
+          subtitle="Subtitle"
+          variant="medium"
+          scrollOffset={scrollOffsetAt(0)}
+        />,
+      )
+      const root = rootOf(toJSON())
+      expect(heightsOf(root)).toContain(136)
+      // 136 - 24 bottom padding - (32 title + 20 subtitle) = 60dp.
+      expect(collapsingBlock(root)).toEqual({ top: 60, height: 52 })
+      expect(textsBeside(root, 'Subtitle')).toEqual(['Title', 'Subtitle'])
+      expectTypeRole('Subtitle', 'labelLarge')
+    })
+
+    it('collapses the subtitle to labelMedium with the title', () => {
+      const { toJSON } = renderWithTheme(
+        <AppBar
+          title="Title"
+          subtitle="Subtitle"
+          variant="large"
+          scrollOffset={scrollOffsetAt(500)}
+        />,
+      )
+      const root = rootOf(toJSON())
+      expect(heightsOf(root)).toContain(64)
+      // The small bar's block: (64 - (28 title + 16 subtitle)) / 2 = 10dp.
+      expect(collapsingBlock(root)).toEqual({ top: 10, height: 44 })
+      expectTypeRole('Subtitle', 'labelMedium')
+      expectTypeRole('Title', 'titleLarge')
+    })
+
+    it.each([
+      ['small', undefined],
+      ['medium', undefined],
+      ['medium', scrollOffsetAt(0)],
+    ] as const)('is not a header on a %s bar', (variant, scrollOffset) => {
+      renderWithTheme(
+        <AppBar
+          title="Title"
+          subtitle="Subtitle"
+          variant={variant}
+          scrollOffset={scrollOffset}
+        />,
+      )
+      expect(screen.getAllByRole('header')).toHaveLength(1)
+      expect(screen.getByRole('header', { name: 'Title' })).toBeTruthy()
+    })
+
+    it.each([
+      ['small', undefined],
+      ['medium', scrollOffsetAt(0)],
+    ] as const)(
+      'keeps its color under contentColor and takes subtitleStyle (%s)',
+      (variant, scrollOffset) => {
+        renderWithTheme(
+          <AppBar
+            title="Title"
+            subtitle="Subtitle"
+            variant={variant}
+            scrollOffset={scrollOffset}
+            contentColor="#00FF00"
+            subtitleStyle={{ fontStyle: 'italic' }}
+          />,
+        )
+        expect(textStyleOf('Title').color).toBe('#00FF00')
+        expect(textStyleOf('Subtitle').color).toBe(colors.onSurfaceVariant)
+        expect(textStyleOf('Subtitle').fontStyle).toBe('italic')
+      },
+    )
+
+    it.each([
+      ['primary', colors.onPrimary],
+      ['primaryContainer', colors.onPrimaryContainer],
+    ] as const)(
+      'takes the content color on the %s scheme',
+      (colorScheme, color) => {
+        renderWithTheme(
+          <AppBar
+            title="Title"
+            subtitle="Subtitle"
+            colorScheme={colorScheme}
+          />,
+        )
+        expect(textStyleOf('Subtitle').color).toBe(color)
+      },
+    )
   })
 
   describe('overrides', () => {

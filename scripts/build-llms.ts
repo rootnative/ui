@@ -707,6 +707,8 @@ import { AppBar } from '@rootnative/components/appbar'
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
 <AppBar title="About" canGoBack navigationIcon="close" onBackPress={router.back} />
+// One line under the title; a medium bar grows from 112 to 136dp for it
+<AppBar title="Processes" subtitle="The list updates every 3 seconds." variant="medium" />
 <AppBar title="Settings" variant="center-aligned" actions={[
   { icon: 'magnify', accessibilityLabel: 'Search', onPress: onSearch },
   { icon: 'dots-vertical', accessibilityLabel: 'More', onPress: onMore },

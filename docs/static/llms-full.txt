@@ -981,6 +981,8 @@ import { AppBar } from '@rootnative/components/appbar'
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
 <AppBar title="About" canGoBack navigationIcon="close" onBackPress={router.back} />
+// One line under the title; a medium bar grows from 112 to 136dp for it
+<AppBar title="Processes" subtitle="The list updates every 3 seconds." variant="medium" />
 <AppBar title="Settings" variant="center-aligned" actions={[
   { icon: 'magnify', accessibilityLabel: 'Search', onPress: onSearch },
   { icon: 'dots-vertical', accessibilityLabel: 'More', onPress: onMore },
@@ -989,6 +991,7 @@ import { AppBar } from '@rootnative/components/appbar'
 
 Props:
 - `title: string` — Title text displayed in the bar.
+- `subtitle?: string` — One line of supporting text under the title. Its type role follows the variant: `labelMedium` on `'small'` and `'center-aligned'`, `labelLarge` on `'medium'`, and `titleMedium` on `'large'`. Its color is `onSurfaceVariant`, or the scheme's content color on the `'primary'` and `'primaryContainer'` schemes. A `'small'` or `'center-aligned'` bar keeps its 64dp height. A `'medium'` bar grows by 24dp and a `'large'` bar by 32dp. A bar that collapses with `scrollOffset` takes the subtitle to `labelMedium` with the title.
 - `variant?: 'small' | 'center-aligned' | 'medium' | 'large'` — Default: `'small'`. Layout variant.
 - `colorScheme?: 'surface' | 'surfaceContainerLowest' | 'surfaceContainerLow' | 'surfaceContainer' | 'surfaceContainerHigh' | 'surfaceContainerHighest' | 'primary' | 'primaryContainer'` — Default: `'surface'`. Color scheme that determines the default container and content colors. `containerColor` and `contentColor` props override these defaults.
 - `canGoBack?: boolean` — Default: `false`. When `true`, renders the navigation button in the leading slot. Its icon is set by `navigationIcon`.
@@ -999,8 +1002,9 @@ Props:
 - `scrollOffset?: SharedValue<number>` — Vertical scroll offset (in px) of the content scrolling under the bar, as a Reanimated shared value. Pass `scrollY` from `@rootnative/inertia`'s `useScroll()` and give the matching `onScroll` to your scroll view: ```tsx // `Motion` and `useScroll` both come from the inertia package root. // There is no `@rootnative/inertia/motion` subpath. import { Motion, useScroll } from '@rootnative/inertia' const { scrollY, onScroll } = useScroll() <AppBar variant="large" title="Title" scrollOffset={scrollY} /> <Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16}> ``` Drives the MD3 collapse-on-scroll behavior of the `'medium'` and `'large'` variants: the container collapses to the small (64dp) form and the title interpolates to `titleLarge` as the user scrolls, with the on-scroll tonal shift riding the same progress. Ignored by the `'small'` and `'center-aligned'` variants.
 - `leading?: ReactNode` — Custom leading content. When provided, overrides `canGoBack` and `navigationIcon`.
 - `containerColor?: string` — Override the container (background) color. Applied to both normal and elevated states.
-- `contentColor?: string` — Override the content (title and icon) color.
+- `contentColor?: string` — Override the content (title and icon) color. The subtitle keeps its own color; set it with `subtitleStyle`.
 - `titleStyle?: StyleProp<TextStyle>` — Additional style applied to the title text.
+- `subtitleStyle?: StyleProp<TextStyle>` — Additional style applied to the subtitle text.
 - `titleLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `1`. The outline level of the title. The bar title is the page heading, so the web renders it as `<h1>`. Pass `2` when a heading above the bar is the page heading.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container.
 - `actions?: AppBarAction[]` — Array of actions rendered in the trailing slot. Each entry is either an icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save"). Mutually exclusive with `trailing`.

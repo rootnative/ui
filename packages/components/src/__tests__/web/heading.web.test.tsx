@@ -109,4 +109,20 @@ describe('AppBar title level on the web', () => {
     )
     expect(screen.getByText('Button').tagName).toBe('H2')
   })
+
+  it.each(['small', 'large'] as const)(
+    'keeps the subtitle out of the heading on a %s bar',
+    (variant) => {
+      renderWeb(
+        <SafeAreaProvider>
+          <AppBar title="Inbox" subtitle="3 unread" variant={variant} />
+        </SafeAreaProvider>,
+      )
+      const heading = screen.getByRole('heading', { level: 1 })
+      expect(heading.textContent).toBe('Inbox')
+      const subtitle = screen.getByText('3 unread')
+      expect(subtitle.closest('h1, h2, h3, h4, h5, h6')).toBeNull()
+      expect(subtitle.getAttribute('role')).toBeNull()
+    },
+  )
 })

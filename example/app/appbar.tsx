@@ -77,13 +77,20 @@ const actions: AppBarAction[] = [
   },
 ]
 
-function CollapseDemo({ variant }: { variant: 'medium' | 'large' }) {
+function CollapseDemo({
+  variant,
+  subtitle,
+}: {
+  variant: 'medium' | 'large'
+  subtitle?: string
+}) {
   const { scrollY, onScroll } = useScroll()
 
   return (
     <>
       <AppBar
         title={variant === 'large' ? 'Large App Bar' : 'Medium App Bar'}
+        subtitle={subtitle}
         variant={variant}
         canGoBack
         actions={actions}
@@ -150,6 +157,30 @@ export default function AppBarScreen() {
                 <Box style={previewStyle}>
                   <AppBar
                     title={item.title}
+                    variant={item.variant}
+                    canGoBack
+                    actions={actions}
+                    onBackPress={() => router.back()}
+                  />
+                </Box>
+              </Column>
+            ))}
+          </Column>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">With Subtitle</Typography>
+          <Typography variant="bodySmall">
+            One line under the title. Medium and large bars grow to hold it.
+          </Typography>
+          <Column gap="md">
+            {variants.map((item) => (
+              <Column key={`subtitle-${item.key}`} gap="sm">
+                <Typography variant="labelMedium">{item.label}</Typography>
+                <Box style={previewStyle}>
+                  <AppBar
+                    title={item.title}
+                    subtitle="Supporting text"
                     variant={item.variant}
                     canGoBack
                     actions={actions}
@@ -234,6 +265,16 @@ export default function AppBarScreen() {
                 </Typography>
                 <Box style={[previewStyle, styles.collapseFrame]}>
                   <CollapseDemo variant={variant} />
+                </Box>
+              </Column>
+            ))}
+            {(['medium', 'large'] as const).map((variant) => (
+              <Column key={`collapse-subtitle-${variant}`} gap="sm">
+                <Typography variant="labelMedium">
+                  {variant === 'large' ? 'Large' : 'Medium'} with subtitle
+                </Typography>
+                <Box style={[previewStyle, styles.collapseFrame]}>
+                  <CollapseDemo variant={variant} subtitle="Supporting text" />
                 </Box>
               </Column>
             ))}

@@ -7,6 +7,7 @@ export interface AppBarColorSchemeColors {
   containerColor: string
   elevatedContainerColor: string
   contentColor: string
+  subtitleColor: string
 }
 
 export function getColorSchemeColors(
@@ -19,42 +20,49 @@ export function getColorSchemeColors(
         containerColor: theme.colors.surfaceContainerLowest,
         elevatedContainerColor: theme.colors.surfaceContainerLowest,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerLow':
       return {
         containerColor: theme.colors.surfaceContainerLow,
         elevatedContainerColor: theme.colors.surfaceContainerLow,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainer':
       return {
         containerColor: theme.colors.surfaceContainer,
         elevatedContainerColor: theme.colors.surfaceContainer,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerHigh':
       return {
         containerColor: theme.colors.surfaceContainerHigh,
         elevatedContainerColor: theme.colors.surfaceContainerHigh,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerHighest':
       return {
         containerColor: theme.colors.surfaceContainerHighest,
         elevatedContainerColor: theme.colors.surfaceContainerHighest,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
     case 'primary':
       return {
         containerColor: theme.colors.primary,
         elevatedContainerColor: theme.colors.primary,
         contentColor: theme.colors.onPrimary,
+        subtitleColor: theme.colors.onPrimary,
       }
     case 'primaryContainer':
       return {
         containerColor: theme.colors.primaryContainer,
         elevatedContainerColor: theme.colors.primaryContainer,
         contentColor: theme.colors.onPrimaryContainer,
+        subtitleColor: theme.colors.onPrimaryContainer,
       }
     case 'surface':
     default:
@@ -62,6 +70,7 @@ export function getColorSchemeColors(
         containerColor: theme.colors.surface,
         elevatedContainerColor: theme.colors.surfaceContainer,
         contentColor: theme.colors.onSurface,
+        subtitleColor: theme.colors.onSurfaceVariant,
       }
   }
 }
@@ -82,12 +91,6 @@ export function createStyles(
     smallContainer: {
       height: topAppBar.smallContainerHeight,
       position: 'relative',
-    },
-    mediumContainer: {
-      height: topAppBar.mediumContainerHeight,
-    },
-    largeContainer: {
-      height: topAppBar.largeContainerHeight,
     },
     expandedContainer: {
       position: 'relative',
@@ -185,6 +188,9 @@ export function createStyles(
       maxWidth: '100%',
       includeFontPadding: false,
       textAlignVertical: 'center',
+    },
+    subtitleColor: {
+      color: schemeColors.subtitleColor,
     },
   })
 }

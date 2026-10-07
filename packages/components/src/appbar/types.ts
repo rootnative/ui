@@ -76,6 +76,19 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   /** Title text displayed in the bar. */
   title: string
   /**
+   * One line of supporting text under the title. Its type role follows the
+   * variant: `labelMedium` on `'small'` and `'center-aligned'`, `labelLarge`
+   * on `'medium'`, and `titleMedium` on `'large'`. Its color is
+   * `onSurfaceVariant`, or the scheme's content color on the `'primary'` and
+   * `'primaryContainer'` schemes.
+   *
+   * A `'small'` or `'center-aligned'` bar keeps its 64dp height. A
+   * `'medium'` bar grows by 24dp and a `'large'` bar by 32dp. A bar that
+   * collapses with `scrollOffset` takes the subtitle to `labelMedium` with
+   * the title.
+   */
+  subtitle?: string
+  /**
    * Layout variant.
    * @default 'small'
    */
@@ -155,11 +168,14 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    */
   containerColor?: string
   /**
-   * Override the content (title and icon) color.
+   * Override the content (title and icon) color. The subtitle keeps its own
+   * color; set it with `subtitleStyle`.
    */
   contentColor?: string
   /** Additional style applied to the title text. */
   titleStyle?: StyleProp<TextStyle>
+  /** Additional style applied to the subtitle text. */
+  subtitleStyle?: StyleProp<TextStyle>
   /**
    * The outline level of the title. The bar title is the page heading, so the
    * web renders it as `<h1>`. Pass `2` when a heading above the bar is the

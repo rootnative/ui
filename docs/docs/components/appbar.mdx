@@ -141,6 +141,57 @@ wrapper.
 `}
 />
 
+## With a Subtitle
+
+`subtitle` adds one line of supporting text under the title. Its color is
+`onSurfaceVariant`. Its type role follows the variant:
+
+| Variant | Subtitle role | Bar height |
+|---------|---------------|------------|
+| `small`, `center-aligned` | `labelMedium` | 64dp, no change |
+| `medium` | `labelLarge` | 112dp → 136dp |
+| `large` | `titleMedium` | 152dp → 184dp |
+
+The roles and the growth come from the MD3 Expressive flexible app bars. The
+baseline `medium` and `large` bars have no subtitle in the spec, so they take
+the subtitle of the flexible bars and keep their own title.
+
+`contentColor` does not change the subtitle color. Use `subtitleStyle` for
+that. On the `primary` and `primaryContainer` schemes, the subtitle takes the
+scheme's content color.
+
+<SnackExample
+  name="RootNative AppBar — Subtitle"
+  code={`
+  import { AppBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ flex: 1, rowGap: 16 }}>
+            <AppBar
+              title="Inbox"
+              subtitle="3 unread"
+              actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+            />
+            <AppBar
+              title="Processes"
+              subtitle="The list updates every 3 seconds."
+              variant="medium"
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
 ## Collapse on Scroll
 
 The `medium` and `large` variants collapse to the small (64dp) form as the
@@ -196,6 +247,8 @@ scroll listener.
 
 The bar collapses over a scroll distance equal to the height it loses
 (48px for `medium`, 88px for `large`), so the motion tracks the finger 1:1.
+With a `subtitle`, the bar is taller, so the distance is 72px for `medium` and
+120px for `large`. The subtitle collapses to `labelMedium` with the title.
 `scrollOffset` is ignored by the `small` and `center-aligned` variants —
 keep using `elevated` for those.
 

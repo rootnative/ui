@@ -58,11 +58,26 @@ const titleVariantBySize: Record<AppBarSize, TypographyVariant> = {
   medium: 'headlineSmall',
   large: 'headlineMedium',
 }
+// Compose `AppBarSmallTokens`, `AppBarMediumFlexibleTokens` and
+// `AppBarLargeFlexibleTokens`. The baseline medium and large bars have no
+// subtitle in the spec, so they take the subtitle of the flexible bars.
+const subtitleVariantBySize: Record<AppBarSize, TypographyVariant> = {
+  small: 'labelMedium',
+  medium: 'labelLarge',
+  large: 'titleMedium',
+}
+// The flexible bars grow by this much when they carry a subtitle: medium
+// 112 → 136dp, large 120 → 152dp. The baseline bars take the same growth.
+const subtitleExtraHeightBySize: Record<AppBarSize, number> = {
+  small: 0,
+  medium: 24,
+  large: 32,
+}
 // The header role and the level are set at each use: `Typography` takes
 // `level`, and the collapsing `Animated.Text` takes the two props by hand.
 // A level-less header renders as `<h1>` on the web, so the level is not
 // optional there.
-const APP_BAR_TITLE_TEXT_PROPS = {
+const APP_BAR_TEXT_PROPS = {
   numberOfLines: 1,
   ellipsizeMode: 'tail',
 } as const
@@ -73,17 +88,6 @@ function resolveSize(variant: AppBarProps['variant']): AppBarSize {
   }
 
   return 'small'
-}
-
-function getSizeStyle(
-  styles: ReturnType<typeof createStyles>,
-  size: AppBarSize,
-) {
-  if (size === 'large') {
-    return styles.largeContainer
-  }
-
-  return styles.mediumContainer
 }
 
 function withTopInset(
@@ -108,6 +112,7 @@ function measureWidth(event: LayoutChangeEvent): number {
 
 export function AppBar({
   title,
+  subtitle,
   variant = 'small',
   colorScheme = 'surface',
   canGoBack = false,
@@ -121,6 +126,7 @@ export function AppBar({
   containerColor,
   contentColor,
   titleStyle,
+  subtitleStyle,
   titleLevel = 1,
   scrollOffset,
   style,
@@ -147,6 +153,8 @@ export function AppBar({
   )
   const size = resolveSize(variant)
   const titleVariant = titleVariantBySize[size]
+  const subtitleVariant = subtitleVariantBySize[size]
+  const hasSubtitle = Boolean(subtitle)
   const isCenterAligned = variant === 'center-aligned'
   const isExpanded = size !== 'small'
   // Same geometry as the Compose Material 3 `TopAppBarLayout`: each side slot
@@ -206,9 +214,14 @@ export function AppBar({
   // `scrollOffset` on the UI thread — no JS-side scroll listener needed.
   const collapsible = isExpanded && scrollOffset != null
   const expandedHeight =
-    size === 'large'
+    (size === 'large'
       ? topAppBar.largeContainerHeight
-      : topAppBar.mediumContainerHeight
+      : topAppBar.mediumContainerHeight) +
+    (hasSubtitle ? subtitleExtraHeightBySize[size] : 0)
+  const expandedContainerStyle = useMemo<ViewStyle>(
+    () => ({ height: expandedHeight }),
+    [expandedHeight],
+  )
   const collapseRange = Math.max(
     1,
     expandedHeight - topAppBar.smallContainerHeight,
@@ -225,17 +238,26 @@ export function AppBar({
 
   const expandedTitleType = theme.typography[titleVariant]
   const collapsedTitleType = theme.typography.titleLarge
-  // Rest geometry of the expanded title (bottom-aligned with the variant's
-  // bottom padding) and the collapsed target (centered in the 64dp top row,
-  // matching the small variant's overlay title exactly).
+  const expandedSubtitleType = theme.typography[subtitleVariant]
+  const collapsedSubtitleType = theme.typography.labelMedium
+  const expandedTitleBlockHeight =
+    expandedTitleType.lineHeight +
+    (hasSubtitle ? expandedSubtitleType.lineHeight : 0)
+  const collapsedTitleBlockHeight =
+    collapsedTitleType.lineHeight +
+    (hasSubtitle ? collapsedSubtitleType.lineHeight : 0)
+  // Rest geometry of the expanded title block, the title and the subtitle
+  // (bottom-aligned with the variant's bottom padding), and the collapsed
+  // target (centered in the 64dp top row, matching the small variant's
+  // overlay title exactly).
   const titleBottomPadding =
     size === 'large'
       ? topAppBar.largeTitleBottomPadding
       : topAppBar.mediumTitleBottomPadding
   const expandedTitleTop =
-    expandedHeight - titleBottomPadding - expandedTitleType.lineHeight
+    expandedHeight - titleBottomPadding - expandedTitleBlockHeight
   const collapsedTitleTop =
-    (topAppBar.topRowHeight - collapsedTitleType.lineHeight) / 2
+    (topAppBar.topRowHeight - collapsedTitleBlockHeight) / 2
   const expandedTitleEndInset = theme.spacing.md
 
   const containerCollapseStyle = useInterpolatedStyle(collapseProgress, {
@@ -260,7 +282,7 @@ export function AppBar({
     height: interpolate(
       collapseProgress.value,
       [0, 1],
-      [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
+      [expandedTitleBlockHeight, collapsedTitleBlockHeight],
     ),
     [collapseEndKey]: interpolate(
       collapseProgress.value,
@@ -271,6 +293,17 @@ export function AppBar({
   const titleTextCollapseStyle = useInterpolatedStyle(collapseProgress, {
     fontSize: [expandedTitleType.fontSize, collapsedTitleType.fontSize],
     lineHeight: [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],
+  })
+  const subtitleTextCollapseStyle = useInterpolatedStyle(collapseProgress, {
+    fontSize: [expandedSubtitleType.fontSize, collapsedSubtitleType.fontSize],
+    lineHeight: [
+      expandedSubtitleType.lineHeight,
+      collapsedSubtitleType.lineHeight,
+    ],
+    letterSpacing: [
+      expandedSubtitleType.letterSpacing,
+      collapsedSubtitleType.letterSpacing,
+    ],
   })
 
   const leadingContent = useMemo(() => {
@@ -446,6 +479,24 @@ export function AppBar({
     containerOverride,
   ]
 
+  const titleAlignStyle = isCenterAligned
+    ? styles.centeredTitle
+    : styles.startAlignedTitle
+  const subtitleNode = hasSubtitle ? (
+    <Typography
+      {...APP_BAR_TEXT_PROPS}
+      variant={subtitleVariant}
+      style={[
+        styles.title,
+        styles.subtitleColor,
+        titleAlignStyle,
+        subtitleStyle,
+      ]}
+    >
+      {subtitle}
+    </Typography>
+  ) : null
+
   if (isExpanded) {
     // Collapsible: the container height and the title's position/type scale
     // are scroll-driven, so the title lives in an absolutely-positioned
@@ -458,7 +509,7 @@ export function AppBar({
       <Animated.View
         style={[
           styles.expandedContainer,
-          getSizeStyle(styles, size),
+          expandedContainerStyle,
           containerCollapseStyle,
         ]}
       >
@@ -470,7 +521,7 @@ export function AppBar({
           ]}
         >
           <Animated.Text
-            {...APP_BAR_TITLE_TEXT_PROPS}
+            {...APP_BAR_TEXT_PROPS}
             accessibilityRole="header"
             aria-level={titleLevel}
             style={[
@@ -484,10 +535,25 @@ export function AppBar({
           >
             {title}
           </Animated.Text>
+          {hasSubtitle ? (
+            <Animated.Text
+              {...APP_BAR_TEXT_PROPS}
+              style={[
+                expandedSubtitleType,
+                styles.title,
+                styles.subtitleColor,
+                styles.startAlignedTitle,
+                subtitleTextCollapseStyle,
+                subtitleStyle,
+              ]}
+            >
+              {subtitle}
+            </Animated.Text>
+          ) : null}
         </Animated.View>
       </Animated.View>
     ) : (
-      <View style={[styles.expandedContainer, getSizeStyle(styles, size)]}>
+      <View style={[styles.expandedContainer, expandedContainerStyle]}>
         {topRow}
         <View
           style={[
@@ -499,7 +565,7 @@ export function AppBar({
           ]}
         >
           <Typography
-            {...APP_BAR_TITLE_TEXT_PROPS}
+            {...APP_BAR_TEXT_PROPS}
             level={titleLevel}
             variant={titleVariant}
             style={[
@@ -511,6 +577,7 @@ export function AppBar({
           >
             {title}
           </Typography>
+          {subtitleNode}
         </View>
       </View>
     )
@@ -522,20 +589,18 @@ export function AppBar({
     )
   }
 
-  const titleNode = (
-    <Typography
-      {...APP_BAR_TITLE_TEXT_PROPS}
-      level={titleLevel}
-      variant={titleVariant}
-      style={[
-        styles.title,
-        titleColorStyle,
-        isCenterAligned ? styles.centeredTitle : styles.startAlignedTitle,
-        titleStyle,
-      ]}
-    >
-      {title}
-    </Typography>
+  const titleBlock = (
+    <>
+      <Typography
+        {...APP_BAR_TEXT_PROPS}
+        level={titleLevel}
+        variant={titleVariant}
+        style={[styles.title, titleColorStyle, titleAlignStyle, titleStyle]}
+      >
+        {title}
+      </Typography>
+      {subtitleNode}
+    </>
   )
 
   const content = (
@@ -553,10 +618,10 @@ export function AppBar({
             style={[styles.centeredTitleNode, centeredTitleOffsetStyle]}
             onLayout={onTitleLayout}
           >
-            {titleNode}
+            {titleBlock}
           </View>
         ) : (
-          titleNode
+          titleBlock
         )}
       </View>
     </View>
