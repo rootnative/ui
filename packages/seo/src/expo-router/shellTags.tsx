@@ -1,12 +1,19 @@
 import type { ReactElement } from 'react'
 
+type ThemeColor = string | { light: string; dark: string }
+
 export type ShellTagsOptions = {
   /**
    * The base path of a subpath host, for example `/ui/demo`. Every relative
    * `href` in this list is prefixed with it. Pass `process.env.EXPO_BASE_URL`.
    */
   basePath?: string
-  themeColor?: string
+  /**
+   * The browser toolbar colour. The `{ light, dark }` form writes one
+   * `theme-color` tag for each `prefers-color-scheme`. The tags follow the
+   * system scheme, not a mode the user picks in the app.
+   */
+  themeColor?: ThemeColor
   /** The `/favicon.ico` or `.png` of the site. */
   favicon?: string
   /** A 180×180 PNG for iOS. */
@@ -27,11 +34,33 @@ function withBase(basePath: string | undefined, href: string): string {
   return `${base}${href.startsWith('/') ? href : `/${href}`}`
 }
 
+function themeColorTags(themeColor: ThemeColor | undefined): ReactElement[] {
+  if (!themeColor) return []
+  if (typeof themeColor === 'string') {
+    return [<meta key="theme-color" name="theme-color" content={themeColor} />]
+  }
+  return (['light', 'dark'] as const)
+    .filter((scheme) => themeColor[scheme])
+    .map((scheme) => (
+      <meta
+        key={`theme-color:${scheme}`}
+        name="theme-color"
+        media={`(prefers-color-scheme: ${scheme})`}
+        content={themeColor[scheme]}
+      />
+    ))
+}
+
 /**
  * The head of the HTML shell as React elements: charset, viewport, theme
  * colour, icons, manifest, and preconnect links. Place the result first in the
  * `<head>` of `app/+html.tsx`. It has no router dependency, so the same list
  * serves a Vite template through `renderToStaticMarkup`.
+ *
+ * Expo Router writes the `PageHead` tags at the start of `<head>`, before
+ * these. On a page with a long head the charset is then after byte 1024,
+ * where the HTML spec requires it, so the host must send
+ * `Content-Type: text/html; charset=utf-8`.
  */
 export function shellTags(options: ShellTagsOptions = {}): ReactElement[] {
   const { basePath } = options
@@ -42,16 +71,8 @@ export function shellTags(options: ShellTagsOptions = {}): ReactElement[] {
       name="viewport"
       content={options.viewport ?? DEFAULT_VIEWPORT}
     />,
+    ...themeColorTags(options.themeColor),
   ]
-  if (options.themeColor) {
-    tags.push(
-      <meta
-        key="theme-color"
-        name="theme-color"
-        content={options.themeColor}
-      />,
-    )
-  }
   if (options.favicon) {
     tags.push(
       <link key="icon" rel="icon" href={withBase(basePath, options.favicon)} />,

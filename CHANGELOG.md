@@ -198,6 +198,34 @@ the web test for the throw stays.
 wrapper only for `PageHead`, you can remove it. Keep the provider at the
 root of the app.
 
+### `shellTags` takes a light and a dark theme colour
+
+`themeColor` took one string, and `shellTags` wrote one `theme-color` tag
+with no `media`. A browser uses the first `theme-color` tag whose media
+matches, so on a site with a light and a dark theme the browser toolbar
+stayed light over the dark page. The site had to write the two tags by hand.
+
+`themeColor` now also takes `{ light, dark }`. The object form writes one tag
+for each `prefers-color-scheme`, light first. A scheme with an empty colour
+gets no tag. The string form does not change. The tags follow the system
+scheme, not a mode that the user picks in the app. `writeManifest` still
+takes one string, because the manifest has one theme colour. Four new tests;
+a fault put into the media, the order, the empty-colour rule or the keys
+makes one of them fail.
+
+**Check your `+html.tsx`.** If it writes two `theme-color` tags next to
+`shellTags`, remove them and pass `themeColor: { light, dark }`.
+
+### The docs give the charset position on an Expo Router export
+
+Expo Router writes the `PageHead` tags at the start of `<head>`, before the
+children of `+html.tsx`. So the `<meta charset>` that `shellTags` writes is
+after byte 1024 on a page with a full head, and the HTML spec requires it in
+the first 1024 bytes. `shellTags` cannot change that order. The `shellTags`
+JSDoc, the SEO checklist, a new "The charset position" section on the Limits
+page, and the `llms` files now say that the host must send
+`Content-Type: text/html; charset=utf-8`. GitHub Pages does.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole

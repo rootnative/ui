@@ -1,12 +1,12 @@
 ---
 sidebar_position: 4
 sidebar_label: Limits
-description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the per-route noindex decision, and the checks that count on the live host.
+description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the charset position, the per-route noindex decision, and the checks that count on the live host.
 ---
 
 # Limits
 
-Four things are outside the package. Each one is a decision the app or the
+Five things are outside the package. Each one is a decision the app or the
 host makes, and the docs say so instead of hiding it.
 
 ## The server-rendered image
@@ -36,6 +36,22 @@ No package changes that. Check the host:
   `index.html` with a 200 for an unknown path.
 - A dynamic route with real data needs `generateStaticParams` and a data
   source the export server can reach.
+
+## The charset position
+
+The HTML spec requires the `<meta charset>` in the first 1024 bytes of the
+page. `shellTags` writes it first in the shell, but Expo Router writes the
+`PageHead` tags at the start of `<head>`, before the shell. A page with a
+title, a description, the Open Graph tags and a JSON-LD script puts the
+charset after byte 1024. The home page of the example app is one such page.
+
+No package changes that order. The host must send the charset in the
+`Content-Type` header, because the header wins over the tag:
+
+- GitHub Pages sends `text/html; charset=utf-8` for an `.html` file.
+- A host that sends `text/html` with no charset, or no `Content-Type`, makes
+  the browser guess the encoding. Check the header with
+  `curl -I <url>`.
 
 ## The per-route `noindex` decision
 

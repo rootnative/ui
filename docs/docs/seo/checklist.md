@@ -297,12 +297,30 @@ export default function Root({ children }: PropsWithChildren) {
 subpath host. `shellTags` has no router dependency: the same function serves
 a Vite `index.html` template through `renderToStaticMarkup`.
 
+Expo Router writes the `PageHead` tags at the start of `<head>`, before the
+shell. On a page with a title, a description, the Open Graph tags and a
+JSON-LD script, the charset is then after byte 1024. The HTML spec requires
+it in the first 1024 bytes, so the host must send the charset in the
+`Content-Type` header. See [the charset position](./limits.md#the-charset-position).
+
+A site with a light and a dark theme gives both colours:
+
+```tsx
+shellTags({ themeColor: { light: '#f8f9ff', dark: '#0e141c' } })
+```
+
+This writes one `theme-color` tag for each `prefers-color-scheme`. A browser
+uses the first tag whose media matches, so one tag with no media always wins
+over a dark one. The tags follow the system scheme, not a mode that the user
+picks in the app.
+
 ## 8. The small tags
 
 `writeManifest` writes a web app manifest with relative paths, so it works
 under a subpath host. Pass `themeColor` to both `shellTags` and
 `writeManifest`, and the same value to `backgroundColor` as the page
-background.
+background. The manifest has one theme colour, so `writeManifest` takes a
+string, also on a site with two themes.
 
 ## Check the result
 

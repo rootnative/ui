@@ -41,6 +41,35 @@ describe('shellTags', () => {
     )
   })
 
+  it('writes one theme-color tag for each scheme with the object form', () => {
+    const out = html({ themeColor: { light: '#f8f9ff', dark: '#0e141c' } })
+    expect(out).toBe(
+      '<meta charSet="utf-8"/>' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>' +
+        '<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8f9ff"/>' +
+        '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e141c"/>',
+    )
+  })
+
+  it('writes no media on the string form', () => {
+    const out = html({ themeColor: '#4C0519' })
+    expect(out.match(/name="theme-color"/g)).toHaveLength(1)
+    expect(out).not.toContain('media=')
+  })
+
+  it('leaves out a scheme with an empty colour', () => {
+    const out = html({ themeColor: { light: '', dark: '#0e141c' } })
+    expect(out.match(/name="theme-color"/g)).toHaveLength(1)
+    expect(out).toContain(
+      '<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e141c"/>',
+    )
+  })
+
+  it('needs both schemes in the object form', () => {
+    // @ts-expect-error -- `dark` is required
+    html({ themeColor: { light: '#f8f9ff' } })
+  })
+
   it('leaves hrefs alone without a base path', () => {
     const out = html({ favicon: '/favicon.ico', manifest: '/m.json' })
     expect(out).toContain('href="/favicon.ico"')
@@ -48,9 +77,19 @@ describe('shellTags', () => {
   })
 
   it('gives every element a key', () => {
+    const options = {
+      themeColor: { light: '#fff', dark: '#000' },
+      favicon: '/a',
+      preconnect: [{ href: 'https://b' }],
+    }
     const warn = jest.spyOn(console, 'error').mockImplementation(() => {})
-    html({ favicon: '/a', preconnect: [{ href: 'https://b' }] })
+    html(options)
     expect(warn).not.toHaveBeenCalled()
     warn.mockRestore()
+
+    // The server renderer does not report a duplicate key, so read the keys.
+    const keys = shellTags(options).map((tag) => tag.key)
+    expect(keys).not.toContain(null)
+    expect(new Set(keys).size).toBe(keys.length)
   })
 })
