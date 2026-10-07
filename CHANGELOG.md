@@ -251,6 +251,19 @@ JSDoc, the SEO checklist, a new "The charset position" section on the Limits
 page, and the `llms` files now say that the host must send
 `Content-Type: text/html; charset=utf-8`. GitHub Pages does.
 
+### `rootnative create` pins `@rootnative/inertia` `0.0.18`
+
+The two templates pinned `0.0.17`. In inertia `0.0.18`, the config keys of a
+mixed transition map, such as
+`{ type: 'spring', tension: 120, opacity: { type: 'timing' } }`, are the
+default for every key with no entry. Before, those keys got the default
+spring, and a dev build logged `Unknown transition name "spring"`. The dev
+and example pins move to `0.0.18` too.
+
+The peer range stays `>=0.0.17 <0.1.0`. No component uses an inertia API
+that is newer than `0.0.17`, and no component passes a mixed map, so the
+components animate the same on both versions.
+
 ## 0.0.0-alpha.23 — 2026-10-06
 
 **No breaking change.** This release is the structural audit of the whole
