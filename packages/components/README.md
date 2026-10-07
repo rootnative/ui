@@ -76,7 +76,7 @@ import { Button, Card } from '@rootnative/components'
 | AppBar | `./appbar` | small, center-aligned, medium, large |
 | Card | `./card` | elevated, filled, outlined |
 | Chip | `./chip` | assist, filter, input, suggestion |
-| Avatar | `./avatar` | image, icon, or text initials · 5 sizes (xSmall..xLarge) |
+| Avatar | `./avatar` | image, icon, or text initials · 5 sizes (extraSmall..extraLarge) |
 | Checkbox | `./checkbox` | — |
 | Radio | `./radio` | — |
 | Switch | `./switch` | — |

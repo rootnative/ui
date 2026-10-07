@@ -11,7 +11,6 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
-import { resolveSize } from '../internal/size'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -79,7 +78,7 @@ export function IconButton({
   selected,
   defaultSelected,
   onSelectedChange,
-  size: sizeProp = 'small',
+  size = 'small',
   width = 'uniform',
   shape = 'round',
   hitSlop,
@@ -89,7 +88,6 @@ export function IconButton({
   const theme = useTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
-  const size = resolveSize(sizeProp, 'IconButton')
   const sizeTokens = getIconButtonSizeTokens(size)
 
   const isDisabled = Boolean(disabled)

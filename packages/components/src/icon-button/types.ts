@@ -8,10 +8,6 @@ export type IconButtonVariant = 'filled' | 'tonal' | 'outlined' | 'standard'
  * MD3 Expressive icon-button size. Drives container height, icon size, and
  * the widths available to the `width` prop. `'small'` (40 dp) is the
  * default.
- *
- * `'xs' | 's' | 'm' | 'l' | 'xl'` are the old names. They map to the five
- * names above, warn once in development, and are removed in the next
- * release.
  */
 export type IconButtonSize =
   | 'extraSmall'
@@ -19,11 +15,6 @@ export type IconButtonSize =
   | 'medium'
   | 'large'
   | 'extraLarge'
-  | 'xs'
-  | 's'
-  | 'm'
-  | 'l'
-  | 'xl'
 
 /**
  * MD3 Expressive icon-button width variant. `'narrow'`/`'wide'` trade
@@ -102,9 +93,7 @@ export interface IconButtonProps extends Omit<
   onSelectedChange?: (selected: boolean) => void
   /**
    * MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' |
-   * 'large' | 'extraLarge'`. Sets container height and icon size. The old
-   * `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and
-   * warn in development.
+   * 'large' | 'extraLarge'`. Sets container height and icon size.
    * @default 'small'
    */
   size?: IconButtonSize

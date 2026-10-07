@@ -1,6 +1,6 @@
 {
   "name": "avatar",
-  "description": "Circular avatar with image, icon, or text initials and 5 sizes (xSmall to xLarge).",
+  "description": "Circular avatar with image, icon, or text initials and 5 sizes (extraSmall to extraLarge).",
   "files": [
     "packages/components/src/avatar/Avatar.tsx",
     "packages/components/src/avatar/index.ts",

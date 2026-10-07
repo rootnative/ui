@@ -232,7 +232,7 @@ import { Link } from 'expo-router'
 Props:
 - `children: string` — Text label rendered inside the button.
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
-- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
 - `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
@@ -338,7 +338,7 @@ Props:
 - `selected?: boolean` — Enables toggle mode and controls it. The button changes appearance based on the selected/unselected state. Pair with `onSelectedChange`, or use `defaultSelected` for an uncontrolled toggle.
 - `defaultSelected?: boolean` — Enables toggle mode without controlling it: the button flips its own state on press and reports it through `onSelectedChange`.
 - `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a toggle button is pressed.
-- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xs' | 's' | 'm' | 'l' | 'xl'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height and icon size. The old `'xs' | 's' | 'm' | 'l' | 'xl'` names still work for one release and warn in development.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height and icon size.
 - `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
 - `accessibilityLabel: string` — Required — icon-only buttons must have a label for screen readers.
@@ -1717,7 +1717,7 @@ Props:
 - `imageUri?: string` — URI of the image to display. Takes priority over `icon` and `label`.
 - `icon?: IconSource` — Icon to display. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Takes priority over `label` when `imageUri` is not set.
 - `label?: string` — Text initials to display (1–2 characters recommended). Shown when `imageUri` and `icon` are not set.
-- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | 'xSmall' | 'xLarge'` — Default: `'medium'`. Size of the avatar.
+- `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'medium'`. Size of the avatar.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically when `onPress` is set.
 - `contentColor?: string` — Override the content (icon / initials) color.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.

@@ -11,6 +11,31 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Breaking: the old size names are removed
+
+alpha.22 gave `Button`, `IconButton` and `Avatar` the MD3 size names and
+kept the old names as aliases for one release, with a warning. The aliases
+are now removed:
+
+| Component | Removed | Use |
+| --- | --- | --- |
+| `Button`, `IconButton` | `'xs'`, `'s'`, `'m'`, `'l'`, `'xl'` | `'extraSmall'`, `'small'`, `'medium'`, `'large'`, `'extraLarge'` |
+| `Avatar` | `'xSmall'`, `'xLarge'` | `'extraSmall'`, `'extraLarge'` |
+
+TypeScript rejects an old name. No runtime check reads the name, so a
+JavaScript app gets no warning: `Button` and `IconButton` throw
+`Cannot read properties of undefined (reading 'iconSize')`, and `Avatar`
+renders at the `medium` size with unstyled initials. The development warning,
+`resolveSize`, and the `size-aliases` tests are removed. A new test holds a
+`@ts-expect-error` for each removed name, so the typecheck fails if a props
+type accepts one again.
+
+The `IconButton` page listed its sizes with the old names, and the
+accessibility page named `xs`. Both now use the MD3 names.
+
+**Check your app.** If the development console showed
+`uses an old size name`, rename each `size` that the warning named.
+
 ### `AppBar` takes a subtitle
 
 The MD3 Expressive app bar shows one line of supporting text under the title.

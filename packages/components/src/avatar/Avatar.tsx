@@ -7,7 +7,6 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { ExpressiveSize } from '../internal/size'
-import { resolveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
@@ -60,7 +59,7 @@ export function Avatar({
   imageUri,
   icon,
   label,
-  size: sizeProp = 'medium',
+  size = 'medium',
   containerColor,
   contentColor,
   style,
@@ -77,7 +76,6 @@ export function Avatar({
 
   const bgColor = containerColor ?? theme.colors.primaryContainer
   const fgColor = contentColor ?? theme.colors.onPrimaryContainer
-  const size = resolveSize(sizeProp, 'Avatar')
   const sizeStyle = getSizeStyle(styles, size)
   const iconPx = ICON_PX[size]
   const initials = label ? label.slice(0, 2).toUpperCase() : undefined

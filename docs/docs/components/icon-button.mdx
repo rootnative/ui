@@ -50,15 +50,15 @@ The `icon` and `selectedIcon` props accept three forms — a string name (resolv
 
 ## Sizes
 
-Five MD3 Expressive sizes. `s` is the default.
+Five MD3 Expressive sizes. `small` is the default.
 
 | `size` | Height | Icon |
 |--------|--------|------|
-| `xs` | 32dp | 20dp |
-| `s` | 40dp | 24dp |
-| `m` | 56dp | 24dp |
-| `l` | 96dp | 32dp |
-| `xl` | 136dp | 40dp |
+| `extraSmall` | 32dp | 20dp |
+| `small` | 40dp | 24dp |
+| `medium` | 56dp | 24dp |
+| `large` | 96dp | 32dp |
+| `extraLarge` | 136dp | 40dp |
 
 <SnackExample
   name="RootNative IconButton — Sizes"
@@ -111,7 +111,7 @@ import { Heart } from 'lucide-react-native'
 />
 ```
 
-The render-function form receives the size and color the IconButton would have given to its default icon (24dp at the default `s` size, plus the variant + state color), so the icon stays in sync with size/variant changes automatically.
+The render-function form receives the size and color the IconButton would have given to its default icon (24dp at the default `small` size, plus the variant + state color), so the icon stays in sync with size/variant changes automatically.
 
 ## Toggle Mode
 

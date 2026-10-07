@@ -67,7 +67,7 @@ so it needs no flag of its own.
 ## Touch targets
 
 Several MD3 Expressive size tokens are deliberately smaller than the 48dp
-WCAG 2.5.5 / MD3 minimum — a `Button` at `xs` and a `ButtonGroup` item at
+WCAG 2.5.5 / MD3 minimum — a `Button` and a `ButtonGroup` item at
 `extraSmall` are 32dp tall, and a `Switch` track is 32dp. On native those
 controls carry a `hitSlop` sized to bring the *touch* area back to 48dp without
 moving a single pixel of layout, so the small sizes stay usable.
@@ -77,7 +77,7 @@ variant sit 2dp apart, so horizontal slop would make each item's touch area
 overlap its neighbour's.
 
 **This does not apply on web.** react-native-web does not implement `hitSlop`,
-so on web these controls are exactly their token size. If you use `xs` /
+so on web these controls are exactly their token size. If you use
 `extraSmall` on a touch-capable web build, give them room yourself.
 
 ## What you have to supply
