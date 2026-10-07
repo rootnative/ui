@@ -39,6 +39,26 @@ on a web export of the example app at 390px: every bar has the heights and
 positions above, and a medium bar scrolled 36px is 100dp high with a 13px
 subtitle, halfway through its 72px collapse. Not checked on iOS or Android.
 
+### Web without Expo: the Vite config now runs `vite dev`
+
+The Vite config on the "Web without Expo" page worked for `vite build` only.
+`vite dev` pre-bundles `node_modules` in a separate Rolldown pass, and that
+pass reads neither the `plugins` list nor `resolve.extensions`. With the
+config as written, the dev server stopped at start with
+`Flow is not supported` in `react-native/Libraries/...`, because the
+pre-bundle took the native files of Reanimated, the safe-area package and
+`react-native-svg`. With the extensions alone, the page was blank and
+Reanimated threw `useAnimatedStyle was used without a dependency array or
+Babel plugin`.
+
+The config now gives `optimizeDeps.rolldownOptions` its own copy of the
+worklets plugin and of the extensions. A new section, "The Vite dev server",
+explains why, and the symptoms table has a row for each failure. The `llms`
+files say the same. Checked with Vite 8.3.2: the config from the page, copied
+as written, starts the dev server and renders with no error, and the
+pre-bundle holds no raw `'worklet'` directive. `vite build` output does not
+change. The webpack config needs nothing new.
+
 ### A `Button` link: the docs give the recipe, and `hrefAttrs` is typed
 
 A landing page that linked out with `Button` and `Linking.openURL` exported

@@ -2136,6 +2136,17 @@ babel({
 })
 \`\`\`
 
+\`vite dev\` needs steps 2 and 3 a second time. Its dependency pre-bundle is a
+separate Rolldown pass that reads neither \`plugins\` nor
+\`resolve.extensions\`, so give it its own copy in
+\`optimizeDeps.rolldownOptions\`: \`plugins\` with the same \`babel()\` call
+(the \`node_modules\` pattern is enough there) and \`resolve: { extensions }\`.
+Without the extensions, \`vite dev\` stops at start with \`Flow is not
+supported\` in \`react-native/Libraries/...\`. Without the plugin, the page is
+blank and Reanimated throws \`useAnimatedStyle was used without a dependency
+array or Babel plugin\`. \`vite build\` has no pre-bundle and ignores the
+block. A webpack dev server uses the build rules and needs no second copy.
+
 The app root is the same as on Expo, and no \`SafeAreaProvider\` is needed.
 Electron adds three facts: set the bundler base path to \`./\` for a
 \`file://\` page, allow \`'unsafe-inline'\` in \`style-src\` because

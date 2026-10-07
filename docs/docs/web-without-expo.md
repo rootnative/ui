@@ -12,8 +12,8 @@ runs `react-native-web` without Metro.
 
 The recipe was built with Vite 8, `@rolldown/plugin-babel`, `react-native-web`
 0.21 and Electron 31 on macOS. Each line of config below exists because a
-build without it failed in a specific way. The [symptoms table](#symptoms)
-maps each failure back to its line.
+build or a dev server without it failed in a specific way. The
+[symptoms table](#symptoms) maps each failure back to its line.
 
 ## Install
 
@@ -42,6 +42,8 @@ own names.
 `react-native-safe-area-context`, `react-native-reanimated` and the library
 ship web variants as `.web.js` and `.web.ts` files. Metro picks them by
 platform. Put the `.web.*` extensions before the plain ones in the resolver.
+The Vite dev server needs the list a second time; see
+[The Vite dev server](#the-vite-dev-server).
 
 ### 3. Run the worklets Babel plugin on `node_modules`
 
@@ -59,6 +61,9 @@ Run the plugin on your app source **and** on these three packages:
   Without it, a dev build logs `timing easing: the provided easing function is
   not a worklet` for every `cubicBezier` easing in the theme.
 - `node_modules/react-native-worklets` — the runtime the plugin targets.
+
+The Vite dev server needs the plugin a second time; see
+[The Vite dev server](#the-vite-dev-server).
 
 `@rootnative/inertia` checks for the plugin at the first `Motion` render and
 logs one `console.error` when it is missing, in production too. If you see that
@@ -93,39 +98,51 @@ import babel from '@rolldown/plugin-babel'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
+// 2. Web variants first.
+const extensions = [
+  '.web.tsx',
+  '.web.ts',
+  '.web.mjs',
+  '.web.js',
+  '.tsx',
+  '.ts',
+  '.mjs',
+  '.js',
+  '.jsx',
+  '.json',
+]
+
+const workletPackages =
+  /node_modules\/(@rootnative|react-native-reanimated|react-native-worklets)\/.*\.m?js$/
+
+// 3. The worklets plugin.
+function worklets(include: RegExp[]) {
+  return babel({
+    include,
+    // The default `exclude` skips all of node_modules. Keep only its own
+    // runtime entry excluded.
+    exclude: /\0rolldown\/runtime\.js/,
+    plugins: ['react-native-worklets/plugin'],
+  })
+}
+
 export default defineConfig({
-  plugins: [
-    react(),
-    babel({
-      // 3. The plugin must see the app and the three worklet packages.
-      include: [
-        /src\/.*\.tsx?$/,
-        /node_modules\/(@rootnative|react-native-reanimated|react-native-worklets)\/.*\.m?js$/,
-      ],
-      // The default `exclude` skips all of node_modules. Keep only its own
-      // runtime entry excluded.
-      exclude: /\0rolldown\/runtime\.js/,
-      plugins: ['react-native-worklets/plugin'],
-    }),
-  ],
+  // 3. The plugin must see the app and the three worklet packages.
+  plugins: [react(), worklets([/src\/.*\.tsx?$/, workletPackages])],
   resolve: {
     alias: [
       // 1. Exact match, so react-native-svg and friends keep their names.
       { find: /^react-native$/, replacement: 'react-native-web' },
     ],
-    // 2. Web variants first.
-    extensions: [
-      '.web.tsx',
-      '.web.ts',
-      '.web.mjs',
-      '.web.js',
-      '.tsx',
-      '.ts',
-      '.mjs',
-      '.js',
-      '.jsx',
-      '.json',
-    ],
+    extensions,
+  },
+  // 2. and 3. again for `vite dev`. Its dependency pre-bundle is a separate
+  // pass that reads neither `plugins` nor `resolve.extensions` above.
+  optimizeDeps: {
+    rolldownOptions: {
+      plugins: [worklets([workletPackages])],
+      resolve: { extensions },
+    },
   },
   define: {
     // 4. The globals Metro provides.
@@ -137,6 +154,34 @@ export default defineConfig({
   },
 })
 ```
+
+### The Vite dev server
+
+`vite dev` pre-bundles the packages in `node_modules` before it serves the
+page. The pre-bundle is a separate Rolldown pass, and it reads neither the
+`plugins` list nor `resolve.extensions`. The alias does reach it. So
+`optimizeDeps.rolldownOptions` gives the pass its own copy of both. `vite build`
+has no pre-bundle and ignores the block.
+
+Each half fails in its own way when it is missing:
+
+- **No extensions.** The dev server stops at start with
+  `Error during dependency optimization` and `Flow is not supported` in
+  `react-native/Libraries/...`. The pre-bundle takes the native files of
+  `react-native-reanimated`, `react-native-safe-area-context` and
+  `react-native-svg`, not their `.web.*` files, and those native files import
+  Flow source from `react-native`.
+- **No plugin.** The dev server starts, but the page is blank and throws
+  ``[Reanimated] `useAnimatedStyle` was used without a dependency array or
+  Babel plugin``. The pre-bundled packages keep their raw `'worklet'`
+  directives.
+
+Checked with Vite 8.3, `@rolldown/plugin-babel` 0.2, `react-native-web` 0.21
+and `react-native-reanimated` 4.5. With the block, the pre-bundle holds no raw
+`'worklet'` directive and the page renders with no error.
+
+The webpack dev server compiles with the same rules as the build, so the
+webpack config needs no second copy.
 
 ## webpack
 
@@ -252,6 +297,8 @@ drag regions, keyboard focus, Reduce motion, and the packaged build.
 | The build succeeds, nothing animates, no console error | The worklets plugin did not run on `node_modules` | Step 3: add the three packages to the include |
 | `[inertia] The Reanimated worklets babel plugin is not configured` | Same as above, reported by the library | Step 3 |
 | `timing easing: the provided easing function is not a worklet` | The include covers `@rootnative` but not `react-native-reanimated` | Step 3: add `react-native-reanimated` |
+| `vite dev` stops at start: `Error during dependency optimization`, `Flow is not supported` in `react-native/Libraries/...` | The dev pre-bundle does not read `resolve.extensions` | [The Vite dev server](#the-vite-dev-server): add `resolve.extensions` to `optimizeDeps.rolldownOptions` |
+| `vite build` works, but `vite dev` shows a blank page and ``[Reanimated] `useAnimatedStyle` was used without a dependency array or Babel plugin`` | The dev pre-bundle does not run the worklets plugin | [The Vite dev server](#the-vite-dev-server): add the plugin to `optimizeDeps.rolldownOptions` |
 | `ReferenceError: global is not defined` | No define for `global` | Step 4 |
 | `Unable to resolve @react-native-vector-icons/material-design-icons` | The app imports `@rootnative/components/mdi` | Step 5: install the package, or pass your own `iconResolver` and drop the import |
 | MDI glyphs render as `?` or as empty squares | `@expo/vector-icons` and `@react-native-vector-icons/*` both register the font | Remove `@expo/vector-icons`; run `npx @react-native-vector-icons/codemod` on app code that imports it |
