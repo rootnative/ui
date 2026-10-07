@@ -9,7 +9,17 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.24 — 2026-10-08
+
+**Breaking.** `Button`, `IconButton` and `Avatar` no longer accept the old
+size names, so rename each `size` first. Four changes can move or change a
+screen: the layout keys in `style` now place `Button`, `IconButton`, `FAB`
+and `Chip` by their wrapper, a `Chip` with no action is a label, an
+emphasized display or headline is a header on native, and `hrefAttrs` is
+declared on `ViewProps`. Each entry below ends with what to check. New in
+this release: a subtitle on `AppBar`, the `rootnative-seo` command that
+writes the sitemap and `robots.txt` from the export, a light and a dark
+theme colour in `shellTags`, and a Vite recipe that runs `vite dev`.
 
 ### Breaking: the old size names are removed
 
