@@ -159,6 +159,20 @@ describe('Tooltip', () => {
     fireEvent(screen.getByText('Save'), 'longPress')
     expect(screen.getByTestId('custom-content')).toBeTruthy()
   })
+
+  it('wraps text with an expression in the supporting-text style', () => {
+    const count = 3
+    renderTooltip(
+      <Tooltip anchor={<Button>Delete</Button>}>Delete {count} items</Tooltip>,
+    )
+
+    fireEvent(screen.getByText('Delete'), 'longPress')
+    const style = StyleSheet.flatten(
+      screen.getByText('Delete 3 items').props.style,
+    )
+    expect(style.color).toBe(lightTheme.colors.inverseOnSurface)
+    expect(style.fontSize).toBe(lightTheme.typography.bodySmall.fontSize)
+  })
 })
 
 describe('Tooltip — plain is transient', () => {

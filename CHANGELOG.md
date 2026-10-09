@@ -11,6 +11,26 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Text with an expression renders in `Dialog.Content` and `Tooltip`
+
+JSX text with an expression, such as `You guessed in {tries} tries`,
+compiles to an array of parts, not to one string. `Dialog.Content` and
+`Tooltip` put their children in the supporting-text `Text` only when the
+children were one string or one number, so the array went into a `View`. On
+native, the body was empty and React Native logged `Text strings must be
+rendered within a <Text> component`. On the web, react-native-web logged
+`Unexpected text node` and showed the text without the supporting-text
+style. A template string was the only workaround.
+
+Both now wrap the children when every child is a string or a number. The
+same rule names the dialog: a `Dialog.Title` such as `Delete {name}?` is now
+the accessible name of the dialog, and before, that dialog had no name. One
+internal helper does the check in the three places. A unit test covers the
+helper, and a test for each place uses text with an expression.
+
+**What does not change.** Text beside an element, such as
+`Delete <Text>{name}</Text>?`, is not wrapped. Put it in your own `Text`.
+
 ### On the web, a focused control shows one focus ring
 
 On the web, a control that draws its own MD3 focus ring also showed the

@@ -3,6 +3,7 @@ import { renderIcon } from '@rootnative/utils'
 import { isValidElement, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { Text, View } from 'react-native'
+import { plainTextOf } from '../internal/plainText'
 import { useDialogContext } from './context'
 import { DIALOG_ICON_SIZE, createDialogStyles } from './styles'
 import type {
@@ -98,8 +99,7 @@ export function DialogContent({ children, color, style }: DialogContentProps) {
     [styles.supportingText, color],
   )
 
-  const isPlainText =
-    typeof children === 'string' || typeof children === 'number'
+  const isPlainText = plainTextOf(children) !== undefined
 
   return (
     <View

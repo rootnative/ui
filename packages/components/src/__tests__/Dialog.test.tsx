@@ -74,6 +74,20 @@ describe('Dialog', () => {
     expect(await screen.findByText('bare child')).toBeTruthy()
   })
 
+  it('wraps text with an expression in the supporting-text style', async () => {
+    const tries = 2
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()}>
+        <Dialog.Content>You guessed in {tries} tries</Dialog.Content>
+      </Dialog>,
+    )
+
+    const text = await screen.findByText('You guessed in 2 tries')
+    const style = StyleSheet.flatten(text.props.style)
+    expect(style.color).toBe(lightTheme.colors.onSurfaceVariant)
+    expect(style.fontSize).toBe(lightTheme.typography.bodyMedium.fontSize)
+  })
+
   it('applies the MD3 basic container tokens', async () => {
     renderDialog(
       <Dialog visible onDismiss={jest.fn()} testID="dialog">
@@ -138,6 +152,17 @@ describe('Dialog', () => {
     )
     const surface = await screen.findByTestId('dialog')
     expect(surface.props.accessibilityLabel).toBe('Reset settings?')
+  })
+
+  it('takes its accessible name from a headline with an expression', async () => {
+    const name = 'notes.txt'
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        <Dialog.Title>Delete {name}?</Dialog.Title>
+      </Dialog>,
+    )
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.accessibilityLabel).toBe('Delete notes.txt?')
   })
 
   it('prefers an explicit accessibilityLabel over the headline', async () => {

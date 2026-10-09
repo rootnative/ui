@@ -5,6 +5,7 @@ import type { ReactNode, Ref } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
+import { plainTextOf } from '../internal/plainText'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -49,17 +50,14 @@ function collectSlots(children: ReactNode): Slots {
 
 /**
  * A dialog needs an accessible name, and its headline is that name. Only a
- * plain-string headline can be lifted automatically — a `Dialog.Title` built
- * out of nodes has no single string to announce, so those dialogs pass
- * `accessibilityLabel` themselves.
+ * plain-text headline (strings and numbers, also with `{expressions}`) can be
+ * lifted automatically — a `Dialog.Title` built out of nodes has no single
+ * string to announce, so those dialogs pass `accessibilityLabel` themselves.
  */
 function headlineOf(title: ReactNode[]): string | undefined {
   const [first] = title
   if (!isValidElement<{ children?: ReactNode }>(first)) return undefined
-  const { children } = first.props
-  if (typeof children === 'string') return children
-  if (typeof children === 'number') return String(children)
-  return undefined
+  return plainTextOf(first.props.children)
 }
 
 function DialogBasic({

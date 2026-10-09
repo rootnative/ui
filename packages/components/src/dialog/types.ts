@@ -54,8 +54,8 @@ export interface DialogProps extends ViewProps {
   role?: ViewProps['role']
   /**
    * Accessible name for the dialog. Derived from `Dialog.Title` when its
-   * headline is a plain string, so this is only needed when the headline is
-   * built from nodes or the dialog has no title.
+   * headline is plain text, also text with `{expressions}`, so this is only
+   * needed when the headline is built from nodes or the dialog has no title.
    */
   accessibilityLabel?: string
   /** Style applied to the dialog surface. */
@@ -89,8 +89,9 @@ export interface DialogTitleProps {
 
 export interface DialogContentProps {
   /**
-   * Supporting text or arbitrary content. Strings and numbers are wrapped in
-   * MD3 supporting-text styling; anything else renders as given.
+   * Supporting text or arbitrary content. Strings and numbers, also text with
+   * `{expressions}`, are wrapped in MD3 supporting-text styling. Anything else
+   * renders as given, so text beside an element needs its own `Text`.
    */
   children: ReactNode
   /** Override the supporting-text color. @default theme.colors.onSurfaceVariant */

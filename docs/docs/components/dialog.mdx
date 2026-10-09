@@ -65,7 +65,7 @@ fullscreen variant move the title and actions into its header.
 |------|---------|----------|
 | `Dialog.Icon` | An `IconSource` at 24dp, centered | Optional hero icon. Its presence centers the headline. |
 | `Dialog.Title` | `headlineSmall` / `onSurface` | Headline |
-| `Dialog.Content` | Strings get `bodyMedium` / `onSurfaceVariant`; anything else renders as-is | Supporting text or arbitrary content |
+| `Dialog.Content` | Strings and numbers, also text with `{expressions}`, get `bodyMedium` / `onSurfaceVariant`; anything else renders as-is | Supporting text or arbitrary content |
 | `Dialog.Actions` | An end-aligned row with an 8dp gap | Action buttons — text `Button`s per MD3 |
 
 Any child that isn't one of these is treated as content, so `<Dialog><MyForm /></Dialog>` works without ceremony.
@@ -217,7 +217,7 @@ Every one of these collapses to a hard cut under reduced motion — see [Motion]
 ## Accessibility
 
 - Both surfaces report `role="dialog"` plus `aria-modal` and `accessibilityViewIsModal`, so assistive tech treats the content beneath as inert. Pass `role="alertdialog"` for a dialog that interrupts the user with something they must resolve — assistive technology treats that role as urgent, so it is opt-in rather than the default.
-- The dialog takes its accessible name from `Dialog.Title` when the headline is a plain string. Build the headline out of nodes and there is nothing to lift, so pass `accessibilityLabel` yourself.
+- The dialog takes its accessible name from `Dialog.Title` when the headline is plain text, also text with `{expressions}` such as `Delete {name}?`. Build the headline out of nodes and there is nothing to lift, so pass `accessibilityLabel` yourself.
 - `Dialog.Title` reports `role="heading"`.
 - **On web**, focus moves into the surface when it opens, Tab and Shift-Tab cycle inside it, Escape dismisses a `dismissable` dialog, and focus returns to the control that opened it on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
 - The scrim is announced as a button labelled "Close dialog" — override with `scrimAccessibilityLabel`. It disappears from the accessibility tree when `dismissable={false}`.

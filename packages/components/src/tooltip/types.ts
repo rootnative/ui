@@ -29,7 +29,9 @@ export interface TooltipProps extends ViewProps {
   anchor: ReactNode
   /**
    * Supporting text, or arbitrary nodes when a plain string isn't enough.
-   * Strings and numbers are wrapped in the variant's supporting-text styling.
+   * Strings and numbers, also text with `{expressions}`, are wrapped in the
+   * variant's supporting-text styling. Text beside an element needs its own
+   * `Text`.
    */
   children?: ReactNode
   /**

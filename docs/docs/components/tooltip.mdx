@@ -63,8 +63,9 @@ Pass the control as `anchor` and the text as children.
 />
 
 The anchor renders where the `<Tooltip>` sits in your tree, wrapped in a measuring view that
-watches for hover. Strings and numbers passed as children are wrapped in the variant's
-supporting-text styling; anything else renders as given.
+watches for hover. Strings and numbers passed as children, also text with `{expressions}`, are
+wrapped in the variant's supporting-text styling. Anything else renders as given, so text beside
+an element needs its own `Text`.
 
 ## Triggers
 

@@ -17,6 +17,7 @@ import type {
   TargetedEvent,
 } from 'react-native'
 import { Pressable, Text, View } from 'react-native'
+import { plainTextOf } from '../internal/plainText'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
@@ -231,8 +232,7 @@ export function Tooltip({
     [styles.anchorWrapper, anchorStyle],
   )
 
-  const isPlainText =
-    typeof children === 'string' || typeof children === 'number'
+  const isPlainText = plainTextOf(children) !== undefined
   const body = isPlainText ? (
     <Text style={resolvedTextStyle}>{children}</Text>
   ) : (

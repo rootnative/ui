@@ -1695,7 +1695,7 @@ Props:
 - `closeAccessibilityLabel?: string` — Screen-reader label for the fullscreen close button. @default 'Close'
 - `scrimAccessibilityLabel?: string` — Screen-reader label for the scrim's dismiss action. @default 'Close dialog'
 - `role?: ViewProps['role']` — Default: `'dialog'`. Announced role. An MD3 dialog is a plain `'dialog'`; pass `'alertdialog'` only for one that interrupts the user with something they must resolve (destructive confirmation, error), since assistive technology treats that role as urgent.
-- `accessibilityLabel?: string` — Accessible name for the dialog. Derived from `Dialog.Title` when its headline is a plain string, so this is only needed when the headline is built from nodes or the dialog has no title.
+- `accessibilityLabel?: string` — Accessible name for the dialog. Derived from `Dialog.Title` when its headline is plain text, also text with `{expressions}`, so this is only needed when the headline is built from nodes or the dialog has no title.
 - `style?: StyleProp<ViewStyle>` — Style applied to the dialog surface.
 - `scrimStyle?: StyleProp<ViewStyle>` — Style applied to the scrim. Ignored by the fullscreen variant.
 - `testID?: string` — Test id applied to the dialog surface.
@@ -1725,7 +1725,7 @@ Props:
 Supporting text (strings get `bodyMedium` / `onSurfaceVariant`) or arbitrary content.
 
 Props:
-- `children: ReactNode` — Supporting text or arbitrary content. Strings and numbers are wrapped in MD3 supporting-text styling; anything else renders as given.
+- `children: ReactNode` — Supporting text or arbitrary content. Strings and numbers, also text with `{expressions}`, are wrapped in MD3 supporting-text styling. Anything else renders as given, so text beside an element needs its own `Text`.
 - `color?: string` — Override the supporting-text color. @default theme.colors.onSurfaceVariant
 - `style?: StyleProp<ViewStyle>`
 
@@ -1986,7 +1986,7 @@ import { Tooltip } from '@rootnative/components/tooltip'
 
 Props:
 - `anchor: ReactNode` — The control the tooltip describes. Rendered where the `<Tooltip>` sits in the tree, wrapped in a measuring view that watches for hover. Touch devices open the tooltip on a long press, which needs the anchor to accept `onLongPress` — every RootNative pressable does. Its own `onLongPress` still fires.
-- `children?: ReactNode` — Supporting text, or arbitrary nodes when a plain string isn't enough. Strings and numbers are wrapped in the variant's supporting-text styling.
+- `children?: ReactNode` — Supporting text, or arbitrary nodes when a plain string isn't enough. Strings and numbers, also text with `{expressions}`, are wrapped in the variant's supporting-text styling. Text beside an element needs its own `Text`.
 - `variant?: 'plain' | 'rich'` — Default: `'plain'`. Tooltip anatomy.
 - `subhead?: string` — Subhead above the supporting text. Rich tooltips only.
 - `actions?: ReactNode` — Action buttons below the supporting text — text `Button`s per MD3. Rich tooltips only.
