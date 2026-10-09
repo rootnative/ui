@@ -2,7 +2,12 @@ import { useSyncExternalStore } from 'react'
 
 type Modality = 'keyboard' | 'pointer'
 
-let currentModality: Modality = 'pointer'
+// Web starts in keyboard modality, as inertia's tracker and the W3C polyfill
+// do, so a focus that a script moves before any user input still shows a
+// ring. The components remove the browser's own focus outline, so without
+// this a slider focused that way would show no indicator at all.
+let currentModality: Modality =
+  typeof document !== 'undefined' ? 'keyboard' : 'pointer'
 const subscribers = new Set<() => void>()
 
 function setModality(next: Modality) {
@@ -47,6 +52,13 @@ function getSnapshot() {
   return currentModality === 'keyboard'
 }
 
+// The server has no `document`, so it renders in pointer modality. Hydration
+// must read the same value, or a render that depends on the modality would
+// not match the server HTML.
+function getServerSnapshot() {
+  return false
+}
+
 /**
  * Reactive focus-visible state — re-renders the calling component whenever
  * the user's input modality flips between keyboard and pointer. Mirrors the
@@ -62,7 +74,7 @@ function getSnapshot() {
  * ring rendered conditionally without a separate handler).
  */
 export function useFocusVisible(): boolean {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }
 
 /**

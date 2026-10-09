@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import type { StyleProp, TextStyle } from 'react-native'
 import { Pressable, Text, View } from 'react-native'
 import { Badge } from '../badge'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -117,6 +118,7 @@ export function NavigationItem({
   const containerStyle = useMemo(
     () => [
       styles.container,
+      webOutlineReset,
       disabled ? styles.disabledContainer : styles.interactiveContainer,
     ],
     [styles, disabled],

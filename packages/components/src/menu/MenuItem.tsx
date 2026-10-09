@@ -4,6 +4,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useMenuContext } from './context'
@@ -76,6 +77,7 @@ export function MenuItem({
       {...handlers}
       style={[
         styles.container,
+        webOutlineReset,
         disabled ? styles.disabledContainer : styles.interactiveContainer,
         // The gesture-layer style owns backgroundColor (rest included), so it
         // has to come after the static container style for Reanimated's prop

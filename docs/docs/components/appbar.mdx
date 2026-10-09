@@ -252,6 +252,42 @@ With a `subtitle`, the bar is taller, so the distance is 72px for `medium` and
 `scrollOffset` is ignored by the `small` and `center-aligned` variants —
 keep using `elevated` for those.
 
+## Align with a Page Gutter
+
+The bar follows the Compose `TopAppBarLayout` geometry. Each side slot and the
+title carry `horizontalPadding`, so with the default `theme.topAppBar` tokens:
+
+| Content | Distance from the bar edge |
+|---------|----------------------------|
+| Title, with no leading content | `titleStartInset` + `horizontalPadding` = 16dp |
+| Title, after a 48dp navigation icon | 4 + 48 + 4 = 56dp |
+| End of the last action | `horizontalPadding` = 4dp |
+
+`horizontalPadding` counts twice for the title and once for the actions, so no
+pair of token values puts both on one wider gutter. For a page with a wider
+gutter, keep the tokens and pad the bar with `style`. For a 32dp gutter:
+
+```tsx
+import { AppBar } from '@rootnative/components/appbar'
+import { defaultTopAppBarTokens } from '@rootnative/core'
+import { StyleSheet } from 'react-native'
+
+const GUTTER = 32
+const { horizontalPadding, titleStartInset } = defaultTopAppBarTokens
+
+const styles = StyleSheet.create({
+  bar: {
+    paddingStart: GUTTER - horizontalPadding - titleStartInset,
+    paddingEnd: GUTTER - horizontalPadding,
+  },
+})
+
+<AppBar title="Storage" subtitle="Find files that take space." style={styles.bar} />
+```
+
+The title then starts 32dp from the start edge, and the last action ends 32dp
+from the end edge. The `TopAppBarTokens` type documents each token.
+
 ## Props
 
 <PropTable name="AppBar" />

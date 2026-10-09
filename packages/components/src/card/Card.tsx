@@ -6,6 +6,7 @@ import { Platform, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { CardActions } from './CardActions'
@@ -137,6 +138,7 @@ export function Card({
         {...(isDisabled ? undefined : composeHandlers(handlers, props))}
         style={[
           styles.container,
+          webOutlineReset,
           styles.interactiveContainer,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled background

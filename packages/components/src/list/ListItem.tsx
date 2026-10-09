@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createListItemStyles } from './styles'
@@ -126,6 +127,7 @@ export function ListItem({
       {...composeHandlers(handlers, props)}
       style={[
         styles.container,
+        webOutlineReset,
         styles.interactiveContainer,
         // The gesture-layer style owns backgroundColor (rest included) and
         // must come after the static container background so Reanimated's

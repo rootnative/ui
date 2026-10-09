@@ -22,6 +22,7 @@ import { PanResponder, Platform, Pressable, View } from 'react-native'
 // / 'state-focus'), resolving them through `<MotionConfig>` and honouring
 // reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
+import { webOutlineReset } from '../internal/focusOutline'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
@@ -647,7 +648,7 @@ export function Slider({
         // the prop because RN's Pressable doesn't dispatch onKeyDown there.
         onKeyDown={handleKeyDown}
         disabled={isDisabled}
-        style={styles.pressableWrapper}
+        style={[styles.pressableWrapper, webOutlineReset]}
       >
         <View
           {...panResponder.panHandlers}

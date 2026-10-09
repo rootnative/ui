@@ -236,7 +236,7 @@ Props:
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
 - `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
-- `iconSize?: number` — Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized. Defaults to the icon size for the current `size` (20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`).
+- `iconSize?: number` — Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized. Defaults to the icon size for the current `size` (20 for `extraSmall` and `small`, 24 for `medium`, 32 for `large`, 40 for `extraLarge`).
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.

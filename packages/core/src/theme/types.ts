@@ -176,16 +176,44 @@ export interface Spacing {
   xl: number
 }
 
+/**
+ * Layout tokens of the MD3 top app bar, in dp. `AppBar` follows the Compose
+ * `TopAppBarLayout` geometry: each side slot and the title carry
+ * `horizontalPadding`. So the title starts at
+ * `max(titleStartInset, horizontalPadding + leading width) + horizontalPadding`
+ * from the start edge (16 with no leading content, 56 after a 48dp navigation
+ * icon), and the last action ends `horizontalPadding` (4) from the end edge.
+ * No pair of values puts the title and the actions on one wider gutter. Pad
+ * the bar with `style` for that (AppBar docs, "Align with a Page Gutter").
+ */
 export interface TopAppBarTokens {
+  /** Padding at each end of the top row, and on each side of the title. Default 4. */
   horizontalPadding: number
+  /**
+   * Smallest start position of the title's own padding, used when the
+   * leading slot is narrower. With `horizontalPadding`, also the start inset
+   * of the title row of a `medium` or `large` bar. Default 12.
+   */
   titleStartInset: number
+  /** Height of a `small` or `center-aligned` bar, and of a collapsed `medium` or `large` bar. Default 64. */
   smallContainerHeight: number
+  /** Height of a `medium` bar with no subtitle. A subtitle adds 24. Default 112. */
   mediumContainerHeight: number
+  /** Height of a `large` bar with no subtitle. A subtitle adds 32. Default 152. */
   largeContainerHeight: number
+  /** Height of the row that holds the navigation icon and the actions. Default 64. */
   topRowHeight: number
+  /** Smallest height of the leading and trailing slots. Default 48. */
   sideSlotMinHeight: number
+  /**
+   * Width of the frame around the navigation icon, and the smallest width of
+   * custom slot content, so a 40dp `IconButton` takes the 48dp footprint of
+   * an MD3 icon button. Default 48.
+   */
   iconFrameSize: number
+  /** Space under the title of a `medium` bar. Default 24. */
   mediumTitleBottomPadding: number
+  /** Space under the title of a `large` bar. Default 28. */
   largeTitleBottomPadding: number
 }
 

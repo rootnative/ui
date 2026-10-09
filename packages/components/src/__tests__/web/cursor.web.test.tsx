@@ -40,9 +40,12 @@ import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { Menu } from '../../menu'
 import { NavigationBar } from '../../navigation-bar'
+import { NavigationDrawer } from '../../navigation-drawer'
+import { NavigationRail } from '../../navigation-rail'
 import { PortalHost } from '../../portal/PortalHost'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
+import { Slider } from '../../slider'
 import { Switch } from '../../switch'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
@@ -350,6 +353,128 @@ it('SearchBar suppresses the UA focus outline', () => {
   expect(getComputedStyle(screen.getByRole('searchbox')).outlineStyle).toBe(
     'none',
   )
+})
+
+/**
+ * The same reset on every control that draws its own MD3 focus ring. Chromium
+ * draws `outline: auto` on `:focus-visible`, in the system focus color, so
+ * without it a keyboard user sees the browser outline inside the ring: two
+ * indicators in two colors.
+ */
+const FOCUS_RING_CASES: { name: string; role: string; ui: ReactElement }[] = [
+  { name: 'Button', role: 'button', ui: <Button>Save</Button> },
+  {
+    name: 'IconButton',
+    role: 'button',
+    ui: <IconButton icon="heart" accessibilityLabel="Like" />,
+  },
+  {
+    name: 'FAB',
+    role: 'button',
+    ui: <FAB icon="plus" accessibilityLabel="Add" />,
+  },
+  {
+    name: 'Chip',
+    role: 'button',
+    ui: <Chip onPress={() => {}}>Assist</Chip>,
+  },
+  {
+    name: 'Card — pressable',
+    role: 'button',
+    ui: (
+      <Card onPress={() => {}}>
+        <Text>Card</Text>
+      </Card>
+    ),
+  },
+  {
+    name: 'ListItem — pressable',
+    role: 'button',
+    ui: <ListItem headlineText="Item" onPress={() => {}} />,
+  },
+  {
+    name: 'Avatar — pressable',
+    role: 'button',
+    ui: <Avatar label="AB" onPress={() => {}} />,
+  },
+  { name: 'Checkbox', role: 'checkbox', ui: <Checkbox /> },
+  { name: 'Radio', role: 'radio', ui: <Radio /> },
+  { name: 'Switch', role: 'switch', ui: <Switch /> },
+  {
+    name: 'Slider',
+    role: 'slider',
+    ui: <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
+  },
+  {
+    name: 'Tabs — tab',
+    role: 'tab',
+    ui: <Tabs items={TAB_ITEMS} value="flights" />,
+  },
+  {
+    name: 'NavigationBar — item',
+    role: 'tab',
+    ui: <NavigationBar items={NAV_ITEMS} value="home" />,
+  },
+  {
+    name: 'NavigationRail — item',
+    role: 'tab',
+    ui: <NavigationRail items={NAV_ITEMS} value="home" />,
+  },
+  {
+    name: 'NavigationDrawer — item',
+    role: 'tab',
+    ui: (
+      <NavigationDrawer variant="standard" value="home">
+        <NavigationDrawer.Item value="home" label="Home" />
+      </NavigationDrawer>
+    ),
+  },
+  {
+    name: 'ButtonGroup — item',
+    role: 'button',
+    ui: <ButtonGroup items={GROUP_ITEMS} />,
+  },
+  {
+    name: 'SearchBar — trigger',
+    role: 'button',
+    ui: <SearchBar placeholder="Search" onPress={() => {}} />,
+  },
+  {
+    name: 'Menu.Item',
+    role: 'menuitem',
+    ui: (
+      <PortalHost>
+        <Menu anchor={<Button>Actions</Button>} visible onDismiss={() => {}}>
+          <Menu.Item label="Edit" />
+        </Menu>
+      </PortalHost>
+    ),
+  },
+]
+
+describe('a control with its own focus ring suppresses the UA focus outline', () => {
+  it.each(FOCUS_RING_CASES)('$name', ({ role, ui }) => {
+    renderWeb(ui)
+    expect(getComputedStyle(screen.getAllByRole(role)[0]).outlineStyle).toBe(
+      'none',
+    )
+  })
+})
+
+/**
+ * The negative control. The close button of an input chip has hover and
+ * press layers but no focus ring, so the UA outline is its only focus
+ * indicator and must stay.
+ */
+it("Chip's close button keeps the UA focus outline", () => {
+  renderWeb(
+    <Chip variant="input" onClose={() => {}}>
+      Tag
+    </Chip>,
+  )
+  expect(
+    getComputedStyle(screen.getByLabelText('Remove Tag')).outlineStyle,
+  ).not.toBe('none')
 })
 
 /**

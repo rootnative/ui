@@ -11,6 +11,7 @@
     "packages/components/src/navigation-drawer/styles.ts",
     "packages/components/src/navigation-drawer/types.ts",
     "packages/components/src/internal/composeHandlers.ts",
+    "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useBooleanProgress.ts",

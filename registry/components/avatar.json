@@ -8,6 +8,7 @@
     "packages/components/src/avatar/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
     "packages/components/src/internal/composeHandlers.ts",
+    "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/size.ts",
     "packages/components/src/internal/touchTarget.ts",

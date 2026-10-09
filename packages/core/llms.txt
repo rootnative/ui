@@ -291,9 +291,11 @@ BaseTheme {
 Theme extends BaseTheme {
   colors: Colors         — 49 MD3 color roles
   typography: Typography — 30 type scale variants: 15 base (displayLarge..labelSmall) + 15 MD3 Expressive emphasized (displayLargeEmphasized..labelSmallEmphasized)
-  topAppBar?: TopAppBarTokens
+  topAppBar?: TopAppBarTokens — horizontalPadding, titleStartInset, smallContainerHeight, mediumContainerHeight, largeContainerHeight, topRowHeight, sideSlotMinHeight, iconFrameSize, mediumTitleBottomPadding, largeTitleBottomPadding (AppBar geometry in dp)
 }
 ```
+
+`TopAppBarTokens`: `AppBar` follows the Compose `TopAppBarLayout` geometry. The title starts at `max(titleStartInset, horizontalPadding + leading width) + horizontalPadding` from the start edge (16dp with no leading content, 56dp after a 48dp navigation icon), and the last action ends `horizontalPadding` (4dp) from the end edge. No pair of token values puts both on one wider gutter: keep the tokens and pad the bar with `style` (`paddingStart: gutter - horizontalPadding - titleStartInset`, `paddingEnd: gutter - horizontalPadding`).
 
 Colors: primary, onPrimary, primaryContainer, onPrimaryContainer, primaryFixed, onPrimaryFixed, primaryFixedDim, onPrimaryFixedVariant, secondary (same pattern), tertiary (same pattern), error, onError, errorContainer, onErrorContainer, background, onBackground, surface, surfaceDim, surfaceBright, surfaceContainerLowest, surfaceContainerLow, surfaceContainer, surfaceContainerHigh, surfaceContainerHighest, onSurface, surfaceVariant, onSurfaceVariant, outline, outlineVariant, surfaceTint, shadow, scrim, inverseSurface, inverseOnSurface, inversePrimary
 

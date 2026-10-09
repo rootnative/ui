@@ -1,13 +1,8 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
-import { Platform, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { webOutlineReset } from '../internal/focusOutline'
 import type { SearchBarDensity } from './types'
-
-// RN-Web only: the focus ring and the focus state layer are the focus signal,
-// so the browser's own rectangle inside the pill is noise. RN's types do not
-// admit 'none', so we cast — RN-Web translates the string to CSS.
-const webOutlineReset =
-  Platform.OS === 'web' ? { outlineStyle: 'none' as 'solid' } : null
 
 export const SEARCH_BAR_HEIGHT = 56
 export const SEARCH_BAR_DENSITY_STEP = 4
@@ -20,7 +15,7 @@ export const SEARCH_BAR_MAX_WIDTH = 720
 export const SEARCH_BAR_ICON_SIZE = 24
 export const SEARCH_BAR_FOCUS_RING_OFFSET = 2
 export const SEARCH_BAR_FOCUS_RING_WIDTH = 3
-// The frame of an `IconButton` at size 's'. A static leading icon sits in a
+// The frame of an `IconButton` at size 'small'. A static leading icon sits in a
 // frame of the same size, so the text starts at 56 dp in both cases.
 const SLOT_SIZE = 40
 

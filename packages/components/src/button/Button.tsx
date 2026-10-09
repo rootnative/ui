@@ -11,6 +11,7 @@ import { Platform, Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
@@ -214,9 +215,10 @@ export function Button({
         accessibilityRole="button"
         aria-disabled={isDisabled}
         hitSlop={
-          // Sized per token, not a flat 4: `xs` is 32dp tall, so a constant
-          // slop left it at 40dp — under the 48dp WCAG/MD3 floor. Web is
-          // excluded because react-native-web does not implement `hitSlop`.
+          // Sized per token, not a flat 4: `extraSmall` is 32dp tall, so a
+          // constant slop left it at 40dp — under the 48dp WCAG/MD3 floor.
+          // Web is excluded because react-native-web does not implement
+          // `hitSlop`.
           hitSlop ??
           (Platform.OS === 'web'
             ? undefined
@@ -226,6 +228,7 @@ export function Button({
         {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
         style={[
           styles.container,
+          webOutlineReset,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled background
           // applies instantly (no animated layer to fight it). The press

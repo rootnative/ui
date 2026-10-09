@@ -8,6 +8,7 @@
     "packages/components/src/chip/types.ts",
     "packages/components/src/internal/AnimatedPressable.ts",
     "packages/components/src/internal/composeHandlers.ts",
+    "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/pressedState.ts",
     "packages/components/src/internal/splitLayoutStyle.ts",

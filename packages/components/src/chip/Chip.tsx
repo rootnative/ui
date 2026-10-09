@@ -25,6 +25,7 @@ import {
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
@@ -410,6 +411,7 @@ export function Chip(props: ChipProps) {
             : composeHandlers(composedHandlers, rest))}
           style={[
             styles.container,
+            webOutlineReset,
             // The gesture-layer style owns backgroundColor while enabled; when
             // disabled it is dropped entirely so the static disabled background
             // applies instantly (no animated layer to fight it). The radius

@@ -22,6 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -272,6 +273,7 @@ export function Switch({
         {...composeHandlers(handlers, props)}
         style={[
           styles.track,
+          webOutlineReset,
           trackColorStyle,
           trackBorderStyle,
           isDisabled

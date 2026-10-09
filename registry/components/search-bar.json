@@ -6,6 +6,7 @@
     "packages/components/src/search-bar/index.ts",
     "packages/components/src/search-bar/styles.ts",
     "packages/components/src/search-bar/types.ts",
+    "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useStateLayer.ts",
     "packages/components/src/internal/warnOnce.ts"

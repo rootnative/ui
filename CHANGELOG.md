@@ -9,6 +9,61 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+### On the web, a focused control shows one focus ring
+
+On the web, a control that draws its own MD3 focus ring also showed the
+browser's focus outline inside that ring, in the system focus color: two
+rings in two colors on each keyboard focus. Only `TextField`, `SearchBar` and
+`SearchView` removed the browser outline.
+
+These now remove it too, from one shared reset: `Avatar`, `Button`,
+`ButtonGroup` items, `Card`, `Checkbox`, `Chip`, `FAB`, `IconButton`,
+`ListItem`, `Menu.Item`, the `NavigationBar`, `NavigationRail` and
+`NavigationDrawer` items, `Radio`, `Slider`, `Switch` and `Tabs`. The close
+button of an input `Chip` has no ring of its own, so it keeps the browser
+outline. A web test per component asserts the reset, and a second test
+asserts that the close button keeps the outline.
+
+**What changes.** Keyboard focus shows the MD3 ring only. Mouse focus shows
+nothing, as before. One case differs from Chromium: after a click that
+focuses nothing, Chromium shows its outline when a script then moves focus,
+but the ring follows the input modality and stays off. So that focus has no
+indicator now. Keyboard input always shows the ring.
+
+The modality tracker that `Slider` reads now starts in keyboard modality on
+the web, as the tracker of the other rings does. A slider that a script
+focuses before any user input shows its ring.
+
+**Check your own styles.** Where `style` reaches the focusable node, a
+`style` that sets `outlineStyle` still wins, because the component applies
+the reset before your `style`. On `Slider`, `Tabs`, the navigation items and
+the `ButtonGroup` items, `style` does not reach that node.
+
+### The `topAppBar` theme tokens are documented
+
+The `topAppBar` tokens had no docs, and their geometry is not obvious:
+`horizontalPadding` counts twice for the title and once for the actions. To
+align a bar with a 32dp page gutter, an app set `horizontalPadding: 32` and
+`titleStartInset: 0`. The actions moved to 32dp, and the title moved to
+64dp.
+
+Each `TopAppBarTokens` field now has a JSDoc line. The AppBar page has a new
+section, "Align with a Page Gutter", with the geometry and the recipe: keep
+the tokens and pad the bar with `style`. The theming page and the `llms`
+files list the fields. No behavior changes.
+
+### The `Button` `iconSize` docs use the MD3 size names
+
+alpha.24 removed the old size names, but the `iconSize` prop of `Button`
+still gave its default with them: "20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`".
+TypeScript rejects each of those names, and a JavaScript app that passes one
+to `Button` throws. The text now reads "20 for `extraSmall` and `small`, 24
+for `medium`, 32 for `large`, 40 for `extraLarge`", in the JSDoc, the `llms`
+files and the prop table of the Button page. The values are unchanged. Five
+internal comments that used the old names use the new ones too.
+
 ## 0.0.0-alpha.24 — 2026-10-08
 
 **Breaking.** `Button`, `IconButton` and `Avatar` no longer accept the old

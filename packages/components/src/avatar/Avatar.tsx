@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { Image, Platform, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { ExpressiveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
@@ -154,6 +155,7 @@ export function Avatar({
       {...composeHandlers(handlers, props)}
       style={[
         styles.container,
+        webOutlineReset,
         sizeStyle,
         // The gesture-layer style owns backgroundColor (rest included) — a
         // trailing static background here would hide it from Reanimated's

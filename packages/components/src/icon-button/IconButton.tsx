@@ -9,6 +9,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
@@ -116,10 +117,10 @@ export function IconButton({
   const iconPixelSize = sizeTokens.iconSize
   const containerWidth = getIconButtonWidth(size, width)
 
-  // Per axis, because the container is not square: `narrow` at `xs` is 28dp
-  // wide and 32dp tall, so one shared value taken from the height would leave
-  // the width at 44dp — still under the 48dp floor. Collapses to a plain
-  // number when both axes agree, which is the common `uniform` case.
+  // Per axis, because the container is not square: `narrow` at `extraSmall`
+  // is 28dp wide and 32dp tall, so one shared value taken from the height
+  // would leave the width at 44dp — still under the 48dp floor. Collapses to
+  // a plain number when both axes agree, which is the common `uniform` case.
   // Read off the token object before the memo rather than inside it. Reading
   // `sizeTokens.height` in the body makes the React Compiler infer the whole
   // `sizeTokens` object as the dependency while the declared list says only
@@ -276,6 +277,7 @@ export function IconButton({
         {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
         style={[
           styles.container,
+          webOutlineReset,
           sizeStyle,
           // The gesture-layer style owns backgroundColor while enabled; when
           // disabled it is dropped entirely so the static disabled override

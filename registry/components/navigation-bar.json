@@ -7,6 +7,7 @@
     "packages/components/src/navigation-bar/index.ts",
     "packages/components/src/navigation-bar/styles.ts",
     "packages/components/src/navigation-bar/types.ts",
+    "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/useStateLayer.ts",

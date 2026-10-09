@@ -7,6 +7,7 @@ import { Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -165,6 +166,7 @@ export function FAB({
         {...(isDisabled ? undefined : composeHandlers(handlers, rest))}
         style={[
           styles.container,
+          webOutlineReset,
           isExtended
             ? [styles.extended, icon ? styles.extendedWithIcon : undefined]
             : getFABSizeStyle(styles, size),

@@ -89,7 +89,8 @@ export interface ButtonProps extends Omit<
    * Size of leading and trailing icons in dp. Used when resolving string
    * icon names or invoking the render-function form. Pre-rendered elements
    * are not resized. Defaults to the icon size for the current `size`
-   * (20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`).
+   * (20 for `extraSmall` and `small`, 24 for `medium`, 32 for `large`, 40 for
+   * `extraLarge`).
    */
   iconSize?: number
   /**

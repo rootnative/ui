@@ -1,12 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { Platform, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { webOutlineReset } from '../internal/focusOutline'
 import { SEARCH_BAR_MAX_WIDTH } from '../search-bar/styles'
-
-// RN-Web only: the input sits in a header that is the whole focus signal, so
-// the browser's own rectangle is noise. RN's types do not admit 'none', so we
-// cast — RN-Web translates the string to CSS.
-const webOutlineReset =
-  Platform.OS === 'web' ? { outlineStyle: 'none' as 'solid' } : null
 
 /**
  * MD3 search view metrics.
@@ -26,7 +21,7 @@ export const SEARCH_VIEW_DOCKED_MIN_HEIGHT = 240
 export const SEARCH_VIEW_DOCKED_MAX_WIDTH = SEARCH_BAR_MAX_WIDTH
 /** Distance the surface travels on enter and exit. */
 export const SEARCH_VIEW_SLIDE = 24
-// The frame of an `IconButton` at size 's', the same as the bar's slots.
+// The frame of an `IconButton` at size 'small', the same as the bar's slots.
 const SLOT_SIZE = 40
 
 export function createStyles(theme: MaterialTheme, containerColor?: string) {

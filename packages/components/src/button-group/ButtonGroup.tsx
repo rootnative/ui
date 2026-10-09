@@ -17,6 +17,7 @@ import {
   type TextStyle,
 } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import {
@@ -465,6 +466,7 @@ function ButtonGroupItemImpl({
         {...handlers}
         style={[
           itemStyles.container,
+          webOutlineReset,
           animatedContainerStyle,
           isDisabled ? itemStyles.disabledContainer : undefined,
         ]}

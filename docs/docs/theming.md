@@ -514,6 +514,7 @@ function MyComponent() {
 | `elevation` | Shadow levels `level0` through `level5` |
 | `stateLayer` | Opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
 | `motion` | Duration, easing, and spring tokens — see [Motion](./motion) |
+| `topAppBar` | MD3 only, optional. `AppBar` geometry in dp: `horizontalPadding`, `titleStartInset`, `smallContainerHeight`, `mediumContainerHeight`, `largeContainerHeight`, `topRowHeight`, `sideSlotMinHeight`, `iconFrameSize`, `mediumTitleBottomPadding`, `largeTitleBottomPadding` — see [AppBar](./components/appbar#align-with-a-page-gutter) |
 
 ## Type hierarchy
 

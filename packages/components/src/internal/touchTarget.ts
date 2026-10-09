@@ -2,8 +2,8 @@
  * The 48dp minimum touch target, and the `hitSlop` needed to reach it.
  *
  * WCAG 2.5.5 and MD3 both put the floor at 48dp. Several MD3 Expressive size
- * tokens sit below it on purpose — a `Button` at `xs` and a `ButtonGroup` item
- * at `extraSmall` are 32dp tall, and a `Switch` track is 32dp — so the
+ * tokens sit below it on purpose — a `Button` and a `ButtonGroup` item at
+ * `extraSmall` are 32dp tall, and a `Switch` track is 32dp — so the
  * container alone cannot satisfy the rule. `hitSlop` closes the gap without
  * changing a single pixel of layout.
  *

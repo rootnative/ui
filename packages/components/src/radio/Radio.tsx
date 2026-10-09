@@ -4,6 +4,7 @@ import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
@@ -122,6 +123,7 @@ export function Radio({
       {...composeHandlers(handlers, props)}
       style={[
         styles.container,
+        webOutlineReset,
         isDisabled ? styles.disabledContainer : undefined,
         style,
       ]}

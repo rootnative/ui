@@ -1,16 +1,8 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, transformOrigin } from '@rootnative/utils'
-import { Platform, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { webOutlineReset } from '../internal/focusOutline'
 import type { TextFieldVariant } from './types'
-
-// RN-Web only: suppress the browser's default focus outline. The field's
-// active indicator (filled) or thickened outline (outlined) is the focus
-// signal, so the UA outline is redundant noise on web. `outline-style: none`
-// is the canonical CSS reset; RN's types restrict the union to solid/dotted/
-// dashed, so we cast — the value at runtime is still the string 'none' and
-// RN-Web translates it to the right CSS.
-const webOutlineReset =
-  Platform.OS === 'web' ? { outlineStyle: 'none' as 'solid' } : null
 
 const CONTAINER_HEIGHT = 56
 const ICON_SIZE = 24

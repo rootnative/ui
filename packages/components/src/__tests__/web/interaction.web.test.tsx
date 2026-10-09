@@ -220,6 +220,23 @@ describe('focus feedback is keyboard-only', () => {
   })
 
   /**
+   * `Slider` reads the utils store, and the components remove the browser's
+   * focus outline. A store that started in pointer modality would leave a
+   * slider that a script focuses before any user input with no indicator, so
+   * it starts in keyboard modality, as inertia's tracker does. A fresh module
+   * is the only way to see the start value: every other test here moves it.
+   */
+  it('the utils modality store starts in keyboard modality on web', () => {
+    jest.isolateModules(() => {
+      const {
+        isFocusVisible: freshIsFocusVisible,
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+      } = require('@rootnative/utils')
+      expect(freshIsFocusVisible()).toBe(true)
+    })
+  })
+
+  /**
    * Known gap, pinned rather than deleted — the same convention the repo used
    * for the Card iOS shadow bug and the two native a11y gaps.
    *

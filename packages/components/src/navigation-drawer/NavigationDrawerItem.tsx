@@ -5,6 +5,7 @@ import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { composeHandlers } from '../internal/composeHandlers'
+import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -78,6 +79,7 @@ export function NavigationDrawerItem({
   const containerStyle = useMemo(
     () => [
       styles.container,
+      webOutlineReset,
       disabled ? styles.disabledContainer : styles.interactiveContainer,
       style,
     ],
