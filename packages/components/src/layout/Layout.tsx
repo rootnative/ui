@@ -20,7 +20,11 @@ export interface LayoutProps extends PropsWithChildren {
    * @default ['bottom']
    */
   edges?: Edge[]
-  /** Additional styles applied to the SafeAreaView container. */
+  /**
+   * Additional styles applied to the SafeAreaView container. `Layout` always
+   * paints `theme.colors.background` and drops `backgroundColor` from this
+   * style. To draw a different background, nest a `Box` or a `View` inside it.
+   */
   style?: StyleProp<ViewStyle>
 }
 

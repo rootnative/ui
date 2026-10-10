@@ -43,7 +43,12 @@ export interface IconButtonProps extends Omit<
   icon: IconSource
   /** Icon to display when `selected` is `true` (toggle mode). */
   selectedIcon?: IconSource
-  /** Overrides the automatic icon color derived from the variant and state. */
+  /**
+   * Overrides the automatic icon color derived from the variant and state. In
+   * the `leading` or `trailing` slot of an `AppBar`, the automatic color of a
+   * `'standard'` button is the icon color of that slot, and its hover and
+   * press layers derive from that color. A selected toggle keeps `primary`.
+   */
   iconColor?: string
   /**
    * Override the content (icon) color.

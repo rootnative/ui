@@ -3,6 +3,7 @@
   "description": "Icon-only button with 4 variants (filled, tonal, outlined, standard) and toggle support.",
   "files": [
     "packages/components/src/icon-button/IconButton.tsx",
+    "packages/components/src/icon-button/context.ts",
     "packages/components/src/icon-button/index.ts",
     "packages/components/src/icon-button/styles.ts",
     "packages/components/src/icon-button/types.ts",

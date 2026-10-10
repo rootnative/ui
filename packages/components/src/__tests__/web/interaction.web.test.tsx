@@ -22,8 +22,10 @@
  * wrong reason — a false green that looks identical to a real one. Hence
  * `renderWebSettled` and the explicit `flush()` after every event.
  */
-import { isFocusVisible } from '@rootnative/utils'
+import { lightTheme } from '@rootnative/core'
+import { alphaColor, isFocusVisible } from '@rootnative/utils'
 import { fireEvent, screen } from '@testing-library/react'
+import { AppBar } from '../../appbar'
 import { Button } from '../../button'
 import { Card } from '../../card'
 import { Checkbox } from '../../checkbox'
@@ -128,7 +130,55 @@ describe('hover paints a state layer', () => {
     // hover layer either.
     expect(hovered).not.toBe('rgb(115, 94, 171)')
   })
+
+  /**
+   * In an `AppBar` slot a standard `IconButton` takes the bar's content color,
+   * and MD3 derives the state layer from the content color. On a `primary` bar
+   * the layer is then light, not the dark `onSurfaceVariant` one.
+   *
+   * `flush` clones the root only, and `AppBar` memoizes its slot on the
+   * `trailing` element. So the bar renders from a component that makes a new
+   * element on each pass, or the flush never reaches the button.
+   */
+  it('derives the hover layer of a standard IconButton from the AppBar', () => {
+    function PrimaryBar() {
+      return (
+        <AppBar
+          title="Inbox"
+          colorScheme="primary"
+          trailing={
+            <IconButton
+              icon="share"
+              variant="standard"
+              accessibilityLabel="Share"
+            />
+          }
+        />
+      )
+    }
+    const { flush } = renderWebSettled(<PrimaryBar />)
+    const share = screen.getByRole('button', { name: 'Share' })
+
+    fireEvent.mouseEnter(share)
+    flush()
+
+    expect(share.style.backgroundColor).toBe(
+      cssColor(
+        alphaColor(
+          lightTheme.colors.onPrimary,
+          lightTheme.stateLayer.hoveredOpacity,
+        ),
+      ),
+    )
+  })
 })
+
+/** The color as the DOM serializes it, so a hex and an `rgba()` compare. */
+function cssColor(color: string) {
+  const probe = document.createElement('div')
+  probe.style.backgroundColor = color
+  return probe.style.backgroundColor
+}
 
 /**
  * The selection controls are deliberately not in the table above. Their state

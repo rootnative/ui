@@ -5,7 +5,7 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { alphaColor, renderIcon } from '@rootnative/utils'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -17,6 +17,7 @@ import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
+import { AppBarContentColorContext } from './context'
 import {
   ICON_BUTTON_FOCUS_RING_OFFSET,
   ICON_BUTTON_FOCUS_RING_WIDTH,
@@ -29,11 +30,15 @@ import {
 } from './styles'
 import type { IconButtonProps, IconButtonVariant } from './types'
 
+// In an `AppBar` slot, a standard button takes the bar's content color where
+// it would take `onSurfaceVariant`, as Compose's `LocalContentColor` does. A
+// selected toggle keeps `primary`.
 function getIconColor(
   variant: IconButtonVariant,
   theme: ReturnType<typeof useTheme>,
   isToggle: boolean,
   selected: boolean,
+  barContentColor: string | undefined,
 ): string {
   if (isToggle) {
     if (variant === 'filled') {
@@ -52,7 +57,9 @@ function getIconColor(
         : theme.colors.onSurfaceVariant
     }
 
-    return selected ? theme.colors.primary : theme.colors.onSurfaceVariant
+    return selected
+      ? theme.colors.primary
+      : (barContentColor ?? theme.colors.onSurfaceVariant)
   }
 
   if (variant === 'filled') {
@@ -61,6 +68,10 @@ function getIconColor(
 
   if (variant === 'tonal') {
     return theme.colors.onSecondaryContainer
+  }
+
+  if (variant === 'standard') {
+    return barContentColor ?? theme.colors.onSurfaceVariant
   }
 
   return theme.colors.onSurfaceVariant
@@ -88,6 +99,7 @@ export function IconButton({
 }: IconButtonProps) {
   const theme = useTheme()
   const iconResolver = useIconResolver()
+  const barContentColor = useContext(AppBarContentColorContext)
   const styles = useMemo(() => createStyles(theme), [theme])
   const sizeTokens = getIconButtonSizeTokens(size)
 
@@ -105,13 +117,18 @@ export function IconButton({
     }
     onPress?.()
   }, [isToggle, isSelected, isControlledToggle, onSelectedChange, onPress])
+  const defaultIconColor = getIconColor(
+    variant,
+    theme,
+    isToggle,
+    isSelected,
+    barContentColor,
+  )
   // Disabled always renders 38% onSurface — contentColor/iconColor never
   // override the MD3 disabled treatment.
   const resolvedIconColor = isDisabled
     ? alphaColor(theme.colors.onSurface, theme.stateLayer.disabledOpacity)
-    : (contentColor ??
-      iconColor ??
-      getIconColor(variant, theme, isToggle, isSelected))
+    : (contentColor ?? iconColor ?? defaultIconColor)
   const displayIcon =
     isToggle && isSelected && selectedIcon ? selectedIcon : icon
   const iconPixelSize = sizeTokens.iconSize
@@ -161,13 +178,12 @@ export function IconButton({
   // State-layer crossfade (rest → focus → hover → press, press wins) with
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
   // The overlay color the layers derive from matches styles.ts: the
-  // variant/toggle default icon color — or the resolved icon color when a
-  // containerColor override re-derives the layers (per the override
-  // contract). While disabled the hook's style/handlers are not applied at
-  // all — the static disabled treatment below owns the container.
-  const layerContent = containerColor
-    ? resolvedIconColor
-    : getIconColor(variant, theme, isToggle, isSelected)
+  // default icon color (the variant/toggle color, or the bar color in an
+  // `AppBar` slot) — or the resolved icon color when a containerColor
+  // override re-derives the layers (per the override contract). While
+  // disabled the hook's style/handlers are not applied at all — the static
+  // disabled treatment below owns the container.
+  const layerContent = containerColor ? resolvedIconColor : defaultIconColor
   const {
     style: stateLayerStyle,
     handlers,

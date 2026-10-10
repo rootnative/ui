@@ -75,6 +75,8 @@ const PACKAGES: PackageSpec[] = [
       'SnackbarContext',
       'DialogContext',
       'MenuContext',
+      'NavigationDrawerContext',
+      'AppBarContentColorContext',
     ],
   },
   {

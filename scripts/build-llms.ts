@@ -702,7 +702,7 @@ import { FAB } from '@rootnative/components/fab'
 \`\`\``,
 
   appbar: `\`\`\`tsx
-import { AppBar } from '@rootnative/components/appbar'
+import { AppBar, useAppBarContentColor } from '@rootnative/components/appbar'
 
 <AppBar title="Home" variant="small" />
 <AppBar title="Details" canGoBack onBackPress={router.back} insetTop />
@@ -713,6 +713,25 @@ import { AppBar } from '@rootnative/components/appbar'
   { icon: 'magnify', accessibilityLabel: 'Search', onPress: onSearch },
   { icon: 'dots-vertical', accessibilityLabel: 'More', onPress: onMore },
 ]} />
+
+// A standard IconButton in a slot takes the slot's icon color, and its hover
+// and press layers derive from it. leading: the title color. trailing:
+// onSurfaceVariant on the surface schemes, the title color on primary and
+// primaryContainer. contentColor replaces both. A selected toggle keeps
+// primary. Content that a Portal renders, such as the open menu, does not.
+<AppBar title="Notes" colorScheme="primary" trailing={
+  <Menu align="end" anchor={
+    <IconButton icon="dots-vertical" variant="standard" accessibilityLabel="More options" />
+  }>
+    <Menu.Item label="Settings" onPress={openSettings} />
+  </Menu>
+} />
+
+// Other custom content reads the slot color. It is undefined outside the slots.
+function SyncState() {
+  const color = useAppBarContentColor()
+  return <Icon source="cloud-check-outline" color={color} accessibilityLabel="Synced" />
+}
 \`\`\``,
 
   card: `\`\`\`tsx
@@ -1518,8 +1537,10 @@ import { Grid } from '@rootnative/components/layout'
         '`trailing`.\n' +
         '- `trailing?: ReactNode` — Custom trailing content. Use instead of ' +
         '`actions` when the slot needs something `actions` cannot build, such ' +
-        'as a `Menu` anchor or a `Tooltip`. Mutually exclusive with `actions` ' +
-        '— the type rejects both together.\n'
+        'as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in the ' +
+        'slot takes the trailing icon color (see `colorScheme`); other ' +
+        'content reads it with `useAppBarContentColor()`. Mutually exclusive ' +
+        'with `actions` — the type rejects both together.\n'
       output += section.includes(inheritsLine)
         ? section.replace(inheritsLine, trailingProps + inheritsLine)
         : section + trailingProps

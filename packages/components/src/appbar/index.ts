@@ -1,4 +1,5 @@
 export { AppBar } from './AppBar'
+export { useAppBarContentColor } from '../icon-button/context'
 export type {
   AppBarAction,
   AppBarColorScheme,

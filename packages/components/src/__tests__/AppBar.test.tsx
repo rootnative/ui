@@ -1,11 +1,14 @@
 import { defaultTopAppBarTokens, lightTheme } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
+import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import type { TextStyle, ViewStyle } from 'react-native'
-import { AppBar } from '../appbar/AppBar'
+import { AppBar, useAppBarContentColor } from '../appbar'
 import { IconButton } from '../icon-button'
+import { Menu } from '../menu'
+import { Portal, PortalHost } from '../portal'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 import type { RenderedNode } from '../test-support/rendered-node'
 
@@ -795,6 +798,271 @@ describe('AppBar', () => {
         expect(textStyleOf('Subtitle').color).toBe(color)
       },
     )
+  })
+
+  describe('content color in the slots', () => {
+    const { colors } = lightTheme
+
+    function iconColor(name: string) {
+      return screen.getByText(name, { includeHiddenElements: true }).props.color
+    }
+
+    function ColorProbe({ testID }: { testID: string }) {
+      return <Text testID={testID}>{String(useAppBarContentColor())}</Text>
+    }
+
+    it('colors a Menu anchor in trailing on a primary bar', () => {
+      renderWithTheme(
+        <PortalHost>
+          <AppBar
+            title="Guess It"
+            colorScheme="primary"
+            trailing={
+              <Menu
+                anchor={
+                  <IconButton
+                    icon="dots-vertical"
+                    variant="standard"
+                    accessibilityLabel="More options"
+                  />
+                }
+              >
+                <Menu.Item label="Developer" />
+              </Menu>
+            }
+          />
+        </PortalHost>,
+      )
+      expect(iconColor('dots-vertical')).toBe(colors.onPrimary)
+    })
+
+    it('colors a standard IconButton in leading', () => {
+      renderWithTheme(
+        <AppBar
+          title="Inbox"
+          colorScheme="primaryContainer"
+          leading={
+            <IconButton
+              icon="menu"
+              variant="standard"
+              accessibilityLabel="Menu"
+            />
+          }
+        />,
+      )
+      expect(iconColor('menu')).toBe(colors.onPrimaryContainer)
+    })
+
+    // Compose `AppBarTokens`: `LeadingIconColor` is `OnSurface` and
+    // `TrailingIconColor` is `OnSurfaceVariant`.
+    it('gives leading onSurface and trailing onSurfaceVariant on a surface bar', () => {
+      renderWithTheme(
+        <AppBar
+          title="Inbox"
+          leading={
+            <IconButton
+              icon="menu"
+              variant="standard"
+              accessibilityLabel="Menu"
+            />
+          }
+          trailing={
+            <IconButton
+              icon="share"
+              variant="standard"
+              accessibilityLabel="Share"
+            />
+          }
+        />,
+      )
+      expect(iconColor('menu')).toBe(colors.onSurface)
+      expect(iconColor('share')).toBe(colors.onSurfaceVariant)
+    })
+
+    it('gives the built-in buttons the same two colors', () => {
+      renderWithTheme(
+        <AppBar
+          title="About"
+          canGoBack
+          navigationIcon="close"
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      expect(iconColor('close')).toBe(colors.onSurface)
+      expect(iconColor('magnify')).toBe(colors.onSurfaceVariant)
+    })
+
+    it('gives the bar contentColor to both slots', () => {
+      renderWithTheme(
+        <AppBar
+          title="Inbox"
+          contentColor="#00FF00"
+          leading={
+            <IconButton
+              icon="menu"
+              variant="standard"
+              accessibilityLabel="Menu"
+            />
+          }
+          trailing={
+            <IconButton
+              icon="share"
+              variant="standard"
+              accessibilityLabel="Share"
+            />
+          }
+        />,
+      )
+      expect(iconColor('menu')).toBe('#00FF00')
+      expect(iconColor('share')).toBe('#00FF00')
+    })
+
+    it('still colors the built-in navigation button and actions', () => {
+      renderWithTheme(
+        <AppBar
+          title="About"
+          colorScheme="primary"
+          canGoBack
+          navigationIcon="close"
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      expect(iconColor('close')).toBe(colors.onPrimary)
+      expect(iconColor('magnify')).toBe(colors.onPrimary)
+    })
+
+    it('keeps a color that the button sets itself', () => {
+      renderWithTheme(
+        <AppBar
+          title="Inbox"
+          colorScheme="primary"
+          trailing={
+            <>
+              <IconButton
+                icon="share"
+                variant="standard"
+                iconColor="#FF0000"
+                accessibilityLabel="Share"
+              />
+              <IconButton
+                icon="star"
+                variant="standard"
+                contentColor="#0000FF"
+                accessibilityLabel="Star"
+              />
+              <IconButton
+                icon="pencil"
+                variant="tonal"
+                accessibilityLabel="Edit"
+              />
+            </>
+          }
+        />,
+      )
+      expect(iconColor('share')).toBe('#FF0000')
+      expect(iconColor('star')).toBe('#0000FF')
+      expect(iconColor('pencil')).toBe(colors.onSecondaryContainer)
+    })
+
+    it('keeps primary on a selected toggle', () => {
+      renderWithTheme(
+        <AppBar
+          title="Film"
+          colorScheme="primaryContainer"
+          trailing={
+            <>
+              <IconButton
+                icon="heart"
+                variant="standard"
+                selected
+                accessibilityLabel="Liked"
+              />
+              <IconButton
+                icon="bookmark"
+                variant="standard"
+                selected={false}
+                accessibilityLabel="Save"
+              />
+            </>
+          }
+        />,
+      )
+      expect(iconColor('heart')).toBe(colors.primary)
+      expect(iconColor('bookmark')).toBe(colors.onPrimaryContainer)
+    })
+
+    it('keeps the disabled treatment', () => {
+      renderWithTheme(
+        <AppBar
+          title="Inbox"
+          colorScheme="primary"
+          trailing={
+            <IconButton
+              icon="share"
+              variant="standard"
+              disabled
+              accessibilityLabel="Share"
+            />
+          }
+        />,
+      )
+      expect(iconColor('share')).toBe(
+        alphaColor(colors.onSurface, lightTheme.stateLayer.disabledOpacity),
+      )
+    })
+
+    it('does not reach content that a Portal renders', () => {
+      renderWithTheme(
+        <PortalHost>
+          <AppBar
+            title="Inbox"
+            colorScheme="primary"
+            trailing={
+              <Portal>
+                <IconButton
+                  icon="share"
+                  variant="standard"
+                  accessibilityLabel="Share"
+                />
+              </Portal>
+            }
+          />
+        </PortalHost>,
+      )
+      expect(iconColor('share')).toBe(colors.onSurfaceVariant)
+    })
+
+    it('does not reach an IconButton outside the bar', () => {
+      renderWithTheme(
+        <>
+          <AppBar title="Inbox" colorScheme="primary" />
+          <IconButton
+            icon="share"
+            variant="standard"
+            accessibilityLabel="Share"
+          />
+        </>,
+      )
+      expect(iconColor('share')).toBe(colors.onSurfaceVariant)
+    })
+
+    it('returns the slot color from useAppBarContentColor', () => {
+      renderWithTheme(
+        <>
+          <AppBar
+            title="Inbox"
+            leading={<ColorProbe testID="leading" />}
+            trailing={<ColorProbe testID="trailing" />}
+          />
+          <ColorProbe testID="outside" />
+        </>,
+      )
+      expect(screen.getByTestId('leading')).toHaveTextContent(colors.onSurface)
+      expect(screen.getByTestId('trailing')).toHaveTextContent(
+        colors.onSurfaceVariant,
+      )
+      expect(screen.getByTestId('outside')).toHaveTextContent('undefined')
+    })
   })
 
   describe('overrides', () => {

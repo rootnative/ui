@@ -20,6 +20,7 @@ import { Platform, View } from 'react-native'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
+import { AppBarContentColorContext } from '../icon-button/context'
 import { SafeAreaView } from '../safe-area'
 import { Typography } from '../typography'
 import type { TypographyVariant } from '../typography'
@@ -139,6 +140,8 @@ export function AppBar({
     [theme, colorScheme],
   )
   const resolvedContentColor = contentColor ?? schemeColors.contentColor
+  const resolvedTrailingIconColor =
+    contentColor ?? schemeColors.trailingIconColor
   const styles = useMemo(
     () => createStyles(theme, schemeColors),
     [theme, schemeColors],
@@ -323,7 +326,6 @@ export function AppBar({
           icon={navigationButton.icon}
           size="small"
           variant="standard"
-          iconColor={resolvedContentColor}
           accessibilityLabel={navigationButton.accessibilityLabel}
           onPress={onBackPress}
         />
@@ -332,7 +334,6 @@ export function AppBar({
   }, [
     canGoBack,
     navigationIcon,
-    resolvedContentColor,
     leading,
     onBackPress,
     styles.iconFrame,
@@ -375,7 +376,6 @@ export function AppBar({
                 icon={action.icon}
                 size="small"
                 variant="standard"
-                iconColor={resolvedContentColor}
                 accessibilityLabel={action.accessibilityLabel}
                 onPress={action.onPress}
                 disabled={action.disabled}
@@ -417,23 +417,29 @@ export function AppBar({
     })
   }, [])
 
+  // The built-in buttons read their color from these contexts, not from
+  // `iconColor`, so their hover and press layers derive from the slot color.
   const topRow = (
     <View style={styles.topRow}>
-      <View
-        collapsable={false}
-        onLayout={onLeadingLayout}
-        style={styles.sideSlot}
-      >
-        {leadingContent}
-      </View>
+      <AppBarContentColorContext.Provider value={resolvedContentColor}>
+        <View
+          collapsable={false}
+          onLayout={onLeadingLayout}
+          style={styles.sideSlot}
+        >
+          {leadingContent}
+        </View>
+      </AppBarContentColorContext.Provider>
       <View style={styles.topRowSpacer} />
-      <View
-        collapsable={false}
-        onLayout={onActionsLayout}
-        style={styles.sideSlot}
-      >
-        {actionsContent}
-      </View>
+      <AppBarContentColorContext.Provider value={resolvedTrailingIconColor}>
+        <View
+          collapsable={false}
+          onLayout={onActionsLayout}
+          style={styles.sideSlot}
+        >
+          {actionsContent}
+        </View>
+      </AppBarContentColorContext.Provider>
     </View>
   )
 

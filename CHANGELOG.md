@@ -11,6 +11,51 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### A standard `IconButton` in an `AppBar` slot takes the slot color
+
+`AppBar` gave its content color to its built-in buttons only. Custom content
+in `leading` or `trailing` got no color. So on a `primary` bar, a `Menu`
+anchor in `trailing` was a dark icon on the dark bar, while the title was
+`onPrimary`. The consumer had to read the theme and set `iconColor` by hand,
+and a change of `colorScheme` broke it.
+
+Each slot now gives its icon color through a context. A standard
+`IconButton` with no `iconColor` and no `contentColor` takes it, and its
+hover and press layers derive from it. The colors follow the Compose
+`AppBarTokens` (`VERSION 14_0_0`): `leading` gets the title color
+(`LeadingIconColor`), and `trailing` gets `onSurfaceVariant` on the six
+surface schemes (`TrailingIconColor`). On `primary` and `primaryContainer`,
+both slots get the title color. The bar's `contentColor` replaces both. A
+selected toggle keeps `primary`, and a disabled button keeps the MD3 disabled
+color. Other custom content reads the slot color with the new
+`useAppBarContentColor()` hook, from `@rootnative/components/appbar` or the
+package root. The hook returns `undefined` outside the two slots. Content
+that a `Portal` renders, such as an open menu, does not get the color.
+
+**What changes.**
+
+- On the surface schemes, the built-in icon actions change from `onSurface`
+  to `onSurfaceVariant`, as the MD3 tokens give them. Text actions and the
+  navigation button keep `onSurface`.
+- The built-in buttons read the same context. Their hover and press layers
+  now derive from the slot color, not from `onSurfaceVariant`. So on the
+  `primary` and `primaryContainer` schemes, the layer matches the icon.
+- A standard `IconButton` that you put in `leading` with no color changes
+  from `onSurfaceVariant` to the title color. In `trailing` on a surface
+  scheme it keeps `onSurfaceVariant`. On `primary` and `primaryContainer` it
+  changes to the title color in both slots.
+
+`check:singletons` now also guards the new context and the
+`NavigationDrawer` context, which it did not list before.
+
+### The `Layout` `style` docs say that `backgroundColor` is dropped
+
+`Layout` always paints `theme.colors.background` and drops a
+`backgroundColor` from `style`. The Layout page said so, but the `style`
+JSDoc, and with it the `llms` files, did not. The JSDoc now gives the rule
+and the fix: nest a `Box` or a `View` to draw a different background. No
+behavior changes.
+
 ### Text with an expression renders in `Dialog.Content` and `Tooltip`
 
 JSX text with an expression, such as `You guessed in {tries} tries`,

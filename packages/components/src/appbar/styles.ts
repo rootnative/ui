@@ -8,6 +8,11 @@ export interface AppBarColorSchemeColors {
   elevatedContainerColor: string
   contentColor: string
   subtitleColor: string
+  /**
+   * Compose `AppBarTokens.TrailingIconColor`. The leading icon takes
+   * `contentColor`, which is `AppBarTokens.LeadingIconColor`.
+   */
+  trailingIconColor: string
 }
 
 export function getColorSchemeColors(
@@ -21,6 +26,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainerLowest,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerLow':
       return {
@@ -28,6 +34,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainerLow,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainer':
       return {
@@ -35,6 +42,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainer,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerHigh':
       return {
@@ -42,6 +50,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainerHigh,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
     case 'surfaceContainerHighest':
       return {
@@ -49,6 +58,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainerHighest,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
     case 'primary':
       return {
@@ -56,6 +66,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.primary,
         contentColor: theme.colors.onPrimary,
         subtitleColor: theme.colors.onPrimary,
+        trailingIconColor: theme.colors.onPrimary,
       }
     case 'primaryContainer':
       return {
@@ -63,6 +74,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.primaryContainer,
         contentColor: theme.colors.onPrimaryContainer,
         subtitleColor: theme.colors.onPrimaryContainer,
+        trailingIconColor: theme.colors.onPrimaryContainer,
       }
     case 'surface':
     default:
@@ -71,6 +83,7 @@ export function getColorSchemeColors(
         elevatedContainerColor: theme.colors.surfaceContainer,
         contentColor: theme.colors.onSurface,
         subtitleColor: theme.colors.onSurfaceVariant,
+        trailingIconColor: theme.colors.onSurfaceVariant,
       }
   }
 }

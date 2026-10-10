@@ -141,6 +141,86 @@ wrapper.
 `}
 />
 
+## Custom Slot Content
+
+`leading` and `trailing` take any content, for example a `Menu` anchor. Each
+slot gives its icon color to each standard `IconButton` in it, and the
+button's hover and press layers derive from that color. The colors come from
+the MD3 top app bar tokens:
+
+| `colorScheme` | `leading` | `trailing` |
+|---------------|-----------|------------|
+| The six surface schemes | `onSurface` | `onSurfaceVariant` |
+| `primary` | `onPrimary` | `onPrimary` |
+| `primaryContainer` | `onPrimaryContainer` | `onPrimaryContainer` |
+
+The bar's `contentColor` replaces both. The built-in navigation button and
+icon actions use the same colors. A selected toggle keeps `primary`, and a
+disabled button keeps the MD3 disabled color. Set `iconColor` on the button to
+use a different color.
+
+For other content, such as an `Icon` or a text, read the slot color with
+`useAppBarContentColor()`. The hook returns `undefined` outside the two slots.
+Content that a `Portal` renders, such as the open menu, does not get the
+color.
+
+<SnackExample
+  name="RootNative AppBar — Custom Slot Content"
+  code={`
+  import {
+    AppBar,
+    Icon,
+    IconButton,
+    Menu,
+    PortalHost,
+    useAppBarContentColor,
+  } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { Alert, View } from 'react-native'
+
+  function SyncState() {
+    const color = useAppBarContentColor()
+    return <Icon source="cloud-check-outline" color={color} accessibilityLabel="Synced" />
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <PortalHost>
+            <View style={{ flex: 1 }}>
+              <AppBar
+                title="Notes"
+                colorScheme="primary"
+                trailing={
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <SyncState />
+                    <Menu
+                      align="end"
+                      anchor={
+                        <IconButton
+                          icon="dots-vertical"
+                          variant="standard"
+                          accessibilityLabel="More options"
+                        />
+                      }
+                    >
+                      <Menu.Item label="Settings" onPress={() => Alert.alert('Settings')} />
+                    </Menu>
+                  </View>
+                }
+              />
+            </View>
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
 ## With a Subtitle
 
 `subtitle` adds one line of supporting text under the title. Its color is

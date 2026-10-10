@@ -265,6 +265,7 @@
         "elevationBoxShadow",
         "elevationShadowConfig",
         "snackbarOffsetFor",
+        "useAppBarContentColor",
         "useSnackbar",
         "useSnackbarOffset"
       ]

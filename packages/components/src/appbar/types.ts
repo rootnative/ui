@@ -95,7 +95,10 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   variant?: AppBarVariant
   /**
    * Color scheme that determines the default container and content colors.
-   * `containerColor` and `contentColor` props override these defaults.
+   * `containerColor` and `contentColor` props override these defaults. The
+   * trailing icons take `onSurfaceVariant` on the surface schemes, as the MD3
+   * tokens give them, and the content color on `'primary'` and
+   * `'primaryContainer'`.
    * @default 'surface'
    */
   colorScheme?: AppBarColorScheme
@@ -159,7 +162,8 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   scrollOffset?: SharedValue<number>
   /**
    * Custom leading content. When provided, overrides `canGoBack` and
-   * `navigationIcon`.
+   * `navigationIcon`. A standard `IconButton` in the slot takes the title
+   * color; other content reads it with `useAppBarContentColor()`.
    */
   leading?: ReactNode
   /**
@@ -168,8 +172,10 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    */
   containerColor?: string
   /**
-   * Override the content (title and icon) color. The subtitle keeps its own
-   * color; set it with `subtitleStyle`.
+   * Override the content (title and icon) color. It replaces the icon color
+   * of both slots, so it also reaches each standard `IconButton` in `leading`
+   * and `trailing`. The subtitle keeps its own color; set it with
+   * `subtitleStyle`.
    */
   contentColor?: string
   /** Additional style applied to the title text. */
@@ -211,7 +217,9 @@ type AppBarTrailingProps =
       /**
        * Custom trailing content. Use this instead of `actions` when the slot
        * needs a component `actions` cannot build, such as a `Menu` anchor or a
-       * `Tooltip`.
+       * `Tooltip`. A standard `IconButton` in the slot takes the trailing icon
+       * color (see `colorScheme`); other content reads it with
+       * `useAppBarContentColor()`.
        */
       trailing: ReactNode
     }

@@ -36,7 +36,7 @@ export type {
 export { Icon } from './icon'
 export type { IconProps } from './icon'
 
-export { AppBar } from './appbar'
+export { AppBar, useAppBarContentColor } from './appbar'
 export type {
   AppBarAction,
   AppBarColorScheme,

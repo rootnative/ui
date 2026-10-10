@@ -293,6 +293,7 @@ const NOT_COMPONENTS = new Set([
   'useSnackbar',
   'useSnackbarOffset',
   'snackbarOffsetFor',
+  'useAppBarContentColor',
   'FAB_SIZES',
   'FAB_ICON_SIZES',
   'BADGE_MAX_DEFAULT',
