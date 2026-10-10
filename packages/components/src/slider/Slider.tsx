@@ -13,6 +13,8 @@ import type {
   AccessibilityActionEvent,
   GestureResponderEvent,
   LayoutChangeEvent,
+  NativeSyntheticEvent,
+  TargetedEvent,
 } from 'react-native'
 import { PanResponder, Platform, Pressable, View } from 'react-native'
 // Sanctioned escape hatch: the slider's hover/focus/label progress is routed
@@ -481,15 +483,18 @@ export function Slider({
     animate(highHovered, 0, 'state-hover')
   }, [lowHovered, highHovered, animate])
 
-  const handleFocus = useCallback(() => {
-    if (isDisabled || !isFocusVisible()) return
-    isFocused.current = true
-    if (keyboardThumb === 'low') {
-      animate(lowFocused, 1, 'state-focus')
-    } else {
-      animate(highFocused, 1, 'state-focus')
-    }
-  }, [isDisabled, keyboardThumb, lowFocused, highFocused, animate])
+  const handleFocus = useCallback(
+    (event: NativeSyntheticEvent<TargetedEvent>) => {
+      if (isDisabled || !isFocusVisible(event)) return
+      isFocused.current = true
+      if (keyboardThumb === 'low') {
+        animate(lowFocused, 1, 'state-focus')
+      } else {
+        animate(highFocused, 1, 'state-focus')
+      }
+    },
+    [isDisabled, keyboardThumb, lowFocused, highFocused, animate],
+  )
 
   const handleBlur = useCallback(() => {
     isFocused.current = false

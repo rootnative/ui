@@ -41,6 +41,35 @@ if (
   document.addEventListener('touchstart', onPointerDown, true)
 }
 
+interface MatchableTarget {
+  matches(selector: string): boolean
+}
+
+function isMatchable(target: unknown): target is MatchableTarget {
+  return (
+    typeof target === 'object' &&
+    target !== null &&
+    typeof (target as { matches?: unknown }).matches === 'function'
+  )
+}
+
+// The same rule as inertia's tracker, so a Slider ring and a state-layer
+// ring agree: the browser's `:focus-visible` decides for a focused target.
+function browserFocusVisible(event: unknown): boolean | undefined {
+  if (typeof document === 'undefined') return undefined
+  const target = (event as { target?: unknown } | null | undefined)?.target
+  if (!isMatchable(target)) return undefined
+  try {
+    // A dispatched focus event moves no focus, and the browser then answers
+    // `false` whatever the input was. Only a focused target gets its answer.
+    if (!target.matches(':focus')) return undefined
+    return target.matches(':focus-visible')
+  } catch {
+    // A browser without `:focus-visible` throws a SyntaxError.
+    return undefined
+  }
+}
+
 function subscribe(callback: () => void) {
   subscribers.add(callback)
   return () => {
@@ -78,14 +107,19 @@ export function useFocusVisible(): boolean {
 }
 
 /**
- * Imperative read of focus-visible state — returns `true` when the user's
- * most recent input was a keyboard event. Designed for use inside event
+ * Imperative read of focus-visible state. Designed for use inside event
  * handlers (`onFocus`, `onBlur`, etc.) where you want the boolean value
  * without subscribing the component to re-renders.
  *
+ * Pass the focus event. On web, when its target holds focus, the browser's
+ * `:focus-visible` decides, so the ring shows wherever the browser would
+ * draw its own outline. Otherwise the function returns `true` when the
+ * user's most recent input was a keyboard event: for a call with no event,
+ * a dispatched focus event, a browser without `:focus-visible`, and native.
+ *
  * If the rendered output itself depends on the modality, use the reactive
- * `useFocusVisible()` hook instead.
+ * `useFocusVisible()` hook instead. It reads the modality only.
  */
-export function isFocusVisible(): boolean {
-  return currentModality === 'keyboard'
+export function isFocusVisible(event?: unknown): boolean {
+  return browserFocusVisible(event) ?? currentModality === 'keyboard'
 }

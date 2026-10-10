@@ -24,7 +24,7 @@
  */
 import { lightTheme } from '@rootnative/core'
 import { alphaColor, isFocusVisible } from '@rootnative/utils'
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { AppBar } from '../../appbar'
 import { Button } from '../../button'
 import { Card } from '../../card'
@@ -35,6 +35,7 @@ import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
+import { Slider } from '../../slider'
 import { Switch } from '../../switch'
 import { renderWebSettled } from './render-web'
 
@@ -384,6 +385,100 @@ describe('the focus ring follows the same modality rule', () => {
 
     expect(opacities(container)).toContain('1')
   })
+})
+
+/**
+ * The components remove the browser's focus outline, so a ring must show
+ * wherever the browser would draw that outline. After a click that focuses
+ * nothing, Chromium marks the next focus that a script moves as
+ * `:focus-visible`, while the modality store is in pointer modality. So a
+ * focus handler asks the focused element first.
+ *
+ * jsdom matches `:focus-visible` on every focused element, so these tests
+ * prove that the component asks the browser, not what Chromium answers. A
+ * `fireEvent.focus` moves no focus, so it still reads the modality store.
+ */
+describe('focus feedback follows the browser :focus-visible', () => {
+  function focusEvent(focused: boolean, visible: boolean | 'throws') {
+    return {
+      target: {
+        matches(selector: string) {
+          if (selector === ':focus') return focused
+          if (visible === 'throws') throw new SyntaxError(selector)
+          return visible
+        },
+      },
+    }
+  }
+
+  /** The low thumb's focus ring is the first node in the track with an opacity. */
+  function sliderRingOpacity() {
+    const slider = screen.getByRole('slider')
+    return Array.from(slider.querySelectorAll<HTMLElement>('*'))
+      .map((node) => node.style.opacity)
+      .find((value) => value !== '')
+  }
+
+  it('the utils store lets the browser decide for a focused target', () => {
+    expect(isFocusVisible(focusEvent(true, true))).toBe(true)
+
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(isFocusVisible(focusEvent(true, false))).toBe(false)
+  })
+
+  it('the utils store falls back to the modality without a browser answer', () => {
+    fireEvent.keyDown(document, { key: 'Tab' })
+    expect(isFocusVisible(focusEvent(false, false))).toBe(true)
+    expect(isFocusVisible(focusEvent(true, 'throws'))).toBe(true)
+
+    fireEvent.pointerDown(document)
+    expect(isFocusVisible(focusEvent(false, true))).toBe(false)
+    expect(isFocusVisible(focusEvent(true, 'throws'))).toBe(false)
+  })
+
+  it('a Slider that a script focuses after a click on nothing shows its ring', () => {
+    const { flush } = renderWebSettled(
+      <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
+    )
+
+    act(() => screen.getByRole('slider').focus())
+    flush()
+
+    expect(sliderRingOpacity()).toBe('1')
+  })
+
+  it('a dispatched focus on a Slider after a pointer press shows no ring', () => {
+    const { flush } = renderWebSettled(
+      <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
+    )
+
+    fireEvent.focus(screen.getByRole('slider'))
+    flush()
+
+    expect(sliderRingOpacity()).toBe('0')
+  })
+
+  /**
+   * Known gap, pinned until the `@rootnative/inertia` pin moves to the
+   * release whose `useGesture` reads `:focus-visible`. The state layers read
+   * inertia's tracker, not the utils store. This test goes green on its own
+   * after that bump; then make it a plain `it`.
+   */
+  it.failing(
+    'a Button that a script focuses after a click on nothing shows its focus layer',
+    () => {
+      const { flush } = renderWebSettled(<Button>Save</Button>)
+      const rest = background('button')
+      // inertia attaches its listeners when the first tracking component
+      // mounts, so the click comes after the render.
+      fireEvent.pointerDown(document)
+
+      act(() => screen.getByRole('button').focus())
+      flush()
+
+      expect(background('button')).not.toBe(rest)
+    },
+  )
 })
 
 /**

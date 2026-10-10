@@ -267,8 +267,8 @@ interface FocusRingSlotProps {
   baseStyle: ViewStyle
 }
 
-// MD3 keyboard-focus ring around the focused thumb. Only shows when focus is
-// keyboard-induced (the parent Pressable gates `focused` via isFocusVisible()).
+// MD3 focus ring around the focused thumb. Only shows when the focus is
+// visible (the parent Pressable gates `focused` via isFocusVisible(event)).
 export function FocusRingSlot({
   centerX,
   focused,

@@ -95,7 +95,8 @@ asserts that the close button keeps the outline.
 nothing, as before. One case differs from Chromium: after a click that
 focuses nothing, Chromium shows its outline when a script then moves focus,
 but the ring follows the input modality and stays off. So that focus has no
-indicator now. Keyboard input always shows the ring.
+indicator now. Keyboard input always shows the ring. The next entry closes
+this case.
 
 The modality tracker that `Slider` reads now starts in keyboard modality on
 the web, as the tracker of the other rings does. A slider that a script
@@ -105,6 +106,29 @@ focuses before any user input shows its ring.
 `style` that sets `outlineStyle` still wins, because the component applies
 the reset before your `style`. On `Slider`, `Tabs`, the navigation items and
 the `ButtonGroup` items, `style` does not reach that node.
+
+### On the web, a focus ring follows the browser's `:focus-visible`
+
+The rings followed the input modality only: keyboard after a key press,
+pointer after a pointer press. After a click that focuses nothing, Chromium
+marks the next focus that a script moves as `:focus-visible` and draws its
+outline there. The ring stayed off, and with the outline removed, that focus
+had no indicator.
+
+`Slider` now asks the focused element whether it matches `:focus-visible`,
+so its ring shows where the browser would draw the outline. The
+`isFocusVisible` function of `@rootnative/utils` takes the focus event for
+this. Pass the event, and the browser decides for a focused target. With no
+event, for a focus event that a script dispatches, and in a browser without
+`:focus-visible`, the function reads the modality, as before.
+
+The other rings come from `@rootnative/inertia`. They follow the same rule
+after the `@rootnative/inertia` pin moves to the release that carries it. A
+web test pins that gap until then.
+
+**What changes.** In jsdom, `:focus-visible` matches every focused element.
+A test that calls `element.focus()` on a `Slider` now always sees the ring.
+`fireEvent.focus` moves no focus, so it still reads the modality.
 
 ### The `topAppBar` theme tokens are documented
 
