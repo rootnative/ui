@@ -11,6 +11,79 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `Button`, `IconButton`, `FAB` and `Chip` follow the parent `alignItems`
+
+The wrapper around the pressable set `alignSelf: 'flex-start'`, so that the
+component did not stretch across a column. But an `alignSelf` also overrides
+every other `alignItems` of the parent. In a `View` with
+`alignItems: 'center'`, a `Button` stayed at the start edge, and in a centered
+row it sat at the top. A `width` in `style` stayed on the pressable and
+resolved against the wrapper, which is only as wide as the button. So
+`width: '50%'` did not give half of the parent: on native the result changed
+with the label, and on the web it was half of the button's own width.
+
+Now the pressable, the focus ring and the shadow are in a frame, and the frame
+is in an outer view that the parent lays out:
+
+- The outer view sets no `alignSelf`, so the parent's `alignItems` places the
+  component. `center` and `flex-end` work in a column and in a row.
+- The outer view sets `alignItems: 'flex-start'`. A parent that stretches its
+  children, as a plain `View` does, makes the outer view wide, and the button
+  keeps its own width at the start edge, as before.
+- `width` goes to the outer view, so a percentage resolves against the parent.
+  `minWidth` and `maxWidth` go with a `width`, so `width: '100%'` with
+  `maxWidth: 360` works. Alone, they stay on the container, as before.
+- With `flex` or `flexGrow` above 0, or with `alignSelf: 'stretch'`, the frame
+  and the container fill the outer view.
+
+The rule was checked on the Yoga that React Native 0.86.3 ships, compiled with
+its default layout conformance, and in headless Chromium with the
+react-native-web base styles. The test was 126 layouts: 9 parents, 7 `style`
+shapes, a `Button` and an `IconButton`. With the old tree, the focus ring was
+not on the button in 37 layouts on native and in 49 on the web. Now it is on
+the button in every layout on the web, and in all but 6 on native. In those 6,
+`flex: 1` in a column with no height makes the outer view 0 high, as it does
+for any `View`, and the old tree fails the same 6. Not checked on a device.
+
+**What changes.**
+
+- A button in a parent with `alignItems: 'center'` or `'flex-end'` moves
+  there. In a centered row, a button beside a taller item moves from the top
+  to the middle. If you added a `Row`, a `View` or an `alignSelf` only to place
+  a button, you can remove it.
+- `flex: 1` in a column makes the button full width, as for any `View`. Before,
+  the button was only as wide as its label.
+- On the web, `flex: 1` in a row that stretches makes the button as tall as
+  the row. Native already did this.
+- Each of these components renders one more `View`, with layout styles only.
+
+**Not changed.** On the web, a percentage `minWidth` or `maxWidth` with no
+`width` still resolves against the frame. Native resolves it against the
+parent.
+
+### A `Menu` is as wide as its widest item on native
+
+A `Menu` with one short item opened 280dp wide on iOS and Android. The item
+label and its content row had `flexGrow: 1`. The default layout conformance
+of React Native keeps a legacy Yoga rule (`StretchFlexBasis`): in a row that
+is as wide as its content, a `flexGrow` child grows to all the width it can
+get. So the menu reached its 280dp maximum every time. The web did not have
+the defect.
+
+Now no node in an item grows. The item is a column, so its content row
+stretches to the menu width only after the menu has its width. The first
+trailing element (the trailing text, or else the trailing icon) takes the free
+space with an auto start margin, so it stays at the end edge. On the Yoga that
+React Native 0.86.3 ships, a menu with one short item is 112dp wide (the
+minimum). A menu with mixed items is as wide as its widest item, with the
+trailing text at the end edge. A long label still stops at 280dp. The web
+layout does not change. Not checked on a device.
+
+**What changes.** On native, a menu with short items is narrower. A `width`
+in the `Menu` `style` still sets the width. `Menu.Item` lays out its content
+in a column now, so a `flexDirection` or an `alignItems` in an item `style`
+acts on a different layout than before.
+
 ### A standard `IconButton` in an `AppBar` slot takes the slot color
 
 `AppBar` gave its content color to its built-in buttons only. Custom content

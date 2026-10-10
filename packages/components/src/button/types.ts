@@ -106,11 +106,14 @@ export interface ButtonProps extends Omit<
   /** Additional style applied to the label text. */
   labelStyle?: StyleProp<TextStyle>
   /**
-   * Style for the component. The keys that place it in its parent —
-   * `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins,
-   * `position`, the insets and `zIndex` — go to the outer wrapper, so the
-   * focus ring and the shadow move with it. Every other key styles the
-   * container. Static form only — the function form `(state) => style` is
+   * Style for the component. The keys that place or size it in its parent —
+   * `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the
+   * margins, `position`, the insets and `zIndex` — go to the outer wrapper,
+   * so the focus ring and the shadow move with it. `minWidth` and `maxWidth`
+   * go with a `width`; alone, they style the container. The wrapper sets no
+   * `alignSelf`, so the parent's `alignItems` places the component. In a
+   * parent that stretches its children, the component keeps its own width at
+   * the start edge. Every other key styles the container. Static form only — the function form `(state) => style` is
    * not supported because the component drives its container background
    * through Reanimated. Use `containerColor` / `contentColor` for
    * state-aware styling.

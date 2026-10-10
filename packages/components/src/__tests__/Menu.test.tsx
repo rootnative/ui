@@ -362,6 +362,7 @@ describe('Menu.Item', () => {
     const container = StyleSheet.flatten(screen.getByTestId('item').props.style)
     expect(container.minHeight).toBe(48)
     expect(container.paddingHorizontal).toBe(12)
+    expect(container.justifyContent).toBe('center')
 
     const label = StyleSheet.flatten(screen.getByText('Edit').props.style)
     expect(label.color).toBe(lightTheme.colors.onSurface)
@@ -434,5 +435,78 @@ describe('Menu.Item', () => {
       /must be rendered inside a <Menu>/,
     )
     errorSpy.mockRestore()
+  })
+})
+
+/**
+ * React Native's default layout conformance keeps a legacy Yoga rule: a
+ * `flexGrow` child grows a row that is as wide as its content to all the
+ * width it can get. A menu is as wide as its content, so one such child
+ * between an item label and the surface opened every menu at its 280dp
+ * maximum. Jest computes no layout, so these tests read the styles.
+ */
+describe('Menu — the width follows the items', () => {
+  type Node = ReturnType<typeof screen.getByText>
+
+  /** Host nodes from `node` up to `surface`, with their flattened styles. */
+  function hostChain(node: Node, surface: Node) {
+    const chain: { type: string; style: ViewStyle }[] = []
+    for (let n: Node | null = node; n; n = n.parent) {
+      if (typeof n.type === 'string') {
+        chain.push({
+          type: n.type,
+          style: StyleSheet.flatten(n.props.style) ?? {},
+        })
+      }
+      if (n === surface) return chain
+    }
+    throw new Error('the node is not inside the surface')
+  }
+
+  function growsInARow(chain: { type: string; style: ViewStyle }[]) {
+    return chain.flatMap(({ type, style }, index) => {
+      const parent = chain[index + 1]?.style
+      const isRow = parent?.flexDirection?.startsWith('row') ?? false
+      const grow =
+        (style.flexGrow ?? 0) > 0 ||
+        (typeof style.flex === 'number' && style.flex > 0)
+      return isRow && grow ? [type] : []
+    })
+  }
+
+  it('no node between an item and the surface grows a row', async () => {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu">
+        <Menu.Item label="Developer" leadingIcon="cog" trailingText="⌘D" />
+        <Menu.Item label="Help" trailingIcon="open-in-new" />
+      </Menu>,
+    )
+    const surface = await open()
+    for (const text of ['Developer', '⌘D', 'Help']) {
+      expect(growsInARow(hostChain(screen.getByText(text), surface))).toEqual(
+        [],
+      )
+    }
+  })
+
+  it('the first trailing element takes the free space with an auto margin', async () => {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu">
+        <Menu.Item label="Copy" trailingText="⌘C" />
+        <Menu.Item label="Help" trailingIcon="open-in-new" />
+        <Menu.Item label="Paste" trailingText="⌘V" trailingIcon="check" />
+      </Menu>,
+    )
+    await open()
+    const marginOf = (node: Node | null) =>
+      node ? StyleSheet.flatten(node.props.style)?.marginStart : undefined
+    const iconView = (name: string) =>
+      screen.getByText(name, { includeHiddenElements: true }).parent?.parent ??
+      null
+
+    expect(marginOf(screen.getByText('⌘C'))).toBe('auto')
+    expect(marginOf(screen.getByText('⌘V'))).toBe('auto')
+    expect(marginOf(iconView('open-in-new'))).toBe('auto')
+    expect(marginOf(iconView('check'))).toBeUndefined()
   })
 })

@@ -63,6 +63,10 @@ export function MenuItem({
     () => [styles.label, labelStyle],
     [styles.label, labelStyle],
   )
+  const trailingTextStyle = useMemo(
+    () => [styles.trailingText, styles.trailingStart],
+    [styles.trailingText, styles.trailingStart],
+  )
 
   return (
     <AnimatedPressable
@@ -98,11 +102,20 @@ export function MenuItem({
           {label}
         </Text>
         {trailingText !== undefined ? (
-          <Text style={styles.trailingText} numberOfLines={1}>
+          <Text style={trailingTextStyle} numberOfLines={1}>
             {trailingText}
           </Text>
         ) : null}
-        {trailing ? <View aria-hidden>{trailing}</View> : null}
+        {trailing ? (
+          <View
+            aria-hidden
+            style={
+              trailingText === undefined ? styles.trailingStart : undefined
+            }
+          >
+            {trailing}
+          </View>
+        ) : null}
       </View>
     </AnimatedPressable>
   )

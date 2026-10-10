@@ -188,70 +188,75 @@ export function Button({
     [isDisabled, styles.disabledLabel, styles.label, labelStyleOverride],
   )
 
-  const { outer: layoutStyle, inner: containerStyle } = useMemo(
-    () => splitLayoutStyle(style),
-    [style],
-  )
+  const {
+    outer: layoutStyle,
+    frame: frameStyle,
+    inner: containerStyle,
+  } = useMemo(() => splitLayoutStyle(style), [style])
 
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
 
   return (
     <View style={[styles.wrapper, layoutStyle]}>
-      <Animated.View
-        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
-      />
-      {showElevationLayer ? (
+      <View style={frameStyle}>
         <Animated.View
-          style={[
-            styles.elevationLayer,
-            animatedElevationRadiusStyle,
-            elevationShadowStyle,
-            pointerEvents.none,
-          ]}
+          style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
         />
-      ) : null}
-      <AnimatedPressable
-        {...props}
-        accessibilityRole="button"
-        aria-disabled={isDisabled}
-        hitSlop={
-          // Sized per token, not a flat 4: `extraSmall` is 32dp tall, so a
-          // constant slop left it at 40dp — under the 48dp WCAG/MD3 floor.
-          // Web is excluded because react-native-web does not implement
-          // `hitSlop`.
-          hitSlop ??
-          (Platform.OS === 'web'
+        {showElevationLayer ? (
+          <Animated.View
+            style={[
+              styles.elevationLayer,
+              animatedElevationRadiusStyle,
+              elevationShadowStyle,
+              pointerEvents.none,
+            ]}
+          />
+        ) : null}
+        <AnimatedPressable
+          {...props}
+          accessibilityRole="button"
+          aria-disabled={isDisabled}
+          hitSlop={
+            // Sized per token, not a flat 4: `extraSmall` is 32dp tall, so a
+            // constant slop left it at 40dp — under the 48dp WCAG/MD3 floor.
+            // Web is excluded because react-native-web does not implement
+            // `hitSlop`.
+            hitSlop ??
+            (Platform.OS === 'web'
+              ? undefined
+              : getDefaultHitSlop(sizeTokens.height))
+          }
+          disabled={isDisabled}
+          {...(isDisabled
             ? undefined
-            : getDefaultHitSlop(sizeTokens.height))
-        }
-        disabled={isDisabled}
-        {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
-        style={[
-          styles.container,
-          webOutlineReset,
-          // The gesture-layer style owns backgroundColor while enabled; when
-          // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it). The press
-          // morph sits before the consumer `style` so an explicit
-          // borderRadius override still wins.
-          isDisabled ? undefined : stateLayerStyle,
-          isDisabled ? undefined : morph.style,
-          isDisabled ? styles.disabledContainer : undefined,
-          containerStyle,
-        ]}
-      >
-        {leadingIcon ? (
-          <View aria-hidden style={styles.leadingIcon}>
-            {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
-          </View>
-        ) : null}
-        <Text style={computedLabelStyle}>{children}</Text>
-        {trailingIcon ? (
-          <View aria-hidden style={styles.trailingIcon}>
-            {renderIcon(trailingIcon, iconRenderProps, iconResolver)}
-          </View>
-        ) : null}
-      </AnimatedPressable>
+            : composeHandlers(composedHandlers, props))}
+          style={[
+            styles.container,
+            webOutlineReset,
+            // The gesture-layer style owns backgroundColor while enabled; when
+            // disabled it is dropped entirely so the static disabled background
+            // applies instantly (no animated layer to fight it). The press
+            // morph sits before the consumer `style` so an explicit
+            // borderRadius override still wins.
+            isDisabled ? undefined : stateLayerStyle,
+            isDisabled ? undefined : morph.style,
+            isDisabled ? styles.disabledContainer : undefined,
+            containerStyle,
+          ]}
+        >
+          {leadingIcon ? (
+            <View aria-hidden style={styles.leadingIcon}>
+              {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
+            </View>
+          ) : null}
+          <Text style={computedLabelStyle}>{children}</Text>
+          {trailingIcon ? (
+            <View aria-hidden style={styles.trailingIcon}>
+              {renderIcon(trailingIcon, iconRenderProps, iconResolver)}
+            </View>
+          ) : null}
+        </AnimatedPressable>
+      </View>
     </View>
   )
 }

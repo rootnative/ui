@@ -272,54 +272,62 @@ export function IconButton({
       variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth,
   }
 
-  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+  const {
+    outer: layoutStyle,
+    frame: frameStyle,
+    inner: containerStyle,
+  } = useMemo(
     () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
     [style],
   )
 
   return (
     <Animated.View style={[styles.wrapper, layoutStyle]}>
-      <Animated.View
-        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
-      />
-      <AnimatedPressable
-        {...props}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-        {...ariaState}
-        disabled={isDisabled}
-        hitSlop={hitSlop ?? defaultHitSlop}
-        onPress={handlePress}
-        {...(isDisabled ? undefined : composeHandlers(composedHandlers, props))}
-        style={[
-          styles.container,
-          webOutlineReset,
-          sizeStyle,
-          // The gesture-layer style owns backgroundColor while enabled; when
-          // disabled it is dropped entirely so the static disabled override
-          // applies instantly (no animated layer to fight it). The radius
-          // morph stays applied while disabled — a selected toggle keeps its
-          // squarer resting shape (the press progress is pinned to rest).
-          animatedRadiusStyle,
-          isDisabled ? undefined : stateLayerStyle,
-          disabledOverride,
-          isDisabled ? styles.disabled : undefined,
-          // Function-form `style` is intentionally dropped on animated
-          // components — wrapping the whole `style` array in a function would
-          // hide the animated container style from Reanimated's prop diff and
-          // break the state-layer transitions. Use `containerColor` /
-          // `contentColor` for state-aware styling instead.
-          containerStyle,
-        ]}
-      >
-        <View aria-hidden>
-          {renderIcon(
-            displayIcon,
-            { size: iconPixelSize, color: resolvedIconColor },
-            iconResolver,
-          )}
-        </View>
-      </AnimatedPressable>
+      <View style={frameStyle}>
+        <Animated.View
+          style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
+        />
+        <AnimatedPressable
+          {...props}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          {...ariaState}
+          disabled={isDisabled}
+          hitSlop={hitSlop ?? defaultHitSlop}
+          onPress={handlePress}
+          {...(isDisabled
+            ? undefined
+            : composeHandlers(composedHandlers, props))}
+          style={[
+            styles.container,
+            webOutlineReset,
+            sizeStyle,
+            // The gesture-layer style owns backgroundColor while enabled; when
+            // disabled it is dropped entirely so the static disabled override
+            // applies instantly (no animated layer to fight it). The radius
+            // morph stays applied while disabled — a selected toggle keeps its
+            // squarer resting shape (the press progress is pinned to rest).
+            animatedRadiusStyle,
+            isDisabled ? undefined : stateLayerStyle,
+            disabledOverride,
+            isDisabled ? styles.disabled : undefined,
+            // Function-form `style` is intentionally dropped on animated
+            // components — wrapping the whole `style` array in a function would
+            // hide the animated container style from Reanimated's prop diff and
+            // break the state-layer transitions. Use `containerColor` /
+            // `contentColor` for state-aware styling instead.
+            containerStyle,
+          ]}
+        >
+          <View aria-hidden>
+            {renderIcon(
+              displayIcon,
+              { size: iconPixelSize, color: resolvedIconColor },
+              iconResolver,
+            )}
+          </View>
+        </AnimatedPressable>
+      </View>
     </Animated.View>
   )
 }

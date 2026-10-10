@@ -195,10 +195,10 @@ describe('SearchBar', () => {
   })
 
   /**
-   * `IconButton` sets `alignSelf: 'flex-start'`, which beats the row's
-   * `alignItems: 'center'`. Without its frame, each button rides at the top
-   * of the 56dp bar. Found on web, where the clear button sat 8dp high; jsdom
-   * computes no layout, so this asserts the frame instead of a position.
+   * Each icon button sits at the centre of the 56dp bar. An `alignSelf` on the
+   * button's outer view would beat the `alignItems` around it and put the
+   * button at the top of the bar. jsdom computes no layout, so this asserts
+   * the styles instead of a position.
    */
   describe('icon buttons stay centered', () => {
     it.each(['Clear search', 'Open menu', 'Voice search'])(
@@ -215,18 +215,19 @@ describe('SearchBar', () => {
             ]}
           />,
         )
-        // The button's outermost node is the one that sets `flex-start`.
-        // Its parent must be the frame: in the broken layout the parent was
-        // the 56dp bar itself.
+        // The button's outer view is the node with `alignItems:
+        // 'flex-start'`. It sets no `alignSelf`, and its parent is the frame.
         let node: ReactTestInstance | null = screen.getByLabelText(label)
-        while (node && styleOf(node)?.alignSelf !== 'flex-start') {
+        while (node && styleOf(node)?.alignItems !== 'flex-start') {
           node = node.parent
         }
+        expect(node).not.toBeNull()
+        expect(node && styleOf(node).alignSelf).toBeUndefined()
         let parent = node?.parent ?? null
         while (
           parent &&
           (styleOf(parent) === undefined ||
-            styleOf(parent).alignSelf === 'flex-start')
+            styleOf(parent).alignItems === 'flex-start')
         ) {
           parent = parent.parent
         }

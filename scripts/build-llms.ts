@@ -1634,7 +1634,7 @@ import { Grid } from '@rootnative/components/layout'
     output +=
       '- `closeAccessibilityLabel?: string` — Default: `` `Remove ${children}` ``. Accessible name for the trailing close affordance, which is a separate a11y target from the chip itself.\n'
     output +=
-      '- `style?: StyleProp<ViewStyle>` — Style for the chip. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. Every other key styles the container. Static form only.\n'
+      '- `style?: StyleProp<ViewStyle>` — Style for the chip. The keys that place or size it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. `minWidth` and `maxWidth` go with a `width`; alone, they style the container. The wrapper sets no `alignSelf`, so the `alignItems` of the parent places the chip. In a parent that stretches its children, the chip keeps its own width at the start edge. Every other key styles the container. Static form only.\n'
     output += '- Inherits `PressableProps` (except `children`)\n\n'
 
     const interfaceVariants: {

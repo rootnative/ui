@@ -113,7 +113,7 @@ export function createStyles(theme: MaterialTheme) {
 
   return StyleSheet.create({
     wrapper: {
-      alignSelf: 'flex-start' as const,
+      alignItems: 'flex-start' as const,
     },
     container: {
       alignItems: 'center',

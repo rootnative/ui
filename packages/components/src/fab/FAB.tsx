@@ -129,75 +129,81 @@ export function FAB({
     ? { backgroundColor: colors.disabledBackgroundColor }
     : undefined
 
-  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+  const {
+    outer: layoutStyle,
+    frame: frameStyle,
+    inner: containerStyle,
+  } = useMemo(
     () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
     [style],
   )
 
   return (
     <View style={[styles.wrapper, layoutStyle]}>
-      <Animated.View
-        style={[
-          styles.focusRing,
-          getFocusRingSizeStyle(styles, size, isExtended),
-          animatedFocusRingStyle,
-          pointerEvents.none,
-        ]}
-      />
-      {showElevationLayer ? (
+      <View style={frameStyle}>
         <Animated.View
           style={[
-            styles.elevationLayer,
-            getElevationLayerRadiusStyle(styles, size, isExtended),
-            elevationLayerColorStyle,
-            elevationShadowStyle,
+            styles.focusRing,
+            getFocusRingSizeStyle(styles, size, isExtended),
+            animatedFocusRingStyle,
             pointerEvents.none,
           ]}
         />
-      ) : null}
-      <AnimatedPressable
-        {...rest}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel ?? label}
-        aria-disabled={isDisabled}
-        disabled={isDisabled}
-        hitSlop={resolvedHitSlop}
-        onPress={onPress}
-        {...(isDisabled ? undefined : composeHandlers(handlers, rest))}
-        style={[
-          styles.container,
-          webOutlineReset,
-          isExtended
-            ? [styles.extended, icon ? styles.extendedWithIcon : undefined]
-            : getFABSizeStyle(styles, size),
-          // The gesture-layer style owns backgroundColor while enabled; when
-          // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it).
-          isDisabled ? undefined : stateLayerStyle,
-          disabledOverride,
-          isDisabled ? styles.disabled : undefined,
-          // Function-form `style` is intentionally dropped on animated
-          // components — wrapping the whole `style` array in a function would
-          // hide the animated container style from Reanimated's prop diff and
-          // break the state-layer transitions. Use `containerColor` /
-          // `contentColor` for state-aware styling instead.
-          containerStyle,
-        ]}
-      >
-        {icon ? (
-          <View
-            aria-hidden
-            style={isExtended ? styles.extendedIcon : undefined}
-          >
-            {renderIcon(
-              icon,
-              { size: iconPixelSize, color: resolvedContentColor },
-              iconResolver,
-            )}
-          </View>
+        {showElevationLayer ? (
+          <Animated.View
+            style={[
+              styles.elevationLayer,
+              getElevationLayerRadiusStyle(styles, size, isExtended),
+              elevationLayerColorStyle,
+              elevationShadowStyle,
+              pointerEvents.none,
+            ]}
+          />
         ) : null}
-        {isExtended ? <Text style={labelTextStyle}>{label}</Text> : null}
-      </AnimatedPressable>
+        <AnimatedPressable
+          {...rest}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel ?? label}
+          aria-disabled={isDisabled}
+          disabled={isDisabled}
+          hitSlop={resolvedHitSlop}
+          onPress={onPress}
+          {...(isDisabled ? undefined : composeHandlers(handlers, rest))}
+          style={[
+            styles.container,
+            webOutlineReset,
+            isExtended
+              ? [styles.extended, icon ? styles.extendedWithIcon : undefined]
+              : getFABSizeStyle(styles, size),
+            // The gesture-layer style owns backgroundColor while enabled; when
+            // disabled it is dropped entirely so the static disabled background
+            // applies instantly (no animated layer to fight it).
+            isDisabled ? undefined : stateLayerStyle,
+            disabledOverride,
+            isDisabled ? styles.disabled : undefined,
+            // Function-form `style` is intentionally dropped on animated
+            // components — wrapping the whole `style` array in a function would
+            // hide the animated container style from Reanimated's prop diff and
+            // break the state-layer transitions. Use `containerColor` /
+            // `contentColor` for state-aware styling instead.
+            containerStyle,
+          ]}
+        >
+          {icon ? (
+            <View
+              aria-hidden
+              style={isExtended ? styles.extendedIcon : undefined}
+            >
+              {renderIcon(
+                icon,
+                { size: iconPixelSize, color: resolvedContentColor },
+                iconResolver,
+              )}
+            </View>
+          ) : null}
+          {isExtended ? <Text style={labelTextStyle}>{label}</Text> : null}
+        </AnimatedPressable>
+      </View>
     </View>
   )
 }

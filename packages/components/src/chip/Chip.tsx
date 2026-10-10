@@ -366,7 +366,11 @@ export function Chip(props: ChipProps) {
     return null
   }
 
-  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+  const {
+    outer: layoutStyle,
+    frame: frameStyle,
+    inner: containerStyle,
+  } = useMemo(
     () => splitLayoutStyle(typeof style === 'function' ? undefined : style),
     [style],
   )
@@ -381,100 +385,106 @@ export function Chip(props: ChipProps) {
 
   return (
     <View style={[styles.wrapper, layoutStyle]}>
-      {isInteractive ? (
-        <Animated.View
-          style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
-        />
-      ) : null}
-      {showElevationLayer ? (
-        <Animated.View
-          style={[
-            styles.elevationLayer,
-            animatedElevationRadiusStyle,
-            elevationShadowStyle,
-            pointerEvents.none,
-          ]}
-        />
-      ) : null}
-      {isInteractive ? (
-        <AnimatedPressable
-          {...rest}
-          accessibilityRole="button"
-          aria-disabled={isDisabled}
-          {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
-          // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
-          hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
-          disabled={isDisabled}
-          onPress={handlePress}
-          {...(isDisabled
-            ? undefined
-            : composeHandlers(composedHandlers, rest))}
-          style={[
-            styles.container,
-            webOutlineReset,
-            // The gesture-layer style owns backgroundColor while enabled; when
-            // disabled it is dropped entirely so the static disabled background
-            // applies instantly (no animated layer to fight it). The radius
-            // morph stays applied while disabled — a selected filter chip
-            // keeps its pill resting shape (the press progress is pinned).
-            animatedRadiusStyle,
-            isDisabled ? undefined : stateLayerStyle,
-            isDisabled ? styles.disabledContainer : undefined,
-            // Function-form `style` is intentionally dropped on animated
-            // components — wrapping the whole `style` array in a function would
-            // hide the animated container style from Reanimated's prop diff and
-            // break the state-layer transitions. Use `containerColor` /
-            // `contentColor` for state-aware styling instead.
-            containerStyle,
-          ]}
-        >
-          {content}
-        </AnimatedPressable>
-      ) : (
-        // A chip with no action is a label, as a `Card` with no `onPress` is:
-        // no button role, no tab stop, and no state layer.
-        <Animated.View
-          {...rest}
-          style={[
-            styles.container,
-            animatedRadiusStyle,
-            styles.staticContainer,
-            isDisabled ? styles.disabledContainer : undefined,
-            containerStyle,
-          ]}
-        >
-          {content}
-        </Animated.View>
-      )}
-      {showCloseIcon ? (
-        // Sibling of the chip's Pressable (overlaying `closeSpacer`), not a
-        // child — a nested Pressable renders <button> inside <button> on
-        // web, which is invalid DOM nesting. Sibling buttons also match the
-        // reference Material Web chip structure: hovering the close target
-        // drives only its own state layer, and Tab reaches chip → close in
-        // order.
-        <AnimatedPressable
-          onPress={onClose}
-          accessibilityRole="button"
-          // Composed with the chip's label by default: this button is a second
-          // accessibility target inside what reads as one control, so a bare
-          // "Remove" gives no clue which chip is about to go.
-          accessibilityLabel={closeAccessibilityLabel ?? `Remove ${children}`}
-          aria-disabled={isDisabled}
-          disabled={isDisabled}
-          hitSlop={12}
-          {...(isDisabled ? undefined : closeHandlers)}
-          style={[
-            styles.closeButton,
-            isDisabled ? styles.disabledCloseButton : undefined,
-            animatedCloseStyle,
-          ]}
-        >
-          <View aria-hidden>
-            {renderIcon('close', closeIconRenderProps, iconResolver)}
-          </View>
-        </AnimatedPressable>
-      ) : null}
+      <View style={frameStyle}>
+        {isInteractive ? (
+          <Animated.View
+            style={[
+              styles.focusRing,
+              animatedFocusRingStyle,
+              pointerEvents.none,
+            ]}
+          />
+        ) : null}
+        {showElevationLayer ? (
+          <Animated.View
+            style={[
+              styles.elevationLayer,
+              animatedElevationRadiusStyle,
+              elevationShadowStyle,
+              pointerEvents.none,
+            ]}
+          />
+        ) : null}
+        {isInteractive ? (
+          <AnimatedPressable
+            {...rest}
+            accessibilityRole="button"
+            aria-disabled={isDisabled}
+            {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
+            // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
+            hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
+            disabled={isDisabled}
+            onPress={handlePress}
+            {...(isDisabled
+              ? undefined
+              : composeHandlers(composedHandlers, rest))}
+            style={[
+              styles.container,
+              webOutlineReset,
+              // The gesture-layer style owns backgroundColor while enabled; when
+              // disabled it is dropped entirely so the static disabled background
+              // applies instantly (no animated layer to fight it). The radius
+              // morph stays applied while disabled — a selected filter chip
+              // keeps its pill resting shape (the press progress is pinned).
+              animatedRadiusStyle,
+              isDisabled ? undefined : stateLayerStyle,
+              isDisabled ? styles.disabledContainer : undefined,
+              // Function-form `style` is intentionally dropped on animated
+              // components — wrapping the whole `style` array in a function would
+              // hide the animated container style from Reanimated's prop diff and
+              // break the state-layer transitions. Use `containerColor` /
+              // `contentColor` for state-aware styling instead.
+              containerStyle,
+            ]}
+          >
+            {content}
+          </AnimatedPressable>
+        ) : (
+          // A chip with no action is a label, as a `Card` with no `onPress` is:
+          // no button role, no tab stop, and no state layer.
+          <Animated.View
+            {...rest}
+            style={[
+              styles.container,
+              animatedRadiusStyle,
+              styles.staticContainer,
+              isDisabled ? styles.disabledContainer : undefined,
+              containerStyle,
+            ]}
+          >
+            {content}
+          </Animated.View>
+        )}
+        {showCloseIcon ? (
+          // Sibling of the chip's Pressable (overlaying `closeSpacer`), not a
+          // child — a nested Pressable renders <button> inside <button> on
+          // web, which is invalid DOM nesting. Sibling buttons also match the
+          // reference Material Web chip structure: hovering the close target
+          // drives only its own state layer, and Tab reaches chip → close in
+          // order.
+          <AnimatedPressable
+            onPress={onClose}
+            accessibilityRole="button"
+            // Composed with the chip's label by default: this button is a second
+            // accessibility target inside what reads as one control, so a bare
+            // "Remove" gives no clue which chip is about to go.
+            accessibilityLabel={closeAccessibilityLabel ?? `Remove ${children}`}
+            aria-disabled={isDisabled}
+            disabled={isDisabled}
+            hitSlop={12}
+            {...(isDisabled ? undefined : closeHandlers)}
+            style={[
+              styles.closeButton,
+              isDisabled ? styles.disabledCloseButton : undefined,
+              animatedCloseStyle,
+            ]}
+          >
+            <View aria-hidden>
+              {renderIcon('close', closeIconRenderProps, iconResolver)}
+            </View>
+          </AnimatedPressable>
+        ) : null}
+      </View>
     </View>
   )
 }

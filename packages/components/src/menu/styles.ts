@@ -78,9 +78,14 @@ export function createMenuItemStyles(
   contentColor?: string,
 ) {
   return StyleSheet.create({
+    // No `flexGrow` in an item. React Native's default layout conformance
+    // keeps a legacy Yoga rule: a `flexGrow` child grows a row that is as
+    // wide as its content to all the width it can get, so every menu opened
+    // at its 280dp maximum. The item is a column, so the content row
+    // stretches to the menu width only after the menu has its width, and the
+    // trailing content takes the free space with an auto start margin.
     container: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      justifyContent: 'center',
       minHeight: MENU_ITEM_HEIGHT,
       minWidth: MENU_MIN_WIDTH,
       paddingHorizontal: MENU_ITEM_HORIZONTAL_PADDING,
@@ -91,14 +96,9 @@ export function createMenuItemStyles(
     disabledContainer: {
       cursor: 'auto',
     },
-    // `flexGrow`/`flexShrink` rather than `flex: 1`: RN's `flex: 1` also sets
-    // `flexBasis: 0%`, which would drop the label out of the surface's
-    // intrinsic width and collapse the menu to its 112dp minimum.
     content: {
       flexDirection: 'row',
       alignItems: 'center',
-      flexGrow: 1,
-      flexShrink: 1,
       gap: MENU_ITEM_HORIZONTAL_PADDING,
     },
     // Label and both icons dim together — MD3's disabled treatment, never
@@ -109,12 +109,14 @@ export function createMenuItemStyles(
     label: {
       ...theme.typography.labelLarge,
       color: contentColor ?? theme.colors.onSurface,
-      flexGrow: 1,
       flexShrink: 1,
     },
     trailingText: {
       ...theme.typography.labelLarge,
       color: contentColor ?? theme.colors.onSurfaceVariant,
+    },
+    trailingStart: {
+      marginStart: 'auto',
     },
     focusRing: {
       position: 'absolute',

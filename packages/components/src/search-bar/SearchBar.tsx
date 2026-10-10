@@ -210,9 +210,8 @@ export function SearchBar({
     )
   }
 
-  // Every `IconButton` sits in a `slot` frame. The button sets
-  // `alignSelf: 'flex-start'`, which beats the row's `alignItems: 'center'`,
-  // so without the frame it rides above the center of the bar.
+  // Every `IconButton` sits in a `slot` frame, so a button and a plain icon
+  // take the same 40dp box.
   const leadingContent = onLeadingIconPress ? (
     <View style={styles.slot}>
       <IconButton

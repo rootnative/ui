@@ -141,18 +141,18 @@ export function createStyles(
     },
     // The side slot centres this view, and this view is only as tall as its
     // content. A direct child of the slot with its own `alignSelf` escapes
-    // the slot's `alignItems`: `IconButton` sets `flex-start` and sat 4pt
-    // above the title. The minimum width gives a custom 40dp `IconButton`
-    // the 48dp footprint of an MD3 icon button.
+    // the slot's `alignItems` and can sit above the title. The minimum width
+    // gives a custom 40dp `IconButton` the 48dp footprint of an MD3 icon
+    // button.
     slotContent: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       minWidth: topAppBar.iconFrameSize,
     },
-    // No fixed height: `IconButton` sets `alignSelf: 'flex-start'`, which
-    // beats `alignItems` on the cross axis of any frame. A row centres it on
-    // the main axis, and the parent centres this content-height frame.
+    // No fixed height: a row that stretches an `IconButton` keeps the button
+    // at the top of the space it gets. A row centres it on the main axis,
+    // and the parent centres this content-height frame.
     iconFrame: {
       width: topAppBar.iconFrameSize,
       flexDirection: 'row',
