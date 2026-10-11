@@ -5,6 +5,7 @@ import {
   Row,
   Typography,
 } from '@rootnative/components'
+import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -13,6 +14,12 @@ const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
 const sizes = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const
 
 export default function ButtonScreen() {
+  const [isLoading, setIsLoading] = useState(false)
+  const load = () => {
+    setIsLoading(true)
+    setTimeout(() => setIsLoading(false), 2000)
+  }
+
   return (
     <ScrollView style={styles.container}>
       <Container width="expanded" p="lg" gap={20}>
@@ -33,6 +40,22 @@ export default function ButtonScreen() {
           <Row wrap gap="sm">
             {variants.map((variant) => (
               <Button key={`disabled-${variant}`} variant={variant} disabled>
+                {`${variant} button`}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Loading</Typography>
+          <Row wrap gap="sm">
+            {variants.map((variant) => (
+              <Button
+                key={`loading-${variant}`}
+                variant={variant}
+                loading={isLoading}
+                onPress={load}
+              >
                 {`${variant} button`}
               </Button>
             ))}

@@ -8,6 +8,13 @@ export const BUTTON_FOCUS_RING_OFFSET = 2
 export const BUTTON_FOCUS_RING_WIDTH = 3
 
 /**
+ * Stroke of the `loading` spinner as a share of the icon size: 2dp at the
+ * 20dp icon of the default size. The `CircularProgress` ratio (4dp at 48dp)
+ * gives a line too thin to see at icon size.
+ */
+export const BUTTON_LOADING_STROKE_RATIO = 0.1
+
+/**
  * Per-size Expressive geometry (androidx `Button<Size>Tokens.kt`). `height`,
  * `iconSize`, and `paddingVertical` are absolute dp; `padding` is the base
  * horizontal inset; `labelRole`/`iconLabelRole` name the typography variant

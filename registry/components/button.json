@@ -18,7 +18,7 @@
     "packages/components/src/elevation-shadow.ts"
   ],
   "utils": ["color", "elevation", "pressable", "render-icon"],
-  "componentDependencies": [],
+  "componentDependencies": ["progress"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.24",
     "@rootnative/inertia": ">=0.0.17",

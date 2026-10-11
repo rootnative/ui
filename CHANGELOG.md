@@ -267,6 +267,33 @@ Checkbox, Radio and Switch pages link to it. The `onValueChange` JSDoc and the
   hidden.
 - Such a control no longer shows a hover, focus or press state layer.
 
+### `Button` takes `loading`
+
+A button that starts an action had no way to show that the action runs. A
+`leadingIcon` render function with a `CircularProgress` worked, but each app
+had to find it and choose the size, the stroke and the colors.
+
+`Button` now takes `loading`. The button shows an indeterminate
+`CircularProgress` in place of `leadingIcon`, at the icon size and in the
+label color, with no track. While it loads, the button:
+
+- ignores `onPress` and `onLongPress`,
+- shows no hover or press state layer, and no press morph,
+- sets `aria-busy`, and hides the spinner from assistive technology,
+- keeps its colors and its focus. It is not disabled, so a keyboard user
+  stays on it. Pass `disabled` as well if it must also look disabled.
+
+MD3 has no loading button, so this is a library addition. With no
+`leadingIcon`, the spinner adds the icon and its gap, so the button gets wider
+while it loads. A `width` in `style` keeps the size. The Button page has a new
+section, "Loading".
+
+**What changes.** The CLI `button` entry now depends on `progress`, so
+`rootnative add button` also installs `progress` and `react-native-svg`. The
+same applies to `appbar` and `snackbar`, which depend on `button`. The npm
+package already requires `react-native-svg`, so an npm install does not
+change.
+
 ### `List` takes a `headline`
 
 A list with a section title had to put a `Typography` above it and choose the

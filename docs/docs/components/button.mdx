@@ -160,6 +160,51 @@ to depart from the resolved values:
 `}
 />
 
+## Loading
+
+Set `loading` while the action runs. The button shows an indeterminate
+`CircularProgress` in place of the leading icon, at the icon size and in the
+label color. It ignores presses, shows no hover or press state, and sets
+`aria-busy`. It keeps its colors and its focus, so a keyboard user stays on it.
+MD3 has no loading button, so this is a library addition.
+
+<SnackExample
+  name="RootNative Button — Loading"
+  code={`
+  import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  export default function App() {
+    const [isSaving, setIsSaving] = useState(false)
+
+    const save = () => {
+      setIsSaving(true)
+      setTimeout(() => setIsSaving(false), 2000)
+    }
+
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+            <Button loading={isSaving} onPress={save} style={{ width: 160 }}>
+              Save
+            </Button>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+With no `leadingIcon`, the spinner adds the icon and its gap, so the button
+gets wider while it loads. A `width` in `style` keeps the size, as above. Pass
+`disabled` as well if the button must also look disabled.
+
 ## A button as a link
 
 A button that opens a page must be a link on the web. A `Button` with an

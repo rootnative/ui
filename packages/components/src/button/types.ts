@@ -106,6 +106,19 @@ export interface ButtonProps extends Omit<
   /** Additional style applied to the label text. */
   labelStyle?: StyleProp<TextStyle>
   /**
+   * Show an indeterminate `CircularProgress` in place of `leadingIcon`, at
+   * the icon size and in the label color. The button keeps its colors and
+   * its focus, ignores `onPress` and `onLongPress`, shows no hover or press
+   * state, and sets `aria-busy`. MD3 has no loading button, so this is a
+   * library addition.
+   *
+   * With no `leadingIcon`, the spinner adds the icon and its gap, so the
+   * button gets wider while it loads. Give it a `width` in `style` to keep
+   * the size. Pass `disabled` as well if the button must also look disabled.
+   * @default false
+   */
+  loading?: boolean
+  /**
    * Style for the component. The keys that place or size it in its parent —
    * `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the
    * margins, `position`, the insets and `zIndex` — go to the outer wrapper,

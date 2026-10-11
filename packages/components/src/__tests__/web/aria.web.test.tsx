@@ -17,7 +17,7 @@
  * So: these tests read `getAttribute` off real DOM nodes. Asserting on props
  * here would reproduce exactly the blindness the file is here to remove.
  */
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { Text } from 'react-native'
 import { Avatar } from '../../avatar'
 import { Button } from '../../button'
@@ -281,6 +281,32 @@ describe('aria-disabled reaches the DOM', () => {
  * crawler does not follow. The props are spread because `href` is a
  * react-native-web prop that the React Native types do not declare.
  */
+describe('a loading Button on the web', () => {
+  it('reports aria-busy, hides the spinner, and stays a tab stop', () => {
+    renderWeb(<Button loading>Save</Button>)
+    const button = screen.getByRole('button')
+    expect(button.getAttribute('aria-busy')).toBe('true')
+    expect(button.getAttribute('tabindex')).toBe('0')
+    expect(screen.queryByRole('progressbar')).toBeNull()
+  })
+
+  it('renders no aria-busy when it is not loading', () => {
+    renderWeb(<Button>Save</Button>)
+    expect(aria('button', 'aria-busy')).toBeNull()
+  })
+
+  it('ignores a click', () => {
+    const onPress = jest.fn()
+    renderWeb(
+      <Button loading onPress={onPress}>
+        Save
+      </Button>,
+    )
+    fireEvent.click(screen.getByRole('button'))
+    expect(onPress).not.toHaveBeenCalled()
+  })
+})
+
 describe('a consumer role reaches the DOM', () => {
   const linkProps = { href: '/movie/19404', role: 'link' as const }
 

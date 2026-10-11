@@ -1,8 +1,10 @@
+import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
-import { screen, fireEvent } from '@testing-library/react-native'
+import { screen, fireEvent, userEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button/Button'
 import type { ButtonSize } from '../button/types'
+import { CircularProgress } from '../progress'
 
 describe('Button', () => {
   it('renders the label text', () => {
@@ -231,6 +233,101 @@ describe('Button', () => {
       )
       const l = StyleSheet.flatten(screen.getByRole('button').props.style)
       expect(l.borderWidth).toBe(2)
+    })
+  })
+
+  describe('loading', () => {
+    function spinner() {
+      return screen.UNSAFE_getByType(CircularProgress)
+    }
+
+    it('shows a spinner in place of the leading icon', () => {
+      const renderFn = jest.fn(() => <Text testID="icon">x</Text>)
+      renderWithTheme(
+        <Button loading leadingIcon={renderFn}>
+          Save
+        </Button>,
+      )
+      expect(spinner()).toBeTruthy()
+      expect(renderFn).not.toHaveBeenCalled()
+    })
+
+    it('draws the spinner at the icon size, in the label color, with no track', () => {
+      renderWithTheme(
+        <Button loading size="large">
+          Save
+        </Button>,
+      )
+      expect(spinner().props).toMatchObject({
+        size: 32,
+        thickness: 3.2,
+        containerColor: 'transparent',
+        contentColor: lightTheme.colors.onPrimary,
+      })
+    })
+
+    it('hides the spinner from assistive technology', () => {
+      renderWithTheme(<Button loading>Save</Button>)
+      expect(screen.queryByRole('progressbar')).toBeNull()
+    })
+
+    // `fireEvent` walks up to the `onPress` prop of the `Button` element
+    // itself, which the pressable never receives. `userEvent` drives the
+    // responder events of the host view, as a real touch does.
+    it('ignores onPress and onLongPress', async () => {
+      const onPress = jest.fn()
+      const onLongPress = jest.fn()
+      renderWithTheme(
+        <Button loading onPress={onPress} onLongPress={onLongPress}>
+          Save
+        </Button>,
+      )
+      const user = userEvent.setup()
+      await user.press(screen.getByRole('button'))
+      await user.longPress(screen.getByRole('button'))
+      expect(onPress).not.toHaveBeenCalled()
+      expect(onLongPress).not.toHaveBeenCalled()
+    })
+
+    it('reports busy, and stays enabled so it keeps focus', () => {
+      renderWithTheme(<Button loading>Save</Button>)
+      expect(screen.getByRole('button', { busy: true })).toBeTruthy()
+      expect(screen.getByRole('button', { disabled: false })).toBeTruthy()
+    })
+
+    it('keeps the enabled colors', () => {
+      renderWithTheme(<Button loading>Save</Button>)
+      expect(
+        StyleSheet.flatten(screen.getByText('Save').props.style).color,
+      ).toBe(lightTheme.colors.onPrimary)
+    })
+
+    it('takes the leading-icon padding when it has no leading icon', () => {
+      renderWithTheme(
+        <>
+          <Button loading testID="loading">
+            Save
+          </Button>
+          <Button leadingIcon="check" testID="icon">
+            Save
+          </Button>
+        </>,
+      )
+      const padding = (testID: string) =>
+        StyleSheet.flatten(screen.getByTestId(testID).props.style).paddingStart
+      expect(padding('loading')).toBe(padding('icon'))
+    })
+
+    it('calls onPress again when loading ends', async () => {
+      const onPress = jest.fn()
+      const { rerender } = renderWithTheme(
+        <Button loading onPress={onPress}>
+          Save
+        </Button>,
+      )
+      rerender(<Button onPress={onPress}>Save</Button>)
+      await userEvent.setup().press(screen.getByRole('button'))
+      expect(onPress).toHaveBeenCalledTimes(1)
     })
   })
 

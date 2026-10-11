@@ -17,9 +17,11 @@ import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
+import { CircularProgress } from '../progress'
 import {
   BUTTON_FOCUS_RING_OFFSET,
   BUTTON_FOCUS_RING_WIDTH,
+  BUTTON_LOADING_STROKE_RATIO,
   createStyles,
   getButtonMorphRadii,
   getButtonSizeTokens,
@@ -40,11 +42,19 @@ export function Button({
   contentColor,
   labelStyle: labelStyleOverride,
   disabled = false,
+  loading = false,
+  onPress,
+  onLongPress,
   hitSlop,
   ...props
 }: ButtonProps) {
   const isDisabled = Boolean(disabled)
-  const hasLeading = Boolean(leadingIcon)
+  // A loading button keeps its colors and its focus, so a keyboard user stays
+  // on it. It takes no press, and its state layer and press morph stay at
+  // rest, as for a disabled button.
+  const isLoading = Boolean(loading)
+  const isInert = isDisabled || isLoading
+  const hasLeading = Boolean(leadingIcon) || isLoading
   const hasTrailing = Boolean(trailingIcon)
   const theme = useTheme()
   const iconResolver = useIconResolver()
@@ -94,7 +104,7 @@ export function Button({
   } = useStateLayer({
     rest: colors.backgroundColor,
     content: colors.textColor,
-    disabled: isDisabled,
+    disabled: isInert,
   })
 
   // Expressive press shape morph: rest shape (pill for `round`, size corner
@@ -109,7 +119,7 @@ export function Button({
     rest: restRadius,
     pressed: pressedRadius,
     transition: 'spring-default-effects',
-    disabled: isDisabled,
+    disabled: isInert,
   })
   const morphProgress = morph.progress
 
@@ -216,6 +226,7 @@ export function Button({
           {...props}
           accessibilityRole="button"
           aria-disabled={isDisabled}
+          aria-busy={isLoading || props['aria-busy']}
           hitSlop={
             // Sized per token, not a flat 4: `extraSmall` is 32dp tall, so a
             // constant slop left it at 40dp — under the 48dp WCAG/MD3 floor.
@@ -227,6 +238,8 @@ export function Button({
               : getDefaultHitSlop(sizeTokens.height))
           }
           disabled={isDisabled}
+          onPress={isLoading ? undefined : onPress}
+          onLongPress={isLoading ? undefined : onLongPress}
           {...(isDisabled
             ? undefined
             : composeHandlers(composedHandlers, props))}
@@ -244,7 +257,16 @@ export function Button({
             containerStyle,
           ]}
         >
-          {leadingIcon ? (
+          {isLoading ? (
+            <View aria-hidden style={styles.leadingIcon}>
+              <CircularProgress
+                size={resolvedIconSize}
+                thickness={resolvedIconSize * BUTTON_LOADING_STROKE_RATIO}
+                containerColor="transparent"
+                contentColor={resolvedIconColor}
+              />
+            </View>
+          ) : leadingIcon ? (
             <View aria-hidden style={styles.leadingIcon}>
               {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
             </View>
