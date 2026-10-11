@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { ViewProps } from 'react-native'
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 
 /** Surface style variant of the card following Material Design 3 roles. */
 export type CardVariant = 'elevated' | 'filled' | 'outlined'
@@ -79,4 +79,16 @@ export interface CardProps extends ViewProps {
    * State-layer colors (hover, press) are derived automatically.
    */
   containerColor?: string
+  /**
+   * Style for the card. With no `onPress`, every key styles the one surface
+   * node. With `onPress`, the card wraps its surface in an outer view that
+   * also holds the focus ring and the shadow. The keys that place or size
+   * the card in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`,
+   * `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` —
+   * go to that outer view, so the ring and the shadow move with the card.
+   * `minWidth` and `maxWidth` go with a `width`. When `flex` or `flexGrow`
+   * is above 0, or `alignSelf` is `'stretch'`, the surface fills the outer
+   * view. Every other key styles the surface.
+   */
+  style?: StyleProp<ViewStyle>
 }

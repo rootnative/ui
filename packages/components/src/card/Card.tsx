@@ -8,6 +8,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { useStateLayer } from '../internal/useStateLayer'
 import { CardActions } from './CardActions'
 import { CardContent } from './CardContent'
@@ -79,14 +80,20 @@ export function Card({
     progress: states.hovered,
   })
 
+  const { outer: layoutStyle, inner: containerStyle } = useMemo(
+    () => splitLayoutStyle(style),
+    [style],
+  )
+
   if (!isInteractive) {
     // An elevated Card without `onPress` keeps its shadow on this node, because
     // neither structural alternative is free. A carrier is an
     // absolutely-positioned *sibling*, so it needs a wrapper View above the
     // container — and that makes the wrapper the node the parent lays out, so
-    // `<Card style={{ flex: 1 }}>` silently stops stretching (the docs homepage
-    // grid relies on exactly that; the interactive path already has the
-    // limitation). Moving the clip to an inner view instead puts the children
+    // the layout keys in `style` must be split onto it, as the interactive
+    // path does. Without that split, `<Card style={{ flex: 1 }}>` stops
+    // stretching, and the docs homepage grid relies on it. Moving the clip to
+    // an inner view instead puts the children
     // one level down, which breaks `flexDirection` / `alignItems` / `gap`
     // passed through `style` — the common media-plus-text card.
     //
@@ -111,7 +118,7 @@ export function Card({
   }
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, layoutStyle]}>
       <Animated.View
         style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
       />
@@ -146,7 +153,7 @@ export function Card({
           isDisabled ? undefined : stateLayerStyle,
           showElevationLayer ? styles.elevationDelegated : undefined,
           isDisabled ? styles.disabledContainer : undefined,
-          style,
+          containerStyle,
         ]}
       >
         {isDisabled ? (

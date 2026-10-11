@@ -72,6 +72,18 @@ export interface SplitLayoutStyle {
   inner: StyleProp<ViewStyle>
 }
 
+export interface SplitLayoutStyleOptions {
+  /**
+   * Make the frame and the pressable fill the outer view when it grows or
+   * takes a `width`. Pass `false` for a control with a fixed size, such as
+   * `Switch`: its thumb travel is a constant, so a wider track would stop the
+   * thumb short of the end. The layout keys still go to the outer view, and
+   * the control keeps its own size at the start edge.
+   * @default true
+   */
+  fill?: boolean
+}
+
 /**
  * Split a consumer `style` between the two views around a component's
  * pressable. Button, IconButton, FAB and Chip draw the focus ring and the
@@ -82,6 +94,11 @@ export interface SplitLayoutStyle {
  * stretches it, the frame stays at the start edge, as big as the button. One
  * view cannot do both: an `alignSelf` that stops the stretch also overrides
  * every other `alignItems` of the parent.
+ *
+ * `Card` with `onPress` needs no frame view. Its outer view keeps the default
+ * `alignItems: 'stretch'`, so the pressable is as wide as the outer view, and
+ * the ring and the shadow are placed against the outer view. It ignores
+ * `frame`.
  *
  * The keys that place or size the component go to the outer view. On the
  * pressable, `alignSelf` and a percentage `width` resolve against the frame,
@@ -101,6 +118,7 @@ export interface SplitLayoutStyle {
  */
 export function splitLayoutStyle(
   style: StyleProp<ViewStyle>,
+  { fill = true }: SplitLayoutStyleOptions = {},
 ): SplitLayoutStyle {
   const keys = hasMovableWidth(style)
     ? LAYOUT_KEYS_WITH_WIDTH_BOUNDS
@@ -113,6 +131,9 @@ export function splitLayoutStyle(
   }
 
   const merged: Record<string, unknown> = Object.assign({}, ...outer)
+  if (!fill) {
+    return { outer: merged as ViewStyle, frame: undefined, inner }
+  }
   const grows =
     [merged.flex, merged.flexGrow].some(
       (value) => typeof value === 'number' && value > 0,

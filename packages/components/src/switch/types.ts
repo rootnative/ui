@@ -51,7 +51,13 @@ export interface SwitchProps extends Omit<
    */
   contentColor?: string
   /**
-   * Style applied to the root container. Static form only — the function
+   * Style for the switch. The keys that place it in its parent —
+   * `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the
+   * margins, `position`, the insets and `zIndex` — go to an outer view, so
+   * the focus ring moves with the track. `minWidth` and `maxWidth` go with a
+   * `width`. The track keeps its MD3 size at the start edge of the outer
+   * view, because the thumb travel is fixed. Every other key styles the
+   * track. Static form only — the function
    * form `(state) => style` is not supported because the component drives
    * its container background through Reanimated. Use `containerColor` /
    * `contentColor` for state-aware styling.

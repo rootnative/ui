@@ -1076,6 +1076,7 @@ Props:
 - `onPress?: () => void` — When provided, the card becomes interactive (Pressable) with `role="button"`. Omit to render as a plain View. A `role` you pass replaces the default. Expo Router's `<Link asChild>` passes `role="link"` and `href`, so the card renders as an `<a>` on the web.
 - `disabled?: boolean` — Default: `false`. Disables the press interaction and reduces opacity. Only effective when `onPress` is provided.
 - `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
+- `style?: StyleProp<ViewStyle>` — Style for the card. With no `onPress`, every key styles the one surface node. With `onPress`, the card wraps its surface in an outer view that also holds the focus ring and the shadow. The keys that place or size the card in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to that outer view, so the ring and the shadow move with the card. `minWidth` and `maxWidth` go with a `width`. When `flex` or `flexGrow` is above 0, or `alignSelf` is `'stretch'`, the surface fills the outer view. Every other key styles the surface.
 - Inherits `ViewProps`
 
 #### Card.Media
@@ -1232,7 +1233,7 @@ Props:
 - `unselectedIcon?: IconSource` — Icon shown on the thumb when unselected. When provided, the thumb renders at the larger selected size. Same accepted forms as `selectedIcon`.
 - `containerColor?: string` — Override the track color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the thumb and icon color.
-- `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- `style?: StyleProp<ViewStyle>` — Style for the switch. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to an outer view, so the focus ring moves with the track. `minWidth` and `maxWidth` go with a `width`. The track keeps its MD3 size at the start edge of the outer view, because the thumb travel is fixed. Every other key styles the track. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
 
 ---
 

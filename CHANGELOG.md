@@ -11,6 +11,43 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### Layout keys in `style` place `Card` with `onPress` and `Switch`
+
+alpha.24 sent the layout keys in `style` to the wrapper of `Button`,
+`IconButton`, `FAB` and `Chip`. `Card` with `onPress` and `Switch` have the
+same kind of wrapper: it holds the focus ring, and on `Card` also the shadow.
+Their `style` still went to the node inside the wrapper, and three things
+broke:
+
+- `flex: 1` in a row did not grow a `Card` with `onPress`. The card stayed at
+  the width of its content. A `Card` without `onPress` has no wrapper and did
+  grow, so the two forms did not agree.
+- A margin moved the card or the switch track away from its own focus ring
+  and shadow.
+- `alignSelf` and `position` placed the inner node in the wrapper, not the
+  component in its parent.
+
+Now the same keys go to the wrapper: `alignSelf`, `flex`, `flexGrow`,
+`flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and
+`zIndex`. `minWidth` and `maxWidth` go with a `width`. Every other key styles
+the surface or the track, as before.
+
+- **`Card`.** When `flex` or `flexGrow` is above 0, or `alignSelf` is
+  `'stretch'`, the surface fills the wrapper. A `Card` without `onPress` does
+  not change.
+- **`Switch`.** The track keeps its MD3 size of 52 by 32 at the start edge of
+  the wrapper, because the thumb travel is fixed. Before, a `width` in `style`
+  made the track wider, and the thumb stopped before the end. Now the `width`
+  sizes the wrapper, and the track does not change.
+
+A web test reads the wrapper and the inner node of each component from the
+DOM, and 8 of its 12 new cases fail on the old code.
+
+**Check your layout.** A `flex`, an `alignSelf` or a `position` that you set
+on these components now takes effect. A margin moves the component as before,
+and now the focus ring and the shadow move with it. If you added a wrapper
+`View` only to give a `Card` with `onPress` a `flex`, you can remove it.
+
 ### The docs say not to use `@expo/vector-icons`
 
 The `VectorIconSet` JSDoc, the Icons page and the `llms` files said that an

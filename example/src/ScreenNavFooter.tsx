@@ -33,29 +33,28 @@ function NavCard({ entry, direction }: NavCardProps) {
   )
 
   return (
-    <View style={styles.slot}>
-      <Card
-        variant="outlined"
-        onPress={() => router.navigate(entry.route)}
-        accessibilityLabel={`${isPrevious ? 'Previous' : 'Next'}: ${entry.label}`}
-      >
-        <Row align="center" gap="xs" px="sm" py="sm">
-          {isPrevious ? chevron : null}
-          <Column flex={1} align={isPrevious ? 'flex-start' : 'flex-end'}>
-            <Typography
-              variant="labelSmall"
-              color={theme.colors.onSurfaceVariant}
-            >
-              {isPrevious ? 'Previous' : 'Next'}
-            </Typography>
-            <Typography variant="titleSmall" numberOfLines={1}>
-              {entry.label}
-            </Typography>
-          </Column>
-          {isPrevious ? null : chevron}
-        </Row>
-      </Card>
-    </View>
+    <Card
+      variant="outlined"
+      onPress={() => router.navigate(entry.route)}
+      accessibilityLabel={`${isPrevious ? 'Previous' : 'Next'}: ${entry.label}`}
+      style={styles.slot}
+    >
+      <Row align="center" gap="xs" px="sm" py="sm">
+        {isPrevious ? chevron : null}
+        <Column flex={1} align={isPrevious ? 'flex-start' : 'flex-end'}>
+          <Typography
+            variant="labelSmall"
+            color={theme.colors.onSurfaceVariant}
+          >
+            {isPrevious ? 'Previous' : 'Next'}
+          </Typography>
+          <Typography variant="titleSmall" numberOfLines={1}>
+            {entry.label}
+          </Typography>
+        </Column>
+        {isPrevious ? null : chevron}
+      </Row>
+    </Card>
   )
 }
 
@@ -97,14 +96,6 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 8,
   },
-  // Each side takes half the row from this slot, and the `flex` has to live
-  // here rather than on the Card. An *interactive* Card renders a wrapper View
-  // above the node `style` lands on (the focus ring and the elevation carrier
-  // are absolutely-positioned siblings, so they need one), which means
-  // `<Card onPress style={{ flex: 1 }}>` never reaches the node this Row
-  // measures: the card collapsed to its content width and stretched down the
-  // wrapper's column axis instead. A non-interactive Card has no wrapper and
-  // does take `flex` through `style`, so the two shapes are not interchangeable.
   slot: {
     flex: 1,
   },

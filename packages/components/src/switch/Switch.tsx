@@ -28,6 +28,7 @@ import {
   passiveControlProps,
 } from '../internal/passiveControl'
 import { pointerEvents } from '../internal/pointerEvents'
+import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
@@ -254,100 +255,108 @@ export function Switch({
     onValueChange?.(next)
   }, [isDisabled, isSelected, isControlled, onValueChange])
 
+  const { outer: layoutStyle, inner: trackStyle } = useMemo(
+    () => splitLayoutStyle(style, { fill: false }),
+    [style],
+  )
+
   return (
-    <View style={styles.wrapper}>
-      <Animated.View
-        style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
-      />
-      <AnimatedPressable
-        {...props}
-        accessibilityRole="switch"
-        aria-disabled={isDisabled}
-        aria-checked={isSelected}
-        hitSlop={
-          // The track is the pressable, and MD3 makes it 32dp tall — a flat 4
-          // left the control at 40dp, under the 48dp WCAG/MD3 floor. Web is
-          // excluded because react-native-web does not implement `hitSlop`.
-          hitSlop ??
-          (Platform.OS === 'web'
-            ? undefined
-            : getDefaultHitSlop(SWITCH_TRACK_HEIGHT))
-        }
-        disabled={isDisabled || isPassive}
-        onPress={handlePress}
-        {...composeHandlers(handlers, props)}
-        {...(isPassive ? passiveControlProps : undefined)}
-        style={[
-          styles.track,
-          webOutlineReset,
-          trackColorStyle,
-          trackBorderStyle,
-          isDisabled
-            ? isSelected
-              ? styles.disabledTrackSelected
-              : styles.disabledTrack
-            : undefined,
-          style,
-          isPassive ? pointerEvents.none : undefined,
-        ]}
-      >
+    <View style={layoutStyle}>
+      <View style={styles.wrapper}>
         <Animated.View
-          style={[
-            styles.stateLayer,
-            haloPositionStyle,
-            haloOpacityStyle,
-            haloColorStyle,
-            animatedHaloStyle,
-            pointerEvents.none,
-          ]}
+          style={[styles.focusRing, animatedFocusRingStyle, pointerEvents.none]}
         />
-        <Animated.View
-          testID="switch-thumb"
+        <AnimatedPressable
+          {...props}
+          accessibilityRole="switch"
+          aria-disabled={isDisabled}
+          aria-checked={isSelected}
+          hitSlop={
+            // The track is the pressable, and MD3 makes it 32dp tall — a flat
+            // 4 left the control at 40dp, under the 48dp WCAG/MD3 floor. Web
+            // is excluded because react-native-web does not implement
+            // `hitSlop`.
+            hitSlop ??
+            (Platform.OS === 'web'
+              ? undefined
+              : getDefaultHitSlop(SWITCH_TRACK_HEIGHT))
+          }
+          disabled={isDisabled || isPassive}
+          onPress={handlePress}
+          {...composeHandlers(handlers, props)}
+          {...(isPassive ? passiveControlProps : undefined)}
           style={[
-            styles.thumbBase,
-            thumbColorStyle,
-            animatedThumbStyle,
+            styles.track,
+            webOutlineReset,
+            trackColorStyle,
+            trackBorderStyle,
             isDisabled
               ? isSelected
-                ? styles.disabledThumbSelected
-                : styles.disabledThumb
+                ? styles.disabledTrackSelected
+                : styles.disabledTrack
               : undefined,
+            trackStyle,
+            isPassive ? pointerEvents.none : undefined,
           ]}
         >
-          {selectedIcon ? (
-            <Animated.View
-              aria-hidden
-              style={[
-                styles.iconLayer,
-                animatedSelectedIconStyle,
-                pointerEvents.none,
-              ]}
-            >
-              {renderIcon(
-                selectedIcon,
-                { size: ICON_SIZE, color: selectedIconColor },
-                iconResolver,
-              )}
-            </Animated.View>
-          ) : null}
-          {unselectedIcon ? (
-            <Animated.View
-              aria-hidden
-              style={[
-                styles.iconLayer,
-                animatedUnselectedIconStyle,
-                pointerEvents.none,
-              ]}
-            >
-              {renderIcon(
-                unselectedIcon,
-                { size: ICON_SIZE, color: unselectedIconColor },
-                iconResolver,
-              )}
-            </Animated.View>
-          ) : null}
-        </Animated.View>
-      </AnimatedPressable>
+          <Animated.View
+            style={[
+              styles.stateLayer,
+              haloPositionStyle,
+              haloOpacityStyle,
+              haloColorStyle,
+              animatedHaloStyle,
+              pointerEvents.none,
+            ]}
+          />
+          <Animated.View
+            testID="switch-thumb"
+            style={[
+              styles.thumbBase,
+              thumbColorStyle,
+              animatedThumbStyle,
+              isDisabled
+                ? isSelected
+                  ? styles.disabledThumbSelected
+                  : styles.disabledThumb
+                : undefined,
+            ]}
+          >
+            {selectedIcon ? (
+              <Animated.View
+                aria-hidden
+                style={[
+                  styles.iconLayer,
+                  animatedSelectedIconStyle,
+                  pointerEvents.none,
+                ]}
+              >
+                {renderIcon(
+                  selectedIcon,
+                  { size: ICON_SIZE, color: selectedIconColor },
+                  iconResolver,
+                )}
+              </Animated.View>
+            ) : null}
+            {unselectedIcon ? (
+              <Animated.View
+                aria-hidden
+                style={[
+                  styles.iconLayer,
+                  animatedUnselectedIconStyle,
+                  pointerEvents.none,
+                ]}
+              >
+                {renderIcon(
+                  unselectedIcon,
+                  { size: ICON_SIZE, color: unselectedIconColor },
+                  iconResolver,
+                )}
+              </Animated.View>
+            ) : null}
+          </Animated.View>
+        </AnimatedPressable>
+      </View>
     </View>
   )
 }

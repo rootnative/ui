@@ -131,4 +131,19 @@ describe('splitLayoutStyle', () => {
     expect(splitLayoutStyle({ marginTop: 8 }).frame).toBeUndefined()
     expect(splitLayoutStyle({ opacity: 0.5 }).frame).toBeUndefined()
   })
+
+  it('with fill false, sends the layout keys out and adds no fill', () => {
+    const grows = splitLayoutStyle({ flex: 1, opacity: 0.5 }, { fill: false })
+    expect(grows.outer).toEqual({ flex: 1 })
+    expect(grows.frame).toBeUndefined()
+    expect(StyleSheet.flatten(grows.inner)).toEqual({ opacity: 0.5 })
+
+    const sized = splitLayoutStyle(
+      { width: 120, maxWidth: 200 },
+      { fill: false },
+    )
+    expect(sized.outer).toEqual({ width: 120, maxWidth: 200 })
+    expect(sized.frame).toBeUndefined()
+    expect(StyleSheet.flatten(sized.inner)).toEqual({})
+  })
 })
