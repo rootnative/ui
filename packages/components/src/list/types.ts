@@ -1,10 +1,24 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
+import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 import type { DividerProps } from '../divider'
 
 export interface ListProps extends ViewProps {
   /** Content rendered inside the list container. */
   children: ReactNode
+  /**
+   * Section headline in `titleSmall` and `onSurfaceVariant`, above the items.
+   * It has the same start and end padding as `ListItem`. Omit it for a list
+   * with no title.
+   */
+  headline?: string
+  /**
+   * The outline level of the headline on web, where it renders as `<hN>`.
+   * Native has no heading levels and ignores it.
+   * @default 2
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  /** Style applied to the headline `Text`. */
+  headlineStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
 }
 

@@ -60,15 +60,17 @@ describe('renderSettled', () => {
 
   describe('progress-driven transitions', () => {
     it('is already settled at mount, like renderWithTheme', () => {
-      renderSettled(<Switch value />)
+      renderSettled(<Switch onValueChange={jest.fn()} value />)
       expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
     })
 
     it('settles after a prop change, without an explicit flush', () => {
-      const { rerender } = renderSettled(<Switch value={false} />)
+      const { rerender } = renderSettled(
+        <Switch onValueChange={jest.fn()} value={false} />,
+      )
       expect(thumbTranslateX()).toBe(0)
 
-      rerender(<Switch value />)
+      rerender(<Switch onValueChange={jest.fn()} value />)
       expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
     })
 
@@ -83,8 +85,10 @@ describe('renderSettled', () => {
     })
 
     it('flushes what is mounted, not the element first passed in', () => {
-      const view = renderSettled(<Switch value={false} />)
-      view.rerender(<Switch value />)
+      const view = renderSettled(
+        <Switch onValueChange={jest.fn()} value={false} />,
+      )
+      view.rerender(<Switch onValueChange={jest.fn()} value />)
 
       // A flush that re-rendered the original element would revert the switch
       // to its off position here.

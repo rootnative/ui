@@ -11,6 +11,7 @@
 import { screen } from '@testing-library/react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
+import { List, ListItem } from '../../list'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { Typography } from '../../typography'
 import { renderWeb } from './render-web'
@@ -88,6 +89,26 @@ describe('NavigationDrawer section headline level on the web', () => {
   it('follows headingLevel', () => {
     renderSection(3)
     expect(screen.getByText('Mail').tagName).toBe('H3')
+  })
+})
+
+describe('List headline level on the web', () => {
+  function renderList(headingLevel?: 2 | 3) {
+    renderWeb(
+      <List headline="Settings" headingLevel={headingLevel}>
+        <ListItem headlineText="Dark mode" />
+      </List>,
+    )
+  }
+
+  it('is <h2> by default, not one <h1> per list', () => {
+    renderList()
+    expect(screen.getByText('Settings').tagName).toBe('H2')
+  })
+
+  it('follows headingLevel', () => {
+    renderList(3)
+    expect(screen.getByText('Settings').tagName).toBe('H3')
   })
 })
 

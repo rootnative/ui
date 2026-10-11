@@ -598,7 +598,7 @@ import { Checkbox } from '@rootnative/components/checkbox'
 Props:
 - `value?: boolean` — Whether the checkbox is checked (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
 - `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed.
-- `onValueChange?: (value: boolean) => void` — Callback fired when the checkbox is toggled. Receives the new value.
+- `onValueChange?: (value: boolean) => void` — Callback fired when the checkbox is toggled. Receives the new value. With `value` set and no `onValueChange`, the checkbox only shows the state. It takes no press, leaves the tab order, and is hidden from assistive technology. Use this in a pressable `ListItem`, and give the row `role="checkbox"` and `aria-checked`. The row then carries the press and the state. A disabled checkbox is never hidden.
 - `indeterminate?: boolean` — Default: `false`. Render the MD3 indeterminate ("mixed") state — a dash mark on the selected container colors. Wins over `value` visually, and reports `checked: 'mixed'` to accessibility.
 - `error?: boolean` — Default: `false`. Render the MD3 error state: `error`-colored outline when unchecked, and an `error` container with `onError` mark when checked or indeterminate. State-layer (hover, focus, press) colors also use `error`. The standard disabled treatment wins over the error state.
 - `checkIcon?: IconSource` — Default: `'check'`. Icon shown when the checkbox is checked. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Override this when your `iconResolver` doesn't map the default `'check'` name (e.g. a Lucide-only resolver).
@@ -619,7 +619,7 @@ import { Radio } from '@rootnative/components/radio'
 Props:
 - `value?: boolean` — Whether the radio button is selected (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
 - `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed. A radio is select-only, so an uncontrolled one latches on: only a controlling parent can turn it back off.
-- `onValueChange?: (value: boolean) => void` — Callback fired when an unselected radio is pressed. Always receives `true` — radios are select-only, so pressing an already-selected radio is a no-op.
+- `onValueChange?: (value: boolean) => void` — Callback fired when an unselected radio is pressed. Always receives `true` — radios are select-only, so pressing an already-selected radio is a no-op. With `value` set and no `onValueChange`, the radio only shows the state. It takes no press, leaves the tab order, and is hidden from assistive technology. Use this in a pressable `ListItem`, and give the row `role="radio"` and `aria-checked`. The row then carries the press and the state. A disabled radio is never hidden.
 - `containerColor?: string` — Override the outer ring and inner dot color when selected. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the outer ring color when unselected.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
@@ -639,7 +639,7 @@ import { Switch } from '@rootnative/components/switch'
 Props:
 - `value?: boolean` — Whether the switch is toggled on (controlled). Pass this together with `onValueChange` to own the state. Omit it and the component manages its own state, starting from `defaultValue`.
 - `defaultValue?: boolean` — Default: `false`. Initial value when uncontrolled. Ignored once `value` is passed.
-- `onValueChange?: (value: boolean) => void` — Callback fired when the switch is toggled. Receives the new value.
+- `onValueChange?: (value: boolean) => void` — Callback fired when the switch is toggled. Receives the new value. With `value` set and no `onValueChange`, the switch only shows the state. It takes no press, leaves the tab order, and is hidden from assistive technology. Use this in a pressable `ListItem`, and give the row `role="switch"` and `aria-checked`. The row then carries the press and the state. A disabled switch is never hidden.
 - `selectedIcon?: IconSource` — Icon shown on the thumb when selected. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`. Opt-in: the MD3 default switch renders no icons — pass `'check'` for the spec's "switch with icon" variant.
 - `unselectedIcon?: IconSource` — Icon shown on the thumb when unselected. When provided, the thumb renders at the larger selected size. Same accepted forms as `selectedIcon`.
 - `containerColor?: string` — Override the track color. State-layer colors (hover, press) are derived automatically.
@@ -981,6 +981,9 @@ Container for list items.
 
 Props:
 - `children: ReactNode` — Content rendered inside the list container.
+- `headline?: string` — Section headline in `titleSmall` and `onSurfaceVariant`, above the items. It has the same start and end padding as `ListItem`. Omit it for a list with no title.
+- `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `2`. The outline level of the headline on web, where it renders as `<hN>`. Native has no heading levels and ignores it.
+- `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
 - `style?: StyleProp<ViewStyle>`
 - Inherits `ViewProps`
 

@@ -22,7 +22,7 @@ describe('Radio', () => {
   })
 
   it('reports checked=true when value is true', () => {
-    renderWithTheme(<Radio value />)
+    renderWithTheme(<Radio onValueChange={jest.fn()} value />)
     const radio = screen.getByRole('radio')
     expect(radio.props.accessibilityState).toEqual(
       expect.objectContaining({ checked: true }),
@@ -59,7 +59,9 @@ describe('Radio', () => {
   })
 
   it('renders inner dot when selected', () => {
-    renderWithTheme(<Radio value testID="radio-selected" />)
+    renderWithTheme(
+      <Radio onValueChange={jest.fn()} value testID="radio-selected" />,
+    )
     const radio = screen.getByRole('radio')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const outer = radio.children[0] as any
@@ -68,7 +70,7 @@ describe('Radio', () => {
   })
 
   it('has transparent inner dot when unselected', () => {
-    renderWithTheme(<Radio value={false} />)
+    renderWithTheme(<Radio onValueChange={jest.fn()} value={false} />)
     const radio = screen.getByRole('radio')
     expect(radio.props.accessibilityState).toEqual(
       expect.objectContaining({ checked: false }),

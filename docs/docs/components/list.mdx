@@ -46,6 +46,38 @@ List items auto-detect their height from the content provided:
 | Two-line | + `supportingText` or `overlineText` | 72dp |
 | Three-line | + both, or multi-line `supportingText` | 88dp |
 
+## Headline
+
+Give the list a section title with `headline`. It shows in `titleSmall` and
+`onSurfaceVariant` above the items, with the same start padding as `ListItem`.
+On web it renders as `<h2>`. Use `headingLevel` to change the level:
+
+<SnackExample
+  name="RootNative List — Headline"
+  code={`
+  import { List, ListItem } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <List headline="App preference">
+            <ListItem headlineText="Language" supportingText="English" />
+            <ListItem headlineText="Dark mode" />
+          </List>
+          <List headline="News preference">
+            <ListItem headlineText="Country" supportingText="India" />
+          </List>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
 ## Leading and trailing content
 
 Pass any `ReactNode` as `leadingContent` or `trailingContent`:
@@ -107,6 +139,69 @@ When `onPress` is provided, the item renders as a `Pressable` with state-layer f
   }
 `}
 />
+
+## Selection controls in a row
+
+To let the full row toggle a `Checkbox`, `Radio` or `Switch`, give the press to
+the row:
+
+1. Put `onPress` on the `ListItem`.
+2. Give the control `value` and no `onValueChange`.
+3. Give the row `role` and `aria-checked`.
+
+A control with `value` and no `onValueChange` only shows the state. It takes no
+press, so a tap on the control goes to the row. It also leaves the tab order
+and is hidden from assistive technology. The row announces the role and the
+state in its place.
+
+<SnackExample
+  name="RootNative List — Selection controls"
+  code={`
+  import { Checkbox, List, ListItem, Switch } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+
+  export default function App() {
+    const [wifi, setWifi] = useState(true)
+    const [news, setNews] = useState(false)
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <List>
+            <ListItem
+              headlineText="Wi-Fi"
+              role="switch"
+              aria-checked={wifi}
+              onPress={() => setWifi(!wifi)}
+              trailingContent={<Switch value={wifi} />}
+            />
+            <ListItem
+              headlineText="Newsletter"
+              role="checkbox"
+              aria-checked={news}
+              onPress={() => setNews(!news)}
+              leadingContent={<Checkbox value={news} />}
+            />
+          </List>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+:::warning Give the row the role and the state
+
+The hidden control does not announce anything. Without `role` and
+`aria-checked` on the row, a screen reader announces a button and no checked
+state.
+
+:::
+
+A disabled control is never hidden. Give the control an `onValueChange` when
+it must take the press itself.
 
 ## Inset dividers
 

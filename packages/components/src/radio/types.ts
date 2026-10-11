@@ -19,6 +19,12 @@ export interface RadioProps extends Omit<PressableProps, 'children' | 'style'> {
    * Callback fired when an unselected radio is pressed. Always receives
    * `true` — radios are select-only, so pressing an already-selected radio
    * is a no-op.
+   *
+   * With `value` set and no `onValueChange`, the radio only shows the
+   * state. It takes no press, leaves the tab order, and is hidden from
+   * assistive technology. Use this in a pressable `ListItem`, and give the
+   * row `role="radio"` and `aria-checked`. The row then carries the press
+   * and the state. A disabled radio is never hidden.
    */
   onValueChange?: (value: boolean) => void
   /**

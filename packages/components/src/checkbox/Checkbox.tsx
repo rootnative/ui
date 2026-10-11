@@ -7,6 +7,10 @@ import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
+import {
+  isPassiveControl,
+  passiveControlProps,
+} from '../internal/passiveControl'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
@@ -37,6 +41,7 @@ export function Checkbox({
   const isControlled = value !== undefined
   const [selfValue, setSelfValue] = useState(() => Boolean(defaultValue))
   const isChecked = isControlled ? Boolean(value) : selfValue
+  const isPassive = isPassiveControl(isControlled, onValueChange, isDisabled)
   const isIndeterminate = Boolean(indeterminate)
   const hasError = Boolean(error)
   // Indeterminate wins over checked visually — both fill the box.
@@ -160,14 +165,16 @@ export function Checkbox({
       // The container is already 48dp, so there is no default slop: extra
       // slop on a control that clears the floor only overlaps its neighbours.
       hitSlop={hitSlop}
-      disabled={isDisabled}
+      disabled={isDisabled || isPassive}
       onPress={handlePress}
       {...composeHandlers(handlers, props)}
+      {...(isPassive ? passiveControlProps : undefined)}
       style={[
         styles.container,
         webOutlineReset,
         isDisabled ? styles.disabledContainer : undefined,
         style,
+        isPassive ? pointerEvents.none : undefined,
       ]}
     >
       <Animated.View

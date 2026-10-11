@@ -16,7 +16,15 @@ export interface CheckboxProps extends Omit<
    * @default false
    */
   defaultValue?: boolean
-  /** Callback fired when the checkbox is toggled. Receives the new value. */
+  /**
+   * Callback fired when the checkbox is toggled. Receives the new value.
+   *
+   * With `value` set and no `onValueChange`, the checkbox only shows the
+   * state. It takes no press, leaves the tab order, and is hidden from
+   * assistive technology. Use this in a pressable `ListItem`, and give the
+   * row `role="checkbox"` and `aria-checked`. The row then carries the press
+   * and the state. A disabled checkbox is never hidden.
+   */
   onValueChange?: (value: boolean) => void
   /**
    * Render the MD3 indeterminate ("mixed") state — a dash mark on the

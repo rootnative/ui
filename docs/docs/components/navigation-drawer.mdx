@@ -127,6 +127,27 @@ bottom insets while the container color extends under them. A standard drawer de
 off, because the `Layout` around it usually owns the edges. `insetTop` and `insetBottom`
 override either default.
 
+## In a navigator drawer
+
+A drawer navigator, from `expo-router/drawer` or `@react-navigation/drawer`,
+brings its own sheet and renders your `drawerContent` in it. Neither variant
+fits that host as it is. `'modal'` brings a second scrim and sheet, and
+`'standard'` is a 360dp panel, wider than the navigator sheet on a phone. Use
+`'standard'` at the full width of the sheet, and keep the top inset:
+
+```tsx
+<Drawer
+  drawerContent={() => (
+    <NavigationDrawer variant="standard" insetTop style={{ width: '100%' }}>
+      <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" />
+    </NavigationDrawer>
+  )}
+/>
+```
+
+When the drawer is only a menu of actions, it needs no navigator. A modal
+`NavigationDrawer` that a button opens does the same work.
+
 ## Overrides
 
 | Prop | Target |

@@ -69,7 +69,7 @@ describe('aria-checked reaches the DOM', () => {
   })
 
   it('Checkbox — checked', () => {
-    renderWeb(<Checkbox value />)
+    renderWeb(<Checkbox value onValueChange={jest.fn()} />)
     expect(aria('checkbox', 'aria-checked')).toBe('true')
   })
 
@@ -79,12 +79,12 @@ describe('aria-checked reaches the DOM', () => {
   })
 
   it('Radio', () => {
-    renderWeb(<Radio value />)
+    renderWeb(<Radio value onValueChange={jest.fn()} />)
     expect(aria('radio', 'aria-checked')).toBe('true')
   })
 
   it('Switch', () => {
-    renderWeb(<Switch value />)
+    renderWeb(<Switch value onValueChange={jest.fn()} />)
     expect(aria('switch', 'aria-checked')).toBe('true')
   })
 

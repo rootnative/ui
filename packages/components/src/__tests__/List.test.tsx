@@ -1,3 +1,4 @@
+import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text, View } from 'react-native'
@@ -13,6 +14,40 @@ describe('List', () => {
       </List>,
     )
     expect(screen.getByText('Child')).toBeTruthy()
+  })
+
+  it('renders no headline by default', () => {
+    renderWithTheme(
+      <List>
+        <Text>Child</Text>
+      </List>,
+    )
+    expect(screen.queryByRole('heading')).toBeNull()
+  })
+
+  it('renders the headline as a heading above the items', () => {
+    renderWithTheme(
+      <List headline="App preference">
+        <ListItem headlineText="Dark mode" />
+      </List>,
+    )
+    const headline = screen.getByRole('heading', { name: 'App preference' })
+    const style = StyleSheet.flatten(headline.props.style)
+    expect(style.fontSize).toBe(lightTheme.typography.titleSmall.fontSize)
+    expect(style.color).toBe(lightTheme.colors.onSurfaceVariant)
+    // The same start and end padding as ListItem, so the text lines up.
+    expect(style.paddingStart).toBe(16)
+    expect(style.paddingEnd).toBe(24)
+  })
+
+  it('applies headlineStyle after the default style', () => {
+    renderWithTheme(
+      <List headline="News" headlineStyle={{ color: '#FF0000' }}>
+        <ListItem headlineText="Country" />
+      </List>,
+    )
+    const headline = screen.getByRole('heading', { name: 'News' })
+    expect(StyleSheet.flatten(headline.props.style).color).toBe('#FF0000')
   })
 })
 

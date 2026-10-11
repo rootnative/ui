@@ -1,13 +1,16 @@
 import {
+  Checkbox,
   Column,
   Container,
   Icon,
   List,
   ListDivider,
   ListItem,
+  Switch,
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -38,6 +41,8 @@ function Avatar({ label }: { label: string }) {
 }
 
 export default function ListScreen() {
+  const [wifi, setWifi] = useState(true)
+  const [newsletter, setNewsletter] = useState(false)
   return (
     <ScrollView style={styles.container}>
       <Container width="expanded" p="lg" gap={20}>
@@ -175,6 +180,24 @@ export default function ListScreen() {
             />
           </List>
         </Column>
+
+        <List headline="Headline and selection controls">
+          <ListItem
+            headlineText="Wi-Fi"
+            supportingText="The row takes the press"
+            role="switch"
+            aria-checked={wifi}
+            onPress={() => setWifi(!wifi)}
+            trailingContent={<Switch value={wifi} />}
+          />
+          <ListItem
+            headlineText="Newsletter"
+            role="checkbox"
+            aria-checked={newsletter}
+            onPress={() => setNewsletter(!newsletter)}
+            leadingContent={<Checkbox value={newsletter} />}
+          />
+        </List>
 
         <Column gap="sm">
           <Typography variant="titleSmall">Disabled items</Typography>

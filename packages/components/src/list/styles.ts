@@ -18,6 +18,13 @@ export function createListStyles(theme: MaterialTheme) {
     container: {
       paddingVertical: theme.spacing.sm,
     },
+    headline: {
+      ...theme.typography.titleSmall,
+      color: theme.colors.onSurfaceVariant,
+      paddingStart: theme.spacing.md,
+      paddingEnd: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+    },
   })
 }
 

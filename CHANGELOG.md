@@ -226,6 +226,71 @@ for `medium`, 32 for `large`, 40 for `extraLarge`", in the JSDoc, the `llms`
 files and the prop table of the Button page. The values are unchanged. Five
 internal comments that used the old names use the new ones too.
 
+### A `Checkbox`, `Radio` or `Switch` with no handler lets a row take the press
+
+A common list row puts `onPress` on the `ListItem` and shows the state in a
+control: `<Checkbox value={on} />` with no `onValueChange`. A tap on the row
+worked. A tap on the control did nothing, and nothing was logged. The control
+always rendered a pressable, so it became the touch responder, and its press
+handler had nothing to call. On the web, the control also stopped the click
+and added a second tab stop in the row.
+
+Now a control with `value`, no `onValueChange` and no `disabled` only shows
+the state. Compose has the same rule for `Checkbox(checked,
+onCheckedChange = null)`. The control:
+
+- lets the press go through to its parent, on native and on the web,
+- leaves the tab order on the web,
+- is hidden from assistive technology.
+
+So the row must carry the state. Give it `role` and `aria-checked`:
+
+```tsx
+<ListItem
+  headlineText="Wi-Fi"
+  role="switch"
+  aria-checked={on}
+  onPress={() => setOn(!on)}
+  trailingContent={<Switch value={on} />}
+/>
+```
+
+The List page has a new section, "Selection controls in a row", and the
+Checkbox, Radio and Switch pages link to it. The `onValueChange` JSDoc and the
+`llms` files give the rule.
+
+**What changes.**
+
+- A controlled control with no `onValueChange` is no longer announced. If you
+  show one outside a pressable row, as a read-only indicator, give it an
+  `onValueChange`, or put `disabled` on it. A disabled control is never
+  hidden.
+- Such a control no longer shows a hover, focus or press state layer.
+
+### `List` takes a `headline`
+
+A list with a section title had to put a `Typography` above it and choose the
+variant, the color, the padding and the heading level again on each screen.
+`List` now takes `headline`, in the same form as `NavigationDrawer.Section`:
+`titleSmall` in `onSurfaceVariant`, with the start and end padding of
+`ListItem`. On the web it renders as `<h2>`, and `headingLevel` changes the
+level. `headlineStyle` styles the text. A list with no `headline` does not
+change.
+
+### The theming docs show how to theme a navigator
+
+A navigator draws its screen container, and can draw a header, a drawer sheet
+and a tab bar, from its own navigation theme. With no navigation theme, a dark
+RootNative theme showed a light screen behind content that paints no
+background. No docs page said how to connect the two.
+
+The theming page has a new section, "With Expo Router and React Navigation".
+It gives two ways: `contentStyle` in the `Stack` `screenOptions`, or a
+navigation theme mapped from `useTheme()` for an app that keeps a navigator
+header, drawer or tab bar. It also gives the rules for the mapping and where
+the `dark` flag comes from. The NavigationDrawer page has a new section, "In a
+navigator drawer", for `drawerContent`. No behavior changes.
+
 ## 0.0.0-alpha.24 — 2026-10-08
 
 **Breaking.** `Button`, `IconButton` and `Avatar` no longer accept the old

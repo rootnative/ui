@@ -18,11 +18,15 @@
 import { act, fireEvent, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { Button } from '../../button'
+import { Checkbox } from '../../checkbox'
 import { Dialog } from '../../dialog'
+import { ListItem } from '../../list'
 import { Menu } from '../../menu'
 import { PortalHost } from '../../portal/PortalHost'
+import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
 import { SearchView } from '../../search-view'
+import { Switch } from '../../switch'
 import { TextField } from '../../text-field'
 import { Tooltip } from '../../tooltip'
 import { renderWeb } from './render-web'
@@ -487,4 +491,33 @@ describe('SearchBar as a trigger', () => {
     // and moved focus back into it. The trigger holds it now.
     expect(document.activeElement).toBe(trigger)
   })
+})
+
+describe('a selection control with no onValueChange in a pressable row', () => {
+  it.each([
+    ['Checkbox', Checkbox],
+    ['Radio', Radio],
+    ['Switch', Switch],
+  ] as const)(
+    '%s leaves the tab stop and the click to the row',
+    (_, Control) => {
+      const onPress = jest.fn()
+      const { container } = renderWeb(
+        <ListItem
+          headlineText="Wi-Fi"
+          onPress={onPress}
+          trailingContent={<Control value testID="control" />}
+        />,
+      )
+      const control = container.querySelector('[data-testid="control"]')!
+
+      expect(control.getAttribute('aria-hidden')).toBe('true')
+      expect(control.getAttribute('tabindex')).toBe('-1')
+      expect(container.querySelectorAll('[tabindex="0"]')).toHaveLength(1)
+
+      // An enabled control stopped the click, so the row press never fired.
+      fireEvent.click(control)
+      expect(onPress).toHaveBeenCalledTimes(1)
+    },
+  )
 })

@@ -29,7 +29,7 @@ describe('Switch', () => {
   })
 
   it('reports checked=true when value is true', () => {
-    renderWithTheme(<Switch value />)
+    renderWithTheme(<Switch onValueChange={jest.fn()} value />)
     const sw = screen.getByRole('switch')
     expect(sw.props.accessibilityState).toEqual(
       expect.objectContaining({ checked: true }),

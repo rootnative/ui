@@ -16,7 +16,15 @@ export interface SwitchProps extends Omit<
    * @default false
    */
   defaultValue?: boolean
-  /** Callback fired when the switch is toggled. Receives the new value. */
+  /**
+   * Callback fired when the switch is toggled. Receives the new value.
+   *
+   * With `value` set and no `onValueChange`, the switch only shows the
+   * state. It takes no press, leaves the tab order, and is hidden from
+   * assistive technology. Use this in a pressable `ListItem`, and give the
+   * row `role="switch"` and `aria-checked`. The row then carries the press
+   * and the state. A disabled switch is never hidden.
+   */
   onValueChange?: (value: boolean) => void
   /**
    * Icon shown on the thumb when selected. Accepts a string name (resolved

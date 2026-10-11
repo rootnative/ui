@@ -175,6 +175,107 @@ provider then never changes mode on its own, and ignores `storage` — your stat
 is the source of truth, and writing behind it would restore a stale value on the
 next launch.
 
+### With Expo Router and React Navigation
+
+A navigator draws its own screen container, and it can also draw a header, a
+drawer sheet and a tab bar. It takes their colors from its own navigation
+theme, not from `ThemeProvider`. When the app gives it no navigation theme, it
+uses its light default. A dark RootNative theme then shows a light screen
+behind any content that does not paint its own background.
+
+Expo Router uses its own copy of React Navigation, so the same two ways apply
+to both.
+
+**1. Color the screen container.** Use this way when the header, the drawer
+and the tabs are RootNative components. Only the screen background then needs
+the theme. Set `contentStyle` in the `Stack` `screenOptions`:
+
+```tsx
+import { useTheme, useThemeMode } from '@rootnative/core'
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+
+// Reads the theme, so it must be below ThemeProvider.
+function ThemedStack() {
+  const theme = useTheme()
+  const { scheme } = useThemeMode()
+
+  return (
+    <>
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: theme.colors.background },
+        }}
+      />
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+    </>
+  )
+}
+```
+
+**2. Give the navigator a theme.** Use this way when the app keeps a navigator
+header, drawer or tab bar. Map the RootNative color roles to the six navigation
+colors:
+
+```tsx
+import { useTheme, useThemeMode } from '@rootnative/core'
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from 'expo-router'
+import { useMemo, type ReactNode } from 'react'
+
+function NavigationTheme({ children }: { children: ReactNode }) {
+  const theme = useTheme()
+  const { scheme } = useThemeMode()
+
+  const navigationTheme = useMemo(
+    () => ({
+      ...(scheme === 'dark' ? NavigationDarkTheme : NavigationDefaultTheme),
+      colors: {
+        primary: theme.colors.primary,
+        background: theme.colors.background,
+        card: theme.colors.surface,
+        text: theme.colors.onSurface,
+        border: theme.colors.outlineVariant,
+        notification: theme.colors.error,
+      },
+    }),
+    [scheme, theme],
+  )
+
+  return (
+    <NavigationThemeProvider value={navigationTheme}>
+      {children}
+    </NavigationThemeProvider>
+  )
+}
+```
+
+With React Navigation and no Expo Router, import `DarkTheme` and
+`DefaultTheme` from `@react-navigation/native`, and pass the same object to
+`<NavigationContainer theme={navigationTheme}>`.
+
+Obey these rules:
+
+- Keep the `useMemo`. A new theme object on each render updates the navigation
+  theme context, and each component that reads it renders again.
+- Put the navigation theme provider, or `NavigationContainer`, below the
+  RootNative `ThemeProvider`. The mapping calls `useTheme()` and
+  `useThemeMode()`, and they need the RootNative provider above them.
+- `expo-router` also exports a `ThemeProvider` and a `useTheme`. Import one of
+  each pair with an alias, as above.
+
+The navigation theme needs a `dark` flag, and the MD3 theme has none. The
+spread of `NavigationDarkTheme` or `NavigationDefaultTheme` supplies it, from
+`scheme`. `useThemeMode()` needs a `{ light, dark }` pair and throws for a
+single theme. With a single theme, you know which theme you gave, so spread the
+matching navigation theme directly.
+
+To put `NavigationDrawer` items in the `drawerContent` of a navigator drawer,
+see [In a navigator drawer](./components/navigation-drawer#in-a-navigator-drawer).
+
 ### Override specific tokens
 
 Spread the base theme and override individual tokens:
@@ -530,6 +631,7 @@ function MyComponent() {
 | Follow the OS light/dark setting | `<ThemeProvider theme={{ light, dark }}>` |
 | Let the user switch theme | `const { scheme, setMode } = useThemeMode()` |
 | Remember the choice | `<ThemeProvider theme={{ light, dark }} storage={AsyncStorage}>` |
+| Theme the navigator screens | `Stack` `contentStyle`, or a navigation theme mapped from `useTheme()` — see [With Expo Router and React Navigation](#with-expo-router-and-react-navigation) |
 | Override a few MD3 colors | Spread `lightTheme` and override |
 | Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
 | Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |

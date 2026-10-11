@@ -23,6 +23,10 @@ import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
+import {
+  isPassiveControl,
+  passiveControlProps,
+} from '../internal/passiveControl'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
@@ -66,6 +70,7 @@ export function Switch({
   const isControlled = value !== undefined
   const [selfValue, setSelfValue] = useState(() => Boolean(defaultValue))
   const isSelected = isControlled ? Boolean(value) : selfValue
+  const isPassive = isPassiveControl(isControlled, onValueChange, isDisabled)
   const hasUnselectedIcon = Boolean(unselectedIcon)
   const offThumbSize = hasUnselectedIcon
     ? SWITCH_THUMB_ON_SIZE
@@ -268,9 +273,10 @@ export function Switch({
             ? undefined
             : getDefaultHitSlop(SWITCH_TRACK_HEIGHT))
         }
-        disabled={isDisabled}
+        disabled={isDisabled || isPassive}
         onPress={handlePress}
         {...composeHandlers(handlers, props)}
+        {...(isPassive ? passiveControlProps : undefined)}
         style={[
           styles.track,
           webOutlineReset,
@@ -282,6 +288,7 @@ export function Switch({
               : styles.disabledTrack
             : undefined,
           style,
+          isPassive ? pointerEvents.none : undefined,
         ]}
       >
         <Animated.View

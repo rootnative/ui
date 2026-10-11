@@ -114,6 +114,13 @@ When `unselectedIcon` is provided, the thumb renders at the larger selected size
 `}
 />
 
+## In a list row
+
+To let the full `ListItem` toggle the switch, put `onPress` on the row and
+give the switch `value` with no `onValueChange`. The switch then only shows
+the state, and the row takes the press. See
+[Selection controls in a row](./list.mdx#selection-controls-in-a-row).
+
 ## Props
 
 <PropTable name="Switch" />

@@ -112,6 +112,13 @@ Build a radio group by controlling which Radio has `value={true}`:
 `}
 />
 
+## In a list row
+
+To let the full `ListItem` toggle the radio, put `onPress` on the row and
+give the radio `value` with no `onValueChange`. The radio then only shows
+the state, and the row takes the press. See
+[Selection controls in a row](./list.mdx#selection-controls-in-a-row).
+
 ## Props
 
 <PropTable name="Radio" />

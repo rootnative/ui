@@ -25,7 +25,7 @@ describe('Checkbox', () => {
   })
 
   it('reports checked=true when value is true', () => {
-    renderWithTheme(<Checkbox value />)
+    renderWithTheme(<Checkbox onValueChange={jest.fn()} value />)
     const cb = screen.getByRole('checkbox')
     expect(cb.props.accessibilityState).toEqual(
       expect.objectContaining({ checked: true }),
@@ -100,7 +100,9 @@ describe('Checkbox', () => {
     })
 
     it('wins over checked visually and in accessibility', () => {
-      renderWithTheme(<Checkbox value indeterminate />)
+      renderWithTheme(
+        <Checkbox onValueChange={jest.fn()} value indeterminate />,
+      )
       expect(screen.getByTestId('checkbox-indeterminate-mark')).toBeTruthy()
       expect(
         screen.queryByText('check', { includeHiddenElements: true }),
@@ -129,7 +131,9 @@ describe('Checkbox', () => {
 
     it('uses the error container with onError mark when checked', () => {
       const iconResolver = jest.fn(() => <Text testID="resolved">r</Text>)
-      renderWithTheme(<Checkbox value error />, { iconResolver })
+      renderWithTheme(<Checkbox onValueChange={jest.fn()} value error />, {
+        iconResolver,
+      })
       const box = screen.getByTestId('checkbox-box')
       const flatStyle = StyleSheet.flatten(box.props.style)
       expect(flatStyle.backgroundColor).toBe(lightTheme.colors.error)
@@ -151,14 +155,22 @@ describe('Checkbox', () => {
 
   describe('overrides', () => {
     it('applies containerColor to the box when checked', () => {
-      renderWithTheme(<Checkbox value containerColor="#FF0000" />)
+      renderWithTheme(
+        <Checkbox onValueChange={jest.fn()} value containerColor="#FF0000" />,
+      )
       const box = screen.getByTestId('checkbox-box')
       const flatStyle = StyleSheet.flatten(box.props.style)
       expect(flatStyle.backgroundColor).toBe('#FF0000')
     })
 
     it('keeps the outline-only appearance when unchecked', () => {
-      renderWithTheme(<Checkbox value={false} containerColor="#FF0000" />)
+      renderWithTheme(
+        <Checkbox
+          onValueChange={jest.fn()}
+          value={false}
+          containerColor="#FF0000"
+        />,
+      )
       const box = screen.getByTestId('checkbox-box')
       const flatStyle = StyleSheet.flatten(box.props.style)
       expect(flatStyle.backgroundColor).toBe('transparent')
@@ -247,7 +259,9 @@ describe('Checkbox — uncontrolled', () => {
   })
 
   it('defaultValue is ignored once value is passed', () => {
-    renderWithTheme(<Checkbox defaultValue value={false} />)
+    renderWithTheme(
+      <Checkbox onValueChange={jest.fn()} defaultValue value={false} />,
+    )
     expect(screen.getByRole('checkbox').props.accessibilityState).toMatchObject(
       { checked: false },
     )
