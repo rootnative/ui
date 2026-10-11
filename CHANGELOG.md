@@ -9,7 +9,20 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.25 — 2026-10-11
+
+**No breaking change.** No export and no prop is removed. Five changes can
+move or change a screen. `Button`, `IconButton`, `FAB` and `Chip` follow the
+parent `alignItems`. A `Menu` on native is as wide as its widest item. A
+standard `IconButton` in an `AppBar` slot takes the slot color. A
+`Checkbox`, `Radio` or `Switch` with no handler lets its row take the press,
+and is not announced. On the web, a focused control shows one focus ring,
+not two. Each of these entries ends with what to check. New in this
+release: `loading` on `Button`, a `headline` on `List`, and the
+`useAppBarContentColor` hook. `rootnative add button` now also installs
+`progress`. Text with an expression renders in `Dialog.Content` and
+`Tooltip`. The docs now cover the `topAppBar` tokens and how to theme a
+navigator.
 
 ### `Button`, `IconButton`, `FAB` and `Chip` follow the parent `alignItems`
 
