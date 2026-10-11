@@ -171,7 +171,7 @@ Phosphor exports each glyph in PascalCase (e.g. `MagnifyingGlass`, `DotsThreeVer
 
 #### `@react-native-vector-icons/*`
 
-Use this for a vector-icon set other than `mdiResolver`, or to register a small alias map at the resolver level. An `@expo/vector-icons` set has the same shape and works too, but Expo is retiring that package:
+Use this for a vector-icon set other than `mdiResolver`, or to register a small alias map at the resolver level. Do not pass an `@expo/vector-icons` set. Expo is retiring that package, and its sets are classes, so TypeScript rejects them as `IconSet` (TS2322). Use the `@react-native-vector-icons/*` package of the same icon family:
 
 ```tsx
 import { Ionicons } from '@react-native-vector-icons/ionicons'

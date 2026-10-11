@@ -2,12 +2,17 @@ import type { IconResolver, IconRenderProps } from '@rootnative/core'
 import * as React from 'react'
 
 /**
- * Structural shape of a vector-icons icon set component: any
- * `@react-native-vector-icons/*` set (`MaterialDesignIcons`, `Ionicons`,
- * `FontAwesome7`, …) or an `@expo/vector-icons` set. Each set accepts `name`,
- * `size` and `color`. A set types `name` as its own glyph union, so the shape
- * asks for `never` there: every union is assignable to it, and the resolver
- * casts the string name at the one call site.
+ * Structural shape of a `@react-native-vector-icons/*` icon set component
+ * (`MaterialDesignIcons`, `Ionicons`, `FontAwesome7`, …). Each set is a
+ * function component that accepts `name`, `size` and `color`, and types `name`
+ * as its own glyph union. The shape asks for `never` there: TypeScript compares
+ * a function parameter contravariantly, so every union is assignable to it, and
+ * the resolver casts the string name at the one call site.
+ *
+ * Do not pass an `@expo/vector-icons` set. Expo is retiring that package. Its
+ * sets are classes, and TypeScript compares a class `props` covariantly, so
+ * they do not match this shape. Use the `@react-native-vector-icons/*` package
+ * of the same icon family.
  */
 export type VectorIconSet = React.ComponentType<{
   name: never

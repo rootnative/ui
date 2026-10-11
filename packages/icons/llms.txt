@@ -2,7 +2,8 @@
 
 > Version: 0.0.0-alpha.25
 > Peer deps: @rootnative/core >=0.0.0-alpha.25, react >=19.2.3 <20.0.0, react-native >=0.83.0 <0.87.0
-> Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* or @expo/vector-icons set you install
+> Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
+> Do not use @expo/vector-icons: Expo is retiring it, and its sets do not type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 
 Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
@@ -31,9 +32,11 @@ Per-call elements/functions always take precedence over the resolver. Only `@roo
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual `IconResolver` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | `withLegacyMdiFallback(resolver)` |
 
+**Do not use `@expo/vector-icons`.** Expo is retiring it (https://expo.dev/blog/moving-away-from-expo-vector-icons). Use the `@react-native-vector-icons/*` package of the same icon family, and run `npx @react-native-vector-icons/codemod` to rewrite app code that imports the old package. Do not keep both installed: they register the same font, and the glyphs render as `?`. An `@expo/vector-icons` set also fails to type-check as the `IconSet` of `createVectorIconsResolver` (TS2322), because the set is a class.
+
 ### `@rootnative/icons` adapter package (v0.0.0-alpha.25)
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / `@react-native-vector-icons/*` are declared as optional peer deps.
+Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes the `@react-native-vector-icons/*` set you pass, so the package declares no peer for it.
 
 ```bash
 pnpm add @rootnative/icons
@@ -43,7 +46,7 @@ pnpm add @rootnative/icons
 |--------|-----|
 | `createLucideResolver({ icons })` | [Lucide](https://lucide.dev) (`lucide-react-native`) |
 | `createPhosphorResolver({ icons })` | [Phosphor](https://phosphoricons.com) (`phosphor-react-native`) |
-| `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …), or an `@expo/vector-icons` set |
+| `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …). Not an `@expo/vector-icons` set |
 | `withLegacyMdiFallback(resolver)` | Wrap any custom resolver to add MDI-name compatibility |
 
 #### Lucide

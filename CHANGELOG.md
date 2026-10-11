@@ -9,6 +9,30 @@ whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+### The docs say not to use `@expo/vector-icons`
+
+The `VectorIconSet` JSDoc, the Icons page and the `llms` files said that an
+`@expo/vector-icons` set works as the `IconSet` of
+`createVectorIconsResolver`. It does not type-check: TypeScript reports
+TS2322. An `@expo/vector-icons` set is a class, and TypeScript compares the
+`props` of a class covariantly, so its glyph union does not match
+`name: never`. A `@react-native-vector-icons/*` set is a function component,
+and it matches.
+
+Expo is retiring `@expo/vector-icons`, so the library does not add support
+for it. The JSDoc, the Icons page and every `llms` file now say: do not use
+it, use the `@react-native-vector-icons/*` package of the same icon family,
+and run `npx @react-native-vector-icons/codemod` on the app code. The `llms`
+files also said that `@expo/vector-icons` and `@react-native-vector-icons/*`
+are optional peers of `@rootnative/icons`. They are not. The package declares
+Lucide and Phosphor only.
+
+**What changes.** Nothing at run time and nothing in the types. An app that
+passes an `@expo/vector-icons` set with a cast still works. Move it to the
+`@react-native-vector-icons/*` package.
+
 ## 0.0.0-alpha.25 — 2026-10-11
 
 **No breaking change.** No export and no prop is removed. Five changes can

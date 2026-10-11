@@ -2873,9 +2873,11 @@ Per-call elements/functions always take precedence over the resolver. Only \`@ro
 | Your own SVGs, SF Symbols, or a one-off mapping | A manual \`IconResolver\` function — no adapter package needed |
 | A custom resolver, but existing call sites still use MDI names | \`withLegacyMdiFallback(resolver)\` |
 
+**Do not use \`@expo/vector-icons\`.** Expo is retiring it (https://expo.dev/blog/moving-away-from-expo-vector-icons). Use the \`@react-native-vector-icons/*\` package of the same icon family, and run \`npx @react-native-vector-icons/codemod\` to rewrite app code that imports the old package. Do not keep both installed: they register the same font, and the glyphs render as \`?\`. An \`@expo/vector-icons\` set also fails to type-check as the \`IconSet\` of \`createVectorIconsResolver\` (TS2322), because the set is a class.
+
 ### \`@rootnative/icons\` adapter package (v${ICONS_VERSION})
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use — Lucide / Phosphor / \`@react-native-vector-icons/*\` are declared as optional peer deps.
+Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. \`createVectorIconsResolver\` takes the \`@react-native-vector-icons/*\` set you pass, so the package declares no peer for it.
 
 \`\`\`bash
 pnpm add @rootnative/icons
@@ -2885,7 +2887,7 @@ pnpm add @rootnative/icons
 |--------|-----|
 | \`createLucideResolver({ icons })\` | [Lucide](https://lucide.dev) (\`lucide-react-native\`) |
 | \`createPhosphorResolver({ icons })\` | [Phosphor](https://phosphoricons.com) (\`phosphor-react-native\`) |
-| \`createVectorIconsResolver({ IconSet })\` | Any \`@react-native-vector-icons/*\` set (\`Ionicons\`, \`FontAwesome7\`, …), or an \`@expo/vector-icons\` set |
+| \`createVectorIconsResolver({ IconSet })\` | Any \`@react-native-vector-icons/*\` set (\`Ionicons\`, \`FontAwesome7\`, …). Not an \`@expo/vector-icons\` set |
 | \`withLegacyMdiFallback(resolver)\` | Wrap any custom resolver to add MDI-name compatibility |
 
 #### Lucide
@@ -3028,6 +3030,7 @@ function generateComponentsLlms(): string {
 > Version: ${COMPONENTS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional peer: @react-native-vector-icons/material-design-icons ${COMPONENTS_VECTOR_ICONS} (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver does not install it
+> Do not use @expo/vector-icons: Expo is retiring it, and it registers the same font, so the glyphs render as ?. Use @react-native-vector-icons/* (see Icons)
 
 ## App root setup
 
@@ -3080,7 +3083,8 @@ function generateIconsLlms(): string {
 
 > Version: ${ICONS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, react ${ICONS_REACT}, react-native ${ICONS_RN}
-> Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* or @expo/vector-icons set you install
+> Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
+> Do not use @expo/vector-icons: Expo is retiring it, and its sets do not type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 
 Pre-built resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
@@ -3235,6 +3239,7 @@ function generateFullLlms(): string {
 > Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: \`react-native-safe-area-context ${COMPONENTS_SAFE_AREA}\`, \`react-native-reanimated ${COMPONENTS_REANIMATED}\`, \`react-native-worklets ${COMPONENTS_WORKLETS}\` (Reanimated 4 runtime — Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add \`react-native-worklets/plugin\` last in \`babel.config.js\`)
 > Optional peer: \`@react-native-vector-icons/material-design-icons ${COMPONENTS_VECTOR_ICONS}\` (plus \`expo-font\` on Expo), imported only by the \`@rootnative/components/mdi\` subpath (\`mdiResolver\`, the MaterialDesignIcons resolver for string icon names). An app with its own \`iconResolver\` does not install it
+> Do not use \`@expo/vector-icons\`: Expo is retiring it, and it registers the same font, so the glyphs render as \`?\`. Use \`@react-native-vector-icons/*\` (see Icons)
 
 ---
 
