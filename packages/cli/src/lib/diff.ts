@@ -70,10 +70,7 @@ export function computeDiff(
   }
 }
 
-function buildLCS(
-  a: string[],
-  b: string[],
-): [number, number][] {
+function buildLCS(a: string[], b: string[]): [number, number][] {
   const m = a.length
   const n = b.length
 
@@ -140,9 +137,7 @@ export function formatDiff(diff: FileDiff, context = 3): string {
 
   let lastPrinted = -1
 
-  for (const idx of Array.from(changeIndices).sort(
-    (a, b) => a - b,
-  )) {
+  for (const idx of Array.from(changeIndices).sort((a, b) => a - b)) {
     if (lastPrinted !== -1 && idx > lastPrinted + 1) {
       output.push(chalk.dim('    ...'))
     }
@@ -162,23 +157,15 @@ export function formatDiff(diff: FileDiff, context = 3): string {
   return output.join('\n')
 }
 
-export function formatDiffSummary(
-  diffs: FileDiff[],
-): string {
+export function formatDiffSummary(diffs: FileDiff[]): string {
   const changed = diffs.filter((d) => d.hasChanges)
 
   if (changed.length === 0) {
     return chalk.dim('  No changes detected')
   }
 
-  const totalAdd = changed.reduce(
-    (sum, d) => sum + d.additions,
-    0,
-  )
-  const totalDel = changed.reduce(
-    (sum, d) => sum + d.deletions,
-    0,
-  )
+  const totalAdd = changed.reduce((sum, d) => sum + d.additions, 0)
+  const totalDel = changed.reduce((sum, d) => sum + d.deletions, 0)
 
   return (
     `  ${changed.length} file(s) changed: ` +

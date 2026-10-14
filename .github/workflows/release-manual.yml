@@ -40,6 +40,12 @@ on:
           - beta
           - rc
 
+# One release at a time, shared with release.yml. No `cancel-in-progress`: a
+# cancelled run can leave a version on npm with no tag.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   # The compat matrix gates the publish. compat.yml runs on push and pull
   # request only, so without this job a release can ship from a commit whose
@@ -53,15 +59,15 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install dependencies
@@ -78,7 +84,7 @@ jobs:
         run: pnpm pack --pack-destination ../../pack
 
       - name: Upload candidate
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: release-candidate-components
           path: pack/*.tgz
@@ -106,18 +112,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -157,6 +163,9 @@ jobs:
       # as ci.yml and release.yml rather than fewer. It previously ran none of
       # them, not even lint or test, so a one-package hotfix could publish code
       # that no check had ever seen.
+      - name: Format check
+        run: pnpm run format:check
+
       - name: Lint
         run: pnpm run lint
 
@@ -300,6 +309,23 @@ jobs:
               ;;
           esac
 
+      # Push before publish. A push can fail (branch protection, a commit that
+      # reached main during the run), and an npm publish cannot be undone. The
+      # alpha.23 run published first: one package failed after five were live,
+      # so the push never ran, and main and the tags did not record a version
+      # that npm already served. In this order, a failed push stops the run
+      # before npm gets anything.
+      - name: Push to main
+        run: |
+          git push origin main
+          git push origin "${{ env.tag }}"
+
+          # The ref the CLI resolves registry + templates from. Empty when this
+          # release did not include core.
+          if [ -n "${{ env.version_tag }}" ]; then
+            git push origin "${{ env.version_tag }}"
+          fi
+
       - name: Publish packages
         run: |
           # Publish core first if included (other packages may depend on it)
@@ -318,14 +344,3 @@ jobs:
             echo "Publishing $PKG_NAME..."
             (cd "packages/$PKG_DIR" && pnpm publish --provenance --access public --tag ${{ inputs.tag }} --no-git-checks)
           done
-
-      - name: Push to main
-        run: |
-          git push origin main
-          git push origin "${{ env.tag }}"
-
-          # The ref the CLI resolves registry + templates from. Empty when this
-          # release did not include core.
-          if [ -n "${{ env.version_tag }}" ]; then
-            git push origin "${{ env.version_tag }}"
-          fi

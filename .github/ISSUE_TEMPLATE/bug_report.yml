@@ -43,8 +43,8 @@ body:
     attributes:
       label: Package
       options:
-        - "@rootnative/core"
-        - "@rootnative/components"
+        - '@rootnative/core'
+        - '@rootnative/components'
         - Both
     validations:
       required: true
@@ -65,16 +65,16 @@ body:
     id: version
     attributes:
       label: Package version
-      placeholder: "0.1.0"
+      placeholder: '0.1.0'
 
   - type: input
     id: rn-version
     attributes:
       label: React Native version
-      placeholder: "0.81.5"
+      placeholder: '0.81.5'
 
   - type: input
     id: expo-version
     attributes:
       label: Expo SDK version
-      placeholder: "54"
+      placeholder: '54'

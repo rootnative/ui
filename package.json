@@ -18,6 +18,7 @@
     "clean:deep": "rm -rf node_modules .turbo .expo dist build && pnpm -r exec rm -rf node_modules dist build .turbo .expo && pnpm store prune && watchman watch-del-all 2>/dev/null || true && rm -rf $TMPDIR/metro-* $TMPDIR/haste-* $TMPDIR/react-* 2>/dev/null || true",
     "example": "pnpm --filter example start",
     "format": "prettier . --write",
+    "format:check": "prettier . --check",
     "docs:dev": "pnpm --filter @rootnative/docs dev",
     "docs:build": "pnpm --filter @rootnative/docs build",
     "build:brand": "node scripts/build-brand.mjs",
