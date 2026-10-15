@@ -427,4 +427,11 @@ runs the audit and then asserts the title, the canonical link, the headings
 and the JSON-LD of two pages by value, which is the test that catches a head
 renderer change in Expo Router.
 
+After the deploy, two checks run on the live host, and only they count.
+Lighthouse on the deployed URLs is a gate in the deploy workflow: the
+[script](https://github.com/rootnative/ui/blob/main/scripts/lighthouse-seo.mjs)
+takes the URLs and fails below an SEO score of 100. Google Search Console
+stays manual: verify the property once and submit `<siteUrl>/sitemap.xml`.
+Both are described under [the checks that count](./limits.md#the-checks-that-count).
+
 Then read the [limits](./limits.md).

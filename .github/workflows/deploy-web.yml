@@ -66,3 +66,34 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  # The export check in ci.yml reads the HTML and loads it in Chrome. Only the
+  # live host proves that a crawler gets the page: the status code,
+  # `robots.txt`, and the served head. Lighthouse runs on the deployed URLs
+  # and fails the workflow below an SEO score of 100. The deploy has happened
+  # by then; a red run is the signal. The run id busts the Pages edge cache,
+  # which can hold the previous deploy for ten minutes. The ubuntu runner has
+  # Chrome; Lighthouse comes from npx at the version the script pins.
+  lighthouse:
+    name: Lighthouse SEO on the live site
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Lighthouse SEO
+        run: >
+          node scripts/lighthouse-seo.mjs --bust ${{ github.run_id }}
+          https://rootnative.github.io/ui/
+          https://rootnative.github.io/ui/demo/
+          https://rootnative.github.io/ui/demo/button
+          https://rootnative.github.io/ui/demo/showcase/settings-screen

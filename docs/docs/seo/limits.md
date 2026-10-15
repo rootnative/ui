@@ -75,10 +75,23 @@ the live host only:
 
 - **Lighthouse** in Chrome, on the deployed URL. The SEO audit reads the
   title, the description, the canonical link, the `<h1>`, and the link
-  targets, from the HTML the host serves.
+  targets, from the HTML the host serves. Make it a gate: run it after each
+  deploy and fail the workflow below 100. The
+  [deploy workflow](https://github.com/rootnative/ui/blob/main/.github/workflows/deploy-web.yml)
+  of this site does, with one script that takes the URLs; the GitHub
+  `ubuntu-latest` runner has Chrome. The workflow busts the Pages edge cache
+  with a query string, because the edge can serve the previous deploy for
+  ten minutes. Lighthouse audits the DOM after the script ran, not the
+  served file: the client-side head rewrites the title and the canonical
+  link, so a defect in the HTML file still scores 100 here. `rootnative-seo
+  audit` reads the file and is the gate for that; Lighthouse catches what
+  the host adds or blocks, such as a `noindex` or a `robots.txt` rule.
 - **Google Search Console**, with the sitemap submitted. The URL inspection
   tool shows the page as Google rendered it, and the coverage report shows
-  the routes it indexed and the ones it did not.
+  the routes it indexed and the ones it did not. This step stays manual:
+  verify the property once, then submit `<siteUrl>/sitemap.xml`, the file
+  `rootnative-seo` writes. A site under a subpath submits its own sitemap
+  URL, and the root site lists every sitemap in `robots.txt`.
 
 A green export check and a red Search Console report means the host, not the
 head. Start with the status code of the URL.
