@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="Media card wireframe">
+  <title>Media card wireframe</title>
+  <rect width="600" height="360" rx="24" fill="#EEF2F9"/>
+  <rect x="120" y="32" width="360" height="296" rx="16" fill="#FFFFFF" stroke="#C7D2E6" stroke-width="2"/>
+  <rect x="120" y="32" width="360" height="150" rx="16" fill="#2563EB"/>
+  <rect x="120" y="120" width="360" height="62" fill="#2563EB"/>
+  <rect x="144" y="202" width="200" height="16" rx="8" fill="#1E293B"/>
+  <rect x="144" y="232" width="64" height="24" rx="12" fill="#DBEAFE"/>
+  <rect x="216" y="232" width="80" height="24" rx="12" fill="#DBEAFE"/>
+  <rect x="304" y="232" width="56" height="24" rx="12" fill="#DBEAFE"/>
+  <circle cx="400" cy="296" r="14" fill="#94A3B8"/>
+  <circle cx="444" cy="296" r="14" fill="#94A3B8"/>
+</svg>

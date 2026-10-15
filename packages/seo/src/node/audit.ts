@@ -17,6 +17,7 @@ export type AuditRule =
   | 'h1'
   | 'main'
   | 'lang'
+  | 'alt'
   | 'sitemap'
 
 export type AuditProblem = {
@@ -50,6 +51,7 @@ const TITLE = /<title\b[^>]*>([\s\S]*?)<\/title>/gi
 const H1 = /<h1[\s>]/gi
 const MAIN = /<main[\s>]/gi
 const HTML = /<html\b([^>]*)>/i
+const IMG = /<img\b([^>]*)>/gi
 const LOC = /<loc>([\s\S]*?)<\/loc>/gi
 
 type AuditedPage = ExportedPage & {
@@ -57,6 +59,8 @@ type AuditedPage = ExportedPage & {
   h1: number
   main: number
   lang: string | undefined
+  /** The number of `<img>` tags with no `alt` attribute. */
+  imgNoAlt: number
 }
 
 function headOf(html: string): string {
@@ -72,9 +76,12 @@ async function readPage(outDir: string, file: string): Promise<AuditedPage> {
   const h1 = (html.match(H1) ?? []).length
   const main = (html.match(MAIN) ?? []).length
   const lang = attributesOf(html.match(HTML)?.[1] ?? '').lang?.trim()
+  const imgNoAlt = [...html.matchAll(IMG)].filter(
+    (match) => !('alt' in attributesOf(match[1] ?? '')),
+  ).length
   const path = file.replace(/\.html$/, '')
   const route = path === 'index' ? '/' : `/${path.replace(/\/index$/, '')}`
-  return { file, route, ...readHead(html), titles, h1, main, lang }
+  return { file, route, ...readHead(html), titles, h1, main, lang, imgNoAlt }
 }
 
 function count(n: number, noun: string): string {
@@ -128,6 +135,13 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
 
   if (rules.has('lang') && !page.lang) {
     add('lang', 'no lang on <html>. Set it in app/+html.tsx.')
+  }
+
+  if (rules.has('alt') && page.imgNoAlt > 0) {
+    add(
+      'alt',
+      `${page.imgNoAlt} <img> ${page.imgNoAlt === 1 ? 'tag has' : 'tags have'} no alt. Pass \`alt\` to \`Picture\`, or \`alt=""\` for a decorative image.`,
+    )
   }
 
   return problems
@@ -191,7 +205,7 @@ async function sitemapProblems(
  * Reads every `.html` file under `outDir` and returns each rule a page fails:
  * no `<title>` or an empty one, no canonical link on a page with no
  * `noindex`, not exactly one `<h1>`, not exactly one `<main>`, no `lang` on
- * `<html>`, and a `sitemap.xml` entry that no page declares or a page that
+ * `<html>`, an `<img>` with no `alt`, and a `sitemap.xml` entry that no page declares or a page that
  * must be in the sitemap and is not. It does not
  * throw on a problem; the caller decides. It throws when the folder does not
  * exist or holds no HTML file.
@@ -212,6 +226,7 @@ export async function auditExport(
     'h1',
     'main',
     'lang',
+    'alt',
     'sitemap',
   ])
   for (const rule of options.ignore ?? []) rules.delete(rule)

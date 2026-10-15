@@ -23,3 +23,11 @@ jest.mock('expo-router', () => ({
   usePathname: () => '/',
   useIsFocused: () => true,
 }))
+
+// `Picture` renders `expo-image` on native only, and the real one needs the
+// native module. The stub keeps the props, so a test reads them.
+jest.mock('expo-image', () => {
+  const React = require('react')
+  const Image = (props) => React.createElement('ExpoImage', props)
+  return { __esModule: true, Image }
+})

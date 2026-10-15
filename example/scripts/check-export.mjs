@@ -143,6 +143,29 @@ if (existsSync(template)) {
   }
 }
 
+// `Picture` writes a plain `<img>` on the export, with the text and the size
+// a crawler reads, and the export copies `public/` to the root.
+const showcasePage = resolve(dist, 'showcase', 'settings-screen.html')
+if (existsSync(showcasePage)) {
+  const html = readFileSync(showcasePage, 'utf8')
+  const img = html.match(/<img\b[^>]*>/)?.[0] ?? ''
+  if (!img.includes('src="/ui/demo/showcase/settings-screen.svg"')) {
+    problems.push('showcase/settings-screen.html: no <img> for the wireframe')
+  }
+  if (!img.includes('alt="Settings screen wireframe"')) {
+    problems.push('showcase/settings-screen.html: the <img> has no alt text')
+  }
+  if (!img.includes('width="600"') || !img.includes('height="360"')) {
+    problems.push('showcase/settings-screen.html: the <img> has no size')
+  }
+  if (!existsSync(resolve(dist, 'showcase', 'settings-screen.svg'))) {
+    problems.push('showcase/settings-screen.svg: missing. Is public/ copied?')
+  }
+  if (count(html, /<meta[^>]*property="og:image"/g) !== 1) {
+    problems.push('showcase/settings-screen.html: expected one og:image')
+  }
+}
+
 for (const page of pages) {
   const file = resolve(dist, page.file)
   if (!existsSync(file)) {
@@ -251,7 +274,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link.`,
+    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link; the showcase <img> has alt and size.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

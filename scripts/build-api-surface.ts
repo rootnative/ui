@@ -55,6 +55,7 @@ const PACKAGES: PackageSpec[] = [
       './schema': 'dist/schema/index.d.mts',
       './react': 'dist/react/index.d.mts',
       './expo-router': 'dist/expo-router/index.d.mts',
+      './expo-image': 'dist/expo-image/index.d.mts',
       './node': 'dist/node/index.d.mts',
     },
   },

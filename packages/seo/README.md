@@ -19,6 +19,7 @@ pnpm add @rootnative/seo
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
 | `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `RouteHead`, `shellTags` |
+| `@rootnative/seo/expo-image` | `expo-image` | `Picture`: a plain `<img>` on the web, `expo-image` on native |
 | `@rootnative/seo/node` | Node | `writeSeoFiles`, `auditExport`, `browseExport`, `serveExport`, the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
 
 ## Quick start (Expo Router)
@@ -82,7 +83,7 @@ expo export --platform web && rootnative-seo dist
 
 A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason.
 
-Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
+Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, an `<img>` with no `alt`, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
 
 ## The rules the head follows
 

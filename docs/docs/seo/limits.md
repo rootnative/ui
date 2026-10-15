@@ -12,15 +12,25 @@ host makes, and the docs say so instead of hiding it.
 ## The server-rendered image
 
 `expo-image` mounts its image in an effect, so a static export has no `<img>`
-element. A crawler sees the `alt` text only after the script runs. Two
-fallbacks carry the image to a crawler that does not run it:
+element, and the React Native `Image` writes none either: on the web it
+starts idle, loads the source in an effect, and writes its hidden `<img>`
+only for `defaultSource`. A crawler that runs no script sees no image and
+no `alt`.
+
+`Picture` from `@rootnative/seo/expo-image` closes the gap. On the web it
+renders a plain `<img>` with `src`, `alt`, `width` and `height`, so the
+crawler sees a visible image with its size, and the page reserves the box
+before the image loads. On native it renders `expo-image`. Its `source` is
+absolute or a path under the site URL, like `image` in `PageHead`. The
+cost: the web side takes no `expo-image` feature. A page that needs caching
+or a transition on the web keeps `expo-image` there, with the two fallbacks
+that carry the image to a crawler:
 
 1. `og:image` in the head. Every share card reads it, and so does Google
    Images for the page.
 2. The `image` field of the JSON-LD. Every builder takes one.
 
-Set both on every page that has an image. The React Native `Image` renders an
-`<img>` on the export, so an app that uses it has no gap.
+Set both on every page that has an image, with or without `Picture`.
 
 ## The host 404
 

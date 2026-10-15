@@ -11,6 +11,30 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `Picture` renders an image a crawler sees
+
+`expo-image` mounts its image in an effect, and the React Native `Image`
+loads its source in one, so a static export held no `<img>` for either: a
+crawler that runs no script saw no image and no `alt`. The limits page
+said the React Native `Image` had no gap; it did.
+
+`Picture` in the new `@rootnative/seo/expo-image` entry, with `expo-image`
+as an optional peer, renders a plain `<img>` on the web with `src`, `alt`,
+`width`, `height`, `loading` and `object-fit` from `contentFit`, and
+`expo-image` on native with `alt` and `accessibilityLabel`. Its `source` is
+absolute or a path under the site URL, like `image` in `PageHead`: the web
+gets the path under the host, native the absolute URL. `style` is a React
+Native image style, flattened to CSS on the web. `alt=""` marks a
+decorative image.
+
+`auditExport` gains the `alt` rule: every `<img>` has an `alt` attribute.
+The example's showcase pages render a wireframe through `Picture`, from
+`public/`, and set the `og:image` fallback with it.
+
+**Check your pages.** An image a crawler must see goes through `Picture`.
+An `expo-image` that stays, for its cache or a transition, keeps the two
+fallbacks, `og:image` and the JSON-LD `image`.
+
 ### The layouts are landmarks, and the audit checks `<main>` and `lang`
 
 A crawler and a screen reader read the page by its landmarks, and a

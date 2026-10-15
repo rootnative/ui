@@ -320,18 +320,26 @@ A crawler reads it, and a screen reader picks its voice from it.
 `rootnative-seo audit` fails a page with no `<main>`, more than one, or no
 `lang`.
 
-For images, set both `alt` and `accessibilityLabel` on `expo-image`. The web
-`alt` attribute comes from `accessibilityLabel`. The React Native `Image`
-reads `alt` on its own. `imageLabel` builds the text:
+For an image a crawler must see, render `Picture` from
+`@rootnative/seo/expo-image`. On the web it is a plain `<img>` with `alt`,
+`width` and `height` in the export; on native it is `expo-image`. The
+`source` is absolute or a path under the site URL, like `image` in
+`PageHead`, and `imageLabel` builds the text:
 
 ```tsx
-import { Image } from 'expo-image'
+import { Picture } from '@rootnative/seo/expo-image'
 import { imageLabel } from '@rootnative/seo/react'
 
 const label = imageLabel('Poster', movie.title) // 'Dune poster'
 
-<Image source={poster} alt={label} accessibilityLabel={label} />
+<Picture source={`/posters/${movie.id}.jpg`} alt={label} width={300} height={450} />
 ```
+
+An image that stays on `expo-image`, for its cache or a transition, is not
+in the export; set `og:image` and the JSON-LD `image` for it, and set both
+`alt` and `accessibilityLabel` on it. The web `alt` attribute comes from
+`accessibilityLabel`. `rootnative-seo audit` fails a page with an `<img>`
+that has no `alt`; pass `alt=""` for a decorative image.
 
 ## 6. JSON-LD
 
@@ -427,6 +435,7 @@ exported page and fails on:
 - a page with no `<h1>`, or more than one;
 - a page with no `<main>`, or more than one, and a page with no `lang` on
   `<html>`;
+- an `<img>` with no `alt` attribute;
 - a `sitemap.xml` entry that no page declares as its canonical link, or a page
   that must be in the sitemap and is not.
 

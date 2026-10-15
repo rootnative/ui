@@ -300,6 +300,7 @@
   "@rootnative/seo": {
     "subpaths": [
       ".",
+      "./expo-image",
       "./expo-router",
       "./node",
       "./react",
@@ -361,6 +362,10 @@
         "ShellTagsOptions",
         "renderHeadTag",
         "shellTags"
+      ],
+      "./expo-image": [
+        "Picture",
+        "PictureProps"
       ],
       "./node": [
         "AuditExportOptions",

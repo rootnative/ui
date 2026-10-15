@@ -7,6 +7,7 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { resolveUrl } from '@rootnative/seo'
+import { Picture } from '@rootnative/seo/expo-image'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { breadcrumbList } from '@rootnative/seo/schema'
 import { Link, useLocalSearchParams } from 'expo-router'
@@ -58,12 +59,19 @@ export default function ShowcaseScreen() {
   }
 
   const url = `/showcase/${entry.slug}`
+  // The wireframe lives in `public/showcase/`, which the export copies to the
+  // root, so the path is under the site URL on the web and on native.
+  const image = `/showcase/${entry.slug}.svg`
+  const imageAlt = `${entry.title} wireframe`
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
       <PageHead
         title={entry.title}
         description={entry.description}
         url={url}
+        image={image}
+        imageSize={{ width: 600, height: 360 }}
+        imageAlt={imageAlt}
         jsonLd={[
           breadcrumbList([
             { name: 'Home', url: resolveUrl(site, '/') },
@@ -81,6 +89,16 @@ export default function ShowcaseScreen() {
             {entry.description}
           </Typography>
         </Column>
+        {/* A real `<img>` on the export, with its text and its size. */}
+        <Picture
+          source={image}
+          alt={imageAlt}
+          width={600}
+          height={360}
+          contentFit="contain"
+          loading="eager"
+          style={styles.picture}
+        />
         <Column gap="sm">
           <Typography level={3} variant="titleMedium">
             Built with
@@ -112,5 +130,12 @@ export default function ShowcaseScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
+  },
+  picture: {
+    width: '100%',
+    maxWidth: 600,
+    height: undefined,
+    aspectRatio: 600 / 360,
+    borderRadius: 24,
   },
 })

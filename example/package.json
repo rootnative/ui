@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/react": "^19.1.17",
+    "expo-image": "~57.0.5",
     "typescript": "^5.4.0"
   }
 }

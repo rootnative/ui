@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360" role="img" aria-label="Sign-in form wireframe">
+  <title>Sign-in form wireframe</title>
+  <rect width="600" height="360" rx="24" fill="#EEF2F9"/>
+  <rect x="150" y="48" width="300" height="20" rx="10" fill="#1E293B"/>
+  <rect x="120" y="104" width="360" height="52" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <rect x="136" y="122" width="120" height="14" rx="7" fill="#94A3B8"/>
+  <rect x="120" y="176" width="360" height="52" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+  <rect x="136" y="194" width="90" height="14" rx="7" fill="#94A3B8"/>
+  <rect x="120" y="248" width="20" height="20" rx="4" fill="#2563EB"/>
+  <rect x="152" y="252" width="140" height="12" rx="6" fill="#1E293B"/>
+  <rect x="120" y="292" width="360" height="44" rx="22" fill="#2563EB"/>
+  <rect x="262" y="307" width="76" height="14" rx="7" fill="#FFFFFF"/>
+</svg>

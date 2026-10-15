@@ -6,6 +6,7 @@ export default defineConfig({
     'src/schema/index.ts',
     'src/react/index.ts',
     'src/expo-router/index.ts',
+    'src/expo-image/index.ts',
     'src/node/index.ts',
     'src/node/bin.ts',
   ],
@@ -16,5 +17,11 @@ export default defineConfig({
   splitting: true,
   outDir: 'dist',
   clean: true,
-  external: ['react', 'react-native', 'expo-router', 'expo-router/head'],
+  external: [
+    'react',
+    'react-native',
+    'expo-router',
+    'expo-router/head',
+    'expo-image',
+  ],
 })

@@ -230,6 +230,24 @@ describe('auditExport', () => {
     ])
   })
 
+  it('reports an <img> with no alt, and accepts an empty one', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'pictures.html': page(
+        canonical(`${SITE}/pictures`),
+        '<main><h1>T</h1><img src="/a.png" alt="A"/><IMG SRC="/b.png" ALT=""><img src="/c.png"><img src="/d.png" width="1"></main>',
+      ),
+    })
+    const { problems } = await auditExport({ outDir, ignore: ['sitemap'] })
+    expect(problems).toEqual([
+      {
+        file: 'pictures.html',
+        rule: 'alt',
+        message: expect.stringMatching(/^2 <img> tags have no alt/),
+      },
+    ])
+  })
+
   it('skips an ignored rule', async () => {
     await writePages({ 'index.html': page('', '<p>Nothing</p>', '<html>') })
     const { problems } = await auditExport({
