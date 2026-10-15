@@ -1,0 +1,25 @@
+[
+  {
+    "slug": "settings-screen",
+    "title": "Settings screen",
+    "description": "A list of switches under section dividers and a top bar: the shape of every settings page.",
+    "components": ["appbar", "list", "switch", "divider"]
+  },
+  {
+    "slug": "sign-in-form",
+    "title": "Sign-in form",
+    "description": "Two text fields, a checkbox, and one filled button, with the keyboard kept clear of the fields.",
+    "components": [
+      "text-field",
+      "checkbox",
+      "button",
+      "keyboard-avoiding-wrapper"
+    ]
+  },
+  {
+    "slug": "media-card",
+    "title": "Media card",
+    "description": "A card with an image area, a title, chips for the genres, and icon buttons for the actions.",
+    "components": ["card", "chip", "icon-button", "typography"]
+  }
+]

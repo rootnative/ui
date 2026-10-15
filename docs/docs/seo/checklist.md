@@ -32,8 +32,39 @@ indexes it.
 }
 ```
 
-A dynamic route needs `generateStaticParams`, or the export writes no file
-for it.
+A dynamic route needs `generateStaticParams`, or the export writes the
+route template only. Return one params object per page, from the list the
+app already has:
+
+```tsx title="app/showcase/[slug].tsx"
+import { PageHead } from '@rootnative/seo/expo-router'
+import { useLocalSearchParams } from 'expo-router'
+import { findShowcase, showcaseEntries } from '../../src/showcase'
+
+export function generateStaticParams() {
+  return showcaseEntries.map(({ slug }) => ({ slug }))
+}
+
+export default function ShowcaseScreen() {
+  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const entry = findShowcase(slug)
+  if (!entry) return <PageHead title="Not found" noindex />
+  return (
+    <PageHead
+      title={entry.title}
+      description={entry.description}
+      url={`/showcase/${entry.slug}`}
+    />
+  )
+}
+```
+
+The export writes one file per entry and the template too, `[slug].html`,
+rendered with no matching entry. Answer that case with `noindex` and no
+`url`, as above: the template is then not a page a crawler indexes, and
+`rootnative-seo` keeps it out of the sitemap. The audit cannot tell the
+template from a real page, so the example's check script asserts the
+`noindex` on it by name.
 
 The static output renders your `app/+html.tsx`. The single-page output used
 Expo's own template, so a custom shell that worked before may lack

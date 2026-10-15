@@ -67,8 +67,12 @@ when the folder is missing or holds no HTML file. `rootnative-seo audit
 file and rule, exits with 1 when there is one, and writes nothing. `--ignore
 <rule>` skips a rule.
 
-The example now runs the audit over its whole export and keeps its two-page
-content check. Its `+not-found` screen has a title, `noindex`, and the
+The example now runs the audit over its whole export and keeps its
+per-page content check. It also gains a dynamic route, `showcase/[slug]`,
+with one page per entry of a seeded list through `generateStaticParams`,
+so the audit and the sitemap see the shape every data-driven app has. The
+checklist shows the pattern, including the `noindex` answer for the route
+template Expo writes next to the pages. Its `+not-found` screen has a title, `noindex`, and the
 `AppBar` heading, and the demo bars on the `AppBar` page pass
 `titleLevel={3}`.
 

@@ -31,7 +31,7 @@ import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { webSite } from '@rootnative/seo/schema'
-import { useLocalSearchParams, useRouter } from 'expo-router'
+import { Link, useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useMemo, useState } from 'react'
 import {
   Pressable,
@@ -859,6 +859,11 @@ export default function HomeScreen() {
                   ))}
                 </Grid>
               )}
+              <Link href="/showcase" asChild>
+                <Button variant="text" trailingIcon="arrow-right">
+                  Showcase: patterns built from several components
+                </Button>
+              </Link>
             </Column>
           )}
         </Container>

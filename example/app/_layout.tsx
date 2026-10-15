@@ -35,9 +35,16 @@ if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
   }
 }
 
+/**
+ * The last named segment. A group `(name)` is invisible, and a dynamic
+ * segment `[slug]` takes the name of its parent, so `/showcase/[slug]` is
+ * titled "Showcase" and the screen names the entry in its own heading.
+ */
 function resolveRouteName(segments: string[]): string {
-  const visibleSegments = segments.filter((segment) => !segment.startsWith('('))
-  const currentSegment = visibleSegments[visibleSegments.length - 1]
+  const namedSegments = segments.filter(
+    (segment) => !segment.startsWith('(') && !segment.startsWith('['),
+  )
+  const currentSegment = namedSegments[namedSegments.length - 1]
 
   return currentSegment ?? 'index'
 }

@@ -43,6 +43,16 @@ const pages = [
     h2: 'Button',
     jsonLdType: null,
   },
+  // The dynamic route: one file per seeded entry, through
+  // `generateStaticParams`. The bar names the parent segment.
+  {
+    file: 'showcase/settings-screen.html',
+    title: 'Settings screen | RootNative UI',
+    canonical: `${SITE_URL}/showcase/settings-screen`,
+    h1: 'Showcase',
+    h2: 'Settings screen',
+    jsonLdType: 'BreadcrumbList',
+  },
 ]
 
 /** Routes that must not reach the export. */
@@ -98,6 +108,22 @@ if (existsSync(notFound)) {
   }
 } else {
   problems.push('+not-found.html: missing')
+}
+
+// Expo writes the route template too, rendered with no matching entry. The
+// screen answers with `noindex` and no `url`, so the file is not a page a
+// crawler indexes. The audit alone cannot tell this file from a real page.
+const template = resolve(dist, 'showcase', '[slug].html')
+if (existsSync(template)) {
+  const html = readFileSync(template, 'utf8')
+  if (count(html, /<meta[^>]*name="robots"[^>]*content="noindex"/g) !== 1) {
+    problems.push('showcase/[slug].html: the route template must be noindex')
+  }
+  if (count(html, /<link[^>]*rel="canonical"/g) !== 0) {
+    problems.push(
+      'showcase/[slug].html: the route template has a canonical link',
+    )
+  }
 }
 
 for (const page of pages) {
@@ -208,7 +234,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found has noindex and no canonical link.`,
+    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')
