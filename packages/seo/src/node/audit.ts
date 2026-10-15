@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import {
   absoluteSiteUrl,
+  attributesOf,
   decodeEntities,
   listHtmlFiles,
   readHead,
@@ -10,7 +11,13 @@ import {
 } from './export'
 
 /** One rule of `auditExport`. Pass a rule in `ignore` to skip it. */
-export type AuditRule = 'title' | 'canonical' | 'h1' | 'sitemap'
+export type AuditRule =
+  | 'title'
+  | 'canonical'
+  | 'h1'
+  | 'main'
+  | 'lang'
+  | 'sitemap'
 
 export type AuditProblem = {
   /** The path of the file under `outDir`, or `sitemap.xml`. */
@@ -41,9 +48,16 @@ export type AuditResult = {
 
 const TITLE = /<title\b[^>]*>([\s\S]*?)<\/title>/gi
 const H1 = /<h1[\s>]/gi
+const MAIN = /<main[\s>]/gi
+const HTML = /<html\b([^>]*)>/i
 const LOC = /<loc>([\s\S]*?)<\/loc>/gi
 
-type AuditedPage = ExportedPage & { titles: string[]; h1: number }
+type AuditedPage = ExportedPage & {
+  titles: string[]
+  h1: number
+  main: number
+  lang: string | undefined
+}
 
 function headOf(html: string): string {
   const end = html.search(/<\/head>/i)
@@ -56,9 +70,11 @@ async function readPage(outDir: string, file: string): Promise<AuditedPage> {
     decodeEntities(match[1] ?? '').trim(),
   )
   const h1 = (html.match(H1) ?? []).length
+  const main = (html.match(MAIN) ?? []).length
+  const lang = attributesOf(html.match(HTML)?.[1] ?? '').lang?.trim()
   const path = file.replace(/\.html$/, '')
   const route = path === 'index' ? '/' : `/${path.replace(/\/index$/, '')}`
-  return { file, route, ...readHead(html), titles, h1 }
+  return { file, route, ...readHead(html), titles, h1, main, lang }
 }
 
 function count(n: number, noun: string): string {
@@ -97,6 +113,21 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
         `${count(page.h1, 'h1')}, expected one. The AppBar title is level 1 by default; pass \`titleLevel\` to a bar inside the page.`,
       )
     }
+  }
+
+  if (rules.has('main')) {
+    if (page.main === 0) {
+      add(
+        'main',
+        'no <main>. Give the view around the screen content `role="main"`, once per page.',
+      )
+    } else if (page.main > 1) {
+      add('main', `${count(page.main, 'main')}, expected one`)
+    }
+  }
+
+  if (rules.has('lang') && !page.lang) {
+    add('lang', 'no lang on <html>. Set it in app/+html.tsx.')
   }
 
   return problems
@@ -159,8 +190,9 @@ async function sitemapProblems(
 /**
  * Reads every `.html` file under `outDir` and returns each rule a page fails:
  * no `<title>` or an empty one, no canonical link on a page with no
- * `noindex`, not exactly one `<h1>`, and a `sitemap.xml` entry that no page
- * declares or a page that must be in the sitemap and is not. It does not
+ * `noindex`, not exactly one `<h1>`, not exactly one `<main>`, no `lang` on
+ * `<html>`, and a `sitemap.xml` entry that no page declares or a page that
+ * must be in the sitemap and is not. It does not
  * throw on a problem; the caller decides. It throws when the folder does not
  * exist or holds no HTML file.
  */
@@ -174,7 +206,14 @@ export async function auditExport(
       `auditExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` in app.json.`,
     )
   }
-  const rules = new Set<AuditRule>(['title', 'canonical', 'h1', 'sitemap'])
+  const rules = new Set<AuditRule>([
+    'title',
+    'canonical',
+    'h1',
+    'main',
+    'lang',
+    'sitemap',
+  ])
   for (const rule of options.ignore ?? []) rules.delete(rule)
 
   const pages = await Promise.all(files.map((file) => readPage(outDir, file)))

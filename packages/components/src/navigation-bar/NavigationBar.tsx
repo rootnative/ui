@@ -56,8 +56,16 @@ export function NavigationBar({
     [isControlled, onValueChange],
   )
 
+  // The bar is a `navigation` landmark, `<nav>` on the web. The row inside
+  // is the tablist, and it carries the name: a label on a plain view is not
+  // read on web.
   const row = (
-    <View style={styles.row}>
+    <View
+      style={styles.row}
+      role="tablist"
+      accessibilityLabel={accessibilityLabel}
+      testID={testID === undefined ? undefined : `${testID}-tablist`}
+    >
       {items.map((item) => (
         <NavigationItem
           key={item.value}
@@ -77,10 +85,9 @@ export function NavigationBar({
 
   return (
     <View
+      role="navigation"
       {...rest}
       style={[styles.root, style]}
-      role="tablist"
-      accessibilityLabel={accessibilityLabel}
       testID={testID}
     >
       {insetBottom ? (

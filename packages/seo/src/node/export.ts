@@ -88,7 +88,8 @@ export function decodeEntities(text: string): string {
   )
 }
 
-function attributesOf(source: string): Record<string, string> {
+/** The attributes of one tag, from the text between its name and `>`. */
+export function attributesOf(source: string): Record<string, string> {
   const attributes: Record<string, string> = {}
   for (const match of source.matchAll(ATTRIBUTE)) {
     const name = match[1]?.toLowerCase()

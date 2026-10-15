@@ -55,7 +55,13 @@ export function NavigationRail({
   )
 
   return (
-    <View {...rest} testID={testID} style={[styles.root, style]}>
+    // The rail is a `navigation` landmark, `<nav>` on the web.
+    <View
+      role="navigation"
+      {...rest}
+      testID={testID}
+      style={[styles.root, style]}
+    >
       {header !== undefined && header !== null ? (
         <View style={styles.header}>{header}</View>
       ) : null}

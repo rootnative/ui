@@ -82,7 +82,7 @@ expo export --platform web && rootnative-seo dist
 
 A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason.
 
-Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, more than one `<h1>`, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
+Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
 
 ## The rules the head follows
 

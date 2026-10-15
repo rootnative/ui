@@ -11,6 +11,29 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### The layouts are landmarks, and the audit checks `<main>` and `lang`
+
+A crawler and a screen reader read the page by its landmarks, and a
+React Native web export had none: every container was a `<div>`.
+react-native-web renders a landmark from `role`, so the layouts now set
+their own. `AppBar` is `banner`, which renders `<header>`; inside `<main>`
+it is a plain header, not a landmark, so a bar on a demo page changes
+nothing. `NavigationBar` and `NavigationRail` are `navigation`, which
+renders `<nav>`; the standard `NavigationDrawer` already was. The tablist
+of `NavigationBar` moves from the root to the row inside it, with the
+`accessibilityLabel`, and gets the `<testID>-tablist` test id. A `role` in
+the props replaces the default on every one of them.
+
+`auditExport` gains two rules. `main`: exactly one `<main>` per page.
+`lang`: a `lang` on `<html>`. The page content gets `<main>` from one
+`<View role="main">` around the navigator in the root layout, and the
+checklist shows it. The example and the landing site pass both rules.
+
+**Check your app.** A test that read `role="tablist"` on the root of a
+`NavigationBar` now finds `navigation` there; the tablist is the row inside.
+Add `<View role="main">` around the navigator, or `rootnative-seo audit`
+fails every page.
+
 ### `browseExport` and `rootnative-seo browse` load every page in Chrome
 
 The audit reads the HTML. A hydration mismatch, a component that reads the

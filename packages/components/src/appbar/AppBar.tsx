@@ -588,8 +588,11 @@ export function AppBar({
       </View>
     )
 
+    // `banner` renders `<header>` on the web: the bar is the page header.
+    // Inside `<main>` it is a plain header, not a landmark. `role` in the
+    // props replaces it.
     return (
-      <Animated.View {...rest} style={rootStyle}>
+      <Animated.View role="banner" {...rest} style={rootStyle}>
         {withTopInset(insetTop, content, safeAreaStyle)}
       </Animated.View>
     )
@@ -634,7 +637,7 @@ export function AppBar({
   )
 
   return (
-    <Animated.View {...rest} style={rootStyle}>
+    <Animated.View role="banner" {...rest} style={rootStyle}>
       {withTopInset(insetTop, content, safeAreaStyle)}
     </Animated.View>
   )

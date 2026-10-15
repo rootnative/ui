@@ -23,12 +23,13 @@ Options:
   -h, --help        Show this help.
 
 audit reads every exported page and fails when a page has no title, no
-canonical link and no noindex, or not exactly one <h1>, and when sitemap.xml
-and the pages disagree. It writes nothing.
+canonical link and no noindex, not exactly one <h1> or <main>, or no lang on
+<html>, and when sitemap.xml and the pages disagree. It writes nothing.
 
 Audit options:
   --site-url <url>  The site URL, as above.
-  --ignore <rule>   Skip a rule: title, canonical, h1, or sitemap. Repeat it.
+  --ignore <rule>   Skip a rule: title, canonical, h1, main, lang, or sitemap.
+                    Repeat it.
 
 browse serves the export and loads every page in headless Chrome. It fails on
 an uncaught exception, a console.error, or a failed request, which is where a
@@ -41,7 +42,14 @@ Browse options:
                      default is the path of the canonical link of index.html.
   --settle <ms>      How long to listen after the load event. The default is 750.`
 
-const RULES: AuditRule[] = ['title', 'canonical', 'h1', 'sitemap']
+const RULES: AuditRule[] = [
+  'title',
+  'canonical',
+  'h1',
+  'main',
+  'lang',
+  'sitemap',
+]
 
 const REASONS: Record<SkipReason, string> = {
   'special-route': 'a special route (+, _, or the host 404 page)',

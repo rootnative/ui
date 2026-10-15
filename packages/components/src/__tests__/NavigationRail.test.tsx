@@ -81,6 +81,7 @@ describe('NavigationRail', () => {
 
   it('groups the destinations as a tablist and names the rail', () => {
     renderRail({ accessibilityLabel: 'Main navigation' })
+    expect(screen.getByTestId('rail').props.role).toBe('navigation')
     const destinations = screen.getByTestId('rail-destinations')
     expect(destinations.props.role).toBe('tablist')
     expect(destinations.props.accessibilityLabel).toBe('Main navigation')

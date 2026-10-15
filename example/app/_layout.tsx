@@ -204,7 +204,11 @@ function RootLayoutContent() {
             trailing={appBarTrailing}
             insetTop
           />
-          <Stack screenOptions={stackScreenOptions} />
+          {/* `main` renders `<main>` on the web, one per page, around the
+              screen. The bar above it is the `banner`, outside it. */}
+          <View role="main" style={styles.main}>
+            <Stack screenOptions={stackScreenOptions} />
+          </View>
           {/* After the navigator: the screen renders first, so its PageHead
               claims the route before RouteHead reads the claim. */}
           <RouteHead defaults={routeDefaults} />
@@ -215,6 +219,9 @@ function RootLayoutContent() {
 }
 
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+  },
   actionsRow: {
     flexDirection: 'row',
     alignItems: 'center',

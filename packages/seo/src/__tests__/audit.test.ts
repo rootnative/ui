@@ -22,9 +22,10 @@ const canonical = (href: string) =>
 /** A page as Expo Router exports it, with the given head and body. */
 function page(
   head: string,
-  body = '<h1 aria-level="1" role="heading">Title</h1>',
+  body = '<main><h1 aria-level="1" role="heading">Title</h1></main>',
+  html = '<html lang="en">',
 ): string {
-  return `<!DOCTYPE html><html lang="en"><head><title data-rh="true">Page</title><meta charSet="utf-8"/>${head}</head><body><div id="root">${body}</div></body></html>`
+  return `<!DOCTYPE html>${html}<head><title data-rh="true">Page</title><meta charSet="utf-8"/>${head}</head><body><div id="root">${body}</div></body></html>`
 }
 
 async function writePages(pages: Record<string, string>): Promise<void> {
@@ -107,10 +108,13 @@ describe('auditExport', () => {
   it('reports zero and many <h1>', async () => {
     await writePages({
       'index.html': page(canonical(`${SITE}/`)),
-      'none.html': page(canonical(`${SITE}/none`), '<p>No heading</p>'),
+      'none.html': page(
+        canonical(`${SITE}/none`),
+        '<main><p>No heading</p></main>',
+      ),
       'many.html': page(
         canonical(`${SITE}/many`),
-        '<h1>One</h1><H1 class="x">Two</H1><h10>Not a heading</h10>',
+        '<main><h1>One</h1><H1 class="x">Two</H1><h10>Not a heading</h10></main>',
       ),
     })
     const { problems } = await auditExport({ outDir, ignore: ['sitemap'] })
@@ -186,11 +190,51 @@ describe('auditExport', () => {
     expect((await auditExport({ outDir, siteUrl: SITE })).problems).toEqual([])
   })
 
+  it('reports zero and many <main>, and a missing lang', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'none.html': page(canonical(`${SITE}/none`), '<h1>Title</h1>'),
+      'two.html': page(
+        canonical(`${SITE}/two`),
+        '<main><h1>Title</h1></main><MAIN id="x"></MAIN>',
+      ),
+      'nolang.html': page(canonical(`${SITE}/nolang`), undefined, '<html>'),
+      'blank.html': page(
+        canonical(`${SITE}/blank`),
+        undefined,
+        '<html lang=" " dir="ltr">',
+      ),
+    })
+    const { problems } = await auditExport({ outDir, ignore: ['sitemap'] })
+    expect(problems).toEqual([
+      {
+        file: 'blank.html',
+        rule: 'lang',
+        message: expect.stringMatching(/^no lang/),
+      },
+      {
+        file: 'nolang.html',
+        rule: 'lang',
+        message: expect.stringMatching(/^no lang/),
+      },
+      {
+        file: 'none.html',
+        rule: 'main',
+        message: expect.stringMatching(/^no <main>/),
+      },
+      {
+        file: 'two.html',
+        rule: 'main',
+        message: '2 <main> tags, expected one',
+      },
+    ])
+  })
+
   it('skips an ignored rule', async () => {
-    await writePages({ 'index.html': page('', '<p>Nothing</p>') })
+    await writePages({ 'index.html': page('', '<p>Nothing</p>', '<html>') })
     const { problems } = await auditExport({
       outDir,
-      ignore: ['canonical', 'h1', 'sitemap'],
+      ignore: ['canonical', 'h1', 'main', 'lang', 'sitemap'],
     })
     expect(problems).toEqual([])
   })
@@ -237,9 +281,10 @@ describe('rootnative-seo audit', () => {
     const { errors, output } = capture()
     expect(await main(['audit', outDir, '--ignore', 'sitemap'], output)).toBe(1)
     const text = errors.join('\n')
-    expect(text).toContain('2 problems in 2 pages')
+    expect(text).toContain('3 problems in 2 pages')
     expect(text).toContain('draft.html (canonical): no canonical link')
     expect(text).toContain('draft.html (h1): no <h1>')
+    expect(text).toContain('draft.html (main): no <main>')
     expect(text).not.toContain('sitemap.xml')
   })
 

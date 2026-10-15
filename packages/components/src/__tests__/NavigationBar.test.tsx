@@ -64,11 +64,17 @@ describe('NavigationBar', () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  it('reports role="tablist" on the bar', () => {
+  it('is a navigation landmark around a named tablist', () => {
     renderBar({ accessibilityLabel: 'Main navigation' })
-    const bar = screen.getByTestId('nav')
-    expect(bar.props.role).toBe('tablist')
-    expect(bar.props.accessibilityLabel).toBe('Main navigation')
+    expect(screen.getByTestId('nav').props.role).toBe('navigation')
+    const tablist = screen.getByTestId('nav-tablist')
+    expect(tablist.props.role).toBe('tablist')
+    expect(tablist.props.accessibilityLabel).toBe('Main navigation')
+  })
+
+  it('takes a role from the props', () => {
+    renderBar({ role: 'tablist' })
+    expect(screen.getByTestId('nav').props.role).toBe('tablist')
   })
 })
 

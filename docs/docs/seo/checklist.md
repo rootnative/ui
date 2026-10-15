@@ -294,6 +294,32 @@ One `<h1>` per page. The `AppBar` title is level 1 by default, so put your
 own headings at level 2 and below, or pass `titleLevel={2}` to the bar when a
 heading above it is the page heading.
 
+### Landmarks and the page language
+
+A crawler and a screen reader both read the landmarks: `<main>` for the
+page content, `<nav>` for the navigation, `<header>` for the page bar, and
+`<footer>` for the end matter. react-native-web renders them from `role`:
+`main`, `navigation`, `banner`, and `contentinfo`. The package ships nothing
+for this; the rule is one `<main>` per page, around the screen, with the
+bar and the navigation outside it. Put it in the root layout once, around
+the navigator:
+
+```tsx title="app/_layout.tsx"
+<View role="main" style={{ flex: 1 }}>
+  <Stack />
+</View>
+```
+
+In a RootNative UI app, `AppBar` is the `banner`, and `NavigationBar`,
+`NavigationRail`, and the standard `NavigationDrawer` are `navigation`, on
+their own. A bar inside `<main>`, as on a demo page, is a plain header, not
+a landmark. Pass `role` to change any of them.
+
+Set the page language on `<html>` in `app/+html.tsx`: `<html lang="en">`.
+A crawler reads it, and a screen reader picks its voice from it.
+`rootnative-seo audit` fails a page with no `<main>`, more than one, or no
+`lang`.
+
 For images, set both `alt` and `accessibilityLabel` on `expo-image`. The web
 `alt` attribute comes from `accessibilityLabel`. The React Native `Image`
 reads `alt` on its own. `imageLabel` builds the text:
@@ -399,6 +425,8 @@ exported page and fails on:
 - a page with no canonical link and no `noindex`, or a relative canonical
   link;
 - a page with no `<h1>`, or more than one;
+- a page with no `<main>`, or more than one, and a page with no `lang` on
+  `<html>`;
 - a `sitemap.xml` entry that no page declares as its canonical link, or a page
   that must be in the sitemap and is not.
 
