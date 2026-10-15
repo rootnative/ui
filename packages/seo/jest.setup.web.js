@@ -21,3 +21,12 @@ jest.mock('expo-router/head', () => {
   Head.Provider = HelmetProvider
   return { __esModule: true, default: Head }
 })
+
+// The router hooks `PageHead` and `RouteHead` read. A test sets the route
+// through these globals; a navigator is not part of what the test checks.
+global.__seoRoute = { pathname: '/', focused: true }
+jest.mock('expo-router', () => ({
+  __esModule: true,
+  usePathname: () => global.__seoRoute.pathname,
+  useIsFocused: () => global.__seoRoute.focused,
+}))

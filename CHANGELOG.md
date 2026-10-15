@@ -11,6 +11,37 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `RouteHead` writes the head of a screen that has no `PageHead`
+
+A screen with no `PageHead` was a page with no title, and nothing said so
+until the audit above. `RouteHead` in `@rootnative/seo/expo-router` closes
+the gap. It takes `defaults`, a function from the pathname to a `PageMeta`,
+and writes that head for the current route when no focused screen on it
+renders a `PageHead`. `undefined` writes nothing. On native it renders
+`null`.
+
+A `PageHead` wins the whole page, not one tag at a time. The head renderer
+merges tags one by one, last one wins, so a `noindex` screen with no `url`
+would have kept the canonical link the defaults gave the route. Instead,
+`PageHead` claims its route during render, and `RouteHead` writes nothing
+for a claimed route. The claim is made in render and not in an effect,
+because the static export runs no effect.
+
+That gives `RouteHead` one placement rule: after the navigator in the root
+layout. The screen then renders first, and `RouteHead` reads its claim in
+the same pass. Before the navigator, the static export holds both heads; the
+client corrects itself after the first render, and the component warns in
+development.
+
+The example's component screens no longer render a `PageHead`: `RouteHead`
+builds the same head from the catalog, the home and not-found screens keep
+their own, and the export gate checks that the not-found page gets no
+canonical link from the defaults.
+
+**Check your root layout.** Add `<RouteHead defaults={fn} />` after the
+navigator, with `fn` returning the title, the description and the `url` of
+each route your app can show, and `undefined` for the rest.
+
 ### `auditExport` and `rootnative-seo audit` check every exported page
 
 The docs told each app to write its own export check, and the example's

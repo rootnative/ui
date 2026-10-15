@@ -7,7 +7,6 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
-import { PageHead } from '@rootnative/seo/expo-router'
 import { usePathname } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Linking, Platform, StyleSheet, View } from 'react-native'
@@ -29,7 +28,8 @@ const monoFontFamily = Platform.select({
  *
  * Takes no props — it resolves the current route against the catalog, so a
  * screen only has to render it as the first child of its scroll content.
- * Renders nothing on a route that isn't in the catalog.
+ * Renders nothing on a route that isn't in the catalog. The head of the page
+ * comes from `RouteHead` in the root layout, from the same catalog entry.
  */
 export function ScreenIntro() {
   const theme = useTheme()
@@ -79,11 +79,6 @@ export function ScreenIntro() {
 
   return (
     <Column gap="md">
-      <PageHead
-        title={entry.label}
-        description={entry.description}
-        url={entry.route}
-      />
       <Column gap="xs">
         <Typography level={2} variant="headlineSmall">
           {entry.label}

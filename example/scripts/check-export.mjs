@@ -24,7 +24,8 @@ const SITE_URL = 'https://rootnative.github.io/ui/demo'
 
 // The AppBar title is the `<h1>` of every page: `titleLevel` defaults to 1.
 // The screen intro and the home hero pass `level={2}` to `Typography`, so
-// they sit under it as `<h2>`.
+// they sit under it as `<h2>`. The home page renders its own `PageHead`; the
+// button page has none, so its head comes from `RouteHead` and the catalog.
 const pages = [
   {
     file: 'index.html',
@@ -75,6 +76,28 @@ if (!existsSync(dist)) {
 const audit = await auditExport({ outDir: dist })
 for (const { file, rule, message } of audit.problems) {
   problems.push(`${file} (${rule}): ${message}`)
+}
+
+// The not-found screen renders a `PageHead` with `noindex` and no `url`, and
+// the route defaults would give it a canonical link. The `PageHead` must win
+// the whole page, so the export holds no canonical link here.
+const notFound = resolve(dist, '+not-found.html')
+if (existsSync(notFound)) {
+  const html = readFileSync(notFound, 'utf8')
+  const title = decode(html.match(/<title[^>]*>([^<]*)<\/title>/)?.[1] ?? '')
+  if (title !== 'Page not found | RootNative UI') {
+    problems.push(`+not-found.html: title is "${title}"`)
+  }
+  if (count(html, /<meta[^>]*name="robots"[^>]*content="noindex"/g) !== 1) {
+    problems.push('+not-found.html: expected one noindex rule')
+  }
+  if (count(html, /<link[^>]*rel="canonical"/g) !== 0) {
+    problems.push(
+      '+not-found.html: has a canonical link. The PageHead must win over the route defaults; is <RouteHead /> after the navigator?',
+    )
+  }
+} else {
+  problems.push('+not-found.html: missing')
 }
 
 for (const page of pages) {
@@ -185,7 +208,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD.`,
+    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found has noindex and no canonical link.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

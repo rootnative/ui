@@ -18,7 +18,7 @@ pnpm add @rootnative/seo
 | `@rootnative/seo` | nothing | `defineSite`, `toHeadTags`, `clipDescription`, `isoDuration`, the types |
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
 | `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
-| `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `shellTags` |
+| `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `RouteHead`, `shellTags` |
 | `@rootnative/seo/node` | Node | `writeSeoFiles` and `auditExport`, the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
 
 ## Quick start (Expo Router)
@@ -61,6 +61,15 @@ import { movie } from '@rootnative/seo/schema'
   type="video.movie"
   jsonLd={[movie({ name: data.title, url: `https://example.com/app/movies/${data.id}` })]}
 />
+```
+
+A screen with no `PageHead` gets its head from `RouteHead`, after the navigator in the root layout. It takes a function from the pathname to the page meta, and a `PageHead` on the route wins the whole page:
+
+```tsx
+<SeoProvider site={site}>
+  <Stack />
+  <RouteHead defaults={(pathname) => findPage(pathname)} />
+</SeoProvider>
 ```
 
 Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time.

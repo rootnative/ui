@@ -45,7 +45,7 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 
 ## `@rootnative/seo/react` — peers: react `>=19.2.3 <20.0.0`, react-native `>=0.83.0 <0.87.0`
 
-- `<SeoProvider site={site}>` — gives every `PageHead` below it the site.
+- `<SeoProvider site={site}>` — gives every `PageHead` and `RouteHead` below it the site, and tracks which route a `PageHead` claims.
 - `useSite(site?)` — the site for the tree. A `site` argument wins. Throws with no provider and no argument.
 - `<Heading level={1..6} as={Component}>` — renders the given text component (default RN `Text`) with `accessibilityRole="header"` and `aria-level`. On the web react-native-web writes `<h1>`..`<h6>`. Generic: `<Heading<TypographyProps> level={2} as={Typography} variant="titleMedium">`. The wrapped component's own `as`, `role`, `accessibilityRole` and `aria-level` props are omitted.
 - `imageLabel(kind, subject?)` — `imageLabel('Poster', 'Dune')` → `'Dune poster'`. Set the result as both `alt` and `accessibilityLabel` on `expo-image` (its web `alt` comes from `accessibilityLabel`).
@@ -53,6 +53,7 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 ## `@rootnative/seo/expo-router` — optional peer: expo-router `>=57.0.0`
 
 - `<PageHead {...meta} site?>` — `PageMeta` as props, plus an optional `site` that wins over the provider. Writes the tags through `expo-router/head`. On native it renders `null` and reads no site, so a native tree or test needs no `SeoProvider`. On the web a missing site throws, and the static export fails.
+- `<RouteHead defaults={(pathname) => PageMeta | undefined} site?>` — for the root layout, after the navigator. Writes the head of the current route when no focused screen on it renders a `PageHead`; a `PageHead` wins the whole page, not one tag at a time. `undefined` writes nothing. Native renders `null`. Put it after the navigator: the screen renders first and claims the route, and the static export runs no effect. Before the navigator, the export holds both heads, and the component warns in development.
 - `renderHeadTag(tag, index)` — one `HeadTag` as the element `expo-router/head` expects. A JSON-LD script is written as a string child, not `dangerouslySetInnerHTML` (react-helmet-async drops the latter).
 - `shellTags(options): ReactElement[]` — for `app/+html.tsx`: charset, viewport (default `width=device-width, initial-scale=1, shrink-to-fit=no`), `themeColor`, `favicon`, `appleTouchIcon`, `manifest`, `preconnect: { href, crossOrigin? }[]`. `themeColor` is a string or `{ light, dark }`; the object form writes one `theme-color` tag per `prefers-color-scheme`, which follows the system scheme, not a mode picked in the app. `basePath` (pass `process.env.EXPO_BASE_URL`) prefixes every relative `href`. No router dependency: works in a Vite template through `renderToStaticMarkup`. Expo Router writes the `PageHead` tags before the shell, so the charset can land after byte 1024: the host must send `Content-Type: text/html; charset=utf-8`.
 

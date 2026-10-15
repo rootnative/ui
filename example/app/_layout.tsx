@@ -7,6 +7,7 @@ import {
   useTheme,
   useThemeMode,
 } from '@rootnative/core'
+import { RouteHead } from '@rootnative/seo/expo-router'
 import { SeoProvider } from '@rootnative/seo/react'
 import { isRTLDirection } from '@rootnative/utils'
 import { Stack, useRouter, useSegments } from 'expo-router'
@@ -65,6 +66,24 @@ function resolveTitle(routeName: string): string {
     .replace(/^\[|\]$/g, '')
     .replace(/[-_]/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+/**
+ * The head of a route that renders no `PageHead`: the component screens, from
+ * the catalog. The home and the not-found screens render their own, and a
+ * `PageHead` wins the whole page.
+ */
+function routeDefaults(pathname: string) {
+  const entry = findEntry(pathname)
+  if (entry) {
+    return {
+      title: entry.label,
+      description: entry.description,
+      url: entry.route,
+    }
+  }
+  const routeName = resolveRouteName(pathname.split('/').filter(Boolean))
+  return { title: resolveTitle(routeName), url: pathname }
 }
 
 async function toggleRTL() {
@@ -179,6 +198,9 @@ function RootLayoutContent() {
             insetTop
           />
           <Stack screenOptions={stackScreenOptions} />
+          {/* After the navigator: the screen renders first, so its PageHead
+              claims the route before RouteHead reads the claim. */}
+          <RouteHead defaults={routeDefaults} />
         </PortalHost>
       </Layout>
     </>

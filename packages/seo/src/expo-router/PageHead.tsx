@@ -1,7 +1,8 @@
+import { useIsFocused, usePathname } from 'expo-router'
 import Head from 'expo-router/head'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
-import { useSite } from '../react/SeoProvider'
+import { useClaim, useClaims, useSite } from '../react/SeoProvider'
 import type { HeadTag, PageMeta, Site } from '../types'
 
 export type PageHeadProps = PageMeta & {
@@ -61,5 +62,11 @@ export function PageHead(props: PageHeadProps) {
 
 function WebPageHead({ site, ...meta }: PageHeadProps) {
   const resolved = useSite(site)
+  // A focused screen is the page at `pathname`. The claim keeps `RouteHead`
+  // from writing the route defaults next to this head. A screen that stays
+  // mounted behind the focused one holds no claim, as it writes no head.
+  const focused = useIsFocused()
+  const pathname = usePathname()
+  useClaim(useClaims(), focused ? pathname : null)
   return <Head>{toHeadTags(resolved, meta).map(renderHeadTag)}</Head>
 }

@@ -355,6 +355,9 @@
       "./expo-router": [
         "PageHead",
         "PageHeadProps",
+        "RouteDefaults",
+        "RouteHead",
+        "RouteHeadProps",
         "ShellTagsOptions",
         "renderHeadTag",
         "shellTags"

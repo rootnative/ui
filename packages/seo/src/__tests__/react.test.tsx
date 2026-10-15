@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react-native'
-import { PageHead } from '../expo-router'
+import { PageHead, RouteHead } from '../expo-router'
 import { defineSite } from '../index'
 import { Heading, imageLabel, SeoProvider } from '../react'
 
@@ -38,6 +38,15 @@ describe('PageHead on native', () => {
 
   it('reads no site, so a native tree needs no provider', () => {
     const { toJSON } = render(<PageHead title="Dune" url="/m/1" />)
+    expect(toJSON()).toBeNull()
+  })
+})
+
+describe('RouteHead on native', () => {
+  it('renders nothing and reads no site', () => {
+    const { toJSON } = render(
+      <RouteHead defaults={() => ({ title: 'Default', url: '/' })} />,
+    )
     expect(toJSON()).toBeNull()
   })
 })

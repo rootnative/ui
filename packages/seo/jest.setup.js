@@ -15,3 +15,11 @@ jest.mock('expo-router/head', () => ({
   __esModule: true,
   default: () => null,
 }))
+
+// `PageHead` and `RouteHead` return before they read the router on native.
+// The stub keeps `expo-router` itself out of the native project too.
+jest.mock('expo-router', () => ({
+  __esModule: true,
+  usePathname: () => '/',
+  useIsFocused: () => true,
+}))

@@ -139,6 +139,43 @@ The rules the head follows:
 A page outside the provider, such as `+not-found`, passes `site` as a prop.
 The prop wins over the provider.
 
+### The route a screen forgets
+
+A screen with no `PageHead` is a page with no title. `RouteHead` closes
+that gap: it takes a function from the pathname to a `PageMeta` and writes
+that head for the current route, when no screen on the route renders a
+`PageHead`. A `PageHead` wins the whole page, not one tag at a time, so a
+`noindex` screen with no `url` gets no canonical link from the defaults.
+
+```tsx title="app/_layout.tsx"
+import { RouteHead } from '@rootnative/seo/expo-router'
+import { SeoProvider } from '@rootnative/seo/react'
+import { Stack } from 'expo-router'
+import { site } from '../src/site'
+import { findPage } from '../src/pages'
+
+function routeDefaults(pathname: string) {
+  const page = findPage(pathname)
+  if (!page) return undefined
+  return { title: page.title, description: page.summary, url: pathname }
+}
+
+export default function RootLayout() {
+  return (
+    <SeoProvider site={site}>
+      <Stack />
+      <RouteHead defaults={routeDefaults} />
+    </SeoProvider>
+  )
+}
+```
+
+Put `RouteHead` after the navigator. The screen then renders first and
+claims the route, and `RouteHead` reads the claim in the same render pass.
+That order matters on the static export, which runs no effect. Before the
+navigator, the export holds both heads, and the component warns in
+development. Return `undefined` for a route that must write nothing.
+
 ### Per-route `noindex`
 
 An overlay route, a filter sheet, or a per-device screen is a page the
