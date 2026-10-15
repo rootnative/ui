@@ -360,6 +360,10 @@
         "shellTags"
       ],
       "./node": [
+        "AuditExportOptions",
+        "AuditProblem",
+        "AuditResult",
+        "AuditRule",
         "ExportedPage",
         "ManifestIcon",
         "ManifestOptions",
@@ -372,6 +376,7 @@
         "WriteRobotsOptions",
         "WriteSeoFilesOptions",
         "WriteSitemapOptions",
+        "auditExport",
         "manifestJson",
         "readExport",
         "robotsTxt",

@@ -19,7 +19,7 @@ pnpm add @rootnative/seo
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
 | `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `shellTags` |
-| `@rootnative/seo/node` | Node | `writeSeoFiles` and the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
+| `@rootnative/seo/node` | Node | `writeSeoFiles` and `auditExport`, the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
 
 ## Quick start (Expo Router)
 

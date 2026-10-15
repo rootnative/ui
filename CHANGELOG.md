@@ -11,6 +11,41 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `auditExport` and `rootnative-seo audit` check every exported page
+
+The docs told each app to write its own export check, and the example's
+script checked two pages of thirty-eight. The other thirty-six could lose
+their title and no gate would fail. On its first run over the whole example,
+the new audit found two pages that had: the `+not-found` page had an empty
+`<title>`, no canonical link and no `<h1>`, and the `AppBar` demo page had
+thirty-seven `<h1>` tags, one per demo bar, because the bar title is level 1
+by default.
+
+`auditExport({ outDir, siteUrl?, ignore? })` in `@rootnative/seo/node` reads
+every `.html` file under `outDir` and returns each rule a page fails:
+
+- `title`: one `<title>`, with text.
+- `canonical`: an absolute canonical link, or `noindex`.
+- `h1`: exactly one `<h1>`.
+- `sitemap`: `sitemap.xml` exists, every `<loc>` is the canonical link of a
+  page, and every page `writeSeoFiles` would list is in it.
+
+It returns `{ pages, problems: { file, rule, message }[] }` and throws only
+when the folder is missing or holds no HTML file. `rootnative-seo audit
+<outDir>` runs it from a `package.json` script, prints each problem with its
+file and rule, exits with 1 when there is one, and writes nothing. `--ignore
+<rule>` skips a rule.
+
+The example now runs the audit over its whole export and keeps its two-page
+content check. Its `+not-found` screen has a title, `noindex`, and the
+`AppBar` heading, and the demo bars on the `AppBar` page pass
+`titleLevel={3}`.
+
+**Check your deploy.** Add `rootnative-seo audit dist` after
+`rootnative-seo dist` in the CI step that exports the web app. A demo or a
+list page that renders more than one `AppBar` needs `titleLevel` on every
+bar but the page bar.
+
 ### Layout keys in `style` place `Card` with `onPress` and `Switch`
 
 alpha.24 sent the layout keys in `style` to the wrapper of `Button`,

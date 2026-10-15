@@ -324,10 +324,25 @@ string, also on a site with two themes.
 
 ## Check the result
 
-Read the export before you deploy. One script that asserts the title, the
-canonical link, one `<h1>`, and one JSON-LD script on one page is the test
-that catches a head renderer change in Expo Router. The
+Read the export before you deploy. `rootnative-seo audit dist` reads every
+exported page and fails on:
+
+- a page with no `<title>`, or an empty one;
+- a page with no canonical link and no `noindex`, or a relative canonical
+  link;
+- a page with no `<h1>`, or more than one;
+- a `sitemap.xml` entry that no page declares as its canonical link, or a page
+  that must be in the sitemap and is not.
+
+Run it after `rootnative-seo dist`, so the sitemap exists. It prints each
+problem with its file and the rule, and writes nothing. A rule that does not
+apply to your site is skipped with `--ignore <rule>`. From a script, call
+`auditExport({ outDir })` and read `problems`.
+
+The audit checks the shape of every page, not the content of one. The
 [example app](https://github.com/rootnative/ui/blob/main/example/scripts/check-export.mjs)
-carries one.
+runs the audit and then asserts the title, the canonical link, the headings
+and the JSON-LD of two pages by value, which is the test that catches a head
+renderer change in Expo Router.
 
 Then read the [limits](./limits.md).

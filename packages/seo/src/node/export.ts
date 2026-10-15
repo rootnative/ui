@@ -67,7 +67,7 @@ const ROUTE_TEMPLATE = /\[[^\]]+\]/
 const TAG = /<(link|meta)\b([^>]*)>/gi
 const ATTRIBUTE = /([^\s=/]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/g
 
-function decodeEntities(text: string): string {
+export function decodeEntities(text: string): string {
   return text.replace(
     /&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi,
     (entity, code: string) => {
@@ -140,20 +140,32 @@ function routeOf(file: string): string {
 }
 
 /**
+ * Every `.html` file under `outDir`, as a path with `/` separators, sorted.
+ * Throws when the folder does not exist. `caller` names the function in the
+ * error.
+ */
+export async function listHtmlFiles(
+  outDir: string,
+  caller: string,
+): Promise<string[]> {
+  const folder = await stat(outDir).catch(() => undefined)
+  if (!folder?.isDirectory()) {
+    throw new Error(
+      `${caller}: "${outDir}" is not a folder. Run the web export first.`,
+    )
+  }
+  return (await readdir(outDir, { recursive: true }))
+    .filter((file) => file.endsWith('.html'))
+    .map((file) => file.split(sep).join('/'))
+    .sort()
+}
+
+/**
  * Reads every `.html` file under `outDir`, sorted by path. Throws when the
  * folder does not exist.
  */
 export async function readExport(outDir: string): Promise<ExportedPage[]> {
-  const folder = await stat(outDir).catch(() => undefined)
-  if (!folder?.isDirectory()) {
-    throw new Error(
-      `readExport: "${outDir}" is not a folder. Run the web export first.`,
-    )
-  }
-  const files = (await readdir(outDir, { recursive: true }))
-    .filter((file) => file.endsWith('.html'))
-    .map((file) => file.split(sep).join('/'))
-    .sort()
+  const files = await listHtmlFiles(outDir, 'readExport')
   return Promise.all(
     files.map(async (file) => ({
       file,
@@ -163,11 +175,12 @@ export async function readExport(outDir: string): Promise<ExportedPage[]> {
   )
 }
 
-function absoluteSiteUrl(url: string): string {
+/** `url` with no trailing slash. Throws when it is not absolute. */
+export function absoluteSiteUrl(url: string, caller: string): string {
   const trimmed = trimTrailingSlash(url.trim())
   if (!/^https?:\/\//.test(trimmed)) {
     throw new Error(
-      `writeSeoFiles: \`siteUrl\` must be absolute and start with http:// or https://, got "${url}".`,
+      `${caller}: \`siteUrl\` must be absolute and start with http:// or https://, got "${url}".`,
     )
   }
   return trimmed
@@ -181,7 +194,8 @@ function isUnder(siteUrl: string, url: string): boolean {
   )
 }
 
-function skipReason(
+/** Why `page` stays out of the sitemap, or `undefined` when it goes in. */
+export function skipReason(
   page: ExportedPage,
   siteUrl: string,
   listed: Set<string>,
@@ -222,7 +236,10 @@ export async function writeSeoFiles(
       'writeSeoFiles: no site URL. Pass `siteUrl`, or give the home page (index.html) a canonical link.',
     )
   }
-  const siteUrl = absoluteSiteUrl(options.siteUrl ?? home ?? '')
+  const siteUrl = absoluteSiteUrl(
+    options.siteUrl ?? home ?? '',
+    'writeSeoFiles',
+  )
 
   const listed = new Set<string>()
   const skipped: SeoFilesResult['skipped'] = []

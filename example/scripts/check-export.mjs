@@ -1,9 +1,12 @@
 /**
- * Reads the static web export and asserts what a crawler reads on one page.
+ * Reads the static web export and asserts what a crawler reads.
  *
- * This is the test that catches a head renderer change in Expo Router. The
- * unit tests in `packages/seo` mock `expo-router/head`, so only a real export
- * can show that the head reaches the HTML file.
+ * `auditExport` checks every page: the title, the canonical link or
+ * `noindex`, one `<h1>`, and the sitemap. The two pages below are checked
+ * for their content too, because this is the test that catches a head
+ * renderer change in Expo Router. The unit tests in `packages/seo` mock
+ * `expo-router/head`, so only a real export can show that the head reaches
+ * the HTML file.
  *
  * Usage, from `example/`:
  *   pnpm run check:export        # exports, then checks
@@ -12,6 +15,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { auditExport } from '@rootnative/seo/node'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dist = resolve(here, '..', 'dist')
@@ -61,36 +65,38 @@ function decode(text) {
     .replace(/&#x27;/g, "'")
 }
 
+if (!existsSync(dist)) {
+  console.error(
+    '[check-export] example/dist not found. Is `web.output` set to `static` in app.json? Run `expo export --platform web` first.',
+  )
+  process.exit(1)
+}
+
+const audit = await auditExport({ outDir: dist })
+for (const { file, rule, message } of audit.problems) {
+  problems.push(`${file} (${rule}): ${message}`)
+}
+
 for (const page of pages) {
   const file = resolve(dist, page.file)
   if (!existsSync(file)) {
-    problems.push(
-      `${page.file}: missing. Is \`web.output\` set to \`static\` in app.json?`,
-    )
+    problems.push(`${page.file}: missing`)
     continue
   }
   const html = readFileSync(file, 'utf8')
   const where = page.file
 
-  const titles = [...html.matchAll(/<title[^>]*>([^<]*)<\/title>/g)].map((m) =>
-    decode(m[1]),
-  )
-  if (titles.length !== 1) {
-    problems.push(`${where}: expected one <title>, found ${titles.length}`)
-  } else if (titles[0] !== page.title) {
-    problems.push(`${where}: title is "${titles[0]}", expected "${page.title}"`)
+  const title = decode(html.match(/<title[^>]*>([^<]*)<\/title>/)?.[1] ?? '')
+  if (title !== page.title) {
+    problems.push(`${where}: title is "${title}", expected "${page.title}"`)
   }
 
-  const canonicals = [
-    ...html.matchAll(/<link[^>]*rel="canonical"[^>]*href="([^"]*)"/g),
-  ].map((m) => decode(m[1]))
-  if (canonicals.length !== 1) {
+  const canonical = decode(
+    html.match(/<link[^>]*rel="canonical"[^>]*href="([^"]*)"/)?.[1] ?? '',
+  )
+  if (canonical !== page.canonical) {
     problems.push(
-      `${where}: expected one canonical link, found ${canonicals.length}`,
-    )
-  } else if (canonicals[0] !== page.canonical) {
-    problems.push(
-      `${where}: canonical is "${canonicals[0]}", expected "${page.canonical}"`,
+      `${where}: canonical is "${canonical}", expected "${page.canonical}"`,
     )
   }
 
@@ -169,19 +175,6 @@ for (const file of generated) {
   }
 }
 
-const sitemapFile = resolve(dist, 'sitemap.xml')
-if (existsSync(sitemapFile)) {
-  const xml = readFileSync(sitemapFile, 'utf8')
-  for (const page of pages) {
-    if (!xml.includes(`<loc>${page.canonical}</loc>`)) {
-      problems.push(`sitemap.xml: missing ${page.canonical}`)
-    }
-  }
-  if (xml.includes('+not-found') || xml.includes('_sitemap')) {
-    problems.push('sitemap.xml: lists a route that must stay out')
-  }
-}
-
 for (const file of absent) {
   if (existsSync(resolve(dist, file))) {
     problems.push(
@@ -192,7 +185,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${pages.length} pages carry the title, the canonical link, one <h1>, one <h2>, the manifest link, and the JSON-LD; sitemap.xml lists them.`,
+    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

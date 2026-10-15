@@ -89,6 +89,7 @@ function CollapseDemo({
   return (
     <>
       <AppBar
+        titleLevel={3}
         title={variant === 'large' ? 'Large App Bar' : 'Medium App Bar'}
         subtitle={subtitle}
         variant={variant}
@@ -138,6 +139,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{item.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={item.title}
                     variant={item.variant}
                     actions={actions}
@@ -156,6 +158,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{item.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={item.title}
                     variant={item.variant}
                     canGoBack
@@ -179,6 +182,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{item.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={item.title}
                     subtitle="Supporting text"
                     variant={item.variant}
@@ -201,6 +205,7 @@ export default function AppBarScreen() {
           <Column gap="md">
             <Box style={previewStyle}>
               <AppBar
+                titleLevel={3}
                 title="About"
                 canGoBack
                 navigationIcon="close"
@@ -209,6 +214,7 @@ export default function AppBarScreen() {
             </Box>
             <Box style={previewStyle}>
               <AppBar
+                titleLevel={3}
                 title="About"
                 leading={
                   <IconButton
@@ -238,6 +244,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{item.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={item.title}
                     variant={item.variant}
                     elevated
@@ -289,6 +296,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{scheme.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={scheme.label}
                     colorScheme={scheme.key}
                     canGoBack
@@ -310,6 +318,7 @@ export default function AppBarScreen() {
           <Column gap="md">
             <Box style={previewStyle}>
               <AppBar
+                titleLevel={3}
                 title="Rootnative"
                 canGoBack
                 actions={actions}
@@ -319,6 +328,7 @@ export default function AppBarScreen() {
             </Box>
             <Box style={previewStyle}>
               <AppBar
+                titleLevel={3}
                 title="Rootnative"
                 variant="large"
                 canGoBack
@@ -338,6 +348,7 @@ export default function AppBarScreen() {
                 <Typography variant="labelMedium">{item.label}</Typography>
                 <Box style={previewStyle}>
                   <AppBar
+                    titleLevel={3}
                     title={longTitle}
                     variant={item.variant}
                     canGoBack

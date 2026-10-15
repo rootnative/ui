@@ -51,6 +51,10 @@ function resolveTitle(routeName: string): string {
     return 'Home'
   }
 
+  if (routeName === '+not-found') {
+    return 'Not found'
+  }
+
   const entry = findEntry(`/${routeName}`)
 
   if (entry) {

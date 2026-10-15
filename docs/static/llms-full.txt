@@ -2695,7 +2695,7 @@ pnpm add @rootnative/seo
 7. **Bundle and preconnect.** `shellTags` in `app/+html.tsx` with a `preconnect` per origin the first paint needs.
 8. **The small tags.** Theme colour, icons and the manifest, through `shellTags` and `writeManifest`.
 
-Check the export before you deploy: read one page and assert the title, the canonical link, one `<h1>`, and one JSON-LD script. Lighthouse and Search Console on the live host are the only checks that count.
+Check the export before you deploy: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, more than one `<h1>`, or a sitemap that disagrees with the pages. Lighthouse and Search Console on the live host are the only checks that count.
 
 ## `@rootnative/seo` — core (no dependency)
 
@@ -2748,6 +2748,8 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 - `rootnative-seo <outDir> [--site-url <url>] [--sitemap <url>]... [--no-robots]` — the command for the deploy step, after the export. It runs `writeSeoFiles`, prints each page it leaves out with the reason, and exits with 1 on an error. `--sitemap` replaces the sitemap list in `robots.txt`; repeat it for more than one.
 - `writeSeoFiles({ outDir, siteUrl?, robots? })` — reads every `.html` file under `outDir` and writes `sitemap.xml` and `robots.txt`. A page goes in the sitemap with its canonical link, when the link is under the site and the page has no `noindex`. Left out, with a `reason`: a special route (a `+` or `_` segment, or a root `404.html`), a dynamic route template (`[id].html`), `noindex`, no canonical link, a canonical link outside the site, and a second page with the same link. `siteUrl` defaults to the canonical link of `index.html`. `robots: false` writes no `robots.txt`; an object passes options to `writeRobots`. Resolves to `{ siteUrl, sitemap, robots?, urls, skipped: { file, reason }[] }`. Each sitemap entry holds `loc` only: Google ignores `changefreq` and `priority`, and an export does not know `lastmod`. Throws when no page can go in the sitemap, because an empty sitemap fails with no other signal.
 - `readExport(outDir)` — `{ file, route, canonical?, noindex }[]` for every exported HTML file, sorted by path. Use it to build a URL list of your own.
+- `rootnative-seo audit <outDir> [--site-url <url>] [--ignore <rule>]...` — the gate for CI, after the export and after `rootnative-seo <outDir>`. It runs `auditExport`, prints each problem with its file and rule, and exits with 1 when there is one. It writes nothing. `--ignore` skips one rule; repeat it for more.
+- `auditExport({ outDir, siteUrl?, ignore? })` — reads every `.html` file under `outDir` and returns `{ pages, problems: { file, rule, message }[] }`. The rules: `title` (one `<title>` with text), `canonical` (an absolute canonical link, or `noindex`), `h1` (exactly one `<h1>`), and `sitemap` (`sitemap.xml` exists, every `<loc>` is the canonical link of a page, and every page `writeSeoFiles` would list is in it). `siteUrl` defaults to the canonical link of `index.html`; with neither, the second half of the `sitemap` rule is skipped. An empty `problems` list is a pass. It throws only when the folder is missing or holds no HTML file.
 
 The three functions below write one file each. Each creates `outDir`, writes the file and resolves to its path. Each has a pure sibling that returns the text.
 

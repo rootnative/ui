@@ -1,4 +1,11 @@
 export {
+  auditExport,
+  type AuditExportOptions,
+  type AuditProblem,
+  type AuditResult,
+  type AuditRule,
+} from './audit'
+export {
   readExport,
   writeSeoFiles,
   type ExportedPage,
