@@ -1,5 +1,6 @@
 import { parseArgs } from 'node:util'
 import { auditExport, type AuditRule } from './audit'
+import { browseExport } from './browse'
 import {
   writeSeoFiles,
   type SkipReason,
@@ -8,6 +9,7 @@ import {
 
 const USAGE = `Usage: rootnative-seo <outDir> [options]
        rootnative-seo audit <outDir> [options]
+       rootnative-seo browse <outDir> [options]
 
 Writes sitemap.xml and robots.txt into <outDir> from the exported HTML files.
 A page goes in the sitemap when it has a canonical link under the site URL and
@@ -26,7 +28,18 @@ and the pages disagree. It writes nothing.
 
 Audit options:
   --site-url <url>  The site URL, as above.
-  --ignore <rule>   Skip a rule: title, canonical, h1, or sitemap. Repeat it.`
+  --ignore <rule>   Skip a rule: title, canonical, h1, or sitemap. Repeat it.
+
+browse serves the export and loads every page in headless Chrome. It fails on
+an uncaught exception, a console.error, or a failed request, which is where a
+hydration mismatch shows. It writes nothing.
+
+Browse options:
+  --chrome <path>    The Chrome or Chromium binary. The default is CHROME_PATH,
+                     then the usual names on PATH and the usual install paths.
+  --base-path <path> The path the site lives under, for example /ui/demo. The
+                     default is the path of the canonical link of index.html.
+  --settle <ms>      How long to listen after the load event. The default is 750.`
 
 const RULES: AuditRule[] = ['title', 'canonical', 'h1', 'sitemap']
 
@@ -58,14 +71,18 @@ export async function main(
     output.log(USAGE)
     return 0
   }
-  const audit = positionals[0] === 'audit'
-  const outDir = audit ? positionals[1] : positionals[0]
-  if (!outDir || positionals.length > (audit ? 2 : 1)) {
+  const command =
+    positionals[0] === 'audit' || positionals[0] === 'browse'
+      ? positionals[0]
+      : 'write'
+  const outDir = command === 'write' ? positionals[0] : positionals[1]
+  if (!outDir || positionals.length > (command === 'write' ? 1 : 2)) {
     output.error(USAGE)
     return 1
   }
 
-  if (audit) return runAudit(outDir, values, output)
+  if (command === 'audit') return runAudit(outDir, values, output)
+  if (command === 'browse') return runBrowse(outDir, values, output)
   if (values.ignore?.length) {
     output.error(`--ignore applies to audit only.\n\n${USAGE}`)
     return 1
@@ -144,6 +161,42 @@ async function runAudit(
   }
 }
 
+async function runBrowse(
+  outDir: string,
+  values: ReturnType<typeof parse>['values'],
+  output: Output,
+): Promise<number> {
+  const settle = values.settle === undefined ? undefined : Number(values.settle)
+  if (settle !== undefined && !(settle >= 0)) {
+    output.error(`--settle takes a number of milliseconds.\n\n${USAGE}`)
+    return 1
+  }
+  try {
+    const result = await browseExport({
+      outDir,
+      chrome: values.chrome,
+      basePath: values['base-path'],
+      settleMs: settle,
+    })
+    if (result.problems.length === 0) {
+      output.log(
+        `[rootnative-seo] browse: ${pages(result.pages)} load clean in ${outDir} (${result.chrome})`,
+      )
+      return 0
+    }
+    output.error(
+      `[rootnative-seo] browse: ${result.problems.length} ${result.problems.length === 1 ? 'problem' : 'problems'} in ${pages(result.pages)} in ${outDir} (${result.chrome})`,
+    )
+    for (const { file, kind, message } of result.problems) {
+      output.error(`  ${file} (${kind}): ${message}`)
+    }
+    return 1
+  } catch (error) {
+    output.error(`[rootnative-seo] ${(error as Error).message}`)
+    return 1
+  }
+}
+
 function pages(count: number): string {
   return `${count} ${count === 1 ? 'page' : 'pages'}`
 }
@@ -157,6 +210,9 @@ function parse(argv: string[]) {
       sitemap: { type: 'string', multiple: true },
       'no-robots': { type: 'boolean' },
       ignore: { type: 'string', multiple: true },
+      chrome: { type: 'string' },
+      'base-path': { type: 'string' },
+      settle: { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   })

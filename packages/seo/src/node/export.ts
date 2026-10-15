@@ -133,7 +133,8 @@ export function readHead(
   return { canonical, noindex }
 }
 
-function routeOf(file: string): string {
+/** The route a static host serves `file` at: `/` for `index.html`, `/blog` for `blog/index.html`. */
+export function routeOf(file: string): string {
   const path = file.replace(/\.html$/, '')
   if (path === 'index') return '/'
   return `/${path.replace(/\/index$/, '')}`

@@ -11,6 +11,33 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `browseExport` and `rootnative-seo browse` load every page in Chrome
+
+The audit reads the HTML. A hydration mismatch, a component that reads the
+browser during the hydrating render, or a bundle that fails to load leave
+the file correct and the page broken, and PageSpeed Insights reported
+exactly that on the docs home. `browseExport({ outDir })` in
+`@rootnative/seo/node` serves the export and loads every `.html` file in
+headless Chrome, and returns each error the browser reports: an uncaught
+exception, a `console.error`, or a log entry such as a request that
+failed. It drives Chrome over its debugging pipe, so the package adds no
+dependency; Chrome comes from `CHROME_PATH`, the usual names on `PATH`, or
+the usual install paths, and the GitHub `ubuntu-latest` runner has it.
+`rootnative-seo browse <outDir>` runs it from a script, prints each
+problem with its file and kind, and exits with 1.
+
+`serveExport({ outDir })` is the server behind it, and it is public: it
+serves the folder as a static host serves an Expo Router export, under the
+base path of the canonical link, for Lighthouse or a browser test of your
+own.
+
+The example runs the browser pass after the audit. On a machine with no
+Chrome, `check-export.mjs --no-browser` skips it and says so.
+
+**Check your CI.** Add `rootnative-seo browse dist` after
+`rootnative-seo audit dist`. A page that fails here renders twice for a
+crawler that runs the script, and the HTML gate cannot tell.
+
 ### `RouteHead` writes the head of a screen that has no `PageHead`
 
 A screen with no `PageHead` was a page with no title, and nothing said so

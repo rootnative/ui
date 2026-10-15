@@ -1,4 +1,16 @@
 export {
+  browseExport,
+  findChrome,
+  type BrowseExportOptions,
+  type BrowseProblem,
+  type BrowseResult,
+} from './browse'
+export {
+  serveExport,
+  type ExportServer,
+  type ServeExportOptions,
+} from './serve'
+export {
   auditExport,
   type AuditExportOptions,
   type AuditProblem,

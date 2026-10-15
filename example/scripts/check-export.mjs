@@ -8,14 +8,21 @@
  * `expo-router/head`, so only a real export can show that the head reaches
  * the HTML file.
  *
+ * `browseExport` then loads every page in headless Chrome and fails on an
+ * uncaught exception, a `console.error`, or a failed request. That is where
+ * a hydration mismatch (React error #418) shows, and the HTML cannot show
+ * it. Chrome comes from `CHROME_PATH` or the usual install paths; pass
+ * `--no-browser` on a machine without one, and CI runs the whole gate.
+ *
  * Usage, from `example/`:
  *   pnpm run check:export        # exports, then checks
  *   node scripts/check-export.mjs   # checks an existing dist/
+ *   node scripts/check-export.mjs --no-browser
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { auditExport } from '@rootnative/seo/node'
+import { auditExport, browseExport } from '@rootnative/seo/node'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dist = resolve(here, '..', 'dist')
@@ -86,6 +93,16 @@ if (!existsSync(dist)) {
 const audit = await auditExport({ outDir: dist })
 for (const { file, rule, message } of audit.problems) {
   problems.push(`${file} (${rule}): ${message}`)
+}
+
+const browser = process.argv.includes('--no-browser')
+  ? undefined
+  : await browseExport({ outDir: dist })
+for (const { file, kind, message } of browser?.problems ?? []) {
+  problems.push(`${file} (${kind}): ${message}`)
+}
+if (!browser) {
+  console.warn('[check-export] --no-browser: the browser pass is skipped.')
 }
 
 // The not-found screen renders a `PageHead` with `noindex` and no `url`, and
@@ -234,7 +251,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link.`,
+    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

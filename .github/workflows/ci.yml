@@ -105,5 +105,8 @@ jobs:
       # The `@rootnative/seo` unit tests mock `expo-router/head`, so only a
       # real export can show that the title, the canonical link, the heading
       # outline and the JSON-LD reach the file. Needs the packages built.
+      # The script then loads every page in headless Chrome, which the
+      # ubuntu runner ships, and fails on a console error: that is the only
+      # gate that sees a hydration mismatch.
       - name: Static export check
         run: pnpm --filter example check:export

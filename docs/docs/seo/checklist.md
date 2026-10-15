@@ -407,6 +407,20 @@ problem with its file and the rule, and writes nothing. A rule that does not
 apply to your site is skipped with `--ignore <rule>`. From a script, call
 `auditExport({ outDir })` and read `problems`.
 
+The audit reads the file. It cannot see what happens when the script runs:
+a hydration mismatch (React error #418), a component that reads the browser
+during the hydrating render, or a bundle that fails to load. A crawler that
+runs the script sees a page that renders twice, and Lighthouse counts the
+error. `rootnative-seo browse dist` serves the export and loads every page
+in headless Chrome, and fails on an uncaught exception, a `console.error`,
+or a failed request. It needs Chrome or Chromium: `CHROME_PATH`, or the
+usual install paths. The GitHub `ubuntu-latest` runner has Chrome. Run both
+in CI, after the export:
+
+```bash
+expo export --platform web && rootnative-seo dist && rootnative-seo audit dist && rootnative-seo browse dist
+```
+
 The audit checks the shape of every page, not the content of one. The
 [example app](https://github.com/rootnative/ui/blob/main/example/scripts/check-export.mjs)
 runs the audit and then asserts the title, the canonical link, the headings
