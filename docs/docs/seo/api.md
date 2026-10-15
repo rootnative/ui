@@ -27,6 +27,7 @@ import type { PageMeta, SiteConfig, Site, HeadTag, JsonLd, OpenGraphType } from 
 - `isoDuration(minutes)` — `150` → `'PT2H30M'`. Returns `null` for `0`, a negative, or a non-finite number.
 - `serializeJsonLd(value)` — `JSON.stringify` with every `<` as `\\u003c`, so `</script>` in a title cannot end the tag.
 - `resolveUrl(site, pathOrUrl)` — joins a path under the site; an absolute URL passes through.
+- `headTagsHtml(tags)` — the tags as HTML, one per line, escaped, for a static template such as the `index.html` of a Vite build: `template.replace('</head>', headTagsHtml(toHeadTags(site, meta)) + '</head>')`.
 
 ## `@rootnative/seo/schema` — JSON-LD builders (no dependency)
 
@@ -56,6 +57,10 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 - `<RouteHead defaults={(pathname) => PageMeta | undefined} site?>` — for the root layout, after the navigator. Writes the head of the current route when no focused screen on it renders a `PageHead`; a `PageHead` wins the whole page, not one tag at a time. `undefined` writes nothing. Native renders `null`. Put it after the navigator: the screen renders first and claims the route, and the static export runs no effect. Before the navigator, the export holds both heads, and the component warns in development.
 - `renderHeadTag(tag, index)` — one `HeadTag` as the element `expo-router/head` expects. A JSON-LD script is written as a string child, not `dangerouslySetInnerHTML` (react-helmet-async drops the latter).
 - `shellTags(options): ReactElement[]` — for `app/+html.tsx`: charset, viewport (default `width=device-width, initial-scale=1, shrink-to-fit=no`), `themeColor`, `favicon`, `appleTouchIcon`, `manifest`, `preconnect: { href, crossOrigin? }[]`. `themeColor` is a string or `{ light, dark }`; the object form writes one `theme-color` tag per `prefers-color-scheme`, which follows the system scheme, not a mode picked in the app. `basePath` (pass `process.env.EXPO_BASE_URL`) prefixes every relative `href`. No router dependency: works in a Vite template through `renderToStaticMarkup`. Expo Router writes the `PageHead` tags before the shell, so the charset can land after byte 1024: the host must send `Content-Type: text/html; charset=utf-8`.
+
+## `@rootnative/seo/dom` — peers: react, react-native; no router
+
+- `<PageHead {...meta} site? active?>` — the same `PageMeta` props as the Expo Router `PageHead`, for an app with no Expo Router: React Navigation on react-native-web, a Vite build, an Electron renderer. Writes the `toHeadTags` records to `document.head` in an effect and takes them out on unmount, so the two adapters write the same head. A tag of the same name, property or `rel` that was there before, from the template or from a screen below, is taken out while this head is on and put back when it goes: a screen mounted over another wins, and the one below gets its head back. `active={false}` takes the head out for a screen that stays mounted behind another; a React Navigation screen passes `useIsFocused()`. Native renders `null`. An effect never runs on a server, so a static file gets its head from `headTagsHtml` at build time.
 
 ## `@rootnative/seo/expo-image` — optional peer: expo-image `>=57.0.0`
 

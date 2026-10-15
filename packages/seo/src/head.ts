@@ -106,3 +106,35 @@ function jsonLdTags(meta: PageMeta): HeadTag[] {
     text: serializeJsonLd(item),
   }))
 }
+
+function escapeAttribute(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+/**
+ * The tags as HTML, one per line, for a static template such as the
+ * `index.html` of a Vite build. A JSON-LD script is written as is: its text
+ * already escapes every `<`.
+ */
+export function headTagsHtml(tags: HeadTag[]): string {
+  return tags
+    .map((tag) => {
+      switch (tag.tag) {
+        case 'title':
+          return `<title>${escapeAttribute(tag.text)}</title>`
+        case 'meta':
+          return 'name' in tag
+            ? `<meta name="${escapeAttribute(tag.name)}" content="${escapeAttribute(tag.content)}">`
+            : `<meta property="${escapeAttribute(tag.property)}" content="${escapeAttribute(tag.content)}">`
+        case 'link':
+          return `<link rel="${escapeAttribute(tag.rel)}" href="${escapeAttribute(tag.href)}">`
+        case 'script':
+          return `<script type="${tag.type}">${tag.text}</script>`
+      }
+    })
+    .join('\n')
+}

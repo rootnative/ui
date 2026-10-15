@@ -207,6 +207,37 @@ That order matters on the static export, which runs no effect. Before the
 navigator, the export holds both heads, and the component warns in
 development. Return `undefined` for a route that must write nothing.
 
+### An app without Expo Router
+
+React Navigation on react-native-web, a Vite build, or an Electron renderer
+has no `expo-router/head`. `PageHead` from `@rootnative/seo/dom` takes the
+same props and writes the same tags to `document.head` in an effect, and
+takes them out on unmount. A screen mounted over another wins, and the one
+below gets its head back when the top one unmounts. A screen that stays
+mounted behind another passes `active={false}`; with React Navigation that
+is `useIsFocused()`.
+
+```tsx
+import { PageHead } from '@rootnative/seo/dom'
+import { useIsFocused } from '@react-navigation/native'
+
+export function MovieScreen() {
+  const focused = useIsFocused()
+  return <PageHead title={data.title} url={`/movies/${data.id}`} active={focused} />
+}
+```
+
+An effect runs after the first paint and never on a server, so such an app
+has a static head only at build time. Render it into the template with
+`headTagsHtml` from the core:
+
+```ts
+import { defineSite, headTagsHtml, toHeadTags } from '@rootnative/seo'
+
+const head = headTagsHtml(toHeadTags(site, { title: 'Trek', url: '/' }))
+const html = template.replace('</head>', `${head}</head>`)
+```
+
 ### Per-route `noindex`
 
 An overlay route, a filter sheet, or a per-device screen is a page the

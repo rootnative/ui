@@ -7,6 +7,7 @@ export default defineConfig({
     'src/react/index.ts',
     'src/expo-router/index.ts',
     'src/expo-image/index.ts',
+    'src/dom/index.ts',
     'src/node/index.ts',
     'src/node/bin.ts',
   ],

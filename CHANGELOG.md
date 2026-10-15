@@ -11,6 +11,29 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
+### `PageHead` from `/dom`, for an app with no Expo Router
+
+An app on React Navigation with react-native-web, a Vite build, or an
+Electron renderer has no `expo-router/head`, so it had `toHeadTags` and no
+component to write the tags. `PageHead` in the new `@rootnative/seo/dom`
+entry takes the same `PageMeta` props as the Expo Router one and writes the
+same records to `document.head` in an effect, and takes them out on
+unmount. A test renders both adapters from one `PageMeta` and compares the
+heads.
+
+A tag of the same name, property or `rel` that was there before, from the
+template or from a screen below, is taken out while the head is on and put
+back when it goes, so a screen mounted over another wins and the one below
+gets its head back. `active={false}` takes the head out for a screen that
+stays mounted behind another; a React Navigation screen passes
+`useIsFocused()`. It needs no `react-helmet-async`: Expo Router vendors its
+own copy, and without a server renderer to collect its output a direct
+write gives the same result with no dependency and no provider.
+
+An effect never runs on a server, so such an app has a static head only at
+build time. `headTagsHtml(tags)` in the core writes the tags as escaped
+HTML for the template, one line each.
+
 ### `Picture` renders an image a crawler sees
 
 `expo-image` mounts its image in an effect, and the React Native `Image`

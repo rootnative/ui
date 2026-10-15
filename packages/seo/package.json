@@ -38,6 +38,12 @@
       "import": "./dist/expo-router/index.mjs",
       "default": "./dist/expo-router/index.mjs"
     },
+    "./dom": {
+      "types": "./dist/dom/index.d.mts",
+      "react-native": "./dist/dom/index.mjs",
+      "import": "./dist/dom/index.mjs",
+      "default": "./dist/dom/index.mjs"
+    },
     "./expo-image": {
       "types": "./dist/expo-image/index.d.mts",
       "react-native": "./dist/expo-image/index.mjs",
@@ -60,6 +66,9 @@
       ],
       "expo-router": [
         "dist/expo-router/index.d.mts"
+      ],
+      "dom": [
+        "dist/dom/index.d.mts"
       ],
       "expo-image": [
         "dist/expo-image/index.d.mts"

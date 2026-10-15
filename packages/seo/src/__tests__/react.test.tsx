@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react-native'
+import { PageHead as DomPageHead } from '../dom'
 import { PageHead, RouteHead } from '../expo-router'
 import { defineSite } from '../index'
 import { Heading, imageLabel, SeoProvider } from '../react'
@@ -47,6 +48,13 @@ describe('RouteHead on native', () => {
     const { toJSON } = render(
       <RouteHead defaults={() => ({ title: 'Default', url: '/' })} />,
     )
+    expect(toJSON()).toBeNull()
+  })
+})
+
+describe('PageHead from /dom on native', () => {
+  it('renders nothing and reads no site', () => {
+    const { toJSON } = render(<DomPageHead title="Dune" url="/m/1" />)
     expect(toJSON()).toBeNull()
   })
 })
