@@ -2,6 +2,7 @@ node_modules/
 .expo/
 .expo-shared/
 dist/
+dist-server/
 web-build/
 .DS_Store
 *.pem

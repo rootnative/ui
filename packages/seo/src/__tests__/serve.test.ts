@@ -70,6 +70,30 @@ describe('serveExport', () => {
     await rm(join(tmpdir(), 'seo-serve-outside.txt'), { force: true })
   })
 
+  it('serves a server export: a file from client, then a page from server', async () => {
+    await writeFiles({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'server/index.html': page('https://example.com/app/', 'home'),
+      'server/about.html': page('https://example.com/app/about', 'about'),
+      'server/+not-found.html': page('', 'missing'),
+      'client/_expo/static/js/entry.js': 'console.log(1)',
+      'client/sitemap.xml': '<urlset/>',
+    })
+    server = await serveExport({ outDir })
+    expect(server.basePath).toBe('/app')
+    expect(await (await fetch(server.urlOf('/about'))).text()).toContain(
+      'about',
+    )
+    const script = await fetch(server.urlOf('/_expo/static/js/entry.js'))
+    expect(script.status).toBe(200)
+    expect((await fetch(server.urlOf('/sitemap.xml'))).status).toBe(200)
+    expect((await fetch(server.urlOf('/server/about'))).status).toBe(404)
+    expect((await fetch(server.urlOf('/_expo/routes.json'))).status).toBe(404)
+    const missing = await fetch(server.urlOf('/nope'))
+    expect(missing.status).toBe(404)
+    expect(await missing.text()).toContain('missing')
+  })
+
   it('takes an explicit base path', async () => {
     await writeFiles({ 'index.html': page('', 'home') })
     server = await serveExport({ outDir, basePath: 'demo/' })

@@ -6,6 +6,7 @@ import {
   attributesOf,
   decodeEntities,
   isUnder,
+  exportLayout,
   listHtmlFiles,
   readHead,
   skipReason,
@@ -24,7 +25,7 @@ export type AuditRule =
   | 'sitemap'
 
 export type AuditProblem = {
-  /** The path of the file under `outDir`, or `sitemap.xml`. */
+  /** The path of the page under the pages folder, or `sitemap.xml`. */
   file: string
   rule: AuditRule
   message: string
@@ -379,7 +380,8 @@ function sitemapHreflangProblems(
 }
 
 /**
- * Reads every `.html` file under `outDir` and returns each rule a page fails:
+ * Reads every `.html` page of the export in `outDir` (in `<outDir>/server`
+ * for a server export) and returns each rule a page fails:
  * no `<title>` or an empty one, no canonical link on a page with no
  * `noindex`, not exactly one `<h1>`, not exactly one `<main>`, no `lang` on
  * `<html>`, an `<img>` with no `alt`, a wrong set of `hreflang` links, and a
@@ -392,10 +394,11 @@ export async function auditExport(
   options: AuditExportOptions,
 ): Promise<AuditResult> {
   const { outDir } = options
-  const files = await listHtmlFiles(outDir, 'auditExport')
+  const { pagesDir, filesDir } = await exportLayout(outDir)
+  const files = await listHtmlFiles(pagesDir, 'auditExport')
   if (files.length === 0) {
     throw new Error(
-      `auditExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` in app.json.`,
+      `auditExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
     )
   }
   const rules = new Set<AuditRule>([
@@ -410,7 +413,7 @@ export async function auditExport(
   ])
   for (const rule of options.ignore ?? []) rules.delete(rule)
 
-  const pages = await Promise.all(files.map((file) => readPage(outDir, file)))
+  const pages = await Promise.all(files.map((file) => readPage(pagesDir, file)))
   const problems = pages.flatMap((page) => pageProblems(page, rules))
 
   if (rules.has('sitemap') || rules.has('hreflang')) {
@@ -418,7 +421,7 @@ export async function auditExport(
     const site = options.siteUrl ?? home
     const siteUrl =
       site === undefined ? undefined : absoluteSiteUrl(site, 'auditExport')
-    const xml = await readFile(join(outDir, 'sitemap.xml'), 'utf8').catch(
+    const xml = await readFile(join(filesDir, 'sitemap.xml'), 'utf8').catch(
       () => undefined,
     )
     if (rules.has('sitemap')) {

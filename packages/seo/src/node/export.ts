@@ -7,7 +7,10 @@ import { trimTrailingSlash } from './write'
 
 /** What a crawler reads from one exported HTML file. */
 export type ExportedPage = {
-  /** The path of the file under `outDir`, with `/` separators. */
+  /**
+   * The path of the file under the pages folder, with `/` separators: under
+   * `outDir`, or under `<outDir>/server` for a server export.
+   */
   file: string
   /**
    * The path the host serves the file at: `/` for `index.html`, `/about` for
@@ -154,6 +157,36 @@ export function routeOf(file: string): string {
   return `/${path.replace(/\/index$/, '')}`
 }
 
+/** Where an export keeps its pages, and the folder the host sends as files. */
+export type ExportLayout = {
+  /** The folder of the `.html` pages. */
+  pagesDir: string
+  /** The folder for `sitemap.xml` and `robots.txt`. */
+  filesDir: string
+}
+
+/**
+ * `web.output: 'server'` writes the pages to `<outDir>/server`, next to
+ * `_expo/routes.json`, and the files the server sends as they are to
+ * `<outDir>/client`. A static export keeps both in `outDir`. `expo serve`
+ * tells the two apart by the same file.
+ */
+export async function exportLayout(outDir: string): Promise<ExportLayout> {
+  const routes = await stat(join(outDir, 'server', '_expo', 'routes.json'))
+    .then((info) => info.isFile())
+    .catch(() => false)
+  const client = await stat(join(outDir, 'client'))
+    .then((info) => info.isDirectory())
+    .catch(() => false)
+  if (routes && client) {
+    return {
+      pagesDir: join(outDir, 'server'),
+      filesDir: join(outDir, 'client'),
+    }
+  }
+  return { pagesDir: outDir, filesDir: outDir }
+}
+
 /**
  * Every `.html` file under `outDir`, as a path with `/` separators, sorted.
  * Throws when the folder does not exist. `caller` names the function in the
@@ -176,16 +209,18 @@ export async function listHtmlFiles(
 }
 
 /**
- * Reads every `.html` file under `outDir`, sorted by path. Throws when the
- * folder does not exist.
+ * Reads every `.html` page of the export in `outDir`, sorted by path: the
+ * files in `outDir`, or in `<outDir>/server` for a server export. Throws
+ * when the folder does not exist.
  */
 export async function readExport(outDir: string): Promise<ExportedPage[]> {
-  const files = await listHtmlFiles(outDir, 'readExport')
+  const { pagesDir } = await exportLayout(outDir)
+  const files = await listHtmlFiles(pagesDir, 'readExport')
   return Promise.all(
     files.map(async (file) => ({
       file,
       route: routeOf(file),
-      ...readHead(await readFile(join(outDir, file), 'utf8')),
+      ...readHead(await readFile(join(pagesDir, file), 'utf8')),
     })),
   )
 }
@@ -225,8 +260,9 @@ export function skipReason(
 }
 
 /**
- * Writes `sitemap.xml` and `robots.txt` into `outDir` from the exported HTML
- * files. A page goes in the sitemap with its canonical link, when that link is
+ * Writes `sitemap.xml` and `robots.txt` from the exported HTML files: into
+ * `outDir`, or into `<outDir>/client` for a server export, which is the
+ * folder the server sends as files. A page goes in the sitemap with its canonical link, when that link is
  * under the site and the page has no `noindex`. The sitemap then lists the
  * address each page declares, and a route the export did not write is never
  * listed. A page with `hreflang` links gets the same links as `xhtml:link`
@@ -242,9 +278,10 @@ export async function writeSeoFiles(
   const pages = await readExport(outDir)
   if (pages.length === 0) {
     throw new Error(
-      `writeSeoFiles: no .html file in "${outDir}". Set \`web.output\` to \`static\` in app.json.`,
+      `writeSeoFiles: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
     )
   }
+  const { filesDir } = await exportLayout(outDir)
 
   const home = pages.find((page) => page.route === '/')?.canonical
   if (!options.siteUrl && !home) {
@@ -279,7 +316,7 @@ export async function writeSeoFiles(
   }
 
   const sitemap = await writeSitemap({
-    outDir,
+    outDir: filesDir,
     siteUrl,
     urls: urls.map((loc) => ({ loc, alternates: alternates.get(loc) })),
   })
@@ -289,7 +326,7 @@ export async function writeSeoFiles(
     const extra = typeof options.robots === 'object' ? options.robots : {}
     robots = await writeRobots({
       ...extra,
-      outDir,
+      outDir: filesDir,
       sitemapUrl: extra.sitemapUrl ?? `${siteUrl}/sitemap.xml`,
     })
   }

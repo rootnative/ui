@@ -211,6 +211,45 @@ describe('writeSeoFiles', () => {
     expect(xml).toContain(`<loc>${SITE}/</loc>\n  </url>`)
   })
 
+  it('reads the pages of a server export from server/ and writes the files to client/', async () => {
+    await writePages({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'server/index.html': page(canonical(`${SITE}/`)),
+      'server/about.html': page(canonical(`${SITE}/about`)),
+      'server/+not-found.html': page(''),
+      'client/_expo/static/js/web/entry.js': 'console.log(1)',
+    })
+    expect((await readExport(outDir)).map((p) => [p.file, p.route])).toEqual([
+      ['+not-found.html', '/+not-found'],
+      ['about.html', '/about'],
+      ['index.html', '/'],
+    ])
+    const result = await writeSeoFiles({ outDir })
+    expect(result.siteUrl).toBe(SITE)
+    expect(result.urls).toEqual([`${SITE}/`, `${SITE}/about`])
+    expect(result.sitemap).toBe(join(outDir, 'client', 'sitemap.xml'))
+    expect(result.robots).toBe(join(outDir, 'client', 'robots.txt'))
+    await expect(readFile(join(outDir, 'sitemap.xml'))).rejects.toThrow()
+    await expect(
+      readFile(join(outDir, 'server', 'sitemap.xml')),
+    ).rejects.toThrow()
+  })
+
+  it('reads a folder with server/ and no routes file as a static export', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'server/index.html': page(canonical(`${SITE}/server`)),
+      'client/index.html': page(canonical(`${SITE}/client`)),
+    })
+    const result = await writeSeoFiles({ outDir, robots: false })
+    expect(result.sitemap).toBe(join(outDir, 'sitemap.xml'))
+    expect(result.urls).toEqual([
+      `${SITE}/`,
+      `${SITE}/client`,
+      `${SITE}/server`,
+    ])
+  })
+
   it('writes no robots.txt with robots: false', async () => {
     await writeExport()
     const result = await writeSeoFiles({ outDir, robots: false })

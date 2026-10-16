@@ -74,7 +74,7 @@ A screen with no `PageHead` gets its head from `RouteHead`, after the navigator 
 </SeoProvider>
 ```
 
-Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time.
+Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time. `server` output works too: the commands below read its pages from `dist/server` and write the files into `dist/client`.
 
 After the export, write the sitemap and `robots.txt` from the exported pages:
 

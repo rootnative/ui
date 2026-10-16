@@ -46,6 +46,10 @@ No package changes that. Check the host:
   `index.html` with a 200 for an unknown path.
 - A dynamic route with real data needs `generateStaticParams` and a data
   source the export server can reach.
+- With `web.output: 'server'`, the server sends the 404 for an unknown path,
+  on any host. It sends a dynamic route template with a 200 for every slug,
+  so an unknown entry needs `noindex`. See
+  [server output](./checklist.md#server-output).
 
 ## The charset position
 

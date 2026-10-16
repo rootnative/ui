@@ -248,6 +248,28 @@ describe('auditExport', () => {
     ])
   })
 
+  it('reads a server export: the pages from server/, the sitemap from client/', async () => {
+    await writePages({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'server/index.html': page(canonical(`${SITE}/`)),
+      'server/blog/index.html': page(canonical(`${SITE}/blog`)),
+      'server/+not-found.html': page('<meta name="robots" content="noindex"/>'),
+      'client/_expo/static/js/web/entry.js': 'console.log(1)',
+    })
+    await writeSeoFiles({ outDir, robots: false })
+    expect(await auditExport({ outDir })).toEqual({ pages: 3, problems: [] })
+
+    await rm(join(outDir, 'client', 'sitemap.xml'))
+    await writePages({ 'sitemap.xml': '<urlset/>' })
+    expect((await auditExport({ outDir })).problems).toEqual([
+      {
+        file: 'sitemap.xml',
+        rule: 'sitemap',
+        message: 'missing. Run `rootnative-seo <outDir>` after the export.',
+      },
+    ])
+  })
+
   it('skips an ignored rule', async () => {
     await writePages({ 'index.html': page('', '<p>Nothing</p>', '<html>') })
     const { problems } = await auditExport({

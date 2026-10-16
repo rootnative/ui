@@ -13,7 +13,9 @@ const USAGE = `Usage: rootnative-seo <outDir> [options]
 
 Writes sitemap.xml and robots.txt into <outDir> from the exported HTML files.
 A page goes in the sitemap when it has a canonical link under the site URL and
-no noindex.
+no noindex. For a server export (web.output: 'server'), pass the same
+<outDir>: the pages are read from <outDir>/server, and the files go to
+<outDir>/client. audit and browse read the same layout.
 
 Options:
   --site-url <url>  The site URL. The default is the canonical link of index.html.

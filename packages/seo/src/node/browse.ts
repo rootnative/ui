@@ -3,7 +3,7 @@ import { accessSync, constants } from 'node:fs'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
-import { listHtmlFiles, routeOf } from './export'
+import { exportLayout, listHtmlFiles, routeOf } from './export'
 import { serveExport } from './serve'
 
 export type BrowseProblem = {
@@ -266,10 +266,11 @@ export async function browseExport(
       'browseExport: no Chrome found. Install Google Chrome or Chromium, or set CHROME_PATH to the binary.',
     )
   }
-  const files = await listHtmlFiles(outDir, 'browseExport')
+  const { pagesDir } = await exportLayout(outDir)
+  const files = await listHtmlFiles(pagesDir, 'browseExport')
   if (files.length === 0) {
     throw new Error(
-      `browseExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` in app.json.`,
+      `browseExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
     )
   }
   const settleMs = options.settleMs ?? 750

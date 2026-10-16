@@ -73,6 +73,29 @@ height, a Stack screen that fills its parent fills nothing, and the page
 shows the top bar over an empty area while the DOM holds every node. Keep
 the reset in the shell, as the example in step 7 does.
 
+### Server output
+
+`web.output: 'server'` renders the same HTML at export time and adds a
+server for API routes. Every step in this checklist is the same. Three
+things change:
+
+- The export writes the pages to `dist/server` and the files the server
+  sends as they are to `dist/client`. Pass `dist` to `rootnative-seo`, as
+  for a static export: it reads the pages from `server/` and writes
+  `sitemap.xml` and `robots.txt` into `client/`. `audit` and `browse` read
+  the same layout.
+- The server sends the status itself. An unknown path gets
+  `+not-found.html` with a 404, on any host. A dynamic route is the other
+  way: the server sends the route template with a 200 for every slug, also
+  for a slug that has no page. So the `noindex` answer for an unknown entry,
+  as above, is the only signal a crawler gets there.
+- The server matches each route from the root of its origin and ignores
+  `experiments.baseUrl`, which moves only the URLs of the files. Host a
+  server output at the root of its origin, or remove the base path before
+  the request reaches the server.
+
+Check the status codes with `npx expo serve` before you deploy.
+
 ## 2. Links as `Link`
 
 Use `Link` from `expo-router` for every navigation. It renders an `<a href>`

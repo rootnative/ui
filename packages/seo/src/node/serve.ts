@@ -1,7 +1,7 @@
 import { readFile, stat } from 'node:fs/promises'
 import { createServer, type Server } from 'node:http'
 import { extname, join, resolve, sep } from 'node:path'
-import { readHead } from './export'
+import { exportLayout, readHead } from './export'
 
 export type ServeExportOptions = {
   /** The export folder, for example `dist`. */
@@ -95,16 +95,29 @@ async function fileFor(
 /**
  * Serves `outDir` on `127.0.0.1` the way a static host serves an Expo Router
  * export, under `basePath`. A route with no file gets the `+not-found.html`
- * or `404.html` page with status 404. Close it when done.
+ * or `404.html` page with status 404. A server export is served from its two
+ * folders: a file from `client`, then a page from `server`. A dynamic route
+ * gets its own file only, as on a static host; the Expo server answers
+ * every match with the route template. Close it when done.
  */
 export async function serveExport(
   options: ServeExportOptions,
 ): Promise<ExportServer> {
   const { outDir } = options
+  const { pagesDir, filesDir } = await exportLayout(outDir)
   const basePath = options.basePath
     ? `/${trimSlashes(options.basePath)}`
-    : await basePathOf(outDir)
+    : await basePathOf(pagesDir)
   const base = basePath === '/' ? '' : basePath
+
+  // The server folder also holds the route manifest and the server bundles,
+  // which the Expo server never sends, so only a page comes from there.
+  const resolveRequest = async (route: string) => {
+    const file = await fileFor(filesDir, route)
+    if (file || pagesDir === filesDir) return file
+    const page = await fileFor(pagesDir, route)
+    return page && extname(page) === '.html' ? page : undefined
+  }
 
   const server: Server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
@@ -118,7 +131,7 @@ export async function serveExport(
     const underBase =
       base === '' || path === base || path.startsWith(`${base}/`)
     const file = underBase
-      ? await fileFor(outDir, path.slice(base.length))
+      ? await resolveRequest(path.slice(base.length))
       : undefined
     if (file) {
       response.writeHead(200, {
@@ -128,7 +141,7 @@ export async function serveExport(
       return
     }
     for (const name of ['+not-found.html', '404.html']) {
-      const notFound = join(outDir, name)
+      const notFound = join(pagesDir, name)
       if (await isFile(notFound)) {
         response.writeHead(404, { 'Content-Type': TYPES['.html'] ?? '' })
         response.end(await readFile(notFound))

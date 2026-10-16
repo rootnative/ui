@@ -1,5 +1,5 @@
 /**
- * Reads the static web export and asserts what a crawler reads.
+ * Reads the web export and asserts what a crawler reads.
  *
  * `auditExport` checks every page: the title, the canonical link or
  * `noindex`, one `<h1>`, the hreflang links, and the sitemap. The pages
@@ -14,18 +14,38 @@
  * it. Chrome comes from `CHROME_PATH` or the usual install paths; pass
  * `--no-browser` on a machine without one, and CI runs the whole gate.
  *
+ * A server export (`web.output: 'server'`) keeps its pages in `server/` and
+ * its files in `client/`, and the same checks read both folders. The script
+ * then starts `expo serve` on it and asserts the status code of each route
+ * in `serverRoutes`. The pages are the same HTML as the static export, so
+ * the server check skips the browser pass.
+ *
  * Usage, from `example/`:
  *   pnpm run check:export        # exports, then checks
+ *   pnpm run check:export:server # the same with web.output: 'server'
  *   node scripts/check-export.mjs   # checks an existing dist/
  *   node scripts/check-export.mjs --no-browser
+ *   node scripts/check-export.mjs --dist dist-server --no-browser
  */
+import { spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { createRequire } from 'node:module'
+import { createServer } from 'node:net'
+import { basename, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditExport, browseExport } from '@rootnative/seo/node'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const dist = resolve(here, '..', 'dist')
+const distFlag = process.argv.indexOf('--dist')
+const dist = resolve(
+  here,
+  '..',
+  distFlag === -1 ? 'dist' : (process.argv[distFlag + 1] ?? 'dist'),
+)
+// The rule `expo serve` uses: a server export has a route manifest.
+const isServer = existsSync(resolve(dist, 'server', '_expo', 'routes.json'))
+const pagesDir = isServer ? resolve(dist, 'server') : dist
+const filesDir = isServer ? resolve(dist, 'client') : dist
 
 const SITE_URL = 'https://rootnative.github.io/ui/demo'
 
@@ -83,6 +103,22 @@ const i18nAlternates = [
   `x-default ${SITE_URL}/i18n`,
 ]
 
+/**
+ * The status code `expo serve` sends for each route of the server export.
+ * The Expo server matches a route from the origin root and ignores
+ * `experiments.baseUrl`, so these paths have no `/ui/demo` prefix. A dynamic
+ * route answers every slug with its template and 200, so the template must
+ * be `noindex`: the static host sends 404 there, and this server cannot.
+ */
+const serverRoutes = [
+  { path: '/', status: 200 },
+  { path: '/de/i18n', status: 200 },
+  { path: '/sitemap.xml', status: 200 },
+  { path: '/manifest.webmanifest', status: 200 },
+  { path: '/no-such-page', status: 404, noindex: true },
+  { path: '/showcase/no-such-entry', status: 200, noindex: true },
+]
+
 /** Routes that must not reach the export. */
 const absent = ['_sitemap.html']
 
@@ -106,7 +142,7 @@ function decode(text) {
 
 if (!existsSync(dist)) {
   console.error(
-    '[check-export] example/dist not found. Is `web.output` set to `static` in app.json? Run `expo export --platform web` first.',
+    `[check-export] example/${basename(dist)} not found. Is \`web.output\` set to \`static\` in app.json? Run \`expo export --platform web\` first.`,
   )
   process.exit(1)
 }
@@ -129,7 +165,7 @@ if (!browser) {
 // The not-found screen renders a `PageHead` with `noindex` and no `url`, and
 // the route defaults would give it a canonical link. The `PageHead` must win
 // the whole page, so the export holds no canonical link here.
-const notFound = resolve(dist, '+not-found.html')
+const notFound = resolve(pagesDir, '+not-found.html')
 if (existsSync(notFound)) {
   const html = readFileSync(notFound, 'utf8')
   const title = decode(html.match(/<title[^>]*>([^<]*)<\/title>/)?.[1] ?? '')
@@ -151,7 +187,7 @@ if (existsSync(notFound)) {
 // Expo writes the route template too, rendered with no matching entry. The
 // screen answers with `noindex` and no `url`, so the file is not a page a
 // crawler indexes. The audit alone cannot tell this file from a real page.
-const template = resolve(dist, 'showcase', '[slug].html')
+const template = resolve(pagesDir, 'showcase', '[slug].html')
 if (existsSync(template)) {
   const html = readFileSync(template, 'utf8')
   if (count(html, /<meta[^>]*name="robots"[^>]*content="noindex"/g) !== 1) {
@@ -166,7 +202,7 @@ if (existsSync(template)) {
 
 // `Picture` writes a plain `<img>` on the export, with the text and the size
 // a crawler reads, and the export copies `public/` to the root.
-const showcasePage = resolve(dist, 'showcase', 'settings-screen.html')
+const showcasePage = resolve(pagesDir, 'showcase', 'settings-screen.html')
 if (existsSync(showcasePage)) {
   const html = readFileSync(showcasePage, 'utf8')
   const img = html.match(/<img\b[^>]*>/)?.[0] ?? ''
@@ -179,7 +215,7 @@ if (existsSync(showcasePage)) {
   if (!img.includes('width="600"') || !img.includes('height="360"')) {
     problems.push('showcase/settings-screen.html: the <img> has no size')
   }
-  if (!existsSync(resolve(dist, 'showcase', 'settings-screen.svg'))) {
+  if (!existsSync(resolve(filesDir, 'showcase', 'settings-screen.svg'))) {
     problems.push('showcase/settings-screen.svg: missing. Is public/ copied?')
   }
   if (count(html, /<meta[^>]*property="og:image"/g) !== 1) {
@@ -188,7 +224,7 @@ if (existsSync(showcasePage)) {
 }
 
 for (const file of ['i18n.html', 'de/i18n.html']) {
-  const path = resolve(dist, file)
+  const path = resolve(pagesDir, file)
   if (!existsSync(path)) {
     problems.push(`${file}: missing`)
     continue
@@ -207,7 +243,7 @@ for (const file of ['i18n.html', 'de/i18n.html']) {
     )
   }
 }
-const sitemapFile = resolve(dist, 'sitemap.xml')
+const sitemapFile = resolve(filesDir, 'sitemap.xml')
 if (existsSync(sitemapFile)) {
   const xml = readFileSync(sitemapFile, 'utf8')
   for (const loc of [`${SITE_URL}/i18n`, `${SITE_URL}/de/i18n`]) {
@@ -221,7 +257,7 @@ if (existsSync(sitemapFile)) {
 }
 
 for (const page of pages) {
-  const file = resolve(dist, page.file)
+  const file = resolve(pagesDir, page.file)
   if (!existsSync(file)) {
     problems.push(`${page.file}: missing`)
     continue
@@ -311,7 +347,7 @@ for (const page of pages) {
 }
 
 for (const file of generated) {
-  if (!existsSync(resolve(dist, file))) {
+  if (!existsSync(resolve(filesDir, file))) {
     problems.push(
       `${file}: missing. Run \`node scripts/write-seo.mjs\` after the export.`,
     )
@@ -319,16 +355,84 @@ for (const file of generated) {
 }
 
 for (const file of absent) {
-  if (existsSync(resolve(dist, file))) {
+  if (existsSync(resolve(pagesDir, file))) {
     problems.push(
       `${file}: must not be exported. Set extra.router.sitemap to false.`,
     )
   }
 }
 
+/** A port no other process listens on now. */
+function freePort() {
+  return new Promise((done, fail) => {
+    const probe = createServer()
+    probe.once('error', fail)
+    probe.listen(0, '127.0.0.1', () => {
+      const { port } = probe.address()
+      probe.close(() => done(port))
+    })
+  })
+}
+
+async function waitForServer(origin, child) {
+  const deadline = Date.now() + 60_000
+  while (Date.now() < deadline && child.exitCode === null) {
+    try {
+      await fetch(origin)
+      return true
+    } catch {
+      await new Promise((done) => setTimeout(done, 250))
+    }
+  }
+  return false
+}
+
+/** Starts `expo serve` on the export and checks each of `serverRoutes`. */
+async function serverProblems() {
+  const found = []
+  const port = await freePort()
+  // The CLI entry, not `npx`: a kill must reach the server process itself.
+  const cli = createRequire(import.meta.url).resolve('expo/bin/cli')
+  const child = spawn(
+    process.execPath,
+    [cli, 'serve', dist, '--port', String(port)],
+    { cwd: resolve(here, '..'), stdio: ['ignore', 'ignore', 'pipe'] },
+  )
+  let stderr = ''
+  child.stderr.on('data', (chunk) => {
+    stderr += chunk
+  })
+  try {
+    const origin = `http://127.0.0.1:${port}`
+    if (!(await waitForServer(origin, child))) {
+      return [`expo serve did not start. ${stderr.trim()}`]
+    }
+    for (const route of serverRoutes) {
+      const response = await fetch(`${origin}${route.path}`)
+      const body = await response.text()
+      if (response.status !== route.status) {
+        found.push(
+          `expo serve ${route.path}: status ${response.status}, expected ${route.status}`,
+        )
+      }
+      if (
+        route.noindex &&
+        count(body, /<meta[^>]*name="robots"[^>]*content="noindex"/g) !== 1
+      ) {
+        found.push(`expo serve ${route.path}: expected one noindex rule`)
+      }
+    }
+  } finally {
+    child.kill()
+  }
+  return found
+}
+
+if (isServer) problems.push(...(await serverProblems()))
+
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; both i18n versions and their sitemap entries carry the hreflang set; +not-found and the route template have noindex and no canonical link; the showcase <img> has alt and size.`,
+    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; both i18n versions and their sitemap entries carry the hreflang set; +not-found and the route template have noindex and no canonical link; the showcase <img> has alt and size${isServer ? `; expo serve sends the expected status for ${serverRoutes.length} routes` : ''}.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

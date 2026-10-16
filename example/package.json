@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "export:web": "expo export --platform web && node scripts/write-seo.mjs",
     "lint": "eslint . --max-warnings 0",
-    "check:export": "expo export --platform web && node scripts/write-seo.mjs && node scripts/check-export.mjs"
+    "check:export": "expo export --platform web && node scripts/write-seo.mjs && node scripts/check-export.mjs",
+    "check:export:server": "WEB_OUTPUT=server expo export --platform web --output-dir dist-server && node scripts/write-seo.mjs dist-server && node scripts/check-export.mjs --dist dist-server --no-browser"
   },
   "dependencies": {
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
