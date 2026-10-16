@@ -1,15 +1,99 @@
 # Changelog
 
-All `@rootnative/*` packages (`core`, `components`, `icons`, `cli`, and the
-`rootnative` binary) release together with a synced version, so this is a
-single changelog for the repo. These are prereleases and they break things
-freely — assume every entry can require a change on upgrade, and read the
-whole release rather than scanning for a label.
+All `@rootnative/*` packages (`core`, `components`, `icons`, `cli`, `seo`,
+and the `rootnative` binary) release together with a synced version, so
+this is a single changelog for the repo. These are prereleases and they
+break things freely — assume every entry can require a change on upgrade,
+and read the whole release rather than scanning for a label.
 
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.26 — 2026-10-16
+
+**No breaking change.** No export and no prop is removed. Two changes can
+move a screen or fail a test. On the web, `AppBar`, `NavigationBar` and
+`NavigationRail` render a landmark, and the tablist of `NavigationBar`
+moves to the row inside it. The layout keys in `style` place `Card` with
+`onPress` and `Switch` by their wrapper. Each of these entries ends with
+what to check. Most of this release is `@rootnative/seo`: `auditExport` and
+`browseExport` check every exported page, `RouteHead` writes the head of a
+screen that has no `PageHead`, `Picture` renders an image that a crawler
+sees, `PageHead` from `/dom` serves an app with no Expo Router,
+`alternates` writes `hreflang` links, and every command reads a server
+export. A release now pushes its tag before it publishes.
+
+### `rootnative-seo` reads a server export
+
+`web.output: 'server'` writes the pages to `dist/server`, next to
+`_expo/routes.json`, and the files that the server sends as they are to
+`dist/client`. `rootnative-seo dist` read `server/index.html` as the route
+`/server`, found no home page, and stopped. With `--site-url`, it wrote
+`sitemap.xml` into `dist`, and the server does not send that folder.
+
+Now each function in `@rootnative/seo/node` finds the layout first, by the
+rule that `expo serve` uses: a `server/_expo/routes.json` file and a
+`client/` folder. `readExport`, `auditExport` and `browseExport` read the
+pages from `server/`, and `writeSeoFiles` writes `sitemap.xml` and
+`robots.txt` into `client/`. `serveExport` sends a file from `client/`,
+then a page from `server/`, and never the route manifest. You pass `dist`
+for both outputs.
+
+The checklist has a server section, with three facts measured on the
+SDK 57 export:
+
+- The server sends `+not-found.html` with a 404 for an unknown path, on
+  any host.
+- The server sends a dynamic route template with a 200 for every slug,
+  also for a slug that has no page. So the `noindex` answer for an unknown
+  entry is the only signal that a crawler gets there.
+- The server matches each route from the root of its origin and ignores
+  `experiments.baseUrl`, which moves only the URLs of the files.
+
+The example exports itself a second time with `web.output: 'server'`, in
+CI. The audit and the content checks read that export, and `expo serve`
+must send the expected status for six routes.
+
+**Check your server app.** Pass `dist` to `rootnative-seo`, `audit` and
+`browse`, not `dist/server`. If the app sets `experiments.baseUrl`, remove
+it, or remove the base path before the request reaches the server. Answer
+an unknown entry of a dynamic route with `noindex`.
+
+### `hreflang` links name the language versions of a page
+
+`PageMeta` takes `alternates`: a list of `{ lang, url }` with every
+language version of the page, this page included. The new `PageAlternate`
+type is one entry. `toHeadTags` writes one
+`<link rel="alternate" hreflang>` for each entry after the canonical link,
+with the URL under the site. When the list has no `x-default` entry, it
+writes one more for `x-default`, with the URL of the first entry. A page
+with no `url` gets no `hreflang` link.
+
+Both `PageHead` components and `headTagsHtml` write the links. The `/dom`
+`PageHead` takes out every `hreflang` link of the head below as one set, so
+no language of the page below stays, and a link with no `hreflang`, such as
+a feed, stays. `rootnative-seo dist` writes the same links into the sitemap
+as `xhtml:link` entries, and `readExport` returns them as `alternates`.
+
+`auditExport` gains the `hreflang` rule. On each indexable page that has
+the links, it fails:
+
+- a code that is not a language code or `x-default`, and the region `UK`,
+  which is `GB`;
+- a relative link, or two links for one code;
+- a page that does not name itself;
+- a link to a page with `noindex` or with no file, and a linked page that
+  lists a different set;
+- a sitemap whose `xhtml:link` entries are not the links of the page.
+
+The example has one page in English and in German, `/i18n` and `/de/i18n`.
+The export check asserts both sets by value, because the audit passes a
+page that has no `hreflang` link at all.
+
+**Check your translated pages.** Pass the same `alternates` list to the
+`PageHead` of each version. Every version still has the `lang` of
+`app/+html.tsx`; [the limits page](https://rootnative.github.io/ui/seo/limits#the-page-language)
+says what that changes.
 
 ### `PageHead` from `/dom`, for an app with no Expo Router
 
@@ -81,6 +165,22 @@ checklist shows it. The example and the landing site pass both rules.
 Add `<View role="main">` around the navigator, or `rootnative-seo audit`
 fails every page.
 
+### The docs give a Lighthouse gate for the live host
+
+The limits page said that Lighthouse and Search Console are the checks
+that count, and gave no way to run them. Lighthouse is now a gate in the
+deploy workflow of this site: after each deploy, one
+[script](https://github.com/rootnative/ui/blob/main/scripts/lighthouse-seo.mjs)
+runs the SEO audit on the deployed URLs and fails the workflow below 100.
+The docs link the script and the workflow. They also say what Lighthouse
+cannot see: it audits the page after the script ran, so a defect in the
+HTML file still scores 100, and `rootnative-seo audit` is the gate for the
+file. Search Console stays manual, and the docs give the sitemap URL to
+submit.
+
+**Check your deploy.** Run Lighthouse on the deployed URLs after each
+deploy, and fail below 100.
+
 ### `browseExport` and `rootnative-seo browse` load every page in Chrome
 
 The audit reads the HTML. A hydration mismatch, a component that reads the
@@ -94,7 +194,9 @@ failed. It drives Chrome over its debugging pipe, so the package adds no
 dependency; Chrome comes from `CHROME_PATH`, the usual names on `PATH`, or
 the usual install paths, and the GitHub `ubuntu-latest` runner has it.
 `rootnative-seo browse <outDir>` runs it from a script, prints each
-problem with its file and kind, and exits with 1.
+problem with its file and kind, and exits with 1. Full Chrome asks for
+`/favicon.ico` by itself when a page names no icon, and the headless shell
+does not. That request is not a problem, so the result is the same in both.
 
 `serveExport({ outDir })` is the server behind it, and it is public: it
 serves the folder as a static host serves an Expo Router export, under the
@@ -177,6 +279,22 @@ template Expo writes next to the pages. Its `+not-found` screen has a title, `no
 `rootnative-seo dist` in the CI step that exports the web app. A demo or a
 list page that renders more than one `AppBar` needs `titleLevel` on every
 bar but the page bar.
+
+### A release pushes its commit and its tag before it publishes
+
+The release workflows published each package and pushed the commit and the
+tags last. On alpha.23, the `seo` publish failed after the other five
+packages were on npm, so the push did not run. No `v0.0.0-alpha.23` tag
+existed, and `rootnative init`, which pins the component registry to the
+tag of the `@rootnative/core` version, used `main` and showed a warning.
+Both workflows now push first and then publish, and they share one
+`concurrency: release` group, so two releases never run at the same time.
+`release-manual.yml` also runs the format check, as `release.yml` and CI
+do.
+
+**What changes.** Nothing in the packages. If a publish fails now, the tag
+exists for a version that npm does not have, and the release is finished
+by hand.
 
 ### Layout keys in `style` place `Card` with `onPress` and `Switch`
 
