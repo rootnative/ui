@@ -6,6 +6,8 @@ import { main } from '../node/cli'
 
 const chrome = findChrome()
 // CI has Chrome. A machine without one skips the browser pass, and says so.
+// The pages declare no icon, so full Chrome requests /favicon.ico by itself.
+// The headless shell does not, so only full Chrome proves the audit ignores it.
 const describeWithChrome = chrome ? describe : describe.skip
 if (!chrome) {
   console.warn('browse.test: no Chrome found, the browser pass is skipped.')
@@ -88,6 +90,33 @@ describeWithChrome('browseExport', () => {
     await rm(join(outDir, 'bad.html'))
     expect(await main(['browse', outDir, '--settle', '300'], output)).toBe(0)
     expect(lines.join('\n')).toContain('1 page load clean')
+  })
+
+  it('leaves no timer that keeps the process alive', async () => {
+    await writeFiles({ 'index.html': page('') })
+    const pending = new Set<NodeJS.Timeout>()
+    const { setTimeout: realSet, clearTimeout: realClear } = globalThis
+    jest.spyOn(globalThis, 'setTimeout').mockImplementation(((
+      callback: () => void,
+      ms?: number,
+    ) => {
+      const timer = realSet(() => {
+        pending.delete(timer)
+        callback()
+      }, ms)
+      pending.add(timer)
+      return timer
+    }) as typeof setTimeout)
+    jest.spyOn(globalThis, 'clearTimeout').mockImplementation((timer) => {
+      pending.delete(timer as NodeJS.Timeout)
+      realClear(timer)
+    })
+    try {
+      await browseExport({ outDir, settleMs: 0 })
+    } finally {
+      jest.restoreAllMocks()
+    }
+    expect([...pending].filter((timer) => timer.hasRef())).toEqual([])
   })
 })
 

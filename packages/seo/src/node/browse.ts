@@ -276,6 +276,10 @@ export async function browseExport(
   const timeoutMs = options.timeoutMs ?? 30_000
 
   const server = await serveExport({ outDir, basePath: options.basePath })
+  // Full Chrome requests /favicon.ico by itself when a page declares no icon,
+  // and the headless shell never does. The page did not ask for it, so its 404
+  // is not a page error, and the result must not change with the Chrome build.
+  const implicitFavicon = `${server.origin}/favicon.ico`
   const userDataDir = await mkdtemp(join(tmpdir(), 'rootnative-seo-chrome-'))
   const browser = new Chrome(chrome, userDataDir)
   const problems: BrowseProblem[] = []
@@ -333,6 +337,7 @@ export async function browseExport(
               | { level?: string; source?: string; text?: string; url?: string }
               | undefined
             if (entry?.level !== 'error') break
+            if (entry.url === implicitFavicon) break
             report(
               'log',
               `${entry.source ?? 'log'}: ${entry.text ?? ''}${entry.url ? ` (${entry.url})` : ''}`,
@@ -341,16 +346,24 @@ export async function browseExport(
           }
         }
       })
+      let timer: ReturnType<typeof setTimeout> | undefined
       try {
         await browser.send('Page.navigate', { url }, sessionId)
-        const timeout = sleep(timeoutMs).then(() => {
-          throw new Error(
-            `browseExport: ${file} fired no load event in ${timeoutMs} ms.`,
+        const timeout = new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `browseExport: ${file} fired no load event in ${timeoutMs} ms.`,
+                ),
+              ),
+            timeoutMs,
           )
         })
         await Promise.race([load, timeout])
         await sleep(settleMs)
       } finally {
+        clearTimeout(timer)
         stop()
       }
     }
