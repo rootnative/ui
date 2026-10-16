@@ -20,6 +20,10 @@ const dune: PageMeta = {
   image: '/posters/dune.jpg',
   imageSize: { width: 1200, height: 630 },
   type: 'video.movie',
+  alternates: [
+    { lang: 'en', url: '/movies/1' },
+    { lang: 'de', url: '/de/movies/1' },
+  ],
   jsonLd: [movie({ name: 'Dune', url: 'https://example.com/app/movies/1' })],
 }
 
@@ -47,6 +51,13 @@ function headSignature(): string[] {
       return `${node.tagName.toLowerCase()} ${attributes} ${node.textContent}`
     })
     .sort()
+}
+
+/** `lang href` for each `hreflang` link in the head, in order. */
+function hreflangs(): string[] {
+  return Array.from(document.head.querySelectorAll('link[hreflang]')).map(
+    (node) => `${node.getAttribute('hreflang')} ${node.getAttribute('href')}`,
+  )
 }
 
 function content(selector: string): string[] {
@@ -80,6 +91,9 @@ describe('PageHead from /dom', () => {
       </SeoProvider>,
     )
     expect(fromRouter.length).toBeGreaterThan(10)
+    expect(fromRouter.filter((line) => line.includes('hreflang'))).toHaveLength(
+      3,
+    )
     expect(headSignature()).toEqual(fromRouter)
     expect(document.title).toBe(routerTitle)
   })
@@ -160,6 +174,65 @@ describe('PageHead from /dom', () => {
     ])
   })
 
+  it('takes the hreflang links below out as one set, and leaves a feed link', () => {
+    document.head.innerHTML = [
+      '<link rel="alternate" type="application/rss+xml" href="/feed.xml">',
+      '<link rel="alternate" hreflang="en" href="/template">',
+      '<link rel="alternate" hreflang="fr" href="/fr/template">',
+    ].join('')
+    const list = (
+      <DomPageHead
+        title="List"
+        url="/list"
+        alternates={[
+          { lang: 'en', url: '/list' },
+          { lang: 'es', url: '/es/list' },
+        ]}
+      />
+    )
+    const feed = () =>
+      document.head.querySelectorAll('link[type="application/rss+xml"]')
+    const { rerender, unmount } = render(
+      <SeoProvider site={site}>{list}</SeoProvider>,
+    )
+    expect(hreflangs()).toEqual([
+      'en https://example.com/app/list',
+      'es https://example.com/app/es/list',
+      'x-default https://example.com/app/list',
+    ])
+    expect(feed()).toHaveLength(1)
+
+    rerender(
+      <SeoProvider site={site}>
+        {list}
+        <DomPageHead
+          title="Item"
+          url="/list/1"
+          alternates={[
+            { lang: 'en', url: '/list/1' },
+            { lang: 'de', url: '/de/list/1' },
+          ]}
+        />
+      </SeoProvider>,
+    )
+    expect(hreflangs()).toEqual([
+      'en https://example.com/app/list/1',
+      'de https://example.com/app/de/list/1',
+      'x-default https://example.com/app/list/1',
+    ])
+
+    rerender(<SeoProvider site={site}>{list}</SeoProvider>)
+    expect(hreflangs()).toEqual([
+      'en https://example.com/app/list',
+      'es https://example.com/app/es/list',
+      'x-default https://example.com/app/list',
+    ])
+
+    unmount()
+    expect(hreflangs()).toEqual(['en /template', 'fr /fr/template'])
+    expect(feed()).toHaveLength(1)
+  })
+
   it('writes nothing while inactive, and takes the site from the prop', () => {
     const { rerender } = render(
       <DomPageHead site={site} title="Behind" url="/behind" active={false} />,
@@ -177,6 +250,7 @@ describe('headTagsHtml', () => {
         title: 'Tom & "Jerry" <3',
         description: 'A cat & a mouse',
         url: '/t?a=1&b=2',
+        alternates: [{ lang: 'en', url: '/t?a=1&b=2' }],
         jsonLd: [
           movie({ name: '</script>', url: 'https://example.com/app/t' }),
         ],
@@ -187,6 +261,12 @@ describe('headTagsHtml', () => {
     )
     expect(html).toContain(
       '<link rel="canonical" href="https://example.com/app/t?a=1&amp;b=2">',
+    )
+    expect(html).toContain(
+      '<link rel="alternate" hreflang="en" href="https://example.com/app/t?a=1&amp;b=2">',
+    )
+    expect(html).toContain(
+      '<link rel="alternate" hreflang="x-default" href="https://example.com/app/t?a=1&amp;b=2">',
     )
     expect(html).toContain(
       '<meta name="description" content="A cat &amp; a mouse">',

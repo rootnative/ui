@@ -84,12 +84,13 @@ expo export --platform web && rootnative-seo dist
 
 A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason.
 
-Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, an `<img>` with no `alt`, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
+Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, an `<img>` with no `alt`, `hreflang` links that the other language versions do not match, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
 
 ## The rules the head follows
 
 - The tab title uses the site template. The Open Graph title does not, because the card shows the site name on its own line.
 - A page with no `url` gets no canonical link and no share card. That is the correct result for a `noindex` overlay.
+- `alternates` writes one `hreflang` link per language version, and an `x-default` from the first entry when the list has none. Pass the same list to each version, this page included.
 - `og:image:width` and `og:image:height` are written only with an image.
 - A JSON-LD builder leaves an empty field out. It never writes `""`, `null`, or `[]`.
 - The JSON-LD text escapes `<`, so a `</script>` in a title cannot end the tag.

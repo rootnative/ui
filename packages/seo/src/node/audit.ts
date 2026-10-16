@@ -1,9 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import type { PageAlternate } from '../types'
 import {
   absoluteSiteUrl,
   attributesOf,
   decodeEntities,
+  isUnder,
   listHtmlFiles,
   readHead,
   skipReason,
@@ -18,6 +20,7 @@ export type AuditRule =
   | 'main'
   | 'lang'
   | 'alt'
+  | 'hreflang'
   | 'sitemap'
 
 export type AuditProblem = {
@@ -53,6 +56,14 @@ const MAIN = /<main[\s>]/gi
 const HTML = /<html\b([^>]*)>/i
 const IMG = /<img\b([^>]*)>/gi
 const LOC = /<loc>([\s\S]*?)<\/loc>/gi
+const URL_ENTRY = /<url>([\s\S]*?)<\/url>/gi
+const XHTML_LINK = /<xhtml:link\b([^>]*?)\/?>/gi
+/**
+ * A language, then an optional script and an optional region: `en`,
+ * `zh-Hant`, `en-GB`, `es-419`. Google reads ISO 639-1 and ISO 3166-1.
+ */
+const LANGUAGE_CODE =
+  /^(?:x-default|[a-z]{2,3}(?:-[a-z]{4})?(?:-(?:[a-z]{2}|\d{3}))?)$/i
 
 type AuditedPage = ExportedPage & {
   titles: string[]
@@ -147,14 +158,11 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
   return problems
 }
 
-async function sitemapProblems(
-  outDir: string,
+function sitemapProblems(
+  xml: string | undefined,
   pages: AuditedPage[],
   siteUrl: string | undefined,
-): Promise<AuditProblem[]> {
-  const xml = await readFile(join(outDir, 'sitemap.xml'), 'utf8').catch(
-    () => undefined,
-  )
+): AuditProblem[] {
   if (xml === undefined) {
     return [
       {
@@ -201,12 +209,182 @@ async function sitemapProblems(
   return problems
 }
 
+function alternateKey({ lang, url }: PageAlternate): string {
+  return `${lang.toLowerCase()} ${url}`
+}
+
+function isDefault({ lang }: PageAlternate): boolean {
+  return lang.toLowerCase() === 'x-default'
+}
+
+/**
+ * The `hreflang` links of every indexable page: valid codes, absolute URLs,
+ * one link per code, a link to the page itself, and the same set on every
+ * page the set names. A link to a page outside the export is checked for
+ * its shape only.
+ */
+function hreflangProblems(
+  pages: AuditedPage[],
+  siteUrl: string | undefined,
+): AuditProblem[] {
+  const problems: AuditProblem[] = []
+  const reported = new Set<string>()
+  const add = (file: string, message: string, once?: string) => {
+    if (once !== undefined) {
+      if (reported.has(once)) return
+      reported.add(once)
+    }
+    problems.push({ file, rule: 'hreflang', message })
+  }
+  const byCanonical = new Map<string, AuditedPage>()
+  for (const page of pages) {
+    if (page.canonical !== undefined && !byCanonical.has(page.canonical)) {
+      byCanonical.set(page.canonical, page)
+    }
+  }
+
+  for (const page of pages) {
+    if (page.alternates.length === 0 || page.noindex) continue
+    const counts = new Map<string, number>()
+    for (const { lang, url } of page.alternates) {
+      if (!LANGUAGE_CODE.test(lang)) {
+        add(
+          page.file,
+          `hreflang "${lang}" is not a language code. Use a code such as "en" or "en-US", or "x-default".`,
+        )
+      } else if (/-uk$/i.test(lang)) {
+        add(
+          page.file,
+          `hreflang "${lang}": the region code of the United Kingdom is GB.`,
+        )
+      }
+      if (!/^https?:\/\//.test(url)) {
+        add(page.file, `the hreflang "${lang}" link "${url}" is not absolute`)
+      }
+      const code = lang.toLowerCase()
+      counts.set(code, (counts.get(code) ?? 0) + 1)
+    }
+    for (const [code, n] of counts) {
+      if (n > 1)
+        add(page.file, `${n} hreflang links for "${code}", expected one`)
+    }
+
+    const canonical = page.canonical
+    if (canonical === undefined) continue
+    const self = page.alternates.some(
+      (alternate) => alternate.url === canonical && !isDefault(alternate),
+    )
+    if (!self) {
+      add(
+        page.file,
+        `no hreflang link to this page (${canonical}). List every language version, this page included.`,
+      )
+    }
+
+    for (const alternate of page.alternates) {
+      if (alternate.url === canonical) continue
+      const target = byCanonical.get(alternate.url)
+      if (!target) {
+        if (siteUrl !== undefined && isUnder(siteUrl, alternate.url)) {
+          add(
+            page.file,
+            `the hreflang "${alternate.lang}" link points to ${alternate.url}, and no page declares it as its canonical link`,
+          )
+        }
+        continue
+      }
+      if (target.noindex) {
+        add(
+          page.file,
+          `the hreflang "${alternate.lang}" link points to ${alternate.url}, which has noindex`,
+        )
+        continue
+      }
+      if (target.alternates.length === 0) {
+        add(
+          target.file,
+          `no hreflang links, and ${page.file} names this page "${alternate.lang}". Every language version lists the same links.`,
+          `${target.file} none`,
+        )
+        continue
+      }
+      const theirs = new Set(target.alternates.map(alternateKey))
+      const targetHasSelf = target.alternates.some(
+        (link) => link.url === target.canonical && !isDefault(link),
+      )
+      for (const link of page.alternates) {
+        const key = alternateKey(link)
+        if (theirs.has(key)) continue
+        // A page with no link to itself has its own problem above.
+        if (link.url === target.canonical && !targetHasSelf) continue
+        add(
+          target.file,
+          `no hreflang "${link.lang}" link to ${link.url}, and ${page.file} lists it. Every language version lists the same links.`,
+          `${target.file} ${key}`,
+        )
+      }
+    }
+  }
+  return problems
+}
+
+/**
+ * The `xhtml:link` entries of the sitemap against the `hreflang` links of
+ * the page at each `<loc>`. The sitemap may leave them out; when it lists
+ * them, it lists the same set.
+ */
+function sitemapHreflangProblems(
+  xml: string,
+  pages: AuditedPage[],
+): AuditProblem[] {
+  const problems: AuditProblem[] = []
+  const add = (message: string) =>
+    problems.push({ file: 'sitemap.xml', rule: 'hreflang', message })
+  let linked = false
+  for (const entry of xml.matchAll(URL_ENTRY)) {
+    const body = entry[1] ?? ''
+    const loc = decodeEntities(
+      body.match(/<loc>([\s\S]*?)<\/loc>/i)?.[1] ?? '',
+    ).trim()
+    const links: PageAlternate[] = [...body.matchAll(XHTML_LINK)].map(
+      (match) => {
+        const attributes = attributesOf(match[1] ?? '')
+        return { lang: attributes.hreflang ?? '', url: attributes.href ?? '' }
+      },
+    )
+    if (links.length === 0) continue
+    linked = true
+    const page = pages.find((candidate) => candidate.canonical === loc)
+    if (!page) continue
+    const listed = new Set(links.map(alternateKey))
+    const declared = new Set(page.alternates.map(alternateKey))
+    const same =
+      listed.size === declared.size &&
+      [...listed].every((key) => declared.has(key))
+    if (!same) {
+      add(
+        `the xhtml:link entries of ${loc} differ from the hreflang links of ${page.file}`,
+      )
+    }
+  }
+  if (
+    linked &&
+    !/xmlns:xhtml\s*=\s*["']http:\/\/www\.w3\.org\/1999\/xhtml["']/.test(xml)
+  ) {
+    add(
+      'has xhtml:link entries and no xmlns:xhtml="http://www.w3.org/1999/xhtml" on <urlset>',
+    )
+  }
+  return problems
+}
+
 /**
  * Reads every `.html` file under `outDir` and returns each rule a page fails:
  * no `<title>` or an empty one, no canonical link on a page with no
  * `noindex`, not exactly one `<h1>`, not exactly one `<main>`, no `lang` on
- * `<html>`, an `<img>` with no `alt`, and a `sitemap.xml` entry that no page declares or a page that
- * must be in the sitemap and is not. It does not
+ * `<html>`, an `<img>` with no `alt`, a wrong set of `hreflang` links, and a
+ * `sitemap.xml` entry that no page declares or a page that must be in the
+ * sitemap and is not. It does not
  * throw on a problem; the caller decides. It throws when the folder does not
  * exist or holds no HTML file.
  */
@@ -227,6 +405,7 @@ export async function auditExport(
     'main',
     'lang',
     'alt',
+    'hreflang',
     'sitemap',
   ])
   for (const rule of options.ignore ?? []) rules.delete(rule)
@@ -234,12 +413,23 @@ export async function auditExport(
   const pages = await Promise.all(files.map((file) => readPage(outDir, file)))
   const problems = pages.flatMap((page) => pageProblems(page, rules))
 
-  if (rules.has('sitemap')) {
+  if (rules.has('sitemap') || rules.has('hreflang')) {
     const home = pages.find((page) => page.route === '/')?.canonical
     const site = options.siteUrl ?? home
     const siteUrl =
       site === undefined ? undefined : absoluteSiteUrl(site, 'auditExport')
-    problems.push(...(await sitemapProblems(outDir, pages, siteUrl)))
+    const xml = await readFile(join(outDir, 'sitemap.xml'), 'utf8').catch(
+      () => undefined,
+    )
+    if (rules.has('sitemap')) {
+      problems.push(...sitemapProblems(xml, pages, siteUrl))
+    }
+    if (rules.has('hreflang')) {
+      problems.push(...hreflangProblems(pages, siteUrl))
+      if (xml !== undefined) {
+        problems.push(...sitemapHreflangProblems(xml, pages))
+      }
+    }
   }
 
   problems.sort((a, b) => a.file.localeCompare(b.file))

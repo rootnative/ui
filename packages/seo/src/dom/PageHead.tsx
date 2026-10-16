@@ -25,15 +25,24 @@ type Written = {
   title: string
 }
 
-/** The one attribute that makes two tags the same slot, or `null` for a script. */
-function identity(tag: HeadTag): [string, string, string] | null {
+/** Whether a head element fills the same slot as `tag`, or `null` for a script. */
+function slotOf(tag: HeadTag): ((node: Element) => boolean) | null {
   switch (tag.tag) {
     case 'meta':
       return 'name' in tag
-        ? ['META', 'name', tag.name]
-        : ['META', 'property', tag.property]
+        ? (node) =>
+            node.tagName === 'META' && node.getAttribute('name') === tag.name
+        : (node) =>
+            node.tagName === 'META' &&
+            node.getAttribute('property') === tag.property
     case 'link':
-      return ['LINK', 'rel', tag.rel]
+      // The `hreflang` links of a page are one slot, not one per language:
+      // a language of the head below that this page does not list must go
+      // too. A link with no `hreflang`, such as a feed, is not in that slot.
+      return (node) =>
+        node.tagName === 'LINK' &&
+        node.getAttribute('rel') === tag.rel &&
+        node.hasAttribute('hreflang') === (tag.hreflang !== undefined)
     default:
       return null
   }
@@ -53,6 +62,9 @@ function elementOf(doc: Document, tag: HeadTag): Element | null {
     case 'link': {
       const link = doc.createElement('link')
       link.setAttribute('rel', tag.rel)
+      if (tag.hreflang !== undefined) {
+        link.setAttribute('hreflang', tag.hreflang)
+      }
       link.setAttribute('href', tag.href)
       return link
     }
@@ -73,14 +85,14 @@ function write(doc: Document, tags: HeadTag[]): Written {
       doc.title = tag.text
       continue
     }
-    const slot = identity(tag)
-    if (slot) {
-      const [name, attribute, value] = slot
+    const inSlot = slotOf(tag)
+    if (inSlot) {
       // Every tag of the slot goes: a template tag, or the tag of a screen
       // below. This head's own tags from the last write are gone already,
-      // because the effect cleanup ran first.
+      // because the effect cleanup ran first. The tags of this write stay,
+      // as the `hreflang` slot holds more than one.
       for (const node of Array.from(head.children)) {
-        if (node.tagName === name && node.getAttribute(attribute) === value) {
+        if (inSlot(node) && !written.nodes.includes(node)) {
           node.remove()
           written.displaced.push(node)
         }
@@ -107,7 +119,8 @@ function erase(doc: Document, written: Written): void {
  * an Electron renderer. The same `toHeadTags` records as the Expo Router
  * `PageHead`, so the two write the same head. A tag of the same name,
  * property, or `rel` that was there before is taken out while this head is
- * on, and put back when it goes: a screen that mounts over another wins,
+ * on, and put back when it goes, and the `hreflang` links go as one set: a
+ * screen that mounts over another wins,
  * and the one below gets its head back when the top one unmounts. Renders
  * nothing on native.
  *

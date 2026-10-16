@@ -55,7 +55,7 @@ describe('readHead', () => {
   it('reads the canonical link in any attribute order and quote style', () => {
     expect(
       readHead(page(`<link href='/a?x=1&amp;y=2' rel="canonical"/>`)),
-    ).toEqual({ canonical: '/a?x=1&y=2', noindex: false })
+    ).toEqual({ canonical: '/a?x=1&y=2', noindex: false, alternates: [] })
     expect(
       readHead(page('<link rel="alternate canonical" href="/b"/>')).canonical,
     ).toBe('/b')
@@ -65,6 +65,7 @@ describe('readHead', () => {
     expect(readHead(page('<meta name="ROBOTS" content="NoIndex"/>'))).toEqual({
       canonical: undefined,
       noindex: true,
+      alternates: [],
     })
     expect(readHead(page('<meta content="none" name="robots"/>')).noindex).toBe(
       true,
@@ -72,6 +73,20 @@ describe('readHead', () => {
     expect(
       readHead(page('<meta name="robots" content="nofollow"/>')).noindex,
     ).toBe(false)
+  })
+
+  it('reads the hreflang links in order, in the spelling react-helmet-async writes', () => {
+    const head = [
+      `<link data-rh="true" rel="alternate" hrefLang="en" href="${SITE}/a?x=1&amp;y=2"/>`,
+      `<link rel="alternate" href="${SITE}/de/a" hreflang="de"/>`,
+      `<link rel="alternate" type="application/rss+xml" href="${SITE}/feed.xml"/>`,
+      `<link rel="alternate" hreflang="x-default" href="${SITE}/a"/>`,
+    ].join('')
+    expect(readHead(page(head)).alternates).toEqual([
+      { lang: 'en', url: `${SITE}/a?x=1&y=2` },
+      { lang: 'de', url: `${SITE}/de/a` },
+      { lang: 'x-default', url: `${SITE}/a` },
+    ])
   })
 
   it('ignores a canonical link in the body', () => {
@@ -163,6 +178,37 @@ describe('writeSeoFiles', () => {
     const text = await readFile(join(outDir, 'robots.txt'), 'utf8')
     expect(text).toContain('Sitemap: https://example.com/sitemap.xml')
     expect(text).not.toContain(`${SITE}/sitemap.xml`)
+  })
+
+  it('writes the hreflang links of a page as xhtml:link entries', async () => {
+    const alternates = (self: string) =>
+      canonical(`${SITE}${self}`) +
+      [
+        ['en', '/a'],
+        ['de', '/de/a'],
+        ['x-default', '/a'],
+      ]
+        .map(
+          ([lang, path]) =>
+            `<link data-rh="true" rel="alternate" hrefLang="${lang}" href="${SITE}${path}"/>`,
+        )
+        .join('')
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'a.html': page(alternates('/a')),
+      'de/a.html': page(alternates('/de/a')),
+    })
+    await writeSeoFiles({ outDir, robots: false })
+    const xml = await readFile(join(outDir, 'sitemap.xml'), 'utf8')
+    expect(xml).toContain(
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    )
+    const links = `    <xhtml:link rel="alternate" hreflang="en" href="${SITE}/a"/>
+    <xhtml:link rel="alternate" hreflang="de" href="${SITE}/de/a"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/a"/>`
+    expect(xml).toContain(`<loc>${SITE}/a</loc>\n${links}\n  </url>`)
+    expect(xml).toContain(`<loc>${SITE}/de/a</loc>\n${links}\n  </url>`)
+    expect(xml).toContain(`<loc>${SITE}/</loc>\n  </url>`)
   })
 
   it('writes no robots.txt with robots: false', async () => {

@@ -77,6 +77,13 @@ export const sections: CatalogSection[] = [
         description: 'Right-to-left layout — toggle from the AppBar',
         keywords: 'right to left direction bidi i18n locale arabic hebrew',
       },
+      {
+        label: 'i18n',
+        route: '/i18n',
+        description: 'One page in English and German, linked with hreflang',
+        keywords:
+          'internationalization localization translation language locale hreflang german deutsch',
+      },
     ],
   },
   {

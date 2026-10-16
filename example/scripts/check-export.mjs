@@ -2,8 +2,8 @@
  * Reads the static web export and asserts what a crawler reads.
  *
  * `auditExport` checks every page: the title, the canonical link or
- * `noindex`, one `<h1>`, and the sitemap. The two pages below are checked
- * for their content too, because this is the test that catches a head
+ * `noindex`, one `<h1>`, the hreflang links, and the sitemap. The pages
+ * below are checked for their content too, because this is the test that catches a head
  * renderer change in Expo Router. The unit tests in `packages/seo` mock
  * `expo-router/head`, so only a real export can show that the head reaches
  * the HTML file.
@@ -60,6 +60,27 @@ const pages = [
     h2: 'Settings screen',
     jsonLdType: 'BreadcrumbList',
   },
+  // The German version of the i18n page. The bar title is the catalog
+  // label, the same in both languages.
+  {
+    file: 'de/i18n.html',
+    title: 'Eine Seite in zwei Sprachen | RootNative UI',
+    canonical: `${SITE_URL}/de/i18n`,
+    h1: 'i18n',
+    h2: 'Eine Seite in zwei Sprachen',
+    jsonLdType: null,
+  },
+]
+
+/**
+ * The hreflang links of each version of the i18n page, by value. The audit
+ * passes a page with no hreflang link at all, so only this check sees a head
+ * renderer that drops the attribute.
+ */
+const i18nAlternates = [
+  `en ${SITE_URL}/i18n`,
+  `de ${SITE_URL}/de/i18n`,
+  `x-default ${SITE_URL}/i18n`,
 ]
 
 /** Routes that must not reach the export. */
@@ -163,6 +184,39 @@ if (existsSync(showcasePage)) {
   }
   if (count(html, /<meta[^>]*property="og:image"/g) !== 1) {
     problems.push('showcase/settings-screen.html: expected one og:image')
+  }
+}
+
+for (const file of ['i18n.html', 'de/i18n.html']) {
+  const path = resolve(dist, file)
+  if (!existsSync(path)) {
+    problems.push(`${file}: missing`)
+    continue
+  }
+  const html = readFileSync(path, 'utf8')
+  const found = [...html.matchAll(/<link\b[^>]*>/g)]
+    .map(([tag]) => [
+      tag.match(/hreflang="([^"]*)"/i)?.[1],
+      decode(tag.match(/href="([^"]*)"/)?.[1] ?? ''),
+    ])
+    .filter(([lang]) => lang !== undefined)
+    .map(([lang, href]) => `${lang} ${href}`)
+  if (found.join('\n') !== i18nAlternates.join('\n')) {
+    problems.push(
+      `${file}: hreflang links are [${found.join(', ')}], expected [${i18nAlternates.join(', ')}]`,
+    )
+  }
+}
+const sitemapFile = resolve(dist, 'sitemap.xml')
+if (existsSync(sitemapFile)) {
+  const xml = readFileSync(sitemapFile, 'utf8')
+  for (const loc of [`${SITE_URL}/i18n`, `${SITE_URL}/de/i18n`]) {
+    const start = xml.indexOf(`<loc>${loc}</loc>`)
+    const entry =
+      start === -1 ? '' : xml.slice(start, xml.indexOf('</url>', start))
+    if ((entry.match(/<xhtml:link /g) ?? []).length !== 3) {
+      problems.push(`sitemap.xml: ${loc} has no 3 xhtml:link entries`)
+    }
   }
 }
 
@@ -274,7 +328,7 @@ for (const file of absent) {
 
 if (problems.length === 0) {
   console.log(
-    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; +not-found and the route template have noindex and no canonical link; the showcase <img> has alt and size.`,
+    `[check-export] ${audit.pages} pages pass the audit${browser ? ` and load clean in Chrome` : ''}; ${pages.length} pages carry the expected title, canonical link, <h1>, <h2>, manifest link, and JSON-LD; both i18n versions and their sitemap entries carry the hreflang set; +not-found and the route template have noindex and no canonical link; the showcase <img> has alt and size.`,
   )
 } else {
   console.error('\n[check-export] The static export is missing head data\n')

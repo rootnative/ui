@@ -5,6 +5,7 @@ export type {
   HeadTag,
   JsonLd,
   OpenGraphType,
+  PageAlternate,
   PageMeta,
   Site,
   SiteConfig,

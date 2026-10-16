@@ -249,6 +249,50 @@ may fetch.
 <PageHead title="Filters" noindex />
 ```
 
+### A page in more than one language
+
+A page that exists in more than one language names each version with an
+`hreflang` link, so that a search engine shows the reader the version in
+the reader's language. Write the list of versions once, and pass the same
+list to the `PageHead` of each version:
+
+```tsx title="src/about.ts"
+export const aboutVersions = [
+  { lang: 'en', url: '/about' },
+  { lang: 'de', url: '/de/about' },
+]
+```
+
+```tsx title="app/de/about.tsx"
+<PageHead
+  title="Über uns"
+  url="/de/about"
+  locale="de_DE"
+  alternates={aboutVersions}
+/>
+```
+
+`PageHead` writes one `<link rel="alternate" hreflang>` for each entry, with
+the URL under the site, and one more for `x-default` with the URL of the
+first entry. To point `x-default` at a different page, such as a page where
+the reader selects a language, put an `x-default` entry in the list. A page
+with no `url` gets no `hreflang` link.
+
+A search engine ignores a set that breaks one of these rules:
+
+- Each version lists every version, and itself too.
+- Each version lists the same set. A link that the other version does not
+  return has no effect.
+- `lang` is a language code, such as `de`, with an optional region, such
+  as `de-AT`. The region code of the United Kingdom is `GB`, not `UK`.
+- Each version is a page that a crawler can index: it has a canonical link
+  and no `noindex`.
+
+`rootnative-seo dist` writes the same links into the sitemap as
+`xhtml:link` entries. `rootnative-seo audit` fails a set that breaks a rule.
+Every version still has the `lang` of `app/+html.tsx`; see
+[the page language](./limits.md#the-page-language).
+
 ## 4. Robots and sitemap
 
 Run `rootnative-seo` in the deploy step, after the export. It reads the
@@ -467,6 +511,10 @@ exported page and fails on:
 - a page with no `<main>`, or more than one, and a page with no `lang` on
   `<html>`;
 - an `<img>` with no `alt` attribute;
+- an `hreflang` link with a code that is not a language, with a relative
+  URL, or to a page with `noindex` or with no file; a version that does not
+  list itself or that lists a different set; and a sitemap whose
+  `xhtml:link` entries are not the links of the page;
 - a `sitemap.xml` entry that no page declares as its canonical link, or a page
   that must be in the sitemap and is not.
 

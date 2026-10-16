@@ -103,6 +103,13 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           />
         </Row>
       )
+    case 'i18n':
+      return (
+        <Row gap="sm" align="center">
+          <Icon source="translate" size={32} color={theme.colors.primary} />
+          <Typography variant="labelLarge">EN · DE</Typography>
+        </Row>
+      )
     case 'Button':
       return (
         <Column gap="xs">

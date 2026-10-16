@@ -45,6 +45,38 @@ describe('sitemapXml', () => {
     expect((xml.match(/<url>/g) ?? []).length).toBe(3)
   })
 
+  it('writes the alternates as xhtml:link entries, under a namespace only then', () => {
+    const plain = sitemapXml({ siteUrl: 'https://x.y', urls: [{ loc: '/' }] })
+    expect(plain).toContain(
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    )
+    expect(plain).not.toContain('xhtml')
+
+    const xml = sitemapXml({
+      siteUrl: 'https://x.y',
+      urls: [
+        {
+          loc: '/a',
+          alternates: [
+            { lang: 'en', url: '/a?x=1&y=2' },
+            { lang: 'de', url: 'https://de.x.y/a' },
+          ],
+        },
+        { loc: '/b' },
+      ],
+    })
+    expect(xml).toContain(
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    )
+    expect(xml).toContain(
+      '<xhtml:link rel="alternate" hreflang="en" href="https://x.y/a?x=1&amp;y=2"/>',
+    )
+    expect(xml).toContain(
+      '<xhtml:link rel="alternate" hreflang="de" href="https://de.x.y/a"/>',
+    )
+    expect((xml.match(/<xhtml:link/g) ?? []).length).toBe(2)
+  })
+
   it('clamps the priority', () => {
     const xml = sitemapXml({
       siteUrl: 'https://x.y',

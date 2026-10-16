@@ -237,3 +237,76 @@ describe('toHeadTags', () => {
     expect(meta(tags, 'og:locale')).toBe('fr_FR')
   })
 })
+
+describe('toHeadTags alternates', () => {
+  const links = (tags: HeadTag[]) =>
+    tags.filter((tag) => tag.tag === 'link' && tag.rel === 'alternate')
+
+  it('writes one hreflang link per entry after the canonical link, plus x-default from the first', () => {
+    const tags = toHeadTags(site, {
+      title: 'Dune',
+      url: '/de/movies/1',
+      alternates: [
+        { lang: 'en', url: '/movies/1' },
+        { lang: ' de ', url: '/de/movies/1' },
+        { lang: 'fr', url: 'https://fr.example.com/movies/1' },
+      ],
+    })
+    const canonical = tags.findIndex(
+      (tag) => tag.tag === 'link' && tag.rel === 'canonical',
+    )
+    expect(tags.slice(canonical + 1, canonical + 5)).toEqual([
+      {
+        tag: 'link',
+        rel: 'alternate',
+        hreflang: 'en',
+        href: 'https://example.com/app/movies/1',
+      },
+      {
+        tag: 'link',
+        rel: 'alternate',
+        hreflang: 'de',
+        href: 'https://example.com/app/de/movies/1',
+      },
+      {
+        tag: 'link',
+        rel: 'alternate',
+        hreflang: 'fr',
+        href: 'https://fr.example.com/movies/1',
+      },
+      {
+        tag: 'link',
+        rel: 'alternate',
+        hreflang: 'x-default',
+        href: 'https://example.com/app/movies/1',
+      },
+    ])
+    expect(links(tags)).toHaveLength(4)
+  })
+
+  it('writes no second x-default when the list has one', () => {
+    const tags = toHeadTags(site, {
+      title: 'Dune',
+      url: '/movies/1',
+      alternates: [
+        { lang: 'en', url: '/movies/1' },
+        { lang: 'X-Default', url: '/choose-language' },
+      ],
+    })
+    expect(links(tags).map((tag) => 'hreflang' in tag && tag.hreflang)).toEqual(
+      ['en', 'X-Default'],
+    )
+  })
+
+  it('writes no hreflang link for a page with no url, or with no entry', () => {
+    const alternates = [{ lang: 'en', url: '/movies/1' }]
+    expect(links(toHeadTags(site, { title: 'x', alternates }))).toEqual([])
+    expect(
+      links(toHeadTags(site, { title: 'x', url: '/x', alternates: [] })),
+    ).toEqual([])
+    const canonical = toHeadTags(site, { title: 'x', url: '/x' }).find(
+      (tag) => tag.tag === 'link',
+    )
+    expect(canonical).not.toHaveProperty('hreflang')
+  })
+})

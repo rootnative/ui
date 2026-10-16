@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { auditExport, writeSeoFiles } from '../node'
@@ -266,6 +266,161 @@ describe('auditExport', () => {
     await expect(auditExport({ outDir, siteUrl: '/app' })).rejects.toThrow(
       /auditExport: `siteUrl` must be absolute/,
     )
+  })
+})
+
+describe('auditExport hreflang', () => {
+  const link = (lang: string, href: string) =>
+    `<link data-rh="true" rel="alternate" hrefLang="${lang}" href="${href}"/>`
+  /** The head of one language version: its canonical link, then the set. */
+  const version = (self: string, ...set: [string, string][]) =>
+    canonical(`${SITE}${self}`) +
+    set
+      .map(([lang, path]) =>
+        link(lang, /^https?:/.test(path) ? path : `${SITE}${path}`),
+      )
+      .join('')
+  const pair: [string, string][] = [
+    ['en', '/a'],
+    ['de', '/de/a'],
+    ['x-default', '/a'],
+  ]
+
+  async function hreflangProblems(pages: Record<string, string>) {
+    await writePages({ 'index.html': page(canonical(`${SITE}/`)), ...pages })
+    const { problems } = await auditExport({ outDir, ignore: ['sitemap'] })
+    return problems
+      .filter((problem) => problem.rule === 'hreflang')
+      .map(({ file, message }) => `${file}: ${message}`)
+  }
+
+  it('passes a set that every version lists, and its sitemap', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'a.html': page(version('/a', ...pair)),
+      'de/a.html': page(version('/de/a', ...pair)),
+    })
+    await writeSeoFiles({ outDir, robots: false })
+    expect(await auditExport({ outDir })).toEqual({ pages: 3, problems: [] })
+  })
+
+  it('reports a code that is not a language, en-UK, a relative link, and a code twice', async () => {
+    expect(
+      await hreflangProblems({
+        'a.html': page(
+          canonical(`${SITE}/a`) +
+            link('en', `${SITE}/a`) +
+            link('en_US', 'https://other.example/us') +
+            link('en-UK', 'https://other.example/uk') +
+            link('de', '/de/a') +
+            link('fr', 'https://other.example/fr') +
+            link('FR', 'https://other.example/fr-2'),
+        ),
+      }),
+    ).toEqual([
+      'a.html: hreflang "en_US" is not a language code. Use a code such as "en" or "en-US", or "x-default".',
+      'a.html: hreflang "en-UK": the region code of the United Kingdom is GB.',
+      'a.html: the hreflang "de" link "/de/a" is not absolute',
+      'a.html: 2 hreflang links for "fr", expected one',
+    ])
+  })
+
+  it('reports a version that does not list the links of another', async () => {
+    expect(
+      await hreflangProblems({
+        'a.html': page(version('/a', ...pair)),
+        'de/a.html': page(
+          version('/de/a', ['de', '/de/a'], ['x-default', '/de/a']),
+        ),
+      }),
+    ).toEqual([
+      `de/a.html: no hreflang "en" link to ${SITE}/a, and a.html lists it. Every language version lists the same links.`,
+      `de/a.html: no hreflang "x-default" link to ${SITE}/a, and a.html lists it. Every language version lists the same links.`,
+    ])
+  })
+
+  it('reports a version that does not name itself, once', async () => {
+    expect(
+      await hreflangProblems({
+        'a.html': page(version('/a', ['de', '/de/a'])),
+        'de/a.html': page(version('/de/a', ['en', '/a'], ['de', '/de/a'])),
+      }),
+    ).toEqual([
+      `a.html: no hreflang link to this page (${SITE}/a). List every language version, this page included.`,
+    ])
+  })
+
+  it('reports a link to a page with no hreflang links, with noindex, or with no file', async () => {
+    expect(
+      await hreflangProblems({
+        'a.html': page(
+          version(
+            '/a',
+            ['en', '/a'],
+            ['de', '/de/a'],
+            ['fr', '/fr/a'],
+            ['es', '/es/a'],
+            ['it', 'https://other.example/it/a'],
+          ),
+        ),
+        'de/a.html': page(canonical(`${SITE}/de/a`)),
+        'fr/a.html': page(
+          `${canonical(`${SITE}/fr/a`)}<meta name="robots" content="noindex"/>`,
+        ),
+      }),
+    ).toEqual([
+      `a.html: the hreflang "fr" link points to ${SITE}/fr/a, which has noindex`,
+      `a.html: the hreflang "es" link points to ${SITE}/es/a, and no page declares it as its canonical link`,
+      'de/a.html: no hreflang links, and a.html names this page "de". Every language version lists the same links.',
+    ])
+  })
+
+  it('reads no hreflang link on a noindex page', async () => {
+    expect(
+      await hreflangProblems({
+        'a.html': page(
+          `${version('/a', ['de', '/de/a'])}<meta name="robots" content="noindex"/>`,
+        ),
+      }),
+    ).toEqual([])
+  })
+
+  it('reports a sitemap whose xhtml:link entries differ from the page, or have no namespace', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'a.html': page(version('/a', ...pair)),
+      'de/a.html': page(version('/de/a', ...pair)),
+    })
+    await writeSeoFiles({ outDir, robots: false })
+    const file = join(outDir, 'sitemap.xml')
+    const xml = await readFile(file, 'utf8')
+    await writeFile(
+      file,
+      xml
+        .replace(' xmlns:xhtml="http://www.w3.org/1999/xhtml"', '')
+        .replace(
+          `<loc>${SITE}/de/a</loc>\n    <xhtml:link rel="alternate" hreflang="en" href="${SITE}/a"/>\n`,
+          `<loc>${SITE}/de/a</loc>\n`,
+        ),
+      'utf8',
+    )
+    const { problems } = await auditExport({ outDir })
+    expect(problems).toEqual([
+      {
+        file: 'sitemap.xml',
+        rule: 'hreflang',
+        message: `the xhtml:link entries of ${SITE}/de/a differ from the hreflang links of de/a.html`,
+      },
+      {
+        file: 'sitemap.xml',
+        rule: 'hreflang',
+        message:
+          'has xhtml:link entries and no xmlns:xhtml="http://www.w3.org/1999/xhtml" on <urlset>',
+      },
+    ])
+    expect(
+      (await auditExport({ outDir, ignore: ['hreflang'] })).problems,
+    ).toEqual([])
   })
 })
 

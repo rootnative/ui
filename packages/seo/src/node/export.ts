@@ -1,5 +1,6 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { join, sep } from 'node:path'
+import type { PageAlternate } from '../types'
 import { writeRobots, type RobotsOptions } from './robots'
 import { writeSitemap } from './sitemap'
 import { trimTrailingSlash } from './write'
@@ -17,6 +18,8 @@ export type ExportedPage = {
   canonical?: string
   /** True when `<meta name="robots">` holds `noindex` or `none`. */
   noindex: boolean
+  /** Each `<link rel="alternate" hreflang>`, in the order of the head, decoded. */
+  alternates: PageAlternate[]
 }
 
 /** Why a page stays out of the sitemap. */
@@ -107,31 +110,41 @@ function tokens(value: string | undefined, separator: RegExp): string[] {
     .filter(Boolean)
 }
 
-/** The canonical link and the robots rule of one page, read from its head. */
+/** The canonical link, the robots rule and the `hreflang` links of one page, read from its head. */
 export function readHead(
   html: string,
-): Pick<ExportedPage, 'canonical' | 'noindex'> {
+): Pick<ExportedPage, 'canonical' | 'noindex' | 'alternates'> {
   const end = html.search(/<\/head>/i)
   const head = end === -1 ? html : html.slice(0, end)
   let canonical: string | undefined
   let noindex = false
+  const alternates: PageAlternate[] = []
   for (const match of head.matchAll(TAG)) {
     const attributes = attributesOf(match[2] ?? '')
     const tag = match[1]?.toLowerCase()
+    const rel = tokens(attributes.rel, /\s+/)
     if (
       tag === 'link' &&
       canonical === undefined &&
-      tokens(attributes.rel, /\s+/).includes('canonical') &&
+      rel.includes('canonical') &&
       attributes.href
     ) {
       canonical = attributes.href
+    }
+    if (
+      tag === 'link' &&
+      rel.includes('alternate') &&
+      attributes.hreflang !== undefined &&
+      attributes.href
+    ) {
+      alternates.push({ lang: attributes.hreflang, url: attributes.href })
     }
     if (tag === 'meta' && attributes.name?.toLowerCase() === 'robots') {
       const rules = tokens(attributes.content, /,/)
       if (rules.includes('noindex') || rules.includes('none')) noindex = true
     }
   }
-  return { canonical, noindex }
+  return { canonical, noindex, alternates }
 }
 
 /** The route a static host serves `file` at: `/` for `index.html`, `/blog` for `blog/index.html`. */
@@ -188,7 +201,7 @@ export function absoluteSiteUrl(url: string, caller: string): string {
   return trimmed
 }
 
-function isUnder(siteUrl: string, url: string): boolean {
+export function isUnder(siteUrl: string, url: string): boolean {
   return (
     url === siteUrl ||
     url.startsWith(`${siteUrl}/`) ||
@@ -216,7 +229,8 @@ export function skipReason(
  * files. A page goes in the sitemap with its canonical link, when that link is
  * under the site and the page has no `noindex`. The sitemap then lists the
  * address each page declares, and a route the export did not write is never
- * listed.
+ * listed. A page with `hreflang` links gets the same links as `xhtml:link`
+ * entries.
  *
  * Throws when no page can go in the sitemap, because an empty sitemap on a
  * live host fails with no other signal.
@@ -244,11 +258,17 @@ export async function writeSeoFiles(
   )
 
   const listed = new Set<string>()
+  const alternates = new Map<string, PageAlternate[]>()
   const skipped: SeoFilesResult['skipped'] = []
   for (const page of pages) {
     const reason = skipReason(page, siteUrl, listed)
     if (reason) skipped.push({ file: page.file, reason })
-    else if (page.canonical) listed.add(page.canonical)
+    else if (page.canonical) {
+      listed.add(page.canonical)
+      if (page.alternates.length > 0) {
+        alternates.set(page.canonical, page.alternates)
+      }
+    }
   }
 
   const urls = [...listed].sort()
@@ -261,7 +281,7 @@ export async function writeSeoFiles(
   const sitemap = await writeSitemap({
     outDir,
     siteUrl,
-    urls: urls.map((loc) => ({ loc })),
+    urls: urls.map((loc) => ({ loc, alternates: alternates.get(loc) })),
   })
 
   let robots: string | undefined

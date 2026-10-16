@@ -1,12 +1,12 @@
 ---
 sidebar_position: 4
 sidebar_label: Limits
-description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the charset position, the per-route noindex decision, and the checks that count on the live host.
+description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the charset position, the per-route noindex decision, the page language of a translated page, and the checks that count on the live host.
 ---
 
 # Limits
 
-Five things are outside the package. Each one is a decision the app or the
+Six things are outside the package. Each one is a decision the app or the
 host makes, and the docs say so instead of hiding it.
 
 ## The server-rendered image
@@ -76,6 +76,30 @@ set:
 Give the route `noindex` and no `url`. Do not list it in `robots.txt`: a
 crawler reads the `noindex` tag only on a page it may fetch, and a
 `Disallow` line leaves the URL in the index with no title.
+
+## The page language
+
+Expo Router writes the `<html>` element of `app/+html.tsx` on every page.
+So every version of a translated page has the same `lang`, and the German
+version of an English site says `lang="en"`. Google takes the language of a
+version from its `hreflang` links, not from `lang`. A screen reader and some
+other search engines read `lang`, and they read the German text as English.
+
+The package does not set `lang` for each page. An app can write it through
+`expo-router/head`:
+
+```tsx
+import Head from 'expo-router/head'
+
+<Head>
+  <html lang="de" />
+</Head>
+```
+
+The export then holds `<html lang="de" lang="en">`. A browser keeps the
+first of two attributes with the same name, so the page reads as German,
+but the file has a parse error, and `rootnative-seo audit` reads the second
+value.
 
 ## The checks that count
 

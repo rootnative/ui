@@ -15,7 +15,9 @@ function keyOf(tag: HeadTag, index: number): string {
     case 'title':
       return 'title'
     case 'link':
-      return `link:${tag.rel}`
+      return tag.hreflang === undefined
+        ? `link:${tag.rel}`
+        : `link:${tag.rel}:${tag.hreflang}`
     case 'meta':
       return 'name' in tag ? `meta:${tag.name}` : `meta:${tag.property}`
     case 'script':
@@ -35,8 +37,14 @@ export function renderHeadTag(tag: HeadTag, index: number) {
       ) : (
         <meta key={key} property={tag.property} content={tag.content} />
       )
+    // No `hrefLang={undefined}`: react-helmet-async writes an undefined prop
+    // as an empty attribute, and the canonical link gets `hreflang=""`.
     case 'link':
-      return <link key={key} rel={tag.rel} href={tag.href} />
+      return tag.hreflang === undefined ? (
+        <link key={key} rel={tag.rel} href={tag.href} />
+      ) : (
+        <link key={key} rel={tag.rel} hrefLang={tag.hreflang} href={tag.href} />
+      )
     // A string child, not `dangerouslySetInnerHTML`: react-helmet-async reads
     // the inner HTML of a script from its child and drops the tag otherwise.
     // The text is already safe — `serializeJsonLd` escapes every `<`.

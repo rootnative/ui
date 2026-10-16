@@ -15,6 +15,14 @@ export type OpenGraphType =
   | 'video.movie'
   | 'product'
 
+/** One language version of a page, for an `hreflang` link. */
+export type PageAlternate = {
+  /** A BCP 47 code such as `en` or `de-AT`, or `x-default`. */
+  lang: string
+  /** Absolute, or relative to the site URL. */
+  url: string
+}
+
 /** The head of one page. The app maps its data to this shape. */
 export type PageMeta = {
   /** The page title, without the site name. The template adds it. */
@@ -29,6 +37,12 @@ export type PageMeta = {
   type?: OpenGraphType
   locale?: string
   noindex?: boolean
+  /**
+   * Every language version of the page, this page included, in the same
+   * order on each version. With no `x-default` entry, the first entry is
+   * also the `x-default`. Written only with `url`.
+   */
+  alternates?: PageAlternate[]
   /** Force the Twitter card type. The default follows the image. */
   twitterCard?: 'summary' | 'summary_large_image'
   jsonLd?: JsonLd[]
@@ -61,5 +75,5 @@ export type HeadTag =
   | { tag: 'title'; text: string }
   | { tag: 'meta'; name: string; content: string }
   | { tag: 'meta'; property: string; content: string }
-  | { tag: 'link'; rel: string; href: string }
+  | { tag: 'link'; rel: string; href: string; hreflang?: string }
   | { tag: 'script'; type: 'application/ld+json'; text: string }
