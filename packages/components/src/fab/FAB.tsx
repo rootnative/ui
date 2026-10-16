@@ -81,9 +81,7 @@ export function FAB({
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
   // `colors` already folds in the containerColor/contentColor overrides, and
   // layers always derive from the resolved content color over the resolved
-  // background (FAB containers are never transparent). While disabled the
-  // hook's style/handlers are not applied at all — the static disabled
-  // treatment below owns the container.
+  // background (FAB containers are never transparent).
   const {
     style: stateLayerStyle,
     handlers,
@@ -93,6 +91,7 @@ export function FAB({
     rest: colors.backgroundColor,
     content: colors.contentColor,
     disabled: isDisabled,
+    disabledContainerColor: colors.disabledBackgroundColor,
   })
 
   const showElevationLayer = !isDisabled
@@ -175,10 +174,10 @@ export function FAB({
             isExtended
               ? [styles.extended, icon ? styles.extendedWithIcon : undefined]
               : getFABSizeStyle(styles, size),
-            // The gesture-layer style owns backgroundColor while enabled; when
-            // disabled it is dropped entirely so the static disabled background
-            // applies instantly (no animated layer to fight it).
-            isDisabled ? undefined : stateLayerStyle,
+            // The gesture-layer style owns backgroundColor, also while
+            // disabled: removing an animated style leaves its last value on
+            // the view.
+            stateLayerStyle,
             disabledOverride,
             isDisabled ? styles.disabled : undefined,
             // Function-form `style` is intentionally dropped on animated

@@ -1,6 +1,16 @@
 import { useTheme } from '@rootnative/core'
-import { cubicBezier, useAnimation } from '@rootnative/inertia'
-import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
+import {
+  cubicBezier,
+  useAnimation,
+  useAnimator,
+  useMotionValue,
+  useShouldReduceMotion,
+} from '@rootnative/inertia'
+import {
+  Animated,
+  cancelAnimation,
+  useAnimatedProps,
+} from '@rootnative/inertia/reanimated'
 import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
@@ -88,7 +98,7 @@ export function LoadingIndicator({
 
   // --- Global spin ----------------------------------------------------------
   // Indeterminate: a linear 0→1 phase looping every GLOBAL_ROTATION_MS (one
-  // full turn). Reduced motion pins it to 1 (no spin) via useAnimation.
+  // full turn). Reduced motion pins it to 1 (no spin) via useAnimator.
   // Determinate: no global spin.
   const spinTransition = useMemo(
     () => ({
@@ -99,7 +109,19 @@ export function LoadingIndicator({
     }),
     [],
   )
-  const spinPhase = useAnimation(indeterminate ? 1 : 0, spinTransition)
+  const spinPhase = useMotionValue(0)
+  const animate = useAnimator()
+  const shouldReduceMotion = useShouldReduceMotion()
+
+  useEffect(() => {
+    if (!indeterminate) return
+    // `withRepeat` runs each turn from the value that the loop starts at, so
+    // the loop must start at 0. Do not use `useAnimation(1, loop)` here: it
+    // seeds the value at its target, and each turn runs from 1 to 1.
+    spinPhase.value = 0
+    animate(spinPhase, 1, spinTransition)
+    return () => cancelAnimation(spinPhase)
+  }, [indeterminate, shouldReduceMotion, animate, spinPhase, spinTransition])
 
   // Both the shape morph and the rotation are folded into the single animated
   // `d` string (via pointsToPath's rotation arg) — no SVG group transform,

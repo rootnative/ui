@@ -112,15 +112,6 @@ export function createCardRegionStyles(theme: MaterialTheme) {
       width: '100%',
       overflow: 'hidden',
     },
-    // Children fill the slot so a plain `<Image>` needs no style. Absolute
-    // fill rather than `flex: 1`, because the slot is a block whose height
-    // comes from `height`/`aspectRatio`, and a flex child of an
-    // auto-height parent would collapse to zero.
-    mediaFill: {
-      ...StyleSheet.absoluteFill,
-      width: '100%',
-      height: '100%',
-    },
     content: {
       padding: CARD_CONTENT_PADDING,
       gap: theme.spacing.xs,

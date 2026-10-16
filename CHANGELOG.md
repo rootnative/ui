@@ -9,6 +9,117 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No breaking change.** No export and no prop is removed. Three changes can
+move a screen or fail a test: the children of a sized `Card.Media` stack, a
+`Chip` label stays on one line, and `Picture` on the web follows the React
+Native layout rules. Each of these entries ends with what to check.
+
+### `LoadingIndicator` spins
+
+The indeterminate indicator did not turn. Only the shape change ran, one
+change every 650 ms, so on a short task the indicator looked still. The spin
+used `useAnimation(1, loop)`. `useAnimation` starts its value at the target,
+and Reanimated runs each turn of a loop from the value at the start of the
+loop, so each turn ran from 1 to 1.
+
+The spin now starts at 0 and runs to 1 through `useAnimator`. Reduced motion
+still stops it. A determinate indicator also ran an endless loop from 0 to
+0, and now it runs no loop. Three tests record the value that each loop
+starts from, and all three fail on the old code.
+
+**Check your app.** If you put the indicator in a `Motion.View` that turns
+it, remove that wrapper, or the indicator turns two times as fast.
+
+### A control that becomes disabled during a press shows the disabled color
+
+`Button`, `Card` with `onPress`, `Chip`, `FAB` and `IconButton` removed
+their animated state-layer style while disabled. A view keeps the last value
+that an animated style wrote. So a button that disabled itself in its own
+`onPress`, such as Next on the last page, kept the pressed tint after the
+press, and `Button` also kept the pressed corner.
+
+The animated styles now stay on the container while disabled. The state
+layer shows the disabled container color, also on the first frame of a
+control that mounts disabled. A press or a hover that the control did not
+release goes back to rest. A loading `Button` keeps its container color, as
+before. A test for each of the five components disables it during a press,
+and each case fails on the old code.
+
+**What does not change.** A disabled control shows the same colors as
+before.
+
+### Each child of a sized `Card.Media` fills the slot
+
+The docs said that a plain `Image` in a `Card.Media` with a `height` or an
+`aspectRatio` needs no style. A network `Image` was 0 high. The slot put its
+children in a column, which stretches a child across the width only, and a
+network image has no height of its own.
+
+Now each child of a sized slot gets `StyleSheet.absoluteFill` before its own
+style, so a plain `Image` fills the slot. A child's own `width` or `height`
+wins over the fill. A slot with no size does not change.
+
+**Check your cards.** The children of a sized slot now stack: a second child
+is an overlay on the first. If you put two children in a column in one slot,
+wrap them in one `View`. If you gave an image `flex: 1` only to fill the
+slot, you can remove it.
+
+### A `Chip` label stays on one line
+
+The label had no line limit. A long label wrapped, and the 32dp chip cut the
+second line in half. The label now has `numberOfLines={1}` and
+`flexShrink: 1`, so a label that does not fit ends with an ellipsis. MD3
+gives a chip one line of label.
+
+**Check your chips.** A label that wrapped now ends with an ellipsis. To show
+more of it, give the chip more width.
+
+### `Dialog` finds its slots inside a fragment
+
+`Dialog` read its slots from its direct children only. A `Dialog.Title`,
+`Dialog.Content` or `Dialog.Actions` inside a fragment, such as a conditional
+`<>…</>`, went to the body with no warning: no headline, no action row, and
+no accessible name. `Dialog` now collects the children of a fragment at each
+depth.
+
+### `Picture` lays out on the web as on native
+
+On native, `Picture` puts `width` and `height` before `style`, as a React
+Native box. On the web, it rendered a raw `<img>` with the style as inline
+CSS, and a raw element does not lay out as a react-native-web view:
+
+- A border width drew no border, because the element had no `border-style`.
+- A `flex: 1` picture in a shorter frame kept the height of its ratio and
+  went out of the frame, because the element had no `min-height: 0`.
+- A side that `style` set to `undefined` took its size from the `width` or
+  `height` attribute, so an `aspectRatio` did nothing. The picture on the
+  showcase page of the example measured 390 by 360 in a 390 px frame, in
+  place of 390 by 234.
+
+The web branch now puts the react-native-web view defaults before the box:
+`box-sizing: border-box`, a solid border of width 0, `flex-shrink: 0`,
+`min-width` and `min-height` of 0, and `position: relative`. A side that
+`style` sets to `undefined` is `auto`. Each case was measured in headless
+Chromium, before and after.
+
+**Check your pages.** A size in `style` wins over the box, on both
+platforms. To let `flex` or `aspectRatio` set a side, set that side to
+`undefined`: `{ flex: 1, width: undefined }` fills a frame, and
+`{ width: 112, height: undefined, aspectRatio: 2 / 3 }` keeps the ratio. A
+border now draws, and it is inside the box.
+
+### `browseExport` names a base-path mismatch
+
+An export whose scripts load from `/` and whose canonical link is under a
+path, or the reverse, failed on each script of each page.
+`rootnative-seo browse` printed one line for each failed request, and no
+line for the cause. `browseExport` now reads the script URLs of
+`index.html` before it starts Chrome. When they are not under the base path,
+it stops with one message that names both paths and the fix: set
+`experiments.baseUrl`, or pass `basePath`.
+
 ## 0.0.0-alpha.26 — 2026-10-16
 
 **No breaking change.** No export and no prop is removed. Two changes can

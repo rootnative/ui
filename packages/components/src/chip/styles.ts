@@ -234,7 +234,11 @@ export function createStyles(
       borderWidth: CHIP_FOCUS_RING_WIDTH,
       borderColor: theme.colors.secondary,
     },
+    // MD3 gives a chip one line of label. The chip is 32dp high, so a second
+    // line is cut. A label that does not fit shrinks and ends with an
+    // ellipsis.
     label: {
+      flexShrink: 1,
       fontFamily: labelStyle.fontFamily,
       fontSize: labelStyle.fontSize,
       lineHeight: labelStyle.lineHeight,

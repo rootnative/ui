@@ -498,7 +498,7 @@ Props:
 Edge-to-edge media. No padding of its own, and the card clips it to the corner radius. Size it with `height` or `aspectRatio`; children then stretch to fill.
 
 Props:
-- `children: ReactNode` — Media to render — an `Image`, `expo-image`, a video surface, or any other node. The slot does not own the image, so any library works. Children are stretched to fill the slot, so a plain `Image` needs no style of its own.
+- `children: ReactNode` — Media to render — an `Image`, `expo-image`, a video surface, or any other node. The slot does not own the image, so any library works. With `height` or `aspectRatio`, each child fills the slot, so a plain `Image` needs no style of its own. The children stack in order, so a second child is an overlay. A child's own `width` or `height` wins.
 - `height?: number` — Fixed height of the media region in dp. Omit to let the media size itself (for example an `Image` with an `aspectRatio` style).
 - `aspectRatio?: number` — Aspect ratio of the media region (width / height). Ignored when `height` is set.
 - Inherits `ViewProps`

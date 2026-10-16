@@ -1,9 +1,30 @@
 import { useTheme } from '@rootnative/core'
-import { useMemo } from 'react'
-import { View } from 'react-native'
-import { pointerEvents } from '../internal/pointerEvents'
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useMemo,
+} from 'react'
+import type { ReactNode } from 'react'
+import { StyleSheet, View } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
 import { createCardRegionStyles } from './styles'
 import type { CardMediaProps } from './types'
+
+/**
+ * Puts the absolute fill before the child's own style. A flex child is not
+ * sufficient: a column stretches it across the width only, and a network
+ * `Image` has no height of its own. An explicit `width` or `height` on the
+ * child still wins over the insets.
+ */
+function fillSlot(child: ReactNode): ReactNode {
+  if (!isValidElement<{ style?: StyleProp<ViewStyle> }>(child)) return child
+  if (child.type === Fragment) return child
+  return cloneElement(child, {
+    style: [StyleSheet.absoluteFill, child.props.style],
+  })
+}
 
 /**
  * Edge-to-edge media region of a card.
@@ -11,7 +32,8 @@ import type { CardMediaProps } from './types'
  * Carries no padding and no radius: the parent `Card` container already clips
  * (`overflow: 'hidden'`) and rounds its corners, so the media inherits both.
  * The slot does not own the image — any child works (`Image`, `expo-image`, a
- * video surface), and children are stretched to fill it.
+ * video surface). In a sized slot, each child fills the slot, and the
+ * children stack in order.
  */
 export function CardMedia({
   children,
@@ -37,13 +59,7 @@ export function CardMedia({
 
   return (
     <View {...props} style={[styles.media, sizeStyle, style]}>
-      {isSized ? (
-        <View style={[styles.mediaFill, pointerEvents.boxNone]}>
-          {children}
-        </View>
-      ) : (
-        children
-      )}
+      {isSized ? Children.map(children, fillSlot) : children}
     </View>
   )
 }

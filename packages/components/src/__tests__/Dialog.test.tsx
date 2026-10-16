@@ -65,6 +65,32 @@ describe('Dialog', () => {
     expect(order).toEqual(['headline', 'supporting', 'action'])
   })
 
+  it('finds the slots inside a fragment, at each depth', async () => {
+    const kind: string = 'reset'
+    renderDialog(
+      <Dialog visible onDismiss={jest.fn()} testID="dialog">
+        {kind === 'reset' ? (
+          <>
+            <Dialog.Actions>
+              <Text>action</Text>
+            </Dialog.Actions>
+            <>
+              <Dialog.Content>supporting</Dialog.Content>
+            </>
+            <Dialog.Title>headline</Dialog.Title>
+          </>
+        ) : null}
+      </Dialog>,
+    )
+
+    const surface = await screen.findByTestId('dialog')
+    expect(surface.props.accessibilityLabel).toBe('headline')
+    const order = within(surface)
+      .getAllByText(/headline|supporting|action/)
+      .map((node) => node.props.children)
+    expect(order).toEqual(['headline', 'supporting', 'action'])
+  })
+
   it('treats unrecognised children as content', async () => {
     renderDialog(
       <Dialog visible onDismiss={jest.fn()}>

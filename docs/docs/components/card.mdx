@@ -165,7 +165,7 @@ The card needs an `onPress` to become interactive. `Link` adds its own navigatio
 - `aspectRatio` — width / height, which keeps the media proportional as the card resizes. Ignored when `height` is set.
 - Neither — the media sizes itself, and its own child provides the height.
 
-With `height` or `aspectRatio` set, children stretch to fill the region, so a plain `Image` needs no style of its own.
+With `height` or `aspectRatio` set, each child fills the region, so a plain `Image` needs no style of its own. The children stack in order, so a second child is an overlay. A child's own `width` or `height` wins.
 
 ### Raw children still work
 

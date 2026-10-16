@@ -10,6 +10,13 @@ describe('Chip', () => {
     expect(screen.getByText('Tag')).toBeTruthy()
   })
 
+  it('keeps the label on one line, and lets it shrink in a narrow parent', () => {
+    renderWithTheme(<Chip>Ada Lovelace, Charles Babbage, Mary Somerville</Chip>)
+    const label = screen.getByText(/Ada Lovelace/)
+    expect(label.props.numberOfLines).toBe(1)
+    expect(StyleSheet.flatten(label.props.style).flexShrink).toBe(1)
+  })
+
   it('has the button accessibility role when it has an action', () => {
     renderWithTheme(<Chip onPress={jest.fn()}>Action</Chip>)
     expect(screen.getByRole('button')).toBeTruthy()

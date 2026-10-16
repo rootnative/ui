@@ -1,6 +1,6 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
-import { Children, isValidElement, useMemo } from 'react'
+import { Children, Fragment, isValidElement, useMemo } from 'react'
 import type { ReactNode, Ref } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import type { ViewProps } from 'react-native'
@@ -37,13 +37,26 @@ interface Slots {
 function collectSlots(children: ReactNode): Slots {
   const slots: Slots = { icon: [], title: [], content: [], actions: [] }
 
-  Children.forEach(children, (child) => {
-    if (child === null || child === undefined || child === false) return
-    const kind = slotKindOf(child)
-    // Anything that isn't a recognised slot is treated as body content, so
-    // `<Dialog><MyForm /></Dialog>` works without ceremony.
-    slots[kind ?? 'content'].push(child)
-  })
+  const collect = (nodes: ReactNode) => {
+    Children.forEach(nodes, (child) => {
+      if (child === null || child === undefined || child === false) return
+      // `Children.forEach` sees a fragment as one child. Collect the children
+      // of a fragment at each depth, or the slots in a conditional `<>…</>`
+      // go to the body.
+      if (
+        isValidElement<{ children?: ReactNode }>(child) &&
+        child.type === Fragment
+      ) {
+        collect(child.props.children)
+        return
+      }
+      const kind = slotKindOf(child)
+      // Anything that isn't a recognised slot is treated as body content, so
+      // `<Dialog><MyForm /></Dialog>` works without ceremony.
+      slots[kind ?? 'content'].push(child)
+    })
+  }
+  collect(children)
 
   return slots
 }

@@ -164,8 +164,7 @@ export function Chip(props: ChipProps) {
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
   // `colors` already folds in the containerColor/contentColor overrides, and
   // in every variant/override path the layer overlay equals the resolved
-  // text color. While disabled the hook's style/handlers are not applied at
-  // all — the static disabled treatment below owns the container.
+  // text color.
   const {
     style: stateLayerStyle,
     handlers,
@@ -174,6 +173,7 @@ export function Chip(props: ChipProps) {
     rest: colors.backgroundColor,
     content: colors.textColor,
     disabled: isDisabled,
+    disabledContainerColor: colors.disabledBackgroundColor,
   })
 
   // Expressive shape morphs for the selectable chips (filter/input), on the
@@ -378,7 +378,9 @@ export function Chip(props: ChipProps) {
   const content = (
     <>
       {renderLeadingContent()}
-      <Text style={computedLabelStyle}>{children}</Text>
+      <Text numberOfLines={1} style={computedLabelStyle}>
+        {children}
+      </Text>
       {showCloseIcon ? <View style={styles.closeSpacer} /> : null}
     </>
   )
@@ -421,13 +423,13 @@ export function Chip(props: ChipProps) {
             style={[
               styles.container,
               webOutlineReset,
-              // The gesture-layer style owns backgroundColor while enabled; when
-              // disabled it is dropped entirely so the static disabled background
-              // applies instantly (no animated layer to fight it). The radius
-              // morph stays applied while disabled — a selected filter chip
-              // keeps its pill resting shape (the press progress is pinned).
+              // The gesture-layer style owns backgroundColor, also while
+              // disabled: removing an animated style leaves its last value on
+              // the view. The radius morph stays applied while disabled — a
+              // selected filter chip keeps its pill resting shape (the press
+              // progress is pinned).
               animatedRadiusStyle,
-              isDisabled ? undefined : stateLayerStyle,
+              stateLayerStyle,
               isDisabled ? styles.disabledContainer : undefined,
               // Function-form `style` is intentionally dropped on animated
               // components — wrapping the whole `style` array in a function would

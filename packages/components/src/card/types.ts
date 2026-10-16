@@ -15,8 +15,9 @@ export interface CardMediaProps extends ViewProps {
    * Media to render — an `Image`, `expo-image`, a video surface, or any other
    * node. The slot does not own the image, so any library works.
    *
-   * Children are stretched to fill the slot, so a plain `Image` needs no style
-   * of its own.
+   * With `height` or `aspectRatio`, each child fills the slot, so a plain
+   * `Image` needs no style of its own. The children stack in order, so a
+   * second child is an overlay. A child's own `width` or `height` wins.
    */
   children: ReactNode
   /**

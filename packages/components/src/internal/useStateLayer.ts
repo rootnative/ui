@@ -6,7 +6,7 @@ import {
   type UseGestureLayerResult,
 } from '@rootnative/inertia/gesture-layer'
 import { alphaColor, blendColor } from '@rootnative/utils'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 export interface UseStateLayerOptions {
   /**
@@ -26,7 +26,11 @@ export interface UseStateLayerOptions {
    * stay at the variant defaults.
    */
   containerColor?: string
-  /** Suppresses hover/press/focus layers and activates the disabled layer. */
+  /**
+   * Suppresses hover/press/focus layers and shows the disabled container
+   * color. Keep `style` on the container while disabled: a view keeps the
+   * last value that an animated style wrote after the style is removed.
+   */
   disabled?: boolean
   /**
    * Container background while disabled — MD3's 12% `onSurface` for filled
@@ -91,7 +95,11 @@ export function useStateLayer(
   const { stateLayer } = useTheme()
 
   const layers = useMemo<GestureLayerStates>(() => {
-    const base = containerColor ?? rest
+    const disabledBase = disabledContainerColor ?? rest
+    // While disabled, every layer starts from the disabled color. The
+    // `disabled` layer alone is not sufficient: its progress starts at 0, so
+    // a control that mounts disabled would show `rest` first.
+    const base = disabled ? disabledBase : (containerColor ?? rest)
     const layerColor = (opacity: number) =>
       base === 'transparent'
         ? alphaColor(content, opacity)
@@ -106,9 +114,16 @@ export function useStateLayer(
     }
     // The disabled layer never reads `containerColor`. Without this line
     // `useGestureLayer` falls back to `rest`, which is the override.
-    states.disabled = { backgroundColor: disabledContainerColor ?? rest }
+    states.disabled = { backgroundColor: disabledBase }
     return states
-  }, [containerColor, rest, content, stateLayer, disabledContainerColor])
+  }, [
+    disabled,
+    containerColor,
+    rest,
+    content,
+    stateLayer,
+    disabledContainerColor,
+  ])
 
   const gestureOptions = useMemo(
     () => ({
@@ -124,6 +139,17 @@ export function useStateLayer(
   )
 
   const layer = useGestureLayer(layers, gestureOptions)
+  const { pressed, hovered } = layer.states
+
+  // A control that becomes disabled during a press or a hover gets no
+  // release, because its handlers are detached. Put both layers back to
+  // rest, or the control shows them again when it is enabled.
+  useEffect(() => {
+    if (!disabled) return
+    pressed.value = 0
+    hovered.value = 0
+  }, [disabled, pressed, hovered])
+
   const focusRingStyle = useFocusRingStyle(layer.states.focusVisible)
   return { ...layer, focusRingStyle }
 }

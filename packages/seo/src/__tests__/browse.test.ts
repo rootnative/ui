@@ -120,6 +120,69 @@ describeWithChrome('browseExport', () => {
   })
 })
 
+const exported = (canonical: string, scripts: string) =>
+  `<!DOCTYPE html><html><head><title>t</title><link rel="canonical" href="${canonical}"></head><body><div id="root">x</div><script src="${scripts}/_expo/static/js/web/entry-1a2b.js" defer></script></body></html>`
+
+// The check runs before Chrome starts, so a missing binary shows that the
+// export passed it.
+describe('browseExport base path', () => {
+  it('stops with the cause when the scripts are at the root and the canonical link is under a path', async () => {
+    await writeFiles({
+      'index.html': exported('https://example.com/docs', ''),
+    })
+    const error = browseExport({ outDir, chrome: join(outDir, 'nope') })
+    await expect(error).rejects.toThrow(
+      'the scripts of index.html load from "/", and the pages are served under "/docs", from the canonical link of index.html',
+    )
+    await expect(error).rejects.toThrow(
+      'Export with `experiments.baseUrl` set to "/docs", or pass `basePath` "/"',
+    )
+  })
+
+  it('stops when the scripts are under a path and the pages are served at the root', async () => {
+    await writeFiles({
+      'index.html': exported('https://example.com/', '/docs'),
+    })
+    await expect(
+      browseExport({ outDir, chrome: join(outDir, 'nope') }),
+    ).rejects.toThrow(
+      'load from "/docs", and the pages are served under "/", from the canonical link of index.html. Each script request would fail. Export with no `experiments.baseUrl`, or pass `basePath` "/docs"',
+    )
+  })
+
+  it('names `basePath` when the option sets the path', async () => {
+    await writeFiles({
+      'index.html': exported('https://example.com/docs', '/docs'),
+    })
+    await expect(
+      browseExport({ outDir, basePath: '/', chrome: join(outDir, 'nope') }),
+    ).rejects.toThrow('served under "/", from `basePath`')
+  })
+
+  it('passes when the scripts are under the base path', async () => {
+    await writeFiles({
+      'index.html': exported('https://example.com/docs', '/docs'),
+    })
+    await expect(
+      browseExport({ outDir, chrome: join(outDir, 'nope') }),
+    ).rejects.toThrow(/no Chrome found/)
+  })
+
+  it('prints one line from the command, not one for each request', async () => {
+    await writeFiles({
+      'index.html': exported('https://example.com/docs', ''),
+      'about.html': exported('https://example.com/docs/about', ''),
+    })
+    const errors: string[] = []
+    const output = { log: () => {}, error: (line: string) => errors.push(line) }
+    expect(
+      await main(['browse', outDir, '--chrome', join(outDir, 'nope')], output),
+    ).toBe(1)
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain('[rootnative-seo] browseExport: the scripts')
+  })
+})
+
 describe('browseExport without Chrome', () => {
   it('throws with a clear message when the binary is missing', async () => {
     await writeFiles({ 'index.html': page('') })

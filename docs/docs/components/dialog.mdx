@@ -59,7 +59,8 @@ Dialog renders through [Portal](./portal.mdx), so your app must be wrapped in a 
 
 Dialog composes from four slots. **Write them in any order** — Dialog places them
 in MD3 order (icon → headline → content → actions) itself, which is what lets the
-fullscreen variant move the title and actions into its header.
+fullscreen variant move the title and actions into its header. A slot can also
+sit in a fragment, so a conditional `<>…</>` of slots works.
 
 | Slot | Renders | MD3 role |
 |------|---------|----------|

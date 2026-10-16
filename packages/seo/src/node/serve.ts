@@ -64,6 +64,20 @@ export async function basePathOf(outDir: string): Promise<string> {
   return path ? `/${path}` : ''
 }
 
+/**
+ * The base path that `serveExport` serves under: `basePath`, else the path of
+ * the canonical link of `index.html`. `''` is the root.
+ */
+export async function servedBasePath(
+  pagesDir: string,
+  basePath: string | undefined,
+): Promise<string> {
+  const path = basePath
+    ? `/${trimSlashes(basePath)}`
+    : await basePathOf(pagesDir)
+  return path === '/' ? '' : path
+}
+
 async function isFile(path: string): Promise<boolean> {
   const info = await stat(path).catch(() => undefined)
   return info?.isFile() ?? false
@@ -105,10 +119,7 @@ export async function serveExport(
 ): Promise<ExportServer> {
   const { outDir } = options
   const { pagesDir, filesDir } = await exportLayout(outDir)
-  const basePath = options.basePath
-    ? `/${trimSlashes(options.basePath)}`
-    : await basePathOf(pagesDir)
-  const base = basePath === '/' ? '' : basePath
+  const base = await servedBasePath(pagesDir, options.basePath)
 
   // The server folder also holds the route manifest and the server bundles,
   // which the Expo server never sends, so only a page comes from there.

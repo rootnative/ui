@@ -11,7 +11,10 @@ import type {
 export type ChipVariant = 'assist' | 'filter' | 'input' | 'suggestion'
 
 interface ChipCommonProps extends Omit<PressableProps, 'children' | 'style'> {
-  /** Text label rendered inside the chip. */
+  /**
+   * Text label rendered inside the chip, on one line. A label that does not
+   * fit ends with an ellipsis.
+   */
   children: string
   /**
    * Called when the chip is pressed. With no `onPress`, `onLongPress` or

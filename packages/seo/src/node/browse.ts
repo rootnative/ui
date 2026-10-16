@@ -1,10 +1,10 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { accessSync, constants } from 'node:fs'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { exportLayout, listHtmlFiles, routeOf } from './export'
-import { serveExport } from './serve'
+import { servedBasePath, serveExport } from './serve'
 
 export type BrowseProblem = {
   /** The path of the file under `outDir`. */
@@ -241,6 +241,45 @@ function oneLine(message: string): string {
   return message.replace(/\s+/g, ' ').trim()
 }
 
+/**
+ * The path that the scripts of an Expo export load from: the part of a
+ * script URL before `/_expo/`. `undefined` when no script URL on the host
+ * holds `/_expo/`.
+ */
+function scriptBaseOf(html: string): string | undefined {
+  for (const match of html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
+    const src = match[1] ?? ''
+    if (!src.startsWith('/') || src.startsWith('//')) continue
+    const at = src.indexOf('/_expo/')
+    if (at !== -1) return src.slice(0, at)
+  }
+  return undefined
+}
+
+/**
+ * Stops before the first page loads when the scripts of `index.html` are not
+ * under the base path. Each script request would fail, and the browser pass
+ * would report one problem for each file on each page, and not the cause.
+ */
+async function checkScriptBase(
+  pagesDir: string,
+  basePath: string,
+  fromOption: boolean,
+): Promise<void> {
+  const html = await readFile(join(pagesDir, 'index.html'), 'utf8').catch(
+    () => undefined,
+  )
+  const scriptBase = html === undefined ? undefined : scriptBaseOf(html)
+  if (scriptBase === undefined || scriptBase === basePath) return
+  const source = fromOption ? '`basePath`' : 'the canonical link of index.html'
+  const fix = basePath
+    ? `Export with \`experiments.baseUrl\` set to "${basePath}"`
+    : 'Export with no `experiments.baseUrl`'
+  throw new Error(
+    `browseExport: the scripts of index.html load from "${scriptBase || '/'}", and the pages are served under "${basePath || '/'}", from ${source}. Each script request would fail. ${fix}, or pass \`basePath\` "${scriptBase || '/'}".`,
+  )
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((done) => setTimeout(done, ms))
 }
@@ -253,24 +292,29 @@ function sleep(ms: number): Promise<void> {
  * list. The HTML gate cannot see any of them: it reads the file, and these
  * happen when the script runs.
  *
- * Throws when no Chrome is found, the folder is missing, or it holds no
- * HTML file.
+ * Throws when no Chrome is found, the folder is missing, it holds no HTML
+ * file, or the scripts of `index.html` are not under the base path.
  */
 export async function browseExport(
   options: BrowseExportOptions,
 ): Promise<BrowseResult> {
   const { outDir } = options
-  const chrome = findChrome(options.chrome)
-  if (!chrome) {
-    throw new Error(
-      'browseExport: no Chrome found. Install Google Chrome or Chromium, or set CHROME_PATH to the binary.',
-    )
-  }
   const { pagesDir } = await exportLayout(outDir)
   const files = await listHtmlFiles(pagesDir, 'browseExport')
   if (files.length === 0) {
     throw new Error(
       `browseExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
+    )
+  }
+  await checkScriptBase(
+    pagesDir,
+    await servedBasePath(pagesDir, options.basePath),
+    Boolean(options.basePath),
+  )
+  const chrome = findChrome(options.chrome)
+  if (!chrome) {
+    throw new Error(
+      'browseExport: no Chrome found. Install Google Chrome or Chromium, or set CHROME_PATH to the binary.',
     )
   }
   const settleMs = options.settleMs ?? 750

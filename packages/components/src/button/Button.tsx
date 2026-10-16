@@ -95,8 +95,7 @@ export function Button({
   // `colors` already folds in the containerColor/contentColor overrides, and
   // in every variant the layer overlay equals the resolved text color — so
   // rest + textColor reproduce getResolvedButtonColors' layer set exactly.
-  // While disabled the hook's style/handlers are not applied at all — the
-  // static disabled treatment below owns the container.
+  // A loading button is inert, but it keeps its container color.
   const {
     style: stateLayerStyle,
     handlers,
@@ -105,6 +104,9 @@ export function Button({
     rest: colors.backgroundColor,
     content: colors.textColor,
     disabled: isInert,
+    disabledContainerColor: isDisabled
+      ? colors.disabledBackgroundColor
+      : undefined,
   })
 
   // Expressive press shape morph: rest shape (pill for `round`, size corner
@@ -246,13 +248,14 @@ export function Button({
           style={[
             styles.container,
             webOutlineReset,
-            // The gesture-layer style owns backgroundColor while enabled; when
-            // disabled it is dropped entirely so the static disabled background
-            // applies instantly (no animated layer to fight it). The press
-            // morph sits before the consumer `style` so an explicit
-            // borderRadius override still wins.
-            isDisabled ? undefined : stateLayerStyle,
-            isDisabled ? undefined : morph.style,
+            // The gesture-layer style owns backgroundColor, also while
+            // disabled: removing an animated style leaves its last value on
+            // the view, so a press that disables the button would keep the
+            // pressed color and corner. The press morph sits before the
+            // consumer `style` so an explicit borderRadius override still
+            // wins.
+            stateLayerStyle,
+            morph.style,
             isDisabled ? styles.disabledContainer : undefined,
             containerStyle,
           ]}

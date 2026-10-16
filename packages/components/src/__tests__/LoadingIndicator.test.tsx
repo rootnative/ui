@@ -1,5 +1,6 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
+import * as Reanimated from 'react-native-reanimated'
 import { LoadingIndicator } from '../loading-indicator/LoadingIndicator'
 import {
   DETERMINATE_POINTS,
@@ -40,6 +41,70 @@ describe('LoadingIndicator', () => {
   it('renders without crashing in contained mode', () => {
     renderWithTheme(<LoadingIndicator contained accessibilityLabel="Loading" />)
     expect(screen.getByRole('progressbar')).toBeTruthy()
+  })
+})
+
+/**
+ * Records the value that a shared value holds when a `withRepeat` loop is
+ * assigned to it. Reanimated runs each turn of a loop from that value, so a
+ * loop that starts at its target never moves.
+ */
+function recordLoopStarts(): number[] {
+  const starts: number[] = []
+  let loopPending = false
+  const useSharedValue = Reanimated.useSharedValue
+  const instrumented = new WeakSet<object>()
+
+  jest
+    .spyOn(Reanimated, 'useSharedValue')
+    .mockImplementation((initial: unknown) => {
+      const sv = useSharedValue(initial)
+      if (!instrumented.has(sv)) {
+        instrumented.add(sv)
+        let current = sv.value
+        Object.defineProperty(sv, 'value', {
+          get: () => current,
+          set: (next) => {
+            if (loopPending) starts.push(current as number)
+            loopPending = false
+            current = next
+          },
+        })
+      }
+      return sv
+    })
+  jest.spyOn(Reanimated, 'withRepeat').mockImplementation((animation) => {
+    loopPending = true
+    return animation
+  })
+  return starts
+}
+
+describe('LoadingIndicator spin', () => {
+  afterEach(() => jest.restoreAllMocks())
+
+  it('starts the indeterminate spin at 0', () => {
+    const starts = recordLoopStarts()
+    renderWithTheme(<LoadingIndicator accessibilityLabel="Loading" />)
+    expect(starts).toEqual([0])
+  })
+
+  it('runs no loop in determinate mode', () => {
+    const starts = recordLoopStarts()
+    renderWithTheme(
+      <LoadingIndicator progress={0.4} accessibilityLabel="Loading" />,
+    )
+    expect(starts).toEqual([])
+  })
+
+  it('starts the spin at 0 again when it becomes indeterminate again', () => {
+    const starts = recordLoopStarts()
+    const { rerender } = renderWithTheme(
+      <LoadingIndicator accessibilityLabel="Loading" />,
+    )
+    rerender(<LoadingIndicator progress={0.4} accessibilityLabel="Loading" />)
+    rerender(<LoadingIndicator accessibilityLabel="Loading" />)
+    expect(starts).toEqual([0, 0])
   })
 })
 

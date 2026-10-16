@@ -42,9 +42,7 @@ export function Card({
   // State-layer crossfade (rest → focus → hover → press, press wins) with
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
   // `colors.backgroundColor` already folds in any containerColor override,
-  // so the layers re-derive from it automatically. While disabled the hook's
-  // style/handlers are not applied at all — the static disabled treatment
-  // below owns the container, exactly as before.
+  // so the layers re-derive from it automatically.
   const {
     style: stateLayerStyle,
     handlers,
@@ -54,6 +52,7 @@ export function Card({
     rest: colors.backgroundColor,
     content: theme.colors.onSurface,
     disabled: isDisabled,
+    disabledContainerColor: colors.disabledBackgroundColor,
   })
 
   const isElevated = variant === 'elevated'
@@ -147,10 +146,10 @@ export function Card({
           styles.container,
           webOutlineReset,
           styles.interactiveContainer,
-          // The gesture-layer style owns backgroundColor while enabled; when
-          // disabled it is dropped entirely so the static disabled background
-          // applies instantly (no animated layer to fight it).
-          isDisabled ? undefined : stateLayerStyle,
+          // The gesture-layer style owns backgroundColor, also while
+          // disabled: removing an animated style leaves its last value on
+          // the view.
+          stateLayerStyle,
           showElevationLayer ? styles.elevationDelegated : undefined,
           isDisabled ? styles.disabledContainer : undefined,
           containerStyle,

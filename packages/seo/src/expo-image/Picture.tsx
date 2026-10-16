@@ -32,8 +32,31 @@ export type PictureProps = {
   loading?: 'lazy' | 'eager'
   /** Wins over the site from `SeoProvider`. A relative `source` needs one. */
   site?: Site
+  /**
+   * A React Native image style. It comes after the `width` and `height` box,
+   * so a size in `style` wins. To let `flex` or `aspectRatio` set a side, set
+   * that side to `undefined`. The web lays out the `<img>` as a
+   * react-native-web view, and flattens the style to CSS.
+   */
   style?: StyleProp<ImageStyle>
   testID?: string
+}
+
+/**
+ * The react-native-web `View` defaults that change the layout or the border
+ * of an `<img>`. A raw element has none of them: with no `min-height: 0` a
+ * flex item keeps the height of its ratio, with no `border-style` a border
+ * width draws nothing, and with `position: static` an offset does nothing.
+ */
+const WEB_VIEW_DEFAULTS: CSSProperties = {
+  boxSizing: 'border-box',
+  borderWidth: 0,
+  borderStyle: 'solid',
+  borderColor: 'black',
+  flexShrink: 0,
+  minHeight: 0,
+  minWidth: 0,
+  position: 'relative',
 }
 
 function isAbsolute(source: string): boolean {
@@ -72,9 +95,16 @@ export function Picture(props: PictureProps) {
       ? source
       : `${new URL(url).pathname}${new URL(url).search}`
     const css: CSSProperties = {
+      ...WEB_VIEW_DEFAULTS,
+      width,
+      height,
       objectFit: contentFit,
       ...(StyleSheet.flatten(style) as CSSProperties | undefined),
     }
+    // A side with no CSS value takes its size from the `width` or `height`
+    // attribute. On native that side is `auto`, so write `auto` here too.
+    css.width ??= 'auto'
+    css.height ??= 'auto'
     return (
       <img
         src={src}

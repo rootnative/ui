@@ -55,4 +55,78 @@ describe('Picture on the web', () => {
     expect(image.getAttribute('loading')).toBe('lazy')
     expect(image.style.objectFit).toBe('cover')
   })
+
+  // jsdom does no layout, so these read the CSS. The layout that the CSS
+  // gives was measured in headless Chromium: a `flex: 1` picture in a
+  // shorter frame, a `width` with an `aspectRatio`, and a border.
+  it('lays out as a react-native-web view, so a flex item can shrink and a border draws', () => {
+    render(
+      <Picture
+        source="https://cdn.example/a.png"
+        alt=""
+        width={500}
+        height={750}
+        style={framed.poster}
+        testID="poster"
+      />,
+    )
+    const { style } = screen.getByTestId('poster')
+    expect(style.boxSizing).toBe('border-box')
+    expect(style.borderStyle).toBe('solid')
+    expect(style.borderWidth).toBe('1px')
+    expect(style.borderColor).toBe('red')
+    expect(style.minHeight).toMatch(/^0(px)?$/)
+    expect(style.minWidth).toMatch(/^0(px)?$/)
+    expect(style.flexShrink).toBe('0')
+    expect(style.position).toBe('relative')
+  })
+
+  it('takes the box from width and height, as native does, and a size in style wins', () => {
+    render(
+      <>
+        <Picture
+          source="https://cdn.example/a.png"
+          alt=""
+          width={780}
+          height={439}
+          testID="plain"
+        />
+        <Picture
+          source="https://cdn.example/a.png"
+          alt=""
+          width={500}
+          height={750}
+          style={framed.poster}
+          testID="poster"
+        />
+      </>,
+    )
+    const plain = screen.getByTestId('plain').style
+    expect([plain.width, plain.height]).toEqual(['780px', '439px'])
+    const poster = screen.getByTestId('poster').style
+    expect([poster.width, poster.height]).toEqual(['112px', '750px'])
+  })
+
+  // With no CSS height, the `height` attribute gives the height, and an
+  // `aspectRatio` does nothing. On native that side is `auto`.
+  it('writes auto for a side that the style sets to undefined', () => {
+    render(
+      <Picture
+        source="https://cdn.example/a.png"
+        alt=""
+        width={600}
+        height={360}
+        style={framed.fluid}
+        testID="fluid"
+      />,
+    )
+    const { style } = screen.getByTestId('fluid')
+    expect(style.width).toBe('100%')
+    expect(style.height).toBe('auto')
+  })
+})
+
+const framed = StyleSheet.create({
+  poster: { width: 112, borderWidth: 1, borderColor: 'red' },
+  fluid: { width: '100%', height: undefined, aspectRatio: 600 / 360 },
 })

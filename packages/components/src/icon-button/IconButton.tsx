@@ -180,9 +180,7 @@ export function IconButton({
   // The overlay color the layers derive from matches styles.ts: the
   // default icon color (the variant/toggle color, or the bar color in an
   // `AppBar` slot) — or the resolved icon color when a containerColor
-  // override re-derives the layers (per the override contract). While
-  // disabled the hook's style/handlers are not applied at all — the static
-  // disabled treatment below owns the container.
+  // override re-derives the layers (per the override contract).
   const layerContent = containerColor ? resolvedIconColor : defaultIconColor
   const {
     style: stateLayerStyle,
@@ -192,6 +190,7 @@ export function IconButton({
     rest: colors.backgroundColor,
     content: layerContent,
     disabled: isDisabled,
+    disabledContainerColor: colors.disabledBackgroundColor,
   })
 
   // Expressive shape morphs, both on the bounce-free effects spring Compose
@@ -302,13 +301,13 @@ export function IconButton({
             styles.container,
             webOutlineReset,
             sizeStyle,
-            // The gesture-layer style owns backgroundColor while enabled; when
-            // disabled it is dropped entirely so the static disabled override
-            // applies instantly (no animated layer to fight it). The radius
-            // morph stays applied while disabled — a selected toggle keeps its
-            // squarer resting shape (the press progress is pinned to rest).
+            // The gesture-layer style owns backgroundColor, also while
+            // disabled: removing an animated style leaves its last value on
+            // the view. The radius morph stays applied while disabled — a
+            // selected toggle keeps its squarer resting shape (the press
+            // progress is pinned to rest).
             animatedRadiusStyle,
-            isDisabled ? undefined : stateLayerStyle,
+            stateLayerStyle,
             disabledOverride,
             isDisabled ? styles.disabled : undefined,
             // Function-form `style` is intentionally dropped on animated

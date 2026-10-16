@@ -1,7 +1,7 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { getStyle, renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { Card } from '../card/Card'
 import {
@@ -11,8 +11,8 @@ import {
 } from '../card/styles'
 
 /**
- * Absolutely-positioned Views inside a region — the fill wrapper `Card.Media`
- * adds only when it has a size of its own.
+ * Absolutely-positioned Views inside a region — `Card.Media` fills its
+ * children only when it has a size of its own.
  *
  * Asserted through the style rather than node identity: RNTL's `children`
  * yields wrapper instances, so comparing them against a `getByTestId` handle
@@ -25,6 +25,8 @@ import {
 interface StyledNode {
   props: { style?: StyleProp<ViewStyle> }
 }
+
+const badgeStyle = { width: 40, height: 24 }
 
 function absoluteFillsWithin(testID: string): StyledNode[] {
   const nodes: StyledNode[] = screen.getByTestId(testID).findAllByType(View)
@@ -248,19 +250,47 @@ describe('Card', () => {
       expect(absoluteFillsWithin('media')).toHaveLength(0)
     })
 
-    it('Card.Media stretches children to fill when it is sized', () => {
+    // A network `Image` has no size of its own. In a column it is stretched
+    // across the width only, so it must be filled by insets on itself, not
+    // by a wrapper around it.
+    it('Card.Media fills a plain network Image when it is sized', () => {
       renderWithTheme(
         <Card>
-          <Card.Media testID="media" height={120}>
-            <Text>Image</Text>
+          <Card.Media height={120}>
+            <Image
+              testID="image"
+              source={{ uri: 'https://example.com/a.jpg' }}
+            />
           </Card.Media>
         </Card>,
       )
-      const fills = absoluteFillsWithin('media')
-      expect(fills).toHaveLength(1)
-      const flat = StyleSheet.flatten(fills[0].props.style)
-      expect(flat.width).toBe('100%')
-      expect(flat.height).toBe('100%')
+      expect(getStyle(screen.getByTestId('image'))).toMatchObject({
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      })
+    })
+
+    it('Card.Media fills each child, and a child keeps its own size', () => {
+      renderWithTheme(
+        <Card>
+          <Card.Media aspectRatio={16 / 9}>
+            <Image
+              testID="image"
+              source={{ uri: 'https://example.com/a.jpg' }}
+            />
+            <View testID="badge" style={badgeStyle} />
+          </Card.Media>
+        </Card>,
+      )
+      expect(getStyle(screen.getByTestId('image')).position).toBe('absolute')
+      expect(getStyle(screen.getByTestId('badge'))).toMatchObject({
+        position: 'absolute',
+        width: 40,
+        height: 24,
+      })
     })
 
     it('Card.Actions aligns to the trailing edge by default', () => {
