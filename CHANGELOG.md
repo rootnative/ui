@@ -14,7 +14,9 @@ Prior history: these packages were published as `@onlynative/*` through
 **No breaking change.** No export and no prop is removed. Three changes can
 move a screen or fail a test: the children of a sized `Card.Media` stack, a
 `Chip` label stays on one line, and `Picture` on the web follows the React
-Native layout rules. Each of these entries ends with what to check.
+Native layout rules. Each of these entries ends with what to check. The
+`@rootnative/inertia` floor moves to `0.0.19`, so upgrade it in the app with
+this release.
 
 ### `LoadingIndicator` spins
 
@@ -119,6 +121,24 @@ line for the cause. `browseExport` now reads the script URLs of
 `index.html` before it starts Chrome. When they are not under the base path,
 it stops with one message that names both paths and the fix: set
 `experiments.baseUrl`, or pass `basePath`.
+
+### `@rootnative/inertia` floor moves to `0.0.19`
+
+On the web, a component with a state layer showed no focus indicator in one
+case: a click that focused nothing, then a focus that a script moved.
+Chromium matches `:focus-visible` there and draws its outline, but the
+components remove that outline. inertia `0.0.18` read only its own input
+tracker, which was in pointer modality, so the state layer stayed off.
+inertia `0.0.19` asks the focused element whether it matches
+`:focus-visible`. Its tracker also skips a ⌘, Ctrl or Alt chord now, so ⌘S
+in a form does not show a focus layer to a mouse user on the next focus.
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges
+are now `>=0.0.19 <0.1.0`, the dev, example and template pins are `0.0.19`
+exact, and the registry's derived floor follows. Upgrade
+`@rootnative/inertia` to `0.0.19` in the app with this release. Two web
+tests, the script focus after a click on nothing and the chord, fail on an
+older inertia.
 
 ## 0.0.0-alpha.26 — 2026-10-16
 

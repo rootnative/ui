@@ -256,8 +256,8 @@ describe('focus feedback is keyboard-only', () => {
    * **It is not the store the state layers actually consult.** `useStateLayer`
    * → inertia's `useGestureLayer` calls inertia's *own* `isFocusVisible`
    * (`packages/core/src/gestures/focusVisibility.ts`), a second, independent
-   * tracker whose `keydown` listener has no modifier guard — so a chord does
-   * flip the painted layer. See the `it.failing` below, which pins that gap.
+   * tracker. It skips a chord too, and the chord test below pins that rule
+   * for the state layers.
    */
   it('the utils modality store ignores a modifier chord', () => {
     fireEvent.pointerDown(document)
@@ -288,20 +288,17 @@ describe('focus feedback is keyboard-only', () => {
   })
 
   /**
-   * Known gap, pinned rather than deleted — the same convention the repo used
-   * for the Card iOS shadow bug and the two native a11y gaps.
+   * A modifier chord (⌘S, Ctrl+C) is not keyboard navigation, so it must not
+   * flip inertia's modality tracker to `'keyboard'`. If it did, a mouse user
+   * who presses ⌘S in a form would see a focus layer on the next focus.
    *
-   * A modifier chord flips inertia's modality tracker to `'keyboard'`, so the
-   * *next focus* paints a focus layer even though the user is working with a
-   * mouse. Press ⌘S in a form, click a button, and it lights up as if tabbed
-   * to.
-   *
-   * The fix belongs upstream, not here: per CLAUDE.md a missing capability is
-   * built in inertia, and `focusVisibility.ts` needs the same modifier guard
-   * `@rootnative/utils/focus-visible.ts` already has. This test goes green on
-   * its own once that ships and the pin is bumped.
+   * This test pins the fallback rule only. `fireEvent.focus` dispatches a
+   * focus event that moves no focus, so inertia asks its tracker, not the
+   * browser. For the same sequence with a real script focus (a click on
+   * nothing, a chord, `.focus()`), Chromium matches `:focus-visible` and
+   * shows a ring, and inertia follows the browser.
    */
-  it.failing('a modifier chord does not paint a focus layer', () => {
+  it('a modifier chord does not paint a focus layer', () => {
     fireEvent.pointerDown(document)
     const { flush } = renderWebSettled(<Button>Save</Button>)
     const rest = background('button')
@@ -459,26 +456,26 @@ describe('focus feedback follows the browser :focus-visible', () => {
   })
 
   /**
-   * Known gap, pinned until the `@rootnative/inertia` pin moves to the
-   * release whose `useGesture` reads `:focus-visible`. The state layers read
-   * inertia's tracker, not the utils store. This test goes green on its own
-   * after that bump; then make it a plain `it`.
+   * After a click on nothing, Chromium shows the focus that a script moves
+   * next, so the `Button` must show its focus layer. inertia's tracker is in
+   * pointer modality here. The layer shows because inertia's `useGesture`
+   * asks the focused element whether it matches `:focus-visible`. jsdom
+   * matches `:focus-visible` on every focused element, so this test proves
+   * that the layer follows the browser's answer. It does not prove that
+   * jsdom answers as Chromium does.
    */
-  it.failing(
-    'a Button that a script focuses after a click on nothing shows its focus layer',
-    () => {
-      const { flush } = renderWebSettled(<Button>Save</Button>)
-      const rest = background('button')
-      // inertia attaches its listeners when the first tracking component
-      // mounts, so the click comes after the render.
-      fireEvent.pointerDown(document)
+  it('a Button that a script focuses after a click on nothing shows its focus layer', () => {
+    const { flush } = renderWebSettled(<Button>Save</Button>)
+    const rest = background('button')
+    // inertia attaches its listeners when the first tracking component
+    // mounts, so the click comes after the render.
+    fireEvent.pointerDown(document)
 
-      act(() => screen.getByRole('button').focus())
-      flush()
+    act(() => screen.getByRole('button').focus())
+    flush()
 
-      expect(background('button')).not.toBe(rest)
-    },
-  )
+    expect(background('button')).not.toBe(rest)
+  })
 })
 
 /**
