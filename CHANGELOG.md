@@ -9,14 +9,17 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.27 — 2026-10-17
 
-**No breaking change.** No export and no prop is removed. Three changes can
-move a screen or fail a test: the children of a sized `Card.Media` stack, a
+**No breaking change.** No export and no prop is removed. The
+`@rootnative/inertia` floor moves to `0.0.19`, so upgrade it in the app with
+this release. Four changes can move a screen or fail a test:
+`LoadingIndicator` turns, the children of a sized `Card.Media` stack, a
 `Chip` label stays on one line, and `Picture` on the web follows the React
 Native layout rules. Each of these entries ends with what to check. The
-`@rootnative/inertia` floor moves to `0.0.19`, so upgrade it in the app with
-this release.
+other fixes: a control that becomes disabled during a press shows the
+disabled color, `Dialog` finds its slots inside a fragment, and
+`rootnative-seo browse` names a base-path mismatch.
 
 ### `LoadingIndicator` spins
 
