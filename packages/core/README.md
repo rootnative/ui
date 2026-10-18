@@ -49,7 +49,7 @@ Provides the theme context to all child components. Works with any design system
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `BaseTheme` | `lightTheme` (MD3) | Theme object |
-| `iconResolver` | `IconResolver` | none | Resolves string icon names (`leadingIcon="check"`) to icon nodes. Set once at the app root to use Lucide, SF Symbols, custom SVGs, etc. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons) |
+| `iconResolver` | `IconResolver` | none | Resolves string icon names (`leadingIcon="check"`) to icon nodes. Set once at the app root to use Lucide, SF Symbols, custom SVGs, etc. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons). A nested provider without it uses the resolver of its parent |
 | `children` | `ReactNode` | — | App content |
 
 ### useTheme()
@@ -162,6 +162,18 @@ import { ThemeProvider, darkTheme } from '@rootnative/core'
 
 <ThemeProvider theme={darkTheme}>{children}</ThemeProvider>
 ```
+
+### Nested providers
+
+A second `ThemeProvider` inside the root one gives one part of the app its own
+theme. It takes the icon resolver of its parent when it gets no
+`iconResolver`. With a `{ light, dark }` pair and none of `mode`,
+`defaultMode` and `storage`, it follows the mode of its parent, and its
+`setMode()` sets the mode of the parent. An overlay (`Dialog`, `Menu`, ...)
+renders its content at the `PortalHost`, so the components inside it take the
+theme of the provider above the host. The
+[theming guide](https://rootnative.github.io/ui/theming#nested-providers)
+shows the two fixes.
 
 ### useBreakpoint()
 

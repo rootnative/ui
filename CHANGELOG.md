@@ -9,6 +9,45 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No export and no prop is removed.** One change can move a screen: a nested
+`ThemeProvider` with a `{ light, dark }` pair now follows the mode of its
+parent and uses the icon resolver of its parent.
+
+### A nested `ThemeProvider` takes the icon resolver and the mode of its parent
+
+A `ThemeProvider` inside another one did not inherit from it. With only
+`theme` set:
+
+1. It provided `iconResolver ?? null`, so every string icon below it drew
+   nothing and logged the "no icon resolver" warning.
+2. Its mode was its own state, which started at `'system'`. So the subtree
+   followed the OS, and a mode that the reader chose on the root provider did
+   not reach it.
+
+The `MotionConfig` in the provider already merged with its parent, so the two
+values followed a different rule than the named transitions.
+
+Now a nested provider with no `iconResolver` uses the resolver of its parent.
+A nested provider with a pair, below a parent with a pair, follows the mode of
+the parent when it gets none of `mode`, `defaultMode` and `storage`.
+`useThemeMode()` below it reports the mode, the scheme and `isReady` of the
+parent, and `setMode()` sets the mode of the parent and calls the
+`onModeChange` of both providers. A nested provider that gets any of the three
+props keeps a mode of its own, as before. 14 new tests; each of five faults
+put back into the provider fails at least one of them.
+
+The theming page has a new "Nested providers" section. It also states a limit
+that stays: an overlay renders its content at the `PortalHost`. The overlay
+surface takes the nested colors, but the components in the content take the
+theme of the provider above the host. The section gives two fixes.
+
+**Check your app.** If you passed `iconResolver`, `mode` and `onModeChange`
+to a nested provider only to carry the root values down, you can remove them.
+If a nested provider must follow the OS while the root has a pinned mode, pass
+`defaultMode="system"` to it.
+
 ## 0.0.0-alpha.27 — 2026-10-17
 
 **No breaking change.** No export and no prop is removed. The

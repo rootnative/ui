@@ -420,6 +420,7 @@ Ask this first. Every path below ends in the same `<ThemeProvider theme={...}>`.
 | MD3 with sharper or rounder corners | The `roundness` option on `createMaterialTheme`, or `applyRoundness()` on an existing theme |
 | A fully custom design system (your own tokens) | `defineTheme<MyTheme>()` + `useTheme<MyTheme>()` |
 | Light/dark switching and persistence | The `{ light, dark }` pair + `useThemeMode()`; add `storage` to persist |
+| One part of the app with its own colors | A nested `ThemeProvider` with its own pair (see Nested providers) |
 
 ### ThemeProvider
 
@@ -463,11 +464,11 @@ const custom: Theme = {
 
 Props:
 - `theme?: BaseTheme | { light: BaseTheme; dark: BaseTheme }` — A single theme, or a light/dark pair. A pair enables `useThemeMode()`. Default: `lightTheme` (MD3)
-- `mode?: 'system' | 'light' | 'dark'` — Controlled mode. Leave unset and use `setMode()` instead. Pair with `onModeChange`. On a static web export, `'system'` renders light on the server and while the client hydrates, then follows the OS on the next render. No hydration gate is needed around it
-- `defaultMode?: 'system' | 'light' | 'dark'` — Initial mode when uncontrolled. Default: `'system'`
+- `mode?: 'system' | 'light' | 'dark'` — Controlled mode. Leave unset and use `setMode()` instead. Pair with `onModeChange`. On a static web export, `'system'` renders light on the server and while the client hydrates, then follows the OS on the next render. No hydration gate is needed around it. A nested provider with a pair and none of `mode`, `defaultMode` and `storage` follows the mode of its parent; see "Nested providers"
+- `defaultMode?: 'system' | 'light' | 'dark'` — Initial mode when uncontrolled. Default: `'system'`. On a nested provider, setting it gives the provider a mode of its own
 - `onModeChange?: (mode: ThemeMode) => void`
-- `storage?: { getItem, setItem }` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this
-- `iconResolver?: IconResolver` — Renders string icon names. Pass `mdiResolver` from `@rootnative/components/mdi` for MaterialDesignIcons, or your own. Without it a string name renders nothing and logs one warning
+- `storage?: { getItem, setItem }` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this. On a nested provider, setting it gives the provider a mode of its own, and it overwrites the mode the root stored: every provider uses the key `THEME_MODE_STORAGE_KEY` (`'rootnative.theme-mode'`)
+- `iconResolver?: IconResolver` — Renders string icon names. Pass `mdiResolver` from `@rootnative/components/mdi` for MaterialDesignIcons, or your own. Without it a string name renders nothing and logs one warning. A nested provider without it uses the resolver of its parent
 - `children: ReactNode`
 
 ### useThemeMode()
@@ -497,6 +498,30 @@ function ThemeToggle() {
   )
 }
 ```
+
+### Nested providers
+
+A second `ThemeProvider` inside the root one gives one part of the app its own theme, for example the colors of an image:
+
+```tsx
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+
+const themes = useMemo(() => {
+  const { lightTheme: light, darkTheme: dark } = createMaterialTheme(seed)
+  return { light, dark }
+}, [seed])
+
+<ThemeProvider theme={themes}>{children}</ThemeProvider>
+```
+
+What a nested provider takes from its parent:
+- **Icon resolver** — with no `iconResolver`, it uses the resolver of its parent.
+- **Mode** — a nested provider with a pair, below a parent with a pair, follows the mode of the parent when it gets none of `mode`, `defaultMode` and `storage`. `useThemeMode()` below it reports the mode of the parent, and `setMode()` sets the mode of the parent. Pass any of the three props to give it a mode of its own.
+- **Named transitions** — its `MotionConfig` merges with the one above, so the named transitions of the app stay.
+
+A nested provider with a single theme has no mode, so `useThemeMode()` throws below it.
+
+**An overlay does not carry the whole nested theme.** `Dialog`, `Menu`, `Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the snackbar render through a `Portal` at the `PortalHost`, which is usually above the nested provider. The overlay surface reads the theme where you write the overlay, so it takes the nested colors. The components in the overlay content read the theme at the `PortalHost`, so a `Button` in a `Dialog` takes the root colors. To give the content the nested theme, wrap it in a nested provider with the same theme (for `Dialog`, inside the slot: `<Dialog.Content><ThemeProvider theme={themes}>…</ThemeProvider></Dialog.Content>`), or, for `Menu`, `Tooltip`, `BottomSheet` and the modal `NavigationDrawer`, put a named `PortalHost` inside the nested provider and pass its name as `hostName`.
 
 ### useTheme()
 

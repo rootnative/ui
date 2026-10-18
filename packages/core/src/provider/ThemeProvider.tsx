@@ -65,12 +65,17 @@ export interface ThemeProviderProps {
    * the client hydrates, then switches to the OS scheme on the next render.
    * The server cannot know the scheme, so the light theme is the first paint.
    *
+   * A nested provider with a pair, under a parent provider with a pair,
+   * follows the mode of the parent when it gets none of `mode`, `defaultMode`
+   * and `storage`. Its `setMode()` then sets the mode of the parent.
+   *
    * @default 'system'
    */
   mode?: ThemeMode
   /**
    * Initial mode for the uncontrolled case. A persisted value from `storage`
-   * wins over this once it loads.
+   * wins over this once it loads. On a nested provider, setting it gives the
+   * provider a mode of its own.
    *
    * @default 'system'
    */
@@ -85,6 +90,10 @@ export interface ThemeProviderProps {
    * Ignored when `mode` is controlled: your own state is then the source of
    * truth and persisting behind it would fight it.
    *
+   * On a nested provider, setting it gives the provider a mode of its own.
+   * Every provider uses the same storage key, so a nested provider with
+   * `storage` overwrites the mode that the root provider stored.
+   *
    * @example
    * import AsyncStorage from '@react-native-async-storage/async-storage'
    *
@@ -95,6 +104,8 @@ export interface ThemeProviderProps {
    * Resolves string icon names (e.g. `leadingIcon="check"`) to icon nodes.
    * Set this once at the app root to use SF Symbols, Lucide, custom SVGs,
    * etc. `mdiResolver` from `@rootnative/components/mdi` gives MaterialDesignIcons.
+   *
+   * A nested provider without it uses the resolver of its parent.
    *
    * @example
    * import { Check, ArrowRight } from 'lucide-react-native'
@@ -141,17 +152,35 @@ export interface ThemeProviderProps {
  * <ThemeProvider theme={myTheme}>
  *   <App />
  * </ThemeProvider>
+ *
+ * @example
+ * // A nested pair for one screen. It follows the mode and the icon resolver
+ * // of the root provider.
+ * const { lightTheme: light, darkTheme: dark } = createMaterialTheme(seed)
+ *
+ * <ThemeProvider theme={{ light, dark }}>
+ *   <Screen />
+ * </ThemeProvider>
  */
 export function ThemeProvider({
   theme,
   mode: controlledMode,
-  defaultMode = 'system',
+  defaultMode,
   onModeChange,
   storage,
   iconResolver,
   children,
 }: ThemeProviderProps) {
   const pair = theme && isThemePair(theme) ? theme : null
+  const parentModeValue = React.useContext(ThemeModeContext)
+  const parentIconResolver = React.useContext(IconResolverContext)
+  const inheritedMode =
+    pair &&
+    controlledMode === undefined &&
+    defaultMode === undefined &&
+    storage === undefined
+      ? parentModeValue
+      : null
   // The server of a static export has no `matchMedia`, so react-native-web
   // reports 'light' there. The `react-native` hook reports the real scheme on
   // the client's hydration render, and React 19 then keeps the server's light
@@ -159,10 +188,11 @@ export function ThemeProvider({
   const measuredScheme = useColorScheme()
   const systemScheme = useIsHydrating() ? 'light' : measuredScheme
 
-  const [uncontrolledMode, setUncontrolledMode] =
-    React.useState<ThemeMode>(defaultMode)
+  const [uncontrolledMode, setUncontrolledMode] = React.useState<ThemeMode>(
+    defaultMode ?? 'system',
+  )
   const isControlled = controlledMode !== undefined
-  const mode = isControlled ? controlledMode : uncontrolledMode
+  const ownMode = isControlled ? controlledMode : uncontrolledMode
 
   // Nothing to wait for when the mode is controlled or unpersisted.
   const [isReady, setIsReady] = React.useState(
@@ -216,8 +246,15 @@ export function ThemeProvider({
     }
   }, [shouldLoad])
 
+  const setParentMode = inheritedMode?.setMode
   const setMode = React.useCallback(
     (nextMode: ThemeMode) => {
+      if (setParentMode) {
+        setParentMode(nextMode)
+        onModeChange?.(nextMode)
+        return
+      }
+
       if (!isControlled) {
         setUncontrolledMode(nextMode)
       }
@@ -237,11 +274,18 @@ export function ThemeProvider({
         }
       }
     },
-    [isControlled, onModeChange],
+    [setParentMode, isControlled, onModeChange],
   )
 
-  const scheme: ColorScheme =
-    mode === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : mode
+  const ownScheme: ColorScheme =
+    ownMode === 'system'
+      ? systemScheme === 'dark'
+        ? 'dark'
+        : 'light'
+      : ownMode
+  const mode = inheritedMode ? inheritedMode.mode : ownMode
+  const scheme = inheritedMode ? inheritedMode.scheme : ownScheme
+  const ready = inheritedMode ? inheritedMode.isReady : isReady
 
   const resolvedTheme = pair
     ? scheme === 'dark'
@@ -250,8 +294,8 @@ export function ThemeProvider({
     : ((theme as BaseTheme | undefined) ?? lightTheme)
 
   const modeValue = React.useMemo<ThemeModeContextValue | null>(
-    () => (pair ? { mode, scheme, setMode, isReady } : null),
-    [pair, mode, scheme, setMode, isReady],
+    () => (pair ? { mode, scheme, setMode, isReady: ready } : null),
+    [pair, mode, scheme, setMode, ready],
   )
 
   // Register the theme's motion tokens as inertia named transitions so any
@@ -268,7 +312,9 @@ export function ThemeProvider({
   return (
     <ThemeContext.Provider value={resolvedTheme}>
       <ThemeModeContext.Provider value={modeValue}>
-        <IconResolverContext.Provider value={iconResolver ?? null}>
+        <IconResolverContext.Provider
+          value={iconResolver ?? parentIconResolver}
+        >
           <MotionConfig transitions={transitions}>{children}</MotionConfig>
         </IconResolverContext.Provider>
       </ThemeModeContext.Provider>

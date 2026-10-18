@@ -276,6 +276,67 @@ matching navigation theme directly.
 To put `NavigationDrawer` items in the `drawerContent` of a navigator drawer,
 see [In a navigator drawer](./components/navigation-drawer#in-a-navigator-drawer).
 
+### Nested providers
+
+Put a second `ThemeProvider` inside the root one to give one part of the app
+its own theme, for example the colors of an image:
+
+```tsx
+import { ThemeProvider } from '@rootnative/core'
+import { createMaterialTheme } from '@rootnative/core/create-theme'
+import { useMemo, type ReactNode } from 'react'
+
+function ImageTheme({ seed, children }: { seed: string; children: ReactNode }) {
+  const themes = useMemo(() => {
+    const { lightTheme: light, darkTheme: dark } = createMaterialTheme(seed)
+    return { light, dark }
+  }, [seed])
+
+  return <ThemeProvider theme={themes}>{children}</ThemeProvider>
+}
+```
+
+A nested provider takes these values from its parent:
+
+| Value | Rule |
+|-------|------|
+| Icon resolver | A nested provider with no `iconResolver` uses the resolver of its parent. |
+| Mode | A nested provider with a pair, below a parent with a pair, follows the mode of the parent when it gets none of `mode`, `defaultMode` and `storage`. `useThemeMode()` below it reports the mode of the parent, and `setMode()` sets the mode of the parent. |
+| Named transitions | The `MotionConfig` of the nested provider merges with the one above it, so the named transitions of the app stay. |
+
+To give the nested part a mode of its own, pass `mode`, `defaultMode` or
+`storage`. Every provider uses the same storage key, so a nested provider with
+`storage` overwrites the mode that the root provider stored.
+
+A nested provider with a single theme has no mode, so `useThemeMode()` throws
+below it, as it does below a root provider with a single theme.
+
+**An overlay does not carry the whole nested theme.** `Dialog`, `Menu`,
+`Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the
+snackbar render through a `Portal` at the `PortalHost`, which is usually above
+the nested provider. The overlay reads the theme where you write it, so its
+surface takes the nested colors. The components in the overlay content read
+the theme at the `PortalHost`, so a `Button` in a `Dialog` takes the colors of
+the root provider. Two ways give the content the nested theme:
+
+- Wrap the content in a nested provider with the same theme. For a `Dialog`,
+  put the provider inside the slot, so that the `Dialog` still finds its
+  slots:
+
+  ```tsx
+  <Dialog visible={visible} onDismiss={close}>
+    <Dialog.Content>
+      <ThemeProvider theme={themes}>
+        <Button onPress={close}>Close</Button>
+      </ThemeProvider>
+    </Dialog.Content>
+  </Dialog>
+  ```
+
+- For `Menu`, `Tooltip`, `BottomSheet` and the modal `NavigationDrawer`, put a
+  named `PortalHost` inside the nested provider, and pass its name as
+  `hostName`.
+
 ### Override specific tokens
 
 Spread the base theme and override individual tokens:
@@ -632,6 +693,7 @@ function MyComponent() {
 | Let the user switch theme | `const { scheme, setMode } = useThemeMode()` |
 | Remember the choice | `<ThemeProvider theme={{ light, dark }} storage={AsyncStorage}>` |
 | Theme the navigator screens | `Stack` `contentStyle`, or a navigation theme mapped from `useTheme()` — see [With Expo Router and React Navigation](#with-expo-router-and-react-navigation) |
+| Give one part of the app its own colors | A nested `<ThemeProvider theme={{ light, dark }}>` — see [Nested providers](#nested-providers) |
 | Override a few MD3 colors | Spread `lightTheme` and override |
 | Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
 | Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |
