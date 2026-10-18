@@ -1,4 +1,5 @@
-export { ThemeProvider, THEME_MODE_STORAGE_KEY } from './ThemeProvider'
+export { ThemeProvider } from './ThemeProvider'
+export { THEME_MODE_STORAGE_KEY } from './storageKey'
 export type { ThemePair, ThemeProviderProps } from './ThemeProvider'
 export { useTheme } from './useTheme'
 export { useThemeMode } from './useThemeMode'

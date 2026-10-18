@@ -2,7 +2,8 @@
   "@rootnative/core": {
     "subpaths": [
       ".",
-      "./create-theme"
+      "./create-theme",
+      "./static-export"
     ],
     "exports": {
       ".": [
@@ -52,6 +53,14 @@
       ],
       "./create-theme": [
         "createMaterialTheme"
+      ],
+      "./static-export": [
+        "SCHEME_ATTRIBUTE",
+        "SchemeGuardCssOptions",
+        "SchemeGuardScriptOptions",
+        "THEME_READY_ATTRIBUTE",
+        "schemeGuardCss",
+        "schemeGuardScript"
       ]
     }
   },

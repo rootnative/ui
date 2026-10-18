@@ -32,6 +32,7 @@ import {
   useTheme,
   useWindowDimensions,
 } from '@rootnative/core'
+import { THEME_READY_ATTRIBUTE } from '@rootnative/core/static-export'
 import { act } from 'react'
 import { Text, View } from 'react-native'
 import { Icon } from '../../icon'
@@ -307,6 +308,54 @@ it("ThemeProvider hydrates mode='system' in a dark browser against light markup"
   // markup, React keeps the light style, and the page stays light.
   expect(errors).toHaveLength(0)
   expect(pageColor(host)).toBe(cssColor(darkTheme.colors.background))
+})
+
+/**
+ * `schemeGuardCss` hides the page from a dark-scheme reader until this stamp.
+ * A stamp on the hydration render would show the light server colors, which
+ * is the flash the guard exists to hide.
+ */
+it('ThemeProvider stamps the ready attribute only when the dark theme is on screen', async () => {
+  const { renderToString, hydrateRoot } = loadReactDom()
+  const pageColor = (host: HTMLElement) =>
+    host.querySelector<HTMLElement>('[data-testid="page"]')?.style
+      .backgroundColor
+  const ui = (
+    <ThemeProvider theme={{ light: lightTheme, dark: darkTheme }}>
+      <Page />
+    </ThemeProvider>
+  )
+  const html = document.documentElement
+  // The earlier tests in this file mount a ThemeProvider in the same document.
+  html.removeAttribute(THEME_READY_ATTRIBUTE)
+
+  preferDark(false)
+  const host = document.createElement('div')
+  host.innerHTML = renderToString(ui)
+  document.body.appendChild(host)
+  expect(html.hasAttribute(THEME_READY_ATTRIBUTE)).toBe(false)
+
+  preferDark(true)
+
+  const colorsAtStamp: Array<string | undefined> = []
+  const setAttribute = html.setAttribute.bind(html)
+  const spy = jest
+    .spyOn(html, 'setAttribute')
+    .mockImplementation((name: string, value: string) => {
+      if (name === THEME_READY_ATTRIBUTE) colorsAtStamp.push(pageColor(host))
+      setAttribute(name, value)
+    })
+
+  try {
+    await act(async () => {
+      hydrateRoot(host, ui)
+    })
+  } finally {
+    spy.mockRestore()
+    html.removeAttribute(THEME_READY_ATTRIBUTE)
+  }
+
+  expect(colorsAtStamp).toEqual([cssColor(darkTheme.colors.background)])
 })
 
 afterEach(() => {

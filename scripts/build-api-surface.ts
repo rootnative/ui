@@ -35,6 +35,7 @@ const PACKAGES: PackageSpec[] = [
     entries: {
       '.': 'dist/index.d.mts',
       './create-theme': 'dist/create-theme/index.d.mts',
+      './static-export': 'dist/static-export/index.d.mts',
     },
   },
   {

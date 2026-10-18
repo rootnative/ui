@@ -175,6 +175,32 @@ theme of the provider above the host. The
 [theming guide](https://rootnative.github.io/ui/theming#nested-providers)
 shows the two fixes.
 
+### Static export: the dark first paint
+
+The HTML of a static web export holds the light theme, so a reader with a dark
+system setting sees the light page until hydration ends. The
+`@rootnative/core/static-export` subpath hides it. Put both in the HTML shell
+(`app/+html.tsx` with Expo Router), before the body:
+
+```tsx
+import { darkTheme } from '@rootnative/core'
+import {
+  schemeGuardCss,
+  schemeGuardScript,
+} from '@rootnative/core/static-export'
+
+<script dangerouslySetInnerHTML={{ __html: schemeGuardScript() }} />
+<style
+  dangerouslySetInnerHTML={{
+    __html: schemeGuardCss({ background: darkTheme.colors.background }),
+  }}
+/>
+```
+
+A reader with a dark scheme then sees the dark background until
+`ThemeProvider` shows the dark theme. A reader with a light scheme sees no
+change.
+
 ### useBreakpoint()
 
 Returns the current MD3 window size class: `'compact'` | `'medium'` | `'expanded'` | `'large'` | `'extraLarge'`.
@@ -202,6 +228,7 @@ const { width } = useWindowDimensions()
 - `useIconResolver` — Access the configured icon resolver
 - `defineTheme` — Type-safe theme creation helper
 - `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
+- `schemeGuardScript` / `schemeGuardCss` — Hide the light first paint of a static web export from a dark-scheme reader (import from `@rootnative/core/static-export`, with `SCHEME_ATTRIBUTE` and `THEME_READY_ATTRIBUTE`)
 - `applyRoundness` — Scale MD3 corner radius tokens by a multiplier
 - `material` — MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
 - `useBreakpoint` / `breakpoints` — Current window size class

@@ -13,7 +13,9 @@ Prior history: these packages were published as `@onlynative/*` through
 
 **No export and no prop is removed.** One change can move a screen: a nested
 `ThemeProvider` with a `{ light, dark }` pair now follows the mode of its
-parent and uses the icon resolver of its parent.
+parent and uses the icon resolver of its parent. A new subpath,
+`@rootnative/core/static-export`, hides the light first paint of a static web
+export from a reader with a dark scheme.
 
 ### A nested `ThemeProvider` takes the icon resolver and the mode of its parent
 
@@ -47,6 +49,43 @@ theme of the provider above the host. The section gives two fixes.
 to a nested provider only to carry the root values down, you can remove them.
 If a nested provider must follow the OS while the root has a pinned mode, pass
 `defaultMode="system"` to it.
+
+### `@rootnative/core/static-export` hides the light first paint
+
+The alpha.21 entry "`mode="system"` is safe in a static web export" said that
+a reader with a dark system setting sees "one light frame" first. That is
+wrong. react-native-web writes each theme color into the HTML as an inline
+style, and CSS in the HTML shell cannot change an inline style. So the page
+stays light until the script downloads and hydrates. Measured in Chromium with
+a dark color scheme, on a page with 2.6 MB of script: 1.3 s on a fast computer,
+and 5.5 s with a 4× CPU throttle and a 6.4 Mbit/s network. A mode that
+`storage` restores loads after hydration too, so a reader who chose dark sees
+the same light page. The theming page, the `ThemeProvider` JSDoc and the
+`llms` files now give that time.
+
+The new subpath hides the light page:
+
+- `schemeGuardScript()` returns an inline script for the `<head>` of the HTML
+  shell. Before the body paints, it reads the stored mode from `localStorage`,
+  then the OS scheme, and writes the scheme to `<html>` as
+  `data-rootnative-scheme`.
+- `schemeGuardCss({ background })` returns CSS that hides `#root` and paints
+  `background` for the dark scheme, until `<html>` has
+  `data-rootnative-theme-ready`. After 8 s the page shows anyway, for a script
+  that fails to load.
+- `ThemeProvider` writes `data-rootnative-theme-ready` on `<html>` on the
+  first render after hydration, with the stored mode loaded. It does nothing
+  on native.
+
+A reader with a light scheme sees no change, and without JavaScript nothing is
+hidden. A reader with a dark scheme sees content when hydration ends, so the
+Largest Contentful Paint is later for that reader. The example app uses the
+guard. In its export, with a 4× CPU throttle, the light page showed for 2.4 s
+without the guard, and for no frame with it.
+
+**Check your app.** Nothing changes until you add the script and the CSS to
+`app/+html.tsx`. The theming page has the full shell under "The first paint
+of a static export".
 
 ## 0.0.0-alpha.27 — 2026-10-17
 

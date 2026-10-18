@@ -2,11 +2,13 @@ import { MotionConfig } from '@rootnative/inertia'
 import * as React from 'react'
 import { useColorScheme } from 'react-native'
 import { useIsHydrating } from '../internal/useIsHydrating'
+import { useMarkThemeReady } from '../internal/useMarkThemeReady'
 import { lightTheme } from '../theme/light'
 import { motionTransitions } from '../theme/motionAdapter'
 import type { BaseTheme } from '../theme/types'
 import { IconResolverContext } from './IconResolverContext'
 import type { IconResolver } from './IconResolverContext'
+import { THEME_MODE_STORAGE_KEY } from './storageKey'
 import { ThemeContext } from './ThemeContext'
 import { ThemeModeContext } from './ThemeModeContext'
 import type {
@@ -25,9 +27,6 @@ export interface ThemePair {
   light: BaseTheme
   dark: BaseTheme
 }
-
-/** Storage key for the persisted mode. Namespaced to avoid app collisions. */
-export const THEME_MODE_STORAGE_KEY = 'rootnative.theme-mode'
 
 function isThemePair(theme: BaseTheme | ThemePair): theme is ThemePair {
   // A BaseTheme always carries `colors`; a pair never does. Cheaper and more
@@ -62,8 +61,10 @@ export interface ThemeProviderProps {
    * provider then never changes it on its own, so pair it with `onModeChange`.
    *
    * On a static web export, `'system'` renders light on the server and while
-   * the client hydrates, then switches to the OS scheme on the next render.
-   * The server cannot know the scheme, so the light theme is the first paint.
+   * the client hydrates, then switches to the OS scheme on the render after
+   * hydration. The server cannot know the scheme, so a dark-scheme reader sees
+   * the light theme until hydration ends. `schemeGuardCss` from
+   * `@rootnative/core/static-export` hides that light paint.
    *
    * A nested provider with a pair, under a parent provider with a pair,
    * follows the mode of the parent when it gets none of `mode`, `defaultMode`
@@ -186,7 +187,8 @@ export function ThemeProvider({
   // the client's hydration render, and React 19 then keeps the server's light
   // styles with no error. So report the server's value until hydration ends.
   const measuredScheme = useColorScheme()
-  const systemScheme = useIsHydrating() ? 'light' : measuredScheme
+  const isHydrating = useIsHydrating()
+  const systemScheme = isHydrating ? 'light' : measuredScheme
 
   const [uncontrolledMode, setUncontrolledMode] = React.useState<ThemeMode>(
     defaultMode ?? 'system',
@@ -286,6 +288,7 @@ export function ThemeProvider({
   const mode = inheritedMode ? inheritedMode.mode : ownMode
   const scheme = inheritedMode ? inheritedMode.scheme : ownScheme
   const ready = inheritedMode ? inheritedMode.isReady : isReady
+  useMarkThemeReady(!isHydrating && ready)
 
   const resolvedTheme = pair
     ? scheme === 'dark'

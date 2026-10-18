@@ -22,12 +22,21 @@
       "react-native": "./dist/create-theme/index.mjs",
       "import": "./dist/create-theme/index.mjs",
       "default": "./dist/create-theme/index.mjs"
+    },
+    "./static-export": {
+      "types": "./dist/static-export/index.d.mts",
+      "react-native": "./dist/static-export/index.mjs",
+      "import": "./dist/static-export/index.mjs",
+      "default": "./dist/static-export/index.mjs"
     }
   },
   "typesVersions": {
     "*": {
       "create-theme": [
         "dist/create-theme/index.d.mts"
+      ],
+      "static-export": [
+        "dist/static-export/index.d.mts"
       ]
     }
   },

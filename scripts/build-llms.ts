@@ -2354,6 +2354,7 @@ Ask this first. Every path below ends in the same \`<ThemeProvider theme={...}>\
 | A fully custom design system (your own tokens) | \`defineTheme<MyTheme>()\` + \`useTheme<MyTheme>()\` |
 | Light/dark switching and persistence | The \`{ light, dark }\` pair + \`useThemeMode()\`; add \`storage\` to persist |
 | One part of the app with its own colors | A nested \`ThemeProvider\` with its own pair (see Nested providers) |
+| No light flash for dark readers of a static web export | \`schemeGuardScript\` + \`schemeGuardCss\` from \`@rootnative/core/static-export\` in the HTML shell |
 
 ### ThemeProvider
 
@@ -2397,7 +2398,7 @@ const custom: Theme = {
 
 Props:
 - \`theme?: BaseTheme | { light: BaseTheme; dark: BaseTheme }\` — A single theme, or a light/dark pair. A pair enables \`useThemeMode()\`. Default: \`lightTheme\` (MD3)
-- \`mode?: 'system' | 'light' | 'dark'\` — Controlled mode. Leave unset and use \`setMode()\` instead. Pair with \`onModeChange\`. On a static web export, \`'system'\` renders light on the server and while the client hydrates, then follows the OS on the next render. No hydration gate is needed around it. A nested provider with a pair and none of \`mode\`, \`defaultMode\` and \`storage\` follows the mode of its parent; see "Nested providers"
+- \`mode?: 'system' | 'light' | 'dark'\` — Controlled mode. Leave unset and use \`setMode()\` instead. Pair with \`onModeChange\`. On a static web export, \`'system'\` renders light on the server and while the client hydrates, then follows the OS on the render after hydration. No hydration gate is needed around it. A dark-scheme reader sees light until hydration ends; see "Static export: the dark first paint (web)". A nested provider with a pair and none of \`mode\`, \`defaultMode\` and \`storage\` follows the mode of its parent; see "Nested providers"
 - \`defaultMode?: 'system' | 'light' | 'dark'\` — Initial mode when uncontrolled. Default: \`'system'\`. On a nested provider, setting it gives the provider a mode of its own
 - \`onModeChange?: (mode: ThemeMode) => void\`
 - \`storage?: { getItem, setItem }\` — Persists the mode. Any AsyncStorage-shaped object; sync or async. Nothing is persisted unless you pass this. On a nested provider, setting it gives the provider a mode of its own, and it overwrites the mode the root stored: every provider uses the key \`THEME_MODE_STORAGE_KEY\` (\`'rootnative.theme-mode'\`)
@@ -2694,7 +2695,39 @@ A static export (\`web.output: 'static'\`) renders on a server with no DOM, wher
 
 The practical consequence: a breakpoint-dependent layout **starts compact and widens a frame later** on a static export. That is unavoidable — the server cannot know the viewport — so design the compact variant to be the honest first paint. \`Grid\` inherits all of this, which matters because it resolves a \`columns\` map internally and leaves a consumer nowhere to put a gate of their own.
 
-\`ThemeProvider\` reads the same hydration flag for \`mode="system"\`. The export server has no \`matchMedia\`, so react-native-web reports \`'light'\` there and the HTML ships the light theme. The provider keeps light while the client hydrates, then switches to the OS scheme on the same re-render as the window size. A reader with a dark system setting sees one light frame first. The \`useColorScheme\` hook from \`react-native\` is **not** hydration-safe: a theme chosen from it stays light in a dark browser.
+\`ThemeProvider\` reads the same hydration flag for \`mode="system"\`. The export server has no \`matchMedia\`, so react-native-web reports \`'light'\` there and the HTML ships the light theme. The provider keeps light while the client hydrates, then switches to the OS scheme on the same re-render as the window size. A reader with a dark system setting sees the light theme until hydration ends, which takes seconds on a phone; the next section hides it. The \`useColorScheme\` hook from \`react-native\` is **not** hydration-safe: a theme chosen from it stays light in a dark browser.
+
+### Static export: the dark first paint (web)
+
+react-native-web writes each theme color into the HTML as an inline style, and CSS in the HTML shell cannot change an inline style. So on a static export a reader with a dark system setting sees the light page until the script downloads and hydrates: measured at 1.3 s on a fast computer and 5.5 s with a 4× CPU throttle and a 6.4 Mbit/s network, for 2.6 MB of script. A mode that \`storage\` restores loads after hydration too.
+
+\`@rootnative/core/static-export\` hides that light page. Put its script and its CSS in the HTML shell (\`app/+html.tsx\` with Expo Router). The script must come before the body:
+
+\`\`\`tsx
+import { darkTheme } from '@rootnative/core'
+import {
+  schemeGuardCss,
+  schemeGuardScript,
+} from '@rootnative/core/static-export'
+
+const SCHEME_GUARD_CSS = schemeGuardCss({
+  background: darkTheme.colors.background,
+})
+
+// inside <head>
+<script dangerouslySetInnerHTML={{ __html: schemeGuardScript() }} />
+<style dangerouslySetInnerHTML={{ __html: SCHEME_GUARD_CSS }} />
+\`\`\`
+
+1. The script reads the stored mode (\`localStorage\`, key \`THEME_MODE_STORAGE_KEY\`), then the OS scheme, and writes the scheme to \`<html>\` as \`data-rootnative-scheme\` (\`SCHEME_ATTRIBUTE\`) before the body paints.
+2. For the dark scheme, the CSS hides \`#root\` and paints \`background\` under it.
+3. On the first render after hydration, with the stored mode loaded, \`ThemeProvider\` writes \`data-rootnative-theme-ready\` (\`THEME_READY_ATTRIBUTE\`) on \`<html>\`, and the page shows in the dark theme.
+
+A light-scheme reader sees no change. Without JavaScript nothing is hidden. The cost: a dark-scheme reader sees content when hydration ends, so the Largest Contentful Paint is later for that reader. If the theme is not ready after 8 s, the page shows anyway (a failed script).
+
+Options:
+- \`schemeGuardScript({ storageKey? })\` — \`storageKey?: string | null\`, default \`THEME_MODE_STORAGE_KEY\`. \`null\` reads the OS scheme only. The script cannot see a mode that the app controls with \`mode\`; pass the key the app writes, or \`null\`
+- \`schemeGuardCss({ background, rootSelector?, timeoutMs? })\` — \`background\`: the color under the hidden page, use the dark theme background. \`rootSelector\`: default \`'#root'\`, the element Expo hydrates into. \`timeoutMs\`: default \`8000\`
 `
 }
 

@@ -1,6 +1,15 @@
+import { darkTheme } from '@rootnative/core'
+import {
+  schemeGuardCss,
+  schemeGuardScript,
+} from '@rootnative/core/static-export'
 import { shellTags } from '@rootnative/seo/expo-router'
 import { ScrollViewStyleReset } from 'expo-router/html'
 import type { PropsWithChildren } from 'react'
+
+const SCHEME_GUARD_CSS = schemeGuardCss({
+  background: darkTheme.colors.background,
+})
 
 export default function Root({ children }: PropsWithChildren) {
   return (
@@ -19,6 +28,13 @@ export default function Root({ children }: PropsWithChildren) {
           own template, which carries the same reset.
         */}
         <ScrollViewStyleReset />
+        {/*
+          The export holds the light theme. For a dark-scheme reader these
+          two hide the page until ThemeProvider shows the dark theme, so the
+          light server paint never shows.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: schemeGuardScript() }} />
+        <style dangerouslySetInnerHTML={{ __html: SCHEME_GUARD_CSS }} />
         {/*
           SPA redirect handler for GitHub Pages.
           The custom 404.html stores the original path in sessionStorage

@@ -1,5 +1,7 @@
 const workspaceAliases = {
   '^@rootnative/core$': '<rootDir>/../core/src/index.ts',
+  '^@rootnative/core/static-export$':
+    '<rootDir>/../core/src/static-export/index.ts',
   '^@rootnative/utils$': '<rootDir>/../utils/src/index.ts',
   '^@rootnative/utils/test$': '<rootDir>/../utils/src/test-utils/index.ts',
 }

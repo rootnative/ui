@@ -61,9 +61,12 @@ export default function App() {
 On a static web export (`web.output: 'static'`), the server cannot read the
 system setting, so it renders the light theme. The provider keeps the light
 theme while the client hydrates, then switches to the system setting on the
-next render. A reader with a dark system setting sees one light frame first.
-You do not need a hydration gate around `mode`. The
+render after hydration. A reader with a dark system setting sees the light
+theme until hydration ends, which takes seconds on a phone. You do not need a
+hydration gate around `mode`. The
 [static export note](./responsive.md#notes) explains why the provider waits.
+To hide the light page from that reader, see
+[The first paint of a static export](#the-first-paint-of-a-static-export).
 
 `createMaterialTheme()` returns a pair already, so rename on destructure:
 
@@ -174,6 +177,88 @@ To drive mode from your own state instead, pass `mode` and `onModeChange`. The
 provider then never changes mode on its own, and ignores `storage` — your state
 is the source of truth, and writing behind it would restore a stale value on the
 next launch.
+
+### The first paint of a static export
+
+The HTML of a static export holds the light theme, because the server cannot
+read the system setting of the reader. react-native-web writes each theme
+color into the HTML as an inline style, and CSS in the HTML shell cannot
+change an inline style. So a reader with a dark system setting sees the light
+page until the script downloads and hydrates. A mode that `storage` restores
+loads after hydration too, so a reader who chose dark sees the same light
+page.
+
+This was measured on a page that loads 2.6 MB of script, in Chromium with a
+dark color scheme:
+
+| Profile | Time in the light theme |
+|---------|-------------------------|
+| Fast computer, no throttle | 1.3 s |
+| CPU 4×, 6.4 Mbit/s, 150 ms latency | 5.5 s |
+
+`@rootnative/core/static-export` hides that light page. Add its script and its
+CSS to the HTML shell. With Expo Router, the shell is `app/+html.tsx`:
+
+```tsx
+import { darkTheme } from '@rootnative/core'
+import {
+  schemeGuardCss,
+  schemeGuardScript,
+} from '@rootnative/core/static-export'
+import { ScrollViewStyleReset } from 'expo-router/html'
+import type { PropsWithChildren } from 'react'
+
+const SCHEME_GUARD_CSS = schemeGuardCss({
+  background: darkTheme.colors.background,
+})
+
+export default function Root({ children }: PropsWithChildren) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <ScrollViewStyleReset />
+        <script dangerouslySetInnerHTML={{ __html: schemeGuardScript() }} />
+        <style dangerouslySetInnerHTML={{ __html: SCHEME_GUARD_CSS }} />
+      </head>
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+The guard works in three steps:
+
+1. The script runs before the body paints. It reads the stored mode, then the
+   system setting, and writes the scheme to `<html>` as
+   `data-rootnative-scheme`.
+2. For the dark scheme, the CSS hides `#root` and paints `background` under it.
+3. On the first render after hydration, with the stored mode loaded,
+   `ThemeProvider` writes `data-rootnative-theme-ready` on `<html>`. The CSS
+   then stops, and the page shows in the dark theme.
+
+A reader with a light scheme sees no change. Without JavaScript the script
+does not run, so nothing is hidden. The hidden page keeps its layout, so
+nothing moves when it shows.
+
+The guard has a cost. A reader with a dark scheme sees the content when
+hydration ends, not when the HTML arrives, so the Largest Contentful Paint is
+later for that reader. If the theme is not ready after 8 seconds, the page
+shows anyway. That limit is for a script that fails to load.
+
+| Function | Option | Default | Meaning |
+|----------|--------|---------|---------|
+| `schemeGuardScript` | `storageKey` | `THEME_MODE_STORAGE_KEY` | The `localStorage` key of the stored mode. `null` reads the system setting only |
+| `schemeGuardCss` | `background` | — | The color under the hidden page. Use the background of the dark theme |
+| `schemeGuardCss` | `rootSelector` | `'#root'` | The element to hide. Expo hydrates into `#root` |
+| `schemeGuardCss` | `timeoutMs` | `8000` | The time before the page shows anyway |
+
+The script reads the key that `ThemeProvider` writes through `storage`. On
+web, `localStorage` and AsyncStorage both keep the mode under that key. The
+script cannot see a mode that the app passes as `mode` from its own state.
+For that app, pass the `localStorage` key the app writes as `storageKey`, or
+pass `null`. With `null`, a reader who chose light on a dark system waits for
+hydration, but never sees the wrong theme.
 
 ### With Expo Router and React Navigation
 
@@ -694,6 +779,7 @@ function MyComponent() {
 | Remember the choice | `<ThemeProvider theme={{ light, dark }} storage={AsyncStorage}>` |
 | Theme the navigator screens | `Stack` `contentStyle`, or a navigation theme mapped from `useTheme()` — see [With Expo Router and React Navigation](#with-expo-router-and-react-navigation) |
 | Give one part of the app its own colors | A nested `<ThemeProvider theme={{ light, dark }}>` — see [Nested providers](#nested-providers) |
+| No light page for dark readers of a static export | `schemeGuardScript()` and `schemeGuardCss()` in `+html.tsx` — see [The first paint of a static export](#the-first-paint-of-a-static-export) |
 | Override a few MD3 colors | Spread `lightTheme` and override |
 | Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
 | Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |
