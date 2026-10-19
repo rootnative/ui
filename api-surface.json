@@ -323,6 +323,7 @@
         "OpenGraphType",
         "PageAlternate",
         "PageMeta",
+        "PageMetadata",
         "Site",
         "SiteConfig",
         "clipDescription",
@@ -331,7 +332,8 @@
         "isoDuration",
         "resolveUrl",
         "serializeJsonLd",
-        "toHeadTags"
+        "toHeadTags",
+        "toMetadata"
       ],
       "./schema": [
         "ArticleInput",

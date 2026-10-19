@@ -71,6 +71,44 @@ export type Site = {
   descriptionLimit: number
 }
 
+/**
+ * The head of one page as the `Metadata` object of an Expo Router
+ * `generateMetadata` export. It is a subset of that type, so the package
+ * needs no `expo-server` import. `toMetadata` returns it.
+ */
+export type PageMetadata = {
+  /** The tab title, from the site template. */
+  title: string
+  description?: string
+  robots?: string
+  alternates?: {
+    canonical: string
+    /** The `hreflang` code to the URL, `x-default` included. */
+    languages?: Record<string, string>
+  }
+  openGraph?: {
+    type: OpenGraphType
+    siteName: string
+    title: string
+    description?: string
+    url: string
+    locale?: string
+    images?: Array<{
+      url: string
+      width?: number
+      height?: number
+      alt?: string
+    }>
+  }
+  twitter?: {
+    card: 'summary' | 'summary_large_image'
+    site?: string
+    title: string
+    description?: string
+    images?: Array<{ url: string; alt?: string }>
+  }
+}
+
 export type HeadTag =
   | { tag: 'title'; text: string }
   | { tag: 'meta'; name: string; content: string }

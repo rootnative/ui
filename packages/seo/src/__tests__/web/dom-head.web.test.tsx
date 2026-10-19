@@ -39,9 +39,13 @@ function headTags(): Element[] {
   )
 }
 
-/** One line per head element, with no renderer marker, sorted. */
+/**
+ * One line per head element, with no renderer marker, sorted. The JSON-LD is
+ * not in it: the Expo Router `PageHead` writes it into the body.
+ */
 function headSignature(): string[] {
   return headTags()
+    .filter((node) => node.tagName !== 'SCRIPT')
     .map((node) => {
       const attributes = Array.from(node.attributes)
         .filter((attribute) => !attribute.name.startsWith('data-'))
@@ -58,6 +62,13 @@ function hreflangs(): string[] {
   return Array.from(document.head.querySelectorAll('link[hreflang]')).map(
     (node) => `${node.getAttribute('hreflang')} ${node.getAttribute('href')}`,
   )
+}
+
+/** The text of each JSON-LD script in the document, head and body. */
+function jsonLdTexts(): string[] {
+  return Array.from(
+    document.querySelectorAll('script[type="application/ld+json"]'),
+  ).map((node) => node.textContent ?? '')
 }
 
 function content(selector: string): string[] {
@@ -82,6 +93,7 @@ describe('PageHead from /dom', () => {
     )
     const fromRouter = headSignature()
     const routerTitle = document.title
+    const routerJsonLd = jsonLdTexts()
     router.unmount()
     document.head.innerHTML = ''
 
@@ -96,6 +108,8 @@ describe('PageHead from /dom', () => {
     )
     expect(headSignature()).toEqual(fromRouter)
     expect(document.title).toBe(routerTitle)
+    expect(routerJsonLd).toHaveLength(1)
+    expect(jsonLdTexts()).toEqual(routerJsonLd)
   })
 
   it('replaces its tags on a change and takes them out on unmount', () => {

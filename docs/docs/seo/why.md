@@ -50,8 +50,9 @@ No package can fix this one. The docs say so, and the
 
 `@rootnative/seo` holds the parts that do not depend on your data:
 
-- One `PageMeta` shape for the head of a page, and `toHeadTags` to turn it
-  into tag records any renderer can write.
+- One `PageMeta` shape for the head of a page, `toHeadTags` to turn it
+  into tag records any renderer can write, and `toMetadata` to turn it into
+  the `generateMetadata` result that Expo SDK 58 writes into a static page.
 - `PageHead` for Expo Router, `SeoProvider` for the site, and `Heading` for
   the outline.
 - JSON-LD builders for the common schema.org types. An empty field is left

@@ -54,13 +54,16 @@ No package changes that. Check the host:
 ## The charset position
 
 The HTML spec requires the `<meta charset>` in the first 1024 bytes of the
-page. `shellTags` writes it first in the shell, but Expo Router writes the
-`PageHead` tags at the start of `<head>`, before the shell. A page with a
-title, a description, the Open Graph tags and a JSON-LD script puts the
-charset after byte 1024. The home page of the example app is one such page.
+page. `shellTags` writes it first in the shell, but on Expo SDK 57 Expo
+Router writes the `PageHead` tags at the start of `<head>`, before the shell.
+A page with a title, a description and the Open Graph tags puts the charset
+after byte 1024. The home page of the example app is one such page.
 
-No package changes that order. The host must send the charset in the
-`Content-Type` header, because the header wins over the tag:
+On SDK 57 no package changes that order. From SDK 58 the shell places the
+`generateMetadata` tags where it renders `headNodes`, so a shell that renders
+them after `shellTags` keeps the charset first. On both, the host should send
+the charset in the `Content-Type` header, because the header wins over the
+tag:
 
 - GitHub Pages sends `text/html; charset=utf-8` for an `.html` file.
 - A host that sends `text/html` with no charset, or no `Content-Type`, makes

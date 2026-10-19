@@ -6,11 +6,18 @@ import { defineSite } from '../../index'
 import { SeoProvider } from '../../react'
 import { movie } from '../../schema'
 
+declare global {
+  // eslint-disable-next-line no-var
+  var __seoRoute: { pathname: string; focused: boolean }
+}
+
 const site = defineSite({
   name: 'Trek',
   url: 'https://example.com/app',
   twitterSite: '@trek',
 })
+
+const JSON_LD = 'script[type="application/ld+json"]'
 
 function renderHead(ui: ReactElement) {
   return render(<Head.Provider>{ui}</Head.Provider>)
@@ -22,13 +29,22 @@ function metaContent(selector: string): string[] {
   )
 }
 
+/** Puts a tag into the head the way a static page holds it: no Helmet marker. */
+function serverTag(html: string) {
+  document.head.insertAdjacentHTML('beforeend', html)
+}
+
+beforeEach(() => {
+  global.__seoRoute = { pathname: '/', focused: true }
+})
+
 afterEach(() => {
   document.head.innerHTML = ''
 })
 
 describe('PageHead', () => {
-  it('writes each tag once into document.head through the provider', () => {
-    renderHead(
+  it('writes each head tag once into document.head through the provider, and the JSON-LD into the body', () => {
+    const { container } = renderHead(
       <SeoProvider site={site}>
         <PageHead
           title="Dune"
@@ -61,14 +77,89 @@ describe('PageHead', () => {
       'https://example.com/app/movies/1',
     )
 
-    const scripts = document.head.querySelectorAll(
-      'script[type="application/ld+json"]',
-    )
+    // From Expo SDK 58 the static export writes no Helmet tag, so the
+    // JSON-LD is in the page body, where every renderer writes it.
+    expect(document.head.querySelectorAll(JSON_LD)).toHaveLength(0)
+    const scripts = container.querySelectorAll(JSON_LD)
     expect(scripts).toHaveLength(1)
     expect(JSON.parse(scripts[0]?.textContent ?? '')).toMatchObject({
       '@type': 'Movie',
       name: 'Dune',
     })
+  })
+
+  it('writes no JSON-LD from a screen that is not focused', () => {
+    global.__seoRoute.focused = false
+    const { container } = renderHead(
+      <PageHead
+        site={site}
+        title="Dune"
+        url="/movies/1"
+        jsonLd={[
+          movie({ name: 'Dune', url: 'https://example.com/app/movies/1' }),
+        ]}
+      />,
+    )
+    expect(document.querySelectorAll(JSON_LD)).toHaveLength(0)
+    expect(container.innerHTML).toBe('')
+  })
+
+  it('takes out each server tag in a slot it writes, and keeps every other tag', () => {
+    // The head a static page holds from `generateMetadata` and `+html.tsx`.
+    serverTag('<title>Dune | Trek</title>')
+    serverTag('<meta name="description" content="Old text.">')
+    serverTag('<link rel="canonical" href="https://example.com/app/old">')
+    serverTag(
+      '<link rel="alternate" hreflang="fr" href="https://example.com/app/fr/old">',
+    )
+    serverTag('<meta property="og:url" content="https://example.com/app/old">')
+    serverTag('<meta name="theme-color" content="#000000">')
+    serverTag('<link rel="icon" href="/favicon.ico">')
+    serverTag('<meta property="og:image" content="https://example.com/a.jpg">')
+
+    renderHead(
+      <PageHead
+        site={site}
+        title="Dune"
+        description="A duke moves to a desert planet."
+        url="/movies/1"
+        alternates={[{ lang: 'en', url: '/movies/1' }]}
+      />,
+    )
+
+    expect(metaContent('meta[name="description"]')).toEqual([
+      'A duke moves to a desert planet.',
+    ])
+    expect(
+      Array.from(document.head.querySelectorAll('link[rel="canonical"]')).map(
+        (node) => node.getAttribute('href'),
+      ),
+    ).toEqual(['https://example.com/app/movies/1'])
+    expect(
+      Array.from(document.head.querySelectorAll('link[hreflang]')).map((node) =>
+        node.getAttribute('hreflang'),
+      ),
+    ).toEqual(['en', 'x-default'])
+    expect(metaContent('meta[property="og:url"]')).toEqual([
+      'https://example.com/app/movies/1',
+    ])
+    expect(document.querySelectorAll('title')).toHaveLength(1)
+    expect(document.title).toBe('Dune | Trek')
+    // Not a slot this page writes: the shell tags, and the image of a
+    // `generateMetadata` that disagrees with the screen.
+    expect(metaContent('meta[name="theme-color"]')).toEqual(['#000000'])
+    expect(document.head.querySelector('link[rel="icon"]')).not.toBeNull()
+    expect(metaContent('meta[property="og:image"]')).toEqual([
+      'https://example.com/a.jpg',
+    ])
+  })
+
+  it('takes out no server tag from a screen that is not focused', () => {
+    global.__seoRoute.focused = false
+    serverTag('<meta name="description" content="Old text.">')
+    renderHead(<PageHead site={site} title="Dune" description="New text." />)
+    // The mock `Head` has no focus check, so it still writes "New text.".
+    expect(metaContent('meta[name="description"]')).toContain('Old text.')
   })
 
   it('takes the site from the prop when there is no provider', () => {

@@ -15,7 +15,7 @@ pnpm add @rootnative/seo
 
 | Entry | Needs | What it holds |
 | --- | --- | --- |
-| `@rootnative/seo` | nothing | `defineSite`, `toHeadTags`, `headTagsHtml`, `clipDescription`, `isoDuration`, the types |
+| `@rootnative/seo` | nothing | `defineSite`, `toHeadTags`, `toMetadata`, `headTagsHtml`, `clipDescription`, `isoDuration`, the types |
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
 | `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `RouteHead`, `shellTags` |
@@ -73,6 +73,19 @@ A screen with no `PageHead` gets its head from `RouteHead`, after the navigator 
   <RouteHead defaults={(pathname) => findPage(pathname)} />
 </SeoProvider>
 ```
+
+**Expo SDK 58 and later.** The static export writes the head from the `generateMetadata` export of the route, not from `PageHead` or `RouteHead`. Export it from each route with the same meta, and keep the `PageHead`, which writes the JSON-LD into the page body and the head after a client navigation:
+
+```tsx
+// app/movies/[id].tsx
+import { toMetadata } from '@rootnative/seo'
+
+export function generateMetadata(_request: unknown, params: { id: string }) {
+  return toMetadata(site, movieMeta(params.id))
+}
+```
+
+A custom `app/+html.tsx` on SDK 58 must render `headNodes` and `bodyNodes` from `useServerDocumentContext()` in `expo-router/html`, or the page has no head tags and no JavaScript.
 
 Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time. `server` output works too: the commands below read its pages from `dist/server` and write the files into `dist/client`.
 

@@ -74,7 +74,11 @@ describe('auditExport', () => {
         rule: 'title',
         message: expect.stringMatching(/^empty <title>/),
       },
-      { file: 'none.html', rule: 'title', message: 'no <title>' },
+      {
+        file: 'none.html',
+        rule: 'title',
+        message: expect.stringMatching(/^no <title>\. .*generateMetadata/),
+      },
       {
         file: 'two.html',
         rule: 'title',

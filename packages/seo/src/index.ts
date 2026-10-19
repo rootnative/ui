@@ -1,4 +1,4 @@
-export { headTagsHtml, toHeadTags } from './head'
+export { headTagsHtml, toHeadTags, toMetadata } from './head'
 export { defineSite, resolveUrl } from './site'
 export { clipDescription, isoDuration, serializeJsonLd } from './text'
 export type {
@@ -7,6 +7,7 @@ export type {
   OpenGraphType,
   PageAlternate,
   PageMeta,
+  PageMetadata,
   Site,
   SiteConfig,
 } from './types'

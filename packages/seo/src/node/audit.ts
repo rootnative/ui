@@ -66,6 +66,10 @@ const XHTML_LINK = /<xhtml:link\b([^>]*?)\/?>/gi
 const LANGUAGE_CODE =
   /^(?:x-default|[a-z]{2,3}(?:-[a-z]{4})?(?:-(?:[a-z]{2}|\d{3}))?)$/i
 
+/** From Expo SDK 58 the static export writes no `PageHead` tag into the page. */
+const SDK_58_HINT =
+  'On Expo SDK 58 and later, the route must also export `generateMetadata` that returns `toMetadata(site, meta)`.'
+
 type AuditedPage = ExportedPage & {
   titles: string[]
   h1: number
@@ -106,7 +110,7 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
     problems.push({ file: page.file, rule, message })
 
   if (rules.has('title')) {
-    if (page.titles.length === 0) add('title', 'no <title>')
+    if (page.titles.length === 0) add('title', `no <title>. ${SDK_58_HINT}`)
     else if (page.titles.length > 1)
       add('title', `${count(page.titles.length, 'title')}, expected one`)
     else if (page.titles[0] === '')
@@ -117,7 +121,7 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
     if (!page.canonical && !page.noindex) {
       add(
         'canonical',
-        'no canonical link and no noindex. Pass `url` to `PageHead`, or `noindex` on a page a crawler must not index.',
+        `no canonical link and no noindex. Pass \`url\` to \`PageHead\`, or \`noindex\` on a page a crawler must not index. ${SDK_58_HINT}`,
       )
     } else if (page.canonical && !/^https?:\/\//.test(page.canonical)) {
       add('canonical', `canonical link "${page.canonical}" is not absolute`)

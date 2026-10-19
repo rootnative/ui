@@ -1,11 +1,10 @@
 import { usePathname } from 'expo-router'
-import Head from 'expo-router/head'
 import { useEffect, useSyncExternalStore } from 'react'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
 import { useClaims, useSite } from '../react/SeoProvider'
 import type { PageMeta, Site } from '../types'
-import { renderHeadTag } from './PageHead'
+import { HeadTags } from './HeadTags'
 
 /** The head of a route that has no `PageHead`, from its pathname. `undefined` writes nothing. */
 export type RouteDefaults = (pathname: string) => PageMeta | undefined
@@ -21,6 +20,11 @@ export type RouteHeadProps = {
  * `PageHead`. Put it after the navigator in the root layout, so the screen
  * renders first and its `PageHead` wins the whole page, not one tag at a
  * time. Renders nothing on native.
+ *
+ * From Expo SDK 58 the static export writes no head tag from this component,
+ * and Expo Router reads `generateMetadata` from the route file only, not from
+ * a layout. A route that must have a head in its static page exports
+ * `generateMetadata` itself.
  */
 export function RouteHead(props: RouteHeadProps) {
   if (Platform.OS !== 'web') return null
@@ -52,5 +56,5 @@ function WebRouteHead({ defaults, site }: RouteHeadProps) {
   }, [claims, pathname, wrote])
 
   if (!meta) return null
-  return <Head>{toHeadTags(resolved, meta).map(renderHeadTag)}</Head>
+  return <HeadTags tags={toHeadTags(resolved, meta)} active />
 }

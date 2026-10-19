@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
+import { slotOf } from '../headSlots'
 import { useSite } from '../react/SeoProvider'
 import type { HeadTag, PageMeta, Site } from '../types'
 
@@ -23,29 +24,6 @@ type Written = {
   /** Tags of the same identity that were there before, to put back. */
   displaced: Element[]
   title: string
-}
-
-/** Whether a head element fills the same slot as `tag`, or `null` for a script. */
-function slotOf(tag: HeadTag): ((node: Element) => boolean) | null {
-  switch (tag.tag) {
-    case 'meta':
-      return 'name' in tag
-        ? (node) =>
-            node.tagName === 'META' && node.getAttribute('name') === tag.name
-        : (node) =>
-            node.tagName === 'META' &&
-            node.getAttribute('property') === tag.property
-    case 'link':
-      // The `hreflang` links of a page are one slot, not one per language:
-      // a language of the head below that this page does not list must go
-      // too. A link with no `hreflang`, such as a feed, is not in that slot.
-      return (node) =>
-        node.tagName === 'LINK' &&
-        node.getAttribute('rel') === tag.rel &&
-        node.hasAttribute('hreflang') === (tag.hreflang !== undefined)
-    default:
-      return null
-  }
 }
 
 function elementOf(doc: Document, tag: HeadTag): Element | null {

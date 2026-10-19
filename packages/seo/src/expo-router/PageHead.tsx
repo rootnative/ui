@@ -1,67 +1,26 @@
 import { useIsFocused, usePathname } from 'expo-router'
-import Head from 'expo-router/head'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
 import { useClaim, useClaims, useSite } from '../react/SeoProvider'
-import type { HeadTag, PageMeta, Site } from '../types'
+import type { PageMeta, Site } from '../types'
+import { HeadTags } from './HeadTags'
 
 export type PageHeadProps = PageMeta & {
   /** Wins over the site from `SeoProvider`. */
   site?: Site
 }
 
-function keyOf(tag: HeadTag, index: number): string {
-  switch (tag.tag) {
-    case 'title':
-      return 'title'
-    case 'link':
-      return tag.hreflang === undefined
-        ? `link:${tag.rel}`
-        : `link:${tag.rel}:${tag.hreflang}`
-    case 'meta':
-      return 'name' in tag ? `meta:${tag.name}` : `meta:${tag.property}`
-    case 'script':
-      return `ld:${index}`
-  }
-}
-
-/** Turns one `HeadTag` record into the element `expo-router/head` expects. */
-export function renderHeadTag(tag: HeadTag, index: number) {
-  const key = keyOf(tag, index)
-  switch (tag.tag) {
-    case 'title':
-      return <title key={key}>{tag.text}</title>
-    case 'meta':
-      return 'name' in tag ? (
-        <meta key={key} name={tag.name} content={tag.content} />
-      ) : (
-        <meta key={key} property={tag.property} content={tag.content} />
-      )
-    // No `hrefLang={undefined}`: react-helmet-async writes an undefined prop
-    // as an empty attribute, and the canonical link gets `hreflang=""`.
-    case 'link':
-      return tag.hreflang === undefined ? (
-        <link key={key} rel={tag.rel} href={tag.href} />
-      ) : (
-        <link key={key} rel={tag.rel} hrefLang={tag.hreflang} href={tag.href} />
-      )
-    // A string child, not `dangerouslySetInnerHTML`: react-helmet-async reads
-    // the inner HTML of a script from its child and drops the tag otherwise.
-    // The text is already safe — `serializeJsonLd` escapes every `<`.
-    case 'script':
-      return (
-        <script key={key} type={tag.type}>
-          {tag.text}
-        </script>
-      )
-  }
-}
-
 /**
- * Writes the head of one page through `expo-router/head`. Renders nothing on
- * native, where no document exists, and reads no site there, so a native tree
- * and a native test need no `SeoProvider`. On the web a missing site throws,
- * and the static export fails on the first page that has one.
+ * Writes the head of one page through `expo-router/head`, and its JSON-LD
+ * into the page body. Renders nothing on native, where no document exists,
+ * and reads no site there, so a native tree and a native test need no
+ * `SeoProvider`. On the web a missing site throws, and the static export
+ * fails on the first page that has one.
+ *
+ * From Expo SDK 58 the static export writes the head tags from the
+ * `generateMetadata` export of the route, not from this component. Return
+ * `toMetadata(site, meta)` there with the same `meta`. This component still
+ * writes the JSON-LD on every SDK, and the head after a client navigation.
  */
 export function PageHead(props: PageHeadProps) {
   if (Platform.OS !== 'web') return null
@@ -76,5 +35,5 @@ function WebPageHead({ site, ...meta }: PageHeadProps) {
   const focused = useIsFocused()
   const pathname = usePathname()
   useClaim(useClaims(), focused ? pathname : null)
-  return <Head>{toHeadTags(resolved, meta).map(renderHeadTag)}</Head>
+  return <HeadTags tags={toHeadTags(resolved, meta)} active={focused} />
 }

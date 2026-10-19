@@ -193,6 +193,56 @@ The rules the head follows:
 A page outside the provider, such as `+not-found`, passes `site` as a prop.
 The prop wins over the provider.
 
+### Expo SDK 58: `generateMetadata`
+
+From Expo SDK 58, the static export renders each page with the streaming
+renderer. That renderer writes the head from the `generateMetadata` export of
+the route. It writes no tag from `PageHead`. Export `generateMetadata` from
+each route, and return `toMetadata` with the same meta that the screen gives
+to `PageHead`:
+
+```tsx title="app/movies/[id].tsx"
+import { toMetadata, type PageMeta } from '@rootnative/seo'
+import { PageHead } from '@rootnative/seo/expo-router'
+import { useLocalSearchParams } from 'expo-router'
+import { findMovie } from '../../src/movies'
+import { site } from '../../src/site'
+
+function movieMeta(id: string): PageMeta {
+  const movie = findMovie(id)
+  if (!movie) return { title: 'Movie not found', noindex: true }
+  return {
+    title: movie.title,
+    description: movie.overview,
+    url: `/movies/${movie.id}`,
+  }
+}
+
+export function generateMetadata(_request: unknown, params: { id: string }) {
+  return toMetadata(site, movieMeta(params.id))
+}
+
+export default function MovieScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>()
+  return <PageHead {...movieMeta(id)} />
+}
+```
+
+- `toMetadata` follows the same rules as `PageHead`. The Expo serializer
+  writes the same tags from its result.
+- In a static render the request is `undefined`. The function gets the route
+  params only, so it finds the data from the params. Expo removes the
+  function from the client bundle.
+- Keep the `PageHead`. It writes the JSON-LD into the page body, and it
+  writes the head after a client navigation. After hydration it removes each
+  head tag that `generateMetadata` wrote in a slot that it writes, so the
+  head does not hold two sets.
+- On SDK 57 the static export ignores `generateMetadata` and writes the
+  `PageHead` tags. You can add the export before you move to SDK 58.
+- A custom `app/+html.tsx` must render the nodes of
+  `useServerDocumentContext()`. Without them the page has no metadata, no
+  CSS and no JavaScript. See [step 7](#7-bundle-and-preconnect).
+
 ### The route a screen forgets
 
 A screen with no `PageHead` is a page with no title. `RouteHead` closes
@@ -229,6 +279,20 @@ claims the route, and `RouteHead` reads the claim in the same render pass.
 That order matters on the static export, which runs no effect. Before the
 navigator, the export holds both heads, and the component warns in
 development. Return `undefined` for a route that must write nothing.
+
+On Expo SDK 58, `RouteHead` writes no tag into the static page. Expo Router
+reads `generateMetadata` from the route file only, not from a layout. So a
+route that `RouteHead` covers, and that a crawler must index, exports its own
+`generateMetadata`:
+
+```tsx title="app/about.tsx"
+import { toMetadata } from '@rootnative/seo'
+import { site } from '../src/site'
+
+export function generateMetadata() {
+  return toMetadata(site, { title: 'About', url: '/about' })
+}
+```
 
 ### An app without Expo Router
 
@@ -446,6 +510,11 @@ and `@type` set, and leave every empty field out. They never write `""`,
 `null`, or `[]`. `PageHead` writes each one as a script and escapes `<`, so a
 `</script>` in a title cannot end the tag.
 
+The scripts go into the page body, next to the screen, not into the head.
+From Expo SDK 58 the static export writes no `PageHead` tag into the head,
+and the `Metadata` of `generateMetadata` has no field for JSON-LD. A crawler
+reads JSON-LD in the body too.
+
 | Builder | Schema type |
 | --- | --- |
 | `webSite` | `WebSite`, with a `SearchAction` when `searchUrlTemplate` is set |
@@ -497,11 +566,46 @@ export default function Root({ children }: PropsWithChildren) {
 subpath host. `shellTags` has no router dependency: the same function serves
 a Vite `index.html` template through `renderToStaticMarkup`.
 
-Expo Router writes the `PageHead` tags at the start of `<head>`, before the
-shell. On a page with a title, a description, the Open Graph tags and a
-JSON-LD script, the charset is then after byte 1024. The HTML spec requires
-it in the first 1024 bytes, so the host must send the charset in the
-`Content-Type` header. See [the charset position](./limits.md#the-charset-position).
+On SDK 57, Expo Router writes the `PageHead` tags at the start of `<head>`,
+before the shell. On a page with a title, a description and the Open Graph
+tags, the charset is then after byte 1024. The HTML spec requires it in the
+first 1024 bytes, so the host must send the charset in the `Content-Type`
+header. See [the charset position](./limits.md#the-charset-position).
+
+From Expo SDK 58, the server renderer gives the shell the metadata, the CSS
+and the JavaScript bundles as React nodes, through `useServerDocumentContext`.
+A custom shell must render them, or the page has no head tags and does not
+hydrate:
+
+```tsx title="app/+html.tsx (Expo SDK 58)"
+import { shellTags } from '@rootnative/seo/expo-router'
+import {
+  ScrollViewStyleReset,
+  useServerDocumentContext,
+} from 'expo-router/html'
+import type { PropsWithChildren } from 'react'
+
+export default function Root({ children }: PropsWithChildren) {
+  const { htmlAttributes, headNodes, bodyAttributes, bodyNodes } =
+    useServerDocumentContext()
+  return (
+    <html lang="en" {...htmlAttributes}>
+      <head>
+        {shellTags({ themeColor: '#4C0519' })}
+        <ScrollViewStyleReset />
+        {headNodes}
+      </head>
+      <body {...bodyAttributes}>
+        {children}
+        {bodyNodes}
+      </body>
+    </html>
+  )
+}
+```
+
+Put `headNodes` after `shellTags`. The charset then stays in the first bytes
+of the page.
 
 A site with a light and a dark theme gives both colours:
 

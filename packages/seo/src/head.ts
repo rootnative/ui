@@ -1,6 +1,68 @@
 import { resolveUrl } from './site'
 import { clipDescription, serializeJsonLd } from './text'
-import type { HeadTag, PageAlternate, PageMeta, Site } from './types'
+import type {
+  HeadTag,
+  OpenGraphType,
+  PageAlternate,
+  PageMeta,
+  PageMetadata,
+  Site,
+} from './types'
+
+/** The share card and the links of a page that has a `url`. */
+type ResolvedShare = {
+  url: string
+  alternates: { hreflang: string; href: string }[]
+  type: OpenGraphType
+  locale?: string
+  image?: {
+    url: string
+    size?: { width: number; height: number }
+    alt?: string
+  }
+  card: 'summary' | 'summary_large_image'
+}
+
+/**
+ * One page head with every rule applied. `toHeadTags` and `toMetadata` both
+ * write from it, so the two cannot disagree.
+ */
+type ResolvedHead = {
+  /** The tab title, from the site template. */
+  tabTitle: string
+  /** The page title with no site name, for the share card. */
+  title: string
+  description?: string
+  noindex: boolean
+  share?: ResolvedShare
+}
+
+function resolveHead(site: Site, meta: PageMeta): ResolvedHead {
+  const title = meta.title.trim()
+  const description = meta.description
+    ? clipDescription(meta.description, site.descriptionLimit)
+    : ''
+  const head: ResolvedHead = {
+    tabTitle: site.titleTemplate(title),
+    title,
+    description: description || undefined,
+    noindex: Boolean(meta.noindex),
+  }
+  if (!meta.url) return head
+
+  const image = meta.image ? resolveUrl(site, meta.image) : undefined
+  head.share = {
+    url: resolveUrl(site, meta.url),
+    alternates: resolveAlternates(site, meta.alternates ?? []),
+    type: meta.type ?? 'website',
+    locale: meta.locale ?? site.locale,
+    image: image
+      ? { url: image, size: meta.imageSize, alt: meta.imageAlt }
+      : undefined,
+    card: meta.twitterCard ?? (image ? 'summary_large_image' : 'summary'),
+  }
+  return head
+}
 
 /**
  * Turns a `PageMeta` into a flat list of head tags. The list holds data, not
@@ -20,64 +82,56 @@ import type { HeadTag, PageAlternate, PageMeta, Site } from './types'
  */
 export function toHeadTags(site: Site, meta: PageMeta): HeadTag[] {
   const tags: HeadTag[] = []
-  const title = meta.title.trim()
-  const description = meta.description
-    ? clipDescription(meta.description, site.descriptionLimit)
-    : undefined
+  const { tabTitle, title, description, noindex, share } = resolveHead(
+    site,
+    meta,
+  )
 
-  tags.push({ tag: 'title', text: site.titleTemplate(title) })
+  tags.push({ tag: 'title', text: tabTitle })
   if (description) {
     tags.push({ tag: 'meta', name: 'description', content: description })
   }
-  if (meta.noindex) {
+  if (noindex) {
     tags.push({ tag: 'meta', name: 'robots', content: 'noindex' })
   }
 
-  if (!meta.url) return tags.concat(jsonLdTags(meta))
+  if (!share) return tags.concat(jsonLdTags(meta))
 
-  const url = resolveUrl(site, meta.url)
-  const image = meta.image ? resolveUrl(site, meta.image) : undefined
-  const locale = meta.locale ?? site.locale
-
+  const { url, image } = share
   tags.push({ tag: 'link', rel: 'canonical', href: url })
-  tags.push(...alternateTags(site, meta.alternates ?? []))
-  tags.push({
-    tag: 'meta',
-    property: 'og:type',
-    content: meta.type ?? 'website',
-  })
+  for (const { hreflang, href } of share.alternates) {
+    tags.push({ tag: 'link', rel: 'alternate', hreflang, href })
+  }
+  tags.push({ tag: 'meta', property: 'og:type', content: share.type })
   tags.push({ tag: 'meta', property: 'og:site_name', content: site.name })
   tags.push({ tag: 'meta', property: 'og:title', content: title })
   if (description) {
     tags.push({ tag: 'meta', property: 'og:description', content: description })
   }
   tags.push({ tag: 'meta', property: 'og:url', content: url })
-  if (locale) tags.push({ tag: 'meta', property: 'og:locale', content: locale })
+  if (share.locale) {
+    tags.push({ tag: 'meta', property: 'og:locale', content: share.locale })
+  }
   if (image) {
-    tags.push({ tag: 'meta', property: 'og:image', content: image })
-    if (meta.imageSize) {
+    tags.push({ tag: 'meta', property: 'og:image', content: image.url })
+    if (image.size) {
       tags.push({
         tag: 'meta',
         property: 'og:image:width',
-        content: String(meta.imageSize.width),
+        content: String(image.size.width),
       })
       tags.push({
         tag: 'meta',
         property: 'og:image:height',
-        content: String(meta.imageSize.height),
+        content: String(image.size.height),
       })
     }
-    if (meta.imageAlt) {
-      tags.push({
-        tag: 'meta',
-        property: 'og:image:alt',
-        content: meta.imageAlt,
-      })
+    if (image.alt) {
+      tags.push({ tag: 'meta', property: 'og:image:alt', content: image.alt })
     }
   }
 
-  const card = meta.twitterCard ?? (image ? 'summary_large_image' : 'summary')
-  tags.push({ tag: 'meta', name: 'twitter:card', content: card })
+  tags.push({ tag: 'meta', name: 'twitter:card', content: share.card })
   if (site.twitterSite) {
     tags.push({ tag: 'meta', name: 'twitter:site', content: site.twitterSite })
   }
@@ -90,34 +144,93 @@ export function toHeadTags(site: Site, meta: PageMeta): HeadTag[] {
     })
   }
   if (image) {
-    tags.push({ tag: 'meta', name: 'twitter:image', content: image })
-    if (meta.imageAlt) {
-      tags.push({
-        tag: 'meta',
-        name: 'twitter:image:alt',
-        content: meta.imageAlt,
-      })
+    tags.push({ tag: 'meta', name: 'twitter:image', content: image.url })
+    if (image.alt) {
+      tags.push({ tag: 'meta', name: 'twitter:image:alt', content: image.alt })
     }
   }
 
   return tags.concat(jsonLdTags(meta))
 }
 
-function alternateTags(site: Site, alternates: PageAlternate[]): HeadTag[] {
-  const tags = alternates.map(({ lang, url }) => ({
-    tag: 'link' as const,
-    rel: 'alternate',
+/**
+ * Turns a `PageMeta` into the `Metadata` object that an Expo Router route
+ * returns from `generateMetadata`. From Expo SDK 58 the static export writes
+ * the head of a page from that object, not from `PageHead`.
+ *
+ * The result holds the same tags as `toHeadTags`, with the same rules, except
+ * the JSON-LD: `Metadata` has no field for it. `PageHead` writes the JSON-LD
+ * into the page body, so keep the `PageHead` on the screen.
+ */
+export function toMetadata(site: Site, meta: PageMeta): PageMetadata {
+  const { tabTitle, title, description, noindex, share } = resolveHead(
+    site,
+    meta,
+  )
+  const metadata: PageMetadata = { title: tabTitle }
+  if (description) metadata.description = description
+  if (noindex) metadata.robots = 'noindex'
+  if (!share) return metadata
+
+  const { url, image } = share
+  metadata.alternates = { canonical: url }
+  if (share.alternates.length > 0) {
+    metadata.alternates.languages = Object.fromEntries(
+      share.alternates.map(({ hreflang, href }) => [hreflang, href]),
+    )
+  }
+
+  const openGraph: NonNullable<PageMetadata['openGraph']> = {
+    type: share.type,
+    siteName: site.name,
+    title,
+    url,
+  }
+  if (description) openGraph.description = description
+  if (share.locale) openGraph.locale = share.locale
+  if (image) {
+    openGraph.images = [
+      {
+        url: image.url,
+        ...image.size,
+        ...(image.alt ? { alt: image.alt } : {}),
+      },
+    ]
+  }
+  metadata.openGraph = openGraph
+
+  const twitter: NonNullable<PageMetadata['twitter']> = {
+    card: share.card,
+    title,
+  }
+  if (site.twitterSite) twitter.site = site.twitterSite
+  if (description) twitter.description = description
+  if (image) {
+    twitter.images = [
+      { url: image.url, ...(image.alt ? { alt: image.alt } : {}) },
+    ]
+  }
+  metadata.twitter = twitter
+
+  return metadata
+}
+
+function resolveAlternates(
+  site: Site,
+  alternates: PageAlternate[],
+): ResolvedShare['alternates'] {
+  const links = alternates.map(({ lang, url }) => ({
     hreflang: lang.trim(),
     href: resolveUrl(site, url),
   }))
-  const first = tags[0]
+  const first = links[0]
   if (
     first &&
-    !tags.some((tag) => tag.hreflang.toLowerCase() === 'x-default')
+    !links.some((link) => link.hreflang.toLowerCase() === 'x-default')
   ) {
-    tags.push({ ...first, hreflang: 'x-default' })
+    links.push({ ...first, hreflang: 'x-default' })
   }
-  return tags
+  return links
 }
 
 function jsonLdTags(meta: PageMeta): HeadTag[] {

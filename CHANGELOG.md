@@ -15,7 +15,9 @@ Prior history: these packages were published as `@onlynative/*` through
 `ThemeProvider` with a `{ light, dark }` pair now follows the mode of its
 parent and uses the icon resolver of its parent. A new subpath,
 `@rootnative/core/static-export`, hides the light first paint of a static web
-export from a reader with a dark scheme.
+export from a reader with a dark scheme. `@rootnative/seo` adds `toMetadata`
+for the `generateMetadata` export that Expo SDK 58 reads, and the Expo Router
+`PageHead` now writes its JSON-LD into the page body.
 
 ### A nested `ThemeProvider` takes the icon resolver and the mode of its parent
 
@@ -86,6 +88,49 @@ without the guard, and for no frame with it.
 **Check your app.** Nothing changes until you add the script and the CSS to
 `app/+html.tsx`. The theming page has the full shell under "The first paint
 of a static export".
+
+### `@rootnative/seo` writes the head of an Expo SDK 58 static export
+
+On Expo SDK 58, `PageHead` and `RouteHead` wrote nothing into a static
+export: every page had no title, no canonical link and no Open Graph tag.
+`@expo/router-server` 58.0.12 (expo/expo#46526) renders the export with the
+streaming renderer. That renderer writes the head from the `generateMetadata`
+export of the route, and it does not read the `expo-router/head` tags. The
+`seo` peer range (`expo-router >=57.0.0`) claimed support for that version.
+Only `rootnative-seo audit` showed the defect.
+
+- `toMetadata(site, meta)` in `@rootnative/seo` returns the `Metadata` object
+  for `generateMetadata`. It applies the same rules as `toHeadTags`, from one
+  shared resolver. A new test runs the result through the Expo serializer and
+  compares the tags with `toHeadTags` for ten page shapes. The 57.0.9 and
+  58.0.15 serializers give the same tags.
+- The Expo Router `PageHead` and `RouteHead` write the JSON-LD as a script in
+  the page body, not in the head, on every SDK. `Metadata` has no field for
+  JSON-LD. On SDK 57 the script moves from the head to the body.
+- After hydration, the focused `PageHead`, and `RouteHead` when it writes,
+  remove each head tag in a slot they write that react-helmet-async did not
+  write. Without this, an SDK 58 page held two sets of tags after hydration,
+  because Helmet removes only its own tags, and the canonical link of the
+  first page stayed after a client navigation. A removed tag is not put back.
+- The `audit` messages for a missing title and a missing canonical link name
+  `generateMetadata`.
+
+Checked on a scratch Expo SDK 58 app (`expo` 58.0.16, `expo-router` 58.0.24,
+`@expo/router-server` 58.0.15) with the packed package: the static pages hold
+the title, the canonical link, the Open Graph and Twitter tags, and the JSON-LD
+in the body. `rootnative-seo audit` passes the title and canonical rules on
+those pages, and `rootnative-seo browse` loads every page with no error. The
+example app (SDK 57) passes `check:export`, with the browser run.
+
+**Check your app.** On SDK 58, export `generateMetadata` from each route and
+return `toMetadata(site, meta)` with the meta of its `PageHead`. In a static
+render the request is `undefined`, so build the meta from the route params.
+Keep the `PageHead`. `RouteHead` writes no static tag on SDK 58, and Expo
+Router reads `generateMetadata` from the route file only, so a route that
+`RouteHead` covers needs its own export. A custom `app/+html.tsx` must render
+`headNodes` and `bodyNodes` from `useServerDocumentContext()` in
+`expo-router/html`. Without them the page has no head tags, no CSS and no
+JavaScript. Step 3 and step 7 of the SEO checklist have the code.
 
 ## 0.0.0-alpha.27 — 2026-10-17
 

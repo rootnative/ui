@@ -4,6 +4,7 @@ import type { ReactElement } from 'react'
 import { PageHead, RouteHead } from '../../expo-router'
 import { defineSite } from '../../index'
 import { SeoProvider } from '../../react'
+import { webSite } from '../../schema'
 
 declare global {
   // eslint-disable-next-line no-var
@@ -136,5 +137,26 @@ describe('RouteHead', () => {
   it('takes the site from the prop when there is no provider', () => {
     renderHead(<RouteHead site={site} defaults={defaults} />)
     expect(document.title).toBe('Default /movies | Trek')
+  })
+
+  it('writes the JSON-LD of the defaults into the body, and takes out a server tag in its slot', () => {
+    document.head.insertAdjacentHTML(
+      'beforeend',
+      '<link rel="canonical" href="https://example.com/app/old">',
+    )
+    const { container } = renderHead(
+      <RouteHead
+        site={site}
+        defaults={(pathname) => ({
+          title: 'Movies',
+          url: pathname,
+          jsonLd: [webSite({ name: 'Trek', url: 'https://example.com/app' })],
+        })}
+      />,
+    )
+    expect(canonical()).toBe('https://example.com/app/movies')
+    const selector = 'script[type="application/ld+json"]'
+    expect(document.head.querySelectorAll(selector)).toHaveLength(0)
+    expect(container.querySelectorAll(selector)).toHaveLength(1)
   })
 })
