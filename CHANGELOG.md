@@ -9,11 +9,12 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.28 — 2026-10-21
 
-**No export and no prop is removed.** One change can move a screen: a nested
-`ThemeProvider` with a `{ light, dark }` pair now follows the mode of its
-parent and uses the icon resolver of its parent. A new subpath,
+**No breaking change.** No export and no prop is removed. One change can move
+a screen: a nested `ThemeProvider` with a `{ light, dark }` pair now follows
+the mode of its parent and uses the icon resolver of its parent. The entry
+ends with what to check. Three more changes. A new subpath,
 `@rootnative/core/static-export`, hides the light first paint of a static web
 export from a reader with a dark scheme. `@rootnative/seo` adds `toMetadata`
 for the `generateMetadata` export that Expo SDK 58 reads, and the Expo Router
