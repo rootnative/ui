@@ -1,2 +1,9 @@
 export { Chip } from './Chip'
-export type { ChipProps, ChipVariant } from './types'
+export type {
+  AssistChipProps,
+  ChipProps,
+  ChipVariant,
+  FilterChipProps,
+  InputChipProps,
+  SuggestionChipProps,
+} from './types'

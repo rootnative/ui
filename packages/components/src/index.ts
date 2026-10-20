@@ -15,7 +15,12 @@ export type {
 } from './layout'
 
 export { Button } from './button'
-export type { ButtonProps, ButtonVariant } from './button'
+export type {
+  ButtonProps,
+  ButtonShape,
+  ButtonSize,
+  ButtonVariant,
+} from './button'
 
 export { ButtonGroup } from './button-group'
 export type {
@@ -29,8 +34,10 @@ export type {
 export { IconButton } from './icon-button'
 export type {
   IconButtonProps,
+  IconButtonShape,
   IconButtonSize,
   IconButtonVariant,
+  IconButtonWidth,
 } from './icon-button'
 
 export { Icon } from './icon'
@@ -56,7 +63,14 @@ export type {
 } from './card'
 
 export { Chip } from './chip'
-export type { ChipProps, ChipVariant } from './chip'
+export type {
+  AssistChipProps,
+  ChipProps,
+  ChipVariant,
+  FilterChipProps,
+  InputChipProps,
+  SuggestionChipProps,
+} from './chip'
 
 export { Checkbox } from './checkbox'
 export type { CheckboxProps } from './checkbox'

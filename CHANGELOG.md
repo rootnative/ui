@@ -17,7 +17,8 @@ parent and uses the icon resolver of its parent. A new subpath,
 `@rootnative/core/static-export`, hides the light first paint of a static web
 export from a reader with a dark scheme. `@rootnative/seo` adds `toMetadata`
 for the `generateMetadata` export that Expo SDK 58 reads, and the Expo Router
-`PageHead` now writes its JSON-LD into the page body.
+`PageHead` now writes its JSON-LD into the page body. Three `components`
+entry points export the types they used to hide.
 
 ### A nested `ThemeProvider` takes the icon resolver and the mode of its parent
 
@@ -131,6 +132,22 @@ Router reads `generateMetadata` from the route file only, so a route that
 `headNodes` and `bodyNodes` from `useServerDocumentContext()` in
 `expo-router/html`. Without them the page has no head tags, no CSS and no
 JavaScript. Step 3 and step 7 of the SEO checklist have the code.
+
+### Three `components` entry points export their hidden types
+
+`@rootnative/components/button` exported `ButtonProps` and `ButtonVariant`,
+but not `ButtonSize` and `ButtonShape`. An app that wraps `Button` had to
+copy the two unions or index into `ButtonProps`. A scan of every entry point
+found the same gap in two more:
+
+- `@rootnative/components/button`: `ButtonSize`, `ButtonShape`.
+- `@rootnative/components/icon-button`: `IconButtonWidth`, `IconButtonShape`.
+- `@rootnative/components/chip`: `AssistChipProps`, `FilterChipProps`,
+  `InputChipProps`, `SuggestionChipProps`, the four members of the
+  `ChipProps` union.
+
+The package root exports the same eight names. `api-surface.json` records
+them. No runtime code changes.
 
 ## 0.0.0-alpha.27 — 2026-10-17
 
