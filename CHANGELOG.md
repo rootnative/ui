@@ -11,8 +11,26 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix in `core` and `components`, and two new
-exports in `core`.
+**No breaking change.** One fix in `core` and `components`, two new
+exports in `core`, and one new prop on `Tabs`.
+
+### `Tabs` follows a pager position
+
+Above a swipe pager, the indicator stayed on the old tab during the swipe
+and sprang to the new one only when the pager selected the page. The new
+`position` prop takes the page position as a Reanimated shared value: the
+page index plus the fraction of the swipe toward the next page, written on
+the UI thread. The indicator then moves with the finger between the rects of
+the two tabs on each side of the position, in `items` order, in a worklet.
+The rects are measured, so they are correct in either layout direction. A
+position past the last tab clamps to it, and a neighbour that is not
+measured yet falls back to the active tab for that frame. Reduced motion
+does not gate it: that is the swipe, not an animation. Without `position`,
+nothing changes. Keep `value` in sync from the pager's page-selected event:
+it still drives the active tab colors, and it scrolls a scrollable row to
+the selected tab when the swipe ends; the row does not scroll with the
+finger. The Tabs page shows the `react-native-pager-view` wiring with the
+Reanimated `onPageScroll` handler. Four tests.
 
 ### An overlay carries the theme of the place it is written
 

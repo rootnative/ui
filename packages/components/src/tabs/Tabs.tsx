@@ -1,5 +1,10 @@
 import { useTheme } from '@rootnative/core'
-import { useAnimation, useShouldReduceMotion } from '@rootnative/inertia'
+import {
+  useAnimation,
+  useMotionValue,
+  useShouldReduceMotion,
+} from '@rootnative/inertia'
+import type { SharedValue } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
@@ -18,11 +23,40 @@ import type { TabsProps } from './types'
 
 const EMPTY_MEASUREMENT: TabMeasurement = { x: 0, width: 0, contentWidth: 0 }
 
+/** The indicator box of one tab, or `null` until the tab is measured. */
+interface IndicatorRect {
+  x: number
+  width: number
+}
+
+function isMeasured(
+  measurement: TabMeasurement | undefined,
+  variant: 'primary' | 'secondary',
+): measurement is TabMeasurement {
+  return (
+    measurement !== undefined &&
+    measurement.width > 0 &&
+    (variant === 'secondary' || measurement.contentWidth > 0)
+  )
+}
+
+function indicatorRectOf(
+  measurement: TabMeasurement,
+  variant: 'primary' | 'secondary',
+): IndicatorRect {
+  if (variant === 'secondary') {
+    return { x: measurement.x, width: measurement.width }
+  }
+  const width = Math.max(measurement.contentWidth, PRIMARY_INDICATOR_MIN_WIDTH)
+  return { x: measurement.x + (measurement.width - width) / 2, width }
+}
+
 export function Tabs({
   items,
   value,
   defaultValue,
   onValueChange,
+  position,
   variant = 'primary',
   scrollable = false,
   edgePadding = SCROLLABLE_EDGE_PADDING,
@@ -96,21 +130,28 @@ export function Tabs({
   )
 
   const active = selected === undefined ? undefined : measurements[selected]
-  const measured =
-    active !== undefined &&
-    active.width > 0 &&
-    (variant === 'secondary' || active.contentWidth > 0)
+  const measured = isMeasured(active, variant)
+  const activeRect = measured ? indicatorRectOf(active, variant) : null
+  const indicatorWidth = activeRect?.width ?? 0
+  const indicatorX = activeRect?.x ?? 0
 
-  const indicatorWidth = !measured
-    ? 0
-    : variant === 'primary'
-      ? Math.max(active.contentWidth, PRIMARY_INDICATOR_MIN_WIDTH)
-      : active.width
-  const indicatorX = !measured
-    ? 0
-    : variant === 'primary'
-      ? active.x + (active.width - indicatorWidth) / 2
-      : active.x
+  // One rect per item, in `items` order, for the pager position to
+  // interpolate between on the UI thread. `measurements` only changes on a
+  // real geometry change, so the memo rebuilds the list only then.
+  const rects = useMemo(
+    () =>
+      items.map((item) => {
+        const measurement = measurements[item.value]
+        return isMeasured(measurement, variant)
+          ? indicatorRectOf(measurement, variant)
+          : null
+      }),
+    [items, measurements, variant],
+  )
+  const rectsValue = useMotionValue<Array<IndicatorRect | null>>(rects)
+  useEffect(() => {
+    rectsValue.value = rects
+  }, [rects, rectsValue])
 
   const row = (
     <View style={[styles.row, scrollable && styles.scrollRow]}>
@@ -151,6 +192,8 @@ export function Tabs({
         <TabIndicator
           x={indicatorX}
           width={indicatorWidth}
+          position={position}
+          rects={rectsValue}
           style={styles.indicator}
           testID={testID === undefined ? undefined : `${testID}-indicator`}
         />
@@ -184,6 +227,8 @@ export function Tabs({
 interface TabIndicatorProps {
   x: number
   width: number
+  position?: SharedValue<number>
+  rects: SharedValue<Array<IndicatorRect | null>>
   style: StyleProp<ViewStyle>
   testID?: string
 }
@@ -193,15 +238,49 @@ interface TabIndicatorProps {
  * stays a hand-rolled worklet instead of `useInterpolatedStyle`. Both ride
  * `spring-default-spatial` and collapse to a snap under reduced motion, which
  * `useAnimation` gates for us.
+ *
+ * With a pager `position`, the worklet reads the page position instead and
+ * interpolates between the rects of the two tabs on each side of it. That is
+ * the finger, not an animation, so reduced motion does not gate it. The
+ * rects are measured, so they are physical positions in either layout
+ * direction, and no mirroring is needed. A neighbour that is not measured
+ * yet falls back to the springs for that frame.
  */
-function TabIndicator({ x, width, style, testID }: TabIndicatorProps) {
+function TabIndicator({
+  x,
+  width,
+  position,
+  rects,
+  style,
+  testID,
+}: TabIndicatorProps) {
   const animatedX = useAnimation(x, 'spring-default-spatial')
   const animatedWidth = useAnimation(width, 'spring-default-spatial')
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    width: animatedWidth.value,
-    transform: [{ translateX: animatedX.value }],
-  }))
+  const animatedStyle = useAnimatedStyle(() => {
+    if (position !== undefined) {
+      const list = rects.value
+      const last = list.length - 1
+      if (last >= 0) {
+        const page = Math.min(Math.max(position.value, 0), last)
+        const from = Math.floor(page)
+        const to = Math.min(from + 1, last)
+        const a = list[from]
+        const b = list[to]
+        if (a !== null && a !== undefined && b !== null && b !== undefined) {
+          const t = page - from
+          return {
+            width: a.width + (b.width - a.width) * t,
+            transform: [{ translateX: a.x + (b.x - a.x) * t }],
+          }
+        }
+      }
+    }
+    return {
+      width: animatedWidth.value,
+      transform: [{ translateX: animatedX.value }],
+    }
+  })
 
   return (
     <Animated.View

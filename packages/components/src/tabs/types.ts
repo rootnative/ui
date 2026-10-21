@@ -1,3 +1,4 @@
+import type { SharedValue } from '@rootnative/inertia'
 import type { IconSource } from '@rootnative/utils'
 import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
 
@@ -40,6 +41,18 @@ export interface TabsProps extends Omit<ViewProps, 'children'> {
   defaultValue?: string
   /** Called with the value of the tab that was pressed. */
   onValueChange?: (value: string) => void
+  /**
+   * The page position of a pager under the row, as the index of the page
+   * plus the fraction of the swipe toward the next one, on the UI thread.
+   * When set, the indicator moves with the finger between the tabs on each
+   * side of the position, in `items` order, instead of springing to the
+   * active tab when `value` changes. Keep `value` in sync from the pager's
+   * page-selected event: it still drives the active tab colors, and it
+   * scrolls a scrollable row to the selected tab. Pass a Reanimated shared
+   * value written from the pager's UI-thread scroll handler; a value written
+   * from the JS thread lags behind the finger under load.
+   */
+  position?: SharedValue<number>
   /**
    * Tab anatomy.
    * @default 'primary'

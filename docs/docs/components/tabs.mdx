@@ -173,6 +173,73 @@ function LibraryTabs() {
 The same shape works for react-navigation (`useNavigationState` + `navigation.navigate`) or for
 nothing at all — a `useState` and a conditional render.
 
+### Following a pager
+
+Above a swipe pager, pass the page position as `position` and the indicator moves with the finger
+between the two tabs on each side of it, in `items` order. The value is the page index plus the
+fraction of the swipe toward the next page, on the UI thread. With `react-native-pager-view`, write
+it from the Reanimated `onPageScroll` handler, so the indicator does not lag behind the finger when
+the JS thread is busy:
+
+```tsx
+import { Tabs } from '@rootnative/components'
+import { useMotionValue } from '@rootnative/inertia'
+import { Animated } from '@rootnative/inertia/reanimated'
+import { useRef, useState } from 'react'
+import PagerView from 'react-native-pager-view'
+import { useEvent, useHandler } from 'react-native-reanimated'
+
+const AnimatedPager = Animated.createAnimatedComponent(PagerView)
+
+function usePagerScrollHandler(position: SharedValue<number>) {
+  const { context, doDependenciesDiffer } = useHandler({}, [])
+  return useEvent<{ position: number; offset: number }>(
+    (event) => {
+      'worklet'
+      position.value = event.position + event.offset
+    },
+    ['onPageScroll'],
+    doDependenciesDiffer,
+  )
+}
+
+function CategoryPager() {
+  const pager = useRef<PagerView>(null)
+  const [value, setValue] = useState(CATEGORIES[0].value)
+  const position = useMotionValue(0)
+  const onPageScroll = usePagerScrollHandler(position)
+
+  return (
+    <>
+      <Tabs
+        items={CATEGORIES}
+        scrollable
+        value={value}
+        position={position}
+        onValueChange={(next) => {
+          pager.current?.setPage(CATEGORIES.findIndex((c) => c.value === next))
+        }}
+      />
+      <AnimatedPager
+        ref={pager}
+        style={{ flex: 1 }}
+        onPageScroll={onPageScroll}
+        onPageSelected={(e) => setValue(CATEGORIES[e.nativeEvent.position].value)}
+      >
+        {CATEGORIES.map((c) => (
+          <CategoryPage key={c.value} category={c.value} />
+        ))}
+      </AnimatedPager>
+    </>
+  )
+}
+```
+
+Keep `value` in sync from `onPageSelected`: it still drives the active tab colors, and it scrolls a
+scrollable row to the selected tab when the swipe ends. The row does not scroll with the finger.
+`position` takes a Reanimated shared value only; a React Native `Animated` node, such as the
+`position` of `react-native-tab-view`, is not accepted.
+
 ## The indicator
 
 The indicator is placed from measured geometry, not from a flex rule, because a **primary**
@@ -183,6 +250,8 @@ label still gets something to see). A **secondary** indicator spans the whole ta
 It stays unmounted until the active tab reports a layout, so it appears in place instead of sliding
 in from the row's leading edge on first render. After that, both its offset and its width ride
 `springDefaultSpatial` and collapse to a snap under reduced motion — see [Motion](../motion.md).
+With a pager [`position`](#following-a-pager), the indicator follows the finger instead, and
+reduced motion does not gate it: that is the swipe, not an animation.
 
 On a scrollable row, selecting a tab that is partly off screen scrolls it into view, centred where
 there is room to centre it.

@@ -1,4 +1,5 @@
 import { lightTheme } from '@rootnative/core'
+import type { SharedValue } from '@rootnative/inertia'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { ScrollView, StyleSheet } from 'react-native'
@@ -348,5 +349,72 @@ describe('Tabs — overrides', () => {
     expect(
       StyleSheet.flatten(screen.getByText('Flights').props.style).fontWeight,
     ).toBe('700')
+  })
+})
+
+describe('Tabs — position', () => {
+  // The Jest mock evaluates worklets once per render, so a plain `{ value }`
+  // stub stands in for the pager's shared value.
+  function positionAt(value: number): SharedValue<number> {
+    return { value } as SharedValue<number>
+  }
+
+  function indicatorStyle() {
+    return StyleSheet.flatten(screen.getByTestId('tabs-indicator').props.style)
+  }
+
+  it('places the indicator between the two tabs on each side of the position', () => {
+    const { flush } = renderSettled(
+      <Tabs items={ITEMS} testID="tabs" position={positionAt(0.5)} />,
+    )
+    layOutRow()
+    flush()
+
+    // Flights: 0 + (120 - 60) / 2 = 30 wide 60. Trips: 120 + (120 - 40) / 2
+    // = 160 wide 40. Halfway: 95 wide 50.
+    const style = indicatorStyle()
+    expect(style.width).toBe(50)
+    expect(style.transform).toEqual([{ translateX: 95 }])
+  })
+
+  it('spans whole tabs on a secondary row', () => {
+    const { flush } = renderSettled(
+      <Tabs
+        items={ITEMS}
+        variant="secondary"
+        testID="tabs"
+        position={positionAt(1.5)}
+      />,
+    )
+    layOutRow()
+    flush()
+
+    const style = indicatorStyle()
+    expect(style.width).toBe(120)
+    expect(style.transform).toEqual([{ translateX: 180 }])
+  })
+
+  it('clamps a position past the last tab', () => {
+    const { flush } = renderSettled(
+      <Tabs items={ITEMS} testID="tabs" position={positionAt(5)} />,
+    )
+    layOutRow()
+    flush()
+
+    const style = indicatorStyle()
+    expect(style.width).toBe(70)
+    expect(style.transform).toEqual([{ translateX: 265 }])
+  })
+
+  it('falls back to the active tab while a neighbour is not measured', () => {
+    const { flush } = renderSettled(
+      <Tabs items={ITEMS} testID="tabs" position={positionAt(0.5)} />,
+    )
+    layOutTab('Flights', 0, 120, 60)
+    flush()
+
+    const style = indicatorStyle()
+    expect(style.width).toBe(60)
+    expect(style.transform).toEqual([{ translateX: 30 }])
   })
 })

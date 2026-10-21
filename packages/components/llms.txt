@@ -1486,6 +1486,7 @@ Props:
 - `value?: string` — Value of the active tab (controlled).
 - `defaultValue?: string` — Value of the initially active tab (uncontrolled). Defaults to the first item — a tab row with nothing active reads as broken.
 - `onValueChange?: (value: string) => void` — Called with the value of the tab that was pressed.
+- `position?: SharedValue<number>` — The page position of a pager under the row, as the index of the page plus the fraction of the swipe toward the next one, on the UI thread. When set, the indicator moves with the finger between the tabs on each side of the position, in `items` order, instead of springing to the active tab when `value` changes. Keep `value` in sync from the pager's page-selected event: it still drives the active tab colors, and it scrolls a scrollable row to the selected tab. Pass a Reanimated shared value written from the pager's UI-thread scroll handler; a value written from the JS thread lags behind the finger under load.
 - `variant?: 'primary' | 'secondary'` — Default: `'primary'`. Tab anatomy.
 - `scrollable?: boolean` — Default: `false`. Lay the tabs out at their natural width and scroll horizontally, instead of dividing the row equally between them. Reach for it past four tabs, or when the labels are long enough to truncate.
 - `edgePadding?: number` — Default: `52`. Padding before the first and after the last tab, in dp. Scrollable rows only — a fixed row divides the full width between its tabs.
