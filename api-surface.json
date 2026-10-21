@@ -33,6 +33,9 @@
         "ThemePair",
         "ThemeProvider",
         "ThemeProviderProps",
+        "ThemeScope",
+        "ThemeScopeProvider",
+        "ThemeScopeProviderProps",
         "TopAppBarTokens",
         "Typography",
         "TypographyToken",
@@ -49,6 +52,7 @@
         "useIconResolver",
         "useTheme",
         "useThemeMode",
+        "useThemeScope",
         "useWindowDimensions"
       ],
       "./create-theme": [

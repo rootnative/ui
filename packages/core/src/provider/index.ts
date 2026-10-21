@@ -4,6 +4,8 @@ export type { ThemePair, ThemeProviderProps } from './ThemeProvider'
 export { useTheme } from './useTheme'
 export { useThemeMode } from './useThemeMode'
 export { useIconResolver } from './useIconResolver'
+export { ThemeScopeProvider, useThemeScope } from './ThemeScope'
+export type { ThemeScope, ThemeScopeProviderProps } from './ThemeScope'
 // As with `IconResolverContext`, `ThemeModeContext` stays internal — the
 // provider writes it and `useThemeMode()` reads it.
 export type {

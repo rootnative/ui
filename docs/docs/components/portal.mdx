@@ -86,6 +86,10 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
 
 The `Portal` component itself renders nothing inline — its children appear inside the host's overlay layer instead. Mount and unmount as you would any normal React component.
 
+## Theme
+
+The content keeps the theme of the place where you write the `Portal`, not the theme at the host. `Portal` reads the theme, the mode, the icon resolver and the named transitions at its call site with `useThemeScope()` from `@rootnative/core`, and provides them again at the host with `ThemeScopeProvider`. So a `Portal` under a nested `ThemeProvider` renders its content with the nested theme, and the library overlays do the same. See [Nested providers](../theming#nested-providers).
+
 ## How it works
 
 `PortalHost` wraps its children in a root `View` and adds an absolutely-positioned overlay layer on top. Each `<Portal>` registers its children with the host via context; the host renders them into that layer, sorted by `priority`.

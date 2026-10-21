@@ -134,7 +134,23 @@ What a nested provider takes from its parent:
 
 A nested provider with a single theme has no mode, so `useThemeMode()` throws below it.
 
-**An overlay does not carry the whole nested theme.** `Dialog`, `Menu`, `Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the snackbar render through a `Portal` at the `PortalHost`, which is usually above the nested provider. The overlay surface reads the theme where you write the overlay, so it takes the nested colors. The components in the overlay content read the theme at the `PortalHost`, so a `Button` in a `Dialog` takes the root colors. To give the content the nested theme, wrap it in a nested provider with the same theme (for `Dialog`, inside the slot: `<Dialog.Content><ThemeProvider theme={themes}>…</ThemeProvider></Dialog.Content>`), or, for `Menu`, `Tooltip`, `BottomSheet` and the modal `NavigationDrawer`, put a named `PortalHost` inside the nested provider and pass its name as `hostName`.
+**An overlay carries the nested theme.** `Dialog`, `Menu`, `Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the snackbar render through a `Portal` at the `PortalHost`, which is usually above the nested provider. `Portal` reads the theme, the mode, the icon resolver and the named transitions where you write the overlay, and provides them again at the host, so the overlay surface and every component in its content take the nested theme.
+
+### useThemeScope() and ThemeScopeProvider
+
+The pair that `Portal` uses, for content you render at another place yourself, for example through `createPortal` or a third-party modal. `useThemeScope()` reads the theme, the mode, the icon resolver and the motion config of the call site as one `ThemeScope` value. `<ThemeScopeProvider scope={scope}>` provides that value to its children, as if the providers of the call site stood there. A `ThemeProvider` below it inherits from it the same way it inherits from a real parent. Treat `ThemeScope` as opaque.
+
+```tsx
+import { ThemeScopeProvider, useThemeScope } from '@rootnative/core'
+
+function MyPortal({ children }) {
+  const scope = useThemeScope()
+  return createPortal(
+    <ThemeScopeProvider scope={scope}>{children}</ThemeScopeProvider>,
+    host,
+  )
+}
+```
 
 ### useTheme()
 

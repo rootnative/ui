@@ -1,3 +1,11 @@
+import {
+  darkTheme,
+  lightTheme,
+  ThemeProvider,
+  useIconResolver,
+  useTheme,
+} from '@rootnative/core'
+import type { IconResolver } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, within } from '@testing-library/react-native'
 import { Text, View } from 'react-native'
@@ -288,5 +296,69 @@ describe('Portal hosts', () => {
       expect.stringContaining('has no enclosing'),
     )
     errorSpy.mockRestore()
+  })
+})
+
+describe('Portal theme scope', () => {
+  const nestedResolver: IconResolver = (name) => <Text>nested:{name}</Text>
+
+  function Probe({ id }: { id: string }) {
+    const theme = useTheme()
+    const resolver = useIconResolver()
+    return (
+      <>
+        <Text testID={`${id}-primary`}>{theme.colors.primary}</Text>
+        {resolver ? resolver('star', { size: 16 }) : null}
+      </>
+    )
+  }
+
+  it('renders the content with the providers of the call site', async () => {
+    renderWithTheme(
+      <PortalHost>
+        <Probe id="root" />
+        <ThemeProvider theme={darkTheme} iconResolver={nestedResolver}>
+          <Portal>
+            <Probe id="portal" />
+          </Portal>
+        </ThemeProvider>
+      </PortalHost>,
+    )
+
+    expect(await screen.findByTestId('portal-primary')).toBeTruthy()
+    expect(screen.getByTestId('portal-primary').props.children).toBe(
+      darkTheme.colors.primary,
+    )
+    expect(screen.getByTestId('root-primary').props.children).not.toBe(
+      darkTheme.colors.primary,
+    )
+    expect(screen.getByText('nested:star')).toBeTruthy()
+  })
+
+  it('follows a theme change at the call site', async () => {
+    const { rerender } = renderWithTheme(
+      <PortalHost>
+        <ThemeProvider theme={lightTheme}>
+          <Portal>
+            <Probe id="portal" />
+          </Portal>
+        </ThemeProvider>
+      </PortalHost>,
+    )
+    expect(await screen.findByTestId('portal-primary')).toBeTruthy()
+
+    rerender(
+      <PortalHost>
+        <ThemeProvider theme={darkTheme}>
+          <Portal>
+            <Probe id="portal" />
+          </Portal>
+        </ThemeProvider>
+      </PortalHost>,
+    )
+
+    expect((await screen.findByTestId('portal-primary')).props.children).toBe(
+      darkTheme.colors.primary,
+    )
   })
 })

@@ -1,3 +1,4 @@
+import { ThemeScopeProvider, useThemeScope } from '@rootnative/core'
 import { useContext, useEffect, useId } from 'react'
 import { warnOnce } from '../internal/warnOnce'
 import { PortalContext } from './context'
@@ -11,10 +12,18 @@ export function Portal({
 }: PortalProps) {
   const store = useContext(PortalContext)
   const id = useId()
+  // The host is usually above a nested `ThemeProvider`, so the content would
+  // read the root theme there. Carry the providers of the call site with it.
+  const scope = useThemeScope()
   useEffect(() => {
     if (!store) return
-    store.set(id, children, hostName, priority)
-  }, [store, id, children, hostName, priority])
+    store.set(
+      id,
+      <ThemeScopeProvider scope={scope}>{children}</ThemeScopeProvider>,
+      hostName,
+      priority,
+    )
+  }, [store, id, children, hostName, priority, scope])
 
   useEffect(() => {
     if (!store) return

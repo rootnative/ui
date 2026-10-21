@@ -9,6 +9,38 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No breaking change.** One fix in `core` and `components`, and two new
+exports in `core`.
+
+### An overlay carries the theme of the place it is written
+
+An overlay under a nested `ThemeProvider` mixed two themes. `Dialog`, `Menu`,
+`Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the
+snackbar read the theme where the app writes them, so the overlay surface took
+the nested colors. Their `Portal` rendered the content at the `PortalHost`,
+which is usually above the nested provider, so a `Button` in a `Dialog` took
+the root colors, and a `useThemeMode()` call in the content set the mode of
+the root. The alpha.28 theming page documented two app-side fixes.
+
+Now `Portal` reads the theme, the mode, the icon resolver and the motion
+config at its call site, and provides them again around its content at the
+host. Every overlay in the library follows the provider it is written under,
+with no change in the app. A `ThemeProvider` inside the content inherits from
+the carried values the same way it inherits from a real parent. Two Portal
+tests; the first fails on the old `Portal`.
+
+The pair is public in `@rootnative/core`, for content an app renders at
+another place itself (`createPortal`, a third-party modal):
+`useThemeScope()` returns a `ThemeScope`, and `<ThemeScopeProvider scope>`
+provides it. Four `core` tests. The theming page and the Portal page describe
+it; the two app-side workarounds are gone from the theming page.
+
+**Check your app.** If you wrapped overlay content in a second nested
+provider, or gave `Menu`, `Tooltip`, `BottomSheet` or the drawer a named
+`PortalHost` only to carry the nested theme, you can remove that.
+
 ## 0.0.0-alpha.28 — 2026-10-21
 
 **No breaking change.** No export and no prop is removed. One change can move

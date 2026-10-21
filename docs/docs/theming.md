@@ -396,31 +396,34 @@ To give the nested part a mode of its own, pass `mode`, `defaultMode` or
 A nested provider with a single theme has no mode, so `useThemeMode()` throws
 below it, as it does below a root provider with a single theme.
 
-**An overlay does not carry the whole nested theme.** `Dialog`, `Menu`,
-`Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the
-snackbar render through a `Portal` at the `PortalHost`, which is usually above
-the nested provider. The overlay reads the theme where you write it, so its
-surface takes the nested colors. The components in the overlay content read
-the theme at the `PortalHost`, so a `Button` in a `Dialog` takes the colors of
-the root provider. Two ways give the content the nested theme:
+**An overlay carries the nested theme.** `Dialog`, `Menu`, `Tooltip`,
+`BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the snackbar
+render through a `Portal` at the `PortalHost`, which is usually above the
+nested provider. `Portal` reads the theme, the mode, the icon resolver and the
+named transitions where you write the overlay, and provides them again at the
+host. So the overlay surface and every component in its content take the
+nested theme, and a `useThemeMode()` call in a `Dialog` sets the mode of the
+provider the `Dialog` is written under.
 
-- Wrap the content in a nested provider with the same theme. For a `Dialog`,
-  put the provider inside the slot, so that the `Dialog` still finds its
-  slots:
+The same pair is public, for content you render at another place yourself,
+for example through `createPortal` or a third-party modal:
 
-  ```tsx
-  <Dialog visible={visible} onDismiss={close}>
-    <Dialog.Content>
-      <ThemeProvider theme={themes}>
-        <Button onPress={close}>Close</Button>
-      </ThemeProvider>
-    </Dialog.Content>
-  </Dialog>
-  ```
+```tsx
+import { ThemeScopeProvider, useThemeScope } from '@rootnative/core'
 
-- For `Menu`, `Tooltip`, `BottomSheet` and the modal `NavigationDrawer`, put a
-  named `PortalHost` inside the nested provider, and pass its name as
-  `hostName`.
+function MyPortal({ children }: { children: ReactNode }) {
+  const scope = useThemeScope()
+  return createPortal(
+    <ThemeScopeProvider scope={scope}>{children}</ThemeScopeProvider>,
+    host,
+  )
+}
+```
+
+`useThemeScope()` reads the providers at the call site as one value.
+`ThemeScopeProvider` provides that value to its children, as if the providers
+of the call site stood there. A `ThemeProvider` below it inherits from it the
+same way it inherits from a real parent.
 
 ### Override specific tokens
 

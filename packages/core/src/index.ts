@@ -31,9 +31,11 @@ export {
 export {
   THEME_MODE_STORAGE_KEY,
   ThemeProvider,
+  ThemeScopeProvider,
   useIconResolver,
   useTheme,
   useThemeMode,
+  useThemeScope,
 } from './provider'
 export type {
   ColorScheme,
@@ -45,6 +47,8 @@ export type {
   ThemeModeStorage,
   ThemePair,
   ThemeProviderProps,
+  ThemeScope,
+  ThemeScopeProviderProps,
 } from './provider'
 
 export {

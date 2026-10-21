@@ -226,6 +226,7 @@ const { width } = useWindowDimensions()
 - `ThemeProvider` — Theme context provider (works with any design system, defaults to MD3)
 - `useTheme` — Access current theme (generic)
 - `useIconResolver` — Access the configured icon resolver
+- `useThemeScope` / `ThemeScopeProvider` — Read the providers of one place as one value, and provide them again at another place, for content rendered through a portal
 - `defineTheme` — Type-safe theme creation helper
 - `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
 - `schemeGuardScript` / `schemeGuardCss` — Hide the light first paint of a static web export from a dark-scheme reader (import from `@rootnative/core/static-export`, with `SCHEME_ATTRIBUTE` and `THEME_READY_ATTRIBUTE`)
@@ -237,7 +238,7 @@ const { width } = useWindowDimensions()
 - `lightTheme` / `darkTheme` — Built-in MD3 themes
 - `defaultTopAppBarTokens` — MD3 top app bar defaults
 - `motionTransitions` — The named-transition registry mounted by `ThemeProvider`
-- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `TypographyToken`, `FontWeight`, `Shape`, `Spacing`, `Elevation`, `ElevationLevel`, `ShadowOffset`, `StateLayer`, `Motion`, `MotionSpring`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `IconSource`, `ThemeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
+- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `TypographyToken`, `FontWeight`, `Shape`, `Spacing`, `Elevation`, `ElevationLevel`, `ShadowOffset`, `StateLayer`, `Motion`, `MotionSpring`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `IconSource`, `ThemeProviderProps`, `ThemeScope`, `ThemeScopeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
 
 ## Docs
 
