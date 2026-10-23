@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
 import { auditExport, type AuditRule } from './audit'
 import { browseExport } from './browse'
@@ -6,16 +7,20 @@ import {
   type SkipReason,
   type WriteSeoFilesOptions,
 } from './export'
+import { renderServerExport, type RenderSkip, type RouteParams } from './render'
 
 const USAGE = `Usage: rootnative-seo <outDir> [options]
+       rootnative-seo render <outDir> [options]
        rootnative-seo audit <outDir> [options]
        rootnative-seo browse <outDir> [options]
 
 Writes sitemap.xml and robots.txt into <outDir> from the exported HTML files.
 A page goes in the sitemap when it has a canonical link under the site URL and
 no noindex. For a server export (web.output: 'server'), pass the same
-<outDir>: the pages are read from <outDir>/server, and the files go to
-<outDir>/client. audit and browse read the same layout.
+<outDir>: the files go to <outDir>/client. On Expo SDK 58 run render first;
+the pages are then read from <outDir>/rendered. An export from SDK 57 or
+earlier keeps its pages in <outDir>/server. audit and browse read the same
+layout.
 
 Options:
   --site-url <url>  The site URL. The default is the canonical link of index.html.
@@ -23,6 +28,18 @@ Options:
                     The default is <site-url>/sitemap.xml.
   --no-robots       Do not write robots.txt.
   -h, --help        Show this help.
+
+render starts expo serve on a server export, requests each route of
+server/_expo/routes.json, and writes the HTML to <outDir>/rendered. Expo SDK
+58 renders each page at request time and writes no page file, so run render
+before the other commands. A dynamic route gets a page for each entry of
+--params only.
+
+Render options:
+  --params <file>   A JSON file with the params of each dynamic route, by its
+                    page in routes.json: {"/movies/[id]": [{"id": "42"}]}.
+  --origin <url>    A server that answers the routes already, with its base
+                    path. The default starts expo serve from this folder.
 
 audit reads every exported page and fails when a page has no title, no
 canonical link and no noindex, not exactly one <h1> or <main>, no lang on
@@ -66,6 +83,11 @@ const REASONS: Record<SkipReason, string> = {
   duplicate: 'the same canonical link as another page',
 }
 
+const RENDER_SKIPS: Record<RenderSkip['reason'], string> = {
+  'no-params': 'a dynamic route with no entry in --params',
+  'not-404': 'the not-found request matched another route',
+}
+
 type Output = { log: (line: string) => void; error: (line: string) => void }
 
 /** Runs the command with `argv` (no `node` and no script path) and returns the exit code. */
@@ -86,7 +108,9 @@ export async function main(
     return 0
   }
   const command =
-    positionals[0] === 'audit' || positionals[0] === 'browse'
+    positionals[0] === 'audit' ||
+    positionals[0] === 'browse' ||
+    positionals[0] === 'render'
       ? positionals[0]
       : 'write'
   const outDir = command === 'write' ? positionals[0] : positionals[1]
@@ -94,7 +118,12 @@ export async function main(
     output.error(USAGE)
     return 1
   }
+  if (command !== 'render' && (values.params || values.origin)) {
+    output.error(`--params and --origin apply to render only.\n\n${USAGE}`)
+    return 1
+  }
 
+  if (command === 'render') return runRender(outDir, values, output)
   if (command === 'audit') return runAudit(outDir, values, output)
   if (command === 'browse') return runBrowse(outDir, values, output)
   if (values.ignore?.length) {
@@ -128,6 +157,60 @@ export async function main(
       )
       for (const { file, reason } of result.skipped) {
         output.log(`  ${file}: ${REASONS[reason]}`)
+      }
+    }
+    return 0
+  } catch (error) {
+    output.error(`[rootnative-seo] ${(error as Error).message}`)
+    return 1
+  }
+}
+
+/** The `--params` file: each route mapped to a list of params. */
+async function readParams(
+  file: string,
+): Promise<Record<string, RouteParams[]>> {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(await readFile(file, 'utf8'))
+  } catch (error) {
+    throw new Error(
+      `--params: "${file}" is not a JSON file. ${(error as Error).message}`,
+    )
+  }
+  if (
+    typeof parsed !== 'object' ||
+    parsed === null ||
+    Array.isArray(parsed) ||
+    !Object.values(parsed).every(Array.isArray)
+  ) {
+    throw new Error(
+      `--params: "${file}" must map each route to a list of params, for example {"/movies/[id]": [{"id": "42"}]}.`,
+    )
+  }
+  return parsed as Record<string, RouteParams[]>
+}
+
+async function runRender(
+  outDir: string,
+  values: ReturnType<typeof parse>['values'],
+  output: Output,
+): Promise<number> {
+  try {
+    const result = await renderServerExport({
+      outDir,
+      origin: values.origin,
+      params: values.params ? await readParams(values.params) : undefined,
+    })
+    output.log(
+      `[rootnative-seo] render: ${pages(result.pages.length)} → ${result.pagesDir}`,
+    )
+    if (result.skipped.length) {
+      output.log(
+        `[rootnative-seo] ${result.skipped.length} ${result.skipped.length === 1 ? 'route gets' : 'routes get'} no page:`,
+      )
+      for (const { page, reason } of result.skipped) {
+        output.log(`  ${page}: ${RENDER_SKIPS[reason]}`)
       }
     }
     return 0
@@ -227,6 +310,8 @@ function parse(argv: string[]) {
       chrome: { type: 'string' },
       'base-path': { type: 'string' },
       settle: { type: 'string' },
+      params: { type: 'string' },
+      origin: { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   })

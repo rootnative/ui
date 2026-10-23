@@ -12,7 +12,8 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One fix in `core` and `components`, two new
-exports in `core`, one new prop on `Tabs`, and one new function in `seo`.
+exports in `core`, one new prop on `Tabs`, and one new function and one new
+command in `seo`.
 
 ### `Tabs` follows a pager position
 
@@ -74,8 +75,13 @@ values of each dynamic route in `params`. The not-found route is written as
 `+not-found.html`. With `origin`, it requests a server that runs already,
 such as a preview deploy. An export from SDK 57 or earlier keeps its pages
 in `<outDir>/server`, and nothing changes for it. On a server export with no
-page, the "no .html file" error now names `renderServerExport`. Eight tests;
-one starts a stand-in `expo serve` and checks that it stops.
+page, the "no .html file" error now names `renderServerExport`.
+
+The new `rootnative-seo render <outDir>` command runs it, with
+`--params <file>` for a JSON file of params and `--origin <url>`. Run it
+before the other commands. The README and the server output section of the
+checklist give the SDK 58 steps. Twelve tests; one starts a stand-in
+`expo serve` and checks that it stops.
 
 ## 0.0.0-alpha.28 — 2026-10-21
 

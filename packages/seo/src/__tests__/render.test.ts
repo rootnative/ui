@@ -4,6 +4,7 @@ import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { readExport, renderServerExport, writeSeoFiles } from '../node'
+import { main } from '../node/cli'
 
 const SITE = 'https://example.com/app'
 const NOT_FOUND = '/rootnative-seo-not-found'
@@ -240,5 +241,82 @@ describe('renderServerExport', () => {
     await expect(
       renderServerExport({ outDir, projectRoot: project }),
     ).rejects.toThrow('no `expo` package in')
+  })
+})
+
+describe('rootnative-seo render', () => {
+  function capture() {
+    const lines: string[] = []
+    const errors: string[] = []
+    return {
+      lines,
+      errors,
+      output: {
+        log: (line: string) => lines.push(line),
+        error: (line: string) => errors.push(line),
+      },
+    }
+  }
+
+  it('renders with --origin and --params, and lists each route with no page', async () => {
+    await writeServerExport({
+      htmlRoutes: [
+        { page: '/index' },
+        { page: '/items/[id]' },
+        { page: '/tags/[tag]' },
+      ],
+      notFoundRoutes: [{ page: '/+not-found' }],
+    })
+    const params = join(outDir, 'params.json')
+    await writeFile(params, '{"/items/[id]": [{"id": "42"}]}', 'utf8')
+    const origin = await startServer(ssr)
+    const run = capture()
+    expect(
+      await main(
+        ['render', outDir, '--origin', origin, '--params', params],
+        run.output,
+      ),
+    ).toBe(0)
+    const text = run.lines.join('\n')
+    expect(text).toContain(`3 pages → ${join(outDir, 'rendered')}`)
+    expect(text).toContain('/tags/[tag]: a dynamic route with no entry')
+    expect(
+      await readFile(join(outDir, 'rendered', 'items', '42.html'), 'utf8'),
+    ).toContain(`${SITE}/items/42`)
+  })
+
+  it('fails on a params file that is not a map of lists', async () => {
+    await writeServerExport({ htmlRoutes: [{ page: '/index' }] })
+    const params = join(outDir, 'params.json')
+    for (const content of ['{"/items/[id]": {"id": "42"}}', 'not json']) {
+      await writeFile(params, content, 'utf8')
+      const run = capture()
+      expect(
+        await main(
+          [
+            'render',
+            outDir,
+            '--origin',
+            'http://127.0.0.1:9',
+            '--params',
+            params,
+          ],
+          run.output,
+        ),
+      ).toBe(1)
+      expect(run.errors.join('\n')).toContain('--params:')
+    }
+  })
+
+  it('fails with --params or --origin on another command', async () => {
+    const run = capture()
+    expect(await main([outDir, '--origin', 'http://x'], run.output)).toBe(1)
+    expect(run.errors.join('\n')).toContain('apply to render only')
+  })
+
+  it('lists render in the usage', async () => {
+    const help = capture()
+    expect(await main(['--help'], help.output)).toBe(0)
+    expect(help.lines.join('\n')).toContain('rootnative-seo render <outDir>')
   })
 })

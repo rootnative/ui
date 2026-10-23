@@ -75,15 +75,31 @@ the reset in the shell, as the example in step 7 does.
 
 ### Server output
 
-`web.output: 'server'` renders the same HTML at export time and adds a
-server for API routes. Every step in this checklist is the same. Three
-things change:
+`web.output: 'server'` adds a server for API routes. Up to Expo SDK 57 it
+renders the same HTML at export time. From SDK 58 the server renders each
+page at request time, and the export holds no page file. Every step in this
+checklist is the same. Four things change:
 
-- The export writes the pages to `dist/server` and the files the server
-  sends as they are to `dist/client`. Pass `dist` to `rootnative-seo`, as
-  for a static export: it reads the pages from `server/` and writes
+- The export writes the files the server sends as they are to
+  `dist/client`. On SDK 58, run `rootnative-seo render dist` first: it
+  starts `expo serve`, requests each route of
+  `dist/server/_expo/routes.json`, and writes the HTML to `dist/rendered`.
+  On SDK 57 the pages are in `dist/server` already. Then pass `dist` to
+  `rootnative-seo`, as for a static export: it reads the pages and writes
   `sitemap.xml` and `robots.txt` into `client/`. `audit` and `browse` read
   the same layout.
+- The server export does not run `generateStaticParams`, so `render` does
+  not know the entries of a dynamic route. Give them in a JSON file, by the
+  route as `routes.json` names it. A dynamic route with no entry gets no
+  page, and `render` names it.
+
+  ```bash
+  rootnative-seo render dist --params params.json
+  ```
+
+  ```json title="params.json"
+  { "/movies/[id]": [{ "id": "42" }, { "id": "43" }] }
+  ```
 - The server sends the status itself. An unknown path gets
   `+not-found.html` with a 404, on any host. A dynamic route is the other
   way: the server sends the route template with a 200 for every slug, also

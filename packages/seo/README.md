@@ -87,7 +87,7 @@ export function generateMetadata(_request: unknown, params: { id: string }) {
 
 A custom `app/+html.tsx` on SDK 58 must render `headNodes` and `bodyNodes` from `useServerDocumentContext()` in `expo-router/html`, or the page has no head tags and no JavaScript.
 
-Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time. `server` output works too: the commands below read its pages from `dist/server` and write the files into `dist/client`.
+Set `web.output` to `static` in `app.json`, and the head of each page is in its HTML file at export time. `server` output works too, and the commands below write the files into `dist/client`. On Expo SDK 58 a server export has no page file, because the server renders each page at request time. Run `rootnative-seo render dist` first: it starts `expo serve`, writes each page to `dist/rendered`, and the other commands read the pages there. The server export does not run `generateStaticParams`, so pass the entries of each dynamic route with `--params <file>`. On SDK 57 and earlier the pages are in `dist/server` already.
 
 After the export, write the sitemap and `robots.txt` from the exported pages:
 
