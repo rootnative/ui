@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
-import type { PageAlternate } from '@rootnative/seo'
+import type { PageAlternate, PageMeta } from '@rootnative/seo'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { Link } from 'expo-router'
 import { useMemo, useState } from 'react'
@@ -65,6 +65,18 @@ const COPY: Record<
   },
 }
 
+/** The head of the i18n demo in one language. */
+export function i18nMeta(language: Language): PageMeta {
+  const copy = COPY[language]
+  return {
+    title: copy.title,
+    description: copy.description,
+    url: copy.url,
+    locale: copy.locale,
+    alternates: ALTERNATES,
+  }
+}
+
 /** The i18n demo in one language. `app/i18n.tsx` and `app/de/i18n.tsx` render it. */
 export function I18nScreen({ language }: { language: Language }) {
   const theme = useTheme()
@@ -84,13 +96,7 @@ export function I18nScreen({ language }: { language: Language }) {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <PageHead
-        title={copy.title}
-        description={copy.description}
-        url={copy.url}
-        locale={copy.locale}
-        alternates={ALTERNATES}
-      />
+      <PageHead {...i18nMeta(language)} />
       <Container width="medium" p="lg" gap="lg">
         <Column gap="xs">
           <Typography level={2} variant="headlineSmall">

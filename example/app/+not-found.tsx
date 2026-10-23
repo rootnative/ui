@@ -1,9 +1,19 @@
 import { Button, Column, Container, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import type { PageMeta } from '@rootnative/seo'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { Link } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { pageMetadata } from '../src/metadata'
+
+// The host serves this page at every unknown path, so it has no canonical
+// URL. No `url` means no canonical link and no share card.
+const NOT_FOUND_META: PageMeta = { title: 'Page not found', noindex: true }
+
+export function generateMetadata() {
+  return pageMetadata(NOT_FOUND_META)
+}
 
 export default function NotFoundScreen() {
   const theme = useTheme()
@@ -19,9 +29,7 @@ export default function NotFoundScreen() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      {/* The host serves this page at every unknown path, so it has no
-          canonical URL. No `url` means no canonical link and no share card. */}
-      <PageHead title="Page not found" noindex />
+      <PageHead {...NOT_FOUND_META} />
       <Container width="expanded" p="lg" gap="lg">
         <Column gap="xs">
           <Typography level={2} variant="headlineSmall">

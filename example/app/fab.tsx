@@ -1,5 +1,6 @@
 import { Column, Container, FAB, Row, Typography } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -15,6 +16,10 @@ const sizes = [
   { label: 'Medium', value: 'medium' },
   { label: 'Large', value: 'large' },
 ] as const
+
+export function generateMetadata() {
+  return catalogMetadata('/fab')
+}
 
 export default function FABScreen() {
   return (

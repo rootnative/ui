@@ -12,6 +12,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -38,6 +39,10 @@ function Avatar({ label }: { label: string }) {
       </Typography>
     </View>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/list')
 }
 
 export default function ListScreen() {

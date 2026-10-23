@@ -11,6 +11,7 @@ import { useTheme } from '@rootnative/core'
 import { useMemo, useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import type { ViewInstance } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -21,6 +22,10 @@ const SUGGESTIONS = [
   'Campsites with water',
   'Sunrise times',
 ]
+
+export function generateMetadata() {
+  return catalogMetadata('/search-view')
+}
 
 export default function SearchViewScreen() {
   const theme = useTheme()

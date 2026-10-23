@@ -6,10 +6,15 @@ import {
   Typography,
 } from '@rootnative/components'
 import { Alert, Image, ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['elevated', 'filled', 'outlined'] as const
+
+export function generateMetadata() {
+  return catalogMetadata('/card')
+}
 
 export default function CardScreen() {
   return (

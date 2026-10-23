@@ -8,8 +8,13 @@ import {
 } from '@rootnative/components'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/text-field')
+}
 
 export default function TextFieldScreen() {
   const [filledValue, setFilledValue] = useState('')

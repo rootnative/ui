@@ -11,6 +11,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -206,6 +207,10 @@ function TooltipScreenContent() {
 
 // No PortalHost here on purpose — the root layout mounts one above the AppBar,
 // which is what lets a tooltip near the top of the screen open above its anchor.
+export function generateMetadata() {
+  return catalogMetadata('/tooltip')
+}
+
 export default function TooltipScreen() {
   return <TooltipScreenContent />
 }

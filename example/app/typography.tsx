@@ -1,6 +1,7 @@
 import { Container, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -29,6 +30,10 @@ const toSentenceCase = (value: string) => {
 
 const longText =
   'This is a very long text that demonstrates how the Typography component handles text overflow and truncation in real-world scenarios. It should wrap or truncate based on the configuration.'
+
+export function generateMetadata() {
+  return catalogMetadata('/typography')
+}
 
 export default function TypographyScreen() {
   const theme = useTheme()

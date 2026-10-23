@@ -3,8 +3,13 @@ import type { SliderValue } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/slider')
+}
 
 export default function SliderScreen() {
   const theme = useTheme()

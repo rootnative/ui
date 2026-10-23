@@ -11,6 +11,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -223,6 +224,10 @@ function DialogScreenContent() {
 // No <PortalHost> here on purpose: the root layout already mounts one above
 // the AppBar. An unnamed host inside another shadows it with a store of its
 // own, which would confine the scrim to the area below the AppBar.
+export function generateMetadata() {
+  return catalogMetadata('/dialog')
+}
+
 export default function DialogScreen() {
   return <DialogScreenContent />
 }

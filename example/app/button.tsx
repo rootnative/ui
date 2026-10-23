@@ -7,11 +7,16 @@ import {
 } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
 const sizes = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const
+
+export function generateMetadata() {
+  return catalogMetadata('/button')
+}
 
 export default function ButtonScreen() {
   const [isLoading, setIsLoading] = useState(false)

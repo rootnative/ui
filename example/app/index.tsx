@@ -29,6 +29,7 @@ import {
 } from '@rootnative/components'
 import { useTheme, useBreakpointValue } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
+import type { PageMeta } from '@rootnative/seo'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { webSite } from '@rootnative/seo/schema'
 import { Link, useLocalSearchParams, useRouter } from 'expo-router'
@@ -41,12 +42,17 @@ import {
   View,
 } from 'react-native'
 import { matchesQuery, sections, totalComponents } from '../src/catalog'
+import { pageMetadata } from '../src/metadata'
 import { site } from '../src/site'
 import { useHydrated } from '../src/use-hydrated'
 
-const HOME_DESCRIPTION =
-  'Material Design 3 components for React Native — copy, paste, ship. Browse every component of RootNative UI in the browser.'
-const HOME_JSON_LD = [webSite({ name: site.name, url: site.url })]
+const HOME_META: PageMeta = {
+  title: site.name,
+  description:
+    'Material Design 3 components for React Native — copy, paste, ship. Browse every component of RootNative UI in the browser.',
+  url: '/',
+  jsonLd: [webSite({ name: site.name, url: site.url })],
+}
 
 function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
   switch (label) {
@@ -596,6 +602,10 @@ const previewMutedText = (theme: MaterialTheme) => ({
   color: theme.colors.onSurfaceVariant,
 })
 
+export function generateMetadata() {
+  return pageMetadata(HOME_META)
+}
+
 export default function HomeScreen() {
   const router = useRouter()
   const theme = useTheme()
@@ -796,12 +806,7 @@ export default function HomeScreen() {
         but it still counts as a child, and a child before the hero moves the
         sticky index onto the hero.
       */}
-      <PageHead
-        title={site.name}
-        description={HOME_DESCRIPTION}
-        url="/"
-        jsonLd={HOME_JSON_LD}
-      />
+      <PageHead {...HOME_META} />
       <ScrollView
         contentContainerStyle={[
           styles.scroll,

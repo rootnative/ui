@@ -17,6 +17,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { isRTLDirection } from '@rootnative/utils'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -49,6 +50,10 @@ function Cell({ label }: { label: string }) {
       <Typography variant="labelMedium">{label}</Typography>
     </Box>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/rtl')
 }
 
 export default function RTLScreen() {

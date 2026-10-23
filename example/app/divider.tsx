@@ -10,8 +10,13 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/divider')
+}
 
 export default function DividerScreen() {
   const theme = useTheme()

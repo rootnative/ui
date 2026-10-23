@@ -12,6 +12,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -20,6 +21,10 @@ type OpenSheet = 'basic' | 'snap' | 'standard' | 'persistent' | null
 function DemoIcon({ name }: { name: string }) {
   const theme = useTheme()
   return <Icon source={name} size={24} color={theme.colors.onSurfaceVariant} />
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/bottom-sheet')
 }
 
 export default function BottomSheetScreen() {

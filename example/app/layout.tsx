@@ -8,6 +8,7 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -27,6 +28,10 @@ function Swatch({ label, wide }: { label: string; wide?: boolean }) {
       <Typography variant="labelSmall">{label}</Typography>
     </Box>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/layout')
 }
 
 export default function LayoutScreen() {

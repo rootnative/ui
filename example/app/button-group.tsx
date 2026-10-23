@@ -7,6 +7,7 @@ import {
 import type { ButtonGroupItem, ButtonGroupSize } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -40,6 +41,10 @@ const sizes: ButtonGroupSize[] = [
   'large',
   'extraLarge',
 ]
+
+export function generateMetadata() {
+  return catalogMetadata('/button-group')
+}
 
 export default function ButtonGroupScreen() {
   const [alignment, setAlignment] = useState<string | null>('left')

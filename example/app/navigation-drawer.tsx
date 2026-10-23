@@ -10,6 +10,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -139,6 +140,10 @@ function NavigationDrawerScreenContent() {
       </NavigationDrawer>
     </ScrollView>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/navigation-drawer')
 }
 
 export default function NavigationDrawerScreen() {

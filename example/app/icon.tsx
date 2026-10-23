@@ -9,6 +9,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -111,6 +112,10 @@ function IconScreenContent() {
       </Container>
     </ScrollView>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/icon')
 }
 
 export default function IconScreen() {

@@ -15,6 +15,7 @@ import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import type { KeyboardAvoidingViewProps } from 'react-native'
 import { StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -25,6 +26,10 @@ const behaviorItems: ButtonGroupItem[] = [
   { value: 'height', label: 'height' },
   { value: 'position', label: 'position' },
 ]
+
+export function generateMetadata() {
+  return catalogMetadata('/keyboard-avoiding-wrapper')
+}
 
 export default function KeyboardAvoidingWrapperScreen() {
   const [enabled, setEnabled] = useState(true)

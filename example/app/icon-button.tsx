@@ -6,6 +6,7 @@ import {
   Typography,
 } from '@rootnative/components'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -29,6 +30,10 @@ const widths = [
   { label: 'Uniform', value: 'uniform' },
   { label: 'Wide', value: 'wide' },
 ] as const
+
+export function generateMetadata() {
+  return catalogMetadata('/icon-button')
+}
 
 export default function IconButtonScreen() {
   return (

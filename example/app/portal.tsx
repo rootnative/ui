@@ -14,6 +14,7 @@ import { useTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -240,6 +241,10 @@ function NamedHostDemo() {
       ) : null}
     </>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/portal')
 }
 
 export default function PortalScreen() {

@@ -9,8 +9,13 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/progress')
+}
 
 export default function ProgressScreen() {
   const theme = useTheme()

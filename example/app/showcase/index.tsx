@@ -1,13 +1,25 @@
 import { Card, Column, Container, Typography } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import type { PageMeta } from '@rootnative/seo'
 import { PageHead } from '@rootnative/seo/expo-router'
 import { Link } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { pageMetadata } from '../../src/metadata'
 import { showcaseEntries } from '../../src/showcase'
 
 const DESCRIPTION =
   'Patterns built from several components, one page each. The pages come from a seeded list through generateStaticParams.'
+
+const SHOWCASE_META: PageMeta = {
+  title: 'Showcase',
+  description: DESCRIPTION,
+  url: '/showcase',
+}
+
+export function generateMetadata() {
+  return pageMetadata(SHOWCASE_META)
+}
 
 export default function ShowcaseListScreen() {
   const theme = useTheme()
@@ -23,7 +35,7 @@ export default function ShowcaseListScreen() {
 
   return (
     <ScrollView contentContainerStyle={scrollStyle}>
-      <PageHead title="Showcase" description={DESCRIPTION} url="/showcase" />
+      <PageHead {...SHOWCASE_META} />
       <Container width="expanded" p="lg" gap="lg">
         <Column gap="xs">
           <Typography level={2} variant="headlineSmall">

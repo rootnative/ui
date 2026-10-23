@@ -17,6 +17,7 @@ import { useMemo } from 'react'
 import { Alert, I18nManager, Platform, StyleSheet, View } from 'react-native'
 import { findEntry } from '../src/catalog'
 import { JumpMenu } from '../src/JumpMenu'
+import { catalogMeta } from '../src/metadata'
 import { site } from '../src/site'
 
 // Restore the persisted RTL preference on web before the first render.
@@ -81,13 +82,9 @@ function resolveTitle(routeName: string): string {
  * `PageHead` wins the whole page.
  */
 function routeDefaults(pathname: string) {
-  const entry = findEntry(pathname)
-  if (entry) {
-    return {
-      title: entry.label,
-      description: entry.description,
-      url: entry.route,
-    }
+  const meta = catalogMeta(pathname)
+  if (meta) {
+    return meta
   }
   const routeName = resolveRouteName(pathname.split('/').filter(Boolean))
   return { title: resolveTitle(routeName), url: pathname }

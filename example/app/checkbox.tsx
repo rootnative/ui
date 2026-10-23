@@ -7,10 +7,15 @@ import {
 } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const topicLabels = ['Product updates', 'Security alerts', 'Weekly digest']
+
+export function generateMetadata() {
+  return catalogMetadata('/checkbox')
+}
 
 export default function CheckboxScreen() {
   const [checkA, setCheckA] = useState(true)

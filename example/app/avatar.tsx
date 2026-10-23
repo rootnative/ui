@@ -7,8 +7,13 @@ import {
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
 import { Alert, ScrollView, StyleSheet, View } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/avatar')
+}
 
 export default function AvatarScreen() {
   const theme = useTheme()

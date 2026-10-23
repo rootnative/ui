@@ -7,8 +7,13 @@ import {
 } from '@rootnative/components'
 import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/switch')
+}
 
 export default function SwitchScreen() {
   const [basic, setBasic] = useState(false)

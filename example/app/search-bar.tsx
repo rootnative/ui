@@ -9,8 +9,13 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import {} from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+
+export function generateMetadata() {
+  return catalogMetadata('/search-bar')
+}
 
 export default function SearchBarScreen() {
   const theme = useTheme()

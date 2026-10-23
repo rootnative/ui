@@ -16,6 +16,7 @@ import { Motion, useScroll } from '@rootnative/inertia'
 import { useRouter } from 'expo-router'
 import { useMemo } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -112,6 +113,10 @@ function CollapseDemo({
       </Motion.ScrollView>
     </>
   )
+}
+
+export function generateMetadata() {
+  return catalogMetadata('/appbar')
 }
 
 export default function AppBarScreen() {

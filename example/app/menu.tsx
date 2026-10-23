@@ -12,6 +12,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -269,6 +270,10 @@ function MenuScreenContent() {
 
 // No PortalHost here on purpose — the root layout mounts one above the AppBar,
 // which is what gives the tall "Scrolling" menu the whole window to open into.
+export function generateMetadata() {
+  return catalogMetadata('/menu')
+}
+
 export default function MenuScreen() {
   return <MenuScreenContent />
 }
