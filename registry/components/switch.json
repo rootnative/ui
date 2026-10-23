@@ -20,7 +20,7 @@
   "utils": ["color", "pressable", "render-icon", "rtl"],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.28",
+    "@rootnative/core": ">=0.0.0-alpha.29",
     "@rootnative/inertia": ">=0.0.20",
     "react-native-reanimated": ">=4.7.0 <4.8.0",
     "react-native-worklets": ">=0.13.0 <0.14.0"
