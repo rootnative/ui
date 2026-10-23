@@ -4,10 +4,24 @@ on:
   push:
     branches:
       - main
+    # Only the files that reach the native bundle. The example scripts and
+    # the seo Node tools run in CI and in the web export, not on a device.
+    # Run the workflow by hand after an edit to this file.
     paths:
-      - 'packages/**'
       - 'example/**'
+      - '!example/scripts/**'
+      - '!example/public/**'
+      - 'packages/components/**'
+      - 'packages/core/**'
+      - 'packages/utils/**'
+      - 'packages/seo/**'
+      - '!packages/seo/src/node/**'
+      - '!packages/**/__tests__/**'
+      - '!packages/**/jest.*'
+      - '!packages/**/*.md'
+      - '!packages/**/llms.txt'
       - 'pnpm-lock.yaml'
+  workflow_dispatch:
 
 permissions:
   contents: read

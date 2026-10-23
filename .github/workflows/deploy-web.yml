@@ -4,11 +4,24 @@ on:
   push:
     branches:
       - main
+    # Only the files that reach the site: the docs, the example web export
+    # and the `write-seo.mjs` output, which uses `@rootnative/seo/node`.
+    # Run the workflow by hand after an edit to this file.
     paths:
-      - 'packages/**'
-      - 'example/**'
       - 'docs/**'
+      - 'example/**'
+      - '!example/scripts/check-export.mjs'
+      - 'packages/components/**'
+      - 'packages/core/**'
+      - 'packages/utils/**'
+      - 'packages/seo/**'
+      - '!packages/**/__tests__/**'
+      - '!packages/**/jest.*'
+      - '!packages/**/*.md'
+      - '!packages/**/llms.txt'
       - 'pnpm-lock.yaml'
+      - 'scripts/lighthouse-seo.mjs'
+  workflow_dispatch:
 
 permissions:
   contents: read

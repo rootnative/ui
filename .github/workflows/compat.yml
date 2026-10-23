@@ -7,17 +7,32 @@ name: SDK Compatibility
 # `react-native >=0.72.0` while it depended on @rootnative/inertia, whose floor
 # was higher. npm rejected the advertised floor with ERESOLVE, and that release
 # was already published when the defect was found.
+#
+# The candidate is the components and core tarballs, and components bundles
+# utils. A change in another package cannot change what the fixtures install.
 on:
   push:
     branches:
       - main
     paths:
-      - 'packages/**'
+      - 'packages/components/**'
+      - 'packages/core/**'
+      - 'packages/utils/**'
+      - '!packages/**/__tests__/**'
+      - '!packages/**/jest.*'
+      - '!packages/**/*.md'
+      - '!packages/**/llms.txt'
       - 'pnpm-lock.yaml'
       - '.github/workflows/compat.yml'
   pull_request:
     paths:
-      - 'packages/**'
+      - 'packages/components/**'
+      - 'packages/core/**'
+      - 'packages/utils/**'
+      - '!packages/**/__tests__/**'
+      - '!packages/**/jest.*'
+      - '!packages/**/*.md'
+      - '!packages/**/llms.txt'
       - 'pnpm-lock.yaml'
       - '.github/workflows/compat.yml'
   workflow_dispatch:
