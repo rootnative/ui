@@ -128,7 +128,7 @@
     }
   },
   "devDependencies": {
-    "@expo/router-server": "~57.0.9",
+    "@expo/router-server": "~58.0.16",
     "@react-native/babel-preset": "^0.88.0",
     "@react-native/jest-preset": "^0.88.0",
     "@testing-library/react": "^16.3.0",
@@ -137,7 +137,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "expo-image": "~57.0.5",
+    "expo-image": "~58.0.16",
     "expo-router": "~58.0.25",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",

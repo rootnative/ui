@@ -15,6 +15,7 @@
     "check:export:server": "WEB_OUTPUT=server expo export --platform web --output-dir dist-server && node scripts/write-seo.mjs dist-server && node scripts/check-export.mjs --dist dist-server --no-browser"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~58.0.15",
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
     "@rootnative/components": "workspace:*",
     "@rootnative/core": "workspace:*",
@@ -22,7 +23,9 @@
     "@rootnative/seo": "workspace:*",
     "@rootnative/utils": "workspace:*",
     "expo": "~58.0.17",
+    "expo-constants": "~58.0.13",
     "expo-font": "~58.0.9",
+    "expo-linking": "~58.0.14",
     "expo-router": "~58.0.25",
     "expo-splash-screen": "~58.0.11",
     "expo-status-bar": "~58.0.4",
