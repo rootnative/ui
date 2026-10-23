@@ -73,6 +73,13 @@ jobs:
         working-directory: packages/components
         run: pnpm pack --pack-destination ../../pack
 
+      # core releases with components, and the matrix installs every tarball
+      # of the artifact. Without core here the cell takes the last core
+      # release from the registry, which can declare the previous SDK band.
+      - name: Pack core
+        working-directory: packages/core
+        run: pnpm pack --pack-destination ../../pack
+
       - name: Upload candidate
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
