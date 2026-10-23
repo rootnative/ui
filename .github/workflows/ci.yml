@@ -111,12 +111,13 @@ jobs:
       - name: Static export check
         run: pnpm --filter example check:export
 
-      # The same app with `web.output: 'server'`. The pages move to
-      # `dist-server/server` and the files to `dist-server/client`, so this
-      # proves that the seo tools read that layout. Then `expo serve` must
-      # send 200 for a page and 404 for an unknown path: the server sends
-      # the status itself, where a static host sends what its rewrite rule
-      # says. The pages are the same HTML as above, so the browser pass is
-      # not repeated.
+      # The same app with `web.output: 'server'`. Expo SDK 58 writes no page
+      # file for it, so `write-seo.mjs` renders the pages through
+      # `expo serve` to `dist-server/rendered`, and the files go to
+      # `dist-server/client`. This proves that the seo tools read that
+      # layout. Then `expo serve` must send 200 for a page and 404 for an
+      # unknown path: the server sends the status itself, where a static
+      # host sends what its rewrite rule says. The server renders the same
+      # pages as above, so the browser pass is not repeated.
       - name: Server export check
         run: pnpm --filter example check:export:server

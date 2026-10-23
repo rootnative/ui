@@ -14,8 +14,9 @@
  * it. Chrome comes from `CHROME_PATH` or the usual install paths; pass
  * `--no-browser` on a machine without one, and CI runs the whole gate.
  *
- * A server export (`web.output: 'server'`) keeps its pages in `server/` and
- * its files in `client/`, and the same checks read both folders. The script
+ * A server export (`web.output: 'server'`) keeps its files in `client/`. From
+ * Expo SDK 58 it has no page file: `write-seo.mjs` renders the pages to
+ * `rendered/`, and the same checks read both folders. The script
  * then starts `expo serve` on it and asserts the status code of each route
  * in `serverRoutes`. The pages are the same HTML as the static export, so
  * the server check skips the browser pass.
@@ -44,7 +45,7 @@ const dist = resolve(
 )
 // The rule `expo serve` uses: a server export has a route manifest.
 const isServer = existsSync(resolve(dist, 'server', '_expo', 'routes.json'))
-const pagesDir = isServer ? resolve(dist, 'server') : dist
+const pagesDir = isServer ? resolve(dist, 'rendered') : dist
 const filesDir = isServer ? resolve(dist, 'client') : dist
 
 const SITE_URL = 'https://rootnative.github.io/ui/demo'
