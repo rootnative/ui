@@ -11,6 +11,9 @@ import { pageMetadata } from '../src/metadata'
 // URL. No `url` means no canonical link and no share card.
 const NOT_FOUND_META: PageMeta = { title: 'Page not found', noindex: true }
 
+// Expo SDK 58 does not call this for `+not-found`: the export skips internal
+// routes. `scripts/write-seo.mjs` writes the head of the export from a copy
+// of this meta, so change the two together.
 export function generateMetadata() {
   return pageMetadata(NOT_FOUND_META)
 }
