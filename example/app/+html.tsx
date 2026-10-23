@@ -4,7 +4,10 @@ import {
   schemeGuardScript,
 } from '@rootnative/core/static-export'
 import { shellTags } from '@rootnative/seo/expo-router'
-import { ScrollViewStyleReset } from 'expo-router/html'
+import {
+  ScrollViewStyleReset,
+  useServerDocumentContext,
+} from 'expo-router/html'
 import type { PropsWithChildren } from 'react'
 
 const SCHEME_GUARD_CSS = schemeGuardCss({
@@ -12,8 +15,10 @@ const SCHEME_GUARD_CSS = schemeGuardCss({
 })
 
 export default function Root({ children }: PropsWithChildren) {
+  const { htmlAttributes, headNodes, bodyAttributes, bodyNodes } =
+    useServerDocumentContext()
   return (
-    <html lang="en">
+    <html lang="en" {...htmlAttributes}>
       <head>
         {shellTags({
           basePath: process.env.EXPO_BASE_URL,
@@ -54,8 +59,17 @@ export default function Root({ children }: PropsWithChildren) {
             `,
           }}
         />
+        {/*
+          From Expo SDK 58 the server renderer gives the page metadata, the
+          CSS and the JavaScript bundles to this shell. Without these nodes
+          the page has no head tags and does not hydrate.
+        */}
+        {headNodes}
       </head>
-      <body>{children}</body>
+      <body {...bodyAttributes}>
+        {children}
+        {bodyNodes}
+      </body>
     </html>
   )
 }
