@@ -18,6 +18,14 @@ export {
   type AuditRule,
 } from './audit'
 export {
+  renderServerExport,
+  type RenderedPage,
+  type RenderServerExportOptions,
+  type RenderServerResult,
+  type RenderSkip,
+  type RouteParams,
+} from './render'
+export {
   readExport,
   writeSeoFiles,
   type ExportedPage,

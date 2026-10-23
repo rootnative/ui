@@ -12,7 +12,7 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One fix in `core` and `components`, two new
-exports in `core`, and one new prop on `Tabs`.
+exports in `core`, one new prop on `Tabs`, and one new function in `seo`.
 
 ### `Tabs` follows a pager position
 
@@ -58,6 +58,24 @@ it; the two app-side workarounds are gone from the theming page.
 **Check your app.** If you wrapped overlay content in a second nested
 provider, or gave `Menu`, `Tooltip`, `BottomSheet` or the drawer a named
 `PortalHost` only to carry the nested theme, you can remove that.
+
+### `seo` reads a server export of Expo SDK 58
+
+From Expo SDK 58, `web.output: 'server'` writes no page file: the server
+renders each page at request time. `writeSeoFiles`, `auditExport`,
+`browseExport` and `readExport` read the pages of a server export from
+`<outDir>/server`, so they found no page and stopped with "no .html file".
+
+The new `renderServerExport` in `@rootnative/seo/node` starts `expo serve`
+on the export, requests each route of `server/_expo/routes.json`, and writes
+the HTML to `<outDir>/rendered`. The other functions then read the pages from
+there. The server export does not run `generateStaticParams`, so pass the
+values of each dynamic route in `params`. The not-found route is written as
+`+not-found.html`. With `origin`, it requests a server that runs already,
+such as a preview deploy. An export from SDK 57 or earlier keeps its pages
+in `<outDir>/server`, and nothing changes for it. On a server export with no
+page, the "no .html file" error now names `renderServerExport`. Eight tests;
+one starts a stand-in `expo serve` and checks that it stops.
 
 ## 0.0.0-alpha.28 — 2026-10-21
 

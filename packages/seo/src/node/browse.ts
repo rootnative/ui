@@ -3,7 +3,7 @@ import { accessSync, constants } from 'node:fs'
 import { mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
-import { exportLayout, listHtmlFiles, routeOf } from './export'
+import { exportLayout, listHtmlFiles, noPagesMessage, routeOf } from './export'
 import { servedBasePath, serveExport } from './serve'
 
 export type BrowseProblem = {
@@ -299,12 +299,11 @@ export async function browseExport(
   options: BrowseExportOptions,
 ): Promise<BrowseResult> {
   const { outDir } = options
-  const { pagesDir } = await exportLayout(outDir)
+  const layout = await exportLayout(outDir)
+  const { pagesDir } = layout
   const files = await listHtmlFiles(pagesDir, 'browseExport')
   if (files.length === 0) {
-    throw new Error(
-      `browseExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
-    )
+    throw new Error(noPagesMessage('browseExport', outDir, layout))
   }
   await checkScriptBase(
     pagesDir,

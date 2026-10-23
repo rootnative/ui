@@ -9,7 +9,8 @@ import { trimTrailingSlash } from './write'
 export type ExportedPage = {
   /**
    * The path of the file under the pages folder, with `/` separators: under
-   * `outDir`, or under `<outDir>/server` for a server export.
+   * `outDir`, or for a server export under `<outDir>/rendered` or
+   * `<outDir>/server` (see `exportLayout`).
    */
   file: string
   /**
@@ -163,28 +164,55 @@ export type ExportLayout = {
   pagesDir: string
   /** The folder for `sitemap.xml` and `robots.txt`. */
   filesDir: string
+  /** True for `web.output: 'server'`. */
+  server: boolean
+}
+
+/** The folder under a server export that `renderServerExport` writes to. */
+export const RENDERED_DIR = 'rendered'
+
+async function isDirectory(path: string): Promise<boolean> {
+  return stat(path)
+    .then((info) => info.isDirectory())
+    .catch(() => false)
 }
 
 /**
- * `web.output: 'server'` writes the pages to `<outDir>/server`, next to
- * `_expo/routes.json`, and the files the server sends as they are to
- * `<outDir>/client`. A static export keeps both in `outDir`. `expo serve`
- * tells the two apart by the same file.
+ * `web.output: 'server'` writes the files the server sends as they are to
+ * `<outDir>/client`, and `_expo/routes.json` to `<outDir>/server`. Up to
+ * Expo SDK 57 the pages are in `<outDir>/server` too. From SDK 58 the server
+ * renders each page at request time, so the pages are the ones
+ * `renderServerExport` writes to `<outDir>/rendered`. A static export keeps
+ * the pages and the files in `outDir`. `expo serve` tells the two apart by
+ * the routes file.
  */
 export async function exportLayout(outDir: string): Promise<ExportLayout> {
   const routes = await stat(join(outDir, 'server', '_expo', 'routes.json'))
     .then((info) => info.isFile())
     .catch(() => false)
-  const client = await stat(join(outDir, 'client'))
-    .then((info) => info.isDirectory())
-    .catch(() => false)
-  if (routes && client) {
+  if (routes && (await isDirectory(join(outDir, 'client')))) {
+    const rendered = join(outDir, RENDERED_DIR)
     return {
-      pagesDir: join(outDir, 'server'),
+      pagesDir: (await isDirectory(rendered))
+        ? rendered
+        : join(outDir, 'server'),
       filesDir: join(outDir, 'client'),
+      server: true,
     }
   }
-  return { pagesDir: outDir, filesDir: outDir }
+  return { pagesDir: outDir, filesDir: outDir, server: false }
+}
+
+/** The error message of `caller` for an export with no `.html` file. */
+export function noPagesMessage(
+  caller: string,
+  outDir: string,
+  layout: ExportLayout,
+): string {
+  const hint = layout.server
+    ? 'A server export from Expo SDK 58 has no page files: run `renderServerExport` first.'
+    : 'Set `web.output` to `static` or `server` in app.json.'
+  return `${caller}: no .html file in "${outDir}". ${hint}`
 }
 
 /**
@@ -209,9 +237,8 @@ export async function listHtmlFiles(
 }
 
 /**
- * Reads every `.html` page of the export in `outDir`, sorted by path: the
- * files in `outDir`, or in `<outDir>/server` for a server export. Throws
- * when the folder does not exist.
+ * Reads every `.html` page of the export in `outDir`, sorted by path, from
+ * the pages folder of `exportLayout`. Throws when the folder does not exist.
  */
 export async function readExport(outDir: string): Promise<ExportedPage[]> {
   const { pagesDir } = await exportLayout(outDir)
@@ -276,12 +303,11 @@ export async function writeSeoFiles(
 ): Promise<SeoFilesResult> {
   const { outDir } = options
   const pages = await readExport(outDir)
+  const layout = await exportLayout(outDir)
   if (pages.length === 0) {
-    throw new Error(
-      `writeSeoFiles: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
-    )
+    throw new Error(noPagesMessage('writeSeoFiles', outDir, layout))
   }
-  const { filesDir } = await exportLayout(outDir)
+  const { filesDir } = layout
 
   const home = pages.find((page) => page.route === '/')?.canonical
   if (!options.siteUrl && !home) {

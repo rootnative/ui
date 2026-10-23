@@ -8,6 +8,7 @@ import {
   isUnder,
   exportLayout,
   listHtmlFiles,
+  noPagesMessage,
   readHead,
   skipReason,
   type ExportedPage,
@@ -398,12 +399,11 @@ export async function auditExport(
   options: AuditExportOptions,
 ): Promise<AuditResult> {
   const { outDir } = options
-  const { pagesDir, filesDir } = await exportLayout(outDir)
+  const layout = await exportLayout(outDir)
+  const { pagesDir, filesDir } = layout
   const files = await listHtmlFiles(pagesDir, 'auditExport')
   if (files.length === 0) {
-    throw new Error(
-      `auditExport: no .html file in "${outDir}". Set \`web.output\` to \`static\` or \`server\` in app.json.`,
-    )
+    throw new Error(noPagesMessage('auditExport', outDir, layout))
   }
   const rules = new Set<AuditRule>([
     'title',
