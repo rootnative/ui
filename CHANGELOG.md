@@ -9,11 +9,65 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.29 — 2026-10-23
 
-**No breaking change.** One fix in `core` and `components`, two new
-exports in `core`, one new prop on `Tabs`, one new function and one new
-command in `seo`, and one corrected `seo` audit message.
+The Expo SDK 58 release. **Breaking:** every package moves to the SDK 58
+runtime band and stops claiming SDK 57, so an app that stays on SDK 57 stays
+on `0.0.0-alpha.28`. One set of ranges cannot serve both bands. Three `ref`
+props of `components` take the React Native 0.88 instance types; that entry
+ends with what to check. The `@rootnative/inertia` floor moves to `0.0.20`.
+
+Also in this release: one fix in `core` and `components`, two new exports in
+`core`, one new prop on `Tabs`, one new function and one new command in
+`seo`, and one corrected `seo` audit message.
+
+### Breaking: the peer ranges move to the Expo SDK 58 band
+
+`core`, `components`, `icons` and `seo` declare `react >=19.3.0 <20.0.0` and
+`react-native >=0.88.0 <0.89.0`. `components` also moves
+`react-native-reanimated` to `>=4.7.0 <4.8.0` and `react-native-worklets` to
+`>=0.13.0 <0.14.0`.
+
+The band cannot be wider. React 19.2.3 does not pair with React Native 0.88,
+and Worklets 0.10 does not pair with Reanimated 4.7. A range that admits both
+SDK 57 and SDK 58 also admits pairs that cannot install, and a range promises
+every combination it permits. `@rootnative/inertia` `0.0.20` moved for the
+same reason.
+
+Migration: move the app to Expo SDK 58 — React `19.3.0`, React Native
+`0.88.0`, Reanimated `4.7.1`, Worklets `0.13.0` — and `@rootnative/inertia`
+to `0.0.20`. `npx expo install --fix` picks the SDK versions. An app on SDK 57
+stays on `0.0.0-alpha.28`:
+`npm install @rootnative/components@0.0.0-alpha.28`. The README and the
+installation page carry the table of SDK against version. The example app
+and both `rootnative create` templates pin the SDK 58 runtime.
+
+The release gate installs the `components` and `core` candidates into an Expo
+SDK 58 fixture app and bundles it for Android and the web, before the publish.
+It installs `core` from the same release: the registry still has `core`
+`0.0.0-alpha.28`, which declares the SDK 57 band.
+
+### Breaking: three `ref` props take the React Native 0.88 instance types
+
+The React Native 0.88 types declare `View`, `TextInput` and `ScrollView` as
+function components, so `TextInput` no longer names the host instance. The
+`ref` of `TextField`, `SearchBar` and `SearchView` is now
+`Ref<TextInputInstance>`, and the `anchor` of `SearchView` is
+`RefObject<ViewInstance | null>`. Both types come from `react-native`. The
+value at runtime does not change.
+
+**Check your app.** Type a ref that you pass to `TextField`, `SearchBar` or
+`SearchView` as `useRef<TextInputInstance>(null)`, and the `anchor` of
+`SearchView` as `useRef<ViewInstance>(null)`. On React Native 0.88,
+`useRef<TextInput>(null)` does not compile anyway.
+
+### `@rootnative/inertia` floor moves to `0.0.20`
+
+The `core` and `components` peer ranges are now `>=0.0.20 <0.1.0`, and the
+dev, example and template pins are `0.0.20` exact. `0.0.20` is the first
+`inertia` release on the SDK 58 band; `0.0.19` declares SDK 57. It also lets
+`useAnimation` take a start value, and `animate={{ translateY: 24 }}`
+compiles again on React Native 0.88.
 
 ### `Tabs` follows a pager position
 
