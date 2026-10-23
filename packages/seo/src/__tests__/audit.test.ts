@@ -87,6 +87,41 @@ describe('auditExport', () => {
     ])
   })
 
+  it('tells a static not-found page to get its head after the export, and a server one to export generateMetadata', async () => {
+    const bare = page('').replace('<title data-rh="true">Page</title>', '')
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      '+not-found.html': bare,
+      'blog/+not-found.html': bare,
+    })
+    const statics = await auditExport({ outDir, ignore: ['sitemap'] })
+    expect(statics.problems.map((p) => [p.file, p.rule])).toEqual([
+      ['+not-found.html', 'title'],
+      ['+not-found.html', 'canonical'],
+      ['blog/+not-found.html', 'title'],
+      ['blog/+not-found.html', 'canonical'],
+    ])
+    for (const { message } of statics.problems) {
+      expect(message).toContain('headTagsHtml(toHeadTags(site, meta))')
+      expect(message).not.toContain('must also export')
+    }
+
+    await writePages({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'client/_expo/static/js/web/entry.js': 'console.log(1)',
+      'rendered/index.html': page(canonical(`${SITE}/`)),
+      'rendered/+not-found.html': bare,
+    })
+    const server = await auditExport({ outDir, ignore: ['sitemap'] })
+    expect(server.problems.map((p) => [p.file, p.rule])).toEqual([
+      ['+not-found.html', 'title'],
+      ['+not-found.html', 'canonical'],
+    ])
+    for (const { message } of server.problems) {
+      expect(message).toContain('must also export `generateMetadata`')
+    }
+  })
+
   it('reports a page with no canonical link and no noindex, and a relative canonical link', async () => {
     await writePages({
       'index.html': page(canonical(`${SITE}/`)),

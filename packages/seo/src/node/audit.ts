@@ -70,6 +70,19 @@ const LANGUAGE_CODE =
 /** From Expo SDK 58 the static export writes no `PageHead` tag into the page. */
 const SDK_58_HINT =
   'On Expo SDK 58 and later, the route must also export `generateMetadata` that returns `toMetadata(site, meta)`.'
+/**
+ * The static export skips internal routes, so it never calls the
+ * `generateMetadata` of a not-found route. A server renders that head.
+ */
+const NOT_FOUND_HINT =
+  'On Expo SDK 58 and later, a static export writes no head for a not-found route: Expo does not call its `generateMetadata`. Write the head into the file after the export, for example with `headTagsHtml(toHeadTags(site, meta))`.'
+const NOT_FOUND_FILE = /(^|\/)\+not-found\.html$/
+
+function headHint(page: AuditedPage, server: boolean): string {
+  return !server && NOT_FOUND_FILE.test(page.file)
+    ? NOT_FOUND_HINT
+    : SDK_58_HINT
+}
 
 type AuditedPage = ExportedPage & {
   titles: string[]
@@ -105,13 +118,18 @@ function count(n: number, noun: string): string {
   return `${n} <${noun}> tags`
 }
 
-function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
+function pageProblems(
+  page: AuditedPage,
+  rules: Set<AuditRule>,
+  server: boolean,
+) {
   const problems: AuditProblem[] = []
   const add = (rule: AuditRule, message: string) =>
     problems.push({ file: page.file, rule, message })
+  const hint = headHint(page, server)
 
   if (rules.has('title')) {
-    if (page.titles.length === 0) add('title', `no <title>. ${SDK_58_HINT}`)
+    if (page.titles.length === 0) add('title', `no <title>. ${hint}`)
     else if (page.titles.length > 1)
       add('title', `${count(page.titles.length, 'title')}, expected one`)
     else if (page.titles[0] === '')
@@ -122,7 +140,7 @@ function pageProblems(page: AuditedPage, rules: Set<AuditRule>) {
     if (!page.canonical && !page.noindex) {
       add(
         'canonical',
-        `no canonical link and no noindex. Pass \`url\` to \`PageHead\`, or \`noindex\` on a page a crawler must not index. ${SDK_58_HINT}`,
+        `no canonical link and no noindex. Pass \`url\` to \`PageHead\`, or \`noindex\` on a page a crawler must not index. ${hint}`,
       )
     } else if (page.canonical && !/^https?:\/\//.test(page.canonical)) {
       add('canonical', `canonical link "${page.canonical}" is not absolute`)
@@ -418,7 +436,9 @@ export async function auditExport(
   for (const rule of options.ignore ?? []) rules.delete(rule)
 
   const pages = await Promise.all(files.map((file) => readPage(pagesDir, file)))
-  const problems = pages.flatMap((page) => pageProblems(page, rules))
+  const problems = pages.flatMap((page) =>
+    pageProblems(page, rules, layout.server),
+  )
 
   if (rules.has('sitemap') || rules.has('hreflang')) {
     const home = pages.find((page) => page.route === '/')?.canonical

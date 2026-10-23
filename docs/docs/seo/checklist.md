@@ -255,6 +255,10 @@ export default function MovieScreen() {
   head does not hold two sets.
 - On SDK 57 the static export ignores `generateMetadata` and writes the
   `PageHead` tags. You can add the export before you move to SDK 58.
+- A static export does not call the `generateMetadata` of `+not-found`:
+  Expo skips internal routes, so that page has no head. Write the head into
+  the file after the export, with `headTagsHtml(toHeadTags(site, meta))`
+  before `</head>`. A server export renders that head at request time.
 - A custom `app/+html.tsx` must render the nodes of
   `useServerDocumentContext()`. Without them the page has no metadata, no
   CSS and no JavaScript. See [step 7](#7-bundle-and-preconnect).

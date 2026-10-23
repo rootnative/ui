@@ -12,8 +12,8 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One fix in `core` and `components`, two new
-exports in `core`, one new prop on `Tabs`, and one new function and one new
-command in `seo`.
+exports in `core`, one new prop on `Tabs`, one new function and one new
+command in `seo`, and one corrected `seo` audit message.
 
 ### `Tabs` follows a pager position
 
@@ -82,6 +82,15 @@ The new `rootnative-seo render <outDir>` command runs it, with
 before the other commands. The README and the server output section of the
 checklist give the SDK 58 steps. Twelve tests; one starts a stand-in
 `expo serve` and checks that it stops.
+
+### The audit names the right fix for a not-found page
+
+On Expo SDK 58 a static export skips internal routes, so it never calls the
+`generateMetadata` of `+not-found`, and that page has no head. For this page
+`auditExport` told the user to export `generateMetadata`, which cannot work.
+It now says to write the head into the file after the export, with
+`headTagsHtml(toHeadTags(site, meta))`. A server export renders that head,
+so its message does not change. The checklist says the same. One test.
 
 ## 0.0.0-alpha.28 — 2026-10-21
 
