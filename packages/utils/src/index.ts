@@ -1,5 +1,6 @@
 export { alphaColor, blendColor } from './color'
 export { elevationStyle } from './elevation'
+export type { ElevationStyle } from './elevation'
 export { useFocusVisible, isFocusVisible } from './focus-visible'
 export { resolvePressableStyle, resolveColorFromStyle } from './pressable'
 export type { PressableState, PressableStyleProp } from './pressable'

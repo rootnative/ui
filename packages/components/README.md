@@ -37,13 +37,17 @@ peers at all, so add them explicitly there.
 pnpm add react-native-reanimated react-native-worklets
 ```
 
+Each release line supports one Expo SDK band: SDK 58 takes `0.0.0-alpha.29`
+and later, SDK 57 takes `0.0.0-alpha.16` to `0.0.0-alpha.28`
+(`npm install @rootnative/components@0.0.0-alpha.28`).
+
 > These power state-layer transitions and gesture-driven components (Slider,
 > Switch). Static components (Typography, Layout, Portal,
 > KeyboardAvoidingWrapper, Divider) work without them. They are genuinely
-> optional: nothing imports them statically. With Expo SDK 57 both are already
+> optional: nothing imports them statically. With Expo SDK 58 both are already
 > available in Expo Go.
 >
-> Reanimated 4 runs on `react-native-worklets`. **Expo SDK 57 bundles its Babel
+> Reanimated 4 runs on `react-native-worklets`. **Expo SDK 58 bundles its Babel
 > plugin — nothing to configure.** On bare React Native, add
 > `'react-native-worklets/plugin'` last in your `babel.config.js` `plugins`.
 

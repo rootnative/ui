@@ -4,6 +4,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
 import { StyleSheet, Text, TextInput } from 'react-native'
+import type { TextInputInstance } from 'react-native'
 import type { ReactTestInstance } from 'react-test-renderer'
 import { __resetWarnOnceForTests } from '../internal/warnOnce'
 import { SearchBar } from '../search-bar/SearchBar'
@@ -98,7 +99,7 @@ describe('SearchBar', () => {
     })
 
     it('forwards the ref to the TextInput', () => {
-      const ref = createRef<TextInput>()
+      const ref = createRef<TextInputInstance>()
       renderWithTheme(<SearchBar placeholder="Search" ref={ref} />)
       expect(ref.current).not.toBeNull()
       expect(typeof ref.current?.focus).toBe('function')

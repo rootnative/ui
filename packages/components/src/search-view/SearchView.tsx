@@ -2,7 +2,11 @@ import { useBreakpoint, useTheme, useWindowDimensions } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
-import type { TextInputProps } from 'react-native'
+import type {
+  TextInputInstance,
+  TextInputProps,
+  ViewInstance,
+} from 'react-native'
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -75,9 +79,9 @@ export function SearchView({
   const [internalValue, setInternalValue] = useState(
     () => value ?? defaultValue ?? '',
   )
-  const inputRef = useRef<TextInput | null>(null)
+  const inputRef = useRef<TextInputInstance | null>(null)
   const setInputRef = useCallback(
-    (node: TextInput | null) => {
+    (node: TextInputInstance | null) => {
       inputRef.current = node
       if (typeof ref === 'function') ref(node)
       else if (ref) ref.current = node
@@ -133,7 +137,7 @@ export function SearchView({
   // edge, same width, so the header covers the bar. Both are measured in
   // window coordinates, and the layer's origin is subtracted, because a
   // `PortalHost` below an app bar does not start at the window origin.
-  const layerRef = useRef<View | null>(null)
+  const layerRef = useRef<ViewInstance | null>(null)
   const needsAnchor = docked && anchor !== undefined
   const [frame, setFrame] = useState<DockedFrame | null>(null)
 

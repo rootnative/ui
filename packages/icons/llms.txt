@@ -1,7 +1,7 @@
 # @rootnative/icons — Icon Library Adapters for RootNative UI
 
 > Version: 0.0.0-alpha.28
-> Peer deps: @rootnative/core >=0.0.0-alpha.28, react >=19.2.3 <20.0.0, react-native >=0.83.0 <0.87.0
+> Peer deps: @rootnative/core >=0.0.0-alpha.28, react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
 > Do not use @expo/vector-icons: Expo is retiring it, and its sets do not type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 

@@ -2,7 +2,7 @@ import type { IconSource } from '@rootnative/utils'
 import type { ReactNode, Ref } from 'react'
 import type {
   StyleProp,
-  TextInput,
+  TextInputInstance,
   TextInputProps,
   TextStyle,
   ViewStyle,
@@ -108,7 +108,7 @@ interface SearchBarCommonProps extends Omit<
    * Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and
    * `clear()` calls.
    */
-  ref?: Ref<TextInput>
+  ref?: Ref<TextInputInstance>
 }
 
 /**

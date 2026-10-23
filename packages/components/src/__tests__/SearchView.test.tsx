@@ -3,7 +3,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
 import { BackHandler, Platform, StyleSheet, Text } from 'react-native'
-import type { TextInput, View } from 'react-native'
+import type { TextInputInstance, ViewInstance } from 'react-native'
 import { PortalHost } from '../portal/PortalHost'
 import { SearchView } from '../search-view/SearchView'
 import {
@@ -158,7 +158,7 @@ describe('SearchView', () => {
   })
 
   it('forwards a ref to the input', () => {
-    const ref = createRef<TextInput>()
+    const ref = createRef<TextInputInstance>()
     renderView({ ref })
     expect(ref.current).not.toBeNull()
     expect(typeof ref.current?.focus).toBe('function')
@@ -206,7 +206,7 @@ describe('SearchView — layout', () => {
   })
 
   it('waits for the anchor measurement before it mounts a docked surface', () => {
-    const anchor = createRef<View>()
+    const anchor = createRef<ViewInstance>()
     renderView({ layout: 'docked', anchor })
     // No anchor node to measure, so the surface never mounts.
     expect(screen.queryByTestId('view')).toBeNull()

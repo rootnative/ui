@@ -1,5 +1,5 @@
 import { useContext, useMemo } from 'react'
-import type { ComponentType, Ref } from 'react'
+import type { ComponentProps, ComponentType } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import {
@@ -16,7 +16,7 @@ type Edge = 'top' | 'right' | 'bottom' | 'left'
 // (`pointerEvents`, `testID`, accessibility props) type-errors at call sites.
 interface SafeAreaViewProps extends ViewProps {
   edges?: Edge[]
-  ref?: Ref<View>
+  ref?: ComponentProps<typeof View>['ref']
 }
 
 // The import above is **static on purpose**. A lazy `require()` in a try/catch

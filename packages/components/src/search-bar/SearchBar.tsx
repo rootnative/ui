@@ -6,6 +6,7 @@ import { Pressable, TextInput, View } from 'react-native'
 import type {
   NativeSyntheticEvent,
   TargetedEvent,
+  TextInputInstance,
   TextInputProps,
 } from 'react-native'
 import { IconButton } from '../icon-button'
@@ -59,9 +60,9 @@ export function SearchBar({
   const [internalValue, setInternalValue] = useState(
     () => value ?? textInputProps.defaultValue ?? '',
   )
-  const inputRef = useRef<TextInput>(null)
+  const inputRef = useRef<TextInputInstance>(null)
   const setInputRef = useCallback(
-    (node: TextInput | null) => {
+    (node: TextInputInstance | null) => {
       inputRef.current = node
       if (typeof ref === 'function') ref(node)
       else if (ref) ref.current = node

@@ -3,7 +3,10 @@ import type {
   BreakpointValues,
   MaterialTheme,
 } from '@rootnative/core'
-import type { FlexAlignType, ViewProps } from 'react-native'
+import type { ViewProps, ViewStyle } from 'react-native'
+
+// React Native 0.88 no longer exports `FlexAlignType`.
+type FlexAlignType = NonNullable<ViewStyle['alignItems']>
 
 /** A theme spacing token name or a raw numeric value in dp. */
 export type SpacingValue = keyof MaterialTheme['spacing'] | number

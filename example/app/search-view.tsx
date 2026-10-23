@@ -10,6 +10,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
+import type { ViewInstance } from 'react-native'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
@@ -26,7 +27,7 @@ export default function SearchViewScreen() {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [lastSearch, setLastSearch] = useState<string | null>(null)
-  const anchorRef = useRef<View>(null)
+  const anchorRef = useRef<ViewInstance>(null)
 
   const captionStyle = useMemo(
     () => ({ color: theme.colors.onSurfaceVariant }),

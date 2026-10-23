@@ -7,7 +7,12 @@ import {
 import type { SharedValue } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { LayoutChangeEvent, StyleProp, ViewStyle } from 'react-native'
+import type {
+  LayoutChangeEvent,
+  ScrollViewInstance,
+  StyleProp,
+  ViewStyle,
+} from 'react-native'
 import { ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -308,7 +313,7 @@ function ScrollableRow({
   selectedWidth,
   contentContainerStyle,
 }: ScrollableRowProps) {
-  const scrollRef = useRef<ScrollView>(null)
+  const scrollRef = useRef<ScrollViewInstance>(null)
   const viewportWidth = useRef(0)
   const contentWidth = useRef(0)
   const hasScrolled = useRef(false)

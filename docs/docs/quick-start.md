@@ -64,7 +64,7 @@ my-app/
 └── .gitignore
 ```
 
-There is no `babel.config.js`. Expo SDK 57 applies `babel-preset-expo` by
+There is no `babel.config.js`. Expo SDK 58 applies `babel-preset-expo` by
 default, so the templates ship no Babel config.
 
 The app icon, adaptive icon, favicon and splash screen carry the RootNative

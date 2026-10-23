@@ -2,10 +2,10 @@ import type { IconSource } from '@rootnative/utils'
 import type { ReactNode, Ref, RefObject } from 'react'
 import type {
   StyleProp,
-  TextInput,
+  TextInputInstance,
   TextInputProps,
   TextStyle,
-  View,
+  ViewInstance,
   ViewProps,
   ViewStyle,
 } from 'react-native'
@@ -54,7 +54,7 @@ export interface SearchViewProps extends Omit<ViewProps, 'style'> {
    * the header covers the bar. Without it, a docked view sits at the top of
    * the screen, centered, 720 dp wide at most.
    */
-  anchor?: RefObject<View | null>
+  anchor?: RefObject<ViewInstance | null>
   /** Controlled query. Pair it with `onChangeText`. */
   value?: string
   /** Initial query for the uncontrolled case. */
@@ -123,7 +123,7 @@ export interface SearchViewProps extends Omit<ViewProps, 'style'> {
    * Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and
    * `clear()` calls.
    */
-  ref?: Ref<TextInput>
+  ref?: Ref<TextInputInstance>
   /**
    * The body below the header: suggestions, recent queries, or results. It
    * fills the rest of the view. Put a scrollable list here when it can grow

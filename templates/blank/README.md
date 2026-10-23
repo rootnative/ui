@@ -21,7 +21,7 @@ Then press `i` for iOS, `a` for Android, or `w` for web.
 
 ## What's Included
 
-- Expo SDK 57
+- Expo SDK 58
 - `@rootnative/core` — Theme system with Material Design 3 tokens
 - `@rootnative/components` — UI components (Button, Card, Typography, and more)
 - ThemeProvider already wired up

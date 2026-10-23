@@ -47,7 +47,7 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 - `faqPage(questions: { question, answer }[])` — `Question` + `Answer` under `mainEntity`.
 - `RatingInput`: `{ ratingValue, ratingCount?, reviewCount?, bestRating? (5), worstRating? (1) }`. A rating with no count is left out.
 
-## `@rootnative/seo/react` — peers: react `>=19.2.3 <20.0.0`, react-native `>=0.83.0 <0.87.0`
+## `@rootnative/seo/react` — peers: react `>=19.3.0 <20.0.0`, react-native `>=0.88.0 <0.89.0`
 
 - `<SeoProvider site={site}>` — gives every `PageHead` and `RouteHead` below it the site, and tracks which route a `PageHead` claims.
 - `useSite(site?)` — the site for the tree. A `site` argument wins. Throws with no provider and no argument.

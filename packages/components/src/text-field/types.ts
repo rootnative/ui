@@ -2,7 +2,7 @@ import type { IconSource } from '@rootnative/utils'
 import type { Ref } from 'react'
 import type {
   StyleProp,
-  TextInput,
+  TextInputInstance,
   TextInputProps,
   TextStyle,
 } from 'react-native'
@@ -75,5 +75,5 @@ export interface TextFieldProps extends Omit<
    * Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and
    * `setSelection()` calls. The field keeps its own press-to-focus.
    */
-  ref?: Ref<TextInput>
+  ref?: Ref<TextInputInstance>
 }

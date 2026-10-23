@@ -1,6 +1,6 @@
 import { selectRTL } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { LayoutChangeEvent, View } from 'react-native'
+import type { LayoutChangeEvent, ViewInstance } from 'react-native'
 import { useWindowDimensions } from 'react-native'
 
 /** Side of the anchor the overlay prefers to occupy. */
@@ -79,7 +79,7 @@ export interface UseAnchorPositionOptions {
 
 export interface UseAnchorPositionResult {
   /** Attach to the view the overlay is anchored to. */
-  anchorRef: React.RefObject<View | null>
+  anchorRef: React.RefObject<ViewInstance | null>
   /**
    * Attach to the overlay layer — the absolute-fill view the positioned overlay
    * sits in. Its measured rect is what the overlay is fitted into: a
@@ -88,7 +88,7 @@ export interface UseAnchorPositionResult {
    * no way to reach it. Its origin is also subtracted from the result, so the
    * position is in layer coordinates.
    */
-  layerRef: React.RefObject<View | null>
+  layerRef: React.RefObject<ViewInstance | null>
   /**
    * Re-measure the anchor and the layer. Cheap; safe to call from `onLayout`.
    */
@@ -153,8 +153,8 @@ export function useAnchorPosition(
     maxHeight: maxOverlayHeight = Infinity,
   } = options
 
-  const anchorRef = useRef<View | null>(null)
-  const layerRef = useRef<View | null>(null)
+  const anchorRef = useRef<ViewInstance | null>(null)
+  const layerRef = useRef<ViewInstance | null>(null)
   const [anchor, setAnchor] = useState<AnchorRect | null>(null)
   const [layer, setLayer] = useState<AnchorRect | null>(null)
   const [overlay, setOverlay] = useState<AnchorSize | null>(null)

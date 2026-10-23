@@ -12,10 +12,14 @@ global.__DEV__ = true
 // `render` with no frame to wait for.
 jest.mock('expo-router/head', () => {
   const React = require('react')
-  const {
-    Helmet,
-    HelmetProvider,
-  } = require('expo-router/vendor/react-helmet-async/lib')
+  const path = require('path')
+  // expo-router 58 restricts its `exports` map, and `vendor/` is not in it,
+  // so the vendored copy is reached through the package directory.
+  const helmetLib = path.join(
+    path.dirname(require.resolve('expo-router/package.json')),
+    'vendor/react-helmet-async/lib',
+  )
+  const { Helmet, HelmetProvider } = require(helmetLib)
   const Head = ({ children }) =>
     React.createElement(Helmet, { defer: false }, children)
   Head.Provider = HelmetProvider

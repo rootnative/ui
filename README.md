@@ -4,7 +4,7 @@
 
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![pnpm 10](https://img.shields.io/badge/pnpm-10.x-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![Expo SDK 57](https://img.shields.io/badge/expo-57-000020?logo=expo&logoColor=white)](https://expo.dev/)
+[![Expo SDK 58](https://img.shields.io/badge/expo-58-000020?logo=expo&logoColor=white)](https://expo.dev/)
 [![Turborepo](https://img.shields.io/badge/monorepo-turbo-EF4444)](https://turbo.build/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -184,11 +184,20 @@ pnpm --filter example android
 pnpm --filter example web
 ```
 
+## Expo SDK compatibility
+
+Each release line supports one Expo SDK band. Install the line that matches the SDK of the app.
+
+| Expo SDK | `@rootnative/core`, `components`, `utils`, `icons`, `seo` | `@rootnative/inertia` |
+| --- | --- | --- |
+| 58 | `0.0.0-alpha.29` and later | `0.0.20` and later |
+| 57 | `0.0.0-alpha.16` to `0.0.0-alpha.28` (`npm install @rootnative/components@0.0.0-alpha.28`) | `0.0.11` to `0.0.19` |
+
 ## Tech Stack
 
 | Layer | Technology |
 | --- | --- |
-| Runtime | React 19.2, React Native 0.86.3, Expo SDK 57 |
+| Runtime | React 19.3, React Native 0.88.0, Expo SDK 58 |
 | Language | TypeScript 5 (strict mode) |
 | Build | tsup (package bundling), Turborepo (task orchestration) |
 | Package Manager | pnpm 10 (workspace protocol) |

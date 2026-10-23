@@ -340,13 +340,13 @@
   "peerDependencies": {
     "@react-native-vector-icons/material-design-icons": ">=13.0.0",
     "@rootnative/core": ">=0.0.0-alpha.28",
-    "@rootnative/inertia": ">=0.0.19 <0.1.0",
-    "react": ">=19.2.3 <20.0.0",
-    "react-native": ">=0.83.0 <0.87.0",
-    "react-native-reanimated": ">=4.5.0 <4.6.0",
+    "@rootnative/inertia": ">=0.0.20 <0.1.0",
+    "react": ">=19.3.0 <20.0.0",
+    "react-native": ">=0.88.0 <0.89.0",
+    "react-native-reanimated": ">=4.7.0 <4.8.0",
     "react-native-safe-area-context": ">=4.0.0",
     "react-native-svg": ">=15.0.0",
-    "react-native-worklets": ">=0.10.0 <0.11.0"
+    "react-native-worklets": ">=0.13.0 <0.14.0"
   },
   "peerDependenciesMeta": {
     "react-native-reanimated": {
@@ -361,10 +361,10 @@
   },
   "devDependencies": {
     "@react-native-vector-icons/material-design-icons": "^13.1.4",
-    "@react-native/babel-preset": "^0.86.3",
-    "@react-native/jest-preset": "^0.86.3",
+    "@react-native/babel-preset": "^0.88.0",
+    "@react-native/jest-preset": "^0.88.0",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.19",
+    "@rootnative/inertia": "0.0.20",
     "@rootnative/utils": "workspace:*",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-native": "^13.3.3",
@@ -372,13 +372,13 @@
     "@types/react": "^19.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-native": "0.86.3",
-    "react-native-reanimated": "4.5.1",
-    "react-native-web": "^0.21.0",
-    "react-native-worklets": "0.10.1",
-    "react-test-renderer": "19.2.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-reanimated": "4.7.1",
+    "react-native-web": "^0.21.4",
+    "react-native-worklets": "0.13.0",
+    "react-test-renderer": "19.3.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }

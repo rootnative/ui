@@ -129,7 +129,11 @@ describe('mode resolution', () => {
   // RN 0.86 replaced the `null` "no OS preference" value with 'unspecified'.
   // `useColorScheme()` no longer returns null at all.
   it('treats an unspecified OS scheme as light', () => {
-    mockedUseColorScheme.mockReturnValue('unspecified')
+    mockedUseColorScheme.mockReturnValue(
+      // React Native 0.88 types the scheme as light, dark or null, but the
+      // runtime value of 0.86 still reaches the hook.
+      'unspecified' as unknown as ReturnType<typeof useColorScheme>,
+    )
 
     render(
       <ThemeProvider theme={pair}>

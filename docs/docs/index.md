@@ -8,7 +8,7 @@ description: Design-system agnostic component library for React Native, with Mat
 
 Design-system agnostic component library for React Native. Ships with Material Design 3 out of the box.
 
-Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 57 runtime. See [Installation](./installation#platforms) for the platform table.
+Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 58 runtime. See [Installation](./installation#platforms) for the platform table.
 
 ## Features
 

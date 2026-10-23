@@ -2,9 +2,9 @@
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: `@rootnative/core` 0.0.0-alpha.28 · `@rootnative/components` 0.0.0-alpha.28 · `@rootnative/icons` 0.0.0-alpha.28 · `@rootnative/seo` 0.0.0-alpha.28 · `@rootnative/cli` 0.0.0-alpha.28
-> Requirements: react-native >=0.83.0 <0.87.0, react >=19.2.3 <20.0.0, Expo SDK 57
+> Requirements: react-native >=0.88.0 <0.89.0, react >=19.3.0 <20.0.0, Expo SDK 58
 > Platforms: iOS, Android, and web through `react-native-web` (web also needs `react-dom`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
-> Peer deps: `react-native-safe-area-context >=4.0.0`, `react-native-reanimated >=4.5.0 <4.6.0`, `react-native-worklets >=0.10.0 <0.11.0` (Reanimated 4 runtime — Expo SDK 57 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
+> Peer deps: `react-native-safe-area-context >=4.0.0`, `react-native-reanimated >=4.7.0 <4.8.0`, `react-native-worklets >=0.13.0 <0.14.0` (Reanimated 4 runtime — Expo SDK 58 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
 > Optional peer: `@react-native-vector-icons/material-design-icons >=13.0.0` (plus `expo-font` on Expo), imported only by the `@rootnative/components/mdi` subpath (`mdiResolver`, the MaterialDesignIcons resolver for string icon names). An app with its own `iconResolver` does not install it
 > Do not use `@expo/vector-icons`: Expo is retiring it, and it registers the same font, so the glyphs render as `?`. Use `@react-native-vector-icons/*` (see Icons)
 
@@ -33,7 +33,7 @@ Pass name directly: `npx rootnative create my-app`
 pnpm add @rootnative/core @rootnative/components @react-native-vector-icons/material-design-icons expo-font react-native-safe-area-context react-native-reanimated react-native-worklets
 ```
 
-Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 57 bundles its Babel plugin — nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` last in `babel.config.js` plugins.
+Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 58 bundles its Babel plugin — nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` last in `babel.config.js` plugins.
 
 ---
 
@@ -1336,7 +1336,7 @@ Props:
 - `containerColor?: string` — Override the container (background) color. Disabled state still uses the standard disabled appearance.
 - `contentColor?: string` — Override the content (input text and icon) color. Error and disabled states take precedence.
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
-- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `setSelection()` calls. The field keeps its own press-to-focus.
+- `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `setSelection()` calls. The field keeps its own press-to-focus.
 
 ---
 
@@ -1379,7 +1379,7 @@ Props:
 - `contentColor?: string` — Override the content (input text and icon) color. Disabled state keeps the standard appearance.
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. The MD3 maximum width is 720 dp — set `maxWidth` here to change it.
-- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
+- `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
 - `actions?: SearchBarAction[]` — Icon buttons rendered in the trailing slot, such as a voice action. Mutually exclusive with `trailing`.
 - `trailing?: ReactNode` — Custom trailing content, such as an `Avatar`. Mutually exclusive with `actions` — the type rejects both together. The clear button is not part of the slot: it shows before either one while the bar holds text.
 - Inherits `TextInputProps` (except `editable`, `style`)
@@ -1423,7 +1423,7 @@ Props:
 - `visible: boolean` — Whether the view is open. The view mounts when this becomes `true`.
 - `onDismiss: () => void` — Called when the view asks to close: the back button, the Android back button, Escape on web, or a press outside a docked view. Set `visible` to `false` in response.
 - `layout?: 'auto' | 'fullscreen' | 'docked'` — Default: `'auto'`. The layout. `'auto'` is full screen on a compact window and docked on a wider one.
-- `anchor?: RefObject<View | null>` — The view the docked layout opens from, usually a `View` around the `SearchBar`. The docked view takes its left edge, top edge and width, so the header covers the bar. Without it, a docked view sits at the top of the screen, centered, 720 dp wide at most.
+- `anchor?: RefObject<ViewInstance | null>` — The view the docked layout opens from, usually a `View` around the `SearchBar`. The docked view takes its left edge, top edge and width, so the header covers the bar. Without it, a docked view sits at the top of the screen, centered, 720 dp wide at most.
 - `value?: string` — Controlled query. Pair it with `onChangeText`.
 - `defaultValue?: string` — Initial query for the uncontrolled case.
 - `onChangeText?: (text: string) => void` — Called on every change to the query.
@@ -1442,7 +1442,7 @@ Props:
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
 - `style?: StyleProp<ViewStyle>` — Style applied to the surface. A docked view reads `maxHeight` from it, the default is two thirds of the window height.
 - `inputProps?: Omit<TextInputProps, 'value' | 'defaultValue' | 'onChangeText' | 'placeholder' | 'placeholderTextColor' | 'editable' | 'style' | 'ref' | 'autoFocus'>` — Other props of the `TextInput`, such as `autoCapitalize`.
-- `ref?: Ref<TextInput>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
+- `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
 - `children?: ReactNode` — The body below the header: suggestions, recent queries, or results. It fills the rest of the view. Put a scrollable list here when it can grow past the view.
 - Inherits `ViewProps` (except `style`)
 
@@ -2809,7 +2809,7 @@ Each returns a `JsonLd` with `@context: 'https://schema.org'` and `@type` set. E
 - `faqPage(questions: { question, answer }[])` — `Question` + `Answer` under `mainEntity`.
 - `RatingInput`: `{ ratingValue, ratingCount?, reviewCount?, bestRating? (5), worstRating? (1) }`. A rating with no count is left out.
 
-## `@rootnative/seo/react` — peers: react `>=19.2.3 <20.0.0`, react-native `>=0.83.0 <0.87.0`
+## `@rootnative/seo/react` — peers: react `>=19.3.0 <20.0.0`, react-native `>=0.88.0 <0.89.0`
 
 - `<SeoProvider site={site}>` — gives every `PageHead` and `RouteHead` below it the site, and tracks which route a `PageHead` claims.
 - `useSite(site?)` — the site for the tree. A `site` argument wins. Throws with no provider and no argument.

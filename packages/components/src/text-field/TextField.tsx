@@ -14,7 +14,11 @@ import {
 import { renderIcon, resolveLogical } from '@rootnative/utils'
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
-import type { NativeSyntheticEvent, TargetedEvent } from 'react-native'
+import type {
+  NativeSyntheticEvent,
+  TargetedEvent,
+  TextInputInstance,
+} from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
@@ -86,9 +90,9 @@ export function TextField({
   const [internalValue, setInternalValue] = useState(
     () => value ?? textInputProps.defaultValue ?? '',
   )
-  const inputRef = useRef<TextInput>(null)
+  const inputRef = useRef<TextInputInstance>(null)
   const setInputRef = useCallback(
-    (node: TextInput | null) => {
+    (node: TextInputInstance | null) => {
       inputRef.current = node
       if (typeof ref === 'function') ref(node)
       else if (ref) ref.current = node

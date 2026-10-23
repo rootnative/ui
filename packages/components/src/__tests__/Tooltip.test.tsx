@@ -5,11 +5,17 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { act, fireEvent, screen } from '@testing-library/react-native'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type {
+  MeasureInWindowOnSuccessCallback,
+  StyleProp,
+  ViewStyle,
+} from 'react-native'
 import { StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
 import { PortalHost } from '../portal/PortalHost'
 import { Tooltip } from '../tooltip'
+
+type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
 
 function renderTooltip(ui: React.ReactElement) {
   return renderWithTheme(<PortalHost>{ui}</PortalHost>)
@@ -453,20 +459,28 @@ describe('Tooltip — resolved placement', () => {
 
   beforeEach(() => {
     anchorRect = { x: 100, y: 300, width: 40, height: 40 }
-    jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { style?: StyleProp<ViewStyle> } },
-      callback,
-    ) {
-      // Only the overlay layer absolute-fills with `box-none`; the other
-      // measured view is the wrapper around the anchor. The flag is read out
-      // of the resolved style, not a prop — react-native-web deprecated the
-      // prop spelling, so the components carry it in `style`.
-      const rect =
-        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
-          ? LAYER
-          : anchorRect
-      callback(rect.x, rect.y, rect.width, rect.height)
-    })
+    jest
+      .spyOn(
+        // React Native 0.88 types `View` as a function component, so its
+        // prototype carries no `measureInWindow` in the types. The jest mock
+        // of `View` is still a class, and the spy lands on it.
+        View.prototype as unknown as { measureInWindow: MeasureInWindow },
+        'measureInWindow',
+      )
+      .mockImplementation(function (
+        this: { props?: { style?: StyleProp<ViewStyle> } },
+        callback: MeasureInWindowOnSuccessCallback,
+      ) {
+        // Only the overlay layer absolute-fills with `box-none`; the other
+        // measured view is the wrapper around the anchor. The flag is read out
+        // of the resolved style, not a prop — react-native-web deprecated the
+        // prop spelling, so the components carry it in `style`.
+        const rect =
+          StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+            ? LAYER
+            : anchorRect
+        callback(rect.x, rect.y, rect.width, rect.height)
+      })
   })
 
   afterEach(() => {
@@ -514,16 +528,24 @@ describe('Tooltip — settled entrance', () => {
   const ANCHOR = { x: 100, y: 300, width: 40, height: 40 }
 
   function mockMeasure() {
-    jest.spyOn(View.prototype, 'measureInWindow').mockImplementation(function (
-      this: { props?: { style?: StyleProp<ViewStyle> } },
-      callback,
-    ) {
-      const rect =
-        StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
-          ? LAYER
-          : ANCHOR
-      callback(rect.x, rect.y, rect.width, rect.height)
-    })
+    jest
+      .spyOn(
+        // React Native 0.88 types `View` as a function component, so its
+        // prototype carries no `measureInWindow` in the types. The jest mock
+        // of `View` is still a class, and the spy lands on it.
+        View.prototype as unknown as { measureInWindow: MeasureInWindow },
+        'measureInWindow',
+      )
+      .mockImplementation(function (
+        this: { props?: { style?: StyleProp<ViewStyle> } },
+        callback: MeasureInWindowOnSuccessCallback,
+      ) {
+        const rect =
+          StyleSheet.flatten(this.props?.style)?.pointerEvents === 'box-none'
+            ? LAYER
+            : ANCHOR
+        callback(rect.x, rect.y, rect.width, rect.height)
+      })
   }
 
   afterEach(() => {

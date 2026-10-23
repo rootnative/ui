@@ -1,15 +1,15 @@
 ---
 sidebar_position: 3
-description: Install RootNative UI into an existing app — peer dependencies, provider setup, and the Expo SDK 57 runtime the library targets.
+description: Install RootNative UI into an existing app — peer dependencies, provider setup, and the Expo SDK 58 runtime the library targets.
 ---
 
 # Installation
 
 ## Prerequisites
 
-- Expo SDK 57 (if using Expo)
-- React Native `>=0.83.0 <0.87.0` (developed and tested against 0.86.3)
-- React `>=19.2.3 <20.0.0`
+- Expo SDK 58 (if using Expo)
+- React Native `>=0.88.0 <0.89.0` (developed and tested against 0.88.0)
+- React `>=19.3.0 <20.0.0`
 
 ## Platforms
 
@@ -28,17 +28,25 @@ list.
 
 ## Supported runtime
 
-The library targets **one SDK band, not a floor.** Expo SDK 57 is the whole
-supported range today, so `SDK 57+` is not correct: the peer ranges stop below
-React Native 0.87 and below Reanimated 4.6, which the next SDK will carry.
+The library targets **one SDK band, not a floor.** Expo SDK 58 is the whole
+supported range today, so `SDK 58+` is not correct: the peer ranges stop below
+React Native 0.89 and below Reanimated 4.8, which the next SDK will carry.
 
 The reason is that Reanimated and `react-native-worklets` move together, and
-each pair works with one React Native band. Reanimated 4.5 needs worklets
-0.10.x and React Native 0.83–0.86. A wider range would let a package manager
-mix a new Reanimated with an old worklets, which cannot install. Supporting a
-second SDK therefore needs a second release line, not a wider range.
+each pair works with one React Native band. Reanimated 4.7 needs worklets
+0.13.x and React Native 0.86–0.88, and React 19.2.3 does not pair with React
+Native 0.88. A wider range would let a package manager mix a new Reanimated
+with an old worklets, which cannot install. Supporting a second SDK therefore
+needs a second release line, not a wider range.
 
-The example app and the templates pin the same SDK 57 runtime.
+Each release line supports one Expo SDK band. Install the line that matches the SDK of the app.
+
+| Expo SDK | `@rootnative/core`, `components`, `utils`, `icons`, `seo` | `@rootnative/inertia` |
+| --- | --- | --- |
+| 58 | `0.0.0-alpha.29` and later | `0.0.20` and later |
+| 57 | `0.0.0-alpha.16` to `0.0.0-alpha.28` (`npm install @rootnative/components@0.0.0-alpha.28`) | `0.0.11` to `0.0.19` |
+
+The example app and the templates pin the same SDK 58 runtime.
 
 ## Install packages
 
@@ -69,9 +77,9 @@ What each one does, and which three you can leave out:
 
 [`createMaterialTheme`](./theming#generate-a-theme-from-a-seed-color) needs no extra install: the MD3 color engine (`@material/material-color-utilities`) is bundled inside `@rootnative/core`, behind the `@rootnative/core/create-theme` subpath. Projects that define themes by hand never load it.
 
-`react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 57 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
+`react-native-reanimated` is SDK-vetted and pre-linked in Expo Go on SDK 58 — its native code ships inside the Expo Go binary, so no custom dev client is required. You still install the JavaScript package yourself; `npx expo install` picks the version that matches your SDK. Reanimated 4 runs on `react-native-worklets`, which is why the two are installed together. RootNative never calls Reanimated directly; it animates through [`@rootnative/inertia`](./motion), which sits on top of it.
 
-> **Expo SDK 57 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
+> **Expo SDK 58 bundles the worklets Babel plugin — nothing to configure.** On bare React Native, add `'react-native-worklets/plugin'` to your `babel.config.js` `plugins` (listed last).
 >
 > **Vite, webpack, Electron and other bundlers without Metro** skip `node_modules` by default, so the plugin never reaches the library and nothing animates. [Web without Expo](./web-without-expo.md) has the include list and the full config.
 

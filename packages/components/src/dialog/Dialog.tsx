@@ -1,7 +1,7 @@
 import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { Children, Fragment, isValidElement, useMemo } from 'react'
-import type { ReactNode, Ref } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
@@ -86,7 +86,7 @@ function DialogBasic({
   styles: ReturnType<typeof createDialogStyles>
   style: DialogProps['style']
   testID?: string
-  surfaceRef: Ref<View>
+  surfaceRef: NonNullable<ComponentProps<typeof View>['ref']>
 }) {
   return (
     <View
@@ -127,7 +127,7 @@ function DialogFullscreen({
   closeIcon: DialogProps['closeIcon']
   closeAccessibilityLabel: string
   onDismiss: () => void
-  surfaceRef: Ref<View>
+  surfaceRef: NonNullable<ComponentProps<typeof View>['ref']>
 }) {
   return (
     <SafeAreaView
