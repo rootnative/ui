@@ -163,9 +163,10 @@ if (!browser) {
   console.warn('[check-export] --no-browser: the browser pass is skipped.')
 }
 
-// The not-found screen renders a `PageHead` with `noindex` and no `url`, and
-// the route defaults would give it a canonical link. The `PageHead` must win
-// the whole page, so the export holds no canonical link here.
+// The host serves the not-found page at every unknown path, so its head has
+// `noindex` and no canonical link. On Expo SDK 58 that head comes from
+// `NOT_FOUND_META` in `app/+not-found.tsx` on a server export, and from its
+// copy in `write-seo.mjs` on a static export.
 const notFound = resolve(pagesDir, '+not-found.html')
 if (existsSync(notFound)) {
   const html = readFileSync(notFound, 'utf8')
@@ -178,7 +179,7 @@ if (existsSync(notFound)) {
   }
   if (count(html, /<link[^>]*rel="canonical"/g) !== 0) {
     problems.push(
-      '+not-found.html: has a canonical link. The PageHead must win over the route defaults; is <RouteHead /> after the navigator?',
+      '+not-found.html: has a canonical link. Its meta must have no `url`: check NOT_FOUND_META in app/+not-found.tsx and its copy in scripts/write-seo.mjs.',
     )
   }
 } else {
