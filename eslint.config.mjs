@@ -98,6 +98,21 @@ export default [
           ],
         },
       ],
+      // No dependency list on a Reanimated worklet hook. Reanimated 4.7
+      // ignores the list on native and logs "Dependencies should only be used
+      // on the web" in development, so the consumer sees a warning that points
+      // at no code of their own. Reanimated builds the list from the worklet
+      // closures on every platform. A lint rule for the same reason as
+      // `pointerEvents`: the warning is `warnOnce`-guarded.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name=/^use(AnimatedStyle|AnimatedProps|DerivedValue)$/][arguments.length>1], CallExpression[callee.name='useAnimatedReaction'][arguments.length>2]",
+          message:
+            'Do not pass a dependency list to a Reanimated worklet hook. Reanimated 4.7 ignores it on native and warns in development.',
+        },
+      ],
 
       // React Native
       'react-native/no-raw-text': 'off',

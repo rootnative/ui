@@ -136,7 +136,7 @@ export function LinearProgress({
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const w = Math.max(0, v * (progressArea - midGap))
     return { left: 0, width: w }
-  }, [progressArea])
+  })
 
   const inactiveStyle = useAnimatedStyle(() => {
     const v = progressShared.value
@@ -145,7 +145,7 @@ export function LinearProgress({
     const left = aw + midGap
     const w = Math.max(0, progressArea - aw - midGap)
     return { left, width: w }
-  }, [progressArea])
+  })
 
   const accessibilityValue = indeterminate
     ? undefined

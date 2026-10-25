@@ -83,7 +83,7 @@ export function SegmentSlot({
       borderTopRightRadius: segment.cornerRight,
       borderBottomRightRadius: segment.cornerRight,
     }
-  }, [segment])
+  })
 
   return (
     <Animated.View
@@ -125,7 +125,7 @@ export function StopIndicatorSlot({
       left: center - SLIDER_STOP_INDICATOR / 2,
       opacity: 1,
     }
-  }, [segment])
+  })
 
   return (
     <Animated.View
@@ -245,17 +245,14 @@ export function StateLayerSlot({
     pressedOpacity: PRESS_OPACITY,
   } = theme.stateLayer
 
-  const animatedStyle = useAnimatedStyle(
-    () => ({
-      left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
-      opacity: Math.max(
-        Math.max(0, Math.min(1, hovered.value)) * HOVER_OPACITY,
-        Math.max(0, Math.min(1, focused.value)) * FOCUS_OPACITY,
-        Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
-      ),
-    }),
-    [centerX, HOVER_OPACITY, FOCUS_OPACITY, PRESS_OPACITY],
-  )
+  const animatedStyle = useAnimatedStyle(() => ({
+    left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
+    opacity: Math.max(
+      Math.max(0, Math.min(1, hovered.value)) * HOVER_OPACITY,
+      Math.max(0, Math.min(1, focused.value)) * FOCUS_OPACITY,
+      Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
+    ),
+  }))
   return (
     <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
@@ -274,13 +271,10 @@ export function FocusRingSlot({
   focused,
   baseStyle,
 }: FocusRingSlotProps) {
-  const animatedStyle = useAnimatedStyle(
-    () => ({
-      left: centerX - SLIDER_FOCUS_RING_SIZE / 2,
-      opacity: focused.value,
-    }),
-    [centerX],
-  )
+  const animatedStyle = useAnimatedStyle(() => ({
+    left: centerX - SLIDER_FOCUS_RING_SIZE / 2,
+    opacity: focused.value,
+  }))
   return (
     <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
@@ -326,7 +320,7 @@ export function TickSlot({
       ? Math.min(1, Math.max(0, (highDist - highGap) / 2))
       : 1
     return { opacity: Math.min(lowFade, highFade) }
-  }, [cx, lowPos, highPos, hasHigh])
+  })
 
   const positionStyle = { left: cx - SLIDER_TICK_SIZE / 2 }
 

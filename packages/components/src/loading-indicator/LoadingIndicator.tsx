@@ -146,7 +146,7 @@ export function LoadingIndicator({
       ? spinPhase.value * 360 + pos * QUARTER_ROTATION
       : -pos * 180
     return { d: pointsToPath(pts, scale, center, (deg * Math.PI) / 180) }
-  }, [flatShapes, scale, center, indeterminate, determinateValue])
+  })
 
   const accessibilityValue = indeterminate
     ? undefined

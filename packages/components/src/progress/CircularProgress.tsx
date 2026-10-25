@@ -132,7 +132,7 @@ export function CircularProgress({
       // segment one gap past the end of the active arc).
       strokeDashoffset: -(activeLength + gapLength),
     }
-  }, [indeterminate, circumference, gapLength])
+  })
 
   const indicatorAnimatedProps = useAnimatedProps(() => {
     if (indeterminate) {
@@ -148,7 +148,7 @@ export function CircularProgress({
       strokeDasharray: `${activeLength} ${Math.max(0, circumference - activeLength)}`,
       strokeDashoffset: 0,
     }
-  }, [indeterminate, circumference, gapLength])
+  })
 
   const accessibilityValue = indeterminate
     ? undefined

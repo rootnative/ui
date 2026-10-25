@@ -9,6 +9,21 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No breaking change.** One fix in `components`.
+
+### The progress family and `Slider` no longer cause a Reanimated warning on native
+
+On native, in development, Reanimated 4.7 logs "Dependencies should only be
+used on the web and are always ignored on native" when a worklet hook gets a
+dependency list. `LinearProgress`, `CircularProgress`, `LoadingIndicator`
+and `Slider` passed a list to `useAnimatedStyle` or `useAnimatedProps` in 10
+places, so an app that rendered one of them printed the warning and found no
+offending code in its own source. The 10 calls now pass no list, and
+Reanimated builds the list from the worklet closures on native and on the
+web. No change in a production build.
+
 ## 0.0.0-alpha.29 — 2026-10-23
 
 The Expo SDK 58 release. **Breaking:** every package moves to the SDK 58
