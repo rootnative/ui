@@ -160,9 +160,10 @@ export type {
   NavigationDrawerVariant,
 } from './navigation-drawer'
 
-export { List, ListItem, ListDivider } from './list'
+export { List, ListHeadline, ListItem, ListDivider } from './list'
 export type {
   ListProps,
+  ListHeadlineProps,
   ListItemLines,
   ListItemProps,
   ListDividerProps,

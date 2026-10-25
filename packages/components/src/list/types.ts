@@ -1,5 +1,11 @@
 import type { ReactNode } from 'react'
-import type { StyleProp, TextStyle, ViewProps, ViewStyle } from 'react-native'
+import type {
+  StyleProp,
+  TextProps,
+  TextStyle,
+  ViewProps,
+  ViewStyle,
+} from 'react-native'
 import type { DividerProps } from '../divider'
 
 export interface ListProps extends ViewProps {
@@ -8,7 +14,8 @@ export interface ListProps extends ViewProps {
   /**
    * Section headline in `titleSmall` and `onSurfaceVariant`, above the items.
    * It has the same start and end padding as `ListItem`. Omit it for a list
-   * with no title.
+   * with no title. For a `FlatList`, put `List.Headline` in its
+   * `ListHeaderComponent` instead.
    */
   headline?: string
   /**
@@ -20,6 +27,26 @@ export interface ListProps extends ViewProps {
   /** Style applied to the headline `Text`. */
   headlineStyle?: StyleProp<TextStyle>
   style?: StyleProp<ViewStyle>
+}
+
+/**
+ * The section headline of a `List` as its own component, for a list that
+ * `List` does not wrap. A `FlatList` inside `List` gets no bounded height,
+ * so a long list puts `List.Headline` in `ListHeaderComponent`.
+ */
+export interface ListHeadlineProps extends Omit<
+  TextProps,
+  'children' | 'style'
+> {
+  /** The headline text. */
+  children: ReactNode
+  /**
+   * The outline level of the headline on web, where it renders as `<hN>`.
+   * Native has no heading levels and ignores it.
+   * @default 2
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  style?: StyleProp<TextStyle>
 }
 
 /** Number of text lines the item displays, used to determine minimum height. */

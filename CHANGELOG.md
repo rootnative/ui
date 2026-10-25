@@ -11,8 +11,29 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix and two new `ListItem` props in
-`components`.
+**No breaking change.** One fix, two new `ListItem` props and one new
+`List` part in `components`, and one fix in the `llms.txt` files.
+
+### `List.Headline` for a long list in a `FlatList`
+
+`List` renders all its children and does not scroll. A `FlatList` inside a
+`List` got no bounded height, so the end of a long list did not scroll into
+view, and the headline was not available on its own to move into the
+`FlatList`. The headline is now exported as `List.Headline`, and by name as
+`ListHeadline`. It takes `headingLevel` and `style`, and `List` renders its
+`headline` through it, so the two look the same. Put it in the
+`ListHeaderComponent` of a `FlatList` with `ListItem` rows. The List page
+has a "Long lists" section with the pattern.
+
+### `llms.txt` names the inherited props of 10 more components
+
+The generator dropped the "Inherits" line of a props type whose
+`extends Omit<…>` clause is longer than one line. That was the case for
+`Button`, `Checkbox`, `FAB`, `IconButton`, `Switch`, `TextField`, the
+`NavigationDrawer` props, `NavigationDrawer.Item`, `NavigationDrawer.Section`
+and the `SearchBar` props. Their entries now say which React Native props
+they take, for example "Inherits `PressableProps` (except `children`,
+`style`)".
 
 ### `ListItem` takes a line limit for the headline and the overline
 

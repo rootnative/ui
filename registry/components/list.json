@@ -4,6 +4,7 @@
   "files": [
     "packages/components/src/list/List.tsx",
     "packages/components/src/list/ListDivider.tsx",
+    "packages/components/src/list/ListHeadline.tsx",
     "packages/components/src/list/ListItem.tsx",
     "packages/components/src/list/index.ts",
     "packages/components/src/list/styles.ts",

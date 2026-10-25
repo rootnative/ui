@@ -84,6 +84,67 @@ On web it renders as `<h2>`. Use `headingLevel` to change the level:
 `}
 />
 
+## Long lists
+
+`List` renders all its children, and it does not scroll. For a long list,
+use a `FlatList` as the scroller, with `ListItem` rows. Do not put the
+`FlatList` inside `List`: there it gets no bounded height, so its end does
+not scroll into view. Put `List.Headline` in `ListHeaderComponent` in place
+of the `headline` prop. It takes `headingLevel` and `style`, the same as
+`headingLevel` and `headlineStyle` on `List`. In an edge-to-edge app, add
+the bottom inset to `contentContainerStyle`, so the last row is not under
+the gesture bar:
+
+<SnackExample
+  name="RootNative List — Long lists"
+  code={`
+  import { FlatList } from 'react-native'
+  import { List, ListItem } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import {
+    SafeAreaProvider,
+    useSafeAreaInsets,
+  } from 'react-native-safe-area-context'
+
+  const SOURCES = [
+    'ABC News',
+    'Al Jazeera',
+    'Associated Press',
+    'BBC News',
+    'Bloomberg',
+    'CNN',
+    'NPR',
+    'Reuters',
+    'The Guardian',
+    'The Hindu',
+  ]
+
+  function Sources() {
+    const insets = useSafeAreaInsets()
+    return (
+      <FlatList
+        data={SOURCES}
+        keyExtractor={(item) => item}
+        ListHeaderComponent={<List.Headline>News sources</List.Headline>}
+        renderItem={({ item }) => <ListItem headlineText={item} />}
+        contentContainerStyle={{ paddingBottom: insets.bottom }}
+      />
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <Sources />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
 ## Leading and trailing content
 
 Pass any `ReactNode` as `leadingContent` or `trailingContent`:
@@ -247,6 +308,10 @@ Use `insetStart` to align the divider with text that follows a leading icon:
 ## List Props
 
 <PropTable name="List" />
+
+## List.Headline Props
+
+<PropTable name="ListHeadline" />
 
 ## ListItem Props
 

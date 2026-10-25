@@ -1,7 +1,7 @@
 import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 import { List } from '../list/List'
 import { ListDivider } from '../list/ListDivider'
 import { ListItem } from '../list/ListItem'
@@ -48,6 +48,26 @@ describe('List', () => {
     )
     const headline = screen.getByRole('heading', { name: 'News' })
     expect(StyleSheet.flatten(headline.props.style).color).toBe('#FF0000')
+  })
+
+  it('exports the headline as List.Headline for a FlatList header', () => {
+    renderWithTheme(
+      <FlatList
+        data={['Reuters', 'AP']}
+        keyExtractor={(item) => item}
+        ListHeaderComponent={
+          <List.Headline style={{ color: '#FF0000' }}>Sources</List.Headline>
+        }
+        renderItem={({ item }) => <ListItem headlineText={item} />}
+      />,
+    )
+    const headline = screen.getByRole('heading', { name: 'Sources' })
+    const style = StyleSheet.flatten(headline.props.style)
+    expect(style.fontSize).toBe(lightTheme.typography.titleSmall.fontSize)
+    expect(style.paddingStart).toBe(16)
+    expect(style.paddingEnd).toBe(24)
+    expect(style.color).toBe('#FF0000')
+    expect(screen.getByText('AP')).toBeTruthy()
   })
 })
 

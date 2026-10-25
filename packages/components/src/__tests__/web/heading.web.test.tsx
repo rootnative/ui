@@ -112,6 +112,18 @@ describe('List headline level on the web', () => {
   })
 })
 
+describe('List.Headline level on the web', () => {
+  it('is <h2> by default', () => {
+    renderWeb(<List.Headline>Sources</List.Headline>)
+    expect(screen.getByText('Sources').tagName).toBe('H2')
+  })
+
+  it('follows headingLevel', () => {
+    renderWeb(<List.Headline headingLevel={3}>Sources</List.Headline>)
+    expect(screen.getByText('Sources').tagName).toBe('H3')
+  })
+})
+
 describe('AppBar title level on the web', () => {
   it('is <h1> by default', () => {
     renderWeb(

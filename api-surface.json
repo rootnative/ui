@@ -203,6 +203,8 @@
         "List",
         "ListDivider",
         "ListDividerProps",
+        "ListHeadline",
+        "ListHeadlineProps",
         "ListItem",
         "ListItemLines",
         "ListItemProps",

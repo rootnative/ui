@@ -303,7 +303,14 @@ function parseTypeSource(content: string): ParseResult {
       const extendsArr: string[] = []
       const extendsMatch = declText.match(/extends\s+([\s\S]+?)(?:\s*\{)/)
       if (extendsMatch) {
-        const normalized = extendsMatch[1].replace(/\s+/g, ' ').trim()
+        // Prettier breaks a long `extends Omit<…>` over several lines. Joined,
+        // that reads `Omit< TextProps, … >`, which `formatInheritsNote` does
+        // not match, and the Inherits line is dropped with no error.
+        const normalized = extendsMatch[1]
+          .replace(/\s+/g, ' ')
+          .replace(/<\s/g, '<')
+          .replace(/,?\s>/g, '>')
+          .trim()
         extendsArr.push(...splitExtendsClause(normalized))
       }
 
@@ -1449,6 +1456,17 @@ import { Grid } from '@rootnative/components/layout'
         typeAliases,
         '#### List',
         'Container for list items.',
+      )
+      output += '\n'
+    }
+
+    const headlineIface = interfaces.find((i) => i.name === 'ListHeadlineProps')
+    if (headlineIface) {
+      output += formatSubInterface(
+        headlineIface,
+        typeAliases,
+        '#### List.Headline',
+        'The `List` headline as its own component. A `FlatList` inside `List` gets no bounded height, so a long list puts `List.Headline` in the `ListHeaderComponent` of a `FlatList`, with `ListItem` rows.',
       )
       output += '\n'
     }

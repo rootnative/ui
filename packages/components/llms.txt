@@ -243,6 +243,7 @@ Props:
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
 - `loading?: boolean` — Default: `false`. Show an indeterminate `CircularProgress` in place of `leadingIcon`, at the icon size and in the label color. The button keeps its colors and its focus, ignores `onPress` and `onLongPress`, shows no hover or press state, and sets `aria-busy`. MD3 has no loading button, so this is a library addition. With no `leadingIcon`, the spinner adds the icon and its gap, so the button gets wider while it loads. Give it a `width` in `style` to keep the size. Pass `disabled` as well if the button must also look disabled.
 - `style?: StyleProp<ViewStyle>` — Style for the component. The keys that place or size it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. `minWidth` and `maxWidth` go with a `width`; alone, they style the container. The wrapper sets no `alignSelf`, so the parent's `alignItems` places the component. In a parent that stretches its children, the component keeps its own width at the start edge. Every other key styles the container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- Inherits `PressableProps` (except `children`, `style`)
 
 ---
 
@@ -344,6 +345,7 @@ Props:
 - `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
 - `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
 - `accessibilityLabel: string` — Required — icon-only buttons must have a label for screen readers.
+- Inherits `PressableProps` (except `children`, `onPress`, `style`, `accessibilityLabel`)
 
 ---
 
@@ -399,6 +401,7 @@ Props:
 - `onPress?: () => void` — Called when the FAB is pressed.
 - `disabled?: boolean` — Default: `false`. Disables the FAB.
 - `accessibilityLabel?: string` — Accessible name for screen readers. Required for icon-only FABs. When `label` is set, defaults to the label and may be omitted (override only if you need a more descriptive name).
+- Inherits `PressableProps` (except `children`, `onPress`, `style`, `accessibilityLabel`)
 
 ---
 
@@ -608,6 +611,7 @@ Props:
 - `containerColor?: string` — Override the container (box) color when checked. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the checkmark icon color.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- Inherits `PressableProps` (except `children`, `style`)
 
 ---
 
@@ -648,6 +652,7 @@ Props:
 - `containerColor?: string` — Override the track color. State-layer colors (hover, press) are derived automatically.
 - `contentColor?: string` — Override the thumb and icon color.
 - `style?: StyleProp<ViewStyle>` — Style for the switch. The keys that place it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to an outer view, so the focus ring moves with the track. `minWidth` and `maxWidth` go with a `width`. The track keeps its MD3 size at the start edge of the outer view, because the thumb travel is fixed. Every other key styles the track. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.
+- Inherits `PressableProps` (except `children`, `style`)
 
 ---
 
@@ -677,6 +682,7 @@ Props:
 - `contentColor?: string` — Override the content (input text and icon) color. Error and disabled states take precedence.
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
 - `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `setSelection()` calls. The field keeps its own press-to-focus.
+- Inherits `TextInputProps` (except `placeholderTextColor`, `editable`)
 
 ---
 
@@ -720,6 +726,7 @@ Props:
 - `inputStyle?: StyleProp<TextStyle>` — Additional style applied to the text input element.
 - `style?: StyleProp<ViewStyle>` — Style applied to the root container. The MD3 maximum width is 720 dp — set `maxWidth` here to change it.
 - `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
+- Inherits `TextInputProps` (except `editable`, `style`)
 - `actions?: SearchBarAction[]` — Icon buttons rendered in the trailing slot, such as a voice action. Mutually exclusive with `trailing`.
 - `trailing?: ReactNode` — Custom trailing content, such as an `Avatar`. Mutually exclusive with `actions` — the type rejects both together. The clear button is not part of the slot: it shows before either one while the bar holds text.
 - Inherits `TextInputProps` (except `editable`, `style`)
@@ -984,11 +991,21 @@ Container for list items.
 
 Props:
 - `children: ReactNode` — Content rendered inside the list container.
-- `headline?: string` — Section headline in `titleSmall` and `onSurfaceVariant`, above the items. It has the same start and end padding as `ListItem`. Omit it for a list with no title.
+- `headline?: string` — Section headline in `titleSmall` and `onSurfaceVariant`, above the items. It has the same start and end padding as `ListItem`. Omit it for a list with no title. For a `FlatList`, put `List.Headline` in its `ListHeaderComponent` instead.
 - `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `2`. The outline level of the headline on web, where it renders as `<hN>`. Native has no heading levels and ignores it.
 - `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
 - `style?: StyleProp<ViewStyle>`
 - Inherits `ViewProps`
+
+#### List.Headline
+
+The `List` headline as its own component. A `FlatList` inside `List` gets no bounded height, so a long list puts `List.Headline` in the `ListHeaderComponent` of a `FlatList`, with `ListItem` rows.
+
+Props:
+- `children: ReactNode` — The headline text.
+- `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `2`. The outline level of the headline on web, where it renders as `<hN>`. Native has no heading levels and ignores it.
+- `style?: StyleProp<TextStyle>`
+- Inherits `TextProps` (except `children`, `style`)
 
 #### ListItem
 
@@ -1695,6 +1712,7 @@ Props:
 - `scrimStyle?: StyleProp<ViewStyle>` — Modal only. Style for the scrim.
 - `scrimAccessibilityLabel?: string` — Modal only. Default: `'Close navigation drawer'`.
 The type rejects every modal prop on `variant="standard"`.
+- Inherits `ViewProps` (except `children`, `style`)
 
 #### NavigationDrawer.Item
 
@@ -1712,6 +1730,7 @@ Props:
 - `style?: StyleProp<ViewStyle>` — Style applied to the destination row.
 - `accessibilityLabel?: string` — Screen-reader label. Defaults to `label`.
 - `testID?: string` — Test id applied to the row. The indicator carries `<testID>-indicator`.
+- Inherits `PressableProps` (except `children`, `style`, `onPress`, `disabled`, `role`)
 
 #### NavigationDrawer.Section
 
@@ -1723,6 +1742,7 @@ Props:
 - `children?: ReactNode` — The section's `NavigationDrawer.Item`s.
 - `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
 - `style?: StyleProp<ViewStyle>` — Style applied to the section container.
+- Inherits `ViewProps` (except `children`, `style`)
 
 #### NavigationDrawer.Divider
 
