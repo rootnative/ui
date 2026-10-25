@@ -167,6 +167,31 @@ The card needs an `onPress` to become interactive. `Link` adds its own navigatio
 
 With `height` or `aspectRatio` set, each child fills the region, so a plain `Image` needs no style of its own. The children stack in order, so a second child is an overlay. A child's own `width` or `height` wins.
 
+### Images
+
+The library has no image component. `Card.Media` sizes the image component that you give it, and it does not load the image. A React Native `Image` has no loading state and no error state, so a slow or broken URL leaves the region empty.
+
+On Expo, use [`expo-image`](https://docs.expo.dev/versions/latest/sdk/image/):
+
+- `placeholder` shows while no image has loaded: a blurhash or a thumbhash from your data, or a local image.
+- `placeholderContentFit="cover"` gives the placeholder the same fit as the image. The default, `'scale-down'`, can flicker when the image replaces the placeholder.
+- `transition` fades the image in. A number is the time in milliseconds.
+- `onError` fires when the load fails. Show your own fallback there.
+
+```tsx
+import { Image } from 'expo-image'
+
+<Card.Media height={195}>
+  <Image
+    source={{ uri: article.imageUrl }}
+    placeholder={{ blurhash: article.blurhash }}
+    placeholderContentFit="cover"
+    contentFit="cover"
+    transition={200}
+  />
+</Card.Media>
+```
+
 ### Raw children still work
 
 The slots are additive. A card with raw children renders exactly as before and stays unpadded, so you own the spacing:

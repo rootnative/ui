@@ -12,7 +12,17 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One fix, two new `ListItem` props and one new
-`List` part in `components`, and one fix in the `llms.txt` files.
+`List` part in `components`, one fix in the `llms.txt` files, and one new
+docs section.
+
+### The Card page says how to load an image
+
+The library has no image component, and the Card page did not say so. A
+React Native `Image` in `Card.Media` has no loading state and no error
+state, so a slow or broken URL left the region empty. The new "Images"
+section says that `Card.Media` sizes the image and does not load it, and
+names `expo-image` with `placeholder`, `placeholderContentFit`,
+`transition` and `onError`. No code change.
 
 ### `List.Headline` for a long list in a `FlatList`
 
