@@ -46,6 +46,12 @@ List items auto-detect their height from the content provided:
 | Two-line | + `supportingText` or `overlineText` | 72dp |
 | Three-line | + both, or multi-line `supportingText` | 88dp |
 
+Each text line has a limit of one line by default. Set
+`supportingTextNumberOfLines`, `headlineNumberOfLines` or
+`overlineNumberOfLines` to show more lines, or `0` for no limit. Only a
+multi-line `supportingText` changes the template. A headline or an overline
+that wraps makes the item taller, and keeps its template.
+
 ## Headline
 
 Give the list a section title with `headline`. It shows in `titleSmall` and

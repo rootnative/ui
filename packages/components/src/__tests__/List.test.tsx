@@ -67,6 +67,40 @@ describe('ListItem', () => {
     expect(screen.getByText('OVERLINE')).toBeTruthy()
   })
 
+  it('cuts the headline and the overline at one line by default', () => {
+    renderWithTheme(<ListItem headlineText="Title" overlineText="OVERLINE" />)
+    expect(screen.getByText('Title').props.numberOfLines).toBe(1)
+    expect(screen.getByText('OVERLINE').props.numberOfLines).toBe(1)
+  })
+
+  it('takes a line limit for the headline and the overline', () => {
+    renderWithTheme(
+      <ListItem
+        headlineText="Title"
+        overlineText="OVERLINE"
+        headlineNumberOfLines={2}
+        overlineNumberOfLines={0}
+      />,
+    )
+    expect(screen.getByText('Title').props.numberOfLines).toBe(2)
+    expect(screen.getByText('OVERLINE').props.numberOfLines).toBe(0)
+  })
+
+  it('keeps the template when the headline or the overline wraps', () => {
+    renderWithTheme(
+      <ListItem
+        testID="item"
+        headlineText="Title"
+        overlineText="OVERLINE"
+        headlineNumberOfLines={2}
+        overlineNumberOfLines={2}
+      />,
+    )
+    const style = StyleSheet.flatten(screen.getByTestId('item').props.style)
+    expect(style.minHeight).toBe(72)
+    expect(style.alignItems).toBe('center')
+  })
+
   it('renders trailing supporting text when provided', () => {
     renderWithTheme(
       <ListItem headlineText="Title" trailingSupportingText="100+" />,

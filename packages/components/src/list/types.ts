@@ -58,9 +58,26 @@ export interface ListItemProps extends ViewProps {
   contentColor?: string
   /**
    * Maximum number of lines for supportingText before truncating.
+   * `0` removes the limit.
    * @default 1
    */
   supportingTextNumberOfLines?: number
+  /**
+   * Maximum number of lines for `headlineText` before truncating. `0`
+   * removes the limit. The item grows to fit the lines. Unlike
+   * `supportingTextNumberOfLines`, a value above 1 does not change the item
+   * to the three-line template.
+   * @default 1
+   */
+  headlineNumberOfLines?: number
+  /**
+   * Maximum number of lines for `overlineText` before truncating. `0`
+   * removes the limit. The item grows to fit the lines. Unlike
+   * `supportingTextNumberOfLines`, a value above 1 does not change the item
+   * to the three-line template.
+   * @default 1
+   */
+  overlineNumberOfLines?: number
   style?: StyleProp<ViewStyle>
 }
 

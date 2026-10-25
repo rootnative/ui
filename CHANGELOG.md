@@ -11,7 +11,19 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix in `components`.
+**No breaking change.** One fix and two new `ListItem` props in
+`components`.
+
+### `ListItem` takes a line limit for the headline and the overline
+
+`ListItem` cut the headline and the overline at one line, with no prop to
+change it, so a long headline in a narrow window lost its end. The new
+`headlineNumberOfLines` and `overlineNumberOfLines` props set the limit. The
+default is `1`, as before, and `0` removes the limit, the same as
+`supportingTextNumberOfLines`. The item grows to fit the lines. Unlike a
+multi-line `supportingText`, a wrapped headline or overline does not change
+the item to the three-line template, so a row whose text fits on one line
+keeps its height.
 
 ### The progress family and `Slider` no longer cause a Reanimated warning on native
 

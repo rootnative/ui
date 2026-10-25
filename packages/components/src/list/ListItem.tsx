@@ -39,6 +39,8 @@ export function ListItem({
   containerColor,
   contentColor,
   supportingTextNumberOfLines = 1,
+  headlineNumberOfLines = 1,
+  overlineNumberOfLines = 1,
   style,
   ...props
 }: ListItemProps) {
@@ -77,11 +79,14 @@ export function ListItem({
       )}
       <View style={styles.textBlock}>
         {overlineText != null && (
-          <Text style={styles.overlineText} numberOfLines={1}>
+          <Text
+            style={styles.overlineText}
+            numberOfLines={overlineNumberOfLines}
+          >
             {overlineText}
           </Text>
         )}
-        <Text style={styles.headlineText} numberOfLines={1}>
+        <Text style={styles.headlineText} numberOfLines={headlineNumberOfLines}>
           {headlineText}
         </Text>
         {supportingText != null && (
