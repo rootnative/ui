@@ -9,11 +9,14 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.30 — 2026-10-26
 
-**No breaking change.** One fix, two new `ListItem` props and one new
-`List` part in `components`, one fix in the `llms.txt` files, and one new
-docs section.
+**No breaking change.** No export and no prop is removed, and no change
+moves a screen. One fix, two new `ListItem` props and one new `List` part in
+`components`, one fix in the `llms.txt` files, and one new docs section. The
+`@rootnative/inertia` floor stays at `0.0.20`. `@rootnative/inertia`
+`0.0.21` removes the same Reanimated warning from `useSpring` and
+`useInView`, so upgrade it with this release.
 
 ### The Card page says how to load an image
 
