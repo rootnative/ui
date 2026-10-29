@@ -15,7 +15,8 @@
     "packages/components/src/internal/touchTarget.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/useHaloLayer.ts",
-    "packages/components/src/internal/usePressMorph.ts"
+    "packages/components/src/internal/usePressMorph.ts",
+    "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color", "pressable", "render-icon", "rtl"],
   "componentDependencies": [],

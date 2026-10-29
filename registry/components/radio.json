@@ -12,7 +12,8 @@
     "packages/components/src/internal/passiveControl.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
-    "packages/components/src/internal/useHaloLayer.ts"
+    "packages/components/src/internal/useHaloLayer.ts",
+    "packages/components/src/internal/useStateLayer.ts"
   ],
   "utils": ["color"],
   "componentDependencies": [],

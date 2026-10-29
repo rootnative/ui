@@ -186,6 +186,52 @@ const SHARED_ROOT_MODULES: Record<string, string> = {
   'elevation-shadow': 'elevation-shadow.ts',
 }
 
+/**
+ * The `./<name>` that a relative import becomes after the install, or
+ * `undefined` for an inter-component import (`../button`), which resolves
+ * through `componentDependencies`. Mirrors `packages/cli/src/lib/transform.ts`.
+ */
+function installedName(specifier: string): string | undefined {
+  const name = specifier.startsWith('./')
+    ? specifier.slice('./'.length)
+    : specifier.startsWith('../internal/')
+      ? specifier.slice('../internal/'.length)
+      : specifier.slice('../'.length) in SHARED_ROOT_MODULES
+        ? specifier.slice('../'.length)
+        : undefined
+  return name?.replace(/\.tsx?$/, '')
+}
+
+/**
+ * Each relative import of an entry that the installed component cannot
+ * resolve. The CLI writes every file of an entry into one folder, so after
+ * the install each relative import must name a file of the same entry.
+ *
+ * This reads the import statements of the shipped files, not the scan that
+ * made the list. The scan once followed only `../internal/<name>`, so
+ * `checkbox`, `radio` and `switch` shipped `internal/useHaloLayer.ts` without
+ * the `./useStateLayer` it imports, and `--check` stayed green.
+ */
+function findUnresolvedImports(entry: ComponentEntry): string[] {
+  const shipped = new Set(
+    entry.files.map((file) => path.basename(file).replace(/\.tsx?$/, '')),
+  )
+  const unresolved = new Set<string>()
+  for (const file of entry.files) {
+    const content = fs.readFileSync(path.join(ROOT, file), 'utf-8')
+    for (const match of content.matchAll(/from\s+['"](\.\.?\/[^'"]+)['"]/g)) {
+      const specifier = match[1] as string
+      const name = installedName(specifier)
+      if (name !== undefined && !shipped.has(name)) {
+        unresolved.add(
+          `${path.basename(file)} imports ${specifier}, which the entry does not ship`,
+        )
+      }
+    }
+  }
+  return Array.from(unresolved)
+}
+
 function analyzeImports(componentDir: string): {
   utils: Set<string>
   componentDeps: Set<string>
@@ -210,10 +256,14 @@ function analyzeImports(componentDir: string): {
   const pendingInternal: string[] = []
   const pendingShared: string[] = []
 
-  const collectSharedImports = (content: string) => {
-    const internalImports = content.matchAll(
-      /from\s+['"]\.\.\/internal\/([^'"]+)['"]/g,
-    )
+  // An internal file reaches a sibling with `./<name>`. The CLI flattens both
+  // into the component folder, so the sibling ships the same as a
+  // `../internal/<name>` import.
+  const collectSharedImports = (content: string, fromInternal: boolean) => {
+    const internalImports = [
+      ...content.matchAll(/from\s+['"]\.\.\/internal\/([^'"]+)['"]/g),
+      ...(fromInternal ? content.matchAll(/from\s+['"]\.\/([^'"]+)['"]/g) : []),
+    ]
     for (const match of internalImports) {
       const name = match[1]
       if (!name) continue
@@ -249,7 +299,9 @@ function analyzeImports(componentDir: string): {
   for (const file of files) {
     ownContents.push(fs.readFileSync(path.join(fullDir, file), 'utf-8'))
   }
-  for (const content of ownContents.slice()) collectSharedImports(content)
+  for (const content of ownContents.slice()) {
+    collectSharedImports(content, false)
+  }
   while (pendingInternal.length > 0 || pendingShared.length > 0) {
     const internalName = pendingInternal.pop()
     if (internalName !== undefined) {
@@ -258,7 +310,7 @@ function analyzeImports(componentDir: string): {
         'utf-8',
       )
       ownContents.push(content)
-      collectSharedImports(content)
+      collectSharedImports(content, true)
       continue
     }
 
@@ -268,7 +320,7 @@ function analyzeImports(componentDir: string): {
       'utf-8',
     )
     sharedContents.push(content)
-    collectSharedImports(content)
+    collectSharedImports(content, false)
   }
 
   const contents = [...ownContents, ...sharedContents]
@@ -481,9 +533,13 @@ if (fs.existsSync(existingRegistryDir)) {
 const outputs = new Map<string, string>()
 
 const componentEntries: ComponentEntry[] = []
+const unresolvedImports: string[] = []
 
 for (const dir of componentDirs) {
   const entry = buildComponentEntry(dir)
+  for (const problem of findUnresolvedImports(entry)) {
+    unresolvedImports.push(`registry/components/${dir}.json: ${problem}`)
+  }
   // Preserve existing description
   if (descriptions[dir]) {
     entry.description = descriptions[dir]
@@ -528,6 +584,20 @@ function findOrphans(generated: Map<string, string>): string[] {
 }
 
 async function main(): Promise<void> {
+  if (unresolvedImports.length > 0) {
+    console.error(
+      '\nRegistry entries with an import the install cannot resolve\n',
+    )
+    for (const problem of unresolvedImports)
+      console.error(`  \u2717 ${problem}`)
+    console.error(
+      '\n`rootnative add` copies only the files of an entry into the ' +
+        'component folder. Make `collectSharedImports` ship the imported ' +
+        'file.\n',
+    )
+    process.exit(1)
+  }
+
   // Resolve the repo's Prettier config against a file that lives where the
   // output does, so `.prettierrc` and any `registry/` override both apply.
   const config = await prettier.resolveConfig(
