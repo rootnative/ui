@@ -12,6 +12,7 @@ import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
+import { focusRingOutset } from '../internal/focusRing'
 import { pointerEvents } from '../internal/pointerEvents'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
@@ -134,13 +135,15 @@ export function Button({
   // keyboard-focus progress the state layer runs on, and its radius follows
   // the press morph (offset outward) so a keyboard-activated press keeps the
   // ring hugging the container.
-  const focusRingOutset = BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH
+  const ringOutset = focusRingOutset(
+    BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH,
+  )
   const animatedFocusRingStyle = useAnimatedStyle(() => ({
     opacity: states.focusVisible.value,
     borderRadius: interpolate(
       morphProgress.value,
       [0, 1],
-      [restRadius + focusRingOutset, pressedRadius + focusRingOutset],
+      [restRadius + ringOutset, pressedRadius + ringOutset],
     ),
   }))
 

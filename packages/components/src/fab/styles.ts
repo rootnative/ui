@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { FABSize, FABVariant } from './types'
 
 export const FAB_FOCUS_RING_OFFSET = 2
@@ -107,7 +108,7 @@ export function getFABIconPixelSize(size: FABSize): number {
 }
 
 export function createStyles(theme: MaterialTheme) {
-  const focusRingInset = -(FAB_FOCUS_RING_OFFSET + FAB_FOCUS_RING_WIDTH)
+  const ringOutset = focusRingOutset(FAB_FOCUS_RING_OFFSET)
   const elevationLevel3 = elevationStyle(theme.elevation.level3)
   const labelStyle = theme.typography.labelLarge
 
@@ -185,23 +186,19 @@ export function createStyles(theme: MaterialTheme) {
     disabled: {
       cursor: 'auto',
     },
-    focusRing: {
-      position: 'absolute' as const,
-      top: focusRingInset,
-      left: focusRingInset,
-      right: focusRingInset,
-      bottom: focusRingInset,
-      borderWidth: FAB_FOCUS_RING_WIDTH,
-      borderColor: theme.colors.secondary,
-    },
+    focusRing: focusRingBox(
+      FAB_FOCUS_RING_OFFSET,
+      FAB_FOCUS_RING_WIDTH,
+      theme.colors.secondary,
+    ),
     focusRingSmall: {
-      borderRadius: theme.shape.cornerMedium + FAB_FOCUS_RING_OFFSET,
+      borderRadius: theme.shape.cornerMedium + ringOutset,
     },
     focusRingMedium: {
-      borderRadius: theme.shape.cornerLarge + FAB_FOCUS_RING_OFFSET,
+      borderRadius: theme.shape.cornerLarge + ringOutset,
     },
     focusRingLarge: {
-      borderRadius: theme.shape.cornerExtraLarge + FAB_FOCUS_RING_OFFSET,
+      borderRadius: theme.shape.cornerExtraLarge + ringOutset,
     },
   })
 }

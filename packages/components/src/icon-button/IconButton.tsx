@@ -10,6 +10,7 @@ import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
+import { focusRingOutset } from '../internal/focusRing'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
@@ -237,8 +238,9 @@ export function IconButton({
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on, and its radius follows
   // the shape morphs (offset outward) so it keeps hugging the container.
-  const focusRingOutset =
-    ICON_BUTTON_FOCUS_RING_OFFSET + ICON_BUTTON_FOCUS_RING_WIDTH
+  const ringOutset = focusRingOutset(
+    ICON_BUTTON_FOCUS_RING_OFFSET + ICON_BUTTON_FOCUS_RING_WIDTH,
+  )
   const animatedFocusRingStyle = useAnimatedStyle(() => {
     const rest = interpolate(
       selectedProgress.value,
@@ -249,7 +251,7 @@ export function IconButton({
       opacity: states.focusVisible.value,
       borderRadius:
         interpolate(morphProgress.value, [0, 1], [rest, pressedRadius]) +
-        focusRingOutset,
+        ringOutset,
     }
   })
 

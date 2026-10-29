@@ -26,6 +26,7 @@ import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
+import { focusRingOutset } from '../internal/focusRing'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
@@ -217,6 +218,7 @@ export function Chip(props: ChipProps) {
   // Interop escape hatch: the focus ring derives its opacity from the same
   // keyboard-focus progress the state layer runs on, and its radius follows
   // the shape morphs (offset outward) so it keeps hugging the container.
+  const ringOutset = focusRingOutset(CHIP_FOCUS_RING_OFFSET)
   const animatedFocusRingStyle = useAnimatedStyle(() => {
     const rest = interpolate(
       selectedProgress.value,
@@ -227,7 +229,7 @@ export function Chip(props: ChipProps) {
       opacity: states.focusVisible.value,
       borderRadius:
         interpolate(morphProgress.value, [0, 1], [rest, pressedRadius]) +
-        CHIP_FOCUS_RING_OFFSET,
+        ringOutset,
     }
   })
 

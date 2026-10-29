@@ -1,6 +1,7 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { ExpressiveSize } from '../internal/size'
 import type { ButtonShape, ButtonVariant } from './types'
 
@@ -300,8 +301,6 @@ export function createStyles(
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
 
-  const focusRingInset = -(BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH)
-
   return StyleSheet.create({
     wrapper: {
       alignItems: 'flex-start' as const,
@@ -344,15 +343,14 @@ export function createStyles(
       ...elevationLevel1,
     },
     focusRing: {
-      position: 'absolute' as const,
-      top: focusRingInset,
-      left: focusRingInset,
-      right: focusRingInset,
-      bottom: focusRingInset,
+      ...focusRingBox(
+        BUTTON_FOCUS_RING_OFFSET,
+        BUTTON_FOCUS_RING_WIDTH,
+        theme.colors.secondary,
+      ),
       borderRadius:
-        restCorner + BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH,
-      borderWidth: BUTTON_FOCUS_RING_WIDTH,
-      borderColor: theme.colors.secondary,
+        restCorner +
+        focusRingOutset(BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH),
     },
     label: {
       fontFamily: labelStyle.fontFamily,

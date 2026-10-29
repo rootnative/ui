@@ -221,6 +221,18 @@ Escape, so a keyboard user reads the same text a pointer user does.
 Handled by the theme, not by you — see [Motion](./motion.md). Every animated
 component collapses to a hard cut when the OS setting is on.
 
+## Focus rings on web
+
+`Button`, `IconButton`, `FAB` and `Chip` draw their MD3 focus ring as a CSS
+outline on web: 3 px wide, 2 px outside the control, on a node with the
+control's box. An outline is ink, not layout, so the ring adds no scrollable
+overflow. A ring drawn as a box 5 px outside the control reached past the
+page edge in a bar with the 4 px MD3 gutter and widened the page by 1 px,
+with the ring at opacity 0. On native the ring stays a bordered node outside
+the control. The other controls still draw the ring as an outset node on
+both platforms; a container that puts one of them under 5 px from the edge
+of a scroll container needs `overflow: 'hidden'`.
+
 ## Known limitations
 
 Stated rather than implied, because they affect what you can promise your own

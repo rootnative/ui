@@ -11,7 +11,20 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix in `@rootnative/seo`.
+**No breaking change.** One fix in `@rootnative/seo`, one in
+`@rootnative/components`.
+
+- **`Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on
+  web with their focus ring.** The ring was a node 5 px outside the control,
+  at opacity 0 until keyboard focus. On web an absolutely placed node adds
+  to the scrollable overflow of the page even at opacity 0, so an
+  `IconButton` at the end of a bar with the 4 px MD3 gutter reached 1 px
+  past the page edge, and every window width scrolled sideways by 1 px. On
+  web the four controls now draw the ring as a CSS outline (3 px wide, 2 px
+  out) on a node with the control's box. An outline is ink, not layout, and
+  adds no overflow. The ring follows the corner radius and the shape morph
+  as before. No change on native. The other controls keep the outset node;
+  see "Focus rings on web" on the accessibility page.
 
 - **A page head takes every page slot out of the server head, also the
   slots it leaves empty.** The Expo Router `PageHead` and `RouteHead`

@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { ChipVariant } from './types'
 
 export const CHIP_FOCUS_RING_OFFSET = 2
@@ -175,9 +176,8 @@ export function createStyles(
   const labelStyle = theme.typography.labelLarge
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
-  const focusRingInset = -(CHIP_FOCUS_RING_OFFSET + CHIP_FOCUS_RING_WIDTH)
   const restRadius = getChipRestRadius(theme, variant)
-  const focusRingRadius = restRadius + CHIP_FOCUS_RING_OFFSET
+  const focusRingRadius = restRadius + focusRingOutset(CHIP_FOCUS_RING_OFFSET)
 
   return StyleSheet.create({
     wrapper: {
@@ -225,14 +225,12 @@ export function createStyles(
       ...elevationLevel1,
     },
     focusRing: {
-      position: 'absolute' as const,
-      top: focusRingInset,
-      left: focusRingInset,
-      right: focusRingInset,
-      bottom: focusRingInset,
+      ...focusRingBox(
+        CHIP_FOCUS_RING_OFFSET,
+        CHIP_FOCUS_RING_WIDTH,
+        theme.colors.secondary,
+      ),
       borderRadius: focusRingRadius,
-      borderWidth: CHIP_FOCUS_RING_WIDTH,
-      borderColor: theme.colors.secondary,
     },
     // MD3 gives a chip one line of label. The chip is 32dp high, so a second
     // line is cut. A label that does not fit shrinks and ends with an

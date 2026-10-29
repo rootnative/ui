@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { focusRingBox } from '../internal/focusRing'
 import type { ExpressiveSize } from '../internal/size'
 import type {
   IconButtonShape,
@@ -214,10 +215,6 @@ export function applyContainerColorOverride(
 }
 
 export function createStyles(theme: MaterialTheme) {
-  const focusRingInset = -(
-    ICON_BUTTON_FOCUS_RING_OFFSET + ICON_BUTTON_FOCUS_RING_WIDTH
-  )
-
   return StyleSheet.create({
     wrapper: {
       alignItems: 'flex-start' as const,
@@ -232,15 +229,11 @@ export function createStyles(theme: MaterialTheme) {
     disabled: {
       cursor: 'auto',
     },
-    focusRing: {
-      position: 'absolute' as const,
-      top: focusRingInset,
-      left: focusRingInset,
-      right: focusRingInset,
-      bottom: focusRingInset,
-      // borderRadius applied per size in the component.
-      borderWidth: ICON_BUTTON_FOCUS_RING_WIDTH,
-      borderColor: theme.colors.secondary,
-    },
+    // borderRadius applied per size in the component.
+    focusRing: focusRingBox(
+      ICON_BUTTON_FOCUS_RING_OFFSET,
+      ICON_BUTTON_FOCUS_RING_WIDTH,
+      theme.colors.secondary,
+    ),
   })
 }

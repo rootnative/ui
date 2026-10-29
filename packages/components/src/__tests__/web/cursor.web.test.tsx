@@ -462,6 +462,39 @@ describe('a control with its own focus ring suppresses the UA focus outline', ()
 })
 
 /**
+ * On web the ring of a standalone control is a CSS outline on a node with
+ * the control's box, not a border on a node outset by 5. An outline is ink,
+ * not layout, so it adds no scrollable overflow: a ring node outset by 5 in
+ * a bar with the 4 wide gutter reached 1 px past the page edge and widened
+ * the page by 1 px at opacity 0. The ring node is the first child of the
+ * frame, before the control.
+ */
+describe('a standalone control draws its focus ring as an outline on web', () => {
+  it.each([
+    { name: 'Button', ui: <Button>Save</Button> },
+    {
+      name: 'IconButton',
+      ui: <IconButton icon="heart" accessibilityLabel="Like" />,
+    },
+    { name: 'FAB', ui: <FAB icon="plus" accessibilityLabel="Add" /> },
+    { name: 'Chip', ui: <Chip onPress={() => {}}>Assist</Chip> },
+  ])('$name', ({ ui }) => {
+    renderWeb(ui)
+    const control = screen.getByRole('button')
+    const ring = control.parentElement?.firstElementChild
+    expect(ring).not.toBeNull()
+    expect(ring).not.toBe(control)
+    const style = getComputedStyle(ring as Element)
+    expect(style.outlineStyle).toBe('solid')
+    expect(style.outlineWidth).toBe('3px')
+    expect(style.outlineOffset).toBe('2px')
+    expect(style.top).toBe('0px')
+    expect(style.left).toBe('0px')
+    expect(style.borderWidth === '' || style.borderWidth === '0px').toBe(true)
+  })
+})
+
+/**
  * The negative control. The close button of an input chip has hover and
  * press layers but no focus ring, so the UA outline is its only focus
  * indicator and must stay.
