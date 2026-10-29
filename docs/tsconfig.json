@@ -4,5 +4,6 @@
     "baseUrl": ".",
     "skipLibCheck": true,
     "noEmit": true
-  }
+  },
+  "exclude": [".docusaurus", "build", "static"]
 }
