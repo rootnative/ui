@@ -3,7 +3,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent, userEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button/Button'
-import type { ButtonSize } from '../button/types'
+import type { ButtonSize, ButtonVariant } from '../button/types'
 import { CircularProgress } from '../progress'
 
 describe('Button', () => {
@@ -234,6 +234,62 @@ describe('Button', () => {
       const l = StyleSheet.flatten(screen.getByRole('button').props.style)
       expect(l.borderWidth).toBe(2)
     })
+
+    // The border sits inside the box on top of the padding, so padding plus
+    // border is the inset of the label. `text` has its own padding by spec.
+    const contained: ButtonVariant[] = ['filled', 'tonal', 'elevated']
+    const sizes: ButtonSize[] = [
+      'extraSmall',
+      'small',
+      'medium',
+      'large',
+      'extraLarge',
+    ]
+
+    const cases = sizes.flatMap((size) => [
+      [size, false] as const,
+      [size, true] as const,
+    ])
+
+    it.each(cases)(
+      'outlined %s (icons: %s) has the inset of the other variants',
+      (size, withIcons) => {
+        const icons = withIcons
+          ? { leadingIcon: 'check', trailingIcon: 'arrow-right' }
+          : {}
+        renderWithTheme(
+          <>
+            {[...contained, 'outlined' as const].map((variant) => (
+              <Button
+                key={variant}
+                testID={variant}
+                variant={variant}
+                size={size}
+                {...icons}
+              >
+                Label
+              </Button>
+            ))}
+          </>,
+        )
+        const inset = (variant: ButtonVariant) => {
+          const s = StyleSheet.flatten(screen.getByTestId(variant).props.style)
+          const border = Number(s.borderWidth ?? 0)
+          return {
+            vertical: Number(s.paddingVertical) + border,
+            start: Number(s.paddingStart) + border,
+            end: Number(s.paddingEnd) + border,
+          }
+        }
+        const outlined = StyleSheet.flatten(
+          screen.getByTestId('outlined').props.style,
+        )
+        expect(outlined.borderWidth).toBeGreaterThan(0)
+        for (const variant of contained) {
+          expect(inset('outlined')).toEqual(inset(variant))
+        }
+      },
+    )
   })
 
   describe('loading', () => {

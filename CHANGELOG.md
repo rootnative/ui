@@ -11,7 +11,7 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix in `@rootnative/seo`, one in
+**No breaking change.** One fix in `@rootnative/seo`, two in
 `@rootnative/components`.
 
 - **`Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on
@@ -25,6 +25,17 @@ Prior history: these packages were published as `@onlynative/*` through
   adds no overflow. The ring follows the corner radius and the shape morph
   as before. No change on native. The other controls keep the outset node;
   see "Focus rings on web" on the accessibility page.
+
+- **An outlined `Button` has the same height and width as the other
+  variants at the same size.** The outline came on top of the full token
+  padding, so an outlined button was taller and wider than a `filled`,
+  `tonal` or `elevated` button by two outline widths. A `small` outlined
+  button was 42 high, not 40. Now the padding gives up the outline width,
+  and the outline sits inside the token container, as in MD3. An outlined
+  button gets smaller in each direction: by 2 dp at `extraSmall`, `small`
+  and `medium`, by 4 dp at `large`, and by 6 dp at `extraLarge`. The same
+  applies on web. `IconButton` did not have this defect: it sets a fixed
+  width and height.
 
 - **A page head takes every page slot out of the server head, also the
   slots it leaves empty.** The Expo Router `PageHead` and `RouteHead`

@@ -298,6 +298,10 @@ export function createStyles(
   // size-specific outline (1/1/1/2/3 dp); other variants keep 0.
   const borderWidth =
     variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth
+  // React Native, and react-native-web with `border-box`, put the border
+  // inside the box, outside the padding. MD3 draws the outline inside the
+  // token container, so the padding gives up the border width, and an
+  // outlined button keeps the height and width of the other variants.
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
 
@@ -311,9 +315,9 @@ export function createStyles(
       justifyContent: 'center',
       minWidth: 58,
       minHeight: sizeTokens.height,
-      paddingStart: padding.paddingStart,
-      paddingEnd: padding.paddingEnd,
-      paddingVertical: sizeTokens.paddingVertical,
+      paddingStart: padding.paddingStart - borderWidth,
+      paddingEnd: padding.paddingEnd - borderWidth,
+      paddingVertical: sizeTokens.paddingVertical - borderWidth,
       borderRadius: restCorner,
       borderColor: colors.borderColor,
       borderWidth,
