@@ -2,7 +2,7 @@ import { lightTheme } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { ScrollView, StyleSheet } from 'react-native'
+import { I18nManager, ScrollView, StyleSheet } from 'react-native'
 import { Tabs } from '../tabs'
 import type { TabItem } from '../tabs'
 
@@ -18,13 +18,13 @@ function renderTabs(props?: Partial<React.ComponentProps<typeof Tabs>>) {
 
 /**
  * Feed the row the geometry the indicator is placed from. Two layout events
- * per tab: the tab's own box (from the pressable) and its content box — firing
+ * per tab: the tab's width (from the pressable) and its content width — firing
  * on the label finds the content view, which is the nearest ancestor with an
- * `onLayout`.
+ * `onLayout`. No `x`: the row adds up the widths.
  */
-function layOutTab(name: string, x: number, width: number, content: number) {
+function layOutTab(name: string, width: number, content: number) {
   fireEvent(screen.getByRole('tab', { name }), 'layout', {
-    nativeEvent: { layout: { x, y: 0, width, height: 48 } },
+    nativeEvent: { layout: { x: 0, y: 0, width, height: 48 } },
   })
   fireEvent(screen.getByText(name), 'layout', {
     nativeEvent: { layout: { x: 0, y: 0, width: content, height: 20 } },
@@ -32,9 +32,27 @@ function layOutTab(name: string, x: number, width: number, content: number) {
 }
 
 function layOutRow() {
-  layOutTab('Flights', 0, 120, 60)
-  layOutTab('Trips', 120, 120, 40)
-  layOutTab('Explore', 240, 120, 70)
+  layOutTab('Flights', 120, 60)
+  layOutTab('Trips', 120, 40)
+  layOutTab('Explore', 120, 70)
+}
+
+/** The row that holds the tabs, the divider and the indicator. */
+function rowNode() {
+  let node = screen.getByTestId('tabs-divider').parent
+  while (
+    node &&
+    StyleSheet.flatten(node.props.style)?.flexDirection !== 'row'
+  ) {
+    node = node.parent
+  }
+  if (!node) throw new Error('no row above the divider')
+  return node
+}
+
+function indicatorTransform() {
+  return StyleSheet.flatten(screen.getByTestId('tabs-indicator').props.style)
+    .transform
 }
 
 describe('Tabs', () => {
@@ -140,7 +158,7 @@ describe('Tabs — indicator', () => {
 
   it('never shrinks below the 24dp minimum', () => {
     renderTabs()
-    layOutTab('Flights', 0, 120, 8)
+    layOutTab('Flights', 120, 8)
 
     const style = StyleSheet.flatten(
       screen.getByTestId('tabs-indicator').props.style,
@@ -281,16 +299,8 @@ describe('Tabs — tokens', () => {
 })
 
 describe('Tabs — scrollable edge padding', () => {
-  /** The row that holds the tabs, the divider and the indicator. */
   function rowStyle() {
-    let node = screen.getByTestId('tabs-divider').parent
-    while (
-      node &&
-      StyleSheet.flatten(node.props.style)?.flexDirection !== 'row'
-    ) {
-      node = node.parent
-    }
-    return StyleSheet.flatten(node?.props.style)
+    return StyleSheet.flatten(rowNode().props.style)
   }
 
   // The divider is absolute inside the row, so it spans the row's padding.
@@ -315,6 +325,85 @@ describe('Tabs — scrollable edge padding', () => {
     renderTabs({ edgePadding: 16 })
     expect(rowStyle().paddingHorizontal).toBeUndefined()
     expect(rowStyle().flexGrow).toBeUndefined()
+  })
+})
+
+// react-native-web fires `onLayout` on a change of size only, so a tab that
+// moves and keeps its size sends no new event. These tests send none after the
+// move either: the indicator must follow from the widths alone.
+describe('Tabs — tab offsets', () => {
+  it('follows a new edge padding with no new layout event', () => {
+    const tabs = (edgePadding: number) => (
+      <Tabs
+        items={ITEMS}
+        testID="tabs"
+        scrollable
+        edgePadding={edgePadding}
+        defaultValue="trips"
+      />
+    )
+    const { rerender } = renderSettled(tabs(24))
+    layOutRow()
+    // 24 + 120 + (120 - 40) / 2.
+    expect(indicatorTransform()).toEqual([{ translateX: 184 }])
+
+    rerender(tabs(72))
+    expect(indicatorTransform()).toEqual([{ translateX: 232 }])
+  })
+
+  it('follows an earlier tab that changes size', () => {
+    const { flush } = renderSettled(
+      <Tabs
+        items={ITEMS}
+        testID="tabs"
+        scrollable
+        edgePadding={16}
+        defaultValue="explore"
+      />,
+    )
+    layOutRow()
+    // 16 + 240 + (120 - 70) / 2.
+    expect(indicatorTransform()).toEqual([{ translateX: 281 }])
+
+    layOutTab('Flights', 160, 80)
+    flush()
+    expect(indicatorTransform()).toEqual([{ translateX: 321 }])
+  })
+
+  it('waits for every tab before the active one', () => {
+    renderTabs({ defaultValue: 'explore' })
+    layOutTab('Explore', 120, 70)
+    layOutTab('Flights', 120, 60)
+    expect(screen.queryByTestId('tabs-indicator')).toBeNull()
+
+    layOutTab('Trips', 120, 40)
+    expect(indicatorTransform()).toEqual([{ translateX: 265 }])
+  })
+
+  describe('RTL', () => {
+    const original = I18nManager.isRTL
+    afterEach(() => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: original,
+        configurable: true,
+      })
+    })
+
+    it('counts the offsets back from the right edge of the row', () => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      renderTabs({ scrollable: true, edgePadding: 16, defaultValue: 'trips' })
+      layOutRow()
+      expect(screen.queryByTestId('tabs-indicator')).toBeNull()
+
+      fireEvent(rowNode(), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 500, height: 48 } },
+      })
+      // Trips starts at 500 - 16 - 240 = 244, then (120 - 40) / 2.
+      expect(indicatorTransform()).toEqual([{ translateX: 284 }])
+    })
   })
 })
 
@@ -410,7 +499,7 @@ describe('Tabs — position', () => {
     const { flush } = renderSettled(
       <Tabs items={ITEMS} testID="tabs" position={positionAt(0.5)} />,
     )
-    layOutTab('Flights', 0, 120, 60)
+    layOutTab('Flights', 120, 60)
     flush()
 
     const style = indicatorStyle()

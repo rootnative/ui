@@ -12,7 +12,7 @@
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/useStateLayer.ts"
   ],
-  "utils": ["color", "render-icon"],
+  "utils": ["color", "render-icon", "rtl"],
   "componentDependencies": ["divider"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.31",

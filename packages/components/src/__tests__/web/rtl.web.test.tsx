@@ -36,9 +36,10 @@ import {
   selectRTL,
   transformOrigin,
 } from '@rootnative/utils'
-import { screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { AppBar } from '../../appbar'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
+import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
 
@@ -237,5 +238,64 @@ describe('overlay placement resolves logical alignment against the document', ()
     const position = resolveAnchorPosition({ ...WIDE, align: 'end' })
     expect(position.left).toBe(250)
     expect(position.transformOrigin).toBe('left top')
+  })
+})
+
+/**
+ * `Tabs` places its indicator from the physical left, so in RTL it counts each
+ * tab offset back from the right edge of the row. The native suite covers the
+ * same geometry with `I18nManager.isRTL` stubbed, which does nothing on web.
+ *
+ * jsdom has no `ResizeObserver`, so react-native-web never fires `onLayout`
+ * here. These tests call the handler that react-native-web keeps on the node
+ * for its observer, with the layout a browser would report.
+ */
+describe('Tabs places the indicator for the document direction', () => {
+  const ITEMS = [
+    { value: 'flights', label: 'Flights' },
+    { value: 'trips', label: 'Trips' },
+    { value: 'explore', label: 'Explore' },
+  ]
+
+  function fireLayout(node: Element, width: number) {
+    const handler = (node as Element & { __reactLayoutHandler?: unknown })
+      .__reactLayoutHandler
+    if (typeof handler !== 'function') {
+      throw new Error('react-native-web set no layout handler on the node')
+    }
+    act(() => {
+      handler({ nativeEvent: { layout: { x: 0, y: 0, width, height: 48 } } })
+    })
+  }
+
+  function renderLaidOutTabs() {
+    renderWeb(
+      <Tabs
+        items={ITEMS}
+        testID="tabs"
+        scrollable
+        edgePadding={16}
+        defaultValue="trips"
+      />,
+    )
+    const tabs = screen.getAllByRole('tab')
+    for (const [index, tab] of tabs.entries()) {
+      fireLayout(tab, 120)
+      const label = screen.getByText(ITEMS[index]?.label ?? '')
+      fireLayout(label.parentElement as HTMLElement, 40)
+    }
+    fireLayout(tabs[0]?.parentElement as HTMLElement, 500)
+    return screen.getByTestId('tabs-indicator')
+  }
+
+  it('counts from the left edge in LTR', () => {
+    // 16 + 120 + (120 - 40) / 2.
+    expect(renderLaidOutTabs().style.transform).toBe('translateX(176px)')
+  })
+
+  it('counts from the right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    // 500 - 16 - 240 + (120 - 40) / 2.
+    expect(renderLaidOutTabs().style.transform).toBe('translateX(284px)')
   })
 })

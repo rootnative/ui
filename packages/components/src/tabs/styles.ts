@@ -115,7 +115,7 @@ export function createTabsStyles(
     // `flexGrow` on both, so a short scrollable row still fills the viewport —
     // without it the divider below would stop where the tabs do. The edge
     // padding goes on the row, not on the scroll content, so the divider spans
-    // it and each tab's measured `x` already includes it.
+    // it. `placeTabs` in `Tabs.tsx` starts the tab offsets after it.
     scrollContent: {
       flexGrow: 1,
     },
@@ -130,9 +130,9 @@ export function createTabsStyles(
       bottom: 0,
     },
     // Positioned from the physical left with a translate, not from `start`:
-    // the measured offsets are physical too, so the same math holds in RTL.
-    // Both top corners take the same radius, so the physical spelling is
-    // RTL-safe here too.
+    // the tab offsets are physical too, and `placeTabs` counts them from the
+    // right edge in RTL. Both top corners take the same radius, so the
+    // physical spelling is RTL-safe here too.
     indicator: {
       position: 'absolute',
       left: 0,

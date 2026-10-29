@@ -6,6 +6,7 @@ import {
 } from '@rootnative/inertia'
 import type { SharedValue } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import { isRTLDirection } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   LayoutChangeEvent,
@@ -24,9 +25,14 @@ import {
 } from './styles'
 import { Tab } from './Tab'
 import type { TabMeasurement } from './Tab'
-import type { TabsProps } from './types'
+import type { TabItem, TabsProps } from './types'
 
-const EMPTY_MEASUREMENT: TabMeasurement = { x: 0, width: 0, contentWidth: 0 }
+const EMPTY_MEASUREMENT: TabMeasurement = { width: 0, contentWidth: 0 }
+
+/** A measured tab and its offset from the row's physical left edge. */
+interface TabBox extends TabMeasurement {
+  x: number
+}
 
 /** The indicator box of one tab, or `null` until the tab is measured. */
 interface IndicatorRect {
@@ -34,26 +40,65 @@ interface IndicatorRect {
   width: number
 }
 
+/**
+ * The box of each tab, in `items` order. A tab is `null` until it and every
+ * tab before it are measured.
+ *
+ * The offset is the start padding plus the widths of the tabs before it, not
+ * the `x` of the tab's own layout event. react-native-web fires `onLayout`
+ * from a `ResizeObserver`, so on the web a tab that moves and keeps its size
+ * sends no new `x`: a new `edgePadding`, or a longer label on an earlier tab,
+ * left the indicator at the old place. The tabs sit side by side with no gap,
+ * so the sum is the offset that native layout reports.
+ *
+ * The indicator is placed from the physical left, and in RTL the first tab is
+ * at the right edge, so there the offset counts back from the row width.
+ * `rtlRowWidth` is that width in RTL, 0 until the row is measured, and
+ * `undefined` in LTR.
+ */
+function placeTabs(
+  items: TabItem[],
+  measurements: Record<string, TabMeasurement>,
+  startPadding: number,
+  rtlRowWidth: number | undefined,
+): Array<TabBox | null> {
+  let offset = startPadding
+  let placed = rtlRowWidth !== 0
+  return items.map((item) => {
+    const measurement = measurements[item.value]
+    if (!placed || measurement === undefined || measurement.width <= 0) {
+      placed = false
+      return null
+    }
+    const x =
+      rtlRowWidth === undefined
+        ? offset
+        : rtlRowWidth - offset - measurement.width
+    offset += measurement.width
+    return { ...measurement, x }
+  })
+}
+
 function isMeasured(
-  measurement: TabMeasurement | undefined,
+  box: TabBox | null | undefined,
   variant: 'primary' | 'secondary',
-): measurement is TabMeasurement {
+): box is TabBox {
   return (
-    measurement !== undefined &&
-    measurement.width > 0 &&
-    (variant === 'secondary' || measurement.contentWidth > 0)
+    box !== null &&
+    box !== undefined &&
+    (variant === 'secondary' || box.contentWidth > 0)
   )
 }
 
 function indicatorRectOf(
-  measurement: TabMeasurement,
+  box: TabBox,
   variant: 'primary' | 'secondary',
 ): IndicatorRect {
   if (variant === 'secondary') {
-    return { x: measurement.x, width: measurement.width }
+    return { x: box.x, width: box.width }
   }
-  const width = Math.max(measurement.contentWidth, PRIMARY_INDICATOR_MIN_WIDTH)
-  return { x: measurement.x + (measurement.width - width) / 2, width }
+  const width = Math.max(box.contentWidth, PRIMARY_INDICATOR_MIN_WIDTH)
+  return { x: box.x + (box.width - width) / 2, width }
 }
 
 export function Tabs({
@@ -109,11 +154,13 @@ export function Tabs({
 
   // The indicator is placed from measured geometry rather than from a flex
   // rule, because a primary indicator matches the *label* width — which only
-  // the laid-out tab knows. Each tab reports its own box and its content box;
+  // the laid-out tab knows. Each tab reports its width and its content width;
   // the two arrive as separate layout events, so they merge into one entry.
+  // `placeTabs` turns the widths into offsets.
   const [measurements, setMeasurements] = useState<
     Record<string, TabMeasurement>
   >({})
+  const [rowWidth, setRowWidth] = useState(0)
 
   const handleMeasure = useCallback(
     (tabValue: string, patch: Partial<TabMeasurement>) => {
@@ -122,7 +169,6 @@ export function Tabs({
         const next = { ...(current ?? EMPTY_MEASUREMENT), ...patch }
         if (
           current !== undefined &&
-          current.x === next.x &&
           current.width === next.width &&
           current.contentWidth === next.contentWidth
         ) {
@@ -134,24 +180,36 @@ export function Tabs({
     [],
   )
 
-  const active = selected === undefined ? undefined : measurements[selected]
+  // Only RTL reads the row width, but the handler stays attached in LTR too:
+  // react-native-web decides at mount whether to observe a node, so an
+  // `onLayout` added after the mount never fires.
+  const handleRowLayout = useCallback((event: LayoutChangeEvent) => {
+    setRowWidth(event.nativeEvent.layout.width)
+  }, [])
+
+  const startPadding = scrollable ? edgePadding : 0
+  const rtlRowWidth = isRTLDirection() ? rowWidth : undefined
+  const boxes = useMemo(
+    () => placeTabs(items, measurements, startPadding, rtlRowWidth),
+    [items, measurements, startPadding, rtlRowWidth],
+  )
+
+  const activeIndex = items.findIndex((item) => item.value === selected)
+  const active = activeIndex === -1 ? undefined : boxes[activeIndex]
   const measured = isMeasured(active, variant)
   const activeRect = measured ? indicatorRectOf(active, variant) : null
   const indicatorWidth = activeRect?.width ?? 0
   const indicatorX = activeRect?.x ?? 0
 
   // One rect per item, in `items` order, for the pager position to
-  // interpolate between on the UI thread. `measurements` only changes on a
-  // real geometry change, so the memo rebuilds the list only then.
+  // interpolate between on the UI thread. `boxes` only changes on a real
+  // geometry change, so the memo rebuilds the list only then.
   const rects = useMemo(
     () =>
-      items.map((item) => {
-        const measurement = measurements[item.value]
-        return isMeasured(measurement, variant)
-          ? indicatorRectOf(measurement, variant)
-          : null
-      }),
-    [items, measurements, variant],
+      boxes.map((box) =>
+        isMeasured(box, variant) ? indicatorRectOf(box, variant) : null,
+      ),
+    [boxes, variant],
   )
   const rectsValue = useMotionValue<Array<IndicatorRect | null>>(rects)
   useEffect(() => {
@@ -159,7 +217,10 @@ export function Tabs({
   }, [rects, rectsValue])
 
   const row = (
-    <View style={[styles.row, scrollable && styles.scrollRow]}>
+    <View
+      style={[styles.row, scrollable && styles.scrollRow]}
+      onLayout={handleRowLayout}
+    >
       {items.map((item) => (
         <Tab
           key={item.value}
@@ -247,9 +308,9 @@ interface TabIndicatorProps {
  * With a pager `position`, the worklet reads the page position instead and
  * interpolates between the rects of the two tabs on each side of it. That is
  * the finger, not an animation, so reduced motion does not gate it. The
- * rects are measured, so they are physical positions in either layout
- * direction, and no mirroring is needed. A neighbour that is not measured
- * yet falls back to the springs for that frame.
+ * rects are physical positions in either layout direction (`placeTabs`
+ * counts from the right edge in RTL), so no mirroring is needed. A neighbour
+ * that is not measured yet falls back to the springs for that frame.
  */
 function TabIndicator({
   x,

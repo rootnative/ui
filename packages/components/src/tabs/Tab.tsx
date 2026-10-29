@@ -12,10 +12,12 @@ import { TAB_ICON_SIZE, createTabStyles } from './styles'
 import type { TabColors } from './styles'
 import type { TabItem, TabsVariant } from './types'
 
-/** What the row needs from each tab to place the indicator. */
+/**
+ * What the row needs from each tab to place the indicator. No offset: the row
+ * adds up the widths, because react-native-web sends no layout event for a
+ * tab that moves and keeps its size (see `placeTabs` in `Tabs.tsx`).
+ */
 export interface TabMeasurement {
-  /** Offset from the row's physical left edge. */
-  x: number
   /** Full tab width — what a secondary indicator spans. */
   width: number
   /** Icon + label width — what a primary indicator matches. */
@@ -82,8 +84,7 @@ export function Tab({
 
   const handleLayout = useCallback(
     (event: LayoutChangeEvent) => {
-      const { x, width } = event.nativeEvent.layout
-      onMeasure(item.value, { x, width })
+      onMeasure(item.value, { width: event.nativeEvent.layout.width })
     },
     [item.value, onMeasure],
   )
