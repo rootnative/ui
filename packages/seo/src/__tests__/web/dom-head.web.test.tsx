@@ -161,6 +161,24 @@ describe('PageHead from /dom', () => {
     expect(document.title).toBe('Template')
   })
 
+  it('takes a template tag out of a slot it leaves empty, and puts it back', () => {
+    document.head.innerHTML =
+      '<link rel="manifest" href="/manifest.json"><link rel="canonical" href="/template"><meta property="og:image" content="/template.jpg">'
+    const { unmount } = render(
+      <SeoProvider site={site}>
+        <DomPageHead title="Trailer" noindex />
+      </SeoProvider>,
+    )
+    expect(content('meta[name="robots"]')).toEqual(['noindex'])
+    expect(content('link[rel="canonical"]')).toEqual([])
+    expect(content('meta[property="og:image"]')).toEqual([])
+    expect(document.head.querySelector('link[rel="manifest"]')).not.toBeNull()
+
+    unmount()
+    expect(content('link[rel="canonical"]')).toEqual(['/template'])
+    expect(content('meta[property="og:image"]')).toEqual(['/template.jpg'])
+  })
+
   it('lets a screen mounted over another win, and gives the head back below', () => {
     const { rerender } = render(
       <SeoProvider site={site}>

@@ -250,9 +250,13 @@ export default function MovieScreen() {
   params only, so it finds the data from the params. Expo removes the
   function from the client bundle.
 - Keep the `PageHead`. It writes the JSON-LD into the page body, and it
-  writes the head after a client navigation. After hydration it removes each
-  head tag that `generateMetadata` wrote in a slot that it writes, so the
-  head does not hold two sets.
+  writes the head after a client navigation. After hydration it removes
+  every server tag in a page slot (the description, the robots tag, the
+  canonical link, the `hreflang` links, `og:*` and `twitter:*`), so the head
+  does not hold two sets. It removes the slots it leaves empty too: on a
+  route the export did not write, a `noindex` head takes the canonical link
+  and the share card of the shell page out. The charset, the viewport, the
+  icons and the manifest stay.
 - On SDK 57 the static export ignores `generateMetadata` and writes the
   `PageHead` tags. You can add the export before you move to SDK 58.
 - A static export does not call the `generateMetadata` of `+not-found`:

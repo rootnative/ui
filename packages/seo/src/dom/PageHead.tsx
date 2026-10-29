@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
-import { slotOf } from '../headSlots'
+import { inPageSlot } from '../headSlots'
 import { useSite } from '../react/SeoProvider'
 import type { HeadTag, PageMeta, Site } from '../types'
 
@@ -58,23 +58,19 @@ function elementOf(doc: Document, tag: HeadTag): Element | null {
 function write(doc: Document, tags: HeadTag[]): Written {
   const head = doc.head
   const written: Written = { nodes: [], displaced: [], title: doc.title }
+  // Every tag in a page slot goes, also from a slot this head leaves empty:
+  // a template tag, or the tag of a screen below. This head's own tags from
+  // the last write are gone already, because the effect cleanup ran first.
+  for (const node of Array.from(head.children)) {
+    if (inPageSlot(node)) {
+      node.remove()
+      written.displaced.push(node)
+    }
+  }
   for (const tag of tags) {
     if (tag.tag === 'title') {
       doc.title = tag.text
       continue
-    }
-    const inSlot = slotOf(tag)
-    if (inSlot) {
-      // Every tag of the slot goes: a template tag, or the tag of a screen
-      // below. This head's own tags from the last write are gone already,
-      // because the effect cleanup ran first. The tags of this write stay,
-      // as the `hreflang` slot holds more than one.
-      for (const node of Array.from(head.children)) {
-        if (inSlot(node) && !written.nodes.includes(node)) {
-          node.remove()
-          written.displaced.push(node)
-        }
-      }
     }
     const node = elementOf(doc, tag)
     if (!node) continue
@@ -95,12 +91,13 @@ function erase(doc: Document, written: Written): void {
  * Writes the head of one page to `document.head` in an effect, for an app
  * with no Expo Router: React Navigation on react-native-web, a Vite build,
  * an Electron renderer. The same `toHeadTags` records as the Expo Router
- * `PageHead`, so the two write the same head. A tag of the same name,
- * property, or `rel` that was there before is taken out while this head is
- * on, and put back when it goes, and the `hreflang` links go as one set: a
- * screen that mounts over another wins,
- * and the one below gets its head back when the top one unmounts. Renders
- * nothing on native.
+ * `PageHead`, so the two write the same head. Every tag in a page slot (the
+ * description, the robots tag, the canonical link, the `hreflang` links,
+ * `og:*` and `twitter:*`) that was there before is taken out while this head
+ * is on, also from a slot this head leaves empty, and put back when it goes:
+ * a screen that mounts over another wins, and the one below gets its head
+ * back when the top one unmounts. The charset, the viewport, the icons and
+ * the manifest of a template stay. Renders nothing on native.
  *
  * An effect runs after the first paint, and never on a server, so this
  * writes nothing into a static file. A build-time template takes

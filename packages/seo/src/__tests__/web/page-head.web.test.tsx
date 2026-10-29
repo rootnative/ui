@@ -104,7 +104,7 @@ describe('PageHead', () => {
     expect(container.innerHTML).toBe('')
   })
 
-  it('takes out each server tag in a slot it writes, and keeps every other tag', () => {
+  it('takes out each server tag in a page slot, and keeps every other tag', () => {
     // The head a static page holds from `generateMetadata` and `+html.tsx`.
     serverTag('<title>Dune | Trek</title>')
     serverTag('<meta name="description" content="Old text.">')
@@ -145,13 +145,55 @@ describe('PageHead', () => {
     ])
     expect(document.querySelectorAll('title')).toHaveLength(1)
     expect(document.title).toBe('Dune | Trek')
-    // Not a slot this page writes: the shell tags, and the image of a
-    // `generateMetadata` that disagrees with the screen.
+    // Not a page slot: the shell tags stay.
     expect(metaContent('meta[name="theme-color"]')).toEqual(['#000000'])
     expect(document.head.querySelector('link[rel="icon"]')).not.toBeNull()
-    expect(metaContent('meta[property="og:image"]')).toEqual([
-      'https://example.com/a.jpg',
-    ])
+    // A page slot this page leaves empty: the image of a `generateMetadata`
+    // that disagrees with the screen goes too.
+    expect(metaContent('meta[property="og:image"]')).toEqual([])
+  })
+
+  it('takes the canonical link and the share card of the shell out under a noindex head', () => {
+    // A route the export did not write is served from the home shell, with
+    // the home head from `generateMetadata` and the tags of `+html.tsx`.
+    serverTag('<meta charset="utf-8">')
+    serverTag('<meta name="viewport" content="width=device-width">')
+    serverTag('<title>Trek</title>')
+    serverTag('<meta name="description" content="The home page.">')
+    serverTag('<link rel="canonical" href="https://example.com/app/">')
+    serverTag('<meta property="og:type" content="website">')
+    serverTag('<meta property="og:title" content="Trek">')
+    serverTag('<meta property="og:url" content="https://example.com/app/">')
+    serverTag('<meta property="og:image" content="https://example.com/a.jpg">')
+    serverTag('<meta name="twitter:card" content="summary_large_image">')
+    serverTag('<meta name="twitter:title" content="Trek">')
+    serverTag('<link rel="manifest" href="/manifest.json">')
+    serverTag('<link rel="icon" href="/favicon.ico">')
+    serverTag(
+      '<link rel="alternate" type="application/rss+xml" href="/feed.xml">',
+    )
+
+    renderHead(<PageHead site={site} title="Trailer" noindex />)
+
+    expect(document.title).toBe('Trailer | Trek')
+    expect(metaContent('meta[name="robots"]')).toEqual(['noindex'])
+    expect(document.head.querySelector('link[rel="canonical"]')).toBeNull()
+    expect(metaContent('meta[name="description"]')).toEqual([])
+    expect(
+      document.head.querySelectorAll('meta[property^="og:"]'),
+    ).toHaveLength(0)
+    expect(
+      document.head.querySelectorAll('meta[name^="twitter:"]'),
+    ).toHaveLength(0)
+    expect(document.head.querySelector('meta[charset]')).not.toBeNull()
+    expect(document.head.querySelector('meta[name="viewport"]')).not.toBeNull()
+    expect(document.head.querySelector('link[rel="manifest"]')).not.toBeNull()
+    expect(document.head.querySelector('link[rel="icon"]')).not.toBeNull()
+    expect(
+      document.head.querySelector(
+        'link[rel="alternate"][type="application/rss+xml"]',
+      ),
+    ).not.toBeNull()
   })
 
   it('takes out no server tag from a screen that is not focused', () => {

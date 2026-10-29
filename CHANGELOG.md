@@ -9,6 +9,25 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No breaking change.** One fix in `@rootnative/seo`.
+
+- **A page head takes every page slot out of the server head, also the
+  slots it leaves empty.** The Expo Router `PageHead` and `RouteHead`
+  removed a server tag only from a slot the page wrote. A `noindex` page
+  writes no canonical link and no share card, so on a route the static
+  export did not write, the canonical link, the description and the `og:*`
+  and `twitter:*` tags of the shell page stayed beside the `noindex`, and
+  the canonical link pointed at the home page. Now the sweep covers every
+  page slot: the description, the robots tag, the canonical link, the
+  `hreflang` links, `og:*` and `twitter:*`. The charset, the viewport, the
+  theme colour, the icons, the manifest, the preconnect links and a feed
+  link stay. The `dom` adapter follows the same rule: it takes every page
+  slot of a template or of a screen below out while its head is on, and
+  puts them back when it goes. An `og:image` of a `generateMetadata` that
+  the screen does not declare goes too; declare it on the `PageHead`.
+
 ## 0.0.0-alpha.30 — 2026-10-26
 
 **No breaking change.** No export and no prop is removed, and no change
