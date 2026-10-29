@@ -12,7 +12,19 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One fix in `@rootnative/seo`, two in
-`@rootnative/components`.
+`@rootnative/components`. The `@rootnative/inertia` floor moves to
+`0.0.22`, so upgrade it in the app with this release.
+
+- **The `@rootnative/inertia` floor moves to `0.0.22`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.22 <0.1.0`, the dev,
+  example and template pins are `0.0.22` exact, and the registry's derived
+  floor follows. inertia `0.0.21` stops a Reanimated 4.7 warning from
+  `useSpring` and `useInView` on native. inertia `0.0.22` removes a
+  `<Presence>` child that holds no `Motion.*` when it departs; before, that
+  child stayed on screen. No component in this library needed either fix:
+  none calls `useSpring` or `useInView`, and every `<Presence>` child is a
+  `Motion.View`. The floor moves so that an app gets both fixes with this
+  release.
 
 - **`Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on
   web with their focus ring.** The ring was a node 5 px outside the control,
