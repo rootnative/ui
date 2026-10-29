@@ -1,6 +1,6 @@
 # @rootnative/core — Theme System for React Native
 
-> Version: 0.0.0-alpha.30
+> Version: 0.0.0-alpha.31
 > Peer deps: react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0, @rootnative/inertia >=0.0.22 <0.1.0 (required — every animation runs on it)
 > createMaterialTheme needs no extra install — its color engine (@material/material-color-utilities) is bundled behind the create-theme subpath
 

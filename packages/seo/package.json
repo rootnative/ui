@@ -1,6 +1,6 @@
 {
   "name": "@rootnative/seo",
-  "version": "0.0.0-alpha.30",
+  "version": "0.0.0-alpha.31",
   "description": "Search-engine metadata for a React Native web export — head tags, JSON-LD builders, headings, HTML shell, sitemap, and robots.",
   "private": false,
   "sideEffects": false,
