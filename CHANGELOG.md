@@ -9,60 +9,65 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.31 — 2026-10-29
 
-**No breaking change.** One fix in `@rootnative/seo`, two in
-`@rootnative/components`. The `@rootnative/inertia` floor moves to
-`0.0.22`, so upgrade it in the app with this release.
+**No breaking change.** No export and no prop is removed. One change can
+move a screen: an outlined `Button` gets smaller, to the height and width
+of the other variants. Two fixes in `components` and one in `seo`. The
+`@rootnative/inertia` floor moves to `0.0.22`, so upgrade it in the app
+with this release.
 
-- **The `@rootnative/inertia` floor moves to `0.0.22`.** The `core`,
-  `utils` and `components` peer ranges are now `>=0.0.22 <0.1.0`, the dev,
-  example and template pins are `0.0.22` exact, and the registry's derived
-  floor follows. inertia `0.0.21` stops a Reanimated 4.7 warning from
-  `useSpring` and `useInView` on native. inertia `0.0.22` removes a
-  `<Presence>` child that holds no `Motion.*` when it departs; before, that
-  child stayed on screen. No component in this library needed either fix:
-  none calls `useSpring` or `useInView`, and every `<Presence>` child is a
-  `Motion.View`. The floor moves so that an app gets both fixes with this
-  release.
+### `@rootnative/inertia` floor moves to `0.0.22`
 
-- **`Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on
-  web with their focus ring.** The ring was a node 5 px outside the control,
-  at opacity 0 until keyboard focus. On web an absolutely placed node adds
-  to the scrollable overflow of the page even at opacity 0, so an
-  `IconButton` at the end of a bar with the 4 px MD3 gutter reached 1 px
-  past the page edge, and every window width scrolled sideways by 1 px. On
-  web the four controls now draw the ring as a CSS outline (3 px wide, 2 px
-  out) on a node with the control's box. An outline is ink, not layout, and
-  adds no overflow. The ring follows the corner radius and the shape morph
-  as before. No change on native. The other controls keep the outset node;
-  see "Focus rings on web" on the accessibility page.
+The `core`, `utils` and `components` peer ranges are now `>=0.0.22 <0.1.0`,
+the dev, example and template pins are `0.0.22` exact, and the registry's
+derived floor follows. inertia `0.0.21` stops a Reanimated 4.7 warning from
+`useSpring` and `useInView` on native. inertia `0.0.22` removes a
+`<Presence>` child that holds no `Motion.*` when it departs; before, that
+child stayed on screen. No component in this library needed either fix:
+none calls `useSpring` or `useInView`, and every `<Presence>` child is a
+`Motion.View`. The floor moves so that an app gets both fixes with this
+release.
 
-- **An outlined `Button` has the same height and width as the other
-  variants at the same size.** The outline came on top of the full token
-  padding, so an outlined button was taller and wider than a `filled`,
-  `tonal` or `elevated` button by two outline widths. A `small` outlined
-  button was 42 high, not 40. Now the padding gives up the outline width,
-  and the outline sits inside the token container, as in MD3. An outlined
-  button gets smaller in each direction: by 2 dp at `extraSmall`, `small`
-  and `medium`, by 4 dp at `large`, and by 6 dp at `extraLarge`. The same
-  applies on web. `IconButton` did not have this defect: it sets a fixed
-  width and height.
+### An outlined `Button` has the same height and width as the other variants
 
-- **A page head takes every page slot out of the server head, also the
-  slots it leaves empty.** The Expo Router `PageHead` and `RouteHead`
-  removed a server tag only from a slot the page wrote. A `noindex` page
-  writes no canonical link and no share card, so on a route the static
-  export did not write, the canonical link, the description and the `og:*`
-  and `twitter:*` tags of the shell page stayed beside the `noindex`, and
-  the canonical link pointed at the home page. Now the sweep covers every
-  page slot: the description, the robots tag, the canonical link, the
-  `hreflang` links, `og:*` and `twitter:*`. The charset, the viewport, the
-  theme colour, the icons, the manifest, the preconnect links and a feed
-  link stay. The `dom` adapter follows the same rule: it takes every page
-  slot of a template or of a screen below out while its head is on, and
-  puts them back when it goes. An `og:image` of a `generateMetadata` that
-  the screen does not declare goes too; declare it on the `PageHead`.
+The outline came on top of the full token padding, so an outlined button
+was taller and wider than a `filled`, `tonal` or `elevated` button of the
+same size by two outline widths. A `small` outlined button was 42 high, not
+40. Now the padding gives up the outline width, and the outline sits inside
+the token container, as in MD3. An outlined button gets smaller in each
+direction: by 2 dp at `extraSmall`, `small` and `medium`, by 4 dp at
+`large`, and by 6 dp at `extraLarge`. The same applies on web. `IconButton`
+did not have this defect: it sets a fixed width and height.
+
+### `Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on web with their focus ring
+
+The ring was a node 5 px outside the control, at opacity 0 until keyboard
+focus. On web an absolutely placed node adds to the scrollable overflow of
+the page even at opacity 0, so an `IconButton` at the end of a bar with the
+4 px MD3 gutter reached 1 px past the page edge, and every window width
+scrolled sideways by 1 px. On web the four controls now draw the ring as a
+CSS outline (3 px wide, 2 px out) on a node with the control's box. An
+outline is ink, not layout, and adds no overflow. The ring follows the
+corner radius and the shape morph as before. No change on native. The other
+controls keep the outset node; see "Focus rings on web" on the
+accessibility page.
+
+### A page head takes every page slot out of the server head, also the slots it leaves empty
+
+The Expo Router `PageHead` and `RouteHead` removed a server tag only from a
+slot the page wrote. A `noindex` page writes no canonical link and no share
+card, so on a route the static export did not write, the canonical link,
+the description and the `og:*` and `twitter:*` tags of the shell page
+stayed beside the `noindex`, and the canonical link pointed at the home
+page. Now the sweep covers every page slot: the description, the robots
+tag, the canonical link, the `hreflang` links, `og:*` and `twitter:*`. The
+charset, the viewport, the theme colour, the icons, the manifest, the
+preconnect links and a feed link stay. The `dom` adapter follows the same
+rule: it takes every page slot of a template or of a screen below out while
+its head is on, and puts them back when it goes. An `og:image` of a
+`generateMetadata` that the screen does not declare goes too; declare it on
+the `PageHead`.
 
 ## 0.0.0-alpha.30 — 2026-10-26
 
