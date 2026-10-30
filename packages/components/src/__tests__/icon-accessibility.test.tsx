@@ -32,6 +32,7 @@ import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { View } from 'react-native'
 import { Avatar } from '../avatar'
+import { BottomAppBar } from '../bottom-app-bar'
 import { Button } from '../button'
 import { ButtonGroup } from '../button-group'
 import { Checkbox } from '../checkbox'
@@ -208,6 +209,20 @@ const CASES: Array<{ name: string; render: () => void }> = [
     render: () =>
       renderWithTheme(
         <NavigationBar items={[{ value: 'a', label: 'A', icon: PROBE }]} />,
+      ),
+  },
+  {
+    name: 'BottomAppBar — action icon',
+    render: () =>
+      renderWithTheme(
+        <BottomAppBar actions={[{ icon: PROBE, accessibilityLabel: 'A' }]} />,
+      ),
+  },
+  {
+    name: 'BottomAppBar — fab icon',
+    render: () =>
+      renderWithTheme(
+        <BottomAppBar fab={{ icon: PROBE, accessibilityLabel: 'Add' }} />,
       ),
   },
   {

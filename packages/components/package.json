@@ -52,6 +52,11 @@
       "react-native": "./dist/appbar/index.js",
       "default": "./dist/appbar/index.js"
     },
+    "./bottom-app-bar": {
+      "types": "./dist/bottom-app-bar/index.d.ts",
+      "react-native": "./dist/bottom-app-bar/index.js",
+      "default": "./dist/bottom-app-bar/index.js"
+    },
     "./card": {
       "types": "./dist/card/index.d.ts",
       "react-native": "./dist/card/index.js",
@@ -220,6 +225,9 @@
       ],
       "appbar": [
         "dist/appbar/index.d.ts"
+      ],
+      "bottom-app-bar": [
+        "dist/bottom-app-bar/index.d.ts"
       ],
       "card": [
         "dist/card/index.d.ts"

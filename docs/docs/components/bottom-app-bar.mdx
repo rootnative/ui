@@ -1,0 +1,131 @@
+---
+sidebar_position: 2
+description: Bottom app bars show up to four actions and a FAB at the bottom of a screen.
+---
+
+# BottomAppBar
+
+Bottom app bars show up to four actions and a floating action button at the bottom of a
+mobile screen. Follows the [Material Design 3 Bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
+specification.
+
+The bar is 80dp tall on a `surfaceContainer` background at elevation level 2. The actions sit at
+the start, and the FAB sits 16dp from the end.
+
+:::info BottomAppBar is a toolbar, not a navigator
+`BottomAppBar` holds actions for the current screen. For top-level destinations, use
+[NavigationBar](./navigation-bar).
+:::
+
+## Usage
+
+Pass the icon actions as `actions`, and the FAB as `fab`. Each action needs an
+`accessibilityLabel`. The FAB needs one too, unless it has a `label`.
+
+<SnackExample
+  name="RootNative BottomAppBar — Usage"
+  code={`
+  import { BottomAppBar } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { Text, View } from 'react-native'
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, padding: 24 }}>
+              <Text>Inbox</Text>
+            </View>
+            <BottomAppBar
+              actions={[
+                { icon: 'magnify', accessibilityLabel: 'Search', onPress: () => {} },
+                { icon: 'archive-outline', accessibilityLabel: 'Archive', onPress: () => {} },
+                { icon: 'delete-outline', accessibilityLabel: 'Delete', onPress: () => {} },
+              ]}
+              fab={{ icon: 'plus', accessibilityLabel: 'Compose', onPress: () => {} }}
+              insetBottom
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+MD3 recommends up to four actions. A disabled action takes the MD3 disabled treatment and does
+not respond.
+
+## The FAB
+
+The bar renders a flat `FAB`: no shadow, and no lift on hover, with `elevated={false}`. Its
+variant is `secondary` by default. Set `variant` on the `fab` object for another color, and
+`label` for an extended FAB.
+
+```tsx
+<BottomAppBar
+  fab={{ icon: 'pencil-outline', label: 'Compose', variant: 'tertiary', onPress: compose }}
+/>
+```
+
+Leave `fab` off for a bar of actions only.
+
+## Custom leading content
+
+`leading` replaces `actions` for content that `actions` cannot build, such as a `Menu` anchor
+or a `Tooltip`. The two props fill the same slot, so the type rejects them together.
+
+```tsx
+<BottomAppBar
+  leading={
+    <Menu anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>
+      <Menu.Item label="Settings" onPress={openSettings} />
+    </Menu>
+  }
+  fab={{ icon: 'plus', accessibilityLabel: 'Add', onPress: add }}
+/>
+```
+
+A standard `IconButton` in the slot takes the action color. Other content reads it with
+`useAppBarContentColor()`.
+
+## Safe area
+
+A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap the row in a
+`SafeAreaView` that adds the bottom inset below the bar's 80dp. Leave it off (the default) when
+an ancestor already applies the bottom edge, or the inset is added twice.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The bar background |
+| `contentColor` | The action icons, and a standard `IconButton` in `leading` |
+| `style` | The bar container |
+
+The FAB keeps the colors of its variant. Set `variant` on the `fab` object to change them.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Container | `surfaceContainer`, elevation level 2 |
+| Height | 80dp (+ bottom inset with `insetBottom`) |
+| Action | 48dp frame, 24dp icon, `onSurfaceVariant`; the first icon 16dp from the start |
+| FAB | 56dp `secondaryContainer`, flat, 16dp from the end |
+
+Source: Compose `BottomAppBarTokens` and `BottomAppBar.kt`.
+
+## Accessibility
+
+- The bar reports `role="toolbar"`. Pass `role` to replace it.
+- Each action is a `button` named by its `accessibilityLabel`.
+- The FAB is a `button` named by `accessibilityLabel`, or by `label` on an extended FAB.
+- A disabled action or FAB exposes `accessibilityState.disabled`.
+
+## Props
+
+<PropTable name="BottomAppBar" />

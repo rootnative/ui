@@ -18,6 +18,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
 import { Text } from 'react-native'
 import { AppBar } from '../appbar'
+import { BottomAppBar } from '../bottom-app-bar'
 import { BottomSheet } from '../bottom-sheet'
 import { ButtonGroup } from '../button-group'
 import { Dialog } from '../dialog'
@@ -108,6 +109,17 @@ describe('RN prop passthrough reaches the root node', () => {
 
   it('AppBar', () => {
     renderWithTheme(<AppBar title="Title" testID="bar" nativeID="probe" />)
+    expect(screen.getByTestId('bar').props.nativeID).toBe('probe')
+  })
+
+  it('BottomAppBar', () => {
+    renderWithTheme(
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        testID="bar"
+        nativeID="probe"
+      />,
+    )
     expect(screen.getByTestId('bar').props.nativeID).toBe('probe')
   })
 

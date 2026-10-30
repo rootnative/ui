@@ -100,6 +100,7 @@ import { Button, Card } from '@rootnative/components'
 | BottomSheet | `./bottom-sheet` | modal, standard · snap points · velocity-based settle · drag-to-dismiss |
 | Tabs | `./tabs` | primary, secondary · fixed or scrollable · sliding active indicator |
 | NavigationBar | `./navigation-bar` | 3–5 destinations · label visibility always / selected / never |
+| BottomAppBar | `./bottom-app-bar` | up to 4 icon actions · flat secondary FAB · insetBottom |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
 ## Quick examples

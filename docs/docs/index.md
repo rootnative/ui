@@ -71,6 +71,7 @@ Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 58 r
 | Component | Description |
 |-----------|-------------|
 | [AppBar](./components/appbar) | Top navigation with title and actions |
+| [BottomAppBar](./components/bottom-app-bar) | 80dp bottom bar with icon actions and a flat FAB |
 | [BottomSheet](./components/bottom-sheet) | Draggable modal and standard sheets with snap points |
 | [Dialog](./components/dialog) | Basic and full-screen modal dialogs |
 | [KeyboardAvoidingWrapper](./components/keyboard-avoiding-wrapper) | Keeps inputs visible when the keyboard opens |

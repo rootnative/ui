@@ -547,6 +547,7 @@ const COMPONENT_ORDER = [
   'icon',
   'fab',
   'appbar',
+  'bottom-app-bar',
   'card',
   'chip',
   'checkbox',
@@ -585,6 +586,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   icon: 'Icon',
   fab: 'FAB',
   appbar: 'AppBar',
+  'bottom-app-bar': 'BottomAppBar',
   card: 'Card',
   chip: 'Chip',
   checkbox: 'Checkbox',
@@ -710,6 +712,33 @@ import { FAB } from '@rootnative/components/fab'
 
 // Flat — no shadow and no lift on hover, as MD3 places it in a bottom app bar
 <FAB icon="plus" variant="secondary" elevated={false} accessibilityLabel="Add" onPress={handleAdd} />
+\`\`\``,
+
+  'bottom-app-bar': `\`\`\`tsx
+import { BottomAppBar } from '@rootnative/components/bottom-app-bar'
+
+// Up to four icon actions at the start, a flat secondary FAB at the end.
+// 80dp on surfaceContainer at elevation level 2. A toolbar, not a navigator.
+<BottomAppBar
+  actions={[
+    { icon: 'magnify', accessibilityLabel: 'Search', onPress: search },
+    { icon: 'delete-outline', accessibilityLabel: 'Delete', onPress: remove },
+  ]}
+  fab={{ icon: 'plus', accessibilityLabel: 'Add', onPress: add }}
+  insetBottom // adds the safe-area bottom inset below the 80dp bar
+/>
+
+// An extended FAB from \`label\`, and a FAB variant other than secondary.
+<BottomAppBar fab={{ icon: 'pencil-outline', label: 'Compose', variant: 'tertiary', onPress: compose }} />
+
+// \`leading\` replaces \`actions\` for content they cannot build, such as a Menu
+// anchor. A standard IconButton there takes the action color; other content
+// reads it with useAppBarContentColor().
+<BottomAppBar leading={<Menu anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>...</Menu>} />
+
+// Overrides: containerColor (bar), contentColor (action icons). The FAB keeps
+// the colors of its variant.
+<BottomAppBar containerColor="#FFD8E4" contentColor="#31111D" actions={actions} />
 \`\`\``,
 
   appbar: `\`\`\`tsx
@@ -1584,6 +1613,58 @@ import { Grid } from '@rootnative/components/layout'
         }
         output += line + '\n'
       }
+    }
+
+    return output
+  }
+
+  // --- BottomAppBar: common props + the exclusive leading pair + the two shapes ---
+  if (dirName === 'bottom-app-bar') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    // `BottomAppBarProps` is a type alias, the same shape as `AppBarProps`:
+    // the shared props come from `BottomAppBarCommonProps`, and the exclusive
+    // `actions` / `leading` pair is described here.
+    const propsIface = interfaces.find(
+      (i) => i.name === 'BottomAppBarCommonProps',
+    )
+    if (propsIface) {
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine = '- Inherits `ViewProps` (except `children`)\n'
+      const leadingProps =
+        '- `actions?: BottomAppBarAction[]` — Icon actions rendered at the ' +
+        'start of the bar. MD3 recommends up to four. Mutually exclusive ' +
+        'with `leading`.\n' +
+        '- `leading?: ReactNode` — Custom start content. Use instead of ' +
+        '`actions` when the slot needs something `actions` cannot build, ' +
+        'such as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in ' +
+        'the slot takes the action color; other content reads it with ' +
+        '`useAppBarContentColor()`. Mutually exclusive with `actions` — the ' +
+        'type rejects both together.\n'
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, leadingProps + inheritsLine)
+        : section + leadingProps
+      output += '\n'
+    }
+
+    const actionIface = interfaces.find((i) => i.name === 'BottomAppBarAction')
+    if (actionIface) {
+      output += formatSubInterface(
+        actionIface,
+        typeAliases,
+        '#### BottomAppBarAction',
+        'One icon action at the start of the bar.',
+      )
+    }
+
+    const fabIface = interfaces.find((i) => i.name === 'BottomAppBarFab')
+    if (fabIface) {
+      output += formatSubInterface(
+        fabIface,
+        typeAliases,
+        '#### BottomAppBarFab',
+        'The FAB at the end of the bar. It renders a flat `FAB`: no shadow and no lift on hover.',
+      )
     }
 
     return output

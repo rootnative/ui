@@ -248,6 +248,25 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           <Box bg={theme.colors.onSurface} style={previewStyles.appBarHandle} />
         </Row>
       )
+    case 'BottomAppBar':
+      return (
+        <Row
+          bg={theme.colors.surfaceContainer}
+          style={previewStyles.appBar}
+          align="center"
+          gap="sm"
+          px="sm"
+        >
+          <Box bg={theme.colors.onSurface} style={previewStyles.appBarHandle} />
+          <Box bg={theme.colors.onSurface} style={previewStyles.appBarHandle} />
+          <Box bg={theme.colors.onSurface} style={previewStyles.appBarHandle} />
+          <View style={previewStyles.appBarSpacer} />
+          <Box
+            bg={theme.colors.secondaryContainer}
+            style={previewStyles.bottomAppBarFab}
+          />
+        </Row>
+      )
     case 'Card':
       return (
         <View style={previewStyles.cardMini}>
@@ -1060,6 +1079,11 @@ const previewStyles = StyleSheet.create({
   },
   appBarSpacer: {
     flex: 1,
+  },
+  bottomAppBarFab: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
   },
   cardMini: {
     width: '100%',

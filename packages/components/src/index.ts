@@ -52,6 +52,13 @@ export type {
   AppBarVariant,
 } from './appbar'
 
+export { BottomAppBar } from './bottom-app-bar'
+export type {
+  BottomAppBarAction,
+  BottomAppBarFab,
+  BottomAppBarProps,
+} from './bottom-app-bar'
+
 export { Card, CardMedia, CardContent, CardActions } from './card'
 export type {
   CardProps,

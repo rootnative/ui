@@ -11,8 +11,18 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One new prop and one fix in `@rootnative/components`.
+**No breaking change.** One new component, one new prop and one fix in
+`@rootnative/components`.
 
+- **New `BottomAppBar`.** The MD3 bottom app bar: an 80dp bar on
+  `surfaceContainer` at elevation level 2, with up to four icon `actions`
+  at the start and a flat secondary `fab` at the end. `leading` replaces
+  `actions` for custom content, such as a `Menu` anchor; the type rejects
+  the two together. `insetBottom` adds the bottom safe-area inset, off by
+  default like `NavigationBar`. `containerColor` and `contentColor`
+  override the bar and the action icons. The bar is a `toolbar`; pass
+  `role` to replace it. Subpath `@rootnative/components/bottom-app-bar`,
+  CLI `rootnative add bottom-app-bar`.
 - **`FAB` takes `elevated`.** `elevated={false}` removes the shadow and the
   lift on hover. The container color and the state layers do not change.
   MD3 places a flat FAB in a bottom app bar. The default is `true`, so no

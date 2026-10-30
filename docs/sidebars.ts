@@ -76,6 +76,7 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         'components/appbar',
+        'components/bottom-app-bar',
         'components/bottom-sheet',
         'components/dialog',
         'components/keyboard-avoiding-wrapper',

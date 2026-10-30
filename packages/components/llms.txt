@@ -468,6 +468,68 @@ Props:
 
 ---
 
+### BottomAppBar
+
+```tsx
+import { BottomAppBar } from '@rootnative/components/bottom-app-bar'
+
+// Up to four icon actions at the start, a flat secondary FAB at the end.
+// 80dp on surfaceContainer at elevation level 2. A toolbar, not a navigator.
+<BottomAppBar
+  actions={[
+    { icon: 'magnify', accessibilityLabel: 'Search', onPress: search },
+    { icon: 'delete-outline', accessibilityLabel: 'Delete', onPress: remove },
+  ]}
+  fab={{ icon: 'plus', accessibilityLabel: 'Add', onPress: add }}
+  insetBottom // adds the safe-area bottom inset below the 80dp bar
+/>
+
+// An extended FAB from `label`, and a FAB variant other than secondary.
+<BottomAppBar fab={{ icon: 'pencil-outline', label: 'Compose', variant: 'tertiary', onPress: compose }} />
+
+// `leading` replaces `actions` for content they cannot build, such as a Menu
+// anchor. A standard IconButton there takes the action color; other content
+// reads it with useAppBarContentColor().
+<BottomAppBar leading={<Menu anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>...</Menu>} />
+
+// Overrides: containerColor (bar), contentColor (action icons). The FAB keeps
+// the colors of its variant.
+<BottomAppBar containerColor="#FFD8E4" contentColor="#31111D" actions={actions} />
+```
+
+Props:
+- `fab?: BottomAppBarFab` — The FAB at the end of the bar. Leave it off for a bar of actions only.
+- `insetBottom?: boolean` — Default: `false`. When `true`, wraps the row in a SafeAreaView that adds the bottom inset below the bar's 80dp, so it clears the home indicator. Leave it off when an ancestor (e.g. `Layout` with a `bottom` edge) already handles it.
+- `containerColor?: string` — Default: `surfaceContainer`. Override the bar background.
+- `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon color of the actions. It reaches each standard `IconButton` in `leading` too. The FAB keeps the colors of its variant.
+- `style?: StyleProp<ViewStyle>` — Style applied to the bar container.
+- `actions?: BottomAppBarAction[]` — Icon actions rendered at the start of the bar. MD3 recommends up to four. Mutually exclusive with `leading`.
+- `leading?: ReactNode` — Custom start content. Use instead of `actions` when the slot needs something `actions` cannot build, such as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in the slot takes the action color; other content reads it with `useAppBarContentColor()`. Mutually exclusive with `actions` — the type rejects both together.
+- Inherits `ViewProps` (except `children`)
+
+#### BottomAppBarAction
+
+One icon action at the start of the bar.
+
+Props:
+- `icon: string` — Icon to render. Accepts the same forms as `IconButton.icon` — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function.
+- `accessibilityLabel: string` — Accessibility label for screen readers (required).
+- `onPress?: () => void` — Called when the action is pressed.
+- `disabled?: boolean` — Default: `false`. Disables the action.
+#### BottomAppBarFab
+
+The FAB at the end of the bar. It renders a flat `FAB`: no shadow and no lift on hover.
+
+Props:
+- `icon: FABProps['icon']` — Icon of the FAB. Accepts the same forms as `FAB.icon`.
+- `label?: string` — Optional text label. When provided, the bar renders an extended FAB, and the label is the accessible name unless `accessibilityLabel` is set.
+- `variant?: FABVariant` — Default: `'secondary'`. Color variant of the FAB.
+- `onPress?: () => void` — Called when the FAB is pressed.
+- `disabled?: boolean` — Default: `false`. Disables the FAB.
+- `accessibilityLabel?: string` — Accessible name for screen readers. Required when `label` is not set.
+
+---
+
 ### Card
 
 ```tsx

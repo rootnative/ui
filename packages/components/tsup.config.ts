@@ -11,6 +11,7 @@ export default defineConfig({
     'src/icon-button/index.ts',
     'src/icon/index.ts',
     'src/appbar/index.ts',
+    'src/bottom-app-bar/index.ts',
     'src/card/index.ts',
     'src/chip/index.ts',
     'src/checkbox/index.ts',

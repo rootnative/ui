@@ -68,6 +68,7 @@ The defaults are not uniform, and that is intentional:
 |---|---|---|
 | `AppBar` | `insetTop` | `false` |
 | `NavigationBar` | `insetBottom` | `false` |
+| `BottomAppBar` | `insetBottom` | `false` |
 | `BottomSheet` | `insetBottom` | **`true`** |
 | `NavigationDrawer` (modal) | `insetTop`, `insetBottom` | **`true`** |
 | `NavigationDrawer` (standard) | `insetTop`, `insetBottom` | `false` |

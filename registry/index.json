@@ -14,6 +14,10 @@
       "description": "Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support."
     },
     {
+      "name": "bottom-app-bar",
+      "description": "MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end"
+    },
+    {
       "name": "bottom-sheet",
       "description": "MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss."
     },

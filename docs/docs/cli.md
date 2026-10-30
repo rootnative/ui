@@ -415,6 +415,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `appbar` | button, icon-button, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
 | `avatar` | — | Circular avatar with image, icon, or text initials and 5 sizes (extraSmall to extraLarge) |
 | `badge` | — | Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support |
+| `bottom-app-bar` | fab, icon-button | MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end |
 | `bottom-sheet` | portal | MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss |
 | `button` | progress | MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support |
 | `button-group` | — | Standard and connected button groups with single or multi-select toggle behavior; replaces the deprecated MD3 segmented button |

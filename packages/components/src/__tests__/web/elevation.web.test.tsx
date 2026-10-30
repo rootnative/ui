@@ -14,6 +14,7 @@
 import { lightTheme } from '@rootnative/core'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
+import { BottomAppBar } from '../../bottom-app-bar'
 import { BottomSheet } from '../../bottom-sheet'
 import { Button } from '../../button'
 import { Card } from '../../card'
@@ -212,6 +213,17 @@ it.each([
           { value: 'home', label: 'Home', icon: 'home-outline' },
           { value: 'search', label: 'Search', icon: 'magnify' },
         ]}
+      />
+    ),
+    level: lightTheme.elevation.level2,
+  },
+  {
+    // The FAB inside is flat, so the bar is the one box-shadow.
+    name: 'BottomAppBar',
+    ui: (
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        fab={{ icon: 'plus', accessibilityLabel: 'Add' }}
       />
     ),
     level: lightTheme.elevation.level2,

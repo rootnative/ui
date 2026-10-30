@@ -27,6 +27,7 @@ import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { useEffect } from 'react'
 import { StyleSheet, Text } from 'react-native'
+import { BottomAppBar } from '../bottom-app-bar'
 import { BottomSheet } from '../bottom-sheet'
 import { Button } from '../button'
 import { Card } from '../card'
@@ -269,6 +270,17 @@ const STATIC_CASES = [
           { value: 'home', label: 'Home', icon: 'home-outline' },
           { value: 'search', label: 'Search', icon: 'magnify' },
         ]}
+      />
+    ),
+    rest: lightTheme.elevation.level2,
+  },
+  {
+    // The FAB inside is flat, so the bar is the one shadow node.
+    name: 'BottomAppBar',
+    ui: (
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        fab={{ icon: 'plus', accessibilityLabel: 'Add' }}
       />
     ),
     rest: lightTheme.elevation.level2,

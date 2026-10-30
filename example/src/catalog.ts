@@ -221,6 +221,14 @@ export const sections: CatalogSection[] = [
         keywords: 'toolbar header navbar top app bar title collapse',
       },
       {
+        label: 'BottomAppBar',
+        route: '/bottom-app-bar',
+        description: '80dp bottom bar with icon actions and a flat FAB',
+        add: 'bottom-app-bar',
+        docs: 'components/bottom-app-bar',
+        keywords: 'bottom app bar toolbar actions fab footer',
+      },
+      {
         label: 'Card',
         route: '/card',
         description: 'Contained surfaces for grouping related content',
