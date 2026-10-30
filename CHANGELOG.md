@@ -9,6 +9,24 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No breaking change.** One fix in `@rootnative/components`.
+
+- **On web, Space presses a control whose role is `checkbox`, `switch`,
+  `radio` or `tab`.** react-native-web presses a `Pressable` on Space only
+  when its role is `button`. So Space did nothing on `Checkbox`, `Switch`,
+  `Radio`, a `ButtonGroup` with a selection mode, `Tabs`, `NavigationBar`,
+  `NavigationRail` and `NavigationDrawer.Item`, and Enter was the only key.
+  A role that you pass counts too, for example `role="checkbox"` on a
+  pressable `Card`, or `role="switch"` on a pressable `ListItem`. The
+  control presses on the key down, once for a held key, and the page does
+  not scroll. A key from a focused element inside the control does not
+  press it. When your `onKeyDown` calls `preventDefault`, Space does not
+  press, so an app that handles Space itself does not press twice. Remove
+  that handler when you upgrade. No change on native. A `rootnative update`
+  of these components adds `pressableKeyDown.ts` to the component folder.
+
 ## 0.0.0-alpha.31 — 2026-10-29
 
 **No breaking change.** No export and no prop is removed. One change can

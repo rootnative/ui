@@ -221,6 +221,21 @@ Escape, so a keyboard user reads the same text a pointer user does.
 Handled by the theme, not by you — see [Motion](./motion.md). Every animated
 component collapses to a hard cut when the OS setting is on.
 
+## Keys on web
+
+On web, Enter presses each control. Space presses a control whose role is
+`button`, `checkbox`, `switch`, `radio` or `tab`, as the WAI-ARIA patterns
+say. A held key presses once, and Space does not scroll the page.
+
+A role that you pass counts too, for example `role="checkbox"` with
+`aria-checked` on a pressable `Card`, or `role="switch"` on a pressable
+`ListItem` that holds a passive `Switch`. A key from a focused element inside
+the control, such as a link in a card, does not press the control. When your
+own `onKeyDown` calls `preventDefault`, Space does not press.
+
+react-native-web presses a `Pressable` on Space only for the `button` role.
+A `Pressable` of your own with one of the other roles answers Enter only.
+
 ## Focus rings on web
 
 `Button`, `IconButton`, `FAB` and `Chip` draw their MD3 focus ring as a CSS

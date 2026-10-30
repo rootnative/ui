@@ -8,6 +8,7 @@ import { Pressable, Text, View } from 'react-native'
 import { Badge } from '../badge'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { pressOnSpace } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -140,6 +141,8 @@ export function NavigationItem({
     [styles.label, labelStyle, animatedLabelStyle],
   )
 
+  const handlePress = () => onPress(item.value)
+
   return (
     <Pressable
       role="tab"
@@ -147,7 +150,8 @@ export function NavigationItem({
       aria-selected={selected}
       aria-disabled={disabled}
       disabled={disabled}
-      onPress={() => onPress(item.value)}
+      onPress={handlePress}
+      onKeyDown={pressOnSpace(handlePress, disabled)}
       testID={testID}
       {...handlers}
       style={containerStyle}

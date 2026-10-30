@@ -7,6 +7,7 @@ import { Pressable, Text, View } from 'react-native'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { pressOnSpace } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useNavigationDrawerContext } from './context'
@@ -94,6 +95,11 @@ export function NavigationDrawerItem({
     [styles.label, drawerLabelStyle, labelStyle],
   )
 
+  const handlePress = () => {
+    select(value)
+    onPress?.()
+  }
+
   return (
     <Pressable
       {...rest}
@@ -102,10 +108,8 @@ export function NavigationDrawerItem({
       aria-selected={selected}
       aria-disabled={disabled}
       disabled={disabled}
-      onPress={() => {
-        select(value)
-        onPress?.()
-      }}
+      onPress={handlePress}
+      onKeyDown={pressOnSpace(handlePress, disabled, rest.onKeyDown)}
       testID={testID}
       {...composeHandlers(handlers, rest)}
       style={containerStyle}
