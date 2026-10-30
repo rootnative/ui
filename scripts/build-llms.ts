@@ -707,6 +707,9 @@ import { FAB } from '@rootnative/components/fab'
 
 // Extended — label doubles as the accessible name
 <FAB icon="pencil-outline" label="Edit" variant="surface" onPress={handleEdit} />
+
+// Flat — no shadow and no lift on hover, as MD3 places it in a bottom app bar
+<FAB icon="plus" variant="secondary" elevated={false} accessibilityLabel="Add" onPress={handleAdd} />
 \`\`\``,
 
   appbar: `\`\`\`tsx

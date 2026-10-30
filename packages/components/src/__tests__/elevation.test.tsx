@@ -170,6 +170,10 @@ describe.each(HOVER_CASES)('$name hover elevation', ({ ui }) => {
 it.each([
   { name: 'outlined Button', ui: <Button variant="outlined">Outlined</Button> },
   { name: 'text Button', ui: <Button variant="text">Text</Button> },
+  {
+    name: 'FAB with elevated={false}',
+    ui: <FAB icon="plus" accessibilityLabel="Add" elevated={false} />,
+  },
 ])('$name stays flat on hover', ({ ui }) => {
   const { flush } = renderSettled(ui)
   fireEvent(screen.getByRole('button'), 'hoverIn')

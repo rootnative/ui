@@ -11,8 +11,12 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One fix in `@rootnative/components`.
+**No breaking change.** One new prop and one fix in `@rootnative/components`.
 
+- **`FAB` takes `elevated`.** `elevated={false}` removes the shadow and the
+  lift on hover. The container color and the state layers do not change.
+  MD3 places a flat FAB in a bottom app bar. The default is `true`, so no
+  existing FAB changes.
 - **On web, Space presses a control whose role is `checkbox`, `switch`,
   `radio` or `tab`.** react-native-web presses a `Pressable` on Space only
   when its role is `button`. So Space did nothing on `Checkbox`, `Switch`,

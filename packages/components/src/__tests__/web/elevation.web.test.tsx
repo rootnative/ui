@@ -221,6 +221,14 @@ it.each([
   expect(computedBoxShadows(container)).toEqual([elevationBoxShadow(level)])
 })
 
+it('renders no box-shadow on a FAB with elevated={false}', () => {
+  const { container } = renderWeb(
+    <FAB icon="plus" accessibilityLabel="Add" elevated={false} />,
+  )
+  expect(boxShadows(container)).toHaveLength(0)
+  expect(computedBoxShadows(container)).toHaveLength(0)
+})
+
 /**
  * The web half of the `elevationShadowConfig` contract. The native half is in
  * `../elevation.test.tsx`; this project is the only place `Platform.OS` is

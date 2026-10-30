@@ -75,6 +75,13 @@ export interface FABProps extends Omit<
    */
   disabled?: boolean
   /**
+   * When `false`, the FAB draws no shadow and does not lift on hover. MD3
+   * places a flat FAB in a `BottomAppBar`, which sets this for you. The
+   * container color and the state layers do not change.
+   * @default true
+   */
+  elevated?: boolean
+  /**
    * Accessible name for screen readers. Required for icon-only FABs. When
    * `label` is set, defaults to the label and may be omitted (override only
    * if you need a more descriptive name).

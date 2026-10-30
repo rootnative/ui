@@ -52,6 +52,7 @@ export function FAB({
   style,
   onPress,
   disabled = false,
+  elevated = true,
   accessibilityLabel,
   hitSlop,
   ...rest
@@ -94,7 +95,7 @@ export function FAB({
     disabledContainerColor: colors.disabledBackgroundColor,
   })
 
-  const showElevationLayer = !isDisabled
+  const showElevationLayer = elevated && !isDisabled
 
   // Elevation moves level 3 (rest) → level 4 (hover) per MD3 as one
   // interpolated shadow on a single unclipped carrier View behind the

@@ -156,6 +156,15 @@ Override `containerColor` and `contentColor` to bypass the variant defaults. Sta
 `}
 />
 
+## Flat
+
+Pass `elevated={false}` to remove the shadow and the lift on hover. The container color and
+the state layers stay the same. MD3 uses a flat FAB in a bottom app bar.
+
+```tsx
+<FAB icon="plus" variant="secondary" elevated={false} accessibilityLabel="Add" />
+```
+
 ## Props
 
 <PropTable name="FAB" />
