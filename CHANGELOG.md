@@ -12,7 +12,19 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One new component, one new prop and one fix in
-`@rootnative/components`, and two new props in `@rootnative/seo`.
+`@rootnative/components`, and two new props in `@rootnative/seo`. The
+`@rootnative/inertia` floor moves to `0.0.23`, so upgrade it in the app
+with this release.
+
+- **The `@rootnative/inertia` floor moves to `0.0.23`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.23 <0.1.0`, the dev,
+  example and template pins are `0.0.23` exact, and the registry's derived
+  floor follows. inertia `0.0.23` adds `useHideOnScroll`: a 0 to 1 value
+  from the direction of a scroll, which hides a bar while the content
+  scrolls down and shows it again while the content scrolls up. No
+  component in this library uses it. The same inertia release fixes a
+  native crash in `@rootnative/inertia-svg`, which this library does not
+  use. The floor moves so that an app gets the new hook with this release.
 
 - **`Picture` takes `srcSet` and `sizes`.** `srcSet` lists more files of the
   same image as `{ source, width }`, with the width of each file in pixels.
