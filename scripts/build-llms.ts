@@ -563,6 +563,7 @@ const COMPONENT_ORDER = [
   'portal',
   'dialog',
   'bottom-sheet',
+  'side-sheet',
   'snackbar',
   'menu',
   'tooltip',
@@ -602,6 +603,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   portal: 'Portal',
   dialog: 'Dialog',
   'bottom-sheet': 'BottomSheet',
+  'side-sheet': 'SideSheet',
   snackbar: 'Snackbar',
   menu: 'Menu',
   tooltip: 'Tooltip',
@@ -1004,6 +1006,47 @@ import { BottomSheet } from '@rootnative/components/bottom-sheet'
 
 // Must be resolved by an action — drags rubber-band back, scrim inert
 <BottomSheet visible={open} onDismiss={close} dismissable={false}>…</BottomSheet>
+\`\`\``,
+
+  'side-sheet': `\`\`\`tsx
+import { SideSheet } from '@rootnative/components/side-sheet'
+
+// Modal (default): renders through Portal behind a 32% scrim and slides in
+// from the end edge (the right edge in LTR). The close button, a scrim press,
+// Android back and Escape call onDismiss. Needs a root PortalHost.
+<SideSheet
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  headline="Filters"
+  actions={
+    <>
+      <Button onPress={apply}>Save</Button>
+      <Button variant="outlined" onPress={() => setOpen(false)}>Cancel</Button>
+    </>
+  }
+>
+  <FilterForm />  {/* scrolls between the header and the actions */}
+</SideSheet>
+
+// A second level: onBack adds a back button before the headline.
+<SideSheet visible={open} onDismiss={close} headline="Price" onBack={showFilters}>…</SideSheet>
+
+// edge="start" enters from the start edge. detached adds a 16dp margin and
+// rounds all four corners. width sets the width and the slide distance.
+<SideSheet visible={open} onDismiss={close} edge="start" detached width={320}>…</SideSheet>
+
+// Standard: renders in place, beside the main content, which stays
+// interactive. Put it in a row. onDismiss is optional and only drives the
+// close button; the type rejects the other modal props.
+<View style={{ flex: 1, flexDirection: 'row' }}>
+  <MainContent style={{ flex: 1 }} />
+  <Divider orientation="vertical" />
+  {open ? (
+    <SideSheet variant="standard" headline="Details" onDismiss={() => setOpen(false)}>
+      <Details />
+    </SideSheet>
+  ) : null}
+</View>
 \`\`\``,
 
   snackbar: `\`\`\`tsx
@@ -1998,6 +2041,48 @@ import { Grid } from '@rootnative/components/layout'
       'A `Divider` inset 28dp from both sheet edges, for use between sections. ' +
       'Takes `DividerProps` except `orientation`, `insetStart` and `insetEnd`, ' +
       'which are fixed.\n'
+
+    return output
+  }
+
+  // --- SideSheet: common props + the modal/standard arms ---
+  if (dirName === 'side-sheet') {
+    let output = `### ${displayName}\n\n${example}\n\n`
+
+    // `SideSheetProps` is a type alias, the same shape as
+    // `NavigationDrawerProps`: the shared props come from
+    // `SideSheetCommonProps`, and the arms are described here because the
+    // parser reads interfaces only.
+    const propsIface = interfaces.find((i) => i.name === 'SideSheetCommonProps')
+    if (propsIface) {
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine =
+        '- Inherits `ViewProps` (except `children`, `style`)\n'
+      const armProps =
+        "- `variant?: 'modal' | 'standard'` — Default: `'modal'`. `'modal'` " +
+        'slides in over the content behind a scrim and renders through ' +
+        "`Portal`. `'standard'` renders in place, beside the main content, " +
+        'which stays interactive.\n' +
+        '- `visible: boolean` — **Modal only, required.** Whether the sheet ' +
+        'is shown. Exit animations run before it unmounts.\n' +
+        '- `onDismiss: () => void` — **Required on a modal sheet, optional ' +
+        'on a standard one.** Called by the close button, which shows only ' +
+        'when `onDismiss` is set. On a modal sheet a scrim press, Android ' +
+        'back and Escape on web also call it.\n' +
+        '- `dismissable?: boolean` — Modal only. Default: `true`. Whether the ' +
+        'scrim press, Android back, and Escape dismiss the sheet. The close ' +
+        'button always calls `onDismiss`.\n' +
+        "- `edge?: 'start' | 'end'` — Modal only. Default: `'end'`. Screen " +
+        "edge the sheet enters from; `'end'` is the right edge in LTR.\n" +
+        '- `hostName?: string` — Modal only. Render into a named `PortalHost`.\n' +
+        '- `scrimStyle?: StyleProp<ViewStyle>` — Modal only. Style for the scrim.\n' +
+        "- `scrimAccessibilityLabel?: string` — Modal only. Default: `'Close " +
+        "side sheet'`.\n" +
+        'The type rejects every modal-only prop on `variant="standard"`.\n'
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, armProps + inheritsLine)
+        : section + armProps
+    }
 
     return output
   }

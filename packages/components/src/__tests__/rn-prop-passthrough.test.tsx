@@ -29,6 +29,7 @@ import { NavigationBar } from '../navigation-bar'
 import { NavigationDrawer } from '../navigation-drawer'
 import { NavigationRail } from '../navigation-rail'
 import { PortalHost } from '../portal'
+import { SideSheet } from '../side-sheet'
 import { Tabs } from '../tabs'
 import { Tooltip } from '../tooltip'
 
@@ -89,6 +90,27 @@ describe('RN prop passthrough reaches the root node', () => {
       </NavigationDrawer>,
     )
     expect((await screen.findByTestId('drawer')).props.nativeID).toBe('probe')
+  })
+
+  it('SideSheet — standard surface', () => {
+    renderWithTheme(
+      <SideSheet variant="standard" testID="side-sheet" nativeID="probe" />,
+    )
+    expect(screen.getByTestId('side-sheet').props.nativeID).toBe('probe')
+  })
+
+  it('SideSheet — modal surface', async () => {
+    renderHosted(
+      <SideSheet
+        visible
+        onDismiss={() => {}}
+        testID="side-sheet"
+        nativeID="probe"
+      />,
+    )
+    expect((await screen.findByTestId('side-sheet')).props.nativeID).toBe(
+      'probe',
+    )
   })
 
   it('Icon', () => {

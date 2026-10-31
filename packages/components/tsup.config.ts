@@ -22,6 +22,7 @@ export default defineConfig({
     'src/search-view/index.ts',
     'src/dialog/index.ts',
     'src/bottom-sheet/index.ts',
+    'src/side-sheet/index.ts',
     'src/divider/index.ts',
     'src/menu/index.ts',
     'src/tooltip/index.ts',

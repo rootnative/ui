@@ -121,6 +121,13 @@ export type {
   BottomSheetVariant,
 } from './bottom-sheet'
 
+export { SideSheet } from './side-sheet'
+export type {
+  SideSheetEdge,
+  SideSheetProps,
+  SideSheetVariant,
+} from './side-sheet'
+
 export { Divider } from './divider'
 export type { DividerProps, DividerOrientation } from './divider'
 

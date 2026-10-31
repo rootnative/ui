@@ -43,6 +43,7 @@ import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
 import { NavigationDrawer } from '../navigation-drawer'
 import { PortalHost } from '../portal/PortalHost'
+import { SideSheet } from '../side-sheet'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
 import { Tooltip } from '../tooltip'
 
@@ -258,6 +259,17 @@ const STATIC_CASES = [
         <NavigationDrawer variant="modal" visible onDismiss={() => {}}>
           <NavigationDrawer.Item value="home" label="Home" />
         </NavigationDrawer>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level1,
+  },
+  {
+    name: 'SideSheet (modal)',
+    ui: (
+      <PortalHost>
+        <SideSheet visible onDismiss={() => {}}>
+          <Text>Sheet</Text>
+        </SideSheet>
       </PortalHost>
     ),
     rest: lightTheme.elevation.level1,

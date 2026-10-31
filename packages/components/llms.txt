@@ -1327,6 +1327,83 @@ Props:
 
 ---
 
+### SideSheet
+
+```tsx
+import { SideSheet } from '@rootnative/components/side-sheet'
+
+// Modal (default): renders through Portal behind a 32% scrim and slides in
+// from the end edge (the right edge in LTR). The close button, a scrim press,
+// Android back and Escape call onDismiss. Needs a root PortalHost.
+<SideSheet
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  headline="Filters"
+  actions={
+    <>
+      <Button onPress={apply}>Save</Button>
+      <Button variant="outlined" onPress={() => setOpen(false)}>Cancel</Button>
+    </>
+  }
+>
+  <FilterForm />  {/* scrolls between the header and the actions */}
+</SideSheet>
+
+// A second level: onBack adds a back button before the headline.
+<SideSheet visible={open} onDismiss={close} headline="Price" onBack={showFilters}>…</SideSheet>
+
+// edge="start" enters from the start edge. detached adds a 16dp margin and
+// rounds all four corners. width sets the width and the slide distance.
+<SideSheet visible={open} onDismiss={close} edge="start" detached width={320}>…</SideSheet>
+
+// Standard: renders in place, beside the main content, which stays
+// interactive. Put it in a row. onDismiss is optional and only drives the
+// close button; the type rejects the other modal props.
+<View style={{ flex: 1, flexDirection: 'row' }}>
+  <MainContent style={{ flex: 1 }} />
+  <Divider orientation="vertical" />
+  {open ? (
+    <SideSheet variant="standard" headline="Details" onDismiss={() => setOpen(false)}>
+      <Details />
+    </SideSheet>
+  ) : null}
+</View>
+```
+
+Props:
+- `children?: ReactNode` — Sheet content. It scrolls between the header and the actions.
+- `headline?: string` — Headline in `titleLarge` at the top of the sheet. It is also the accessible name of the sheet when `accessibilityLabel` is not set.
+- `headingLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `2`. The outline level of the headline on web, where it renders as `<hN>`. Native has no heading levels and ignores it.
+- `onBack?: () => void` — Shows a back button before the headline and calls this on press. Use it when the sheet shows a second level of content.
+- `backIcon?: IconSource` — Default: `'arrow-left' ('arrow-right' in RTL)`. Icon for the back button.
+- `backAccessibilityLabel?: string` — Default: `'Back'`. Screen-reader label for the back button.
+- `closeIcon?: IconSource` — Default: `'close'`. Icon for the close button. The close button shows when the sheet has an `onDismiss`.
+- `closeAccessibilityLabel?: string` — Default: `'Close'`. Screen-reader label for the close button.
+- `actions?: ReactNode` — Action buttons in a row below the content, such as a filled "Save" and an outlined "Cancel". The row stays in place while the content scrolls.
+- `showActionsDivider?: boolean` — Default: `true`. Whether a divider separates the actions from the content. Ignored without `actions`.
+- `detached?: boolean` — Default: `false`. Whether the sheet is detached from the screen edges by a 16dp margin, with all four corners rounded.
+- `width?: number` — Default: `256`. Width of the sheet in dp. A modal sheet shrinks on a narrow window, so a strip of scrim stays visible. Set the width here and not in `style`: the slide distance of a modal sheet comes from this value.
+- `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the top safe-area inset. The container color still extends under the inset.
+- `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the bottom safe-area inset.
+- `containerColor?: string` — Default: `surfaceContainerLow for 'modal', surface for 'standard'`. Override the sheet background.
+- `contentColor?: string` — Default: `onSurface for the headline, onSurfaceVariant for the icons`. Override the color of the headline and of the back and close icons. The hover and press layers of the two buttons derive from it.
+- `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
+- `style?: StyleProp<ViewStyle>` — Style applied to the sheet surface.
+- `accessibilityLabel?: string` — Screen-reader label for the sheet. Defaults to `headline`. A modal sheet is announced as a dialog, so it needs a name.
+- `testID?: string` — Test id applied to the sheet surface. A modal sheet's scrim carries `<testID>-scrim`, and the layer that slides carries `<testID>-layer`.
+- `variant?: 'modal' | 'standard'` — Default: `'modal'`. `'modal'` slides in over the content behind a scrim and renders through `Portal`. `'standard'` renders in place, beside the main content, which stays interactive.
+- `visible: boolean` — **Modal only, required.** Whether the sheet is shown. Exit animations run before it unmounts.
+- `onDismiss: () => void` — **Required on a modal sheet, optional on a standard one.** Called by the close button, which shows only when `onDismiss` is set. On a modal sheet a scrim press, Android back and Escape on web also call it.
+- `dismissable?: boolean` — Modal only. Default: `true`. Whether the scrim press, Android back, and Escape dismiss the sheet. The close button always calls `onDismiss`.
+- `edge?: 'start' | 'end'` — Modal only. Default: `'end'`. Screen edge the sheet enters from; `'end'` is the right edge in LTR.
+- `hostName?: string` — Modal only. Render into a named `PortalHost`.
+- `scrimStyle?: StyleProp<ViewStyle>` — Modal only. Style for the scrim.
+- `scrimAccessibilityLabel?: string` — Modal only. Default: `'Close side sheet'`.
+The type rejects every modal-only prop on `variant="standard"`.
+- Inherits `ViewProps` (except `children`, `style`)
+
+---
+
 ### Snackbar
 
 ```tsx

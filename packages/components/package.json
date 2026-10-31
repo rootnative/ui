@@ -107,6 +107,11 @@
       "react-native": "./dist/bottom-sheet/index.js",
       "default": "./dist/bottom-sheet/index.js"
     },
+    "./side-sheet": {
+      "types": "./dist/side-sheet/index.d.ts",
+      "react-native": "./dist/side-sheet/index.js",
+      "default": "./dist/side-sheet/index.js"
+    },
     "./divider": {
       "types": "./dist/divider/index.d.ts",
       "react-native": "./dist/divider/index.js",
@@ -258,6 +263,9 @@
       ],
       "bottom-sheet": [
         "dist/bottom-sheet/index.d.ts"
+      ],
+      "side-sheet": [
+        "dist/side-sheet/index.d.ts"
       ],
       "divider": [
         "dist/divider/index.d.ts"

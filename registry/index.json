@@ -114,6 +114,10 @@
       "description": "MD3 search view — the panel that opens from a search bar, full screen on a compact window and docked on a wider one, with a focus trap and Android back handling"
     },
     {
+      "name": "side-sheet",
+      "description": "MD3 side sheet — modal (scrim, slide from the end edge) and standard variants with a headline, back and close buttons, scrolling content, and an action row"
+    },
+    {
       "name": "skeleton",
       "description": "Pulsing loading placeholder block that matches the shape of the content it stands in for"
     },

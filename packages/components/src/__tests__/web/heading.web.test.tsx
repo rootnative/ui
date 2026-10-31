@@ -13,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
 import { List, ListItem } from '../../list'
 import { NavigationDrawer } from '../../navigation-drawer'
+import { SideSheet } from '../../side-sheet'
 import { Typography } from '../../typography'
 import { renderWeb } from './render-web'
 
@@ -89,6 +90,35 @@ describe('NavigationDrawer section headline level on the web', () => {
   it('follows headingLevel', () => {
     renderSection(3)
     expect(screen.getByText('Mail').tagName).toBe('H3')
+  })
+})
+
+describe('SideSheet headline level on the web', () => {
+  function renderSheet(headingLevel?: 2 | 3) {
+    renderWeb(
+      <SideSheet
+        variant="standard"
+        headline="Filters"
+        headingLevel={headingLevel}
+      />,
+    )
+  }
+
+  it('is <h2> by default', () => {
+    renderSheet()
+    expect(screen.getByText('Filters').tagName).toBe('H2')
+  })
+
+  it('follows headingLevel', () => {
+    renderSheet(3)
+    expect(screen.getByText('Filters').tagName).toBe('H3')
+  })
+
+  it('names the <aside> of a standard sheet after the headline', () => {
+    renderSheet()
+    const region = screen.getByRole('complementary')
+    expect(region.tagName).toBe('ASIDE')
+    expect(region.getAttribute('aria-label')).toBe('Filters')
   })
 })
 

@@ -1,0 +1,24 @@
+{
+  "name": "side-sheet",
+  "description": "MD3 side sheet — modal (scrim, slide from the end edge) and standard variants with a headline, back and close buttons, scrolling content, and an action row",
+  "files": [
+    "packages/components/src/side-sheet/SideSheet.tsx",
+    "packages/components/src/side-sheet/index.ts",
+    "packages/components/src/side-sheet/styles.ts",
+    "packages/components/src/side-sheet/types.ts",
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useBackHandlerDismiss.ts",
+    "packages/components/src/internal/useFocusTrap.ts",
+    "packages/components/src/safe-area.tsx"
+  ],
+  "utils": ["color", "elevation", "render-icon", "rtl"],
+  "componentDependencies": ["divider", "icon-button", "portal"],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.31",
+    "react-native-safe-area-context": ">=4.0.0",
+    "@rootnative/inertia": ">=0.0.23",
+    "react-native-reanimated": ">=4.7.0 <4.8.0",
+    "react-native-worklets": ">=0.13.0 <0.14.0"
+  },
+  "optionalDependencies": {}
+}

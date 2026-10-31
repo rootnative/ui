@@ -29,6 +29,7 @@ import { CircularProgress, LinearProgress } from '../progress'
 import { Radio } from '../radio'
 import { SearchBar } from '../search-bar'
 import { SearchView } from '../search-view'
+import { SideSheet } from '../side-sheet'
 import { Skeleton } from '../skeleton'
 import { Slider } from '../slider'
 import { SnackbarProvider, useSnackbar } from '../snackbar'
@@ -362,6 +363,16 @@ const CASES: readonly ReducedMotionCase[] = [
             icon="home-outline"
           />
         </NavigationDrawer>
+      </PortalHost>
+    ),
+  },
+  {
+    name: 'SideSheet (modal)',
+    render: () => (
+      <PortalHost>
+        <SideSheet visible onDismiss={() => {}} headline="Filters">
+          <Text>Body</Text>
+        </SideSheet>
       </PortalHost>
     ),
   },

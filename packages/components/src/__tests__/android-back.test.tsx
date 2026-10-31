@@ -7,6 +7,7 @@ import { Menu } from '../menu'
 import { NavigationDrawer } from '../navigation-drawer'
 import { PortalHost } from '../portal/PortalHost'
 import { SearchView } from '../search-view'
+import { SideSheet } from '../side-sheet'
 import { Tooltip } from '../tooltip'
 
 /**
@@ -108,6 +109,28 @@ const CASES: {
         >
           <NavigationDrawer.Item value="home" label="Home" />
         </NavigationDrawer>
+      </PortalHost>
+    ),
+  },
+  {
+    name: 'SideSheet (modal)',
+    open: (onDismiss) => (
+      <PortalHost>
+        <SideSheet visible onDismiss={onDismiss} headline="Filters">
+          <Text>Body</Text>
+        </SideSheet>
+      </PortalHost>
+    ),
+    locked: (onDismiss) => (
+      <PortalHost>
+        <SideSheet
+          visible
+          dismissable={false}
+          onDismiss={onDismiss}
+          headline="Filters"
+        >
+          <Text>Body</Text>
+        </SideSheet>
       </PortalHost>
     ),
   },
