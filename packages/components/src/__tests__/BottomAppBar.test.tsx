@@ -1,7 +1,8 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
-import { fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import type { SharedValue } from '@rootnative/inertia'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
+import { act, fireEvent, screen } from '@testing-library/react-native'
+import { AccessibilityInfo, StyleSheet, Text } from 'react-native'
 import { BottomAppBar } from '../bottom-app-bar'
 import { BOTTOM_APP_BAR_HEIGHT } from '../bottom-app-bar/styles'
 
@@ -172,6 +173,108 @@ describe('BottomAppBar', () => {
       )
       const flat = StyleSheet.flatten(screen.getByTestId('bar').props.style)
       expect(flat.opacity).toBe(0.5)
+    })
+  })
+
+  describe('scrollOffset', () => {
+    // The Jest mock runs the reaction once per render, so a plain `{ value }`
+    // stub that a test changes between renders is a scroll offset. The mock
+    // `interpolate` is a step function: only the end points are observable.
+    function offsetAt(value: number): SharedValue<number> {
+      return { value } as SharedValue<number>
+    }
+
+    function barTranslateY(): number | undefined {
+      const flat = StyleSheet.flatten(screen.getByTestId('bar').props.style)
+      const transform = flat.transform as
+        | Array<{ translateY?: number }>
+        | undefined
+      return transform?.find((entry) => 'translateY' in entry)?.translateY
+    }
+
+    function renderHidingBar() {
+      const offset = offsetAt(0)
+      const result = renderSettled(
+        <BottomAppBar actions={ACTIONS} scrollOffset={offset} testID="bar" />,
+      )
+      const scrollTo = (value: number) => {
+        offset.value = value
+        result.flush()
+      }
+      return { ...result, scrollTo }
+    }
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('adds no transform without scrollOffset', () => {
+      renderWithTheme(<BottomAppBar actions={ACTIONS} testID="bar" />)
+      const flat = StyleSheet.flatten(screen.getByTestId('bar').props.style)
+      expect(flat.transform).toBeUndefined()
+    })
+
+    it('stays in place at the top of the content', () => {
+      renderHidingBar()
+      expect(barTranslateY()).toBe(0)
+    })
+
+    it('moves down by its height while the content scrolls down', () => {
+      const { scrollTo } = renderHidingBar()
+      scrollTo(200)
+      expect(barTranslateY()).toBe(BOTTOM_APP_BAR_HEIGHT)
+    })
+
+    it('comes back while the content scrolls up', () => {
+      const { scrollTo } = renderHidingBar()
+      scrollTo(200)
+      scrollTo(100)
+      expect(barTranslateY()).toBe(0)
+    })
+
+    it('moves by the measured height, which includes the bottom inset', () => {
+      const { scrollTo } = renderHidingBar()
+      fireEvent(screen.getByTestId('bar'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 114 } },
+      })
+      scrollTo(300)
+      expect(barTranslateY()).toBe(114)
+    })
+
+    it('comes back when a control in the bar takes focus', () => {
+      const { flush, scrollTo } = renderHidingBar()
+      scrollTo(200)
+      fireEvent(screen.getByTestId('bar'), 'focus')
+      flush()
+      expect(barTranslateY()).toBe(0)
+    })
+
+    it('stays in place while a screen reader is on', async () => {
+      jest
+        .spyOn(AccessibilityInfo, 'isScreenReaderEnabled')
+        .mockResolvedValue(true)
+      const { scrollTo } = renderHidingBar()
+      await act(async () => {})
+      scrollTo(200)
+      expect(barTranslateY()).toBe(0)
+    })
+
+    it('comes back when a screen reader turns on', () => {
+      let notify: (enabled: boolean) => void = () => {}
+      jest
+        .spyOn(AccessibilityInfo, 'addEventListener')
+        .mockImplementation((_event, handler) => {
+          notify = handler as (enabled: boolean) => void
+          return { remove: jest.fn() } as unknown as ReturnType<
+            typeof AccessibilityInfo.addEventListener
+          >
+        })
+      const { flush, scrollTo } = renderHidingBar()
+      scrollTo(200)
+      expect(barTranslateY()).toBe(BOTTOM_APP_BAR_HEIGHT)
+      act(() => notify(true))
+      flush()
+      expect(barTranslateY()).toBe(0)
     })
   })
 })

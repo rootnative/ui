@@ -1,3 +1,4 @@
+import type { SharedValue } from '@rootnative/inertia'
 import type { ReactNode } from 'react'
 import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import type { FABProps, FABVariant } from '../fab'
@@ -64,6 +65,27 @@ interface BottomAppBarCommonProps extends Omit<ViewProps, 'children'> {
    * @default false
    */
   insetBottom?: boolean
+  /**
+   * Vertical scroll offset (in px) of the content behind the bar, as a
+   * Reanimated shared value. Pass `scrollY` from `@rootnative/inertia`'s
+   * `useScroll()` and give the matching `onScroll` to your scroll view:
+   *
+   * ```tsx
+   * import { Motion, useScroll } from '@rootnative/inertia'
+   *
+   * const { scrollY, onScroll } = useScroll()
+   * <Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16}>
+   * <BottomAppBar actions={actions} scrollOffset={scrollY} />
+   * ```
+   *
+   * Drives the MD3 hide-on-scroll behavior: the bar moves down by its own
+   * height while the content scrolls down, and comes back while the content
+   * scrolls up. The bar moves and the content does not, so place the bar
+   * over the content and pad the end of the content by the bar height.
+   * While a screen reader is on (iOS and Android), the bar stays in place.
+   * On web, focus on a control in the bar brings the bar back.
+   */
+  scrollOffset?: SharedValue<number>
   /**
    * Override the bar background.
    * @default surfaceContainer

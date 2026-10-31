@@ -736,6 +736,14 @@ import { BottomAppBar } from '@rootnative/components/bottom-app-bar'
 // reads it with useAppBarContentColor().
 <BottomAppBar leading={<Menu anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>...</Menu>} />
 
+// Hide on scroll: pass the offset from inertia's useScroll(). The bar moves
+// down by its height while the content scrolls down, and back while it scrolls
+// up. The content does not grow into the space, so place the bar over the
+// content and pad the end of the content by the bar height.
+const { scrollY, onScroll } = useScroll() // from '@rootnative/inertia'
+<Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 80 }}>...</Motion.ScrollView>
+<BottomAppBar actions={actions} scrollOffset={scrollY} style={{ position: 'absolute', start: 0, end: 0, bottom: 0 }} />
+
 // Overrides: containerColor (bar), contentColor (action icons). The FAB keeps
 // the colors of its variant.
 <BottomAppBar containerColor="#FFD8E4" contentColor="#31111D" actions={actions} />

@@ -21,10 +21,10 @@ with this release.
   example and template pins are `0.0.23` exact, and the registry's derived
   floor follows. inertia `0.0.23` adds `useHideOnScroll`: a 0 to 1 value
   from the direction of a scroll, which hides a bar while the content
-  scrolls down and shows it again while the content scrolls up. No
-  component in this library uses it. The same inertia release fixes a
-  native crash in `@rootnative/inertia-svg`, which this library does not
-  use. The floor moves so that an app gets the new hook with this release.
+  scrolls down and shows it again while the content scrolls up.
+  `BottomAppBar` uses it for `scrollOffset`, so an older inertia does not
+  work. The same inertia release fixes a native crash in
+  `@rootnative/inertia-svg`, which this library does not use.
 
 - **`Picture` takes `srcSet` and `sizes`.** `srcSet` lists more files of the
   same image as `{ source, width }`, with the width of each file in pixels.
@@ -46,8 +46,14 @@ with this release.
   the two together. `insetBottom` adds the bottom safe-area inset, off by
   default like `NavigationBar`. `containerColor` and `contentColor`
   override the bar and the action icons. The bar is a `toolbar`; pass
-  `role` to replace it. Subpath `@rootnative/components/bottom-app-bar`,
-  CLI `rootnative add bottom-app-bar`.
+  `role` to replace it. `scrollOffset` takes the offset from inertia's
+  `useScroll()`: the bar moves down by its own height while the content
+  scrolls down, and comes back while the content scrolls up. Place the bar
+  over the content, because the content does not grow into the space.
+  While a screen reader is on (iOS and Android), the bar stays in place.
+  On web, focus on a control in the bar brings the bar back. Subpath
+  `@rootnative/components/bottom-app-bar`, CLI
+  `rootnative add bottom-app-bar`.
 - **`FAB` takes `elevated`.** `elevated={false}` removes the shadow and the
   lift on hover. The container color and the state layers do not change.
   MD3 places a flat FAB in a bottom app bar. The default is `true`, so no

@@ -12,7 +12,10 @@
   "componentDependencies": ["fab", "icon-button"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.31",
-    "react-native-safe-area-context": ">=4.0.0"
+    "react-native-safe-area-context": ">=4.0.0",
+    "@rootnative/inertia": ">=0.0.23",
+    "react-native-reanimated": ">=4.7.0 <4.8.0",
+    "react-native-worklets": ">=0.13.0 <0.14.0"
   },
   "optionalDependencies": {}
 }

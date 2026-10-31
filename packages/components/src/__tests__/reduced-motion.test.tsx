@@ -1,4 +1,5 @@
 import { MotionConfig } from '@rootnative/inertia'
+import type { SharedValue } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { useEffect, useState } from 'react'
@@ -7,6 +8,7 @@ import { Pressable, Text } from 'react-native'
 import * as Reanimated from 'react-native-reanimated'
 import { AppBar } from '../appbar'
 import { Avatar } from '../avatar'
+import { BottomAppBar } from '../bottom-app-bar'
 import { BottomSheet } from '../bottom-sheet'
 import { Button } from '../button'
 import { ButtonGroup } from '../button-group'
@@ -192,6 +194,20 @@ const CASES: readonly ReducedMotionCase[] = [
     render: () => <AppBarElevationToggle />,
     settle: () => {
       fireEvent.press(screen.getByTestId('rm-appbar-raise'))
+    },
+  },
+  {
+    // Focus on the bar springs a hidden bar back into place.
+    name: 'BottomAppBar (scrollOffset)',
+    render: () => (
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        scrollOffset={{ value: 0 } as SharedValue<number>}
+        testID="rm-bottom-app-bar"
+      />
+    ),
+    settle: () => {
+      fireEvent(screen.getByTestId('rm-bottom-app-bar'), 'focus')
     },
   },
   { name: 'Slider', render: () => <Slider defaultValue={0.5} /> },

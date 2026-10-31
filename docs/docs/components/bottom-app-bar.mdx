@@ -98,6 +98,60 @@ A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap 
 `SafeAreaView` that adds the bottom inset below the bar's 80dp. Leave it off (the default) when
 an ancestor already applies the bottom edge, or the inset is added twice.
 
+## Hide on scroll
+
+Pass the scroll offset of the content as `scrollOffset`, and the bar follows the MD3
+hide-on-scroll behavior: it moves down by its own height while the content scrolls down, and
+comes back while the content scrolls up. The bar moves with the scroll, one point for one point.
+It is always in place at the top of the content.
+
+`useScroll` from `@rootnative/inertia` gives the offset and the scroll handler:
+
+```tsx
+import { BottomAppBar } from '@rootnative/components'
+import { Motion, useScroll } from '@rootnative/inertia'
+import { StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+function Inbox() {
+  const { scrollY, onScroll } = useScroll()
+  const insets = useSafeAreaInsets()
+  const contentStyle = { paddingBottom: 80 + insets.bottom }
+
+  return (
+    <View style={styles.screen}>
+      <Motion.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={contentStyle}
+      >
+        {messages}
+      </Motion.ScrollView>
+      <BottomAppBar
+        actions={actions}
+        fab={{ icon: 'plus', accessibilityLabel: 'Compose', onPress: compose }}
+        insetBottom
+        scrollOffset={scrollY}
+        style={styles.bar}
+      />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1 },
+  bar: { position: 'absolute', start: 0, end: 0, bottom: 0 },
+})
+```
+
+:::warning Place the bar over the content
+The bar moves, and the content does not grow into the space. A bar below a `flex: 1` content
+view leaves an empty strip when it hides. Position the bar over the content, as above, and pad
+the end of the content by the bar height, so the last item can scroll clear of the bar.
+:::
+
+The bar moves by its measured height, so the bottom inset of `insetBottom` moves with it.
+
 ## Overrides
 
 | Prop | Target |
@@ -125,6 +179,10 @@ Source: Compose `BottomAppBarTokens` and `BottomAppBar.kt`.
 - Each action is a `button` named by its `accessibilityLabel`.
 - The FAB is a `button` named by `accessibilityLabel`, or by `label` on an extended FAB.
 - A disabled action or FAB exposes `accessibilityState.disabled`.
+- With `scrollOffset`, the bar stays in place while a screen reader is on (iOS and Android), so
+  the reader never moves to a control off screen.
+- On web, focus on a control in a hidden bar brings the bar back, so Tab never reaches a control
+  off screen.
 
 ## Props
 

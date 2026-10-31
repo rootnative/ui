@@ -15,8 +15,10 @@
  * `onLayout` that jsdom's missing `ResizeObserver` never fires — its items are
  * in the DOM and keyboard-reachable, which is all these tests read.
  */
+import type { SharedValue } from '@rootnative/inertia'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { useState } from 'react'
+import { BottomAppBar } from '../../bottom-app-bar'
 import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
 import { Dialog } from '../../dialog'
@@ -29,7 +31,7 @@ import { SearchView } from '../../search-view'
 import { Switch } from '../../switch'
 import { TextField } from '../../text-field'
 import { Tooltip } from '../../tooltip'
-import { renderWeb } from './render-web'
+import { renderWeb, renderWebSettled } from './render-web'
 
 /** Escape and Tab are handled on `document` in the capture phase. */
 function press(key: string, init?: KeyboardEventInit) {
@@ -520,4 +522,41 @@ describe('a selection control with no onValueChange in a pressable row', () => {
       expect(onPress).toHaveBeenCalledTimes(1)
     },
   )
+})
+
+describe('BottomAppBar hide on scroll', () => {
+  // A plain `{ value }` stub is a scroll offset under the shared Reanimated
+  // mock, as in the native BottomAppBar tests.
+  function renderHidingBar() {
+    const offset = { value: 0 } as SharedValue<number>
+    const result = renderWebSettled(
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        scrollOffset={offset}
+        testID="bar"
+      />,
+    )
+    const scrollTo = (value: number) => {
+      offset.value = value
+      result.flush()
+    }
+    return { ...result, scrollTo }
+  }
+
+  // react-native-web resolves `isScreenReaderEnabled` to `true` on every
+  // page. A screen-reader check that ran on web would keep the bar in place.
+  it('hides on web after the screen-reader check settles', async () => {
+    const { scrollTo } = renderHidingBar()
+    await act(async () => {})
+    scrollTo(200)
+    expect(screen.getByTestId('bar').style.transform).toBe('translateY(80px)')
+  })
+
+  it('comes back when Tab moves focus to a control in the bar', () => {
+    const { flush, scrollTo } = renderHidingBar()
+    scrollTo(200)
+    act(() => screen.getByRole('button', { name: 'Search' }).focus())
+    flush()
+    expect(screen.getByTestId('bar').style.transform).toBe('translateY(0px)')
+  })
 })

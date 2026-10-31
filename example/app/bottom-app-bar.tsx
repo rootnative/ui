@@ -9,8 +9,9 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { Motion, useScroll } from '@rootnative/inertia'
 import { useMemo, useState } from 'react'
-import { ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -20,6 +21,33 @@ const ACTIONS: BottomAppBarAction[] = [
   { icon: 'archive-outline', accessibilityLabel: 'Archive' },
   { icon: 'delete-outline', accessibilityLabel: 'Delete' },
 ]
+
+function HideOnScrollDemo({ actions }: { actions: BottomAppBarAction[] }) {
+  const { scrollY, onScroll } = useScroll()
+
+  return (
+    <View style={styles.hideFrame}>
+      <Motion.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        nestedScrollEnabled
+        contentContainerStyle={styles.hideScrollContent}
+      >
+        {Array.from({ length: 16 }, (_, index) => (
+          <Typography key={index} variant="bodyMedium">
+            Scroll content row {index + 1}
+          </Typography>
+        ))}
+      </Motion.ScrollView>
+      <BottomAppBar
+        actions={actions}
+        fab={{ icon: 'plus', accessibilityLabel: 'Compose' }}
+        scrollOffset={scrollY}
+        style={styles.hideBar}
+      />
+    </View>
+  )
+}
 
 function BottomAppBarScreenContent() {
   const theme = useTheme()
@@ -141,6 +169,22 @@ function BottomAppBarScreenContent() {
         </Column>
 
         <Column gap="sm">
+          <Typography variant="titleMedium">Hide on scroll</Typography>
+          <Card variant="outlined">
+            <Column gap="sm">
+              <Column p="md">
+                <Typography variant="bodySmall" style={mutedText}>
+                  Scroll the rows. The bar moves down while the content scrolls
+                  down, and comes back while it scrolls up. The bar sits over
+                  the content, and the content ends with room for the bar.
+                </Typography>
+              </Column>
+              <HideOnScrollDemo actions={actions} />
+            </Column>
+          </Card>
+        </Column>
+
+        <Column gap="sm">
           <Typography variant="titleMedium">Overrides</Typography>
           <Card variant="outlined">
             <Column gap="sm">
@@ -184,5 +228,21 @@ export default function BottomAppBarScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
+  },
+  hideFrame: {
+    height: 320,
+    overflow: 'hidden',
+  },
+  // 16 of padding plus the 80dp bar, so the last row scrolls clear of it.
+  hideScrollContent: {
+    padding: 16,
+    paddingBottom: 96,
+    rowGap: 16,
+  },
+  hideBar: {
+    position: 'absolute',
+    start: 0,
+    end: 0,
+    bottom: 0,
   },
 })
