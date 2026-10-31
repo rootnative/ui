@@ -82,6 +82,10 @@ interface BottomAppBarCommonProps extends Omit<ViewProps, 'children'> {
    * height while the content scrolls down, and comes back while the content
    * scrolls up. The bar moves and the content does not, so place the bar
    * over the content and pad the end of the content by the bar height.
+   * On iOS, keep `contentInsetAdjustmentBehavior` at `'never'` and pad the
+   * content instead: with `'automatic'`, the scroll event leaves out the
+   * bottom safe-area inset, and the last stretch of the content (about
+   * 34 pt) does not move the bar.
    * While a screen reader is on (iOS and Android), the bar stays in place.
    * On web, focus on a control in the bar brings the bar back.
    */

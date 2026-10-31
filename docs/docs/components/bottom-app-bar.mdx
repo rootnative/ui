@@ -152,6 +152,14 @@ the end of the content by the bar height, so the last item can scroll clear of t
 
 The bar moves by its measured height, so the bottom inset of `insetBottom` moves with it.
 
+:::note iOS automatic content insets
+Pad the content as above, and keep `contentInsetAdjustmentBehavior` at its default, `'never'`.
+With `'automatic'`, iOS adds the bottom safe-area inset to the scroll view by itself, and the
+scroll event does not include it. The bar then reads the end of the content about 34 pt too
+early: movement in that last stretch does not count, so from the very end the bar comes back
+about 34 pt late.
+:::
+
 ## Overrides
 
 | Prop | Target |
