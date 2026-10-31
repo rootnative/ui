@@ -9,12 +9,12 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
-## Unreleased
+## 0.0.0-alpha.32 — 2026-10-31
 
-**No breaking change.** Two new components, one new prop and one fix in
-`@rootnative/components`, and two new props in `@rootnative/seo`. The
-`@rootnative/inertia` floor moves to `0.0.24`, so upgrade it in the app
-with this release.
+**No breaking change.** Two new components, one new prop and two fixes in
+`@rootnative/components`, two new props in `@rootnative/seo`, and one fix
+in the registry that `rootnative add` copies. The `@rootnative/inertia`
+floor moves to `0.0.24`, so upgrade it in the app with this release.
 
 - **The `@rootnative/inertia` floor moves to `0.0.24`.** The `core`,
   `utils` and `components` peer ranges are now `>=0.0.24 <0.1.0`, the dev,
@@ -97,6 +97,29 @@ with this release.
   press, so an app that handles Space itself does not press twice. Remove
   that handler when you upgrade. No change on native. A `rootnative update`
   of these components adds `pressableKeyDown.ts` to the component folder.
+- **On web, the `Tabs` indicator follows a tab that moves and keeps its
+  size.** react-native-web reports a layout from a `ResizeObserver`, which
+  fires only when the size changes. So a tab that moved with the same
+  width sent no new position, and the indicator stayed at the old place:
+  after a new `edgePadding` on scrollable tabs, or after a longer label on
+  an earlier tab. Now `Tabs` places each tab at the start padding plus the
+  widths of the tabs before it, and in RTL it counts back from the width
+  of the row. The indicator shows when the active tab and every tab before
+  it are measured. No change on native, where the sum gives the same place
+  as before. A `rootnative update tabs` adds the `rtl` util.
+- **`rootnative add` copies every file that `Checkbox`, `Radio` and `Switch`
+  import.** The three components ship `internal/useHaloLayer.ts`, which
+  imports `useFocusRingStyle` from `./useStateLayer`. The registry did not
+  list `useStateLayer.ts` for them, because the generator followed only
+  `../internal/<name>` imports, not an import from one internal file to
+  another. So an installed `Checkbox`, `Radio` or `Switch` could not
+  resolve `./useStateLayer`, in every release since at least
+  `0.0.0-alpha.25`. The registry now lists the file, and
+  `pnpm run registry:check` reads the imports of the shipped files, so a
+  missing file fails the check. In a project that copied one of the three,
+  run `rootnative upgrade`: it moves the registry pin to this release and
+  updates the components, which adds the file. The npm packages do not
+  change.
 
 ## 0.0.0-alpha.31 — 2026-10-29
 
