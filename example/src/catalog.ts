@@ -314,6 +314,15 @@ export const sections: CatalogSection[] = [
         keywords: 'sheet drawer drag swipe snap dismiss handle modal',
       },
       {
+        label: 'SideSheet',
+        route: '/side-sheet',
+        description:
+          'Modal or standard panel at the side with a headline and actions',
+        add: 'side-sheet',
+        docs: 'components/side-sheet',
+        keywords: 'side sheet panel filters details drawer aside modal',
+      },
+      {
         label: 'Snackbar',
         route: '/snackbar',
         description: 'Queued transient messages via SnackbarProvider',

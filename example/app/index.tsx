@@ -384,6 +384,36 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           </Box>
         </View>
       )
+    case 'SideSheet':
+      return (
+        <View style={previewStyles.sideSheetWrapper}>
+          <Box bg={theme.colors.scrim} style={previewStyles.dialogScrim} />
+          <Box
+            bg={theme.colors.surfaceContainerLow}
+            style={previewStyles.sideSheetSurface}
+          >
+            <Row align="center" justify="space-between">
+              <Box
+                bg={theme.colors.onSurface}
+                style={previewStyles.sideSheetHeadline}
+              />
+              <Box
+                bg={theme.colors.onSurfaceVariant}
+                style={previewStyles.sideSheetClose}
+              />
+            </Row>
+            <Box
+              bg={theme.colors.onSurfaceVariant}
+              style={previewStyles.dialogLine}
+            />
+            <View style={previewStyles.appBarSpacer} />
+            <Box
+              bg={theme.colors.primary}
+              style={previewStyles.sideSheetAction}
+            />
+          </Box>
+        </View>
+      )
     case 'Snackbar':
       return (
         <View style={previewStyles.snackbarWrapper}>
@@ -1147,6 +1177,37 @@ const previewStyles = StyleSheet.create({
     width: 34,
     height: 6,
     borderRadius: 3,
+  },
+  sideSheetWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 80,
+    alignItems: 'flex-end',
+  },
+  sideSheetSurface: {
+    width: '55%',
+    height: '100%',
+    borderTopStartRadius: 10,
+    borderBottomStartRadius: 10,
+    borderTopEndRadius: 8,
+    borderBottomEndRadius: 8,
+    padding: 8,
+    gap: 6,
+  },
+  sideSheetHeadline: {
+    width: '55%',
+    height: 7,
+    borderRadius: 4,
+  },
+  sideSheetClose: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  sideSheetAction: {
+    width: 30,
+    height: 7,
+    borderRadius: 4,
   },
   snackbarWrapper: {
     width: '100%',
