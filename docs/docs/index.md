@@ -77,6 +77,7 @@ Runs on iOS, Android, and web (through `react-native-web`), on the Expo SDK 58 r
 | [KeyboardAvoidingWrapper](./components/keyboard-avoiding-wrapper) | Keeps inputs visible when the keyboard opens |
 | [Menu](./components/menu) | Anchored dropdown menus that flip and shift to stay on screen |
 | [Portal](./components/portal) | Render content above the rest of the tree |
+| [SideSheet](./components/side-sheet) | Modal and standard sheets at the side, with a headline and actions |
 | [Snackbar](./components/snackbar) | Queued transient messages with an optional action |
 | [Tooltip](./components/tooltip) | Plain and rich tooltips on hover or a long press |
 

@@ -82,6 +82,7 @@ const sidebars: SidebarsConfig = {
         'components/keyboard-avoiding-wrapper',
         'components/menu',
         'components/portal',
+        'components/side-sheet',
         'components/snackbar',
         'components/tooltip',
       ],

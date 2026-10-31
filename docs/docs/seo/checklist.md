@@ -498,7 +498,7 @@ the navigator:
 
 In a RootNative UI app, `AppBar` is the `banner`, and `NavigationBar`,
 `NavigationRail`, and the standard `NavigationDrawer` are `navigation`, on
-their own. A bar inside `<main>`, as on a demo page, is a plain header, not
+their own. The standard `SideSheet` is `complementary`, an `<aside>`. A bar inside `<main>`, as on a demo page, is a plain header, not
 a landmark. Pass `role` to change any of them.
 
 Set the page language on `<html>` in `app/+html.tsx`: `<html lang="en">`.

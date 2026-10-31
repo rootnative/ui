@@ -66,7 +66,7 @@ What each one does, and which three you can leave out:
 |---------|--------|--------|-----------|
 | `react-native-reanimated` | optional | State-layer transitions and gesture-driven components (Slider, Switch) | You only use Typography, Layout, Portal, KeyboardAvoidingWrapper, or Divider — the five components with no animated value |
 | `react-native-worklets` | optional | Reanimated 4's worklet runtime | You skip Reanimated |
-| `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, BottomAppBar, Layout, BottomSheet, NavigationBar, NavigationDrawer and Snackbar | Never |
+| `react-native-safe-area-context` | **required** | Safe-area insets in AppBar, BottomAppBar, Layout, BottomSheet, NavigationBar, NavigationDrawer, SideSheet and Snackbar | Never |
 | `@react-native-vector-icons/material-design-icons` | optional | `mdiResolver` from `@rootnative/components/mdi`, the MaterialDesignIcons resolver for string icon names (`leadingIcon="check"`). Needs `expo-font` on Expo to load the font at run time | You pass your own `iconResolver`, or you never pass a string icon name. Only the `mdi` subpath imports the package, so a bundler without Expo needs no alias — see [Web without Expo](./web-without-expo.md#5-choose-an-icon-set) |
 | `react-native-svg` | **required** | CircularProgress and LoadingIndicator | Never |
 | `@rootnative/inertia` | **required** | Every animation in the library — [motion tokens](./motion), state layers, gesture-driven components | Never. It's a required peer of both `@rootnative/core` and `@rootnative/components`, so npm and pnpm install it automatically — only Yarn users need to add it by hand |

@@ -1,0 +1,216 @@
+---
+description: Side sheets show secondary content at the side of the screen, over the content or beside it.
+---
+
+# SideSheet
+
+Side sheets show secondary content at the side of the screen, such as filters or the details
+of a selected item. Follows the
+[Material Design 3 Side sheet](https://m3.material.io/components/side-sheets/overview)
+specification.
+
+The sheet is 256dp wide. It has a `titleLarge` headline, an optional back button, a close button,
+content that scrolls, and an optional row of actions at the bottom.
+
+The modal variant renders through [Portal](./portal.mdx), so your app must have a `PortalHost`
+once at the root. It uses the `PORTAL_LAYERS.sheet` layer, the same as the bottom sheet and the
+navigation drawer.
+
+## Usage
+
+Pass the headline as `headline`, the content as children, and the buttons as `actions`. The
+close button shows when the sheet has an `onDismiss`.
+
+<SnackExample
+  name="RootNative SideSheet — Usage"
+  code={`
+  import { Button, Chip, PortalHost, SideSheet } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { Text, View } from 'react-native'
+
+  const GENRES = ['Drama', 'Comedy', 'Documentary']
+
+  function Screen() {
+    const [open, setOpen] = useState(false)
+    const [genres, setGenres] = useState(['Drama'])
+    const toggle = (genre) =>
+      setGenres((current) =>
+        current.includes(genre) ? current.filter((g) => g !== genre) : [...current, genre],
+      )
+    return (
+      <View style={{ flex: 1, padding: 24, gap: 16 }}>
+        <Button variant="tonal" onPress={() => setOpen(true)}>Filters</Button>
+        <Text>Genres: {genres.join(', ')}</Text>
+        <SideSheet
+          visible={open}
+          onDismiss={() => setOpen(false)}
+          headline="Filters"
+          actions={
+            <>
+              <Button onPress={() => setOpen(false)}>Save</Button>
+              <Button variant="outlined" onPress={() => setOpen(false)}>Cancel</Button>
+            </>
+          }
+        >
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {GENRES.map((genre) => (
+              <Chip
+                key={genre}
+                variant="filter"
+                selected={genres.includes(genre)}
+                onPress={() => toggle(genre)}
+              >
+                {genre}
+              </Chip>
+            ))}
+          </View>
+        </SideSheet>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <PortalHost>
+            <Screen />
+          </PortalHost>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The content scrolls between the header and the actions. The actions stay at the bottom of the
+sheet.
+
+## Variants
+
+| Variant | Where it renders | Container | Dismissal |
+|---------|------------------|-----------|-----------|
+| `'modal'` (default) | Through `Portal`, over the content, from the end edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp corners on the inner edge | Close button, scrim press, Android back, and Escape on web |
+| `'standard'` | In place, beside the main content, which stays interactive | `surface`, elevation level 0, no corners | Close button, when you pass `onDismiss` |
+
+A modal sheet needs `visible` and `onDismiss`. On a standard sheet, `onDismiss` is optional and
+only shows the close button. The type rejects `visible`, `dismissable`, `edge`, `hostName`,
+`scrimStyle` and `scrimAccessibilityLabel` on a standard sheet.
+
+Put a standard sheet in a row, beside the content. It stretches to the height of the row. Add
+a vertical `Divider` when the sheet and the content have the same color:
+
+```tsx
+<View style={{ flex: 1, flexDirection: 'row' }}>
+  <View style={{ flex: 1 }}>{/* main content */}</View>
+  <Divider orientation="vertical" />
+  {showDetails ? (
+    <SideSheet variant="standard" headline="Details" onDismiss={() => setShowDetails(false)}>
+      <Details />
+    </SideSheet>
+  ) : null}
+</View>
+```
+
+A standard sheet has no animation. It shows and hides when you add it to the row or remove it.
+
+## Header
+
+The header holds three optional parts, in this order:
+
+- **Back button.** `onBack` shows it and calls it on a press. Use it when the sheet shows a
+  second level of content. The icon is `arrow-left`, and `arrow-right` in RTL. `backIcon`
+  replaces it.
+- **Headline.** `headline` is a `titleLarge` text. On web it renders as `<h2>`. Set
+  `headingLevel` to fit the outline of the page.
+- **Close button.** `onDismiss` shows it. On a modal sheet it calls `onDismiss` also when
+  `dismissable` is `false`, because it is an explicit control. `closeIcon` replaces the
+  `close` icon.
+
+With no headline, no `onBack` and no `onDismiss`, the sheet has no header.
+
+```tsx
+<SideSheet
+  visible={open}
+  onDismiss={close}
+  headline={level === 'sort' ? 'Sort order' : 'Settings'}
+  onBack={level === 'sort' ? () => setLevel('settings') : undefined}
+>
+  {level === 'sort' ? <SortOrders /> : <Settings />}
+</SideSheet>
+```
+
+## Actions
+
+`actions` is a row of buttons below the content. MD3 shows a filled button and an outlined
+button. A divider separates the row from the content. Set `showActionsDivider={false}` to
+remove it.
+
+## Edge, detached, and width
+
+- **`edge`** (modal only) sets the screen edge that the sheet enters from. `'end'` (the
+  default) is the right edge in LTR and the left edge in RTL. `'start'` is the other edge.
+- **`detached`** adds a 16dp margin on all four sides and rounds all four corners.
+- **`width`** sets the width of the sheet. The default is 256dp. Set the width with this prop,
+  not with `style`: the slide distance of a modal sheet comes from `width`. On a narrow
+  window, a modal sheet shrinks, so a 56dp strip of scrim stays visible.
+
+```tsx
+<SideSheet visible={open} onDismiss={close} headline="Account" edge="start" detached width={320}>
+  <AccountDetails />
+</SideSheet>
+```
+
+## Safe area
+
+A modal sheet spans the full height of the screen. By default, it pads its content by the top
+and bottom insets, and the container color extends under them. A standard sheet sets both off
+by default, because the `Layout` around it usually owns the edges. `insetTop` and
+`insetBottom` override either default.
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The sheet background |
+| `contentColor` | The headline and the back and close icons. The hover and press layers of the two buttons derive from it |
+| `headlineStyle` | The headline `Text` |
+| `style` | The sheet surface |
+| `scrimStyle` | The scrim (modal only) |
+
+When you pass `testID`, the sheet surface carries it. A modal sheet's scrim carries
+`<testID>-scrim`, and the layer that slides carries `<testID>-layer`.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Sheet | 256dp wide. Modal: `surfaceContainerLow` at level 1, 16dp corners on the inner edge. Standard: `surface` at level 0, no corners |
+| Detached | 16dp margin, 16dp corners on all four sides |
+| Scrim | `scrim` at 32% |
+| Headline | `titleLarge`, `onSurface` |
+| Back and close icons | 24dp, `onSurfaceVariant`, in a 40dp icon button |
+| Header | At least 72dp tall. The text starts 24dp from the sheet edge, and an icon button 16dp |
+| Content | 24dp padding at the sides and the bottom |
+| Actions | 24dp padding at the sides, 16dp at the top and the bottom, 8dp between buttons, below a 1dp `outlineVariant` divider |
+
+## Accessibility
+
+- A modal sheet is a `dialog` with `aria-modal`. A standard sheet is a `complementary` region,
+  which renders as `<aside>` on web.
+- The headline names the sheet. Pass `accessibilityLabel` when the sheet has no headline, or to
+  give it a different name.
+- The headline is a `heading`.
+- The back and close buttons are named "Back" and "Close". `backAccessibilityLabel` and
+  `closeAccessibilityLabel` change the names. The scrim is named "Close side sheet".
+- On web, a modal sheet traps keyboard focus: focus moves into it when it opens, Tab cycles
+  inside it, Escape dismisses it when `dismissable`, and focus goes back to the trigger when it
+  closes.
+- On Android, the hardware back button dismisses a `dismissable` modal sheet.
+
+## Props
+
+<PropTable name="SideSheet" />

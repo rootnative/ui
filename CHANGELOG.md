@@ -11,7 +11,7 @@ Prior history: these packages were published as `@onlynative/*` through
 
 ## Unreleased
 
-**No breaking change.** One new component, one new prop and one fix in
+**No breaking change.** Two new components, one new prop and one fix in
 `@rootnative/components`, and two new props in `@rootnative/seo`. The
 `@rootnative/inertia` floor moves to `0.0.23`, so upgrade it in the app
 with this release.
@@ -54,6 +54,22 @@ with this release.
   On web, focus on a control in the bar brings the bar back. Subpath
   `@rootnative/components/bottom-app-bar`, CLI
   `rootnative add bottom-app-bar`.
+- **New `SideSheet`.** The MD3 side sheet: a 256dp panel with a
+  `titleLarge` `headline`, a close button, content that scrolls, and an
+  optional row of `actions` at the bottom. The `'modal'` variant, the
+  default, renders through `Portal` and slides in from the end edge over a
+  32% scrim, on `surfaceContainerLow` at elevation level 1. The close
+  button, a scrim press, Android back and Escape call `onDismiss`.
+  `edge="start"` makes the sheet enter from the other edge, and RTL swaps
+  the two edges. The `'standard'` variant renders in place, beside the
+  main content, on `surface` with no elevation; there, `onDismiss` is
+  optional and only shows the close button. `onBack` adds a back button
+  before the headline, for a second level of content. `detached` adds a
+  16dp margin and rounds all four corners. `width` sets the width and the
+  slide distance. A modal sheet pads its content by the top and bottom
+  safe-area insets by default, the same as a modal `NavigationDrawer`.
+  Subpath `@rootnative/components/side-sheet`, CLI
+  `rootnative add side-sheet`.
 - **`FAB` takes `elevated`.** `elevated={false}` removes the shadow and the
   lift on hover. The container color and the state layers do not change.
   MD3 places a flat FAB in a bottom app bar. The default is `true`, so no

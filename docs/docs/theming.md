@@ -397,8 +397,8 @@ A nested provider with a single theme has no mode, so `useThemeMode()` throws
 below it, as it does below a root provider with a single theme.
 
 **An overlay carries the nested theme.** `Dialog`, `Menu`, `Tooltip`,
-`BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the snackbar
-render through a `Portal` at the `PortalHost`, which is usually above the
+`BottomSheet`, `SearchView`, the modal `NavigationDrawer`, the modal
+`SideSheet` and the snackbar render through a `Portal` at the `PortalHost`, which is usually above the
 nested provider. `Portal` reads the theme, the mode, the icon resolver and the
 named transitions where you write the overlay, and provides them again at the
 host. So the overlay surface and every component in its content take the
