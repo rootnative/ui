@@ -521,6 +521,29 @@ const label = imageLabel('Poster', movie.title) // 'Dune poster'
 <Picture source={`/posters/${movie.id}.jpg`} alt={label} width={300} height={450} />
 ```
 
+The export holds one `<img>`, and the server does not know the pixel density
+of the screen or the width of the window. When the image server has more than
+one size of the file, list them in `srcSet`, with the width of each file in
+pixels, and give the shown width in `sizes`. The browser then picks the file
+before any script runs. Without `sizes` the browser takes the full window
+width, and picks a file too large for a small image. On native, `expo-image`
+gets the same files and picks one by the view size and the screen scale:
+
+```tsx
+<Picture
+  source={`/posters/w342/${movie.id}.jpg`}
+  srcSet={[
+    { source: `/posters/w185/${movie.id}.jpg`, width: 185 },
+    { source: `/posters/w342/${movie.id}.jpg`, width: 342 },
+    { source: `/posters/w500/${movie.id}.jpg`, width: 500 },
+  ]}
+  sizes="160px"
+  alt={label}
+  width={342}
+  height={513}
+/>
+```
+
 An image that stays on `expo-image`, for its cache or a transition, is not
 in the export; set `og:image` and the JSON-LD `image` for it, and set both
 `alt` and `accessibilityLabel` on it. The web `alt` attribute comes from

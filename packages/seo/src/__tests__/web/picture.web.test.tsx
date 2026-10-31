@@ -56,6 +56,59 @@ describe('Picture on the web', () => {
     expect(image.style.objectFit).toBe('cover')
   })
 
+  it('writes srcset and sizes, with each relative file under the host path', () => {
+    render(
+      <SeoProvider site={site}>
+        <Picture
+          source="/posters/w342/dune.jpg"
+          srcSet={[
+            { source: '/posters/w185/dune.jpg', width: 185 },
+            { source: 'https://cdn.example/w500/dune.jpg', width: 500 },
+          ]}
+          sizes="160px"
+          alt="Dune poster"
+          width={342}
+          height={513}
+          testID="poster"
+        />
+      </SeoProvider>,
+    )
+    const image = screen.getByTestId('poster')
+    expect(image.getAttribute('src')).toBe('/app/posters/w342/dune.jpg')
+    expect(image.getAttribute('srcset')).toBe(
+      '/app/posters/w185/dune.jpg 185w, https://cdn.example/w500/dune.jpg 500w',
+    )
+    expect(image.getAttribute('sizes')).toBe('160px')
+  })
+
+  it('writes no srcset for an empty list, and no sizes without a srcset', () => {
+    render(
+      <>
+        <Picture
+          source="https://cdn.example/a.png"
+          srcSet={[]}
+          alt=""
+          width={10}
+          height={10}
+          testID="empty"
+        />
+        <Picture
+          source="https://cdn.example/a.png"
+          sizes="160px"
+          alt=""
+          width={10}
+          height={10}
+          testID="alone"
+        />
+      </>,
+    )
+    for (const id of ['empty', 'alone']) {
+      const image = screen.getByTestId(id)
+      expect(image.hasAttribute('srcset')).toBe(false)
+      expect(image.hasAttribute('sizes')).toBe(false)
+    }
+  })
+
   // jsdom does no layout, so these read the CSS. The layout that the CSS
   // gives was measured in headless Chromium: a `flex: 1` picture in a
   // shorter frame, a `width` with an `aspectRatio`, and a border.

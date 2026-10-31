@@ -30,6 +30,32 @@ describe('Picture on native', () => {
     expect(image.props.style).toEqual([{ width: 300, height: 450 }, undefined])
   })
 
+  it('gives expo-image each srcSet file under the site, with its height from the box ratio', () => {
+    render(
+      <SeoProvider site={site}>
+        <Picture
+          source="/posters/w342/dune.jpg"
+          srcSet={[
+            { source: '/posters/w185/dune.jpg', width: 185 },
+            { source: 'https://cdn.example/w500/dune.jpg', width: 500 },
+          ]}
+          alt="Dune poster"
+          width={342}
+          height={513}
+          testID="poster"
+        />
+      </SeoProvider>,
+    )
+    expect(screen.getByTestId('poster').props.source).toEqual([
+      {
+        uri: 'https://example.com/app/posters/w185/dune.jpg',
+        width: 185,
+        height: 278,
+      },
+      { uri: 'https://cdn.example/w500/dune.jpg', width: 500, height: 750 },
+    ])
+  })
+
   it('passes an absolute source through with no site, and marks a decorative image', () => {
     render(
       <Picture

@@ -12,7 +12,20 @@ Prior history: these packages were published as `@onlynative/*` through
 ## Unreleased
 
 **No breaking change.** One new component, one new prop and one fix in
-`@rootnative/components`.
+`@rootnative/components`, and two new props in `@rootnative/seo`.
+
+- **`Picture` takes `srcSet` and `sizes`.** `srcSet` lists more files of the
+  same image as `{ source, width }`, with the width of each file in pixels.
+  On web, `Picture` writes them as `srcset`, and `sizes` as `sizes`, so the
+  browser picks the file by the shown width and the pixel density before
+  any script runs. Before, the export held one `src` for every screen: a
+  file large enough for a high-density screen was too large for the rest,
+  and a script that picked a file after hydration made the browser
+  download the image two times. A relative `source` in the list resolves
+  as `source` does. On native, `expo-image` gets the files in place of
+  `source` and picks one by the view size and the screen scale. Pass
+  `sizes` with `srcSet`: without it the browser takes the full window
+  width. No change without `srcSet`.
 
 - **New `BottomAppBar`.** The MD3 bottom app bar: an 80dp bar on
   `surfaceContainer` at elevation level 2, with up to four icon `actions`
