@@ -356,7 +356,7 @@
   "peerDependencies": {
     "@react-native-vector-icons/material-design-icons": ">=13.0.0",
     "@rootnative/core": ">=0.0.0-alpha.31",
-    "@rootnative/inertia": ">=0.0.23 <0.1.0",
+    "@rootnative/inertia": ">=0.0.24 <0.1.0",
     "react": ">=19.3.0 <20.0.0",
     "react-native": ">=0.88.0 <0.89.0",
     "react-native-reanimated": ">=4.7.0 <4.8.0",
@@ -380,7 +380,7 @@
     "@react-native/babel-preset": "^0.88.0",
     "@react-native/jest-preset": "^0.88.0",
     "@rootnative/core": "workspace:*",
-    "@rootnative/inertia": "0.0.23",
+    "@rootnative/inertia": "0.0.24",
     "@rootnative/utils": "workspace:*",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-native": "^13.3.3",

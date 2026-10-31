@@ -1,7 +1,7 @@
 # @rootnative/components — MD3 UI Components for React Native
 
 > Version: 0.0.0-alpha.31
-> Peer deps: @rootnative/core >=0.0.0-alpha.31, @rootnative/inertia >=0.0.23 <0.1.0 (required — every animation runs on it), react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0, react-native-safe-area-context >=4.0.0, react-native-reanimated >=4.7.0 <4.8.0, react-native-worklets >=0.13.0 <0.14.0 (Expo SDK 58 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
+> Peer deps: @rootnative/core >=0.0.0-alpha.31, @rootnative/inertia >=0.0.24 <0.1.0 (required — every animation runs on it), react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0, react-native-safe-area-context >=4.0.0, react-native-reanimated >=4.7.0 <4.8.0, react-native-worklets >=0.13.0 <0.14.0 (Expo SDK 58 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional peer: @react-native-vector-icons/material-design-icons >=13.0.0 (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver does not install it
 > Do not use @expo/vector-icons: Expo is retiring it, and it registers the same font, so the glyphs render as ?. Use @react-native-vector-icons/* (see Icons)
 

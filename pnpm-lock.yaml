@@ -112,8 +112,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/core
       '@rootnative/inertia':
-        specifier: 0.0.23
-        version: 0.0.23(react-native-reanimated@4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)
+        specifier: 0.0.24
+        version: 0.0.24(react-native-reanimated@4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)
       '@rootnative/seo':
         specifier: workspace:*
         version: link:../packages/seo
@@ -244,8 +244,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@rootnative/inertia':
-        specifier: 0.0.23
-        version: 0.0.23(d41f887a46ec554b1c1cea19a0c54c96)
+        specifier: 0.0.24
+        version: 0.0.24(d41f887a46ec554b1c1cea19a0c54c96)
       '@rootnative/utils':
         specifier: workspace:*
         version: link:../utils
@@ -307,8 +307,8 @@ importers:
         specifier: ^0.88.0
         version: 0.88.0(@babel/core@7.29.0)(react@19.3.0)
       '@rootnative/inertia':
-        specifier: 0.0.23
-        version: 0.0.23(d41f887a46ec554b1c1cea19a0c54c96)
+        specifier: 0.0.24
+        version: 0.0.24(d41f887a46ec554b1c1cea19a0c54c96)
       '@testing-library/react-native':
         specifier: ^13.3.3
         version: 13.3.3(jest@29.7.0(@types/node@22.19.15))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.3.0))(react-test-renderer@19.3.0(react@19.3.0))(react@19.3.0)
@@ -470,8 +470,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@rootnative/inertia':
-        specifier: 0.0.23
-        version: 0.0.23(d41f887a46ec554b1c1cea19a0c54c96)
+        specifier: 0.0.24
+        version: 0.0.24(d41f887a46ec554b1c1cea19a0c54c96)
       '@testing-library/react-native':
         specifier: ^13.3.3
         version: 13.3.3(jest@29.7.0(@types/node@22.19.15))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.3.0))(react-test-renderer@19.3.0(react@19.3.0))(react@19.3.0)
@@ -3168,8 +3168,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@rootnative/inertia@0.0.23':
-    resolution: {integrity: sha512-Exs6C4VzaWE9dAQfri5ysGpV00+j5qNrm7w+pvz9fZ8k7GnKyPMR05Dbuad1zzCvPp2JCKC52tWiWlBLGXV7qQ==}
+  '@rootnative/inertia@0.0.24':
+    resolution: {integrity: sha512-oFKDDa4bv9/aFnbV0DRLp7J9nuJYMELA/x3mXmqZplyta1Ry35kIiX1voDQLuR6Q4O6rua6+cPF7CSa8ba/NeQ==}
     peerDependencies:
       '@testing-library/react-native': '>=13.0.0'
       react: 19.3.0
@@ -14393,7 +14393,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.59.0':
     optional: true
 
-  '@rootnative/inertia@0.0.23(d41f887a46ec554b1c1cea19a0c54c96)':
+  '@rootnative/inertia@0.0.24(d41f887a46ec554b1c1cea19a0c54c96)':
     dependencies:
       react: 19.3.0
       react-native: 0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.3.0)
@@ -14402,7 +14402,7 @@ snapshots:
     optionalDependencies:
       '@testing-library/react-native': 13.3.3(jest@29.7.0(@types/node@22.19.15))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.3.0))(react-test-renderer@19.3.0(react@19.3.0))(react@19.3.0)
 
-  '@rootnative/inertia@0.0.23(react-native-reanimated@4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)':
+  '@rootnative/inertia@0.0.24(react-native-reanimated@4.7.1(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native-worklets@0.13.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0))(react-native@0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0))(react@19.3.0)':
     dependencies:
       react: 19.3.0
       react-native: 0.88.0(@babel/core@7.29.0)(@react-native/metro-config@0.88.0(@babel/core@7.29.0))(@types/react@19.3.0)(react@19.3.0)

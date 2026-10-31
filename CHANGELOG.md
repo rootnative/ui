@@ -13,18 +13,28 @@ Prior history: these packages were published as `@onlynative/*` through
 
 **No breaking change.** Two new components, one new prop and one fix in
 `@rootnative/components`, and two new props in `@rootnative/seo`. The
-`@rootnative/inertia` floor moves to `0.0.23`, so upgrade it in the app
+`@rootnative/inertia` floor moves to `0.0.24`, so upgrade it in the app
 with this release.
 
-- **The `@rootnative/inertia` floor moves to `0.0.23`.** The `core`,
-  `utils` and `components` peer ranges are now `>=0.0.23 <0.1.0`, the dev,
-  example and template pins are `0.0.23` exact, and the registry's derived
+- **The `@rootnative/inertia` floor moves to `0.0.24`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.24 <0.1.0`, the dev,
+  example and template pins are `0.0.24` exact, and the registry's derived
   floor follows. inertia `0.0.23` adds `useHideOnScroll`: a 0 to 1 value
   from the direction of a scroll, which hides a bar while the content
   scrolls down and shows it again while the content scrolls up.
   `BottomAppBar` uses it for `scrollOffset`, so an older inertia does not
-  work. The same inertia release fixes a native crash in
-  `@rootnative/inertia-svg`, which this library does not use.
+  work. inertia `0.0.24` fixes that hook on iOS: a fling to the end of the
+  content bounced past the end and back, and the bounce back showed a
+  hidden `BottomAppBar` again, in part or in full. Now the bar stays
+  hidden at the end. One limit stays on iOS: with
+  `contentInsetAdjustmentBehavior="automatic"`, the scroll event leaves
+  out the bottom safe-area inset, so the last stretch of the content
+  (about 34 pt) does not move the bar. Keep the default `'never'` and add
+  that inset as padding in `contentContainerStyle`. inertia `0.0.24` also
+  makes `useTouchDrag` spring an `elastic` overdrag back inside its bounds
+  on release. `BottomSheet` returns a release transition on every release,
+  so its behavior does not change. inertia `0.0.23` also fixes a native
+  crash in `@rootnative/inertia-svg`, which this library does not use.
 
 - **`Picture` takes `srcSet` and `sizes`.** `srcSet` lists more files of the
   same image as `{ source, width }`, with the width of each file in pixels.
