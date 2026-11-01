@@ -8,21 +8,30 @@ import {
 import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { View } from 'react-native'
-import Svg, { Circle } from 'react-native-svg'
+import Svg, { Circle, Path } from 'react-native-svg'
 import {
   PROGRESS_CIRCULAR_SIZE,
   PROGRESS_CIRCULAR_STROKE,
+  PROGRESS_CIRCULAR_WAVE_AMPLITUDE,
+  PROGRESS_CIRCULAR_WAVELENGTH,
   PROGRESS_TRACK_GAP,
+  PROGRESS_WAVE_FLAT_ABOVE,
+  PROGRESS_WAVE_FLAT_BELOW,
   createCircularStyles,
   getProgressColors,
 } from './styles'
 import type { CircularProgressProps } from './types'
+import { useWaveMotion } from './useWaveMotion'
+import { circularWavePath } from './wave'
 
 // Interop escape hatch (sanctioned): the arc props are per-frame branching
 // dasharray strings derived from the value tween — a shape `MotionCircle`'s
 // declarative props can't express (dasharray is shape-locked at mount there).
 // The `useAnimatedProps` worklets below consume inertia-driven values.
 const AnimatedCircle = Animated.createAnimatedComponent(Circle)
+// The wavy arc is a per-frame `d` string built from the value tween, the
+// amplitude spring and the phase loop.
+const AnimatedPath = Animated.createAnimatedComponent(Path)
 
 // Loop duration/arc ratio are MD3 spec values for progress indicators, not
 // theme tokens — they stay component constants. The arc occupies ~25% of the
@@ -39,6 +48,7 @@ export function CircularProgress({
   thickness = PROGRESS_CIRCULAR_STROKE,
   containerColor,
   contentColor,
+  wavy = false,
   style,
   accessibilityLabel,
   ...rest
@@ -64,9 +74,17 @@ export function CircularProgress({
     [theme.motion],
   )
 
-  const radius = (size - thickness) / 2
+  // The wavy ring keeps its peaks inside `size`, so its midline sits one
+  // amplitude further in. The flat track follows the same midline.
+  const amplitude = wavy ? PROGRESS_CIRCULAR_WAVE_AMPLITUDE : 0
+  const radius = (size - thickness) / 2 - amplitude
   const circumference = 2 * Math.PI * radius
   const center = size / 2
+  // A whole number of waves, so the wave meets itself when the arc closes.
+  const waves = Math.max(
+    3,
+    Math.round(circumference / PROGRESS_CIRCULAR_WAVELENGTH),
+  )
   // Convert a track gap measured in dp along the circumference into the
   // equivalent dasharray segment so the gap appears uniform regardless of
   // size / thickness.
@@ -150,6 +168,52 @@ export function CircularProgress({
     }
   })
 
+  // Wave amplitude follows the value (flat at both ends of the range) and
+  // the phase loops while the wave shows. The arc starts at 12 o'clock.
+  const waveAmplitudeTarget =
+    wavy &&
+    (indeterminate ||
+      (value > PROGRESS_WAVE_FLAT_BELOW && value < PROGRESS_WAVE_FLAT_ABOVE))
+      ? 1
+      : 0
+  const wave = useWaveMotion(waveAmplitudeTarget, waveAmplitudeTarget > 0)
+  const startAngle = -Math.PI / 2
+  const gapAngle = (gapLength / circumference) * 2 * Math.PI
+  // The stroke's round cap adds half the thickness at each end of the arc.
+  const capAngle = (thickness / 2 / circumference) * 2 * Math.PI
+
+  const waveAnimatedProps = useAnimatedProps(() => {
+    if (indeterminate) {
+      const sweep = INDETERMINATE_ARC_RATIO * 2 * Math.PI - capAngle * 2
+      return {
+        d: circularWavePath(
+          center,
+          center,
+          radius,
+          amplitude,
+          waves,
+          wave.phase.value,
+          startAngle + capAngle,
+          startAngle + capAngle + sweep,
+        ),
+      }
+    }
+    const v = progressShared.value
+    const sweep = Math.max(0, v * 2 * Math.PI - gapAngle) - capAngle * 2
+    return {
+      d: circularWavePath(
+        center,
+        center,
+        radius,
+        amplitude * wave.amplitude.value,
+        waves,
+        wave.phase.value,
+        startAngle + capAngle,
+        startAngle + capAngle + sweep,
+      ),
+    }
+  })
+
   const accessibilityValue = indeterminate
     ? undefined
     : { min: 0, max: 100, now: Math.round(value * 100) }
@@ -174,17 +238,28 @@ export function CircularProgress({
         transform={startRotation}
         animatedProps={trackAnimatedProps}
       />
-      <AnimatedCircle
-        cx={center}
-        cy={center}
-        r={radius}
-        stroke={colors.indicator}
-        strokeWidth={thickness}
-        fill="none"
-        strokeLinecap="round"
-        transform={startRotation}
-        animatedProps={indicatorAnimatedProps}
-      />
+      {wavy ? (
+        <AnimatedPath
+          stroke={colors.indicator}
+          strokeWidth={thickness}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          animatedProps={waveAnimatedProps}
+        />
+      ) : (
+        <AnimatedCircle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke={colors.indicator}
+          strokeWidth={thickness}
+          fill="none"
+          strokeLinecap="round"
+          transform={startRotation}
+          animatedProps={indicatorAnimatedProps}
+        />
+      )}
     </Svg>
   )
 

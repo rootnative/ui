@@ -57,6 +57,13 @@ export default function ProgressScreen() {
         </Column>
 
         <Column gap="md">
+          <Typography variant="titleSmall">Linear — wavy</Typography>
+          <LinearProgress progress={value} wavy />
+          <LinearProgress progress={0.5} wavy />
+          <LinearProgress wavy />
+        </Column>
+
+        <Column gap="md">
           <Typography variant="titleSmall">
             Linear — no stop indicator
           </Typography>
@@ -105,6 +112,16 @@ export default function ProgressScreen() {
             <CircularProgress size={24} thickness={3} />
             <CircularProgress />
             <CircularProgress size={56} thickness={5} />
+          </Row>
+        </Column>
+
+        <Column gap="md">
+          <Typography variant="titleSmall">Circular — wavy</Typography>
+          <Row gap="lg" align="center">
+            <CircularProgress progress={value} wavy />
+            <CircularProgress progress={0.5} wavy />
+            <CircularProgress wavy />
+            <CircularProgress progress={0.5} wavy size={72} thickness={6} />
           </Row>
         </Column>
 

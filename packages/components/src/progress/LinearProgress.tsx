@@ -5,17 +5,34 @@ import {
   useAnimation,
   useShouldReduceMotion,
 } from '@rootnative/inertia'
-import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
+import {
+  Animated,
+  useAnimatedProps,
+  useAnimatedStyle,
+} from '@rootnative/inertia/reanimated'
 import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 import {
+  PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
+  PROGRESS_LINEAR_WAVE_AMPLITUDE,
+  PROGRESS_LINEAR_WAVELENGTH,
   PROGRESS_STOP_INDICATOR,
   PROGRESS_TRACK_GAP,
   PROGRESS_TRACK_HEIGHT,
+  PROGRESS_WAVE_FLAT_ABOVE,
+  PROGRESS_WAVE_FLAT_BELOW,
   createLinearStyles,
+  getProgressColors,
 } from './styles'
 import type { LinearProgressProps } from './types'
+import { useWaveMotion } from './useWaveMotion'
+import { linearWavePath } from './wave'
+
+// Interop escape hatch (sanctioned): the wave is a per-frame `d` string
+// built from three inertia-driven values (value, amplitude, phase).
+const AnimatedPath = Animated.createAnimatedComponent(Path)
 
 // Indeterminate segment is 40% of the track width and slides across once per
 // loop iteration. Matches the visual cadence of the MD3 single-segment variant.
@@ -36,6 +53,7 @@ export function LinearProgress({
   contentColor,
   stopIndicator = true,
   thickness = PROGRESS_TRACK_HEIGHT,
+  wavy = false,
   style,
   accessibilityLabel,
   onLayout: onLayoutProp,
@@ -46,8 +64,13 @@ export function LinearProgress({
   const value = indeterminate ? 0 : clamp(progress as number, 0, 1)
 
   const styles = useMemo(
-    () => createLinearStyles(theme, thickness, containerColor, contentColor),
-    [theme, thickness, containerColor, contentColor],
+    () =>
+      createLinearStyles(theme, thickness, containerColor, contentColor, wavy),
+    [theme, thickness, containerColor, contentColor, wavy],
+  )
+  const colors = useMemo(
+    () => getProgressColors(theme, containerColor, contentColor),
+    [theme, containerColor, contentColor],
   )
 
   // MD3 standard curve for value transitions; duration comes from
@@ -147,6 +170,63 @@ export function LinearProgress({
     return { left, width: w }
   })
 
+  // Wavy variant. The active indicator is a stroked SVG path whose wave
+  // amplitude follows the value (flat at both ends of the range) and whose
+  // phase loops while the wave shows. The inactive track stays a flat view.
+  const waveAmplitudeTarget =
+    wavy &&
+    (indeterminate ||
+      (value > PROGRESS_WAVE_FLAT_BELOW && value < PROGRESS_WAVE_FLAT_ABOVE))
+      ? 1
+      : 0
+  const wave = useWaveMotion(waveAmplitudeTarget, waveAmplitudeTarget > 0)
+  const amplitude = wavy ? PROGRESS_LINEAR_WAVE_AMPLITUDE : 0
+  const svgHeight = thickness + amplitude * 2
+  const centerY = svgHeight / 2
+  // The stroke's round cap adds half the thickness at each end, so the path
+  // is inset to keep the painted span equal to the flat variant's segment.
+  const capInset = thickness / 2
+
+  const determinateWaveProps = useAnimatedProps(() => {
+    const v = progressShared.value
+    const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
+    const w = Math.max(0, v * (progressArea - midGap))
+    return {
+      d: linearWavePath(
+        capInset,
+        w - capInset,
+        centerY,
+        amplitude * wave.amplitude.value,
+        PROGRESS_LINEAR_WAVELENGTH,
+        wave.phase.value,
+      ),
+    }
+  })
+
+  const indeterminateWaveProps = useAnimatedProps(() => ({
+    d: linearWavePath(
+      capInset,
+      segmentWidth - capInset,
+      centerY,
+      amplitude,
+      PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
+      wave.phase.value,
+    ),
+  }))
+
+  const staticWaveD = useMemo(
+    () =>
+      linearWavePath(
+        capInset,
+        segmentWidth - capInset,
+        centerY,
+        amplitude,
+        PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
+        0,
+      ),
+    [capInset, segmentWidth, centerY, amplitude],
+  )
+
   const accessibilityValue = indeterminate
     ? undefined
     : { min: 0, max: 100, now: Math.round(value * 100) }
@@ -159,10 +239,78 @@ export function LinearProgress({
   const stopStyle = useMemo(
     () => [
       styles.stopDot,
-      { right: 0, top: thickness / 2 - PROGRESS_STOP_INDICATOR / 2 },
+      { right: 0, top: svgHeight / 2 - PROGRESS_STOP_INDICATOR / 2 },
     ],
-    [styles.stopDot, thickness],
+    [styles.stopDot, svgHeight],
   )
+
+  const renderActive = () => {
+    if (!wavy) {
+      return <Animated.View style={[styles.activeIndicator, activeStyle]} />
+    }
+    return (
+      <Svg width={width} height={svgHeight} style={styles.wave}>
+        <AnimatedPath
+          stroke={colors.indicator}
+          strokeWidth={thickness}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          animatedProps={determinateWaveProps}
+        />
+      </Svg>
+    )
+  }
+
+  const renderIndeterminateSegment = () => {
+    if (!wavy) {
+      return shouldReduceMotion ? (
+        <View style={[styles.activeIndicator, staticSegmentStyle]} />
+      ) : (
+        <Motion.View
+          style={[styles.activeIndicator, indeterminateSegmentStyle]}
+          animate={indeterminateAnimate}
+          transition={indeterminateTransition}
+        />
+      )
+    }
+    if (shouldReduceMotion) {
+      return (
+        <Svg
+          width={segmentWidth}
+          height={svgHeight}
+          style={[styles.wave, staticSegmentStyle]}
+        >
+          <Path
+            d={staticWaveD}
+            stroke={colors.indicator}
+            strokeWidth={thickness}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </Svg>
+      )
+    }
+    return (
+      <Motion.View
+        style={[styles.wave, indeterminateSegmentStyle]}
+        animate={indeterminateAnimate}
+        transition={indeterminateTransition}
+      >
+        <Svg width={segmentWidth} height={svgHeight}>
+          <AnimatedPath
+            stroke={colors.indicator}
+            strokeWidth={thickness}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+            animatedProps={indeterminateWaveProps}
+          />
+        </Svg>
+      </Motion.View>
+    )
+  }
 
   return (
     <View
@@ -180,19 +328,11 @@ export function LinearProgress({
       {indeterminate ? (
         <>
           <View style={styles.inactiveTrackFull} />
-          {shouldReduceMotion ? (
-            <View style={[styles.activeIndicator, staticSegmentStyle]} />
-          ) : (
-            <Motion.View
-              style={[styles.activeIndicator, indeterminateSegmentStyle]}
-              animate={indeterminateAnimate}
-              transition={indeterminateTransition}
-            />
-          )}
+          {renderIndeterminateSegment()}
         </>
       ) : (
         <>
-          <Animated.View style={[styles.activeIndicator, activeStyle]} />
+          {renderActive()}
           <Animated.View style={[styles.inactiveTrack, inactiveStyle]} />
           {showStop ? <View style={stopStyle} /> : null}
         </>

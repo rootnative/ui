@@ -1367,6 +1367,10 @@ import { LinearProgress, CircularProgress } from '@rootnative/components/progres
 // Custom sizing / colors
 <LinearProgress progress={value} thickness={8} containerColor="#C8E6C9" contentColor="#2E7D32" />
 <CircularProgress progress={value} size={56} thickness={5} />
+
+// Wavy (MD3 Expressive): the active indicator is a travelling wave
+<LinearProgress progress={value} wavy />
+<CircularProgress progress={value} wavy />
 \`\`\``,
 
   'loading-indicator': `\`\`\`tsx

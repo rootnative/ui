@@ -2700,6 +2700,10 @@ import { LinearProgress, CircularProgress } from '@rootnative/components/progres
 // Custom sizing / colors
 <LinearProgress progress={value} thickness={8} containerColor="#C8E6C9" contentColor="#2E7D32" />
 <CircularProgress progress={value} size={56} thickness={5} />
+
+// Wavy (MD3 Expressive): the active indicator is a travelling wave
+<LinearProgress progress={value} wavy />
+<CircularProgress progress={value} wavy />
 ```
 
 #### LinearProgress
@@ -2712,6 +2716,7 @@ Props:
 - `contentColor?: string` — Default: `theme.colors.primary`. Override the active indicator color.
 - `thickness?: number` — Default: `4`. Track / indicator thickness in dp.
 - `stopIndicator?: boolean` — Default: `true`. Show the trailing stop indicator dot. Only applies in determinate mode and is hidden when `progress` reaches 1.
+- `wavy?: boolean` — Default: `false`. Draw the active indicator as a travelling wave (MD3 Expressive). The wave is flat below 10% and above 95%, and the inactive track stays flat. The wavy bar is 6dp taller than `thickness`.
 - Inherits `ViewProps` (except `children`)
 
 #### CircularProgress
@@ -2724,6 +2729,7 @@ Props:
 - `contentColor?: string` — Default: `theme.colors.primary`. Override the active indicator color.
 - `size?: number` — Default: `48`. Outer diameter in dp.
 - `thickness?: number` — Default: `4`. Stroke thickness in dp.
+- `wavy?: boolean` — Default: `false`. Draw the active arc as a travelling wave (MD3 Expressive). The wave is flat below 10% and above 95%, and the inactive track stays flat. The wave sits inside `size`, so the ring radius shrinks by 2dp.
 - Inherits `ViewProps` (except `children`)
 
 ---

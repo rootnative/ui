@@ -6,7 +6,9 @@
     "packages/components/src/progress/LinearProgress.tsx",
     "packages/components/src/progress/index.ts",
     "packages/components/src/progress/styles.ts",
-    "packages/components/src/progress/types.ts"
+    "packages/components/src/progress/types.ts",
+    "packages/components/src/progress/useWaveMotion.ts",
+    "packages/components/src/progress/wave.ts"
   ],
   "utils": [],
   "componentDependencies": [],

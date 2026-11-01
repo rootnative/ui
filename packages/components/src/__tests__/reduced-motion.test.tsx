@@ -231,6 +231,20 @@ const CASES: readonly ReducedMotionCase[] = [
     name: 'CircularProgress (indeterminate)',
     render: () => <CircularProgress accessibilityLabel="Loading" />,
   },
+  {
+    // The wave phase loops from mount while the value is mid-range, so no
+    // settle is needed.
+    name: 'LinearProgress (wavy)',
+    render: () => (
+      <LinearProgress progress={0.5} wavy accessibilityLabel="Loading" />
+    ),
+  },
+  {
+    name: 'CircularProgress (wavy)',
+    render: () => (
+      <CircularProgress progress={0.5} wavy accessibilityLabel="Loading" />
+    ),
+  },
   { name: 'Skeleton', render: () => <Skeleton /> },
   {
     name: 'Dialog',

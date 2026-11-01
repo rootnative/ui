@@ -2,7 +2,7 @@ import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { StyleSheet } from 'react-native'
-import { Circle } from 'react-native-svg'
+import { Circle, Path } from 'react-native-svg'
 import { CircularProgress } from '../progress/CircularProgress'
 import { LinearProgress } from '../progress/LinearProgress'
 
@@ -146,5 +146,72 @@ describe('Progress color props', () => {
       .map((c: { props: { stroke?: string } }) => c.props.stroke)
     // Track is rendered first, indicator second.
     expect(strokes).toEqual(['#ABCDEF', '#123456'])
+  })
+})
+
+describe('Progress wavy variant', () => {
+  function paths(testID: string) {
+    return screen.getByTestId(testID).findAllByType(Path as never) as {
+      props: { stroke?: string }
+    }[]
+  }
+
+  it('LinearProgress: the flat variant draws no SVG path', () => {
+    renderWithTheme(<LinearProgress progress={0.5} testID="linear" />)
+    expect(paths('linear')).toHaveLength(0)
+  })
+
+  it('LinearProgress: wavy draws the indicator as a stroked path in contentColor', () => {
+    renderWithTheme(
+      <LinearProgress
+        progress={0.5}
+        wavy
+        contentColor="#123456"
+        testID="linear"
+      />,
+    )
+    const p = paths('linear')
+    expect(p).toHaveLength(1)
+    expect(p[0].props.stroke).toBe('#123456')
+  })
+
+  it('LinearProgress: wavy grows the bar by twice the wave amplitude', () => {
+    renderWithTheme(<LinearProgress progress={0.5} wavy testID="linear" />)
+    const flat = StyleSheet.flatten(screen.getByTestId('linear').props.style)
+    expect(flat.height).toBe(10)
+  })
+
+  it('LinearProgress: wavy indeterminate draws a path too', () => {
+    renderWithTheme(<LinearProgress wavy testID="linear" />)
+    expect(paths('linear')).toHaveLength(1)
+  })
+
+  it('LinearProgress: wavy keeps the accessibility value', () => {
+    renderWithTheme(<LinearProgress progress={0.42} wavy />)
+    const bar = screen.getByRole('progressbar')
+    expect(bar.props.accessibilityValue).toEqual({ min: 0, max: 100, now: 42 })
+  })
+
+  it('CircularProgress: wavy replaces the arc circle with a path', () => {
+    renderWithTheme(
+      <CircularProgress
+        progress={0.5}
+        wavy
+        contentColor="#123456"
+        testID="c"
+      />,
+    )
+    const circles = screen.getByTestId('c').findAllByType(Circle as never)
+    expect(circles).toHaveLength(1)
+    const p = paths('c')
+    expect(p).toHaveLength(1)
+    expect(p[0].props.stroke).toBe('#123456')
+  })
+
+  it('CircularProgress: wavy keeps the 48dp container', () => {
+    renderWithTheme(<CircularProgress progress={0.5} wavy testID="c" />)
+    const flat = StyleSheet.flatten(screen.getByTestId('c').props.style)
+    expect(flat.width).toBe(48)
+    expect(flat.height).toBe(48)
   })
 })

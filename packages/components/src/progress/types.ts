@@ -27,6 +27,13 @@ export interface LinearProgressProps extends Omit<ViewProps, 'children'> {
    * @default true
    */
   stopIndicator?: boolean
+  /**
+   * Draw the active indicator as a travelling wave (MD3 Expressive). The
+   * wave is flat below 10% and above 95%, and the inactive track stays flat.
+   * The wavy bar is 6dp taller than `thickness`.
+   * @default false
+   */
+  wavy?: boolean
 }
 
 export interface CircularProgressProps extends Omit<ViewProps, 'children'> {
@@ -55,4 +62,11 @@ export interface CircularProgressProps extends Omit<ViewProps, 'children'> {
    * @default 4
    */
   thickness?: number
+  /**
+   * Draw the active arc as a travelling wave (MD3 Expressive). The wave is
+   * flat below 10% and above 95%, and the inactive track stays flat. The
+   * wave sits inside `size`, so the ring radius shrinks by 2dp.
+   * @default false
+   */
+  wavy?: boolean
 }

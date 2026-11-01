@@ -161,6 +161,52 @@ They also stop entirely when the OS reduce-motion setting is on — that's the p
 `}
 />
 
+## Wavy
+
+Pass `wavy` to draw the active indicator as a travelling wave, the MD3 Expressive form of both indicators. The inactive track stays flat. The wave is flat below 10% and above 95%, so a nearly empty or nearly full indicator reads as a plain bar, and it grows in with a spring between those points.
+
+<SnackExample
+  name="RootNative Progress — Wavy"
+  code={`
+  import { CircularProgress, LinearProgress } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useEffect, useState } from 'react'
+  import { View } from 'react-native'
+
+  export default function App() {
+    const [value, setValue] = useState(0.25)
+
+    useEffect(() => {
+      const id = setInterval(() => {
+        setValue((v) => (v >= 1 ? 0 : Math.min(1, v + 0.07)))
+      }, 600)
+      return () => clearInterval(id)
+    }, [])
+
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 24, gap: 24 }}>
+            <LinearProgress progress={value} wavy />
+            <LinearProgress wavy />
+            <View style={{ flexDirection: 'row', gap: 24, justifyContent: 'center' }}>
+              <CircularProgress progress={value} wavy />
+              <CircularProgress wavy />
+            </View>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+The wavy `LinearProgress` is 6dp taller than its `thickness`, because the wave peaks 3dp each side of the track. The wavy `CircularProgress` keeps its `size`: the ring radius shrinks by 2dp so the wave stays inside the container. Both wavy indicators use `react-native-svg`.
+
+Under the OS reduce-motion setting the wave stands still; the value still moves.
+
 ## Stop indicator
 
 `LinearProgress` shows a trailing dot by default to mark the completion target. Pass `stopIndicator={false}` to hide it — useful for very short bars or when you want a simpler look.
