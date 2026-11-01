@@ -33,11 +33,13 @@ import { Chip } from '../../chip'
 import { FAB } from '../../fab'
 import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
+import { PortalHost } from '../../portal/PortalHost'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
 import { Slider } from '../../slider'
 import { Switch } from '../../switch'
-import { renderWebSettled } from './render-web'
+import { Tooltip } from '../../tooltip'
+import { renderWeb, renderWebSettled } from './render-web'
 
 /**
  * The modality store in `focus-visible.ts` is module-level and shared across
@@ -540,5 +542,79 @@ describe('SearchBar state layer', () => {
       container.querySelectorAll<HTMLElement>('*'),
     ).map((node) => node.style.opacity)
     expect(opacities).toContain('1')
+  })
+})
+
+/**
+ * Two react-native-web behaviors that no native test can see. RNW adds the
+ * hover-out listener when a hover starts and keeps it until the hover ends, so
+ * the listener holds the handlers of that one render. RNW also starts the
+ * long-press timer for a mouse, and a click after the timer skips `onPress`.
+ */
+describe('Tooltip on web', () => {
+  const NO_HOVER = '(any-hover: none)'
+
+  afterEach(() => {
+    ;(window.matchMedia(NO_HOVER) as { matches: boolean }).matches = false
+    jest.useRealTimers()
+  })
+
+  function renderTooltip(props: {
+    onPress?: () => void
+    onDismiss?: () => void
+  }) {
+    renderWeb(
+      <PortalHost>
+        <Tooltip
+          anchor={<Button onPress={props.onPress}>Save</Button>}
+          onDismiss={props.onDismiss}
+        >
+          Save changes
+        </Tooltip>
+      </PortalHost>,
+    )
+    return screen.getByRole('button')
+  }
+
+  function holdMouse(target: HTMLElement) {
+    fireEvent.mouseDown(target, { button: 0 })
+    act(() => {
+      jest.advanceTimersByTime(600)
+    })
+  }
+
+  it('hides a plain tooltip on hover out, before its duration', () => {
+    const onDismiss = jest.fn()
+    const button = renderTooltip({ onDismiss })
+    const wrapper = button.closest('[tabindex="-1"]') as HTMLElement
+
+    fireEvent.mouseEnter(wrapper)
+    expect(screen.getByRole('tooltip')).toBeTruthy()
+
+    fireEvent.mouseLeave(wrapper)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+    expect(button.getAttribute('aria-describedby')).toBeNull()
+  })
+
+  it('presses the anchor after a mouse press held past the long-press delay', () => {
+    jest.useFakeTimers()
+    const onPress = jest.fn()
+    const button = renderTooltip({ onPress })
+
+    holdMouse(button)
+    fireEvent.mouseUp(button, { button: 0 })
+    fireEvent.click(button, { button: 0 })
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+  })
+
+  it('opens on a long press on a device with no hover', () => {
+    ;(window.matchMedia(NO_HOVER) as { matches: boolean }).matches = true
+    jest.useFakeTimers()
+    const button = renderTooltip({})
+
+    holdMouse(button)
+
+    expect(screen.getByRole('tooltip')).toBeTruthy()
   })
 })

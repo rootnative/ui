@@ -16,7 +16,7 @@ import type {
   NativeSyntheticEvent,
   TargetedEvent,
 } from 'react-native'
-import { Pressable, Text, View } from 'react-native'
+import { Platform, Pressable, Text, View } from 'react-native'
 import { plainTextOf } from '../internal/plainText'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
@@ -51,11 +51,26 @@ const SHOWN = { opacity: 1 }
 type AnchorFocusEvent = NativeSyntheticEvent<TargetedEvent>
 
 interface AnchorTriggerProps {
+  accessibilityLabel?: string
+  'aria-label'?: string
   onPress?: (event: GestureResponderEvent) => void
   onLongPress?: (event: GestureResponderEvent) => void
   onFocus?: (event: AnchorFocusEvent) => void
   onBlur?: (event: AnchorFocusEvent) => void
   'aria-describedby'?: string
+}
+
+/**
+ * react-native-web starts the long-press timer for a mouse too, and a click
+ * that comes after the timer skips `onPress`. So on web a long press opens the
+ * tooltip only on a device with no hover, where it is the only way in.
+ */
+function canOpenOnLongPress(): boolean {
+  if (Platform.OS !== 'web') return true
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(any-hover: none)').matches === true
+  )
 }
 
 export function Tooltip({
@@ -111,12 +126,23 @@ export function Tooltip({
     onDismiss?.()
   }, [isControlled, onDismiss])
 
+  // Read through a ref so an inline `onDismiss` (a new function every render)
+  // cannot restart the timeout on each render and keep the tooltip up forever.
+  const dismissRef = useRef(dismiss)
+  const openRef = useRef(open)
+  useEffect(() => {
+    dismissRef.current = dismiss
+    openRef.current = open
+  })
+
   // Anchor-driven hiding (hover out, anchor press) only reports a dismissal
   // that actually happened — a pointer sweeping across a control that never
-  // showed a tooltip must not fire `onDismiss`.
+  // showed a tooltip must not fire `onDismiss`. It reads the open state
+  // through a ref because react-native-web keeps the hover-out listener of the
+  // render in which the hover started, when the tooltip was still closed.
   const hide = useCallback(() => {
-    if (open) dismiss()
-  }, [open, dismiss])
+    if (openRef.current) dismissRef.current()
+  }, [])
 
   // A rich tooltip is persistent: it has actions, and a mouse has to leave the
   // anchor to reach them. Only the outside press, an action, Escape, or the
@@ -164,17 +190,36 @@ export function Tooltip({
   // injected pair.
   // The description is pointed at only while the tooltip is mounted — an
   // `aria-describedby` naming an absent id is announced as nothing at best.
+  // An MD3 icon button uses its label as the tooltip text, and a description
+  // that repeats the name makes a screen reader say it two times.
+  const plainText = plainTextOf(children)
+  const longPressOpens = !isControlled && canOpenOnLongPress()
   const trigger = useMemo(() => {
     if (!isValidElement(anchor)) return anchor
     const element = anchor as ReactElement<AnchorTriggerProps>
-    const describedBy = open ? { 'aria-describedby': tooltipId } : {}
+    const anchorLabel =
+      element.props.accessibilityLabel ?? element.props['aria-label']
+    const repeatsLabel =
+      !isRich &&
+      plainText !== undefined &&
+      plainText.trim() === anchorLabel?.trim()
+    const describedBy =
+      open && !repeatsLabel ? { 'aria-describedby': tooltipId } : {}
     if (isControlled) return cloneElement(element, describedBy)
+    const ownLongPress = element.props.onLongPress
+    // An anchor with a long press of its own loses its click to it anyway.
+    const longPress =
+      longPressOpens || ownLongPress !== undefined
+        ? {
+            onLongPress: (event: GestureResponderEvent) => {
+              ownLongPress?.(event)
+              show()
+            },
+          }
+        : {}
     return cloneElement(element, {
       ...describedBy,
-      onLongPress: (event: GestureResponderEvent) => {
-        element.props.onLongPress?.(event)
-        show()
-      },
+      ...longPress,
       // A tap is the anchor doing its job, not a request for help text.
       onPress: (event: GestureResponderEvent) => {
         element.props.onPress?.(event)
@@ -189,14 +234,18 @@ export function Tooltip({
         hideOnHoverOut?.()
       },
     })
-  }, [anchor, isControlled, show, hide, hideOnHoverOut, open, tooltipId])
-
-  // Read through a ref so an inline `onDismiss` (a new function every render)
-  // cannot restart the timeout on each render and keep the tooltip up forever.
-  const dismissRef = useRef(dismiss)
-  useEffect(() => {
-    dismissRef.current = dismiss
-  })
+  }, [
+    anchor,
+    isControlled,
+    isRich,
+    plainText,
+    longPressOpens,
+    show,
+    hide,
+    hideOnHoverOut,
+    open,
+    tooltipId,
+  ])
 
   // Plain tooltips are transient: MD3 takes them down after 1.5s whether or not
   // the pointer is still on the anchor. Rich tooltips are persistent and wait
@@ -232,7 +281,7 @@ export function Tooltip({
     [styles.anchorWrapper, anchorStyle],
   )
 
-  const isPlainText = plainTextOf(children) !== undefined
+  const isPlainText = plainText !== undefined
   const body = isPlainText ? (
     <Text style={resolvedTextStyle}>{children}</Text>
   ) : (
@@ -258,7 +307,7 @@ export function Tooltip({
         onHoverOut={isControlled ? undefined : hideOnHoverOut}
         // A key press on the anchor bubbles up to the wrapper, unlike focus.
         onKeyDown={handleKeyDown}
-        onLongPress={isControlled ? undefined : show}
+        onLongPress={longPressOpens ? show : undefined}
       >
         {trigger}
       </Pressable>

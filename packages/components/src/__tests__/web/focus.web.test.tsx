@@ -22,6 +22,7 @@ import { BottomAppBar } from '../../bottom-app-bar'
 import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
 import { Dialog } from '../../dialog'
+import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { Menu } from '../../menu'
 import { PortalHost } from '../../portal/PortalHost'
@@ -369,6 +370,52 @@ describe('Tooltip description', () => {
     expect(describedBy).not.toBeNull()
     expect(document.getElementById(describedBy as string)?.textContent).toBe(
       'Saves your changes',
+    )
+  })
+
+  // An MD3 icon button uses its label as the tooltip text. A description that
+  // repeats the name makes a screen reader say the name two times.
+  it.each([
+    {
+      name: 'accessibilityLabel',
+      anchor: <IconButton icon="heart" accessibilityLabel="Like" />,
+    },
+    { name: 'aria-label', anchor: <Button aria-label="Like">Heart</Button> },
+  ])(
+    'does not describe an anchor whose $name is the tooltip text',
+    ({ anchor }) => {
+      renderWeb(
+        <PortalHost>
+          <Tooltip anchor={anchor} visible>
+            Like
+          </Tooltip>
+        </PortalHost>,
+      )
+
+      expect(screen.getByRole('tooltip')).toBeTruthy()
+      expect(
+        screen.getByRole('button').getAttribute('aria-describedby'),
+      ).toBeNull()
+    },
+  )
+
+  it('describes a labelled anchor when the tooltip text adds to the label', () => {
+    renderWeb(
+      <PortalHost>
+        <Tooltip
+          anchor={<IconButton icon="heart" accessibilityLabel="Like" />}
+          visible
+        >
+          Add to your favourites
+        </Tooltip>
+      </PortalHost>,
+    )
+
+    const describedBy = screen
+      .getByRole('button')
+      .getAttribute('aria-describedby')
+    expect(document.getElementById(describedBy as string)?.textContent).toBe(
+      'Add to your favourites',
     )
   })
 })

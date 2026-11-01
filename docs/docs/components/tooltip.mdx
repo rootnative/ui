@@ -74,7 +74,7 @@ an element needs its own `Text`.
 | Hover in | Shows the tooltip. Hover out hides a plain tooltip. A rich tooltip stays up, so the pointer can reach its actions |
 | Focus | Shows the tooltip on web, so a Tab stop reads the same as a hover. Blur hides a plain tooltip. A rich tooltip stays up, so Tab can reach its actions |
 | Escape | Hides the tooltip while the anchor has focus. The key stops there, so an enclosing dialog does not close on the same press |
-| Long press | Shows the tooltip. This is how touch devices reach it |
+| Long press | Shows the tooltip. This is how touch devices reach it. On web, only on a device with no hover, or on an anchor with its own `onLongPress` |
 | Press | Hides the tooltip — a tap is the control doing its job, not a request for help text |
 | Timeout | Hides a plain tooltip after `duration` (1500ms). Rich tooltips never time out |
 | Outside press / Android back | Hides a rich tooltip. A plain one has no dismiss region to press |
@@ -83,6 +83,10 @@ The long press and the focus pair are injected into the anchor itself, so the an
 `onLongPress`, `onFocus` and `onBlur` — every RootNative pressable does, and its own handlers still
 fire. Hover is caught on the wrapper instead, because every RootNative pressable drives its state
 layer from `onHoverIn`/`onHoverOut` and would overwrite an injected pair.
+
+On web, react-native-web cancels the click of a mouse press that is held for the long-press delay.
+So on web the tooltip adds the long press only when no input can hover, or when the anchor has an
+`onLongPress` of its own. A slow mouse click on the anchor still presses it.
 
 MD3 takes a plain tooltip down 1.5s after it appears, whether or not the pointer is still on the
 anchor. Pass `duration={0}` to keep it up until a hover out or a press instead.
@@ -229,10 +233,13 @@ what decides which side it lands on, so it has to be laid out before it can be p
   announced as a button labelled "Close tooltip" — override with `dismissAccessibilityLabel`.
 - **On web**, the anchor carries `aria-describedby` pointing at the tooltip while it is shown, which
   is the only thing that connects the two — the surface renders in a portal, far from the anchor in
-  the DOM. React Native has no equivalent, so this is web-only.
+  the DOM. React Native has no equivalent, so this is web-only. A plain tooltip whose text is the
+  `accessibilityLabel` or the `aria-label` of the anchor adds no description, so a screen reader
+  says the name one time.
 - The wrapper around the anchor stays out of the accessibility tree, so the anchor's own role and
   label are the only thing a screen reader sees. A tooltip is supplementary: an icon-only button
-  still needs its `accessibilityLabel`, and the tooltip text should add to it rather than repeat it.
+  still needs its `accessibilityLabel`. The tooltip text can be that label, as an MD3 icon button
+  does, or it can add to it.
 - **On web**, keyboard focus on the anchor shows the tooltip and Escape hides it, so a keyboard
   user reaches the same text a pointer does. Focus inside a rich tooltip's own actions does not
   close it.
