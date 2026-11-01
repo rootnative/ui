@@ -160,3 +160,26 @@ describe('RouteHead', () => {
     expect(container.querySelectorAll(selector)).toHaveLength(1)
   })
 })
+
+describe('RouteHead and the page language', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('lang')
+  })
+
+  it('sets lang on <html> from the defaults, and puts the shell lang back', () => {
+    document.documentElement.setAttribute('lang', 'en')
+    const german = (pathname: string) => ({
+      title: `Standard ${pathname}`,
+      url: pathname,
+      locale: 'de_DE',
+    })
+    const { unmount } = renderHead(
+      <SeoProvider site={site}>
+        <RouteHead defaults={german} />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('de-DE')
+    unmount()
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+  })
+})

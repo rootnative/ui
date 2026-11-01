@@ -1,14 +1,17 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { sameLanguage } from '../lang'
 import type { PageAlternate } from '../types'
 import {
   absoluteSiteUrl,
   attributesOf,
   decodeEntities,
+  htmlLang,
   isUnder,
   exportLayout,
   listHtmlFiles,
   noPagesMessage,
+  pageLangOf,
   readHead,
   skipReason,
   type ExportedPage,
@@ -55,7 +58,6 @@ export type AuditResult = {
 const TITLE = /<title\b[^>]*>([\s\S]*?)<\/title>/gi
 const H1 = /<h1[\s>]/gi
 const MAIN = /<main[\s>]/gi
-const HTML = /<html\b([^>]*)>/i
 const IMG = /<img\b([^>]*)>/gi
 const LOC = /<loc>([\s\S]*?)<\/loc>/gi
 const URL_ENTRY = /<url>([\s\S]*?)<\/url>/gi
@@ -105,7 +107,7 @@ async function readPage(outDir: string, file: string): Promise<AuditedPage> {
   )
   const h1 = (html.match(H1) ?? []).length
   const main = (html.match(MAIN) ?? []).length
-  const lang = attributesOf(html.match(HTML)?.[1] ?? '').lang?.trim()
+  const lang = htmlLang(html)
   const imgNoAlt = [...html.matchAll(IMG)].filter(
     (match) => !('alt' in attributesOf(match[1] ?? '')),
   ).length
@@ -168,8 +170,18 @@ function pageProblems(
     }
   }
 
-  if (rules.has('lang') && !page.lang) {
-    add('lang', 'no lang on <html>. Set it in app/+html.tsx.')
+  if (rules.has('lang')) {
+    const own = pageLangOf(page)
+    if (!page.lang) {
+      add('lang', 'no lang on <html>. Set it in app/+html.tsx.')
+    } else if (!server && own && !sameLanguage(page.lang, own)) {
+      // A server export renders each page at request time, so no file can
+      // carry the language of the page: the page sets it after hydration.
+      add(
+        'lang',
+        `lang on <html> is "${page.lang}", but the page is in "${own}" (its hreflang link to itself, or its og:locale). Run \`rootnative-seo <outDir>\` after the export: it sets the lang of the page.`,
+      )
+    }
   }
 
   if (rules.has('alt') && page.imgNoAlt > 0) {

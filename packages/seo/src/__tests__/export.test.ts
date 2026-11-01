@@ -368,3 +368,95 @@ describe('rootnative-seo', () => {
     expect(run.errors.join('\n')).toContain('not a folder')
   })
 })
+
+describe('the page language', () => {
+  const link = (lang: string, href: string) =>
+    `<link data-rh="true" rel="alternate" hrefLang="${lang}" href="${href}"/>`
+  const locale = (value: string) =>
+    `<meta data-rh="true" property="og:locale" content="${value}"/>`
+  const versions = link('en', `${SITE}/about`) + link('de', `${SITE}/de/about`)
+
+  it('reads og:locale from the head, the first one only', () => {
+    expect(readHead(page(locale('de_DE') + locale('en_US'))).locale).toBe(
+      'de_DE',
+    )
+    expect(readHead(page(''))).not.toHaveProperty('locale')
+  })
+
+  it('sets lang on <html> for a page in another language than the shell', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`) + locale('en_US')),
+      'about.html': page(canonical(`${SITE}/about`) + versions),
+      'de/about.html': page(
+        canonical(`${SITE}/de/about`) + versions + locale('de_DE'),
+      ),
+      'fr.html': page(canonical(`${SITE}/fr`) + locale('fr_FR')).replace(
+        '<html lang="en">',
+        '<html dir="ltr">',
+      ),
+      'search.html': page('<meta name="robots" content="noindex"/>'),
+    })
+    const result = await writeSeoFiles({ outDir, robots: false })
+    expect(result.langs).toEqual([
+      { file: 'de/about.html', lang: 'de' },
+      { file: 'fr.html', lang: 'fr-FR' },
+    ])
+    const de = await readFile(join(outDir, 'de', 'about.html'), 'utf8')
+    expect(de).toContain('<html lang="de">')
+    expect(de).not.toContain('lang="en"')
+    expect(await readFile(join(outDir, 'fr.html'), 'utf8')).toContain(
+      '<html dir="ltr" lang="fr-FR">',
+    )
+    for (const file of ['index.html', 'about.html', 'search.html']) {
+      expect(await readFile(join(outDir, file), 'utf8')).toContain(
+        '<html lang="en">',
+      )
+    }
+    expect((await writeSeoFiles({ outDir, robots: false })).langs).toEqual([])
+  })
+
+  it('leaves every page alone with lang: false, and in a server export', async () => {
+    const de = page(canonical(`${SITE}/de/about`) + versions)
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'de/about.html': de,
+    })
+    const result = await writeSeoFiles({ outDir, robots: false, lang: false })
+    expect(result.langs).toEqual([])
+    expect(await readFile(join(outDir, 'de', 'about.html'), 'utf8')).toBe(de)
+
+    await rm(join(outDir, 'de'), { recursive: true })
+    await rm(join(outDir, 'index.html'))
+    await writePages({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'server/index.html': page(canonical(`${SITE}/`)),
+      'server/de/about.html': de,
+      'client/_expo/static/js/web/entry.js': 'console.log(1)',
+    })
+    expect((await writeSeoFiles({ outDir, robots: false })).langs).toEqual([])
+    expect(
+      await readFile(join(outDir, 'server', 'de', 'about.html'), 'utf8'),
+    ).toBe(de)
+  })
+
+  it('prints each page that got its lang, and --no-lang skips the step', async () => {
+    const de = page(canonical(`${SITE}/de/about`) + versions)
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`)),
+      'de/about.html': de,
+    })
+    const lines: string[] = []
+    const output = { log: (line: string) => lines.push(line), error: () => {} }
+    expect(await main([outDir, '--no-lang'], output)).toBe(0)
+    expect(await readFile(join(outDir, 'de', 'about.html'), 'utf8')).toBe(de)
+    expect(lines.join('\n')).not.toContain('own lang')
+
+    expect(await main([outDir], output)).toBe(0)
+    expect(lines.join('\n')).toContain(
+      '1 page gets its own lang on <html>:\n  de/about.html: de',
+    )
+    expect(await readFile(join(outDir, 'de', 'about.html'), 'utf8')).toContain(
+      '<html lang="de">',
+    )
+  })
+})

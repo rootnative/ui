@@ -232,3 +232,38 @@ describe('PageHead', () => {
     error.mockRestore()
   })
 })
+
+describe('PageHead and the page language', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('lang')
+  })
+
+  it('sets lang on <html> while focused, and puts the shell lang back', () => {
+    document.documentElement.setAttribute('lang', 'en')
+    const versions = [
+      { lang: 'en', url: '/movies/1' },
+      { lang: 'de', url: '/de/movies/1' },
+    ]
+    // A new element each time: React skips a subtree whose element is the
+    // same reference, and the focus hook would not run again.
+    const german = () => (
+      <Head.Provider>
+        <SeoProvider site={site}>
+          <PageHead title="Dune" url="/de/movies/1" alternates={versions} />
+        </SeoProvider>
+      </Head.Provider>
+    )
+    const { rerender, unmount } = render(german())
+    expect(document.documentElement.getAttribute('lang')).toBe('de')
+
+    global.__seoRoute = { pathname: '/', focused: false }
+    rerender(german())
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+
+    global.__seoRoute = { pathname: '/', focused: true }
+    rerender(german())
+    expect(document.documentElement.getAttribute('lang')).toBe('de')
+    unmount()
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+  })
+})

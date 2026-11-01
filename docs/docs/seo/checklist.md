@@ -400,15 +400,20 @@ A search engine ignores a set that breaks one of these rules:
   and no `noindex`.
 
 `rootnative-seo dist` writes the same links into the sitemap as
-`xhtml:link` entries. `rootnative-seo audit` fails a set that breaks a rule.
-Every version still has the `lang` of `app/+html.tsx`; see
-[the page language](./limits.md#the-page-language).
+`xhtml:link` entries, and sets `lang` on `<html>` of each version from its
+`hreflang` link to itself, so the German version says `lang="de"`.
+`PageHead` sets the same `lang` after hydration. `rootnative-seo audit`
+fails a set that breaks a rule, and a version whose `lang` is not its
+language. A server export keeps the `lang` of the shell until hydration;
+see [the page language](./limits.md#the-page-language).
 
 ## 4. Robots and sitemap
 
 Run `rootnative-seo` in the deploy step, after the export. It reads the
 canonical link of every exported page and writes `sitemap.xml` and
-`robots.txt` into the export folder.
+`robots.txt` into the export folder. It also sets `lang` on `<html>` of each
+page in another language than the shell; see
+[a page in more than one language](#a-page-in-more-than-one-language).
 
 ```json title="package.json"
 {
@@ -502,9 +507,12 @@ their own. The standard `SideSheet` is `complementary`, an `<aside>`. A bar insi
 a landmark. Pass `role` to change any of them.
 
 Set the page language on `<html>` in `app/+html.tsx`: `<html lang="en">`.
-A crawler reads it, and a screen reader picks its voice from it.
-`rootnative-seo audit` fails a page with no `<main>`, more than one, or no
-`lang`.
+A crawler reads it, and a screen reader picks its voice from it. A page in
+another language gets its own `lang` from `rootnative-seo dist` and from
+`PageHead`; see [a page in more than one
+language](#a-page-in-more-than-one-language). `rootnative-seo audit` fails
+a page with no `<main>`, more than one, no `lang`, or a `lang` that is not
+the language of the page.
 
 For an image a crawler must see, render `Picture` from
 `@rootnative/seo/expo-image`. On the web it is a plain `<img>` with `alt`,
@@ -683,7 +691,8 @@ exported page and fails on:
   link;
 - a page with no `<h1>`, or more than one;
 - a page with no `<main>`, or more than one, and a page with no `lang` on
-  `<html>`;
+  `<html>`, or with a `lang` that is not the language of the page, from its
+  `hreflang` link to itself or its `og:locale` (a static export only);
 - an `<img>` with no `alt` attribute;
 - an `hreflang` link with a code that is not a language, with a relative
   URL, or to a page with `noindex` or with no file; a version that does not

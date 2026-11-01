@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
 import { inPageSlot } from '../headSlots'
+import { pageLang } from '../lang'
+import { useDocumentLang } from '../react/documentLang'
 import { useSite } from '../react/SeoProvider'
 import type { HeadTag, PageMeta, Site } from '../types'
 
@@ -112,6 +114,7 @@ function WebPageHead({ site, active = true, ...meta }: PageHeadProps) {
   const resolved = useSite(site)
   const tags = toHeadTags(resolved, meta)
   const key = JSON.stringify(tags)
+  useDocumentLang(pageLang(resolved, meta), active)
   useEffect(() => {
     if (!active || typeof document === 'undefined') return undefined
     const written = write(document, JSON.parse(key) as HeadTag[])

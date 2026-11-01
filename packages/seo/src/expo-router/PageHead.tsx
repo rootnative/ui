@@ -1,6 +1,8 @@
 import { useIsFocused, usePathname } from 'expo-router'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
+import { pageLang } from '../lang'
+import { useDocumentLang } from '../react/documentLang'
 import { useClaim, useClaims, useSite } from '../react/SeoProvider'
 import type { PageMeta, Site } from '../types'
 import { HeadTags } from './HeadTags'
@@ -35,5 +37,6 @@ function WebPageHead({ site, ...meta }: PageHeadProps) {
   const focused = useIsFocused()
   const pathname = usePathname()
   useClaim(useClaims(), focused ? pathname : null)
+  useDocumentLang(pageLang(resolved, meta), focused)
   return <HeadTags tags={toHeadTags(resolved, meta)} active={focused} />
 }

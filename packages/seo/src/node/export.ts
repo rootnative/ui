@@ -1,5 +1,6 @@
-import { readFile, readdir, stat } from 'node:fs/promises'
+import { readFile, readdir, stat, writeFile } from 'node:fs/promises'
 import { join, sep } from 'node:path'
+import { languageOf, sameLanguage } from '../lang'
 import type { PageAlternate } from '../types'
 import { writeRobots, type RobotsOptions } from './robots'
 import { writeSitemap } from './sitemap'
@@ -24,6 +25,8 @@ export type ExportedPage = {
   noindex: boolean
   /** Each `<link rel="alternate" hreflang>`, in the order of the head, decoded. */
   alternates: PageAlternate[]
+  /** The `content` of `<meta property="og:locale">`, such as `de_DE`. */
+  locale?: string
 }
 
 /** Why a page stays out of the sitemap. */
@@ -49,6 +52,14 @@ export type WriteSeoFilesOptions = {
    * `<siteUrl>/sitemap.xml`.
    */
   robots?: boolean | Partial<RobotsOptions>
+  /**
+   * `false` leaves the `lang` of `<html>` as the shell wrote it. The default
+   * sets it in each page whose own language, from its `hreflang` link to
+   * itself or else its `og:locale`, is not the language on `<html>`. A
+   * server export is not changed: the server renders each page at request
+   * time, and the page sets its `lang` after hydration.
+   */
+  lang?: boolean
 }
 
 export type SeoFilesResult = {
@@ -61,6 +72,8 @@ export type SeoFilesResult = {
   urls: string[]
   /** Every HTML file that stays out of the sitemap, and why. */
   skipped: { file: string; reason: SkipReason }[]
+  /** Each page that got its own `lang` on `<html>`, with the language. */
+  langs: { file: string; lang: string }[]
 }
 
 /**
@@ -73,6 +86,8 @@ const SPECIAL_ROUTE = /(^|\/)[+_]|^404\.html$/
 const ROUTE_TEMPLATE = /\[[^\]]+\]/
 const TAG = /<(link|meta)\b([^>]*)>/gi
 const ATTRIBUTE = /([^\s=/]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/g
+const HTML_TAG = /<html\b([^>]*)>/i
+const LANG_ATTRIBUTE = /\slang\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i
 
 export function decodeEntities(text: string): string {
   return text.replace(
@@ -114,13 +129,14 @@ function tokens(value: string | undefined, separator: RegExp): string[] {
     .filter(Boolean)
 }
 
-/** The canonical link, the robots rule and the `hreflang` links of one page, read from its head. */
+/** The canonical link, the robots rule, the `hreflang` links and the `og:locale` of one page, read from its head. */
 export function readHead(
   html: string,
-): Pick<ExportedPage, 'canonical' | 'noindex' | 'alternates'> {
+): Pick<ExportedPage, 'canonical' | 'noindex' | 'alternates' | 'locale'> {
   const end = html.search(/<\/head>/i)
   const head = end === -1 ? html : html.slice(0, end)
   let canonical: string | undefined
+  let locale: string | undefined
   let noindex = false
   const alternates: PageAlternate[] = []
   for (const match of head.matchAll(TAG)) {
@@ -147,8 +163,45 @@ export function readHead(
       const rules = tokens(attributes.content, /,/)
       if (rules.includes('noindex') || rules.includes('none')) noindex = true
     }
+    if (
+      tag === 'meta' &&
+      locale === undefined &&
+      attributes.property?.toLowerCase() === 'og:locale' &&
+      attributes.content
+    ) {
+      locale = attributes.content
+    }
   }
-  return { canonical, noindex, alternates }
+  return locale === undefined
+    ? { canonical, noindex, alternates }
+    : { canonical, noindex, alternates, locale }
+}
+
+/** The `lang` of `<html>`, trimmed, or `undefined` when the element has none. */
+export function htmlLang(html: string): string | undefined {
+  return attributesOf(html.match(HTML_TAG)?.[1] ?? '').lang?.trim()
+}
+
+/**
+ * The language of an exported page, from the head `readHead` read: the
+ * `hreflang` link to the page itself, else `og:locale`.
+ */
+export function pageLangOf(
+  page: Pick<ExportedPage, 'canonical' | 'alternates' | 'locale'>,
+): string | undefined {
+  return languageOf({
+    url: page.canonical,
+    alternates: page.alternates,
+    locale: page.locale,
+  })
+}
+
+/** `html` with `lang` set on `<html>`. A `lang` that was there is replaced. */
+export function withHtmlLang(html: string, lang: string): string {
+  return html.replace(HTML_TAG, (tag) => {
+    const bare = tag.replace(LANG_ATTRIBUTE, '')
+    return `${bare.slice(0, -1)} lang="${lang}">`
+  })
 }
 
 /** The route a static host serves `file` at: `/` for `index.html`, `/blog` for `blog/index.html`. */
@@ -295,6 +348,13 @@ export function skipReason(
  * listed. A page with `hreflang` links gets the same links as `xhtml:link`
  * entries.
  *
+ * Also sets `lang` on `<html>` in each page of a static export whose own
+ * language, from its `hreflang` link to itself or else its `og:locale`, is
+ * not the language the shell wrote there. Expo Router writes the `<html>`
+ * of `app/+html.tsx` on every page, and from Expo SDK 58 the render changes
+ * no attribute of it, so the German version of an English site says
+ * `lang="en"` until this runs. `lang: false` skips the step.
+ *
  * Throws when no page can go in the sitemap, because an empty sitemap on a
  * live host fails with no other signal.
  */
@@ -308,6 +368,10 @@ export async function writeSeoFiles(
     throw new Error(noPagesMessage('writeSeoFiles', outDir, layout))
   }
   const { filesDir } = layout
+  const langs =
+    options.lang === false || layout.server
+      ? []
+      : await writePageLangs(layout.pagesDir, pages)
 
   const home = pages.find((page) => page.route === '/')?.canonical
   if (!options.siteUrl && !home) {
@@ -357,5 +421,29 @@ export async function writeSeoFiles(
     })
   }
 
-  return { siteUrl, sitemap, robots, urls, skipped }
+  return { siteUrl, sitemap, robots, urls, skipped, langs }
+}
+
+/**
+ * Sets `lang` on `<html>` in each page whose own language is not the one
+ * on the element, and returns those pages. A page with no language of its
+ * own, such as a `noindex` overlay with no `url`, keeps the `lang` of the
+ * shell.
+ */
+async function writePageLangs(
+  pagesDir: string,
+  pages: ExportedPage[],
+): Promise<SeoFilesResult['langs']> {
+  const langs: SeoFilesResult['langs'] = []
+  for (const page of pages) {
+    const lang = pageLangOf(page)
+    if (!lang) continue
+    const path = join(pagesDir, page.file)
+    const html = await readFile(path, 'utf8')
+    const current = htmlLang(html)
+    if (current && sameLanguage(current, lang)) continue
+    await writeFile(path, withHtmlLang(html, lang), 'utf8')
+    langs.push({ file: page.file, lang })
+  }
+  return langs
 }

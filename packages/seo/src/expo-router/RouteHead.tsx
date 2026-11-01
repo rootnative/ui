@@ -2,6 +2,8 @@ import { usePathname } from 'expo-router'
 import { useEffect, useSyncExternalStore } from 'react'
 import { Platform } from 'react-native'
 import { toHeadTags } from '../head'
+import { pageLang } from '../lang'
+import { useDocumentLang } from '../react/documentLang'
 import { useClaims, useSite } from '../react/SeoProvider'
 import type { PageMeta, Site } from '../types'
 import { HeadTags } from './HeadTags'
@@ -44,6 +46,7 @@ function WebRouteHead({ defaults, site }: RouteHeadProps) {
   )
   const meta = claimed ? undefined : defaults(pathname)
   const wrote = meta !== undefined
+  useDocumentLang(meta ? pageLang(resolved, meta) : undefined, wrote)
 
   useEffect(() => {
     if (!wrote || !claims.has(pathname) || warnedOrder) return

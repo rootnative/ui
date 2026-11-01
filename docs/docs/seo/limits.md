@@ -1,7 +1,7 @@
 ---
 sidebar_position: 4
 sidebar_label: Limits
-description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the charset position, the per-route noindex decision, the page language of a translated page, and the checks that count on the live host.
+description: What @rootnative/seo cannot do — the server-rendered image, the host 404, the charset position, the per-route noindex decision, the first paint of a translated page on a server, and the checks that count on the live host.
 ---
 
 # Limits
@@ -86,27 +86,34 @@ crawler reads the `noindex` tag only on a page it may fetch, and a
 
 ## The page language
 
-Expo Router writes the `<html>` element of `app/+html.tsx` on every page.
-So every version of a translated page has the same `lang`, and the German
-version of an English site says `lang="en"`. Google takes the language of a
-version from its `hreflang` links, not from `lang`. A screen reader and some
-other search engines read `lang`, and they read the German text as English.
+Expo Router writes the `<html>` element of `app/+html.tsx` on every page,
+and from Expo SDK 58 the render changes no attribute of it: `Metadata` has
+no field for `lang`, and the renderer applies no `<html>` attribute from a
+page. So every page leaves the export with the `lang` of the shell, and the
+German version of an English site says `lang="en"`. Google takes the
+language of a version from its `hreflang` links, not from `lang`. A screen
+reader and some other search engines read `lang`.
 
-The package does not set `lang` for each page. An app can write it through
-`expo-router/head`:
+The package sets the `lang` of a page in another language in two places:
 
-```tsx
-import Head from 'expo-router/head'
+- `rootnative-seo dist` reads the language of each page from its head, the
+  `hreflang` link to itself or else `og:locale`, and sets `lang` on `<html>`
+  in the file when it names another language than the shell. `--no-lang`
+  leaves the files as they are.
+- `PageHead` and `RouteHead` set `lang` on `<html>` after hydration and
+  after a client navigation, and put the `lang` of the shell back when the
+  page goes. `pageLang(site, meta)` from the core returns the value they
+  use, for a template of your own.
 
-<Head>
-  <html lang="de" />
-</Head>
-```
+A page in the language of the shell keeps the `lang` of the shell: `en`
+stays `en` on a page with `og:locale` `en_US`. `rootnative-seo audit` fails
+a page of a static export whose `lang` is not the language of the page.
 
-The export then holds `<html lang="de" lang="en">`. A browser keeps the
-first of two attributes with the same name, so the page reads as German,
-but the file has a parse error, and `rootnative-seo audit` reads the second
-value.
+Two limits stay. A server export (`web.output: 'server'`) renders each page
+at request time, so no file holds the page: the first paint has the `lang`
+of the shell, and the page sets its own after hydration. And a `<html>`
+element inside `<Head>` from `expo-router/head` does nothing in an SDK 58
+export; do not add one.
 
 ## The checks that count
 

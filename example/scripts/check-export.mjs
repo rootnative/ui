@@ -244,6 +244,17 @@ for (const file of ['i18n.html', 'de/i18n.html']) {
       `${file}: hreflang links are [${found.join(', ')}], expected [${i18nAlternates.join(', ')}]`,
     )
   }
+  // `write-seo.mjs` sets the lang of each version from its hreflang link to
+  // itself. A server export renders each page at request time, so its
+  // rendered pages keep the `en` of the shell; the page sets `de` after
+  // hydration.
+  const expectedLang = isServer || !file.startsWith('de/') ? 'en' : 'de'
+  const lang = html.match(/<html\b[^>]*\slang="([^"]*)"/i)?.[1]
+  if (lang !== expectedLang) {
+    problems.push(
+      `${file}: <html lang> is "${lang}", expected "${expectedLang}"`,
+    )
+  }
 }
 const sitemapFile = resolve(filesDir, 'sitemap.xml')
 if (existsSync(sitemapFile)) {

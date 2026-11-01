@@ -311,3 +311,67 @@ describe('headTagsHtml', () => {
     expect(html).toContain('\\u003c/script>')
   })
 })
+
+describe('PageHead from /dom and the page language', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('lang')
+  })
+
+  it('sets lang on <html> for a page in another language, and puts the shell lang back', () => {
+    document.documentElement.setAttribute('lang', 'en')
+    const { rerender, unmount } = render(
+      <SeoProvider site={site}>
+        <DomPageHead
+          title="Dune"
+          url="/de/movies/1"
+          alternates={dune.alternates}
+        />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('de')
+    rerender(
+      <SeoProvider site={site}>
+        <DomPageHead
+          title="Dune"
+          url="/de/movies/1"
+          alternates={dune.alternates}
+          active={false}
+        />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+    rerender(
+      <SeoProvider site={site}>
+        <DomPageHead
+          title="Dune"
+          url="/de/movies/1"
+          alternates={dune.alternates}
+        />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('de')
+    unmount()
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+  })
+
+  it('keeps the shell lang for a page in the same language, and fills a missing one', () => {
+    document.documentElement.setAttribute('lang', 'en')
+    const { unmount } = render(
+      <SeoProvider site={site}>
+        <DomPageHead title="Dune" url="/movies/1" locale="en_US" />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('en')
+    unmount()
+
+    document.documentElement.removeAttribute('lang')
+    const second = render(
+      <SeoProvider site={site}>
+        <DomPageHead title="Dune" url="/movies/1" locale="en_US" />
+      </SeoProvider>,
+    )
+    expect(document.documentElement.getAttribute('lang')).toBe('en-US')
+    second.unmount()
+    expect(document.documentElement.hasAttribute('lang')).toBe(false)
+  })
+})

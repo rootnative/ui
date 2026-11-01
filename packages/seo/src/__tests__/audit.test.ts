@@ -541,3 +541,50 @@ describe('rootnative-seo audit', () => {
     expect(missing.errors.join('\n')).toContain('not a folder')
   })
 })
+
+describe('auditExport lang', () => {
+  const link = (lang: string, href: string) =>
+    `<link data-rh="true" rel="alternate" hrefLang="${lang}" href="${href}"/>`
+  const locale = (value: string) =>
+    `<meta data-rh="true" property="og:locale" content="${value}"/>`
+  const versions = link('en', `${SITE}/about`) + link('de', `${SITE}/de/about`)
+
+  it('reports a lang that is not the language of the page, before the files are written', async () => {
+    await writePages({
+      'index.html': page(canonical(`${SITE}/`) + locale('en_US')),
+      'about.html': page(canonical(`${SITE}/about`) + versions),
+      'de/about.html': page(canonical(`${SITE}/de/about`) + versions),
+      'at.html': page(
+        canonical(`${SITE}/at`) + locale('de_AT'),
+        undefined,
+        '<html lang="de">',
+      ),
+    })
+    expect(
+      (await auditExport({ outDir, ignore: ['sitemap'] })).problems,
+    ).toEqual([
+      {
+        file: 'de/about.html',
+        rule: 'lang',
+        message: expect.stringMatching(
+          /^lang on <html> is "en", but the page is in "de" .*rootnative-seo <outDir>/,
+        ),
+      },
+    ])
+    await writeSeoFiles({ outDir, robots: false })
+    expect(await auditExport({ outDir })).toEqual({ pages: 4, problems: [] })
+  })
+
+  it('reports no mismatch in a server export, which no file can fix', async () => {
+    await writePages({
+      'server/_expo/routes.json': '{"htmlRoutes":[]}',
+      'server/index.html': page(canonical(`${SITE}/`)),
+      'server/de/about.html': page(
+        canonical(`${SITE}/de/about`) + locale('de_DE'),
+      ),
+      'client/_expo/static/js/web/entry.js': 'console.log(1)',
+    })
+    await writeSeoFiles({ outDir, robots: false })
+    expect(await auditExport({ outDir })).toEqual({ pages: 2, problems: [] })
+  })
+})

@@ -1,4 +1,4 @@
-import { defineSite, resolveUrl, toHeadTags } from '../index'
+import { defineSite, pageLang, resolveUrl, toHeadTags } from '../index'
 import type { HeadTag } from '../index'
 import { movie } from '../schema'
 
@@ -308,5 +308,44 @@ describe('toHeadTags alternates', () => {
       (tag) => tag.tag === 'link',
     )
     expect(canonical).not.toHaveProperty('hreflang')
+  })
+})
+
+describe('pageLang', () => {
+  const versions = [
+    { lang: 'en', url: '/about' },
+    { lang: 'de', url: '/de/about' },
+  ]
+
+  it('takes the hreflang entry that points at the page itself', () => {
+    expect(
+      pageLang(site, { title: 'A', url: '/de/about', alternates: versions }),
+    ).toBe('de')
+    expect(
+      pageLang(site, {
+        title: 'A',
+        url: 'https://example.com/app/about',
+        locale: 'de_DE',
+        alternates: versions,
+      }),
+    ).toBe('en')
+  })
+
+  it('skips x-default and falls back to the locale as a BCP 47 tag', () => {
+    expect(
+      pageLang(site, {
+        title: 'A',
+        url: '/about',
+        alternates: [{ lang: 'x-default', url: '/about' }],
+      }),
+    ).toBe('en-GB')
+    expect(pageLang(site, { title: 'A', locale: ' de_AT ' })).toBe('de-AT')
+  })
+
+  it('reads no alternate without a url, and the site locale as the default', () => {
+    expect(pageLang(site, { title: 'A', alternates: versions })).toBe('en-GB')
+    const bare = defineSite({ name: 'Trek', url: 'https://example.com' })
+    expect(pageLang(bare, { title: 'A', url: '/about' })).toBeUndefined()
+    expect(pageLang(bare, { title: 'A', url: '/de', locale: 'de' })).toBe('de')
   })
 })

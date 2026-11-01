@@ -95,9 +95,9 @@ After the export, write the sitemap and `robots.txt` from the exported pages:
 expo export --platform web && rootnative-seo dist
 ```
 
-A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason.
+A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason. It also sets `lang` on `<html>` of each page whose own language, from its `hreflang` link to itself or else its `og:locale`, is not the language of the shell: Expo Router writes the `<html>` of `app/+html.tsx` on every page, so without this the German version of an English site says `lang="en"`. `PageHead` sets the same `lang` after hydration. `--no-lang` skips the step. A server export renders each page at request time, so it keeps the `lang` of the shell until hydration.
 
-Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>`, an `<img>` with no `alt`, `hreflang` links that the other language versions do not match, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
+Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>` or a `lang` that is not the language of the page, an `<img>` with no `alt`, `hreflang` links that the other language versions do not match, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
 
 ## The rules the head follows
 

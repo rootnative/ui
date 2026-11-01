@@ -16,17 +16,20 @@ const USAGE = `Usage: rootnative-seo <outDir> [options]
 
 Writes sitemap.xml and robots.txt into <outDir> from the exported HTML files.
 A page goes in the sitemap when it has a canonical link under the site URL and
-no noindex. For a server export (web.output: 'server'), pass the same
-<outDir>: the files go to <outDir>/client. On Expo SDK 58 run render first;
-the pages are then read from <outDir>/rendered. An export from SDK 57 or
-earlier keeps its pages in <outDir>/server. audit and browse read the same
-layout.
+no noindex. A page of a static export whose own language (its hreflang link
+to itself, or else its og:locale) is not the language on <html> gets its own
+lang there. For a server export (web.output: 'server'), pass the same
+<outDir>: the files go to <outDir>/client, and no page is changed. On Expo
+SDK 58 run render first; the pages are then read from <outDir>/rendered. An
+export from SDK 57 or earlier keeps its pages in <outDir>/server. audit and
+browse read the same layout.
 
 Options:
   --site-url <url>  The site URL. The default is the canonical link of index.html.
   --sitemap <url>   A sitemap URL for robots.txt. Repeat it to list more.
                     The default is <site-url>/sitemap.xml.
   --no-robots       Do not write robots.txt.
+  --no-lang         Leave the lang of <html> as the shell wrote it.
   -h, --help        Show this help.
 
 render starts expo serve on a server export, requests each route of
@@ -43,9 +46,9 @@ Render options:
 
 audit reads every exported page and fails when a page has no title, no
 canonical link and no noindex, not exactly one <h1> or <main>, no lang on
-<html>, an <img> with no alt, or hreflang links that the other language
-versions do not match, and when sitemap.xml and the pages disagree. It
-writes nothing.
+<html> or a lang that is not the language of the page, an <img> with no alt,
+or hreflang links that the other language versions do not match, and when
+sitemap.xml and the pages disagree. It writes nothing.
 
 Audit options:
   --site-url <url>  The site URL, as above.
@@ -139,6 +142,7 @@ export async function main(
       outDir,
       siteUrl: values['site-url'],
       robots,
+      lang: !values['no-lang'],
     })
     output.log(
       `[rootnative-seo] ${result.sitemap}: ${pages(result.urls.length)} under ${result.siteUrl}`,
@@ -157,6 +161,14 @@ export async function main(
       )
       for (const { file, reason } of result.skipped) {
         output.log(`  ${file}: ${REASONS[reason]}`)
+      }
+    }
+    if (result.langs.length) {
+      output.log(
+        `[rootnative-seo] ${pages(result.langs.length)} ${result.langs.length === 1 ? 'gets its' : 'get their'} own lang on <html>:`,
+      )
+      for (const { file, lang } of result.langs) {
+        output.log(`  ${file}: ${lang}`)
       }
     }
     return 0
@@ -306,6 +318,7 @@ function parse(argv: string[]) {
       'site-url': { type: 'string' },
       sitemap: { type: 'string', multiple: true },
       'no-robots': { type: 'boolean' },
+      'no-lang': { type: 'boolean' },
       ignore: { type: 'string', multiple: true },
       chrome: { type: 'string' },
       'base-path': { type: 'string' },
