@@ -174,7 +174,7 @@ npx rootnative add card chip text-field
 npx rootnative add appbar
 ```
 
-**Automatic dependency resolution** — if a component depends on other components, they are added automatically. For example, `appbar` depends on `button`, `icon-button` and `typography`, so all four are added together.
+**Automatic dependency resolution** — if a component depends on other components, they are added automatically. For example, `appbar` depends on `button`, `icon-button`, `portal`, `tooltip` and `typography`, so all six are added together.
 
 **Options:**
 
@@ -328,7 +328,7 @@ Then `aliases.components` of `@/components/ui` maps to `src/components/ui/` on d
 
 ## Project structure
 
-After running `npx rootnative add appbar`, your project looks like this — `appbar` pulls in three components, so all four are installed:
+After running `npx rootnative add appbar`, your project looks like this — `appbar` pulls in five components, so all six are installed:
 
 ```
 src/
@@ -356,6 +356,28 @@ src/
 │       │   ├── useBooleanProgress.ts
 │       │   ├── usePressMorph.ts
 │       │   └── useStateLayer.ts
+│       ├── portal/                  ← auto-added (appbar dependency)
+│       │   ├── Portal.tsx
+│       │   ├── PortalHost.tsx
+│       │   ├── context.ts
+│       │   ├── layers.ts
+│       │   ├── store.ts
+│       │   ├── types.ts
+│       │   ├── styles.ts
+│       │   ├── index.ts
+│       │   ├── pointerEvents.ts     ← shared file, flattened in
+│       │   └── warnOnce.ts          ← shared file, flattened in
+│       ├── tooltip/                 ← auto-added (appbar dependency)
+│       │   ├── Tooltip.tsx
+│       │   ├── types.ts
+│       │   ├── styles.ts
+│       │   ├── index.ts
+│       │   ├── plainText.ts
+│       │   ├── pointerEvents.ts
+│       │   ├── pressableKeyDown.ts
+│       │   ├── useAnchorPosition.ts
+│       │   ├── useBackHandlerDismiss.ts
+│       │   └── warnOnce.ts
 │       └── typography/              ← auto-added (appbar dependency)
 │           ├── Typography.tsx
 │           ├── types.ts
@@ -412,7 +434,7 @@ what `npx rootnative list` prints, since both read the same registry.
 
 | Component | Dependencies | Description |
 |-----------|-------------|-------------|
-| `appbar` | button, icon-button, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
+| `appbar` | button, icon-button, portal, tooltip, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
 | `avatar` | — | Circular avatar with image, icon, or text initials and 5 sizes (extraSmall to extraLarge) |
 | `badge` | — | Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support |
 | `bottom-app-bar` | fab, icon-button | MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end |

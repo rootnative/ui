@@ -13,15 +13,17 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { resolveLogical, resolveLogicalKey, selectRTL } from '@rootnative/utils'
-import { useCallback, useMemo, useState } from 'react'
-import type { ComponentProps, ReactNode } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import type { LayoutChangeEvent, ViewStyle } from 'react-native'
 import { Platform, View } from 'react-native'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
+import { PortalContext } from '../portal/context'
 import { SafeAreaView } from '../safe-area'
+import { Tooltip } from '../tooltip'
 import { Typography } from '../typography'
 import type { TypographyVariant } from '../typography'
 import { createStyles, getColorSchemeColors } from './styles'
@@ -52,6 +54,17 @@ function getNavigationButton(navigationIcon: AppBarNavigationIcon): {
   }
 
   return { icon: getBackIcon(), accessibilityLabel: 'Go back' }
+}
+
+// A tooltip renders through a portal. Without a `PortalHost` the bar keeps
+// its bare buttons, so an app with no host gets no portal warning from it.
+function withTooltip(
+  button: ReactElement,
+  text: string | false,
+  hasPortalHost: boolean,
+): ReactElement {
+  if (!hasPortalHost || !text) return button
+  return <Tooltip anchor={button}>{text}</Tooltip>
 }
 
 const titleVariantBySize: Record<AppBarSize, TypographyVariant> = {
@@ -135,6 +148,7 @@ export function AppBar({
 }: AppBarProps) {
   const theme = useTheme()
   const topAppBar = theme.topAppBar ?? defaultTopAppBarTokens
+  const hasPortalHost = useContext(PortalContext) !== null
   const schemeColors = useMemo(
     () => getColorSchemeColors(theme, colorScheme),
     [theme, colorScheme],
@@ -322,17 +336,22 @@ export function AppBar({
 
     return (
       <View style={styles.iconFrame}>
-        <IconButton
-          icon={navigationButton.icon}
-          size="small"
-          variant="standard"
-          accessibilityLabel={navigationButton.accessibilityLabel}
-          onPress={onBackPress}
-        />
+        {withTooltip(
+          <IconButton
+            icon={navigationButton.icon}
+            size="small"
+            variant="standard"
+            accessibilityLabel={navigationButton.accessibilityLabel}
+            onPress={onBackPress}
+          />,
+          navigationButton.accessibilityLabel,
+          hasPortalHost,
+        )}
       </View>
     )
   }, [
     canGoBack,
+    hasPortalHost,
     navigationIcon,
     leading,
     onBackPress,
@@ -372,14 +391,18 @@ export function AppBar({
               key={`${String(action.icon)}-${index}`}
               style={styles.iconFrame}
             >
-              <IconButton
-                icon={action.icon}
-                size="small"
-                variant="standard"
-                accessibilityLabel={action.accessibilityLabel}
-                onPress={action.onPress}
-                disabled={action.disabled}
-              />
+              {withTooltip(
+                <IconButton
+                  icon={action.icon}
+                  size="small"
+                  variant="standard"
+                  accessibilityLabel={action.accessibilityLabel}
+                  onPress={action.onPress}
+                  disabled={action.disabled}
+                />,
+                action.tooltip ?? action.accessibilityLabel,
+                hasPortalHost,
+              )}
             </View>
           )
         })}
@@ -387,6 +410,7 @@ export function AppBar({
     )
   }, [
     actions,
+    hasPortalHost,
     resolvedContentColor,
     styles.iconFrame,
     styles.slotContent,

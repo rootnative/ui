@@ -141,6 +141,17 @@ wrapper.
 `}
 />
 
+## Tooltips
+
+Inside a [`PortalHost`](./portal.mdx), each icon action shows a plain
+[Tooltip](./tooltip.mdx) on a hover, a keyboard focus or a long press. The
+tooltip text is the `accessibilityLabel` of the action. Set `tooltip` on the
+action to show a different text, or set `tooltip: false` to show no tooltip.
+The navigation button shows its label, "Go back" or "Close". A text action
+shows no tooltip, because its label is already on the screen.
+
+Without a `PortalHost`, the bar shows no tooltips.
+
 ## Custom Slot Content
 
 `leading` and `trailing` take any content, for example a `Menu` anchor. Each

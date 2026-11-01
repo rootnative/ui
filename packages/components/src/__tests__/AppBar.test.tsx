@@ -449,6 +449,108 @@ describe('AppBar', () => {
     })
   })
 
+  // A long press is the touch trigger of a tooltip. The tooltip text renders in
+  // the portal host, so it is the only node that shows the label as text.
+  describe('tooltips', () => {
+    function renderInHost(ui: React.ReactElement) {
+      return renderWithTheme(<PortalHost>{ui}</PortalHost>)
+    }
+
+    it.each([
+      { navigationIcon: 'back' as const, label: 'Go back' },
+      { navigationIcon: 'close' as const, label: 'Close' },
+    ])(
+      'shows "$label" on a long press of the $navigationIcon button',
+      ({ navigationIcon, label }) => {
+        renderInHost(
+          <AppBar title="Details" canGoBack navigationIcon={navigationIcon} />,
+        )
+        expect(screen.queryByText(label)).toBeNull()
+
+        fireEvent(screen.getByLabelText(label), 'longPress')
+        expect(screen.getByText(label)).toBeTruthy()
+      },
+    )
+
+    it('shows the accessibilityLabel of an icon action by default', () => {
+      renderInHost(
+        <AppBar
+          title="Home"
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      fireEvent(screen.getByLabelText('Search'), 'longPress')
+      expect(screen.getByText('Search')).toBeTruthy()
+    })
+
+    it('shows the tooltip text of an icon action', () => {
+      renderInHost(
+        <AppBar
+          title="Home"
+          actions={[
+            {
+              icon: 'magnify',
+              accessibilityLabel: 'Search',
+              tooltip: 'Search films',
+            },
+          ]}
+        />,
+      )
+      fireEvent(screen.getByLabelText('Search'), 'longPress')
+      expect(screen.getByText('Search films')).toBeTruthy()
+    })
+
+    it('shows no tooltip for tooltip: false', () => {
+      renderInHost(
+        <AppBar
+          title="Home"
+          actions={[
+            { icon: 'magnify', accessibilityLabel: 'Search', tooltip: false },
+          ]}
+        />,
+      )
+      fireEvent(screen.getByLabelText('Search'), 'longPress')
+      expect(screen.queryByText('Search')).toBeNull()
+    })
+
+    // Without a host, a tooltip would warn and render its surface inline in
+    // the bar. So the bar keeps its bare buttons there.
+    it('adds no tooltip without a PortalHost', () => {
+      renderWithTheme(
+        <AppBar
+          title="Details"
+          canGoBack
+          actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        />,
+      )
+      fireEvent(screen.getByLabelText('Go back'), 'longPress')
+      fireEvent(screen.getByLabelText('Search'), 'longPress')
+      expect(screen.queryByText('Go back')).toBeNull()
+      expect(screen.queryByText('Search')).toBeNull()
+    })
+
+    // The action goes through a variable, as an app that builds its actions
+    // does. An object literal in place gets the excess property check, which
+    // rejects `tooltip` with or without the `never` field.
+    it('rejects a tooltip on a text action at the type level', () => {
+      const done = {
+        label: 'Done',
+        accessibilityLabel: 'Done',
+        tooltip: 'Save',
+      }
+      renderInHost(
+        <AppBar
+          title="Edit"
+          actions={[
+            // @ts-expect-error - a text action shows its label, so it takes no tooltip
+            done,
+          ]}
+        />,
+      )
+      expect(screen.getByText('Done')).toBeTruthy()
+    })
+  })
+
   describe('trailing', () => {
     it('renders custom trailing content', () => {
       renderWithTheme(

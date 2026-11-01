@@ -56,6 +56,13 @@ export interface AppBarIconAction extends AppBarActionBase {
    * `mdiResolver`), a pre-rendered element, or a render function.
    */
   icon: IconButtonProps['icon']
+  /**
+   * Text of the plain tooltip that a hover, a keyboard focus or a long press
+   * shows. Pass `false` for no tooltip. The bar adds the tooltip only inside a
+   * `PortalHost`.
+   * @default accessibilityLabel
+   */
+  tooltip?: string | false
   label?: never
 }
 
@@ -64,6 +71,7 @@ export interface AppBarTextAction extends AppBarActionBase {
   /** Text label rendered inside a `Button` with `variant="text"`. */
   label: string
   icon?: never
+  tooltip?: never
 }
 
 /**
@@ -104,7 +112,8 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   colorScheme?: AppBarColorScheme
   /**
    * When `true`, renders the navigation button in the leading slot. Its icon
-   * is set by `navigationIcon`.
+   * is set by `navigationIcon`. Inside a `PortalHost`, the button shows its
+   * label as a plain tooltip.
    * @default false
    */
   canGoBack?: boolean
@@ -201,7 +210,7 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
  *
  * Use `actions` for the MD3 default — a row of icon or text buttons. Use
  * `trailing` when the slot needs something `actions` cannot build, such as a
- * `Menu` anchor or a `Tooltip`.
+ * `Menu` anchor.
  */
 type AppBarTrailingProps =
   | {
@@ -216,10 +225,9 @@ type AppBarTrailingProps =
       actions?: never
       /**
        * Custom trailing content. Use this instead of `actions` when the slot
-       * needs a component `actions` cannot build, such as a `Menu` anchor or a
-       * `Tooltip`. A standard `IconButton` in the slot takes the trailing icon
-       * color (see `colorScheme`); other content reads it with
-       * `useAppBarContentColor()`.
+       * needs a component `actions` cannot build, such as a `Menu` anchor. A
+       * standard `IconButton` in the slot takes the trailing icon color (see
+       * `colorScheme`); other content reads it with `useAppBarContentColor()`.
        */
       trailing: ReactNode
     }

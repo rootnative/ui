@@ -1639,11 +1639,13 @@ import { Grid } from '@rootnative/components/layout'
       const trailingProps =
         '- `actions?: AppBarAction[]` — Array of actions rendered in the ' +
         'trailing slot. Each entry is either an icon action (`{ icon }`) or a ' +
-        'text action (`{ label }`, e.g. "Save"). Mutually exclusive with ' +
-        '`trailing`.\n' +
+        'text action (`{ label }`, e.g. "Save"). Inside a `PortalHost`, an ' +
+        'icon action shows a plain tooltip with its `accessibilityLabel`; ' +
+        '`tooltip: string` replaces the text and `tooltip: false` removes it. ' +
+        'Mutually exclusive with `trailing`.\n' +
         '- `trailing?: ReactNode` — Custom trailing content. Use instead of ' +
         '`actions` when the slot needs something `actions` cannot build, such ' +
-        'as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in the ' +
+        'as a `Menu` anchor. A standard `IconButton` in the ' +
         'slot takes the trailing icon color (see `colorScheme`); other ' +
         'content reads it with `useAppBarContentColor()`. Mutually exclusive ' +
         'with `actions` — the type rejects both together.\n'

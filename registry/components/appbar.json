@@ -9,7 +9,13 @@
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["rtl"],
-  "componentDependencies": ["button", "icon-button", "typography"],
+  "componentDependencies": [
+    "button",
+    "icon-button",
+    "portal",
+    "tooltip",
+    "typography"
+  ],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.32",
     "react-native-safe-area-context": ">=4.0.0",
