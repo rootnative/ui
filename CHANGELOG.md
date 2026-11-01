@@ -9,6 +9,91 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.33 — 2026-11-02
+
+**No breaking change.** One new prop and new tooltips in
+`@rootnative/components`, three web fixes in `Tooltip`, and one new prop
+and page languages in `@rootnative/seo`. The `@rootnative/inertia` floor
+moves to `0.0.25`, so upgrade it in the app with this release. One audit
+check is new: `rootnative-seo audit` reports a page of a static export
+whose `<html lang>` is not the language of the page.
+
+- **The `@rootnative/inertia` floor moves to `0.0.25`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.25 <0.1.0`, the dev,
+  example and template pins are `0.0.25` exact, and the registry's derived
+  floor follows. inertia `0.0.25` fixes a `layoutId` swap in one render:
+  on a slow device, the new element showed at its final place with no
+  animation. This library does not use `layoutId`, so no component
+  changes.
+
+- **`AppBar` shows tooltips on its icon buttons.** Inside a `PortalHost`,
+  the navigation button shows its label, "Go back" or "Close", as a plain
+  tooltip, and each icon action shows its `accessibilityLabel`. A hover, a
+  keyboard focus or a long press shows the tooltip. Set `tooltip` on an
+  icon action to show a different text, or `tooltip: false` to show none.
+  A text action takes no tooltip, because its label is already on the
+  screen; the type rejects `tooltip` there. Without a `PortalHost`, the bar
+  shows no tooltips and gives no warning. `rootnative add appbar` now also
+  adds `portal` and `tooltip`, and `rootnative update appbar` adds them to
+  a project that copied the bar before.
+
+- **`LinearProgress` and `CircularProgress` take `wavy`.** `wavy` draws the
+  active indicator as a travelling wave, the MD3 Expressive form. The
+  inactive track stays flat. The wave is flat below 10% and above 95%, so
+  an indicator that is almost empty or almost full shows a plain bar, and
+  between those points the wave grows in with a spring. A wavy
+  `LinearProgress` is 6dp taller than its `thickness`, because the wave
+  goes 3dp above and below the track. A wavy `CircularProgress` keeps its
+  `size`: the ring radius is 2dp smaller, so the wave stays inside. Both
+  draw the wave with `react-native-svg`. When the OS reduce-motion setting
+  is on, the wave does not move, but the value still changes. The default
+  is `false`, so no existing indicator changes.
+
+- **On web, a slow mouse click on a `Tooltip` anchor presses it.** The
+  tooltip gave its anchor an `onLongPress`, and react-native-web starts
+  the long-press timer for a mouse too. A mouse press held for about half
+  a second showed the tooltip, and the click that followed did not call
+  `onPress`. Now, on web, the tooltip gives the anchor a long press only
+  on a device with no hover, or when the anchor has an `onLongPress` of
+  its own. No change on native.
+
+- **On web, a plain `Tooltip` hides when the pointer leaves the anchor.**
+  react-native-web keeps the hover-out handler of the render in which the
+  hover started, when the tooltip was still closed. So the hover out did
+  nothing, and the tooltip stayed up until `duration` took it down. Now it
+  hides on the hover out.
+
+- **On web, a `Tooltip` does not repeat the name of its anchor.** While a
+  tooltip was open, its anchor got the tooltip as its description
+  (`aria-describedby`). When the tooltip text was the anchor's label, as
+  on an MD3 icon button, a screen reader said the name two times. Now a
+  plain tooltip whose text is the `accessibilityLabel` or the `aria-label`
+  of the anchor adds no description.
+
+- **`Picture` takes `fetchPriority`.** `'high'`, `'low'` or `'auto'`: how
+  soon the browser starts to download the image. Give the hero image, the
+  one image the page is built around, `fetchPriority="high"` and
+  `loading="eager"`. The browser gives an image a low priority until it
+  has laid out the page, and that wait is part of the Largest Contentful
+  Paint. On web, `Picture` writes `fetchpriority`. On native, `expo-image`
+  gets the same value as `priority`, and `'auto'` keeps its default.
+
+- **`@rootnative/seo` sets the language of each page on `<html>`.** Expo
+  Router writes the `<html>` of `app/+html.tsx` on every page, so the
+  German page of an English site said `lang="en"`. The language of a page
+  is its `hreflang` link to itself, else its `locale`, else the `locale`
+  of the site. `PageHead` and `RouteHead` now set it on `<html>` while the
+  page is on, and put the old value back when the page goes. A page in the
+  language of the shell changes nothing: `en-US` on `en` is the same
+  language. In a static export, `rootnative-seo <outDir>` (`writeSeoFiles`)
+  also writes the language into each page file that needs it, and lists
+  those files. `--no-lang` (`lang: false`) skips that step. A server
+  export is not changed: there the page sets its language after
+  hydration. The new `pageLang(site, meta)` returns the language of a
+  page. `rootnative-seo audit` reports a static page whose `<html lang>`
+  is not its own language, so an export that skips
+  `rootnative-seo <outDir>` can now fail an audit that passed before.
+
 ## 0.0.0-alpha.32 — 2026-10-31
 
 **No breaking change.** Two new components, one new prop and two fixes in
