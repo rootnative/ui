@@ -552,6 +552,11 @@ gets the same files and picks one by the view size and the screen scale:
 />
 ```
 
+Give the hero image, the one the page is built around, `loading="eager"` and
+`fetchPriority="high"`. The browser gives an image a low priority until it
+has laid out the page, and that wait is part of the Largest Contentful Paint.
+A backdrop at the top of a detail page is the usual case.
+
 An image that stays on `expo-image`, for its cache or a transition, is not
 in the export; set `og:image` and the JSON-LD `image` for it, and set both
 `alt` and `accessibilityLabel` on it. The web `alt` attribute comes from

@@ -47,6 +47,15 @@ export type PictureProps = {
   sizes?: string
   /** `lazy` defers an image below the fold. Web only. @default 'lazy' */
   loading?: 'lazy' | 'eager'
+  /**
+   * How soon the browser starts the download, next to the other requests
+   * of the page. `high` for the one image the page is built around, the
+   * hero: the browser gives an image a low priority until it has laid out
+   * the page, and that wait is part of the Largest Contentful Paint. The web
+   * writes `fetchpriority`; native gives `expo-image` the same value as
+   * `priority`, with `auto` as its default.
+   */
+  fetchPriority?: 'high' | 'low' | 'auto'
   /** Wins over the site from `SeoProvider`. A relative `source` needs one. */
   site?: Site
   /**
@@ -94,6 +103,13 @@ function resolveSource(source: string, site: Site | undefined): string {
   return resolveUrl(site, source)
 }
 
+/** The `expo-image` `priority` for a `fetchPriority`. `auto` is its default, `normal`. */
+function nativePriority(
+  fetchPriority: PictureProps['fetchPriority'],
+): 'low' | 'high' | undefined {
+  return fetchPriority === 'auto' ? undefined : fetchPriority
+}
+
 /** The `src` of the web `<img>`: a relative source becomes a path under the host. */
 function webSource(source: string, site: Site | undefined): string {
   if (isAbsolute(source)) return source
@@ -139,6 +155,7 @@ export function Picture(props: PictureProps) {
         width={width}
         height={height}
         loading={props.loading ?? 'lazy'}
+        fetchPriority={props.fetchPriority}
         decoding="async"
         style={css}
         data-testid={props.testID}
@@ -159,6 +176,7 @@ export function Picture(props: PictureProps) {
       accessibilityLabel={alt}
       accessible={alt !== ''}
       contentFit={contentFit}
+      priority={nativePriority(props.fetchPriority)}
       style={[{ width, height }, style]}
       testID={props.testID}
     />

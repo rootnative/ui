@@ -56,6 +56,35 @@ describe('Picture on the web', () => {
     expect(image.style.objectFit).toBe('cover')
   })
 
+  it('writes fetchpriority when asked, and leaves it to the browser by default', () => {
+    render(
+      <>
+        <Picture
+          source="https://cdn.example/hero.jpg"
+          alt="Dune backdrop"
+          width={780}
+          height={439}
+          loading="eager"
+          fetchPriority="high"
+          testID="hero"
+        />
+        <Picture
+          source="https://cdn.example/a.png"
+          alt=""
+          width={10}
+          height={10}
+          testID="decor"
+        />
+      </>,
+    )
+    expect(screen.getByTestId('hero').getAttribute('fetchpriority')).toBe(
+      'high',
+    )
+    expect(screen.getByTestId('decor').hasAttribute('fetchpriority')).toBe(
+      false,
+    )
+  })
+
   it('writes srcset and sizes, with each relative file under the host path', () => {
     render(
       <SeoProvider site={site}>

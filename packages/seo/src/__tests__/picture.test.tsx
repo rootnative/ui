@@ -30,6 +30,31 @@ describe('Picture on native', () => {
     expect(image.props.style).toEqual([{ width: 300, height: 450 }, undefined])
   })
 
+  it('gives expo-image the fetchPriority as its priority, and none for auto', () => {
+    render(
+      <>
+        <Picture
+          source="https://cdn.example/hero.jpg"
+          alt="Dune backdrop"
+          width={780}
+          height={439}
+          fetchPriority="high"
+          testID="hero"
+        />
+        <Picture
+          source="https://cdn.example/a.png"
+          alt=""
+          width={10}
+          height={10}
+          fetchPriority="auto"
+          testID="decor"
+        />
+      </>,
+    )
+    expect(screen.getByTestId('hero').props.priority).toBe('high')
+    expect(screen.getByTestId('decor').props.priority).toBeUndefined()
+  })
+
   it('gives expo-image each srcSet file under the site, with its height from the box ratio', () => {
     render(
       <SeoProvider site={site}>
