@@ -10,7 +10,7 @@
   "utils": [],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.32"
+    "@rootnative/core": ">=0.0.0-alpha.33"
   },
   "optionalDependencies": {}
 }
