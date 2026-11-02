@@ -30,7 +30,7 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -234,8 +234,11 @@ export function Carousel<T>({
       // is the later one.
       const lands = indexAtScroll(current.snapOffsets, scroll)
       if (lands !== frontIndex.value) landing.current = lands
+      // In RTL a browser counts the offset down from 0 and clamps a positive
+      // offset to 0. Native is not checked in RTL.
+      const x = Platform.OS === 'web' && isRTLDirection() ? -scroll : scroll
       scrollRef.current?.scrollTo(
-        vertical ? { y: scroll, animated } : { x: scroll, animated },
+        vertical ? { y: scroll, animated } : { x, animated },
       )
       report(clamped)
     },

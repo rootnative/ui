@@ -37,7 +37,12 @@ import {
   transformOrigin,
 } from '@rootnative/utils'
 import { act, screen } from '@testing-library/react'
+import { createRef } from 'react'
+import { Text } from 'react-native'
 import { AppBar } from '../../appbar'
+import { Carousel } from '../../carousel'
+import type { CarouselItemInfo, CarouselRef } from '../../carousel'
+import { buildStrategy } from '../../carousel/strategy'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
@@ -297,5 +302,73 @@ describe('Tabs places the indicator for the document direction', () => {
     document.documentElement.setAttribute('dir', 'rtl')
     // 500 - 16 - 240 + (120 - 40) / 2.
     expect(renderLaidOutTabs().style.transform).toBe('translateX(284px)')
+  })
+})
+
+/**
+ * A browser counts an RTL scroll offset down from 0 and clamps a positive one
+ * to 0. `Carousel.scrollToIndex` passed the positive offset, so under
+ * `dir="rtl"` its Next and Back buttons did not move the carousel.
+ */
+describe('Carousel scrolls to an index for the document direction', () => {
+  const PLACES = ['Cabin', 'Shore', 'Ridge', 'Dunes', 'Falls', 'Harbor']
+  const renderPlace = ({ item }: CarouselItemInfo<string>) => (
+    <Text>{item}</Text>
+  )
+  const { snapOffsets } = buildStrategy({
+    viewport: 380,
+    itemWidth: 186,
+    gap: 8,
+    padding: 16,
+    count: PLACES.length,
+    layout: 'multi-browse',
+  }) ?? { snapOffsets: [] }
+
+  const scroll = jest.fn()
+  beforeEach(() => {
+    scroll.mockClear()
+    Object.defineProperty(HTMLElement.prototype, 'scroll', {
+      configurable: true,
+      value: scroll,
+    })
+  })
+  afterEach(() => {
+    delete (HTMLElement.prototype as Partial<HTMLElement>).scroll
+  })
+
+  function scrollLeftForIndex(index: number) {
+    const ref = createRef<CarouselRef>()
+    renderWeb(
+      <Carousel
+        ref={ref}
+        items={PLACES}
+        renderItem={renderPlace}
+        contentPadding={16}
+        testID="carousel"
+      />,
+    )
+    const handler = (
+      screen.getByTestId('carousel') as Element & {
+        __reactLayoutHandler?: (event: unknown) => void
+      }
+    ).__reactLayoutHandler
+    act(() => {
+      handler?.({
+        nativeEvent: { layout: { x: 0, y: 0, width: 380, height: 205 } },
+      })
+    })
+    scroll.mockClear()
+    act(() => ref.current?.scrollToIndex(index, false))
+    return scroll.mock.lastCall?.[0]?.left
+  }
+
+  it('scrolls to the positive offset in LTR', () => {
+    expect(snapOffsets[3]).toBeGreaterThan(0)
+    expect(scrollLeftForIndex(3)).toBe(snapOffsets[3])
+  })
+
+  it('scrolls to the negative offset under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    expect(scrollLeftForIndex(3)).toBe(-snapOffsets[3])
   })
 })
