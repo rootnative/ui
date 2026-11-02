@@ -1,0 +1,273 @@
+---
+description: Carousels show a scrolling collection of items, with items that change size as they move.
+---
+
+# Carousel
+
+Carousels show a collection of items that the user scrolls through. In the multi-browse and hero
+layouts an item changes size as it moves, so the row always shows large items and small previews
+of the next ones. Follows the
+[Material Design 3 Carousel](https://m3.material.io/components/carousel/overview) specification.
+
+Each item is a container with the extra-large corner (28dp) that clips what `renderItem` draws.
+Items sit 8dp apart. The scroll snaps so one item lands on the first large position.
+
+## Usage
+
+Pass the data as `items` and draw one item in `renderItem`. The node fills the item container.
+
+<SnackExample
+  name="RootNative Carousel — Usage"
+  code={`
+  import { Carousel, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  const PLACES = [
+    { id: 'cabin', title: 'Cabin', color: '#7D5260' },
+    { id: 'shore', title: 'Shore', color: '#006A6A' },
+    { id: 'ridge', title: 'Ridge', color: '#6750A4' },
+    { id: 'dunes', title: 'Dunes', color: '#B3261E' },
+    { id: 'falls', title: 'Falls', color: '#386A20' },
+  ]
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ paddingVertical: 24 }}>
+            <Carousel
+              items={PLACES}
+              keyExtractor={(place) => place.id}
+              contentPadding={16}
+              renderItem={({ item }) => (
+                <View style={{ flex: 1, backgroundColor: item.color, justifyContent: 'flex-end', padding: 16 }}>
+                  <Typography variant="titleMedium" style={{ color: '#FFFFFF' }}>
+                    {item.title}
+                  </Typography>
+                </View>
+              )}
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Variants
+
+| `variant` | What it shows |
+|-----------|---------------|
+| `'multi-browse'` (default) | Large, medium and small items at once. An item changes size as it scrolls. |
+| `'hero'` | One large item and a 56dp preview of the next one. |
+| `'uncontained'` | Items of one width that run past the edge. No size change. |
+| `'full-screen'` | Vertical. One item per screen. Needs a height from `style`. |
+
+In the multi-browse layout, `itemWidth` is the preferred width of a large item. The arrangement
+picks how many large, medium and small items fit the width, then scales the large ones so the
+items fill it. Small items are 40dp to 56dp wide. The last item ends large at the end edge, with
+the item before it small at the start edge.
+
+<SnackExample
+  name="RootNative Carousel — Variants"
+  code={`
+  import { Carousel, Column, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  const COLORS = ['#7D5260', '#006A6A', '#6750A4', '#B3261E', '#386A20', '#625B71']
+
+  const Swatch = ({ item }) => <View style={{ flex: 1, backgroundColor: item }} />
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <Column gap="lg" style={{ paddingVertical: 24 }}>
+            <Typography variant="titleSmall" style={{ paddingHorizontal: 16 }}>Hero</Typography>
+            <Carousel variant="hero" items={COLORS} contentPadding={16} renderItem={Swatch} />
+            <Typography variant="titleSmall" style={{ paddingHorizontal: 16 }}>Uncontained</Typography>
+            <Carousel
+              variant="uncontained"
+              itemWidth={240}
+              itemHeight={140}
+              items={COLORS}
+              contentPadding={16}
+              renderItem={Swatch}
+            />
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Item content
+
+`renderItem` receives the item, its index and `progress`: a shared value that is 0 at the small
+size and 1 at the large size, on the UI thread. Drive a label with it so the text fades out as the
+item shrinks, the way MD3 shows item labels.
+
+The content keeps the large width while the item shrinks. The container masks it from both sides,
+so the center of an image stays visible and nothing is scaled.
+
+<SnackExample
+  name="RootNative Carousel — Labels"
+  code={`
+  import { Carousel, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { Motion, useInterpolatedStyle } from '@rootnative/inertia'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { StyleSheet, View } from 'react-native'
+
+  const PLACES = [
+    { id: 'cabin', title: 'Cabin', color: '#7D5260' },
+    { id: 'shore', title: 'Shore', color: '#006A6A' },
+    { id: 'ridge', title: 'Ridge', color: '#6750A4' },
+    { id: 'dunes', title: 'Dunes', color: '#B3261E' },
+  ]
+
+  function Place({ item, progress }) {
+    const fade = useInterpolatedStyle(progress, { opacity: [0, 1] })
+    return (
+      <View style={{ flex: 1, backgroundColor: item.color, justifyContent: 'flex-end' }}>
+        <Motion.View style={[{ padding: 16 }, fade]}>
+          <Typography variant="titleMedium" style={{ color: '#FFFFFF' }}>
+            {item.title}
+          </Typography>
+        </Motion.View>
+      </View>
+    )
+  }
+
+  export default function App() {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ paddingVertical: 24 }}>
+            <Carousel
+              items={PLACES}
+              keyExtractor={(place) => place.id}
+              contentPadding={16}
+              renderItem={Place}
+            />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Selection
+
+The carousel reports the index of the first large item through `onIndexChange` when it changes.
+A user scroll reports each item that reaches the first large position. Pass `index` to control it:
+a new value scrolls the item into the large position. Pass `defaultIndex` to start on an item
+without controlling it. The `ref` exposes `scrollToIndex`. A new `index` or a `scrollToIndex` call
+reports only the item that it scrolls to, not the items that the scroll passes.
+
+<SnackExample
+  name="RootNative Carousel — Selection"
+  code={`
+  import { Button, Carousel, Column, Row, Typography } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { useState } from 'react'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { View } from 'react-native'
+
+  const COLORS = ['#7D5260', '#006A6A', '#6750A4', '#B3261E', '#386A20']
+
+  export default function App() {
+    const [index, setIndex] = useState(0)
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <Column gap="md" style={{ paddingVertical: 24 }}>
+            <Carousel
+              items={COLORS}
+              index={index}
+              onIndexChange={setIndex}
+              contentPadding={16}
+              renderItem={({ item }) => <View style={{ flex: 1, backgroundColor: item }} />}
+            />
+            <Row gap="sm" align="center" style={{ paddingHorizontal: 16 }}>
+              <Button variant="tonal" onPress={() => setIndex(Math.max(0, index - 1))}>Back</Button>
+              <Button variant="tonal" onPress={() => setIndex(Math.min(COLORS.length - 1, index + 1))}>Next</Button>
+              <Typography variant="bodyMedium">Item {index + 1}</Typography>
+            </Row>
+          </Column>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+## Pressable items
+
+`onItemPress` makes every item a button. The item shows the MD3 hover, focus and press layers,
+a focus ring on the web, and calls back with the item and its index. Give the item a name with
+`itemAccessibilityLabel` when its content has no text.
+
+```tsx
+<Carousel
+  items={PLACES}
+  onItemPress={(place) => router.push(`/places/${place.id}`)}
+  itemAccessibilityLabel={(place) => place.title}
+  renderItem={Place}
+/>
+```
+
+## Overrides
+
+| Prop | Target |
+|------|--------|
+| `containerColor` | The item container, behind the content. The state layers of a pressable item derive from it. |
+| `itemWidth` | Preferred width of a large item. `hero` and `full-screen` ignore it. |
+| `itemHeight` | Height of the carousel. `full-screen` ignores it and takes the height of `style`. |
+| `gap` | Space between items. |
+| `contentPadding` | Space before the first and after the last item. |
+| `style` | The carousel container |
+
+When you pass `testID`, the scroll view carries `<testID>-scroll` and each item container
+`<testID>-item-<index>`.
+
+## Tokens
+
+| Token | Value |
+|-------|-------|
+| Item container | `surfaceContainerHighest`, `shape.cornerExtraLarge` (28dp), clipped |
+| Item gap | 8dp |
+| Large item | `itemWidth` (186dp), scaled to fill the width |
+| Small item | 40dp to 56dp; a third of the large item, clamped |
+| Medium item | The mean of the large and small items, when one fits |
+| Height | `itemHeight` (205dp) |
+| Hero preview | 56dp |
+
+The keyline arrangement follows `androidx.compose.material3.carousel`: `Strategy`, `KeylineList`
+and the end steps that move the small keylines to the start as the scroll reaches the end.
+
+## Accessibility
+
+- A pressable item has `role="button"` and the name from `itemAccessibilityLabel`, or the text of
+  its content.
+- A non-pressable item is a plain container. Name the carousel with `accessibilityLabel` and put
+  the text of each item in its content.
+- The web shows a keyboard focus ring (`secondary`, 3dp) inside a pressable item, driven by the
+  same focus-visible state as the rest of the library.
+- A screen reader scrolls the carousel like any scroll view. Pass `index` from a control outside
+  the carousel when the user needs buttons to move through it.
+
+## Props
+
+<PropTable name="Carousel" />

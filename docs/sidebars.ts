@@ -61,6 +61,7 @@ const sidebars: SidebarsConfig = {
         'components/avatar',
         'components/badge',
         'components/card',
+        'components/carousel',
         'components/divider',
         'components/list',
         'components/loading-indicator',

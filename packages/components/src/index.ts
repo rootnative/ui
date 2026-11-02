@@ -145,6 +145,14 @@ export type {
 export { Tabs } from './tabs'
 export type { TabsProps, TabItem, TabsVariant } from './tabs'
 
+export { Carousel } from './carousel'
+export type {
+  CarouselProps,
+  CarouselItemInfo,
+  CarouselRef,
+  CarouselVariant,
+} from './carousel'
+
 export { NavigationBar } from './navigation-bar'
 export type {
   NavigationBarItem,

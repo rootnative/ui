@@ -280,6 +280,23 @@ function Preview({ label, theme }: { label: string; theme: MaterialTheme }) {
           </Card>
         </View>
       )
+    case 'Carousel':
+      return (
+        <Row gap="xs" align="stretch" style={previewStyles.carouselWrapper}>
+          <Box
+            bg={theme.colors.primaryContainer}
+            style={previewStyles.carouselLarge}
+          />
+          <Box
+            bg={theme.colors.tertiaryContainer}
+            style={previewStyles.carouselMedium}
+          />
+          <Box
+            bg={theme.colors.secondaryContainer}
+            style={previewStyles.carouselSmall}
+          />
+        </Row>
+      )
     case 'List':
       return (
         <Column style={previewStyles.listMini} gap="xs">
@@ -1118,6 +1135,23 @@ const previewStyles = StyleSheet.create({
   cardMini: {
     width: '100%',
     maxWidth: 180,
+  },
+  carouselWrapper: {
+    width: '100%',
+    maxWidth: 180,
+    height: 72,
+  },
+  carouselLarge: {
+    flex: 5,
+    borderRadius: 14,
+  },
+  carouselMedium: {
+    flex: 3,
+    borderRadius: 14,
+  },
+  carouselSmall: {
+    flex: 1,
+    borderRadius: 14,
   },
   listMini: {
     width: '100%',

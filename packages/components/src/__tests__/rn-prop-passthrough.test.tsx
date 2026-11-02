@@ -21,6 +21,7 @@ import { AppBar } from '../appbar'
 import { BottomAppBar } from '../bottom-app-bar'
 import { BottomSheet } from '../bottom-sheet'
 import { ButtonGroup } from '../button-group'
+import { Carousel } from '../carousel'
 import { Dialog } from '../dialog'
 import { Icon } from '../icon'
 import { KeyboardAvoidingWrapper } from '../keyboard-avoiding-wrapper'
@@ -53,6 +54,18 @@ describe('RN prop passthrough reaches the root node', () => {
   it('Tabs', () => {
     renderWithTheme(<Tabs items={ITEMS} testID="tabs" nativeID="probe" />)
     expect(screen.getByTestId('tabs').props.nativeID).toBe('probe')
+  })
+
+  it('Carousel', () => {
+    renderWithTheme(
+      <Carousel
+        items={['a', 'b']}
+        renderItem={() => null}
+        testID="carousel"
+        nativeID="probe"
+      />,
+    )
+    expect(screen.getByTestId('carousel').props.nativeID).toBe('probe')
   })
 
   it('NavigationBar', () => {

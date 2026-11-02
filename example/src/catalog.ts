@@ -237,6 +237,15 @@ export const sections: CatalogSection[] = [
         keywords: 'surface panel tile container elevated outlined',
       },
       {
+        label: 'Carousel',
+        route: '/carousel',
+        description:
+          'Multi-browse, hero, uncontained and full-screen carousels with masked items',
+        add: 'carousel',
+        docs: 'components/carousel',
+        keywords: 'carousel slider gallery swipe pager keyline hero browse',
+      },
+      {
         label: 'List',
         route: '/list',
         description: 'Vertically arranged items with text and icons',

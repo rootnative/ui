@@ -442,6 +442,7 @@ what `npx rootnative list` prints, since both read the same registry.
 | `button` | progress | MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support |
 | `button-group` | — | Standard and connected button groups with single or multi-select toggle behavior; replaces the deprecated MD3 segmented button |
 | `card` | — | Surface container with 3 variants (elevated, filled, outlined) and optional press handler |
+| `carousel` | — | Multi-browse, hero, uncontained and full-screen carousels with MD3 keyline masking and snap |
 | `checkbox` | — | Binary selection control with checked/unchecked states and customizable colors |
 | `chip` | — | Input chip with 4 variants (assist, filter, input, suggestion) and icon/avatar support |
 | `dialog` | icon-button, portal | Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling |

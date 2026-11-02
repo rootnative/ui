@@ -27,6 +27,7 @@ export default defineConfig({
     'src/menu/index.ts',
     'src/tooltip/index.ts',
     'src/tabs/index.ts',
+    'src/carousel/index.ts',
     'src/navigation-bar/index.ts',
     'src/navigation-rail/index.ts',
     'src/navigation-drawer/index.ts',

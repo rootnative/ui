@@ -1,0 +1,25 @@
+{
+  "name": "carousel",
+  "description": "Multi-browse, hero, uncontained and full-screen carousels with MD3 keyline masking, snapping, and pressable items.",
+  "files": [
+    "packages/components/src/carousel/Carousel.tsx",
+    "packages/components/src/carousel/index.ts",
+    "packages/components/src/carousel/strategy.ts",
+    "packages/components/src/carousel/styles.ts",
+    "packages/components/src/carousel/types.ts",
+    "packages/components/src/internal/AnimatedPressable.ts",
+    "packages/components/src/internal/focusOutline.ts",
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/pressableKeyDown.ts",
+    "packages/components/src/internal/useStateLayer.ts"
+  ],
+  "utils": ["color", "rtl"],
+  "componentDependencies": [],
+  "dependencies": {
+    "@rootnative/core": ">=0.0.0-alpha.33",
+    "@rootnative/inertia": ">=0.0.26",
+    "react-native-reanimated": ">=4.7.0 <4.8.0",
+    "react-native-worklets": ">=0.13.0 <0.14.0"
+  },
+  "optionalDependencies": {}
+}

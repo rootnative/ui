@@ -568,6 +568,7 @@ const COMPONENT_ORDER = [
   'menu',
   'tooltip',
   'tabs',
+  'carousel',
   'navigation-bar',
   'navigation-rail',
   'navigation-drawer',
@@ -608,6 +609,7 @@ const COMPONENT_NAMES: Record<string, string> = {
   menu: 'Menu',
   tooltip: 'Tooltip',
   tabs: 'Tabs',
+  carousel: 'Carousel',
   'navigation-bar': 'NavigationBar',
   'navigation-rail': 'NavigationRail',
   'navigation-drawer': 'NavigationDrawer',
@@ -1165,6 +1167,71 @@ import { Tooltip } from '@rootnative/components/tooltip'
 // and Android back still report through onDismiss.
 <Tooltip visible={open} onDismiss={() => setOpen(false)} anchor={anchor}>Saved</Tooltip>
 \`\`\``,
+
+  carousel: `\`\`\`tsx
+import { Carousel } from '@rootnative/components/carousel'
+import { useInterpolatedStyle } from '@rootnative/inertia'
+import { Motion } from '@rootnative/inertia'
+
+const PLACES = [
+  { id: 'a', title: 'Cabin', uri: 'https://example.com/a.jpg' },
+  { id: 'b', title: 'Shore', uri: 'https://example.com/b.jpg' },
+]
+
+// Multi-browse (default): large, medium and small items that change size
+// as they scroll. 205dp tall, items 186dp wide at most, 8dp apart.
+<Carousel
+  items={PLACES}
+  keyExtractor={(place) => place.id}
+  contentPadding={16}
+  renderItem={({ item }) => (
+    <Image source={{ uri: item.uri }} style={{ flex: 1 }} />
+  )}
+/>
+
+// A label that fades out as the item shrinks
+function Place({ item, progress }) {
+  const fade = useInterpolatedStyle(progress, { opacity: [0, 1] })
+  return (
+    <>
+      <Image source={{ uri: item.uri }} style={StyleSheet.absoluteFill} />
+      <Motion.View style={[{ padding: 16 }, fade]}>
+        <Text>{item.title}</Text>
+      </Motion.View>
+    </>
+  )
+}
+
+// Hero: one large item and a 56dp preview of the next one
+<Carousel variant="hero" items={PLACES} renderItem={Place} />
+
+// Uncontained: one width, no size change, items run past the edge
+<Carousel variant="uncontained" itemWidth={240} items={PLACES} renderItem={Place} />
+
+// Full-screen: vertical, one item per screen. Needs a height.
+<Carousel variant="full-screen" style={{ flex: 1 }} items={PLACES} renderItem={Place} />
+
+// Pressable items, a controlled index, and the imperative handle
+const ref = useRef<CarouselRef>(null)
+<Carousel
+  ref={ref}
+  items={PLACES}
+  index={index}
+  onIndexChange={setIndex}
+  onItemPress={(place) => open(place)}
+  itemAccessibilityLabel={(place) => place.title}
+  renderItem={Place}
+/>
+ref.current?.scrollToIndex(1)
+\`\`\`
+
+Items clip to \`shape.cornerExtraLarge\` (28dp) and sit on
+\`surfaceContainerHighest\`. The multi-browse and hero layouts follow the
+Compose keyline strategy: items mask from both sides around their center,
+the last item ends large at the end edge, and the scroll snaps one item to
+the first large position. \`onIndexChange\` fires when the first large item
+changes: a user scroll reports each item on the way, and a new \`index\` or a
+\`scrollToIndex\` call reports only the item that it scrolls to.`,
 
   tabs: `\`\`\`tsx
 import { Tabs } from '@rootnative/components/tabs'

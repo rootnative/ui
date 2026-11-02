@@ -34,6 +34,10 @@
       "description": "Surface container with 3 variants (elevated, filled, outlined), optional press handler, and Media / Content / Actions region slots."
     },
     {
+      "name": "carousel",
+      "description": "Multi-browse, hero, uncontained and full-screen carousels with MD3 keyline masking, snapping, and pressable items."
+    },
+    {
       "name": "checkbox",
       "description": "Binary selection control with checked/unchecked states and customizable colors."
     },
