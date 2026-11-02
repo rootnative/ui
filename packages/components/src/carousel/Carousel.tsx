@@ -48,6 +48,31 @@ import type { CarouselItemInfo, CarouselProps } from './types'
 type CarouselStyles = ReturnType<typeof createCarouselStyles>
 
 /**
+ * react-native-web drops `snapToOffsets`, so on the web the scroll view uses
+ * CSS scroll snap, with one marker node at each snap offset. React Native
+ * types no scroll-snap key, so these styles are cast.
+ */
+const webSnap = {
+  horizontal: { scrollSnapType: 'x mandatory' } as ViewStyle,
+  vertical: { scrollSnapType: 'y mandatory' } as ViewStyle,
+  marker: {
+    position: 'absolute',
+    top: 0,
+    width: 1,
+    height: 1,
+    scrollSnapAlign: 'start',
+  } as ViewStyle,
+  // Native `snapToEnd` makes the end of the content a snap offset too.
+  endMarker: {
+    position: 'absolute',
+    bottom: 0,
+    width: 1,
+    height: 1,
+    scrollSnapAlign: 'end',
+  } as ViewStyle,
+}
+
+/**
  * The scroll geometry of one variant: the size of a slot along the scroll
  * axis, the offset that brings each item to the front, and the keyline
  * strategy of a masked variant.
@@ -290,6 +315,12 @@ export function Carousel<T>({
   )
 
   const direction = isRTLDirection() ? -1 : 1
+  const webSnapStyle =
+    Platform.OS === 'web'
+      ? vertical
+        ? webSnap.vertical
+        : webSnap.horizontal
+      : undefined
 
   return (
     <View {...rest} style={rootStyle} onLayout={handleLayout} testID={testID}>
@@ -303,7 +334,7 @@ export function Carousel<T>({
         decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        style={styles.scroll}
+        style={[styles.scroll, webSnapStyle]}
         contentContainerStyle={styles.content}
         testID={testID === undefined ? undefined : `${testID}-scroll`}
       >
@@ -360,8 +391,39 @@ export function Carousel<T>({
                 />
               )
             })}
+        {Platform.OS === 'web' && geometry !== null ? (
+          <WebSnapMarkers offsets={geometry.snapOffsets} vertical={vertical} />
+        ) : null}
       </Motion.ScrollView>
     </View>
+  )
+}
+
+function WebSnapMarkers({
+  offsets,
+  vertical,
+}: {
+  offsets: number[]
+  vertical: boolean
+}) {
+  // react-native-web writes an inline `start` as `left` whatever the document
+  // direction is, so the markers take the physical side.
+  const startSide = isRTLDirection() ? 'right' : 'left'
+  const endSide = startSide === 'left' ? 'right' : 'left'
+  const at = (offset: number): ViewStyle =>
+    vertical ? { top: offset } : { [startSide]: offset }
+  const end: ViewStyle = { [endSide]: 0 }
+  return (
+    <>
+      {[...new Set(offsets)].map((offset) => (
+        <View
+          key={offset}
+          aria-hidden
+          style={[webSnap.marker, at(offset), pointerEvents.none]}
+        />
+      ))}
+      <View aria-hidden style={[webSnap.endMarker, end, pointerEvents.none]} />
+    </>
   )
 }
 
