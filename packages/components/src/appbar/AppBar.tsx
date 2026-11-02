@@ -368,13 +368,16 @@ export function AppBar({
       return null
     }
 
+    // Key each action by its position. A toggle action changes its icon or
+    // its label, and a key from either one mounted a new button on each
+    // press, so the focus and the tooltip went away.
     return (
       <View style={styles.slotContent}>
         {actions.map((action, index) => {
           if (action.label !== undefined) {
             return (
               <Button
-                key={`${action.label}-${index}`}
+                key={index}
                 variant="text"
                 contentColor={resolvedContentColor}
                 onPress={action.onPress}
@@ -387,10 +390,7 @@ export function AppBar({
           }
 
           return (
-            <View
-              key={`${String(action.icon)}-${index}`}
-              style={styles.iconFrame}
-            >
+            <View key={index} style={styles.iconFrame}>
               {withTooltip(
                 <IconButton
                   icon={action.icon}

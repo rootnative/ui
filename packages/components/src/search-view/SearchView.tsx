@@ -281,8 +281,10 @@ export function SearchView({
           />
         </View>
       ) : null}
+      {/* Key by position: a key from the label mounts a new button when a
+          toggle action changes its label, and the focus goes away. */}
       {actions?.map((action, index) => (
-        <View key={`${action.accessibilityLabel}-${index}`} style={styles.slot}>
+        <View key={index} style={styles.slot}>
           <IconButton
             icon={action.icon}
             size="small"

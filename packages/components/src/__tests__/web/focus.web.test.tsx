@@ -18,6 +18,8 @@
 import type { SharedValue } from '@rootnative/inertia'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { useState } from 'react'
+import type { ReactElement } from 'react'
+import { AppBar } from '../../appbar'
 import { BottomAppBar } from '../../bottom-app-bar'
 import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
@@ -605,5 +607,79 @@ describe('BottomAppBar hide on scroll', () => {
     act(() => screen.getByRole('button', { name: 'Search' }).focus())
     flush()
     expect(screen.getByTestId('bar').style.transform).toBe('translateY(0px)')
+  })
+})
+
+describe('a toggle action keeps the focus when its icon or label changes', () => {
+  type Toggle = (on: boolean) => ReactElement
+  const icon = (on: boolean) => (on ? 'select-off' : 'select-all')
+  const label = (on: boolean) => (on ? 'Select none' : 'Select all')
+  const saveLabel = (on: boolean) => (on ? 'Saving' : 'Save')
+  const iconAction = (on: boolean) => [
+    { icon: icon(on), accessibilityLabel: label(on) },
+  ]
+
+  const cases: [string, Toggle, (on: boolean) => string][] = [
+    [
+      'AppBar icon action',
+      (on) => <AppBar title="Watchlist" actions={iconAction(on)} />,
+      label,
+    ],
+    [
+      'AppBar icon action with a tooltip',
+      (on) => (
+        <PortalHost>
+          <AppBar title="Watchlist" actions={iconAction(on)} />
+        </PortalHost>
+      ),
+      label,
+    ],
+    [
+      'AppBar text action',
+      (on) => (
+        <AppBar
+          title="Edit"
+          actions={[
+            { label: saveLabel(on), accessibilityLabel: saveLabel(on) },
+          ]}
+        />
+      ),
+      saveLabel,
+    ],
+    [
+      'BottomAppBar action',
+      (on) => <BottomAppBar actions={iconAction(on)} />,
+      label,
+    ],
+    [
+      'SearchBar action',
+      (on) => <SearchBar placeholder="Search" actions={iconAction(on)} />,
+      label,
+    ],
+    [
+      'SearchView action',
+      (on) => (
+        <PortalHost>
+          <SearchView
+            visible
+            onDismiss={() => {}}
+            placeholder="Search"
+            actions={iconAction(on)}
+          />
+        </PortalHost>
+      ),
+      label,
+    ],
+  ]
+
+  it.each(cases)('%s', (_name, render, name) => {
+    const { rerender } = renderWeb(render(false))
+    const button = screen.getByRole('button', { name: name(false) })
+    act(() => button.focus())
+
+    rerender(render(true))
+
+    expect(screen.getByRole('button', { name: name(true) })).toBe(button)
+    expect(document.activeElement).toBe(button)
   })
 })

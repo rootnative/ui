@@ -110,8 +110,10 @@ export function BottomAppBar({
       return null
     }
 
+    // Key by position: a key from the icon mounts a new button when a toggle
+    // action changes its icon, and the focus goes away.
     return actions.map((action, index) => (
-      <View key={`${String(action.icon)}-${index}`} style={styles.iconFrame}>
+      <View key={index} style={styles.iconFrame}>
         <IconButton
           icon={action.icon}
           size="small"
