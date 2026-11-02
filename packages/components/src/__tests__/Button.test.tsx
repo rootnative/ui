@@ -182,6 +182,71 @@ describe('Button', () => {
       )
     })
 
+    describe('icon slot box', () => {
+      function slotStyle(testID: string) {
+        let point = screen.getByTestId(testID, {
+          includeHiddenElements: true,
+        }).parent
+        while (point && typeof point.type !== 'string') point = point.parent
+        return StyleSheet.flatten(point?.props.style)
+      }
+
+      const iconSizes: Record<string, number> = {
+        extraSmall: 20,
+        small: 20,
+        medium: 24,
+        large: 32,
+        extraLarge: 40,
+      }
+
+      it.each(Object.entries(iconSizes))(
+        'size %s gives both icon slots a %d box',
+        (size, iconSize) => {
+          renderWithTheme(
+            <Button
+              size={size as ButtonSize}
+              leadingIcon={() => <Text testID="lead">x</Text>}
+              trailingIcon={() => <Text testID="trail">x</Text>}
+            >
+              Sized
+            </Button>,
+          )
+          for (const testID of ['lead', 'trail']) {
+            expect(slotStyle(testID)).toMatchObject({
+              width: iconSize,
+              height: iconSize,
+            })
+          }
+        },
+      )
+
+      it('follows an explicit iconSize', () => {
+        renderWithTheme(
+          <Button
+            iconSize={14}
+            leadingIcon={() => <Text testID="lead">x</Text>}
+          >
+            Small icon
+          </Button>,
+        )
+        expect(slotStyle('lead')).toMatchObject({ width: 14, height: 14 })
+      })
+
+      it('gives the loading spinner the same box', () => {
+        renderWithTheme(
+          <Button loading size="medium">
+            Save
+          </Button>,
+        )
+        let point = screen.UNSAFE_getByType(CircularProgress).parent
+        while (point && typeof point.type !== 'string') point = point.parent
+        expect(StyleSheet.flatten(point?.props.style)).toMatchObject({
+          width: 24,
+          height: 24,
+        })
+      })
+    })
+
     it('uses the size-specific label typography role', () => {
       renderWithTheme(<Button size="extraLarge">Huge</Button>)
       const flatStyle = StyleSheet.flatten(screen.getByText('Huge').props.style)

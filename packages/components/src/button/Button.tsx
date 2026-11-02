@@ -210,6 +210,7 @@ export function Button({
   } = useMemo(() => splitLayoutStyle(style), [style])
 
   const iconRenderProps = { size: resolvedIconSize, color: resolvedIconColor }
+  const iconBoxStyle = { width: resolvedIconSize, height: resolvedIconSize }
 
   return (
     <View style={[styles.wrapper, layoutStyle]}>
@@ -264,7 +265,7 @@ export function Button({
           ]}
         >
           {isLoading ? (
-            <View aria-hidden style={styles.leadingIcon}>
+            <View aria-hidden style={[styles.leadingIcon, iconBoxStyle]}>
               <CircularProgress
                 size={resolvedIconSize}
                 thickness={resolvedIconSize * BUTTON_LOADING_STROKE_RATIO}
@@ -273,13 +274,13 @@ export function Button({
               />
             </View>
           ) : leadingIcon ? (
-            <View aria-hidden style={styles.leadingIcon}>
+            <View aria-hidden style={[styles.leadingIcon, iconBoxStyle]}>
               {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
             </View>
           ) : null}
           <Text style={computedLabelStyle}>{children}</Text>
           {trailingIcon ? (
-            <View aria-hidden style={styles.trailingIcon}>
+            <View aria-hidden style={[styles.trailingIcon, iconBoxStyle]}>
               {renderIcon(trailingIcon, iconRenderProps, iconResolver)}
             </View>
           ) : null}

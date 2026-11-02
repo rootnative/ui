@@ -364,10 +364,17 @@ export function createStyles(
       letterSpacing: labelStyle.letterSpacing,
       color: colors.textColor,
     },
+    // Button.tsx gives each icon slot a box of the icon size. On the web, a
+    // glyph from an icon font can be 1 px taller than its font size
+    // (`line-height: normal`, 21 px at 20 px), and the button grew with it.
     leadingIcon: {
+      alignItems: 'center',
+      justifyContent: 'center',
       marginEnd: theme.spacing.sm,
     },
     trailingIcon: {
+      alignItems: 'center',
+      justifyContent: 'center',
       marginStart: theme.spacing.sm,
     },
     disabledLabel: {
