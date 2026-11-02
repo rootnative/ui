@@ -14,6 +14,7 @@ import type { ReactElement } from 'react'
 import type {
   GestureResponderEvent,
   NativeSyntheticEvent,
+  PointerEvent,
   TargetedEvent,
 } from 'react-native'
 import { Platform, Pressable, Text, View } from 'react-native'
@@ -129,26 +130,46 @@ export function Tooltip({
   // Read through a ref so an inline `onDismiss` (a new function every render)
   // cannot restart the timeout on each render and keep the tooltip up forever.
   const dismissRef = useRef(dismiss)
-  const openRef = useRef(open)
   useEffect(() => {
     dismissRef.current = dismiss
-    openRef.current = open
   })
 
   // Anchor-driven hiding (hover out, anchor press) only reports a dismissal
   // that actually happened — a pointer sweeping across a control that never
-  // showed a tooltip must not fire `onDismiss`. It reads the open state
-  // through a ref because react-native-web keeps the hover-out listener of the
-  // render in which the hover started, when the tooltip was still closed.
+  // showed a tooltip must not fire `onDismiss`.
   const hide = useCallback(() => {
-    if (openRef.current) dismissRef.current()
-  }, [])
+    if (open) dismiss()
+  }, [open, dismiss])
 
   // A rich tooltip is persistent: it has actions, and a mouse has to leave the
   // anchor to reach them. Only the outside press, an action, Escape, or the
   // Android back button take it down. A plain tooltip hides on hover out and
   // on blur.
   const hideOnHoverOut = isRich ? undefined : hide
+
+  // react-native-web ends the hover of a Pressable when the pointer enters a
+  // Pressable inside it. When the pointer leaves the inner one, it starts the
+  // outer hover again, also when the pointer leaves both. A Menu that opens
+  // over the anchor moves the pointer off both, and that hover start would
+  // open again the tooltip that the press closed, with no position. The DOM
+  // `pointerenter` and `pointerleave` count the anchor as part of the wrapper.
+  // https://github.com/necolas/react-native-web/issues/2947
+  const hoverHandlers = useMemo(() => {
+    if (isControlled) return {}
+    if (Platform.OS !== 'web') {
+      return { onHoverIn: show, onHoverOut: hideOnHoverOut }
+    }
+    // A touch fires these events too. A tap is not a hover, and the leave
+    // after a long press would close the tooltip that the long press opened.
+    return {
+      onPointerEnter: (event: PointerEvent) => {
+        if (event.nativeEvent.pointerType !== 'touch') show()
+      },
+      onPointerLeave: (event: PointerEvent) => {
+        if (event.nativeEvent.pointerType !== 'touch') hideOnHoverOut?.()
+      },
+    }
+  }, [isControlled, show, hideOnHoverOut])
 
   // Escape on the anchor, with the key stopped so an enclosing Dialog does
   // not close on the same press.
@@ -303,8 +324,7 @@ export function Tooltip({
         accessible={false}
         importantForAccessibility="no"
         tabIndex={-1}
-        onHoverIn={isControlled ? undefined : show}
-        onHoverOut={isControlled ? undefined : hideOnHoverOut}
+        {...hoverHandlers}
         // A key press on the anchor bubbles up to the wrapper, unlike focus.
         onKeyDown={handleKeyDown}
         onLongPress={longPressOpens ? show : undefined}

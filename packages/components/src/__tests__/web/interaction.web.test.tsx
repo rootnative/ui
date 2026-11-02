@@ -24,7 +24,8 @@
  */
 import { lightTheme } from '@rootnative/core'
 import { alphaColor, isFocusVisible } from '@rootnative/utils'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, createEvent, fireEvent, screen } from '@testing-library/react'
+import { useState } from 'react'
 import { AppBar } from '../../appbar'
 import { Button } from '../../button'
 import { Card } from '../../card'
@@ -33,12 +34,14 @@ import { Chip } from '../../chip'
 import { FAB } from '../../fab'
 import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
+import { Menu } from '../../menu'
 import { PortalHost } from '../../portal/PortalHost'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
 import { Slider } from '../../slider'
 import { Switch } from '../../switch'
 import { Tooltip } from '../../tooltip'
+import { PLAIN_TOOLTIP_DURATION } from '../../tooltip/styles'
 import { renderWeb, renderWebSettled } from './render-web'
 
 /**
@@ -546,10 +549,11 @@ describe('SearchBar state layer', () => {
 })
 
 /**
- * Two react-native-web behaviors that no native test can see. RNW adds the
- * hover-out listener when a hover starts and keeps it until the hover ends, so
- * the listener holds the handlers of that one render. RNW also starts the
- * long-press timer for a mouse, and a click after the timer skips `onPress`.
+ * Two react-native-web behaviors that no native test can see. RNW ends the
+ * hover of a Pressable when the pointer enters a Pressable inside it, and
+ * starts it again when the pointer leaves that one, also when the pointer
+ * leaves both. RNW also starts the long-press timer for a mouse, and a click
+ * after the timer skips `onPress`.
  */
 describe('Tooltip on web', () => {
   const NO_HOVER = '(any-hover: none)'
@@ -583,17 +587,126 @@ describe('Tooltip on web', () => {
     })
   }
 
+  function click(target: HTMLElement) {
+    fireEvent.mouseDown(target, { button: 0 })
+    fireEvent.mouseUp(target, { button: 0 })
+    fireEvent.click(target, { button: 0 })
+  }
+
+  function wrapperOf(anchor: HTMLElement) {
+    return anchor.closest('[tabindex="-1"]') as HTMLElement
+  }
+
+  // A browser sends all the events of one pointer move before React renders,
+  // so each move is one `act`. jsdom has no `PointerEvent`, so RNW listens to
+  // the mouse events here, and React reads the pointer events.
+  function movePointerOnto(anchor: HTMLElement) {
+    act(() => {
+      fireEvent.pointerOver(anchor)
+      fireEvent.mouseEnter(wrapperOf(anchor))
+      fireEvent.mouseEnter(anchor)
+    })
+  }
+
+  function movePointerOff(anchor: HTMLElement) {
+    act(() => {
+      fireEvent.pointerOut(anchor)
+      fireEvent.mouseLeave(anchor)
+      fireEvent.mouseLeave(wrapperOf(anchor))
+    })
+  }
+
+  function touchPointer(type: 'pointerOver' | 'pointerOut', node: HTMLElement) {
+    const event = createEvent[type](node)
+    Object.defineProperty(event, 'pointerType', { value: 'touch' })
+    fireEvent(node, event)
+  }
+
+  function OptionsMenu({ onDismiss }: { onDismiss: () => void }) {
+    const [open, setOpen] = useState(false)
+    return (
+      <Menu
+        visible={open}
+        onDismiss={() => setOpen(false)}
+        anchor={
+          <Tooltip
+            onDismiss={onDismiss}
+            anchor={
+              <IconButton
+                icon="dots-vertical"
+                accessibilityLabel="More options"
+                onPress={() => setOpen(true)}
+              />
+            }
+          >
+            Sort and filter
+          </Tooltip>
+        }
+      >
+        <Menu.Item label="Newest first" />
+      </Menu>
+    )
+  }
+
   it('hides a plain tooltip on hover out, before its duration', () => {
     const onDismiss = jest.fn()
     const button = renderTooltip({ onDismiss })
-    const wrapper = button.closest('[tabindex="-1"]') as HTMLElement
 
-    fireEvent.mouseEnter(wrapper)
+    movePointerOnto(button)
     expect(screen.getByRole('tooltip')).toBeTruthy()
 
-    fireEvent.mouseLeave(wrapper)
+    movePointerOff(button)
     expect(onDismiss).toHaveBeenCalledTimes(1)
     expect(button.getAttribute('aria-describedby')).toBeNull()
+  })
+
+  it('stays closed when its anchor opens a Menu that covers the anchor', () => {
+    const onDismiss = jest.fn()
+    renderWeb(
+      <PortalHost>
+        <OptionsMenu onDismiss={onDismiss} />
+      </PortalHost>,
+    )
+    const button = screen.getByRole('button', { name: 'More options' })
+
+    movePointerOnto(button)
+    expect(button.getAttribute('aria-describedby')).not.toBeNull()
+
+    click(button)
+    expect(screen.getByRole('menu')).toBeTruthy()
+    expect(button.getAttribute('aria-describedby')).toBeNull()
+
+    // The menu's dismiss region is now under the pointer.
+    movePointerOff(button)
+    expect(button.getAttribute('aria-describedby')).toBeNull()
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('stays closed when the pointer leaves after its duration hid it', () => {
+    jest.useFakeTimers()
+    const button = renderTooltip({})
+
+    movePointerOnto(button)
+    act(() => {
+      jest.advanceTimersByTime(PLAIN_TOOLTIP_DURATION)
+    })
+    expect(button.getAttribute('aria-describedby')).toBeNull()
+
+    movePointerOff(button)
+    expect(button.getAttribute('aria-describedby')).toBeNull()
+  })
+
+  it('takes no hover from a touch pointer', () => {
+    ;(window.matchMedia(NO_HOVER) as { matches: boolean }).matches = true
+    jest.useFakeTimers()
+    const button = renderTooltip({})
+
+    touchPointer('pointerOver', button)
+    expect(screen.queryByRole('tooltip')).toBeNull()
+
+    holdMouse(button)
+    touchPointer('pointerOut', button)
+    expect(button.getAttribute('aria-describedby')).not.toBeNull()
   })
 
   it('presses the anchor after a mouse press held past the long-press delay', () => {
