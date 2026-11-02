@@ -47,13 +47,165 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ci.yml and compat.yml already run on each push to main. When they passed
+  # on the commit that this run releases, the release reuses the results:
+  # running them again took about six of the eight minutes of a release. A
+  # failed run stops the release. A missing run, or a matrix result older
+  # than a day, makes the release do that work itself in the `gates`, `pack`
+  # and `compat` jobs. Keep the `verify` step "Find the CI and matrix results"
+  # the same in release.yml.
+  verify:
+    name: Checks on this commit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      actions: read
+    outputs:
+      ci: ${{ steps.checks.outputs.ci }}
+      compat: ${{ steps.checks.outputs.compat }}
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ inputs.custom_version }}" ] && [ "${{ inputs.version }}" = "skip" ]; then
+            echo "::error::Either set a custom_version or select a version bump type."
+            exit 1
+          fi
+
+      - name: Find the CI and matrix results
+        id: checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # "<status> <conclusion> <updated_at>" of the newest push run of a
+          # workflow on this commit, or nothing.
+          latest_run() {
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$1/runs?head_sha=$GITHUB_SHA&event=push&per_page=1" \
+              --jq '.workflow_runs[0] // empty | "\(.status) \(.conclusion) \(.updated_at)"'
+          }
+
+          # Writes <key>=success or <key>=missing, or fails the job. It waits
+          # for a run that has not finished, for up to 40 minutes.
+          result_of() {
+            local workflow=$1 key=$2 max_age_hours=$3
+            for _ in $(seq 80); do
+              read -r status conclusion updated_at <<< "$(latest_run "$workflow")"
+              if [ -z "$status" ]; then
+                echo "$workflow has no push run on this commit. The release runs it."
+                echo "$key=missing" >> "$GITHUB_OUTPUT"
+                return 0
+              fi
+              if [ "$status" != completed ]; then
+                echo "$workflow is $status. Waiting."
+                sleep 30
+                continue
+              fi
+              case "$conclusion" in
+                success)
+                  age=$(( ($(date +%s) - $(date -d "$updated_at" +%s)) / 3600 ))
+                  if [ -n "$max_age_hours" ] && [ "$age" -ge "$max_age_hours" ]; then
+                    echo "$workflow passed $age hours ago. The release runs it again."
+                    echo "$key=missing" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "$workflow passed on this commit. The release reuses the result."
+                    echo "$key=success" >> "$GITHUB_OUTPUT"
+                  fi
+                  return 0
+                  ;;
+                skipped)
+                  echo "$workflow skipped every job on this commit. The release runs it."
+                  echo "$key=missing" >> "$GITHUB_OUTPUT"
+                  return 0
+                  ;;
+                *)
+                  echo "::error::$workflow ended with '$conclusion' on this commit. Fix it or re-run it, then release."
+                  return 1
+                  ;;
+              esac
+            done
+            echo "::error::$workflow did not finish in 40 minutes."
+            return 1
+          }
+
+          result_of ci.yml ci ''
+          # The matrix also reads sdk-compat main and the registry when it
+          # runs, so an old result can miss a new fixture or a new peer release.
+          result_of compat.yml compat 24
+
+  # This workflow publishes a hand-picked subset of packages, which makes it
+  # the *more* dangerous path, not the safer one — so it runs the same gates
+  # as ci.yml and release.yml rather than fewer. It previously ran none of
+  # them, not even lint or test, so a one-package hotfix could publish code
+  # that no check had ever seen. This job runs them when ci.yml has no
+  # result on this commit to reuse.
+  gates:
+    name: Gates
+    needs: verify
+    if: needs.verify.outputs.ci != 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Test
+        run: pnpm run test
+
+      - name: Docs check
+        run: pnpm run docs:check
+
+      # The release job regenerates the registry without a report. This check
+      # stops the release first, the same as in release.yml. Needs no build.
+      - name: Registry drift check
+        run: pnpm run registry:check
+
+      - name: Inertia pin check
+        run: pnpm run check:inertia-pins
+
+      # The templates are not workspace members, so no install, typecheck or
+      # test run ever reads their pins. They sat a whole Expo SDK behind the
+      # library and every gate stayed green. Needs no build.
+      - name: Template pin check
+        run: pnpm run check:template-pins
+
+      # The mark and the docs accent tokens hold the same hex values in two
+      # files; the palette comment declares the CSS as the follower and nothing
+      # checked it, so both themes had drifted by one rung of the ramp while the
+      # token was unreferenced. Needs no build.
+      - name: Brand accent check
+        run: pnpm run check:brand-accent
+
   # The compat matrix gates the publish. compat.yml runs on push and pull
   # request only, so without this job a release can ship from a commit whose
-  # matrix was red, or never ran. The candidate is the tree as dispatched,
-  # before the version bump; the bump changes the version field and the
+  # matrix was red, or never ran. It runs when compat.yml has no recent result
+  # on this commit to reuse. The candidate is the tree as dispatched, before
+  # the version bump; the bump changes the version field and the
   # `@rootnative/core` floor, nothing the fixtures install differently.
   pack:
     name: Pack candidate
+    needs: verify
+    if: needs.verify.outputs.compat != 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -112,7 +264,14 @@ jobs:
 
   release:
     name: Release (Manual)
-    needs: compat
+    needs: [verify, gates, pack, compat]
+    # `gates`, `pack` and `compat` are skipped when the release reuses their
+    # results. always() lets this job start after a skipped job, and the rest
+    # of the condition still stops it after a failed or cancelled one.
+    if: >-
+      always() && needs.verify.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -123,24 +282,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      # pnpm before Node.js: the pnpm cache of setup-node needs pnpm on PATH.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Validate inputs
-        run: |
-          if [ -z "${{ inputs.custom_version }}" ] && [ "${{ inputs.version }}" = "skip" ]; then
-            echo "::error::Either set a custom_version or select a version bump type."
-            exit 1
-          fi
 
       - name: Validate packages exist and are public
         id: packages
@@ -165,52 +319,13 @@ jobs:
           echo "packages=$VALIDATED" >> "$GITHUB_OUTPUT"
           echo "Validated packages: $VALIDATED"
 
-      # This workflow publishes a hand-picked subset of packages, which makes it
-      # the *more* dangerous path, not the safer one — so it runs the same gates
-      # as ci.yml and release.yml rather than fewer. It previously ran none of
-      # them, not even lint or test, so a one-package hotfix could publish code
-      # that no check had ever seen.
-      - name: Format check
-        run: pnpm run format:check
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Test
-        run: pnpm run test
-
-      - name: Docs check
-        run: pnpm run docs:check
-
-      # The regenerate step below repairs drift without a report. This check
-      # stops the release first, the same as in release.yml. Needs no build.
-      - name: Registry drift check
-        run: pnpm run registry:check
-
-      - name: Inertia pin check
-        run: pnpm run check:inertia-pins
-
-      # The templates are not workspace members, so no install, typecheck or
-      # test run ever reads their pins. They sat a whole Expo SDK behind the
-      # library and every gate stayed green. Needs no build.
-      - name: Template pin check
-        run: pnpm run check:template-pins
-
-      # The mark and the docs accent tokens hold the same hex values in two
-      # files; the palette comment declares the CSS as the follower and nothing
-      # checked it, so both themes had drifted by one rung of the ramp while the
-      # token was unreferenced. Needs no build.
-      - name: Brand accent check
-        run: pnpm run check:brand-accent
-
       - name: Build
         run: pnpm run build
 
-      # Read the built output — see the note in release.yml for why these five
-      # cannot be skipped on a publishing path. Keep in sync with ci.yml.
+      # Read the built output — see the note in release.yml for why these
+      # checks cannot be skipped on a publishing path. They run on this build
+      # every time, also when the release reuses the CI result. Keep in sync
+      # with ci.yml.
       - name: API surface
         run: npx tsx scripts/build-api-surface.ts --check
 
@@ -266,9 +381,6 @@ jobs:
             done
           fi
 
-          # Update lockfile after version bumps
-          pnpm install --no-frozen-lockfile
-
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Regenerate LLM docs with new versions
@@ -286,7 +398,6 @@ jobs:
           PKGS_LABEL=$(echo "${{ inputs.packages }}" | tr ',' '+')
           TAG="${PKGS_LABEL}@${{ steps.version.outputs.version }}"
 
-          git add pnpm-lock.yaml
           git add packages/*/llms.txt docs/static/llms-full.txt
           git add registry
           for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
