@@ -9,6 +9,68 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.34 — 2026-11-03
+
+**No breaking change.** One new component, `Carousel`, in
+`@rootnative/components`, and fixes in `Button`, `Tooltip`, and the action
+rows of `AppBar`, `BottomAppBar`, `SearchBar` and `SearchView`. The
+`@rootnative/inertia` floor moves to `0.0.26`, so upgrade it in the app
+with this release.
+
+- **The `@rootnative/inertia` floor moves to `0.0.26`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.26 <0.1.0`, the dev,
+  example and template pins are `0.0.26` exact, and the registry's derived
+  floor follows. `Carousel` uses `useValueChange`, which is new in inertia
+  `0.0.26`. inertia `0.0.26` also measures `useInView` again after a
+  resize, stops a Reanimated strict-mode warning from `useHideOnScroll`,
+  and makes a `layoutId` FLIP read the `easing` and the `delay` of its
+  transition.
+
+- **New: `Carousel`.** The MD3 carousel, in four variants:
+  `'multi-browse'` (the default: large, medium and small items that change
+  size as they scroll), `'hero'` (one large item and a 56dp preview of the
+  next one), `'uncontained'` (items of one width that run past the edge)
+  and `'full-screen'` (vertical, one item per screen). Pass `items` and
+  `renderItem`. Each item is a container with the extra-large corner, and
+  it clips what `renderItem` draws. The scroll snaps so that one item
+  lands on the first large position. On web, the carousel does this with
+  CSS scroll snap, because react-native-web does not apply
+  `snapToOffsets`. `index`, `defaultIndex` and `onIndexChange` follow the
+  first large item, and `scrollToIndex` on the ref scrolls to an item.
+  `onItemPress` makes each item a button with the MD3 state layers and a
+  focus ring. Give `itemAccessibilityLabel` with it when the item has no
+  text. `renderItem` also gets `progress`, a shared value that is 0 at the
+  small size and 1 at the large size, so a label can fade out as its item
+  shrinks. Import it from `@rootnative/components/carousel`, or copy it
+  with `rootnative add carousel`.
+
+- **A `Button` with an icon is as tall as its size token on web.** The
+  icon slot had no size, and the glyph of an icon font is 1px taller than
+  its font size at 20px (`line-height: normal`). So an `extraSmall` or a
+  `small` button with an icon was 33 or 41 high, not 32 or 40. Now each
+  icon slot of `Button`, and the slot of the loading spinner, is a box of
+  the icon size with the icon in its center, as in `Icon`. The box is on
+  every platform: an icon node that is larger than `iconSize` now goes
+  past the box and does not make the button taller. Set `iconSize` to the
+  size of such an icon.
+
+- **A toggle action keeps its button when its icon or its label
+  changes.** `AppBar`, `BottomAppBar`, `SearchBar` and `SearchView` keyed
+  each action by its icon or its label. So an action that changed from
+  "Select all" to "Select none" on a press got a new button: on web the
+  keyboard focus went to the page, and an open tooltip closed. Now each
+  action is keyed by its position in the list.
+
+- **On web, a closing `Tooltip` stays at its anchor when the anchor opens
+  a `Menu`.** When a click on a tooltip anchor opened a `Menu`, the
+  closing tooltip moved to the top-left corner of the page and faded out
+  there, for about 300ms. react-native-web sent a second hover-in when the
+  menu covered the anchor, so the tooltip opened again with no position.
+  Now, on web, the tooltip follows the DOM `pointerenter` and
+  `pointerleave` of its anchor. The same change keeps a tooltip closed
+  when the pointer leaves the anchor after `duration` hid it. No change on
+  native.
+
 ## 0.0.0-alpha.33 — 2026-11-02
 
 **No breaking change.** One new prop and new tooltips in
