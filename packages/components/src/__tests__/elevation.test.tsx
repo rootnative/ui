@@ -287,6 +287,19 @@ const STATIC_CASES = [
     rest: lightTheme.elevation.level2,
   },
   {
+    name: 'NavigationBar — floating',
+    ui: (
+      <NavigationBar
+        variant="floating"
+        items={[
+          { value: 'home', label: 'Home', icon: 'home-outline' },
+          { value: 'search', label: 'Search', icon: 'magnify' },
+        ]}
+      />
+    ),
+    rest: lightTheme.elevation.level3,
+  },
+  {
     // The FAB inside is flat, so the bar is the one shadow node.
     name: 'BottomAppBar',
     ui: (

@@ -3,4 +3,5 @@ export type {
   NavigationBarItem,
   NavigationBarLabelVisibility,
   NavigationBarProps,
+  NavigationBarVariant,
 } from './types'

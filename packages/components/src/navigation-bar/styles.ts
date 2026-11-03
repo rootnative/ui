@@ -44,8 +44,43 @@ export const NAV_RAIL_ITEM_HEIGHT = 56
 export const NAV_RAIL_ITEM_VERTICAL_PADDING = 4
 export const NAV_RAIL_NO_LABEL_INDICATOR_SIZE = 56
 
-/** Where a `NavigationItem` sits: the horizontal bar or the vertical rail. */
-export type NavigationItemPlacement = 'bar' | 'rail'
+/**
+ * Floating navigation bar metrics. MD3 has no floating navigation bar. The
+ * capsule takes the height, the screen offset and the item gap of the MD3
+ * floating toolbar (FloatingToolbarTokens: `ContainerHeight = 64.dp`,
+ * `ContainerExternalPadding = 16.dp`, `ContainerBetweenSpace = 4.dp`). Its
+ * level 3 elevation is not an MD3 value for this surface: the floating
+ * toolbar is level 0, or level 1 beside a FAB. The active indicator fills
+ * the cell of its destination.
+ */
+export const FLOATING_BAR_HEIGHT = 64
+/** The gap between the capsule and each side and the bottom of the window. */
+export const FLOATING_BAR_GAP = 16
+/** Wider than this, the destinations sit too far apart for one thumb. */
+export const FLOATING_BAR_MAX_WIDTH = 480
+/** The room between the edge of the capsule and its destinations. */
+export const FLOATING_BAR_PADDING = 6
+export const FLOATING_BAR_ITEM_GAP = 4
+/**
+ * A bottom inset of this height or less holds only a gesture handle: the iOS
+ * home indicator or the Android gesture bar. The capsule floats over it. A
+ * taller inset holds the Android navigation buttons, and the capsule stays
+ * above it.
+ */
+export const FLOATING_BAR_HANDLE_INSET = 40
+
+/** The distance from the bottom edge of the parent to the capsule. */
+export function floatingBarBottom(insetBottom: number): number {
+  return insetBottom <= FLOATING_BAR_HANDLE_INSET
+    ? FLOATING_BAR_GAP
+    : insetBottom + FLOATING_BAR_GAP
+}
+
+/**
+ * Where a `NavigationItem` sits: the horizontal bar, the vertical rail, or
+ * the floating capsule.
+ */
+export type NavigationItemPlacement = 'bar' | 'rail' | 'floating'
 
 /** Focus-ring geometry, matching the rest of the library. */
 const FOCUS_RING_OFFSET = 2
@@ -93,6 +128,36 @@ export function createNavigationBarStyles(
   })
 }
 
+export function createFloatingNavigationBarStyles(
+  theme: MaterialTheme,
+  containerColor?: string,
+) {
+  return StyleSheet.create({
+    // The track spans the parent, so the capsule can center in it. Its empty
+    // sides let a touch through to the content.
+    track: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      alignItems: 'center',
+    },
+    capsule: {
+      width: '100%',
+      maxWidth: FLOATING_BAR_MAX_WIDTH,
+      borderRadius: theme.shape.cornerFull,
+      backgroundColor: containerColor ?? theme.colors.surfaceContainer,
+      ...elevationStyle(theme.elevation.level3),
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'stretch',
+      height: FLOATING_BAR_HEIGHT,
+      padding: FLOATING_BAR_PADDING,
+      gap: FLOATING_BAR_ITEM_GAP,
+    },
+  })
+}
+
 export function createNavigationItemStyles(
   theme: MaterialTheme,
   selected: boolean,
@@ -101,6 +166,7 @@ export function createNavigationItemStyles(
   labelVisible = true,
 ) {
   const inRail = placement === 'rail'
+  const floating = placement === 'floating'
   // A rail with no labels grows the indicator to a 56dp circle
   // (`NoLabelActiveIndicatorHeight`); the bar keeps its 56×32 pill in every
   // label mode.
@@ -112,7 +178,9 @@ export function createNavigationItemStyles(
   return StyleSheet.create({
     // In the bar, `ItemBetweenSpace` is 0: destinations split the row equally
     // and meet edge to edge, so the whole 80dp band is pressable. In the rail
-    // each destination is an 80dp-wide block, at least 56dp tall.
+    // each destination is an 80dp-wide block, at least 56dp tall. In the
+    // floating capsule the destinations split the row too, and the content
+    // fills each one.
     container: inRail
       ? {
           width: NAV_RAIL_ITEM_WIDTH,
@@ -121,33 +189,43 @@ export function createNavigationItemStyles(
           justifyContent: 'center',
           paddingVertical: NAV_RAIL_ITEM_VERTICAL_PADDING,
         }
-      : {
-          flexGrow: 1,
-          flexShrink: 1,
-          flexBasis: 0,
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingHorizontal: NAV_ITEM_HORIZONTAL_PADDING,
-        },
+      : floating
+        ? {
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+          }
+        : {
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: NAV_ITEM_HORIZONTAL_PADDING,
+          },
     interactiveContainer: {
       cursor: 'pointer',
     },
     disabledContainer: {
       cursor: 'auto',
     },
-    content: {
-      alignItems: 'center',
-      gap: NAV_INDICATOR_LABEL_GAP,
-    },
+    content: floating
+      ? { flexGrow: 1 }
+      : {
+          alignItems: 'center',
+          gap: NAV_INDICATOR_LABEL_GAP,
+        },
     disabledContent: {
       opacity: theme.stateLayer.disabledOpacity,
     },
     // The pill is laid out at full indicator size whether or not the
     // destination is active — the indicator and state layer paint inside it,
-    // so activation never shifts the icon.
+    // so activation never shifts the icon. In the floating capsule the pill
+    // fills the destination.
     pill: {
-      width: NAV_INDICATOR_WIDTH,
-      height: indicatorHeight,
+      ...(floating
+        ? { flexGrow: 1 }
+        : { width: NAV_INDICATOR_WIDTH, height: indicatorHeight }),
       borderRadius: theme.shape.cornerFull,
       alignItems: 'center',
       justifyContent: 'center',

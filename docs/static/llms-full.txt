@@ -2463,6 +2463,14 @@ import { NavigationBar } from '@rootnative/components/navigation-bar'
 // (active icon+label), indicatorColor (pill), labelStyle. Disabled items stay
 // at the MD3 38%.
 <NavigationBar indicatorColor="#FFD8E4" items={items} />
+
+// Floating: a 64dp capsule over the content, icons only, 16dp from the window
+// edges. It places itself at the bottom of its parent and reads the safe-area
+// insets: a bottom inset of 40 or less (a gesture handle) goes under it.
+<View style={{ flex: 1 }}>
+  <ScrollView>{/* content: pad its end by 80 */}</ScrollView>
+  <NavigationBar variant="floating" items={items} value={destination} onValueChange={setDestination} />
+</View>
 ```
 
 Props:
@@ -2470,16 +2478,17 @@ Props:
 - `value?: string` — Value of the active destination (controlled).
 - `defaultValue?: string` — Value of the initially active destination (uncontrolled). Defaults to the first item — a navigation bar with nothing active reads as broken.
 - `onValueChange?: (value: string) => void` — Called with the value of the destination that was pressed.
-- `labelVisibility?: 'always' | 'selected' | 'never'` — Default: `'always'`. When destination labels are shown.
-- `insetBottom?: boolean` — Default: `false`. When `true`, wraps the row in a SafeAreaView that adds the bottom inset below the bar's 80dp, so it clears the home indicator. Leave it off when an ancestor (e.g. `Layout` with a `bottom` edge) already handles it.
 - `containerColor?: string` — Default: `surfaceContainer`. Override the bar background.
 - `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon and label color of inactive destinations.
 - `selectedContentColor?: string` — Default: `onSecondaryContainer (icon) / secondary (label)`. Override the icon and label color of the active destination. State-layer colors are derived from it automatically.
 - `indicatorColor?: string` — Default: `secondaryContainer`. Override the active indicator pill color.
-- `labelStyle?: StyleProp<TextStyle>` — Style applied to every destination's label `Text` — does not affect the icons.
-- `style?: StyleProp<ViewStyle>` — Style applied to the bar container.
+- `style?: StyleProp<ViewStyle>` — Style applied to the bar container. On the floating bar, that is the capsule.
 - `accessibilityLabel?: string` — Screen-reader label for the bar itself.
 - `testID?: string` — Test id applied to the bar container. Each destination carries `<testID>-item-<value>` and its indicator `<testID>-item-<value>-indicator`.
+- `variant?: 'docked' | 'floating'` — Default: `'docked'`. `'docked'` is the MD3 navigation bar, an 80dp band along the bottom edge. `'floating'` is a 64dp capsule over the content, at most 480 wide, 16dp from the window edges, with an icon for each destination and no visible label; the indicator fills the destination. It places itself at the bottom of its parent and reads the insets from a `SafeAreaProvider`: it floats over a bottom inset of 40 or less and stays 16dp above a taller one.
+- `labelVisibility?: 'always' | 'selected' | 'never'` — Default: `'always'`. When destination labels are shown. Docked only.
+- `insetBottom?: boolean` — Default: `false`. Adds the bottom safe-area inset below the bar's 80dp. Leave it off when an ancestor already handles the edge. Docked only.
+- `labelStyle?: StyleProp<TextStyle>` — Style for every label `Text`. Docked only.
 - Inherits `ViewProps` (except `children`)
 
 #### NavigationBarItem

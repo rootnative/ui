@@ -9,6 +9,7 @@ import {
 import { useTheme } from '@rootnative/core'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
@@ -34,6 +35,35 @@ const PANELS: Record<string, string> = {
   search: 'Type to find anything.',
   library: 'Everything you saved.',
   profile: 'Your account and settings.',
+}
+
+// A nested `SafeAreaProvider` measures the insets of its own frame, so the
+// capsule keeps its gap to the frame and not to the window.
+function FloatingDemo() {
+  const [destination, setDestination] = useState('home')
+
+  return (
+    <SafeAreaProvider style={styles.floatingFrame}>
+      <ScrollView
+        nestedScrollEnabled
+        contentContainerStyle={styles.floatingScrollContent}
+      >
+        <Typography variant="bodyMedium">{PANELS[destination]}</Typography>
+        {Array.from({ length: 12 }, (_, index) => (
+          <Typography key={index} variant="bodyMedium">
+            Scroll content row {index + 1}
+          </Typography>
+        ))}
+      </ScrollView>
+      <NavigationBar
+        variant="floating"
+        items={DESTINATIONS}
+        value={destination}
+        onValueChange={setDestination}
+        accessibilityLabel="Floating navigation"
+      />
+    </SafeAreaProvider>
+  )
 }
 
 function NavigationBarScreenContent() {
@@ -109,6 +139,22 @@ function NavigationBarScreenContent() {
         </Column>
 
         <Column gap="sm">
+          <Typography variant="titleMedium">Floating</Typography>
+          <Card variant="outlined">
+            <Column gap="sm">
+              <Column p="md">
+                <Typography variant="bodySmall" style={mutedText}>
+                  variant=&quot;floating&quot; is a capsule over the content,
+                  16dp from the edges, with an icon for each destination. The
+                  label is the screen-reader name.
+                </Typography>
+              </Column>
+              <FloatingDemo />
+            </Column>
+          </Card>
+        </Column>
+
+        <Column gap="sm">
           <Typography variant="titleMedium">Disabled and overrides</Typography>
           <Card variant="outlined">
             <Column gap="sm">
@@ -150,5 +196,17 @@ export default function NavigationBarScreen() {
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 1,
+  },
+  floatingFrame: {
+    flex: 0,
+    height: 320,
+    overflow: 'hidden',
+  },
+  // 16 of padding plus the 64dp capsule and its 16dp gap, so the last row
+  // scrolls clear of it.
+  floatingScrollContent: {
+    padding: 16,
+    paddingBottom: 112,
+    rowGap: 16,
   },
 })

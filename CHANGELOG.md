@@ -9,6 +9,33 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## Unreleased
+
+**No prop is removed.** One new variant in `@rootnative/components`. One
+type change can stop a build: an `interface` that extends
+`NavigationBarProps`.
+
+- **New: `NavigationBar` `variant="floating"`.** A capsule that floats over
+  the content: 64dp high, at most 480dp wide, with a 16dp gap to each side
+  and to the bottom of the window. Each destination shows its icon only,
+  and its label is the screen-reader name. The active indicator fills the
+  destination. The bar places itself at the bottom of its parent and reads
+  the safe-area insets from a `SafeAreaProvider`. It floats over a bottom
+  inset of 40dp or less, which holds only a gesture handle, and it stays
+  16dp above a taller inset. MD3 has no floating navigation bar. The
+  capsule takes the MD3 colors, and the height, the edge gap and the item
+  gap of the MD3 floating toolbar. Its elevation, level 3, is not an MD3
+  value for this surface. The default `variant` is `'docked'`, the bar
+  as before. `labelVisibility`, `labelStyle` and `insetBottom` apply to the
+  docked bar only, and the type rejects them on the floating bar. The new
+  type `NavigationBarVariant` names the two values.
+
+- **`NavigationBarProps` is now a type alias**, so that the type can reject
+  the docked props on the floating bar. An `interface` cannot extend a
+  union, so an `interface` that extends `NavigationBarProps` does not
+  compile. Use an intersection in its place:
+  `type MyBarProps = NavigationBarProps & { … }`.
+
 ## 0.0.0-alpha.34 — 2026-11-03
 
 **No breaking change.** One new component, `Carousel`, in

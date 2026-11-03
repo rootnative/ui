@@ -10,7 +10,9 @@ Follows the [Material Design 3 Navigation bar](https://m3.material.io/components
 specification.
 
 Each destination is an icon over a label, with the active one marked by a `secondaryContainer`
-pill behind its icon. The bar is 80dp tall on a `surfaceContainer` background.
+pill behind its icon. The bar is 80dp tall on a `surfaceContainer` background. The
+[floating](#floating) variant is a 64dp capsule over the content, with an icon for each
+destination.
 
 :::info NavigationBar is a bar, not a navigator
 `NavigationBar` renders the destinations and tells you which one was pressed. It does not own
@@ -140,7 +142,49 @@ inside the same pill shape, on active and inactive destinations alike.
 
 A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap the row in a
 `SafeAreaView` that adds the bottom inset below the bar's 80dp — leave it off (the default) when
-an ancestor already applies the bottom edge, or the inset would be added twice.
+an ancestor already applies the bottom edge, or the inset would be added twice. The floating bar
+reads the insets by itself: see [Floating](#floating).
+
+## Floating
+
+`variant="floating"` draws the bar as a capsule that floats over the content. MD3 has no
+floating navigation bar. This form takes the MD3 colors, and the height, the gap to the window
+edges and the item gap of the MD3 floating toolbar: 64dp, 16dp and 4dp. Its level 3 elevation is
+not an MD3 value for this surface.
+
+- The capsule is 64dp high and at most 480dp wide, with a 16dp gap to each side and to the
+  bottom of the window.
+- Each destination shows its icon only. The label is the screen-reader name of the destination.
+- The active indicator fills the destination.
+
+The bar places itself at the bottom of its parent, over the content. Make it the last child of a
+view that reaches the bottom edge of the window. Pad the end of the content, so that the last
+item can scroll clear of the bar: 80dp (the 64dp capsule and the 16dp gap), plus the bottom
+inset when the inset is more than 40dp.
+
+```tsx
+<View style={styles.screen}>
+  <ScrollView contentContainerStyle={styles.content}>{/* … */}</ScrollView>
+  <NavigationBar
+    variant="floating"
+    items={DESTINATIONS}
+    value={destination}
+    onValueChange={setDestination}
+    accessibilityLabel="Main navigation"
+  />
+</View>
+```
+
+The bar reads the safe-area insets from a `SafeAreaProvider`. Expo Router adds one.
+
+- A bottom inset of 40dp or less holds only a gesture handle: the iOS home indicator or the
+  Android gesture bar. The capsule floats over it, 16dp from the bottom edge.
+- A taller bottom inset holds the Android navigation buttons. The capsule stays 16dp above it.
+- The side insets are added to the 16dp gap.
+- Without a provider, the capsule keeps the 16dp gap.
+
+`labelVisibility`, `labelStyle` and `insetBottom` apply to the docked bar only. The type rejects
+them with `variant="floating"`.
 
 ## Overrides
 
@@ -151,7 +195,7 @@ an ancestor already applies the bottom edge, or the inset would be added twice.
 | `selectedContentColor` | Icon and label color of the active destination; the state layers re-derive from it |
 | `indicatorColor` | The active indicator pill |
 | `labelStyle` | Every destination's label `Text` — does not affect the icons |
-| `style` | The bar container |
+| `style` | The bar container; on the floating bar, the capsule |
 
 Disabled destinations always use the MD3 disabled treatment (38% content); no override changes
 that.
@@ -175,6 +219,18 @@ These are the Expressive-updated androidx tokens: the indicator is 56dp wide (no
 pre-Expressive 64dp) and the active label is `secondary` (not `onSurface`). The 64dp-tall
 Expressive short bar is a possible 1.x variant; this bar uses compose's `TallContainerHeight`.
 
+The floating bar changes these:
+
+| Token | Value |
+|-------|-------|
+| Container | `surfaceContainer`, elevation level 3, full corners |
+| Height | 64dp |
+| Width | The parent less a 16dp gap on each side, at most 480dp |
+| Bottom gap | 16dp from the bottom edge, or 16dp above a bottom inset of more than 40dp |
+| Padding | 6dp around the destinations, 4dp between them |
+| Active indicator | Fills the destination, `secondaryContainer`, full corners |
+| Label | None; the label is the screen-reader name |
+
 ## Accessibility
 
 - The bar reports `role="tablist"` and each destination `role="tab"` with
@@ -184,7 +240,8 @@ Expressive short bar is a possible 1.x variant; this bar uses compose's `TallCon
   hides the visible label; set `accessibilityLabel` on the item to override it.
 - Disabled destinations expose `accessibilityState.disabled` and stop responding.
 - On web, destinations show a keyboard focus ring (`secondary`, 3dp) around the indicator pill,
-  driven by the same focus-visible state as the rest of the library.
+  driven by the same focus-visible state as the rest of the library. On the floating bar, the
+  ring goes around the destination.
 
 ## Props
 
