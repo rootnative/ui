@@ -41,7 +41,15 @@ export interface NavigationBarItem {
   accessibilityLabel?: string
 }
 
-export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
+/**
+ * The form of the bar. `'docked'` is the MD3 navigation bar: an 80dp band
+ * along the bottom edge, with a label under each icon. `'floating'` is a
+ * capsule that floats over the content, clear of the window edges, with an
+ * icon for each destination and no visible label.
+ */
+export type NavigationBarVariant = 'docked' | 'floating'
+
+interface NavigationBarCommonProps extends Omit<ViewProps, 'children'> {
   /** The destinations to render. MD3 recommends 3–5. */
   items: NavigationBarItem[]
   /** Value of the active destination (controlled). */
@@ -53,18 +61,6 @@ export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
   defaultValue?: string
   /** Called with the value of the destination that was pressed. */
   onValueChange?: (value: string) => void
-  /**
-   * When destination labels are shown.
-   * @default 'always'
-   */
-  labelVisibility?: NavigationBarLabelVisibility
-  /**
-   * When `true`, wraps the row in a SafeAreaView that adds the bottom inset
-   * below the bar's 80dp, so it clears the home indicator. Leave it off when
-   * an ancestor (e.g. `Layout` with a `bottom` edge) already handles it.
-   * @default false
-   */
-  insetBottom?: boolean
   /**
    * Override the bar background.
    * @default surfaceContainer
@@ -87,11 +83,9 @@ export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
    */
   indicatorColor?: string
   /**
-   * Style applied to every destination's label `Text` — does not affect the
-   * icons.
+   * Style applied to the bar container. On the floating bar, that is the
+   * capsule.
    */
-  labelStyle?: StyleProp<TextStyle>
-  /** Style applied to the bar container. */
   style?: StyleProp<ViewStyle>
   /** Screen-reader label for the bar itself. */
   accessibilityLabel?: string
@@ -101,3 +95,55 @@ export interface NavigationBarProps extends Omit<ViewProps, 'children'> {
    */
   testID?: string
 }
+
+/**
+ * The props that only one variant takes. The floating bar shows no label,
+ * and it reads the bottom inset by itself, so the type rejects
+ * `labelVisibility`, `labelStyle` and `insetBottom` on it.
+ */
+type NavigationBarVariantProps =
+  | {
+      /**
+       * The form of the bar.
+       * @default 'docked'
+       */
+      variant?: 'docked'
+      /**
+       * When destination labels are shown.
+       * @default 'always'
+       */
+      labelVisibility?: NavigationBarLabelVisibility
+      /**
+       * When `true`, wraps the row in a SafeAreaView that adds the bottom
+       * inset below the bar's 80dp, so it clears the home indicator. Leave
+       * it off when an ancestor (e.g. `Layout` with a `bottom` edge) already
+       * handles it.
+       * @default false
+       */
+      insetBottom?: boolean
+      /**
+       * Style applied to every destination's label `Text` — does not affect
+       * the icons.
+       */
+      labelStyle?: StyleProp<TextStyle>
+    }
+  | {
+      /**
+       * A capsule that floats over the content. It places itself at the
+       * bottom of its parent, so make it the last child of a view that
+       * reaches the bottom edge of the window. It reads the safe-area
+       * insets from a `SafeAreaProvider`.
+       */
+      variant: 'floating'
+      labelVisibility?: never
+      insetBottom?: never
+      labelStyle?: never
+    }
+
+/**
+ * Props of the NavigationBar. `labelVisibility`, `insetBottom` and
+ * `labelStyle` apply to the docked bar only — see
+ * `NavigationBarVariantProps`.
+ */
+export type NavigationBarProps = NavigationBarCommonProps &
+  NavigationBarVariantProps

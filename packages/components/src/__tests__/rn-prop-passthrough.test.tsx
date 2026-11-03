@@ -75,6 +75,18 @@ describe('RN prop passthrough reaches the root node', () => {
     expect(screen.getByTestId('nav').props.nativeID).toBe('probe')
   })
 
+  it('NavigationBar — floating', () => {
+    renderWithTheme(
+      <NavigationBar
+        variant="floating"
+        items={NAV_ITEMS}
+        testID="nav"
+        nativeID="probe"
+      />,
+    )
+    expect(screen.getByTestId('nav').props.nativeID).toBe('probe')
+  })
+
   it('NavigationRail', () => {
     renderWithTheme(
       <NavigationRail items={NAV_ITEMS} testID="rail" nativeID="probe" />,

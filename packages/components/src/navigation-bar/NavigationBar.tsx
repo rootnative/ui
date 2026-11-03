@@ -1,10 +1,18 @@
 import { useTheme } from '@rootnative/core'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useContext, useMemo, useState } from 'react'
 import { View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { pointerEvents } from '../internal/pointerEvents'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
 import { NavigationItem } from './NavigationItem'
-import { createNavigationBarStyles, getNavigationBarColors } from './styles'
+import {
+  FLOATING_BAR_GAP,
+  createFloatingNavigationBarStyles,
+  createNavigationBarStyles,
+  floatingBarBottom,
+  getNavigationBarColors,
+} from './styles'
 import type { NavigationBarProps } from './types'
 
 const BOTTOM_EDGE: Edge[] = ['bottom']
@@ -14,6 +22,7 @@ export function NavigationBar({
   value,
   defaultValue,
   onValueChange,
+  variant = 'docked',
   labelVisibility = 'always',
   insetBottom = false,
   containerColor,
@@ -27,6 +36,7 @@ export function NavigationBar({
   ...rest
 }: NavigationBarProps) {
   const theme = useTheme()
+  const floating = variant === 'floating'
   const colors = useMemo(
     () =>
       getNavigationBarColors(
@@ -40,6 +50,29 @@ export function NavigationBar({
   const styles = useMemo(
     () => createNavigationBarStyles(theme, containerColor),
     [theme, containerColor],
+  )
+  const floatingStyles = useMemo(
+    () => createFloatingNavigationBarStyles(theme, containerColor),
+    [theme, containerColor],
+  )
+
+  // Outside a `SafeAreaProvider` the floating bar has no insets to read, and
+  // it keeps the plain gap to the edges.
+  const insets = useContext(SafeAreaInsetsContext)
+  const insetBottomValue = insets?.bottom ?? 0
+  const insetLeft = insets?.left ?? 0
+  const insetRight = insets?.right ?? 0
+  const trackStyle = useMemo(
+    () => [
+      floatingStyles.track,
+      {
+        bottom: floatingBarBottom(insetBottomValue),
+        paddingLeft: FLOATING_BAR_GAP + insetLeft,
+        paddingRight: FLOATING_BAR_GAP + insetRight,
+      },
+      pointerEvents.boxNone,
+    ],
+    [floatingStyles.track, insetBottomValue, insetLeft, insetRight],
   )
 
   const isControlled = value !== undefined
@@ -61,7 +94,7 @@ export function NavigationBar({
   // read on web.
   const row = (
     <View
-      style={styles.row}
+      style={floating ? floatingStyles.row : styles.row}
       role="tablist"
       accessibilityLabel={accessibilityLabel}
       testID={testID === undefined ? undefined : `${testID}-tablist`}
@@ -71,10 +104,11 @@ export function NavigationBar({
           key={item.value}
           item={item}
           selected={item.value === selected}
-          labelVisibility={labelVisibility}
+          labelVisibility={floating ? 'never' : labelVisibility}
           colors={colors}
-          labelStyle={labelStyle}
+          labelStyle={floating ? undefined : labelStyle}
           onPress={handlePress}
+          placement={floating ? 'floating' : 'bar'}
           testID={
             testID === undefined ? undefined : `${testID}-item-${item.value}`
           }
@@ -82,6 +116,21 @@ export function NavigationBar({
       ))}
     </View>
   )
+
+  if (floating) {
+    return (
+      <View style={trackStyle}>
+        <View
+          role="navigation"
+          {...rest}
+          style={[floatingStyles.capsule, style]}
+          testID={testID}
+        >
+          {row}
+        </View>
+      </View>
+    )
+  }
 
   return (
     <View

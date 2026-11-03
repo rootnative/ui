@@ -233,6 +233,7 @@
         "NavigationBarItem",
         "NavigationBarLabelVisibility",
         "NavigationBarProps",
+        "NavigationBarVariant",
         "NavigationDrawer",
         "NavigationDrawerDivider",
         "NavigationDrawerDividerProps",

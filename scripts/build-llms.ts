@@ -1291,6 +1291,14 @@ import { NavigationBar } from '@rootnative/components/navigation-bar'
 // (active icon+label), indicatorColor (pill), labelStyle. Disabled items stay
 // at the MD3 38%.
 <NavigationBar indicatorColor="#FFD8E4" items={items} />
+
+// Floating: a 64dp capsule over the content, icons only, 16dp from the window
+// edges. It places itself at the bottom of its parent and reads the safe-area
+// insets: a bottom inset of 40 or less (a gesture handle) goes under it.
+<View style={{ flex: 1 }}>
+  <ScrollView>{/* content: pad its end by 80 */}</ScrollView>
+  <NavigationBar variant="floating" items={items} value={destination} onValueChange={setDestination} />
+</View>
 \`\`\``,
 
   'navigation-rail': `\`\`\`tsx
@@ -2003,9 +2011,34 @@ import { Grid } from '@rootnative/components/layout'
   if (dirName === 'navigation-bar') {
     let output = `### ${displayName}\n\n${example}\n\n`
 
-    const propsIface = interfaces.find((i) => i.name === 'NavigationBarProps')
+    // `NavigationBarProps` is a type alias: the shared props come from
+    // `NavigationBarCommonProps`, and the props of one variant are described
+    // here, because a union arm's props are invisible to the parser.
+    const propsIface = interfaces.find(
+      (i) => i.name === 'NavigationBarCommonProps',
+    )
     if (propsIface) {
-      output += formatPropsSection(propsIface, typeAliases)
+      const section = formatPropsSection(propsIface, typeAliases)
+      const inheritsLine = '- Inherits `ViewProps` (except `children`)\n'
+      const variantProps =
+        "- `variant?: 'docked' | 'floating'` — Default: `'docked'`. " +
+        "`'docked'` is the MD3 navigation bar, an 80dp band along the bottom " +
+        "edge. `'floating'` is a 64dp capsule over the content, at most 480 " +
+        'wide, 16dp from the window edges, with an icon for each destination ' +
+        'and no visible label; the indicator fills the destination. It ' +
+        'places itself at the bottom of its parent and reads the insets from ' +
+        'a `SafeAreaProvider`: it floats over a bottom inset of 40 or less ' +
+        'and stays 16dp above a taller one.\n' +
+        "- `labelVisibility?: 'always' | 'selected' | 'never'` — Default: " +
+        "`'always'`. When destination labels are shown. Docked only.\n" +
+        '- `insetBottom?: boolean` — Default: `false`. Adds the bottom ' +
+        "safe-area inset below the bar's 80dp. Leave it off when an ancestor " +
+        'already handles the edge. Docked only.\n' +
+        '- `labelStyle?: StyleProp<TextStyle>` — Style for every label `Text`. ' +
+        'Docked only.\n'
+      output += section.includes(inheritsLine)
+        ? section.replace(inheritsLine, variantProps + inheritsLine)
+        : section + variantProps
       output += '\n'
     }
 

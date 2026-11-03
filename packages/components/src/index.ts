@@ -158,6 +158,7 @@ export type {
   NavigationBarItem,
   NavigationBarLabelVisibility,
   NavigationBarProps,
+  NavigationBarVariant,
 } from './navigation-bar'
 
 export { NavigationRail } from './navigation-rail'

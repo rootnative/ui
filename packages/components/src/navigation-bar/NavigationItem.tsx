@@ -29,7 +29,8 @@ interface NavigationItemProps {
   testID?: string
   /**
    * `'bar'` sizes the destination to share a row; `'rail'` sizes it as an
-   * 80dp-wide block in a column.
+   * 80dp-wide block in a column; `'floating'` shares a row of the capsule,
+   * and the indicator fills the destination.
    * @default 'bar'
    */
   placement?: NavigationItemPlacement
