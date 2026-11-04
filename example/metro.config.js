@@ -24,7 +24,9 @@ config.resolver.nodeModulesPaths = [
 ]
 // Search only the two paths above. Without this, Metro also walks up from
 // each importing file and can find a second copy of a singleton (react,
-// react-native, reanimated) in a tree that is not hoisted.
+// react-native, reanimated) in a tree that is not hoisted, or in a hoisted
+// tree where two workspace members pin different versions. `expo-doctor`
+// reports this flag as a Metro config mismatch. That is expected.
 config.resolver.disableHierarchicalLookup = true
 
 // Resolve workspace @rootnative/* packages to source so they go through the

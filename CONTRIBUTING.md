@@ -7,9 +7,9 @@ Thanks for contributing. This project is a `pnpm` monorepo with shared packages 
 | Tool | Version |
 | --- | --- |
 | Node.js | >= 18 |
-| pnpm | 9.x |
-| Expo SDK | 57 |
-| React Native | 0.88.0 |
+| pnpm | 10.x |
+| Expo SDK | 58 |
+| React Native | 0.88.1 |
 | React | 19.3.0 |
 | TypeScript | 5.x (strict) |
 

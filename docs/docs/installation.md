@@ -8,7 +8,7 @@ description: Install RootNative UI into an existing app — peer dependencies, p
 ## Prerequisites
 
 - Expo SDK 58 (if using Expo)
-- React Native `>=0.88.0 <0.89.0` (developed and tested against 0.88.0)
+- React Native `>=0.88.0 <0.89.0` (developed and tested against 0.88.1)
 - React `>=19.3.0 <20.0.0`
 
 ## Platforms
