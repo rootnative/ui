@@ -15,7 +15,11 @@ export type ShellTagsOptions = {
    * `useBrowserThemeColor` from `@rootnative/seo/react` too.
    */
   themeColor?: ThemeColor
-  /** The `/favicon.ico` or `.png` of the site. */
+  /**
+   * The icon of the site: an `.ico`, `.png` or `.svg` URL. With `web.favicon`
+   * in `app.json`, the Expo export adds a link to its own `favicon.ico`, and
+   * Chrome picks that file over an SVG.
+   */
   favicon?: string
   /** A 180×180 PNG for iOS. */
   appleTouchIcon?: string

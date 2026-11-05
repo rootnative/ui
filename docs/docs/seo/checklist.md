@@ -697,6 +697,13 @@ export function BrowserThemeColor() {
 Keep the static tags of `shellTags`. They give the first paint and a page
 with no JavaScript their colour.
 
+`favicon` takes the URL of an `.ico`, a `.png` or an `.svg` file. When
+`app.json` sets `web.favicon`, the Expo export writes a second icon link, to
+a `favicon.ico` with 16, 32 and 48 px images. Chrome picks that file over an
+SVG `favicon`, in either order. To show the SVG, remove `web.favicon` from
+`app.json`, or put your own `favicon.ico` in `public/`. With either change,
+the export writes no second link.
+
 ## 8. The small tags
 
 `writeManifest` writes a web app manifest with relative paths, so it works
