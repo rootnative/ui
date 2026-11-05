@@ -9,6 +9,52 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.35 — 2026-11-06
+
+**No breaking change.** One new hook in `@rootnative/seo`, one new prop on
+`AppBar`, and doc fixes. No peer range moves. The `@rootnative/inertia`
+floor stays at `0.0.26`; inertia `0.0.27` is inside the range and this
+release needs nothing from it.
+
+- **New: `useBrowserThemeColor(color)` in `@rootnative/seo/react`.** The
+  `{ light, dark }` tags that `shellTags` writes follow the system
+  scheme, not a mode that the user picks in the app, so a dark mode on a
+  light system kept a light browser toolbar. Call the hook in one place
+  inside the theme provider, with the background of the theme that
+  renders. After hydration it sets the `content` of each `theme-color`
+  tag to that colour, and puts the old values back on unmount. With no
+  tag it adds one. `undefined` changes nothing, and the hook does nothing
+  on native. Keep the static tags of `shellTags`: they give the first
+  paint and a page with no JavaScript their colour.
+
+- **`AppBar` sends its tooltips to a named `PortalHost` with
+  `tooltipHostName`.** The tooltips of the navigation button and of the
+  icon actions rendered in the root host only. On iOS a `transparentModal`
+  route covers the root host, so a bar in one showed no tooltip on a long
+  press. Mount a named `PortalHost` inside the modal and pass its name.
+  The default is still the root host, and a `fullScreenModal` does not
+  need it.
+
+- **Docs: the `favicon` of `shellTags` and the Expo `favicon.ico`.** When
+  `app.json` sets `web.favicon`, the Expo export writes a second icon link
+  to a `favicon.ico` with 16, 32 and 48 px images, and Chrome picks that
+  file over an SVG `favicon`, in either order. To show the SVG, remove
+  `web.favicon`, or put your own `favicon.ico` in `public/`. The option
+  now says that it takes an `.ico`, `.png` or `.svg` URL.
+
+- **Docs: the Tabs "Following a pager" example compiles and causes no
+  Reanimated warning.** The example passed a dependency list to
+  `useHandler`, which Reanimated 4.7 reports on native, and typed the
+  `useEvent` payload as the top-level event, which does not type-check as
+  the `onPageScroll` prop of an animated `PagerView`. The example now
+  calls `useEvent` directly, with the `PagerViewOnPageScrollEvent` type
+  from `react-native-pager-view`.
+
+- **Dev pins:** the example, the templates and the package dev
+  dependencies move to Expo `58.0.23`, React Native `0.88.1`, Expo Router
+  `58.0.30` and `react-native-safe-area-context` `5.11.1`. The peer ranges
+  do not change.
+
 ## 0.0.0-alpha.34 — 2026-11-03
 
 **No breaking change.** One new component, `Carousel`, in
