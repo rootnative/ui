@@ -17,7 +17,7 @@ pnpm add @rootnative/seo
 | --- | --- | --- |
 | `@rootnative/seo` | nothing | `defineSite`, `toHeadTags`, `toMetadata`, `headTagsHtml`, `clipDescription`, `isoDuration`, the types |
 | `@rootnative/seo/schema` | nothing | JSON-LD builders: `webSite`, `breadcrumbList`, `organization`, `article`, `product`, `movie`, `person`, `event`, `faqPage` |
-| `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel` |
+| `@rootnative/seo/react` | `react`, `react-native` | `SeoProvider`, `Heading`, `imageLabel`, `useBrowserThemeColor` |
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `RouteHead`, `shellTags` |
 | `@rootnative/seo/expo-image` | `expo-image` | `Picture`: a plain `<img>` on the web, `expo-image` on native |
 | `@rootnative/seo/dom` | `react`, `react-native` | `PageHead` for an app with no Expo Router: writes the same tags to `document.head` |

@@ -11,7 +11,8 @@ export type ShellTagsOptions = {
   /**
    * The browser toolbar colour. The `{ light, dark }` form writes one
    * `theme-color` tag for each `prefers-color-scheme`. The tags follow the
-   * system scheme, not a mode the user picks in the app.
+   * system scheme, not a mode the user picks in the app. For that mode, call
+   * `useBrowserThemeColor` from `@rootnative/seo/react` too.
    */
   themeColor?: ThemeColor
   /** The `/favicon.ico` or `.png` of the site. */

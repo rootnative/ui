@@ -2,7 +2,12 @@ import { render, screen } from '@testing-library/react-native'
 import { PageHead as DomPageHead } from '../dom'
 import { PageHead, RouteHead } from '../expo-router'
 import { defineSite } from '../index'
-import { Heading, imageLabel, SeoProvider } from '../react'
+import {
+  Heading,
+  imageLabel,
+  SeoProvider,
+  useBrowserThemeColor,
+} from '../react'
 
 const site = defineSite({ name: 'Trek', url: 'https://example.com' })
 
@@ -55,6 +60,18 @@ describe('RouteHead on native', () => {
 describe('PageHead from /dom on native', () => {
   it('renders nothing and reads no site', () => {
     const { toJSON } = render(<DomPageHead title="Dune" url="/m/1" />)
+    expect(toJSON()).toBeNull()
+  })
+})
+
+describe('useBrowserThemeColor on native', () => {
+  it('does nothing, with no document', () => {
+    function ToolbarColor() {
+      useBrowserThemeColor('#0e141c')
+      return null
+    }
+    expect(typeof document).toBe('undefined')
+    const { toJSON } = render(<ToolbarColor />)
     expect(toJSON()).toBeNull()
   })
 })

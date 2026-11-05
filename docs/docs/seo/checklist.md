@@ -678,6 +678,25 @@ uses the first tag whose media matches, so one tag with no media always wins
 over a dark one. The tags follow the system scheme, not a mode that the user
 picks in the app.
 
+An app with a light, dark and system choice also calls
+`useBrowserThemeColor` from `@rootnative/seo/react`. Call it in one place,
+inside the theme provider, with the background of the theme that renders.
+After hydration it sets each `theme-color` tag to that colour, and it does
+nothing on native. With `@rootnative/core`:
+
+```tsx
+import { useTheme } from '@rootnative/core'
+import { useBrowserThemeColor } from '@rootnative/seo/react'
+
+export function BrowserThemeColor() {
+  useBrowserThemeColor(useTheme().colors.background)
+  return null
+}
+```
+
+Keep the static tags of `shellTags`. They give the first paint and a page
+with no JavaScript their colour.
+
 ## 8. The small tags
 
 `writeManifest` writes a web app manifest with relative paths, so it works
