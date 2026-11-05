@@ -2,7 +2,7 @@ import { defaultTopAppBarTokens, lightTheme } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
 import { alphaColor } from '@rootnative/utils'
 import { renderWithTheme } from '@rootnative/utils/test'
-import { screen, fireEvent } from '@testing-library/react-native'
+import { screen, fireEvent, within } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import type { TextStyle, ViewStyle } from 'react-native'
 import { AppBar, useAppBarContentColor } from '../appbar'
@@ -527,6 +527,32 @@ describe('AppBar', () => {
       fireEvent(screen.getByLabelText('Search'), 'longPress')
       expect(screen.queryByText('Go back')).toBeNull()
       expect(screen.queryByText('Search')).toBeNull()
+    })
+
+    // On iOS a `transparentModal` covers the root host, so the bar must be
+    // able to send its tooltips to a host inside the modal.
+    it('renders the tooltips in the host that tooltipHostName names', () => {
+      renderWithTheme(
+        <PortalHost testID="root">
+          <PortalHost name="sheet" testID="sheet">
+            <AppBar
+              title="Details"
+              canGoBack
+              tooltipHostName="sheet"
+              actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+            />
+          </PortalHost>
+        </PortalHost>,
+      )
+      // A named outlet renders only while it holds a portal. With the name
+      // dropped, the tooltips sit in the root host and `sheet` is not found.
+      const sheet = screen.getByTestId('sheet')
+
+      fireEvent(screen.getByLabelText('Go back'), 'longPress')
+      expect(within(sheet).getByText('Go back')).toBeTruthy()
+
+      fireEvent(screen.getByLabelText('Search'), 'longPress')
+      expect(within(sheet).getByText('Search')).toBeTruthy()
     })
 
     // The action goes through a variable, as an app that builds its actions

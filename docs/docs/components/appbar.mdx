@@ -152,6 +152,17 @@ shows no tooltip, because its label is already on the screen.
 
 Without a `PortalHost`, the bar shows no tooltips.
 
+The tooltips render in the root host. On iOS, a `transparentModal` route
+covers the root host, so the tooltips of a bar in one are out of view. Mount
+a named `PortalHost` inside the modal and pass its name as
+`tooltipHostName`. A `fullScreenModal` does not cover the root host.
+
+```tsx
+<PortalHost name="sheet">
+  <AppBar title="Filters" canGoBack navigationIcon="close" tooltipHostName="sheet" />
+</PortalHost>
+```
+
 ## Custom Slot Content
 
 `leading` and `trailing` take any content, for example a `Menu` anchor. Each

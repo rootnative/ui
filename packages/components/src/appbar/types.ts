@@ -126,6 +126,13 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
   /** Called when the auto-rendered navigation button is pressed. */
   onBackPress?: () => void
   /**
+   * Name of the `PortalHost` that receives the tooltips of the navigation
+   * button and of the icon actions. The default is the root host. On iOS a
+   * `transparentModal` route covers the root host, so a bar in one passes
+   * the name of a host inside the modal.
+   */
+  tooltipHostName?: string
+  /**
    * When `true`, pads the bar by the top safe-area inset. Inside a
    * `SafeAreaProvider` the inset comes from context, so it is correct on the
    * first paint of a modal route. Without a provider the bar falls back to the

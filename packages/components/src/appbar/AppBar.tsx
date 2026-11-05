@@ -62,9 +62,14 @@ function withTooltip(
   button: ReactElement,
   text: string | false,
   hasPortalHost: boolean,
+  hostName: string | undefined,
 ): ReactElement {
   if (!hasPortalHost || !text) return button
-  return <Tooltip anchor={button}>{text}</Tooltip>
+  return (
+    <Tooltip anchor={button} hostName={hostName}>
+      {text}
+    </Tooltip>
+  )
 }
 
 const titleVariantBySize: Record<AppBarSize, TypographyVariant> = {
@@ -132,6 +137,7 @@ export function AppBar({
   canGoBack = false,
   navigationIcon = 'back',
   onBackPress,
+  tooltipHostName,
   insetTop = false,
   elevated = false,
   leading,
@@ -346,12 +352,14 @@ export function AppBar({
           />,
           navigationButton.accessibilityLabel,
           hasPortalHost,
+          tooltipHostName,
         )}
       </View>
     )
   }, [
     canGoBack,
     hasPortalHost,
+    tooltipHostName,
     navigationIcon,
     leading,
     onBackPress,
@@ -402,6 +410,7 @@ export function AppBar({
                 />,
                 action.tooltip ?? action.accessibilityLabel,
                 hasPortalHost,
+                tooltipHostName,
               )}
             </View>
           )
@@ -411,6 +420,7 @@ export function AppBar({
   }, [
     actions,
     hasPortalHost,
+    tooltipHostName,
     resolvedContentColor,
     styles.iconFrame,
     styles.slotContent,
