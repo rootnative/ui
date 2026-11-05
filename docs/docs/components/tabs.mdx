@@ -186,28 +186,24 @@ import { Tabs } from '@rootnative/components'
 import { useMotionValue } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useRef, useState } from 'react'
-import PagerView from 'react-native-pager-view'
-import { useEvent, useHandler } from 'react-native-reanimated'
+import PagerView, {
+  type PagerViewOnPageScrollEvent,
+} from 'react-native-pager-view'
+import { useEvent } from 'react-native-reanimated'
 
 const AnimatedPager = Animated.createAnimatedComponent(PagerView)
-
-function usePagerScrollHandler(position: SharedValue<number>) {
-  const { context, doDependenciesDiffer } = useHandler({}, [])
-  return useEvent<{ position: number; offset: number }>(
-    (event) => {
-      'worklet'
-      position.value = event.position + event.offset
-    },
-    ['onPageScroll'],
-    doDependenciesDiffer,
-  )
-}
 
 function CategoryPager() {
   const pager = useRef<PagerView>(null)
   const [value, setValue] = useState(CATEGORIES[0].value)
   const position = useMotionValue(0)
-  const onPageScroll = usePagerScrollHandler(position)
+  const onPageScroll = useEvent<PagerViewOnPageScrollEvent>(
+    (event) => {
+      'worklet'
+      position.value = event.position + event.offset
+    },
+    ['onPageScroll'],
+  )
 
   return (
     <>
