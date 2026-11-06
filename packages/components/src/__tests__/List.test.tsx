@@ -121,6 +121,23 @@ describe('ListItem', () => {
     expect(style.alignItems).toBe('center')
   })
 
+  it.each([2, 0])(
+    'takes the three-line template when the supporting text limit is %i',
+    (limit) => {
+      renderWithTheme(
+        <ListItem
+          testID="item"
+          headlineText="Title"
+          supportingText="Subtitle"
+          supportingTextNumberOfLines={limit}
+        />,
+      )
+      const style = StyleSheet.flatten(screen.getByTestId('item').props.style)
+      expect(style.minHeight).toBe(88)
+      expect(style.alignItems).toBe('flex-start')
+    },
+  )
+
   it('renders trailing supporting text when provided', () => {
     renderWithTheme(
       <ListItem headlineText="Title" trailingSupportingText="100+" />,

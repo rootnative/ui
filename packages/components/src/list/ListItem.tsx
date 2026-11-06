@@ -11,18 +11,14 @@ import { createListItemStyles } from './styles'
 import type { ListItemLines, ListItemProps } from './types'
 
 function getLines(
-  supportingText?: string,
-  overlineText?: string,
-  supportingTextNumberOfLines?: number,
+  supportingText: string | undefined,
+  overlineText: string | undefined,
+  supportingTextNumberOfLines: number,
 ): ListItemLines {
-  if (
-    (supportingText && overlineText) ||
-    (supportingText &&
-      supportingTextNumberOfLines &&
-      supportingTextNumberOfLines > 1)
-  ) {
-    return 3
-  }
+  // `0` removes the limit, so the text can wrap the same as a limit above 1.
+  const supportingTextCanWrap =
+    supportingTextNumberOfLines === 0 || supportingTextNumberOfLines > 1
+  if (supportingText && (overlineText || supportingTextCanWrap)) return 3
   if (supportingText || overlineText) return 2
   return 1
 }
