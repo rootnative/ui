@@ -95,12 +95,12 @@
       <a href="https://rootnative.github.io/ui/demo/"><b>rootnative.github.io/ui/demo</b></a>
       <br /><br />
       Each component has its own page.<br />
-      You do not need an install or an account.
+      You don't need an install or an account.
     </td>
   </tr>
 </table>
 
-The QR code always serves the newest update from `main`. You do not need this
+The QR code always serves the newest update from `main`. You don't need this
 repository or a development server. The demo runs on Expo Go for SDK 58. Update
 Expo Go if it reports a version mismatch.
 

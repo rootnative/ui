@@ -5,18 +5,18 @@ description: Switch between an app's top-level destinations on medium and expand
 
 # NavigationRail
 
-Navigation rails let people switch between an app's top-level destinations on medium and
-expanded screens, where a bottom bar would waste width. Follows the
+A navigation rail lets people switch between the top-level destinations of an app on a medium
+or expanded screen, where a bottom bar would waste width. It follows the
 [Material Design 3 Navigation rail](https://m3.material.io/components/navigation-rail/overview)
 specification.
 
-Each destination is an icon over a label, with the active one marked by a `secondaryContainer`
-pill behind its icon. The rail is 80dp wide on a `surface` background, and an optional header
-above the destinations holds the menu button and the FAB.
+Each destination is an icon over a label. A `secondaryContainer` pill behind the icon marks the
+active one. The rail is 80dp wide on a `surface` background, and an optional header above the
+destinations holds the menu button and the FAB.
 
 :::info NavigationRail is a rail, not a navigator
-`NavigationRail` renders the destinations and tells you which one was pressed. It does not own
-screens or integrate with a navigator. Drive it the same way as
+`NavigationRail` renders the destinations and tells you which one the user pressed. It doesn't
+own screens or integrate with a navigator. Drive it the same way as
 [NavigationBar](./navigation-bar.mdx#wiring-it-to-a-navigator).
 :::
 
@@ -82,25 +82,25 @@ the start of a row that fills the screen height.
 `}
 />
 
-MD3 recommends 3–7 destinations. An item is the same shape as a `NavigationBarItem`, so one
-array can feed a `NavigationBar` on a compact window and a `NavigationRail` on a wider one —
-see [Responsive](../responsive.md).
+MD3 recommends 3–7 destinations. An item has the same shape as a `NavigationBarItem`, so one
+array can feed a `NavigationBar` on a compact window and a `NavigationRail` on a wider one.
+See [Responsive](../responsive.md).
 
 ## Selection
 
-`value` + `onValueChange` is the controlled form; leave `value` off and the rail tracks the
-selection itself, starting on `defaultValue` or the first item. A rail with nothing active reads
-as broken, which is why there is no "no selection" state.
+`value` + `onValueChange` is the controlled form. Leave `value` off, and the rail tracks the
+selection itself, and starts on `defaultValue` or the first item. A rail with nothing active
+looks broken, so there is no "no selection" state.
 
 ## Header
 
-`header` renders above the destinations with an 8dp gap below it. MD3 puts the menu
-`IconButton` there, and the screen's `FAB` below it when the screen has one. The header stays at
-the top whatever `align` is.
+`header` renders above the destinations, with an 8dp gap below it. MD3 puts the menu
+`IconButton` there, and the `FAB` of the screen below it when the screen has one. The header
+stays at the top, whatever `align` is.
 
 ## Alignment
 
-`align` places the destinations along the rail's height:
+`align` places the destinations along the height of the rail:
 
 | Value | Meaning |
 |-------|---------|
@@ -110,15 +110,15 @@ the top whatever `align` is.
 
 ## Label visibility
 
-`labelVisibility` controls when destination labels are shown:
+`labelVisibility` controls when the destination labels show:
 
 | Value | Meaning |
 |-------|---------|
 | `'always'` (default) | Every destination keeps its label |
-| `'selected'` | Only the active destination's label is visible |
-| `'never'` | No labels; the indicator grows to a 56dp circle |
+| `'selected'` | Only the label of the active destination is visible |
+| `'never'` | No labels. The indicator grows to a 56dp circle |
 
-The label stays required on the item either way: it is also the destination's screen-reader name.
+The label stays required on the item in every mode. It is also the screen-reader name of the destination.
 
 ## Overrides
 
@@ -126,12 +126,12 @@ The label stays required on the item either way: it is also the destination's sc
 |------|--------|
 | `containerColor` | The rail background |
 | `contentColor` | Icon and label color of inactive destinations |
-| `selectedContentColor` | Icon and label color of the active destination; the state layers re-derive from it |
+| `selectedContentColor` | Icon and label color of the active destination. The state layers derive from it again |
 | `indicatorColor` | The active indicator pill |
-| `labelStyle` | Every destination's label `Text` — does not affect the icons |
+| `labelStyle` | The label `Text` of every destination. It doesn't affect the icons |
 | `style` | The rail container |
 
-Disabled destinations always use the MD3 disabled treatment (38% content); no override changes
+A disabled destination always uses the MD3 disabled treatment (38% content). No override changes
 that.
 
 When you pass `testID`, the destinations column carries `<testID>-destinations`, each
@@ -145,22 +145,22 @@ destination `<testID>-item-<value>`, and its indicator `<testID>-item-<value>-in
 | Padding | 4dp top and bottom, 4dp between destinations, 8dp below the header |
 | Destination | 80dp wide, at least 56dp tall |
 | Active indicator | 56×32dp pill, `secondaryContainer`, full corners; 56×56dp with no labels |
-| Icon | 24dp — active `onSecondaryContainer`, inactive `onSurfaceVariant` |
-| Label | `labelMedium` — active `secondary`, inactive `onSurfaceVariant` |
+| Icon | 24dp. Active `onSecondaryContainer`, inactive `onSurfaceVariant` |
+| Label | `labelMedium`. Active `secondary`, inactive `onSurfaceVariant` |
 
-The destination tokens are the ones `NavigationBar` paints, so the two components agree on the
-active destination. The Expressive 96dp collapsed wide rail is a possible 1.x variant; this
-rail uses compose's `NavigationRail`.
+The destination tokens are the ones that `NavigationBar` paints, so the two components agree on
+the active destination. The Expressive 96dp collapsed wide rail is a possible 1.x variant. This
+rail uses the `NavigationRail` of Compose.
 
 ## Accessibility
 
-- The destinations column reports `role="tablist"` and each destination `role="tab"` with
-  `accessibilityState.selected`. Pass `accessibilityLabel` to name the rail itself
+- The destinations column reports `role="tablist"`, and each destination reports `role="tab"`
+  with `accessibilityState.selected`. Pass `accessibilityLabel` to name the rail itself
   ("Main navigation").
-- A destination's screen-reader name falls back to its label, including when `labelVisibility`
-  hides the visible label; set `accessibilityLabel` on the item to override it.
-- Disabled destinations expose `accessibilityState.disabled` and stop responding.
-- On web, destinations show a keyboard focus ring (`secondary`, 3dp) around the indicator pill.
+- The screen-reader name of a destination falls back to its label, also when `labelVisibility`
+  hides the visible label. Set `accessibilityLabel` on the item to override it.
+- A disabled destination exposes `accessibilityState.disabled` and stops responding.
+- On web, a destination shows a keyboard focus ring (`secondary`, 3dp) around the indicator pill.
 
 ## Props
 

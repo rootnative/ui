@@ -5,11 +5,11 @@ description: Replace the platform-default font stack with any custom font, and m
 
 # Fonts
 
-RootNative UI uses platform-default fonts out of the box — Roboto on Android, System (San Francisco) on iOS, and the system font stack on web. You can replace these with any custom font.
+Root Native UI uses the platform-default fonts by default: Roboto on Android, System (San Francisco) on iOS, and the system font stack on web. You can replace these with any custom font.
 
 ## Quick setup with createMaterialTheme
 
-The easiest way to use a custom font is the `fontFamily` option on `createMaterialTheme`:
+The easiest way to use a custom font is the `fontFamily` option of `createMaterialTheme`:
 
 ```tsx
 import { createMaterialTheme } from '@rootnative/core/create-theme'
@@ -28,11 +28,11 @@ export default function App() {
 }
 ```
 
-This applies the font to all 30 MD3 typography styles at once — the 15 base roles (display, headline, title, body, label) and their 15 emphasized counterparts.
+This applies the font to all 30 MD3 typography styles at once: the 15 base roles (display, headline, title, body, label) and their 15 emphasized counterparts.
 
 ## Loading fonts in Expo
 
-Before using a custom font, you need to load it. Expo provides two approaches:
+Before you use a custom font, you need to load it. Expo gives you two ways:
 
 ### Using expo-font (recommended)
 
@@ -101,11 +101,11 @@ export default function RootLayout() {
 }
 ```
 
-> **Note:** When using `@expo-google-fonts`, the `fontFamily` value must match the exact export name (e.g. `Inter_400Regular`, not `Inter`).
+> **Note:** With `@expo-google-fonts`, the `fontFamily` value must match the exact export name (for example `Inter_400Regular`, not `Inter`).
 
 ## Different fonts per weight
 
-If your font files use separate family names per weight (common with Google Fonts), you can override individual typography styles:
+If your font files use a separate family name per weight (common with Google Fonts), you can override single typography styles:
 
 ```tsx
 import { lightTheme } from '@rootnative/core'
@@ -128,7 +128,7 @@ const theme: Theme = {
 
 ## Combining with other options
 
-`fontFamily` works alongside other `createMaterialTheme` options:
+`fontFamily` works together with the other `createMaterialTheme` options:
 
 ```tsx
 const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
@@ -139,7 +139,7 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 
 ## Platform defaults
 
-When no `fontFamily` is specified, RootNative UI uses:
+When you set no `fontFamily`, Root Native UI uses:
 
 | Platform | Default font |
 |----------|-------------|

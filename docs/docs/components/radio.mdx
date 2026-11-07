@@ -5,8 +5,8 @@ description: Select one option from a set of mutually exclusive choices. Follows
 
 # Radio
 
-Radio buttons allow users to select one option from a set of mutually exclusive choices.
-Follows the [Material Design 3 Radio button](https://m3.material.io/components/radio-button/overview) specification.
+A radio button lets the user select one option from a set of mutually exclusive choices.
+It follows the [Material Design 3 Radio button](https://m3.material.io/components/radio-button/overview) specification.
 
 ## Usage
 
@@ -45,19 +45,19 @@ Pass `value` with `onValueChange` to own the state, as above. Omit `value` and
 <Radio defaultValue onValueChange={handleChange} />
 ```
 
-`onValueChange` still fires either way. In earlier prereleases, passing
-`onValueChange` *without* `value` did nothing visually — the callback fired but
-the control never moved. See the changelog if you are upgrading.
+`onValueChange` still fires either way. In earlier prereleases, `onValueChange`
+*without* `value` did nothing visible: the callback fired, but the control never
+moved. See the changelog if you upgrade.
 
-A radio is select-only, so an uncontrolled one latches: it turns itself on and
-only a controlling parent can turn it back off. Radio groups are the controlled
-case — see [Radio Group](#radio-group) below.
+A radio is select-only, so an uncontrolled one latches: it turns itself on, and
+only a controlling parent can turn it off again. A radio group is the controlled
+case; see [Radio Group](#radio-group) below.
 
 :::
 
 ## Radio Group
 
-Build a radio group by controlling which Radio has `value={true}`:
+To build a radio group, control which Radio has `value={true}`:
 
 <SnackExample
   name="RootNative Radio — Group"

@@ -5,18 +5,18 @@ description: Express an unspecified wait or show how far a process has run. Foll
 
 # Progress
 
-Progress indicators express an unspecified wait time or display the length of a process.
-Follows the [Material Design 3 Progress Indicators](https://m3.material.io/components/progress-indicators/overview) specification.
+A progress indicator shows an unspecified wait, or how far a process has run.
+It follows the [Material Design 3 Progress Indicators](https://m3.material.io/components/progress-indicators/overview) specification.
 
-RootNative ships two progress indicators that share the same API:
+Root Native ships two progress indicators with the same API:
 
-- **`LinearProgress`** — a horizontal bar, used for tracking long-running processes that have a clear start and end
-- **`CircularProgress`** — a circular spinner, used for shorter waits or compact UIs where horizontal space is scarce
+- **`LinearProgress`**: a horizontal bar, for a long process with a clear start and end
+- **`CircularProgress`**: a circular spinner, for a shorter wait or a compact UI with little horizontal space
 
 Both indicators have two modes:
 
-- **Determinate** — pass a `progress` value between `0` and `1` to show how complete the operation is
-- **Indeterminate** — omit `progress` entirely to show a continuous animation when the wait time is unknown
+- **Determinate**: pass a `progress` value between `0` and `1` to show how complete the operation is
+- **Indeterminate**: omit `progress` to show a continuous animation when the wait time is unknown
 
 ## Linear
 
@@ -53,7 +53,7 @@ Both indicators have two modes:
 `}
 />
 
-In determinate mode the bar is split into three parts: the **active indicator** (filled portion on the left), a small gap, the **inactive track** (remaining portion on the right), and a trailing **stop indicator dot** that marks the completion target. The dot disappears automatically when `progress` reaches `1`.
+In determinate mode the bar has three parts: the **active indicator** (the filled part on the left), a small gap, the **inactive track** (the remaining part on the right), and a trailing **stop indicator dot** that marks the completion target. The dot disappears when `progress` reaches `1`.
 
 ## Circular
 
@@ -90,11 +90,11 @@ In determinate mode the bar is split into three parts: the **active indicator** 
 `}
 />
 
-`CircularProgress` is built on `react-native-svg` — make sure it's installed in your app (`npx expo install react-native-svg`). The arc grows clockwise from the 12 o'clock position with a small gap between the active arc and the inactive track.
+`CircularProgress` is built on `react-native-svg`. Make sure it's installed in your app (`npx expo install react-native-svg`). The arc grows clockwise from the 12 o'clock position, with a small gap between the active arc and the inactive track.
 
 ## Indeterminate
 
-When the duration of an operation is unknown, omit `progress` to show a continuous animation. `LinearProgress` slides a single segment across the track; `CircularProgress` spins a fixed-length arc.
+When the duration of an operation is unknown, omit `progress` to show a continuous animation. `LinearProgress` slides one segment across the track. `CircularProgress` spins an arc of fixed length.
 
 <SnackExample
   name="RootNative Progress — Indeterminate"
@@ -122,13 +122,13 @@ When the duration of an operation is unknown, omit `progress` to show a continuo
 `}
 />
 
-The animations run on the UI thread through [`@rootnative/inertia`](../motion), so they stay smooth even while the JS thread is busy.
+The animations run on the UI thread through [`@rootnative/inertia`](../motion), so they stay smooth while the JS thread is busy.
 
-They also stop entirely when the OS reduce-motion setting is on — that's the point of the setting, but it means an indeterminate indicator no longer conveys "still working". Prefer a determinate `progress` value wherever you have one, and pair indeterminate indicators with a text label so the state survives without the animation.
+They also stop when the OS reduce-motion setting is on. That's the point of the setting, but then an indeterminate indicator no longer says "still working". Prefer a determinate `progress` value wherever you have one. Pair an indeterminate indicator with a text label, so the state survives without the animation.
 
 ## Size and thickness
 
-`LinearProgress` exposes `thickness` to control the track height. `CircularProgress` exposes both `size` (outer diameter) and `thickness` (stroke width) so you can place small spinners next to text or larger ones as page-level indicators.
+`LinearProgress` takes `thickness` to set the track height. `CircularProgress` takes both `size` (the outer diameter) and `thickness` (the stroke width), so you can put a small spinner next to text, or a large one as a page-level indicator.
 
 <SnackExample
   name="RootNative Progress — Sizing"
@@ -163,7 +163,7 @@ They also stop entirely when the OS reduce-motion setting is on — that's the p
 
 ## Wavy
 
-Pass `wavy` to draw the active indicator as a travelling wave, the MD3 Expressive form of both indicators. The inactive track stays flat. The wave is flat below 10% and above 95%, so a nearly empty or nearly full indicator reads as a plain bar, and it grows in with a spring between those points.
+Pass `wavy` to draw the active indicator as a travelling wave, the MD3 Expressive form of both indicators. The inactive track stays flat. The wave is flat below 10% and above 95%, so a nearly empty or nearly full indicator looks like a plain bar. Between those points the wave grows in with a spring.
 
 <SnackExample
   name="RootNative Progress — Wavy"
@@ -205,22 +205,22 @@ Pass `wavy` to draw the active indicator as a travelling wave, the MD3 Expressiv
 
 The wavy `LinearProgress` is 6dp taller than its `thickness`, because the wave peaks 3dp each side of the track. The wavy `CircularProgress` keeps its `size`: the ring radius shrinks by 2dp so the wave stays inside the container. Both wavy indicators use `react-native-svg`.
 
-Under the OS reduce-motion setting the wave stands still; the value still moves.
+Under the OS reduce-motion setting the wave stands still. The value still moves.
 
 ## Stop indicator
 
-`LinearProgress` shows a trailing dot by default to mark the completion target. Pass `stopIndicator={false}` to hide it — useful for very short bars or when you want a simpler look.
+`LinearProgress` shows a trailing dot by default to mark the completion target. Pass `stopIndicator={false}` to hide it, for a very short bar or a simpler look.
 
 ```tsx
 <LinearProgress progress={value} />
 <LinearProgress progress={value} stopIndicator={false} />
 ```
 
-The dot is automatically hidden in indeterminate mode and when `progress` reaches `1`.
+The dot is hidden in indeterminate mode, and when `progress` reaches `1`.
 
 ## Custom colors
 
-`containerColor` overrides the inactive track — the indicator's container — and `contentColor` overrides the active indicator drawn on it. Both indicators accept the same overrides, and the pair matches every other component in the library.
+`containerColor` overrides the inactive track, the container of the indicator. `contentColor` overrides the active indicator drawn on it. Both indicators accept the same overrides, and the pair matches every other component in the library.
 
 <SnackExample
   name="RootNative Progress — Custom colors"
@@ -258,9 +258,9 @@ The dot is automatically hidden in indeterminate mode and when `progress` reache
 
 ## Accessibility
 
-Both components set `accessibilityRole="progressbar"`. In determinate mode, `accessibilityValue` is exposed as `{ min: 0, max: 100, now }` (rounded to integers — native a11y APIs require integer values). In indeterminate mode `accessibilityValue` is omitted, signaling to assistive technologies that the duration is unknown.
+Both components set `accessibilityRole="progressbar"`. In determinate mode, they set `accessibilityValue` to `{ min: 0, max: 100, now }`, rounded to integers, because the native accessibility APIs require integer values. In indeterminate mode they omit `accessibilityValue`, which tells assistive technology that the duration is unknown.
 
-Pass `accessibilityLabel` to describe what the progress indicator is tracking.
+Pass `accessibilityLabel` to say what the progress indicator tracks.
 
 ```tsx
 <LinearProgress progress={uploadProgress} accessibilityLabel="Upload progress" />

@@ -1,11 +1,11 @@
 ---
 sidebar_position: 4
-description: Add components to your project as owned source files with the RootNative CLI, in the shadcn/ui model — no component npm package.
+description: Add components to your project as owned source files with the Root Native CLI, in the shadcn/ui model — no component npm package.
 ---
 
 # CLI
 
-The RootNative CLI lets you add components directly into your project as source files — no npm package for components, full ownership of the code. Inspired by [shadcn/ui](https://ui.shadcn.com).
+The Root Native CLI adds components to your project as source files. There is no npm package for the components, and you own the code. The model comes from [shadcn/ui](https://ui.shadcn.com).
 
 ```bash
 npx rootnative init
@@ -14,20 +14,20 @@ npx rootnative add button card
 
 ## Why use the CLI?
 
-With the standard `@rootnative/components` package, components live in `node_modules` and you import them as-is. The CLI takes a different approach:
+With the standard `@rootnative/components` package, the components live in `node_modules`, and you import them as they are. The CLI takes a different approach:
 
-- **Full ownership** — component source files live in your project, not `node_modules`
-- **Customizable** — modify styles, adjust behavior, or remove what you don't need
-- **No version lock-in** — you decide when to pull updates
-- **Tree-shake friendly** — only the components you use exist in your codebase
+- **Full ownership**: the component source files live in your project, not in `node_modules`
+- **Customizable**: change the styles, change the behavior, or remove what you don't need
+- **No version lock-in**: you decide when to pull an update
+- **Tree-shake friendly**: only the components you use exist in your codebase
 
-The theme system (`@rootnative/core`) stays as an npm dependency so theme updates propagate automatically.
+The theme system (`@rootnative/core`) stays an npm dependency, so a theme update reaches you through npm.
 
 ## Prerequisites
 
 - Node.js >= 18
-- Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band the published packages declare
-- TypeScript project with path aliases configured (e.g. `@/*` → `src/*`)
+- Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band that the published packages declare
+- A TypeScript project with path aliases (for example `@/*` → `src/*`)
 
 ## Quick start
 
@@ -39,18 +39,18 @@ Run `init` in your React Native or Expo project:
 npx rootnative init
 ```
 
-The CLI will:
+The CLI does this:
 
-1. Detect your project type (Expo or bare React Native) — it stops here if it finds neither
-2. Detect your package manager (npm, yarn, pnpm, bun)
-3. Read path aliases from your `tsconfig.json` to seed the defaults
-4. Ask where to place components and utility files
-5. Create an `rootnative.json` config file, pinned to the current release tag
-6. Add a `paths` mapping to your `tsconfig.json` when your alias prefix has none
-7. Offer to point AI agents at the [LLM docs](./llms) from your `CLAUDE.md`
-8. Offer to install `@rootnative/core`
+1. Detects your project type (Expo or bare React Native). It stops here if it finds neither.
+2. Detects your package manager (npm, yarn, pnpm, bun).
+3. Reads the path aliases from your `tsconfig.json` as the defaults.
+4. Asks where to put the components and the utility files.
+5. Creates a `rootnative.json` config file, pinned to the current release tag.
+6. Adds a `paths` mapping to your `tsconfig.json` when your alias prefix has none.
+7. Offers to point AI agents at the [LLM docs](./llms) from your `CLAUDE.md`.
+8. Offers to install `@rootnative/core`.
 
-Steps 7 and 8 are confirmation prompts; `-y` accepts both.
+Steps 7 and 8 are confirmation prompts. `-y` accepts both.
 
 ### 2. Add components
 
@@ -58,7 +58,7 @@ Steps 7 and 8 are confirmation prompts; `-y` accepts both.
 npx rootnative add button
 ```
 
-This copies the Button source files into your project and installs any required dependencies.
+This copies the Button source files into your project and installs each required dependency.
 
 ### 3. Use them
 
@@ -78,8 +78,8 @@ export default function App() {
 ```
 
 A string icon name such as `leadingIcon="check"` needs an `iconResolver` on
-`ThemeProvider`. A copy-paste project does not install `@rootnative/components`,
-so it does not get `mdiResolver` from the npm package. Write the resolver in the
+`ThemeProvider`. A copy-paste project doesn't install `@rootnative/components`,
+so it doesn't get `mdiResolver` from the npm package. Write the resolver in the
 project instead:
 
 ```tsx
@@ -109,7 +109,7 @@ does.
 
 ### `create`
 
-Create a new project with RootNative UI pre-configured. See [Quick Start](./quick-start) for a full walkthrough.
+Creates a new project with Root Native UI set up. See [Quick Start](./quick-start) for the full steps.
 
 ```bash
 npx rootnative create
@@ -117,9 +117,9 @@ npx rootnative create my-app
 npx rootnative create .
 ```
 
-The CLI prompts for template, project name, display name, and package manager, then scaffolds a ready-to-run Expo project with `ThemeProvider` and example components.
+The CLI asks for the template, the project name, the display name, and the package manager. Then it makes a ready-to-run Expo project with `ThemeProvider` and example components.
 
-**Scaffolding into the current directory:** pass `.` as the name. The CLI writes the template into the directory you are in, and takes the project name from that directory's name. Your directory is never deleted. If the template would overwrite a file that is already there — an existing `.gitignore` or `README.md`, for example — the CLI lists each file and asks first. With `-y` it stops instead, and changes nothing.
+**To create the project in the current directory**, pass `.` as the name. The CLI writes the template into the directory you are in, and takes the project name from the name of that directory. It never deletes your directory. If the template would overwrite a file that is already there, for example an existing `.gitignore` or `README.md`, the CLI lists each file and asks first. With `-y` it stops instead, and changes nothing.
 
 A named project goes into a new subdirectory. If that subdirectory already exists, the CLI asks to delete it and all of its contents. With `-y` it stops instead.
 
@@ -133,13 +133,13 @@ A named project goes into a new subdirectory. If that subdirectory already exist
 
 ### `init`
 
-Initialize your project for RootNative UI.
+Sets up your project for Root Native UI.
 
 ```bash
 npx rootnative init
 ```
 
-If `rootnative.json` already exists, you'll be asked whether to overwrite it.
+If `rootnative.json` already exists, the CLI asks whether to overwrite it.
 
 **Options:**
 
@@ -152,21 +152,21 @@ If `rootnative.json` already exists, you'll be asked whether to overwrite it.
 
 **What `init` writes:**
 
-1. `rootnative.json` — your aliases, plus a `registryVersion` pinned to the release tag
+1. `rootnative.json`: your aliases, plus a `registryVersion` pinned to the release tag
    that matches the latest published `@rootnative/core`.
-2. A `paths` mapping in `tsconfig.json` for your alias prefix, when one is not already
-   there. `add` rewrites every generated import to that alias, so without the mapping
-   TypeScript cannot resolve any of them. An existing mapping is never overwritten.
+2. A `paths` mapping in `tsconfig.json` for your alias prefix, when there is none.
+   `add` rewrites every generated import to that alias, so without the mapping
+   TypeScript can't resolve any of them. `init` never overwrites an existing mapping.
 3. A pointer to the LLM docs in `CLAUDE.md`, if you accept the prompt.
 
-If `init` cannot pin `registryVersion` to a release tag — npm unreachable, or the tag is
-not pushed yet — it warns and falls back to `main`. Take that warning seriously: `main` is
-the development branch, and component source copied from it can use `@rootnative/core`
-APIs that your installed release does not export yet.
+If `init` can't pin `registryVersion` to a release tag (npm is unreachable, or nobody
+pushed the tag yet), it warns and falls back to `main`. Take that warning seriously.
+`main` is the development branch, and component source from it can use
+`@rootnative/core` APIs that your installed release doesn't export yet.
 
 ### `add`
 
-Add one or more components to your project.
+Adds one or more components to your project.
 
 ```bash
 npx rootnative add button
@@ -174,7 +174,7 @@ npx rootnative add card chip text-field
 npx rootnative add appbar
 ```
 
-**Automatic dependency resolution** — if a component depends on other components, they are added automatically. For example, `appbar` depends on `button`, `icon-button`, `portal`, `tooltip` and `typography`, so all six are added together.
+**Automatic dependency resolution.** If a component depends on other components, the CLI adds them too. For example, `appbar` depends on `button`, `icon-button`, `portal`, `tooltip` and `typography`, so the CLI adds all six together.
 
 **Options:**
 
@@ -187,18 +187,18 @@ npx rootnative add appbar
 
 **What happens when you run `add`:**
 
-1. The CLI fetches the component registry and validates the requested names
-2. It resolves the full dependency graph
-3. It shows a summary of what will be installed — components, utilities, and npm packages
-4. After confirmation, utility files are copied to your `lib/` directory
-5. A barrel file (`rootnative-utils.ts`) is generated that re-exports only the utilities your installed components need
-6. It fetches the component source files from the registry
-7. Import paths are rewritten to match your project's alias configuration
-8. Any required npm packages are installed via your package manager
+1. The CLI fetches the component registry and checks the requested names.
+2. It resolves the full dependency graph.
+3. It shows a summary of what it will install: components, utilities, and npm packages.
+4. After your confirmation, it copies the utility files to your `lib/` directory.
+5. It generates a barrel file (`rootnative-utils.ts`) that re-exports only the utilities your installed components need.
+6. It fetches the component source files from the registry.
+7. It rewrites the import paths to match the alias configuration of your project.
+8. It installs each required npm package with your package manager.
 
 ### `update`
 
-Update installed components to the latest version from the registry.
+Updates the installed components to the latest version from the registry.
 
 ```bash
 npx rootnative update button
@@ -214,7 +214,7 @@ npx rootnative update --all
 
 ### `upgrade`
 
-Upgrade `@rootnative/core` to the latest version and install any new peer dependencies.
+Upgrades `@rootnative/core` to the latest version and installs each new peer dependency.
 
 ```bash
 npx rootnative upgrade
@@ -230,7 +230,7 @@ npx rootnative upgrade
 
 ### `list`
 
-Show all available components with their install status.
+Shows all available components with their install status.
 
 ```bash
 npx rootnative list
@@ -248,19 +248,19 @@ Available components (v<registry version>):
   ...
 ```
 
-The version is the registry's, which tracks the latest published release.
-`installed` means the component's directory exists under your configured
-components alias.
+The version is the version of the registry, which follows the latest published
+release. `installed` means that the directory of the component exists under
+your configured components alias.
 
 ### `doctor`
 
-Diagnose common issues in your project.
+Finds common problems in your project.
 
 ```bash
 npx rootnative doctor
 ```
 
-Checks performed:
+The checks:
 
 | Check | Description | On failure |
 |-------|-------------|------------|
@@ -275,12 +275,12 @@ Checks performed:
 | Required peers | `react-native-svg` is installed — the `@rootnative/components` barrel requires it at load time | fail |
 | Optional peers | `react-native-safe-area-context` status, and `@react-native-vector-icons/material-design-icons` status (needed only by `mdiResolver`) | warn |
 
-Only `fail` rows count toward the issue total in the summary line. `info` rows never do,
-so `doctor` runs and exits zero on a project straight out of `create`.
+Only the `fail` rows count in the issue total of the summary line. The `info` rows never
+do, so `doctor` runs and exits with zero on a project straight out of `create`.
 
 ## Configuration
 
-`rootnative init` creates an `rootnative.json` file in your project root:
+`rootnative init` creates a `rootnative.json` file in your project root:
 
 ```json
 {
@@ -296,21 +296,21 @@ so `doctor` runs and exits zero on a project straight out of `create`.
 
 | Field | Default | Description |
 |-------|---------|-------------|
-| `aliases.components` | `@/components/ui` | Directory where component folders are created |
-| `aliases.lib` | `@/lib` | Directory where utility files are placed |
-| `registryUrl` | GitHub raw URL | Base URL for fetching source files |
-| `registryVersion` | the current release tag | Git ref to fetch from (tag, branch name, or commit hash) |
+| `aliases.components` | `@/components/ui` | The directory where the CLI creates the component folders |
+| `aliases.lib` | `@/lib` | The directory where the CLI puts the utility files |
+| `registryUrl` | GitHub raw URL | The base URL for the source files |
+| `registryVersion` | the current release tag | The Git ref to fetch from (a tag, a branch name, or a commit hash) |
 
-`init` pins `registryVersion` to the `v<version>` tag matching the latest
+`init` pins `registryVersion` to the `v<version>` tag that matches the latest
 published `@rootnative/core`, so `add` and `update` fetch reproducible source.
-It falls back to `main` only when npm is unreachable or the tag hasn't been
-pushed yet. A pinned project doesn't pick up new component source on its
-own — `rootnative upgrade` moves the pin forward. See
+It falls back to `main` only when npm is unreachable, or when nobody pushed the
+tag yet. A pinned project doesn't get new component source on its own.
+`rootnative upgrade` moves the pin forward. See
 [API stability](./api-stability#registry-pinning).
 
 ### Path aliases
 
-The CLI uses your `tsconfig.json` path aliases to generate clean import paths. If your project has:
+The CLI uses the path aliases of your `tsconfig.json` to generate clean import paths. If your project has:
 
 ```json
 {
@@ -322,13 +322,13 @@ The CLI uses your `tsconfig.json` path aliases to generate clean import paths. I
 }
 ```
 
-Then `aliases.components` of `@/components/ui` maps to `src/components/ui/` on disk, and generated imports use `@/components/ui/button` instead of relative paths.
+Then `aliases.components` of `@/components/ui` maps to `src/components/ui/` on disk, and the generated imports use `@/components/ui/button` instead of relative paths.
 
-> **Note:** If you use `~/*` instead of `@/*`, the CLI detects that and adjusts the default aliases accordingly.
+> **Note:** If you use `~/*` instead of `@/*`, the CLI detects that and changes the default aliases to match.
 
 ## Project structure
 
-After running `npx rootnative add appbar`, your project looks like this — `appbar` pulls in five components, so all six are installed:
+After `npx rootnative add appbar`, your project looks like this. `appbar` pulls in five components, so the CLI installs all six:
 
 ```
 src/
@@ -394,13 +394,13 @@ src/
 
 ### What gets copied
 
-**Component files** — each component is a self-contained directory with the same structure as the library source: the component file, types, styles, and an index barrel.
+**Component files.** Each component is a self-contained directory with the same structure as the library source: the component file, the types, the styles, and an index barrel.
 
-**Shared files** — hooks and helpers that several components share (`useStateLayer`, `usePressMorph`, `useBooleanProgress`, `elevationShadow`, `safe-area`) are **copied into each component's own directory** rather than into `lib/`, and their imports are rewritten to be local. That keeps every component directory self-contained and independently deletable, at the cost of duplicating a file when two components need it — `usePressMorph.ts` above lands in both `button/` and `icon-button/`. These are library internals, not API: see [API stability](./api-stability#copy-pasted-component-source).
+**Shared files.** The CLI **copies the hooks and helpers that several components share** (`useStateLayer`, `usePressMorph`, `useBooleanProgress`, `elevationShadow`, `safe-area`) into the directory of each component, not into `lib/`, and rewrites their imports to local paths. So every component directory is self-contained, and you can delete it on its own. The cost is a duplicate file when two components need it: `usePressMorph.ts` above lands in both `button/` and `icon-button/`. These files are library internals, not API; see [API stability](./api-stability#copy-pasted-component-source).
 
-**Utility files** — small helper functions that components depend on. These are copied from `@rootnative/utils` (which is not published to npm) into your `lib/` directory. Only the utilities needed by your installed components are copied.
+**Utility files.** Small helper functions that the components depend on. The CLI copies them from `@rootnative/utils` (not published to npm) into your `lib/` directory. It copies only the utilities that your installed components need.
 
-**Barrel file** — `rootnative-utils.ts` is auto-generated and re-exports only the functions your components use:
+**Barrel file.** The CLI generates `rootnative-utils.ts`. It re-exports only the functions your components use:
 
 ```ts
 // Auto-generated by rootnative CLI. Do not edit.
@@ -415,22 +415,22 @@ export { transformOrigin, selectRTL } from './rtl'
 
 ### Import rewriting
 
-The CLI rewrites imports in copied component files so they work in your project:
+The CLI rewrites the imports in the copied component files, so they work in your project:
 
 | Original (library source) | Rewritten to |
 |---------------------------|-------------|
-| `from '@rootnative/core'` | Unchanged — npm package |
-| `from '@rootnative/inertia'` | Unchanged — npm package |
+| `from '@rootnative/core'` | Unchanged (npm package) |
+| `from '@rootnative/inertia'` | Unchanged (npm package) |
 | `from '@rootnative/utils'` | `from '@/lib/rootnative-utils'` |
 | `from '../icon-button'` | `from '@/components/ui/icon-button'` |
-| `from '../internal/useStateLayer'` | `from './useStateLayer'` — flattened into the component's own directory |
-| `from '../safe-area'` | `from './safe-area'` — same flattening |
-| `from './styles'` | Unchanged — same directory |
+| `from '../internal/useStateLayer'` | `from './useStateLayer'` (flattened into the directory of the component) |
+| `from '../safe-area'` | `from './safe-area'` (the same flattening) |
+| `from './styles'` | Unchanged (same directory) |
 
 ## Available components
 
-All 37, with the components each one pulls in automatically. Descriptions match
-what `npx rootnative list` prints, since both read the same registry.
+All 37, with the components that each one pulls in. The descriptions match
+what `npx rootnative list` prints, because both read the same registry.
 
 | Component | Dependencies | Description |
 |-----------|-------------|-------------|
@@ -478,9 +478,9 @@ what `npx rootnative list` prints, since both read the same registry.
 | | CLI (`npx rootnative add`) | npm (`@rootnative/components`) |
 |---|---|---|
 | Component code lives in | Your project (`src/`) | `node_modules/` |
-| Customization | Edit source directly | Override via props/theme only |
-| Updates | Re-run `add --force` when you choose | `npm update` |
+| Customization | Edit the source directly | Override through props and the theme only |
+| Updates | Run `add --force` again when you choose | `npm update` |
 | Bundle size | Only what you add | Tree-shaking at build time |
 | Setup | `npx rootnative init` | `pnpm add @rootnative/components` |
 
-Both approaches use `@rootnative/core` for theming — they are fully compatible and you can even mix them in the same project.
+Both approaches use `@rootnative/core` for the theme. They are fully compatible, and you can mix them in one project.

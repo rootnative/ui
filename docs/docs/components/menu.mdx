@@ -5,18 +5,18 @@ description: Menus show a list of choices on a temporary surface, anchored to th
 
 # Menu
 
-Menus show a list of choices on a temporary surface, anchored to the control that opened them.
-Follows the [Material Design 3 Menu](https://m3.material.io/components/menus/overview) specification.
+A menu shows a list of choices on a temporary surface, anchored to the control that opened it.
+It follows the [Material Design 3 Menu](https://m3.material.io/components/menus/overview) specification.
 
-Menu renders through [Portal](./portal.mdx), so your app must be wrapped in a `PortalHost` once
-at the root. It claims the `PORTAL_LAYERS.menu` layer, which puts it above bottom sheets,
-dialogs, and snackbars — a menu can be opened from any of them.
+Menu renders through [Portal](./portal.mdx), so wrap your app in a `PortalHost` once at the
+root. It claims the `PORTAL_LAYERS.menu` layer, which puts it above bottom sheets, dialogs, and
+snackbars. A menu can open from any of them.
 
 ## Usage
 
 Pass the trigger as `anchor` and the choices as children. With no `visible` prop, Menu manages
-its own open state: it hooks the anchor's press to open, and closes on an outside press, an item
-press, or the Android back button.
+its own open state. It hooks the press of the anchor to open, and closes on an outside press, an
+item press, or the Android back button.
 
 <SnackExample
   name="RootNative Menu — Usage"
@@ -60,14 +60,14 @@ press, or the Android back button.
 />
 
 The anchor renders where the `<Menu>` sits in your tree, wrapped in a measuring `View`. In
-self-managing mode it has to be a single element that accepts `onPress` — every RootNative
+self-managing mode it must be a single element that accepts `onPress`. Every Root Native
 pressable does. Its own `onPress` still fires.
 
 ## Controlled
 
-Pass `visible` and `onDismiss` to drive visibility yourself. Menu then never toggles itself:
-the anchor's press is yours to wire, and `onDismiss` fires for outside presses, item presses,
-and Android back.
+Pass `visible` and `onDismiss` to drive the visibility yourself. Menu then never toggles
+itself. You wire the press of the anchor, and `onDismiss` fires for an outside press, an item
+press, and Android back.
 
 <SnackExample
   name="RootNative Menu — Controlled"
@@ -127,20 +127,20 @@ and Android back.
 
 ## Items
 
-`Menu.Item` renders a leading icon, a label, trailing text, and a trailing icon — all optional
-except the label. Anything else you put in a Menu renders as given, which is how a
+`Menu.Item` renders a leading icon, a label, trailing text, and a trailing icon. All are
+optional except the label. Anything else you put in a Menu renders as given. That is how a
 [`Divider`](./divider.mdx) groups items.
 
 | Prop | Renders |
 |------|---------|
 | `label` | `labelLarge` / `onSurface`, truncated to one line |
 | `leadingIcon` | 24dp / `onSurfaceVariant` |
-| `trailingText` | `labelLarge` / `onSurfaceVariant` — a keyboard shortcut or short status |
+| `trailingText` | `labelLarge` / `onSurfaceVariant`: a keyboard shortcut or a short status |
 | `trailingIcon` | 24dp / `onSurfaceVariant` |
-| `disabled` | Label and both icons dim together at 38% opacity, keeping their own colors; the item stops responding |
+| `disabled` | The label and both icons dim together at 38% opacity, and keep their own colors. The item stops responding |
 
 **An item press closes the menu.** Set `closeOnPress={false}` on an item that toggles something
-and should stay open — a sort choice or a "show hidden files" switch.
+and must stay open, such as a sort choice or a "show hidden files" switch.
 
 ## Placement
 
@@ -152,27 +152,27 @@ and should stay open — a sort choice or a "show hidden files" switch.
 | `align` | `'start' \| 'center' \| 'end'` | `'start'` | Cross-axis alignment against the anchor |
 | `offset` | `number` | `0` | Gap between the anchor edge and the menu, in dp |
 | `screenMargin` | `number` | `8` | Minimum distance the menu keeps from every screen edge |
-| `maxHeight` | `number` | — | Cap the menu's height in dp, scrolling past it |
+| `maxHeight` | `number` | — | Caps the height of the menu in dp. The menu scrolls past it |
 
-`align` is **logical**: `'start'` is the anchor's left edge in LTR and its right edge in RTL.
+`align` is **logical**: `'start'` is the left edge of the anchor in LTR and its right edge in RTL.
 
-A menu that would not fit on its preferred side flips to the other side — but only when that
-side is genuinely roomier, since flipping into an equally cramped side just moves the clipping
-around. Horizontally, the menu shifts back inside the margin rather than flipping. When neither
-side has room for the whole menu, it caps at the available height and scrolls.
+A menu that doesn't fit on its preferred side flips to the other side, but only when that side
+has more room. A flip into a side with the same room only moves the clipping. Horizontally, the
+menu shifts back inside the margin instead of a flip. When neither side has room for the whole
+menu, it caps at the available height and scrolls.
 
-The menu positions itself from the anchor's window coordinates, measured when it opens. It does
-not follow the anchor while a scroll view moves underneath it — closing and reopening
-re-measures.
+The menu positions itself from the window coordinates of the anchor, measured when it opens.
+It doesn't follow the anchor while a scroll view moves under it. A close and a reopen measure
+again.
 
 ### Height
 
-A menu never exceeds the space available on the side it resolved to — anything past that would
-put items where they cannot be seen. When the items do not fit, the menu caps at that space and
+A menu never exceeds the space available on the side it resolved to. Anything past that would
+put items where nobody can see them. When the items don't fit, the menu caps at that space and
 scrolls.
 
-`maxHeight` caps it sooner. It is a cap, not an override: it only ever makes the menu shorter,
-and a value larger than the available space is ignored.
+`maxHeight` caps it sooner. It is a cap, not an override. It only ever makes the menu shorter,
+and the menu ignores a value larger than the available space.
 
 ```tsx
 {/* 30 items with room for all of them is a wall of text; 280dp reads better */}
@@ -183,20 +183,19 @@ and a value larger than the available space is ignored.
 </Menu>
 ```
 
-The cap is folded into the placement decision rather than applied after it, so a menu that fits
-below the anchor *once capped* stays below it instead of flipping above on account of its
-uncapped height.
+The placement decision includes the cap, and doesn't apply it after. So a menu that fits below
+the anchor *once capped* stays below it, and doesn't flip above because of its uncapped height.
 
 ### The menu is confined to its PortalHost
 
-A menu can only be seen inside the overlay layer it renders into, so that layer — not the window
-— is what it fits itself to. A `PortalHost` mounted *inside* a screen, below an app bar or above
-a bottom navigation, gives a layer shorter than the window, and a tall menu caps at the layer's
-edge instead of reaching past it into a region that would be clipped.
+You can see a menu only inside the overlay layer it renders into, so the menu fits itself to
+that layer, not to the window. A `PortalHost` mounted *inside* a screen, below an app bar or
+above a bottom navigation, gives a layer shorter than the window. A tall menu then caps at the
+edge of the layer, and doesn't reach past it into a region that the layer would clip.
 
-That is why the root of your app is the right place for `PortalHost`: it gives menus the whole
-window to work with. Mount one per screen and menus near the bottom of a long list will have
-noticeably less room to open into.
+That is why the root of your app is the right place for `PortalHost`. It gives a menu the whole
+window. If you mount one per screen, a menu near the bottom of a long list has much less room
+to open into.
 
 ## Overrides
 
@@ -205,17 +204,17 @@ noticeably less room to open into.
 | `containerColor` | The menu surface background |
 | `style` | The menu surface |
 | `anchorStyle` | The `View` wrapping the anchor |
-| `Menu.Item` `containerColor` | The item background; hover/press/focus layers re-derive from it |
-| `Menu.Item` `contentColor` | The item's label, both icons, and trailing text |
-| `Menu.Item` `labelStyle` | The label `Text` only — does not affect the icons |
+| `Menu.Item` `containerColor` | The item background. The hover, press and focus layers derive from it again |
+| `Menu.Item` `contentColor` | The label, both icons, and the trailing text of the item |
+| `Menu.Item` `labelStyle` | The label `Text` only. It doesn't affect the icons |
 
-`contentColor` on an item is how a destructive choice gets `error` coloring:
+`contentColor` on an item is how a destructive choice gets the `error` color:
 
 ```tsx
 <Menu.Item label="Delete" leadingIcon="trash-can-outline" contentColor={theme.colors.error} />
 ```
 
-Disabled items always use the MD3 disabled treatment; neither override changes that.
+A disabled item always uses the MD3 disabled treatment. Neither override changes that.
 
 ## Tokens
 
@@ -228,25 +227,25 @@ Disabled items always use the MD3 disabled treatment; neither override changes t
 | Item padding | 12dp horizontal, 12dp between icon, label, and trailing content |
 | Item label | `labelLarge` / `onSurface` |
 | Leading / trailing icon | 24dp / `onSurfaceVariant` |
-| Scrim | None — MD3 menus do not dim what is behind them |
+| Scrim | None. An MD3 menu doesn't dim what is behind it |
 
 ## Motion
 
-The menu scales in from 80% and fades on `springFastSpatial`, growing out of the corner nearest
-the anchor via `transformOrigin`. Both collapse to a hard cut under reduced motion — see
+The menu scales in from 80% and fades on `springFastSpatial`. It grows out of the corner nearest
+the anchor, through `transformOrigin`. Both collapse to a hard cut under reduced motion; see
 [Motion](../motion.md).
 
-The surface stays invisible for the frame between mounting and being measured: its own size is
-what decides which side it lands on, so it has to be laid out before it can be placed.
+The surface stays invisible for the frame between the mount and the measurement. Its own size
+decides which side it lands on, so the layout must run before the placement.
 
 ## Accessibility
 
-- The surface reports `role="menu"` and items report `role="menuitem"`.
-- Items expose `accessibilityState.disabled`.
-- The anchor is annotated for you, in both the controlled and uncontrolled forms: `aria-haspopup="menu"` plus an `aria-expanded` that tracks the menu, so a screen reader announces the trigger as opening a menu rather than as a plain button.
-- **On web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web). The surface is deliberately *not* marked modal on native — that would take the dismiss region below out of the accessibility tree along with it.
-- The region that catches outside presses is announced as a button labelled "Close menu" — override with `dismissAccessibilityLabel`. MD3 menus have no scrim, so this region is transparent; it exists to catch outside presses and to give screen readers a way out.
-- On web, items show a keyboard focus ring (`secondary`, 3dp) driven by the same focus-visible state as the rest of the library.
+- The surface reports `role="menu"`, and each item reports `role="menuitem"`.
+- An item exposes `accessibilityState.disabled`.
+- The anchor is annotated for you, in both the controlled and the uncontrolled form: `aria-haspopup="menu"` plus an `aria-expanded` that follows the menu. So a screen reader announces the trigger as a control that opens a menu, not as a plain button.
+- **On web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between the items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web). The surface is *not* marked modal on native, on purpose. A modal mark would also take the dismiss region below out of the accessibility tree.
+- The region that catches outside presses announces as a button labelled "Close menu". Override it with `dismissAccessibilityLabel`. An MD3 menu has no scrim, so this region is transparent. It exists to catch outside presses and to give a screen reader a way out.
+- On web, an item shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible state as the rest of the library.
 
 ## Props
 

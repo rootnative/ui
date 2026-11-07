@@ -5,7 +5,7 @@
 
 What a search engine and a link preview read from a React Native web app: the document head, the structured data, the heading outline, the image text, the HTML shell, the sitemap, and the robots file.
 
-The package holds the parts that do not depend on your data. Your app keeps the mapping from its data to the meta. The same package serves an Expo Router static export, a Vite and react-native-web build, and an Electron renderer, because the core has no dependency on React Native or on a router.
+The package holds the parts that don't depend on your data. Your app keeps the mapping from its data to the meta. The same package serves an Expo Router static export, a Vite and react-native-web build, and an Electron renderer, because the core has no dependency on React Native or on a router.
 
 ## Install
 
@@ -97,7 +97,17 @@ expo export --platform web && rootnative-seo dist
 
 A page goes in the sitemap with its canonical link, when that link is under the site and the page has no `noindex`. The command prints each page it leaves out, with the reason. It also sets `lang` on `<html>` of each page whose own language, from its `hreflang` link to itself or else its `og:locale`, is not the language of the shell: Expo Router writes the `<html>` of `app/+html.tsx` on every page, so without this the German version of an English site says `lang="en"`. `PageHead` sets the same `lang` after hydration. `--no-lang` skips the step. A server export renders each page at request time, so it keeps the `lang` of the shell until hydration.
 
-Then check the export, in CI: `rootnative-seo audit dist` reads every page and fails on a missing title, a page with no canonical link and no `noindex`, not exactly one `<h1>` or `<main>`, no `lang` on `<html>` or a `lang` that is not the language of the page, an `<img>` with no `alt`, `hreflang` links that the other language versions do not match, or a sitemap that disagrees with the pages. `rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request, which is where a hydration mismatch shows.
+Then check the export, in CI. `rootnative-seo audit dist` reads every page and fails on one of these:
+
+- a missing title
+- a page with no canonical link and no `noindex`
+- not exactly one `<h1>` or `<main>`
+- no `lang` on `<html>`, or a `lang` that is not the language of the page
+- an `<img>` with no `alt`
+- `hreflang` links that the other language versions don't match
+- a sitemap that disagrees with the pages
+
+`rootnative-seo browse dist` loads every page in headless Chrome and fails on an uncaught exception, a `console.error`, or a failed request. That is where a hydration mismatch shows.
 
 ## The rules the head follows
 

@@ -6,7 +6,7 @@
 
 # @rootnative/core
 
-Design-system agnostic theme engine for [RootNative UI](https://github.com/rootnative/ui) — a React Native component library. Ships with Material Design 3 out of the box.
+The theme engine of [Root Native UI](https://github.com/rootnative/ui), a React Native component library. It works with any design system, and ships with Material Design 3.
 
 ## Install
 
@@ -16,17 +16,17 @@ pnpm add @rootnative/core @rootnative/inertia
 
 Peer dependencies: `react >=19.3.0`, `react-native >=0.88.0 <0.89.0`, `@rootnative/inertia >=0.0.26 <0.1.0`
 
-`@rootnative/inertia` is required — every animation in the library runs on it.
-npm and pnpm install required peers automatically; Yarn classic does not, so add
+`@rootnative/inertia` is required. Every animation in the library runs on it.
+npm and pnpm install the required peers for you. Yarn classic doesn't, so add
 it by hand there.
 
-`createMaterialTheme` needs no extra install — its MD3 color engine
+`createMaterialTheme` needs no extra install. Its MD3 color engine
 (`@material/material-color-utilities`) is bundled behind the
 `@rootnative/core/create-theme` subpath.
 
 ## Quick start (Material Design 3)
 
-Wrap your app root with `ThemeProvider`:
+Wrap your app root in `ThemeProvider`:
 
 ```tsx
 import { ThemeProvider } from '@rootnative/core'
@@ -44,13 +44,13 @@ export default function App() {
 
 ### ThemeProvider
 
-Provides the theme context to all child components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme.
+Provides the theme context to all child components. It works with any design system: Material Design 3 or a custom theme. The default is the MD3 light theme.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `theme` | `BaseTheme` | `lightTheme` (MD3) | Theme object |
-| `iconResolver` | `IconResolver` | none | Resolves string icon names (`leadingIcon="check"`) to icon nodes. Set once at the app root to use Lucide, SF Symbols, custom SVGs, etc. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons). A nested provider without it uses the resolver of its parent |
-| `children` | `ReactNode` | — | App content |
+| `theme` | `BaseTheme` | `lightTheme` (MD3) | The theme object |
+| `iconResolver` | `IconResolver` | none | Resolves a string icon name (`leadingIcon="check"`) to an icon node. Set it once at the app root to use Lucide, SF Symbols, custom SVGs, and so on. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons). A nested provider without it uses the resolver of its parent |
+| `children` | `ReactNode` | — | The app content |
 
 ### useTheme()
 
@@ -68,7 +68,7 @@ const theme = useTheme<MyTheme>()
 
 ### defineTheme(theme)
 
-Type-safe helper for creating custom themes:
+A helper that makes a custom theme with full type checks:
 
 ```tsx
 import { defineTheme } from '@rootnative/core'
@@ -87,7 +87,7 @@ const myTheme = defineTheme({
 
 ### createMaterialTheme(seedColor)
 
-Generates a complete MD3 light and dark theme from a single seed color using Google's HCT color space.
+Makes a complete MD3 light and dark theme from one seed color, with Google's HCT color space.
 
 ```tsx
 import { createMaterialTheme } from '@rootnative/core/create-theme'
@@ -98,13 +98,13 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A')
 <ThemeProvider theme={lightTheme}>{children}</ThemeProvider>
 ```
 
-No extra install is needed, and the subpath imports nothing from
-`react-native`, so it also runs in plain Node — print a palette from a script
+You need no extra install, and the subpath imports nothing from
+`react-native`, so it also runs in plain Node. Print a palette from a script,
 or check a theme in CI.
 
 ### applyRoundness(roundness)
 
-Scales the MD3 corner radius tokens by a multiplier — `0` = sharp corners, `1` = default MD3, `2` = double rounding. `cornerNone` stays `0` and `cornerFull` stays `999`.
+Scales the MD3 corner radius tokens by a multiplier: `0` = sharp corners, `1` = the MD3 default, `2` = double rounding. `cornerNone` stays `0` and `cornerFull` stays `999`.
 
 ```tsx
 import { lightTheme, applyRoundness } from '@rootnative/core'
@@ -114,7 +114,7 @@ const sharp: Theme = { ...lightTheme, shape: applyRoundness(0.5) }
 
 ### material preset
 
-Grouped object with all MD3 theme values:
+One grouped object with all MD3 theme values:
 
 ```tsx
 import { material } from '@rootnative/core'
@@ -126,19 +126,19 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- `BaseTheme` — Generic base. Colors as `Record<string, string>`, typography as `Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
-- `Theme` — MD3 theme. Extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 emphasized), optional `topAppBar` tokens. `MaterialTheme` is an identical alias — use it to disambiguate in multi-design-system codebases.
+- `BaseTheme`: the generic base. Colors as `Record<string, string>`, typography as `Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
+- `Theme`: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 emphasized), and the optional `topAppBar` tokens. `MaterialTheme` is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
 
 ### Theme structure
 
 | Token group | Description |
 |-------------|-------------|
-| `colors` | Design-system specific color roles (`Record<string, string>`) |
-| `typography` | Type scale variants (`Record<string, TypographyToken>`) |
-| `shape` | `roundness` multiplier plus corner radius tokens (`cornerNone` through `cornerFull`) |
-| `spacing` | Spacing scale (xs, sm, md, lg, xl) |
-| `elevation` | Shadow levels `level0` through `level5` |
-| `stateLayer` | Opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
+| `colors` | The color roles of the design system (`Record<string, string>`) |
+| `typography` | The type scale variants (`Record<string, TypographyToken>`) |
+| `shape` | The `roundness` multiplier plus the corner radius tokens (`cornerNone` through `cornerFull`) |
+| `spacing` | The spacing scale (xs, sm, md, lg, xl) |
+| `elevation` | The shadow levels `level0` through `level5` |
+| `stateLayer` | The opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
 | `motion` | 16 `duration*`, 7 `easing*` and 6 `spring*` tokens |
 
 ### Custom MD3 theme
@@ -207,7 +207,7 @@ Returns the current MD3 window size class: `'compact'` | `'medium'` | `'expanded
 
 ### useBreakpointValue(values)
 
-Returns a value based on the current breakpoint with cascade fallback.
+Returns the value of the current breakpoint. A missing breakpoint falls back to the nearest smaller entry.
 
 ```tsx
 const columns = useBreakpointValue({ compact: 1, medium: 2, expanded: 4 })
@@ -223,28 +223,28 @@ const { width } = useWindowDimensions()
 
 ## Exports
 
-- `ThemeProvider` — Theme context provider (works with any design system, defaults to MD3)
-- `useTheme` — Access current theme (generic)
-- `useIconResolver` — Access the configured icon resolver
-- `useThemeScope` / `ThemeScopeProvider` — Read the providers of one place as one value, and provide them again at another place, for content rendered through a portal
-- `defineTheme` — Type-safe theme creation helper
-- `createMaterialTheme` — Generate MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
-- `schemeGuardScript` / `schemeGuardCss` — Hide the light first paint of a static web export from a dark-scheme reader (import from `@rootnative/core/static-export`, with `SCHEME_ATTRIBUTE` and `THEME_READY_ATTRIBUTE`)
-- `applyRoundness` — Scale MD3 corner radius tokens by a multiplier
-- `material` — MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
-- `useBreakpoint` / `breakpoints` — Current window size class
-- `useBreakpointValue` — Responsive values
-- `useWindowDimensions` — Window size that is safe to hydrate from a static export
-- `lightTheme` / `darkTheme` — Built-in MD3 themes
-- `defaultTopAppBarTokens` — MD3 top app bar defaults
-- `motionTransitions` — The named-transition registry mounted by `ThemeProvider`
-- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `TypographyToken`, `FontWeight`, `Shape`, `Spacing`, `Elevation`, `ElevationLevel`, `ShadowOffset`, `StateLayer`, `Motion`, `MotionSpring`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `IconSource`, `ThemeProviderProps`, `ThemeScope`, `ThemeScopeProviderProps`, `Breakpoint`, `BreakpointValues` — Types
+- `ThemeProvider`: the theme context provider (works with any design system, defaults to MD3)
+- `useTheme`: reads the current theme (generic)
+- `useIconResolver`: reads the configured icon resolver
+- `useThemeScope` / `ThemeScopeProvider`: read the providers of one place as one value, and provide them again at another place, for content rendered through a portal
+- `defineTheme`: makes a custom theme with full type checks
+- `createMaterialTheme`: makes MD3 themes from a seed color (import from `@rootnative/core/create-theme`)
+- `schemeGuardScript` / `schemeGuardCss`: hide the light first paint of a static web export from a dark-scheme reader (import from `@rootnative/core/static-export`, with `SCHEME_ATTRIBUTE` and `THEME_READY_ATTRIBUTE`)
+- `applyRoundness`: scales the MD3 corner radius tokens by a multiplier
+- `material`: the MD3 preset object (`lightTheme`, `darkTheme`, `defaultTopAppBarTokens`)
+- `useBreakpoint` / `breakpoints`: the current window size class
+- `useBreakpointValue`: responsive values
+- `useWindowDimensions`: the window size, safe to hydrate from a static export
+- `lightTheme` / `darkTheme`: the built-in MD3 themes
+- `defaultTopAppBarTokens`: the MD3 top app bar defaults
+- `motionTransitions`: the named-transition registry that `ThemeProvider` mounts
+- `BaseTheme`, `Theme`, `MaterialTheme`, `Colors`, `Typography`, `TypographyToken`, `FontWeight`, `Shape`, `Spacing`, `Elevation`, `ElevationLevel`, `ShadowOffset`, `StateLayer`, `Motion`, `MotionSpring`, `TopAppBarTokens`, `IconResolver`, `IconRenderProps`, `IconSource`, `ThemeProviderProps`, `ThemeScope`, `ThemeScopeProviderProps`, `Breakpoint`, `BreakpointValues`: types
 
 ## Docs
 
 Full docs: https://rootnative.github.io/ui/
 
-LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/core/llms.txt` for the exact installed version.
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt. Or read `node_modules/@rootnative/core/llms.txt` for the exact installed version.
 
 ## License
 

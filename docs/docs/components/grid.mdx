@@ -5,7 +5,7 @@ description: A multi-column grid that wraps children into equal-width columns, b
 
 # Grid
 
-A multi-column grid that wraps children into equal-width columns. Built on top of [Row](./row), so all Box spacing and alignment props are available.
+A multi-column grid that wraps its children into equal-width columns. It is built on [Row](./row), so all the Box spacing and alignment props are available.
 
 ## Usage
 
@@ -39,7 +39,7 @@ A multi-column grid that wraps children into equal-width columns. Built on top o
 
 ## How It Works
 
-Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all columns are equal width. The `gap` prop is implemented as gutters rather than by shrinking cells: each cell takes half the gap as horizontal padding, and the row cancels the outer half on both edges with a negative margin. `flexBasis` stays exactly `100 / columns%`, so the row occupies the full width of its parent and the outermost cells stay flush with its edges.
+Grid wraps each child in a cell with `flexBasis: ${100 / columns}%`, so all columns have the same width. The `gap` prop works as gutters, not as a shrink of the cells: each cell takes half the gap as horizontal padding, and the row cancels the outer half on both edges with a negative margin. `flexBasis` stays exactly `100 / columns%`, so the row takes the full width of its parent, and the outermost cells stay flush with its edges.
 
 ## Different Column Counts
 
@@ -80,9 +80,9 @@ Each child is wrapped in a cell with `flexBasis: ${100 / columns}%`, so all colu
 ## Responsive Columns
 
 `columns` also accepts a map of [window size classes](../responsive). The grid
-re-resolves the count when the window crosses a breakpoint. A map cascades down
-to the nearest smaller breakpoint, so you only set the widths where the count
-changes.
+resolves the count again when the window crosses a breakpoint. A missing
+breakpoint falls back to the nearest smaller one, so you set only the widths
+where the count changes.
 
 <SnackExample
   name="RootNative Grid — Responsive Columns"
@@ -119,9 +119,9 @@ the column count must follow the same breakpoints.
 ## Spanning Cells
 
 A plain child always spans one column. Wrap a child in `Grid.Cell` to make it
-span more, for asymmetric layouts such as a main area with a sidebar. The
-`span` prop also accepts a breakpoint map, and an oversized span is clamped to
-the column count, so it fills the row instead of overflowing it.
+span more, for an asymmetric layout such as a main area with a sidebar. The
+`span` prop also accepts a breakpoint map. Grid clamps an oversized span to
+the column count, so it fills the row instead of an overflow.
 
 <SnackExample
   name="RootNative Grid — Spanning Cells"
@@ -156,15 +156,15 @@ the column count, so it fills the row instead of overflowing it.
 `}
 />
 
-`Grid.Cell` is also exported as `GridCell` for direct imports. It only sizes
-itself inside a `Grid` — rendered anywhere else it warns in development and
-falls back to full width.
+`Grid.Cell` is also exported as `GridCell` for a direct import. It sizes
+itself only inside a `Grid`. Anywhere else, it warns in development and
+falls back to the full width.
 
 ## Staggered entrances
 
-A `<Stagger>` from `@rootnative/inertia` can wrap the grid's children directly.
-`Grid` looks through it, so each child still gets its own cell and still
-inherits its own delay:
+A `<Stagger>` from `@rootnative/inertia` can wrap the children of the grid
+directly. `Grid` looks through it, so each child still gets its own cell and
+still inherits its own delay:
 
 ```tsx
 import { Grid } from '@rootnative/components'

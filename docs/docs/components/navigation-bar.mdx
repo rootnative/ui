@@ -5,17 +5,17 @@ description: Switch between an app's top-level destinations on compact screens.
 
 # NavigationBar
 
-Navigation bars let people switch between an app's top-level destinations on compact screens.
-Follows the [Material Design 3 Navigation bar](https://m3.material.io/components/navigation-bar/overview)
+A navigation bar lets people switch between the top-level destinations of an app on a compact
+screen. It follows the [Material Design 3 Navigation bar](https://m3.material.io/components/navigation-bar/overview)
 specification.
 
-Each destination is an icon over a label, with the active one marked by a `secondaryContainer`
-pill behind its icon. The bar is 80dp tall on a `surfaceContainer` background.
+Each destination is an icon over a label. A `secondaryContainer` pill behind the icon marks the
+active one. The bar is 80dp tall on a `surfaceContainer` background.
 
 :::info NavigationBar is a bar, not a navigator
-`NavigationBar` renders the destinations and tells you which one was pressed. It does not own
-screens, mount panels, or integrate with a navigator. Point it at whatever you already use — see
-[Wiring it to a navigator](#wiring-it-to-a-navigator).
+`NavigationBar` renders the destinations and tells you which one the user pressed. It doesn't
+own screens, mount panels, or integrate with a navigator. Point it at the navigator you already
+use; see [Wiring it to a navigator](#wiring-it-to-a-navigator).
 :::
 
 ## Usage
@@ -74,21 +74,21 @@ prop, the bar tracks the active destination itself and starts on the first item.
 `}
 />
 
-MD3 recommends 3–5 destinations. The row is split equally between them, whatever the count.
+MD3 recommends 3–5 destinations. The destinations split the row equally, whatever the count.
 
-An item's `selectedIcon` is shown while it is active — MD3 pairs an outlined resting icon with
+An item shows its `selectedIcon` while it is active. MD3 pairs an outlined icon at rest with
 its filled counterpart. Leave it off to keep the same icon in both states.
 
 ## Selection
 
-`value` + `onValueChange` is the controlled form; leave `value` off and the bar tracks the
-selection itself, starting on `defaultValue` or the first item. A navigation bar with nothing
-active reads as broken, which is why there is no "no selection" state. `onValueChange` fires on
-every press, controlled or not.
+`value` + `onValueChange` is the controlled form. Leave `value` off, and the bar tracks the
+selection itself, and starts on `defaultValue` or the first item. A navigation bar with nothing
+active looks broken, so there is no "no selection" state. `onValueChange` fires on every press,
+controlled or not.
 
 ### Wiring it to a navigator
 
-NavigationBar deliberately stops at the bar. With `expo-router`, drive it from the current route:
+NavigationBar stops at the bar, on purpose. With `expo-router`, drive it from the current route:
 
 ```tsx
 import { NavigationBar } from '@rootnative/components'
@@ -114,33 +114,33 @@ function AppShellBar() {
 }
 ```
 
-The same shape works for react-navigation — render it as a custom `tabBar` and map
+The same shape works for react-navigation. Render it as a custom `tabBar` and map
 `state.index` to `value`.
 
 ## Label visibility
 
-`labelVisibility` controls when destination labels are shown:
+`labelVisibility` controls when the destination labels show:
 
 | Value | Meaning |
 |-------|---------|
 | `'always'` (default) | Every destination keeps its label |
-| `'selected'` | Only the active destination's label is visible — it fades in on selection while the inactive icons sit centred |
-| `'never'` | No labels; every icon is centred |
+| `'selected'` | Only the label of the active destination is visible. It fades in on selection, and the inactive icons sit centred |
+| `'never'` | No labels. Every icon is centred |
 
-The label stays required on the item either way: it is also the destination's screen-reader name.
+The label stays required on the item in every mode. It is also the screen-reader name of the destination.
 
 ## The indicator
 
 The active indicator is a 56×32dp `secondaryContainer` pill behind the icon. On selection it
-fades in while expanding from its centre, riding `springDefaultSpatial`, and collapses to a hard
-cut under reduced motion — see [Motion](../motion.md). Hover, press, and focus state layers paint
+fades in and expands from its centre on `springDefaultSpatial`. It collapses to a hard cut under
+reduced motion; see [Motion](../motion.md). The hover, press, and focus state layers paint
 inside the same pill shape, on active and inactive destinations alike.
 
 ## Safe area
 
-A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap the row in a
-`SafeAreaView` that adds the bottom inset below the bar's 80dp — leave it off (the default) when
-an ancestor already applies the bottom edge, or the inset would be added twice.
+A bar at the bottom must clear the home indicator. Pass `insetBottom` to wrap the row in a
+`SafeAreaView` that adds the bottom inset below the 80dp of the bar. Leave it off (the default)
+when an ancestor already applies the bottom edge, or the inset applies twice.
 
 ## Overrides
 
@@ -148,16 +148,16 @@ an ancestor already applies the bottom edge, or the inset would be added twice.
 |------|--------|
 | `containerColor` | The bar background |
 | `contentColor` | Icon and label color of inactive destinations |
-| `selectedContentColor` | Icon and label color of the active destination; the state layers re-derive from it |
+| `selectedContentColor` | Icon and label color of the active destination. The state layers derive from it again |
 | `indicatorColor` | The active indicator pill |
-| `labelStyle` | Every destination's label `Text` — does not affect the icons |
+| `labelStyle` | The label `Text` of every destination. It doesn't affect the icons |
 | `style` | The bar container |
 
-Disabled destinations always use the MD3 disabled treatment (38% content); no override changes
+A disabled destination always uses the MD3 disabled treatment (38% content). No override changes
 that.
 
-When you pass `testID`, each destination carries `<testID>-item-<value>` and its indicator
-`<testID>-item-<value>-indicator` so a test can assert on them.
+When you pass `testID`, each destination carries `<testID>-item-<value>`, and its indicator
+carries `<testID>-item-<value>-indicator`, so a test can assert on them.
 
 ## Tokens
 
@@ -166,25 +166,26 @@ When you pass `testID`, each destination carries `<testID>-item-<value>` and its
 | Container | `surfaceContainer`, elevation level 2 |
 | Height | 80dp (+ bottom inset with `insetBottom`) |
 | Active indicator | 56×32dp pill, `secondaryContainer`, full corners |
-| Icon | 24dp — active `onSecondaryContainer`, inactive `onSurfaceVariant` |
-| Label | `labelMedium` — active `secondary`, inactive `onSurfaceVariant` |
+| Icon | 24dp. Active `onSecondaryContainer`, inactive `onSurfaceVariant` |
+| Label | `labelMedium`. Active `secondary`, inactive `onSurfaceVariant` |
 | Indicator → label gap | 4dp |
-| Item padding | 8dp horizontal, destinations split the row equally |
+| Item padding | 8dp horizontal. The destinations split the row equally |
 
 These are the Expressive-updated androidx tokens: the indicator is 56dp wide (not the
-pre-Expressive 64dp) and the active label is `secondary` (not `onSurface`). The 64dp-tall
-Expressive short bar is a possible 1.x variant; this bar uses compose's `TallContainerHeight`.
+pre-Expressive 64dp), and the active label is `secondary` (not `onSurface`). The 64dp-tall
+Expressive short bar is a possible 1.x variant. This bar uses the `TallContainerHeight` of
+Compose.
 
 ## Accessibility
 
-- The bar reports `role="tablist"` and each destination `role="tab"` with
+- The bar reports `role="tablist"`, and each destination reports `role="tab"` with
   `accessibilityState.selected`. Pass `accessibilityLabel` to name the bar itself
   ("Main navigation").
-- A destination's screen-reader name falls back to its label — including when `labelVisibility`
-  hides the visible label; set `accessibilityLabel` on the item to override it.
-- Disabled destinations expose `accessibilityState.disabled` and stop responding.
-- On web, destinations show a keyboard focus ring (`secondary`, 3dp) around the indicator pill,
-  driven by the same focus-visible state as the rest of the library.
+- The screen-reader name of a destination falls back to its label, also when `labelVisibility`
+  hides the visible label. Set `accessibilityLabel` on the item to override it.
+- A disabled destination exposes `accessibilityState.disabled` and stops responding.
+- On web, a destination shows a keyboard focus ring (`secondary`, 3dp) around the indicator
+  pill, driven by the same focus-visible state as the rest of the library.
 
 ## Props
 

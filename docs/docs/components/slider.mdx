@@ -5,15 +5,15 @@ description: Select a value or a range from a continuous or discrete set. Follow
 
 # Slider
 
-Sliders let users select a value or range of values from a continuous or discrete set.
-Follows the [Material Design 3 Slider](https://m3.material.io/components/sliders/overview) specification.
+A slider lets the user select a value, or a range of values, from a continuous or discrete set.
+It follows the [Material Design 3 Slider](https://m3.material.io/components/sliders/overview) specification.
 
-The component supports four MD3 configurations from a single API:
+The component supports four MD3 configurations from one API:
 
-- **Continuous** — single thumb, any value within range
-- **Discrete** — single thumb that snaps to a `step`, with auto-rendered tick marks
-- **Range** — two thumbs (`value={[low, high]}`)
-- **Centered** — active track fills from the midpoint to the thumb (useful for symmetric values like balance)
+- **Continuous**: one thumb, any value in the range
+- **Discrete**: one thumb that snaps to a `step`, with tick marks that the component renders
+- **Range**: two thumbs (`value={[low, high]}`)
+- **Centered**: the active track fills from the midpoint to the thumb, for a symmetric value such as a balance
 
 ## Usage
 
@@ -44,7 +44,7 @@ The component supports four MD3 configurations from a single API:
 
 ## Discrete
 
-Set `step` to a positive number to snap to fixed increments. Tick marks are rendered automatically.
+Set `step` to a positive number to snap to fixed increments. The component renders the tick marks for you.
 
 <SnackExample
   name="RootNative Slider — Discrete"
@@ -80,7 +80,7 @@ Set `step` to a positive number to snap to fixed increments. Tick marks are rend
 
 ## Range
 
-Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `step` when set.
+Pass a `[low, high]` tuple for a range slider with two thumbs. Both thumbs obey `step` when you set it.
 
 <SnackExample
   name="RootNative Slider — Range"
@@ -118,7 +118,7 @@ Pass a `[low, high]` tuple for a two-thumb range slider. Both thumbs respect `st
 
 ## Centered
 
-Pass `centered` for a slider where the active track fills outward from the midpoint instead of from the start. Useful for symmetric values like balance, EQ, or zoom adjustments.
+Pass `centered` for a slider whose active track fills out from the midpoint, not from the start. Use it for a symmetric value such as a balance, an EQ band, or a zoom adjustment.
 
 <SnackExample
   name="RootNative Slider — Centered"
@@ -156,7 +156,7 @@ Pass `centered` for a slider where the active track fills outward from the midpo
 
 ## With Icons
 
-Decorate either side of the track with `startIcon` and `endIcon` — useful for volume, brightness, or other affordances where the bounds need a visual label.
+Add an icon at either end of the track with `startIcon` and `endIcon`. Use them for volume, brightness, or any other control where the bounds need a visual label.
 
 <SnackExample
   name="RootNative Slider — Icons"
@@ -190,7 +190,7 @@ Decorate either side of the track with `startIcon` and `endIcon` — useful for 
 
 ## Value label
 
-The value-label bubble appears above the active thumb during a drag by default. Pass `'always'` to keep it visible, or `false` to hide it. Use `formatValueLabel` to customize the displayed string.
+By default, the value-label bubble appears above the active thumb during a drag. Pass `'always'` to keep it visible, or `false` to hide it. Use `formatValueLabel` to change the displayed string.
 
 ```tsx
 <Slider value={value} onValueChange={setValue} showValueLabel="always" />
@@ -207,7 +207,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
 
 ## Custom colors
 
-`containerColor` overrides the active track, `contentColor` overrides the thumb, and `inactiveTrackColor` overrides the inactive track. Ticks and stop indicators on the active segment stay `onPrimary` per MD3 and are not derived from these overrides. The MD3 disabled treatment is preserved regardless of overrides.
+`containerColor` overrides the active track, `contentColor` overrides the thumb, and `inactiveTrackColor` overrides the inactive track. The ticks and stop indicators on the active segment stay `onPrimary`, as MD3 specifies. They don't derive from these overrides. The MD3 disabled treatment stays in place, whatever you override.
 
 <SnackExample
   name="RootNative Slider — Custom colors"
@@ -267,7 +267,7 @@ The value-label bubble appears above the active thumb during a drag by default. 
 
 ## Controlled vs uncontrolled
 
-Pass `value` for a controlled slider (you own state, mutations come through `onValueChange`). Omit `value` and pass `defaultValue` for an uncontrolled slider that manages its own state internally.
+Pass `value` for a controlled slider: you own the state, and each change comes through `onValueChange`. Omit `value` and pass `defaultValue` for an uncontrolled slider that keeps its own state.
 
 ```tsx
 // Controlled
@@ -277,11 +277,11 @@ Pass `value` for a controlled slider (you own state, mutations come through `onV
 <Slider defaultValue={[20, 80]} onSlidingComplete={(v) => console.log(v)} />
 ```
 
-`onValueChange` fires continuously during a drag; `onSlidingComplete` fires once when the user releases the thumb — useful for committing expensive updates (network calls, large recomputes) only on release.
+`onValueChange` fires continuously during a drag. `onSlidingComplete` fires once, when the user releases the thumb. Use it to commit an expensive update (a network call, a large recompute) only on release.
 
 ## Accessibility
 
-The track has `accessibilityRole="adjustable"` and exposes `accessibilityValue` with `min`/`max`/`now` (rounded to integers; native a11y APIs require integer values) and a formatted `text` field that screen readers read aloud. Pass `accessibilityLabel` to describe what the slider controls.
+The track has `accessibilityRole="adjustable"`. It sets `accessibilityValue` with `min`/`max`/`now`, rounded to integers, because the native accessibility APIs require integer values, and with a formatted `text` field that a screen reader reads aloud. Pass `accessibilityLabel` to say what the slider controls.
 
 ```tsx
 <Slider

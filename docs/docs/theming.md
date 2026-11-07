@@ -5,7 +5,7 @@ description: Customize MD3, generate a branded theme from a seed color, or repla
 
 # Theming
 
-RootNative UI ships with Material Design 3 out of the box, but the theme engine is design-system agnostic — you can customize MD3, generate branded themes from a seed color, or build an entirely custom design system.
+Root Native UI ships with Material Design 3, but the theme engine works with any design system. You can change MD3, make a branded theme from a seed color, or build your own design system.
 
 ## Material Design 3 (default)
 
@@ -62,7 +62,7 @@ On a static web export (`web.output: 'static'`), the server cannot read the
 system setting, so it renders the light theme. The provider keeps the light
 theme while the client hydrates, then switches to the system setting on the
 render after hydration. A reader with a dark system setting sees the light
-theme until hydration ends, which takes seconds on a phone. You do not need a
+theme until hydration ends, which takes seconds on a phone. You don't need a
 hydration gate around `mode`. The
 [static export note](./responsive.md#notes) explains why the provider waits.
 To hide the light page from that reader, see
@@ -100,14 +100,14 @@ The hook returns four values:
 
 | Value | Type | Meaning |
 |-------|------|---------|
-| `mode` | `'system' \| 'light' \| 'dark'` | What was asked for. `'system'` means "follow the OS" |
-| `scheme` | `'light' \| 'dark'` | What is actually on screen, with `'system'` resolved |
-| `setMode` | `(mode) => void` | Switches mode. Persists it when `storage` is set |
-| `isReady` | `boolean` | `false` until a persisted mode loads. Always `true` without `storage` |
+| `mode` | `'system' \| 'light' \| 'dark'` | The mode you asked for. `'system'` means "follow the OS" |
+| `scheme` | `'light' \| 'dark'` | The scheme on screen, with `'system'` resolved |
+| `setMode` | `(mode) => void` | Switches the mode. Saves it when `storage` is set |
+| `isReady` | `boolean` | `false` until a saved mode loads. Always `true` without `storage` |
 
-Read `scheme`, not `mode`, when you need to know which theme is rendering —
-`mode` can be `'system'`, which does not tell you the answer. Use it to sync
-anything that lives outside the theme, most commonly the status bar:
+Read `scheme`, not `mode`, when you need to know which theme renders. `mode`
+can be `'system'`, and that doesn't tell you. Use `scheme` to sync anything
+outside the theme, most often the status bar:
 
 ```tsx
 import { useThemeMode } from '@rootnative/core'
@@ -120,15 +120,16 @@ function ThemedStatusBar() {
 }
 ```
 
-`useThemeMode()` throws when the nearest provider was given a single theme
-rather than a pair. There is no mode to control in that case, so the error is
-raised instead of reporting a mode the provider cannot honour.
+`useThemeMode()` throws when the nearest provider got a single theme, not a
+pair. There is no mode to control in that case, so the hook throws instead of
+a mode that the provider can't honour.
 
 ### Remembering the choice
 
 `@rootnative/core` takes no storage dependency. Pass any object with
-`getItem`/`setItem` — AsyncStorage, MMKV, or `localStorage` — and the mode is
-saved on change and restored on launch. Both methods may be sync or async:
+`getItem`/`setItem` (AsyncStorage, MMKV, or `localStorage`). The provider
+saves the mode on change and restores it on launch. Both methods can be sync
+or async:
 
 ```tsx
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -141,10 +142,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 </ThemeProvider>
 ```
 
-On web, pass `localStorage` itself. The provider catches a `getItem` or
-`setItem` that throws, which `localStorage` does when site data is blocked or
-in some private windows, and keeps `defaultMode`. No wrapper is needed. Guard
-the access only for a static export, where the server has no `window`:
+On web, pass `localStorage` itself. `localStorage` throws in `getItem` or
+`setItem` when site data is blocked, or in some private windows. The provider
+catches that and keeps `defaultMode`. You need no wrapper. Guard the access
+only for a static export, where the server has no `window`:
 
 ```tsx
 const storage = typeof window === 'undefined' ? undefined : window.localStorage
@@ -157,7 +158,7 @@ const storage = typeof window === 'undefined' ? undefined : window.localStorage
 </ThemeProvider>
 ```
 
-Reading storage takes a moment, so the first frame renders with `defaultMode`
+A storage read takes a moment, so the first frame renders with `defaultMode`
 before the saved mode arrives. Gate your splash screen on `isReady` to avoid a
 visible flash:
 
@@ -173,10 +174,10 @@ function Gate({ children }) {
 }
 ```
 
-To drive mode from your own state instead, pass `mode` and `onModeChange`. The
-provider then never changes mode on its own, and ignores `storage` — your state
-is the source of truth, and writing behind it would restore a stale value on the
-next launch.
+To drive the mode from your own state, pass `mode` and `onModeChange`. The
+provider then never changes the mode on its own, and it ignores `storage`.
+Your state is the source of truth, and a write behind it would restore a stale
+value on the next launch.
 
 ### The first paint of a static export
 
@@ -265,14 +266,14 @@ hydration, but never sees the wrong theme.
 A navigator draws its own screen container, and it can also draw a header, a
 drawer sheet and a tab bar. It takes their colors from its own navigation
 theme, not from `ThemeProvider`. When the app gives it no navigation theme, it
-uses its light default. A dark RootNative theme then shows a light screen
+uses its light default. A dark Root Native theme then shows a light screen
 behind any content that does not paint its own background.
 
 Expo Router uses its own copy of React Navigation, so the same two ways apply
 to both.
 
 **1. Color the screen container.** Use this way when the header, the drawer
-and the tabs are RootNative components. Only the screen background then needs
+and the tabs are Root Native components. Only the screen background then needs
 the theme. Set `contentStyle` in the `Stack` `screenOptions`:
 
 ```tsx
@@ -299,7 +300,7 @@ function ThemedStack() {
 ```
 
 **2. Give the navigator a theme.** Use this way when the app keeps a navigator
-header, drawer or tab bar. Map the RootNative color roles to the six navigation
+header, drawer or tab bar. Map the Root Native color roles to the six navigation
 colors:
 
 ```tsx
@@ -347,8 +348,8 @@ Obey these rules:
 - Keep the `useMemo`. A new theme object on each render updates the navigation
   theme context, and each component that reads it renders again.
 - Put the navigation theme provider, or `NavigationContainer`, below the
-  RootNative `ThemeProvider`. The mapping calls `useTheme()` and
-  `useThemeMode()`, and they need the RootNative provider above them.
+  Root Native `ThemeProvider`. The mapping calls `useTheme()` and
+  `useThemeMode()`, and they need the Root Native provider above them.
 - `expo-router` also exports a `ThemeProvider` and a `useTheme`. Import one of
   each pair with an alias, as above.
 
@@ -449,14 +450,13 @@ const brandTheme: Theme = {
 
 :::note Color and typography keys are checked
 
-`Colors` and `Typography` list the MD3 roles exactly — there is no index
-signature, so `colors.primry` is a compile error rather than a silently-typed
-`string`. That is deliberate: `theme.colors.*` is the most-touched expression in
-consumer code, and typo detection there is worth more than being able to bolt an
-extra key onto the MD3 palette.
+`Colors` and `Typography` list the MD3 roles exactly. There is no index
+signature, so `colors.primry` is a compile error, not a silent `string`. That
+is intentional: `theme.colors.*` is the most-used expression in app code, and
+a typo check there is worth more than an extra key on the MD3 palette.
 
-To carry brand tokens the MD3 scheme has no role for, put them on the theme root
-rather than inside `colors` — `BaseTheme` keeps its `[key: string]: unknown`
+For brand tokens that the MD3 scheme has no role for, put them on the theme
+root, not inside `colors`. `BaseTheme` keeps its `[key: string]: unknown`
 escape hatch:
 
 ```tsx
@@ -467,18 +467,18 @@ const brandTheme = {
 ```
 
 Or define your own theme interface, as [Custom design systems](#custom-design-systems)
-describes — a custom `Colors` type is yours to shape.
+describes. A custom `Colors` type is yours to shape.
 
-`Colors` and `Typography` are `type` aliases, not interfaces, so they cannot be
-widened with a `declare module` augmentation. That is a deliberate consequence of
-being strict: a type alias is what lets a closed `Colors` still satisfy
-`BaseTheme`'s `colors: Record<string, string>`.
+`Colors` and `Typography` are `type` aliases, not interfaces, so a
+`declare module` augmentation can't widen them. That follows from the strict
+types: a type alias is what lets a closed `Colors` still satisfy the
+`colors: Record<string, string>` of `BaseTheme`.
 
 :::
 
 ### Generate a theme from a seed color
 
-`createMaterialTheme` runs on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), which is **bundled inside `@rootnative/core`** — there is nothing to install. It lives behind the `@rootnative/core/create-theme` subpath: importing `@rootnative/core` alone never pulls it in, so projects that define themes by hand don't carry it.
+`createMaterialTheme` runs on [`@material/material-color-utilities`](https://www.npmjs.com/package/@material/material-color-utilities), which is **bundled inside `@rootnative/core`**. There is nothing to install. It lives behind the `@rootnative/core/create-theme` subpath. An import of `@rootnative/core` alone never loads it, so a project that defines its themes by hand doesn't carry it.
 
 The subpath also imports nothing from `react-native`, so it runs in plain Node. You can print a palette from a script, check a theme in CI, or feed the roles to a design-token pipeline:
 
@@ -486,7 +486,7 @@ The subpath also imports nothing from `react-native`, so it runs in plain Node. 
 node -e "import('@rootnative/core/create-theme').then(({ createMaterialTheme }) => console.log(createMaterialTheme('#006A6A').lightTheme.colors))"
 ```
 
-It generates a complete MD3 light and dark theme from a single hex color using Google's HCT color space. All 49 color roles are derived automatically:
+It makes a complete MD3 light and dark theme from one hex color, with Google's HCT color space. It derives all 49 color roles for you:
 
 ```tsx
 import { createMaterialTheme } from '@rootnative/core/create-theme'
@@ -507,22 +507,22 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 })
 ```
 
-This is the easiest way to create a branded theme — pick your brand color and the entire palette is generated for you. See the [Fonts](./fonts) guide for full details on loading and using custom fonts.
+This is the easiest way to make a branded theme: pick your brand color, and the function makes the whole palette. See the [Fonts](./fonts) guide for how to load and use custom fonts.
 
 #### Spec-aligned options
 
-These map directly to MD3 spec primitives. Defaults produce byte-identical output to the official `material-color-utilities` library.
+These options map directly to MD3 spec primitives. With the defaults, the output is byte-identical to the output of the official `material-color-utilities` library.
 
 | Option | Type | Default | Notes |
 |--------|------|---------|-------|
-| `variant` | [see below](#md3-scheme-variants) | `'tonalSpot'` | The MD3 scheme used to derive palettes. |
-| `contrastLevel` | `'standard' \| 'medium' \| 'high'` | `'standard'` | MD3 contrast preset. Maps to MD3 contrast values `0 / 0.5 / 1.0`. |
+| `variant` | [see below](#md3-scheme-variants) | `'tonalSpot'` | The MD3 scheme that derives the palettes. |
+| `contrastLevel` | `'standard' \| 'medium' \| 'high'` | `'standard'` | The MD3 contrast preset. Maps to the MD3 contrast values `0 / 0.5 / 1.0`. |
 | `fontFamily` | `string` | platform default | Applied to every typography style. |
-| `roundness` | `number` | `1` | Corner-radius multiplier. `0` = sharp, `1` = MD3 default, `2` = doubled. |
+| `roundness` | `number` | `1` | The corner-radius multiplier. `0` = sharp, `1` = MD3 default, `2` = doubled. |
 
 ##### MD3 scheme variants
 
-Each variant is a spec-defined recipe in `material-color-utilities` for deriving the full palette from the seed.
+Each variant is a spec-defined recipe in `material-color-utilities` that derives the full palette from the seed.
 
 | Variant | When to use |
 |---------|-------------|
@@ -552,11 +552,11 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 })
 ```
 
-`'standard'` matches the MD3 spec exactly. `'medium'` and `'high'` widen the gap between content and container colors, useful for WCAG AAA targets or low-vision modes.
+`'standard'` matches the MD3 spec exactly. `'medium'` and `'high'` widen the gap between the content and container colors, which helps with WCAG AAA targets or low-vision modes.
 
 #### Explicit overrides
 
-These deviate from the MD3 spec. **Reach for them only when no built-in `variant` covers your case** — the spec already covers most aesthetics.
+These options deviate from the MD3 spec. **Use them only when no built-in `variant` covers your case.** The spec already covers most looks.
 
 | Option | Type | Default | Notes |
 |--------|------|---------|-------|
@@ -572,7 +572,7 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 })
 ```
 
-Use this when you need a colorful primary/secondary (e.g. brand color) but want OLED-near-black, untinted surfaces (a "carbon" aesthetic). For a fully neutral theme prefer the spec-legal `variant: 'monochrome'`.
+Use this option when you need a colorful primary/secondary (for example a brand color), but want untinted surfaces that are near black on OLED (a "carbon" look). For a fully neutral theme, prefer the spec-legal `variant: 'monochrome'`.
 
 ##### `seedAdjustments` — chroma overrides
 
@@ -582,7 +582,7 @@ const { lightTheme, darkTheme } = createMaterialTheme('#006A6A', {
 })
 ```
 
-Overrides the HCT chroma of the primary and secondary palettes while keeping their hues. Use this only when the spec-defined chromas come out too pastel or too vivid for your brand. Try `variant: 'vibrant'` first — it's the spec-legal answer to "containers too pastel".
+This option overrides the HCT chroma of the primary and secondary palettes, and keeps their hues. Use it only when the spec-defined chromas come out too pastel or too vivid for your brand. Try `variant: 'vibrant'` first. It's the spec-legal answer to "the containers are too pastel".
 
 ### Access theme values
 
@@ -603,7 +603,7 @@ function MyComponent() {
 
 ### `applyRoundness` — scale the corner tokens directly
 
-`createMaterialTheme`'s [`roundness` option](#spec-aligned-options) is the usual way to reshape corners, but it's a seed-color API. When you're overriding an existing theme instead, `applyRoundness(multiplier)` returns the same scaled `Shape` object on its own:
+The [`roundness` option](#spec-aligned-options) of `createMaterialTheme` is the usual way to reshape the corners, but it's a seed-color API. When you override an existing theme instead, `applyRoundness(multiplier)` returns the same scaled `Shape` object on its own:
 
 ```tsx
 import { applyRoundness, material, defineTheme } from '@rootnative/core'
@@ -614,11 +614,11 @@ const sharp = defineTheme({
 })
 ```
 
-It scales the five intermediate tokens (`cornerExtraSmall` through `cornerExtraLarge`) and **leaves `cornerNone` at 0 and `cornerFull` at 999** — those two are sentinels, not measurements, so scaling them would either do nothing or break the pill shapes that read `cornerFull`. Results are rounded to whole dp. The multiplier is echoed back on the returned object as `shape.roundness`, so a theme carries a record of how far it was reshaped — no component reads it, but your own code can.
+It scales the five intermediate tokens (`cornerExtraSmall` through `cornerExtraLarge`) and **leaves `cornerNone` at 0 and `cornerFull` at 999**. Those two are sentinels, not measurements. A scale of them would do nothing, or break the pill shapes that read `cornerFull`. It rounds each result to a whole dp. The returned object carries the multiplier as `shape.roundness`, so a theme records how far you reshaped it. No component reads it, but your own code can.
 
 ### Material preset
 
-All MD3 values are also available as a grouped object:
+All MD3 values are also available in one grouped object:
 
 ```tsx
 import { material } from '@rootnative/core'
@@ -630,7 +630,7 @@ material.defaultTopAppBarTokens
 
 ## Custom design systems
 
-The theme engine supports any design system, not just MD3. Use `BaseTheme`, `defineTheme`, and `ThemeProvider` to build your own.
+The theme engine supports any design system, not only MD3. Use `BaseTheme`, `defineTheme`, and `ThemeProvider` to build your own.
 
 ### BaseTheme
 
@@ -653,7 +653,7 @@ interface BaseTheme {
 
 ### Define a custom theme
 
-Use `defineTheme` for type-safe theme creation:
+Use `defineTheme` to make a theme with full type checks:
 
 ```tsx
 import { defineTheme, material } from '@rootnative/core'
@@ -710,20 +710,20 @@ const brandTheme = defineTheme<BrandTheme>({
 
 :::caution
 
-`shape`, `stateLayer`, `elevation` and `motion` are **not** freely shaped
-objects. Each is a fixed interface — `shape` is `roundness` plus `cornerNone`
-through `cornerFull`, `stateLayer` is the six `*Opacity` keys, `elevation` is
-`level0`–`level5` (every level needing all five shadow fields), and `motion` is
-a flat set of 16 `duration*`, 7 `easing*` and 6 `spring*` tokens. Omitting or
-renaming any of them fails to type-check, and a partially populated token set
-breaks the components that read it at runtime. Spreading a preset is the
-supported way to supply them.
+`shape`, `stateLayer`, `elevation` and `motion` are **not** free-form
+objects. Each one is a fixed interface. `shape` is `roundness` plus
+`cornerNone` through `cornerFull`. `stateLayer` is the six `*Opacity` keys.
+`elevation` is `level0` to `level5`, and every level needs all five shadow
+fields. `motion` is a flat set of 16 `duration*`, 7 `easing*` and 6 `spring*`
+tokens. If you omit or rename any of them, the type check fails, and a token
+set with gaps breaks the components that read it at runtime. Spread a preset
+to supply them. That is the supported way.
 
 :::
 
 ### ThemeProvider
 
-Use `ThemeProvider` for custom design systems:
+Use `ThemeProvider` for a custom design system too:
 
 ```tsx
 import { ThemeProvider } from '@rootnative/core'
@@ -757,19 +757,19 @@ function MyComponent() {
 
 | Token group | Description |
 |-------------|-------------|
-| `colors` | Design-system specific color roles (`Record<string, string>`) |
-| `typography` | Type scale variants (`Record<string, TypographyToken>`) |
-| `shape` | `roundness` multiplier plus corner radius tokens (`cornerNone` through `cornerFull`) |
-| `spacing` | Spacing scale (`xs`, `sm`, `md`, `lg`, `xl`) |
-| `elevation` | Shadow levels `level0` through `level5` |
-| `stateLayer` | Opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
-| `motion` | Duration, easing, and spring tokens — see [Motion](./motion) |
-| `topAppBar` | MD3 only, optional. `AppBar` geometry in dp: `horizontalPadding`, `titleStartInset`, `smallContainerHeight`, `mediumContainerHeight`, `largeContainerHeight`, `topRowHeight`, `sideSlotMinHeight`, `iconFrameSize`, `mediumTitleBottomPadding`, `largeTitleBottomPadding` — see [AppBar](./components/appbar#align-with-a-page-gutter) |
+| `colors` | The color roles of the design system (`Record<string, string>`) |
+| `typography` | The type scale variants (`Record<string, TypographyToken>`) |
+| `shape` | The `roundness` multiplier plus the corner radius tokens (`cornerNone` through `cornerFull`) |
+| `spacing` | The spacing scale (`xs`, `sm`, `md`, `lg`, `xl`) |
+| `elevation` | The shadow levels `level0` through `level5` |
+| `stateLayer` | The opacity values: `pressedOpacity`, `focusedOpacity`, `hoveredOpacity`, `draggedOpacity`, `disabledOpacity`, `disabledContainerOpacity` |
+| `motion` | The duration, easing, and spring tokens; see [Motion](./motion) |
+| `topAppBar` | MD3 only, optional. The `AppBar` geometry in dp: `horizontalPadding`, `titleStartInset`, `smallContainerHeight`, `mediumContainerHeight`, `largeContainerHeight`, `topRowHeight`, `sideSlotMinHeight`, `iconFrameSize`, `mediumTitleBottomPadding`, `largeTitleBottomPadding`; see [AppBar](./components/appbar#align-with-a-page-gutter) |
 
 ## Type hierarchy
 
-- **`BaseTheme`** — Generic base. Any design system extends this.
-- **`Theme`** — MD3 theme. Extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias — use it to disambiguate in multi-design-system codebases.
+- **`BaseTheme`**: the generic base. Any design system extends it.
+- **`Theme`**: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), and the optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
 
 ## Summary
 
@@ -780,12 +780,12 @@ function MyComponent() {
 | Follow the OS light/dark setting | `<ThemeProvider theme={{ light, dark }}>` |
 | Let the user switch theme | `const { scheme, setMode } = useThemeMode()` |
 | Remember the choice | `<ThemeProvider theme={{ light, dark }} storage={AsyncStorage}>` |
-| Theme the navigator screens | `Stack` `contentStyle`, or a navigation theme mapped from `useTheme()` — see [With Expo Router and React Navigation](#with-expo-router-and-react-navigation) |
-| Give one part of the app its own colors | A nested `<ThemeProvider theme={{ light, dark }}>` — see [Nested providers](#nested-providers) |
-| No light page for dark readers of a static export | `schemeGuardScript()` and `schemeGuardCss()` in `+html.tsx` — see [The first paint of a static export](#the-first-paint-of-a-static-export) |
+| Theme the navigator screens | `Stack` `contentStyle`, or a navigation theme mapped from `useTheme()`; see [With Expo Router and React Navigation](#with-expo-router-and-react-navigation) |
+| Give one part of the app its own colors | A nested `<ThemeProvider theme={{ light, dark }}>`; see [Nested providers](#nested-providers) |
+| No light page for dark readers of a static export | `schemeGuardScript()` and `schemeGuardCss()` in `+html.tsx`; see [The first paint of a static export](#the-first-paint-of-a-static-export) |
 | Override a few MD3 colors | Spread `lightTheme` and override |
 | Branded MD3 theme from one color | `import { createMaterialTheme } from '@rootnative/core/create-theme'` |
-| Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })` — see [Fonts](./fonts) |
+| Custom font | `createMaterialTheme('#color', { fontFamily: 'Inter' })`; see [Fonts](./fonts) |
 | Switch MD3 variant | `createMaterialTheme('#color', { variant: 'vibrant' })` |
 | High-contrast accessibility | `createMaterialTheme('#color', { contrastLevel: 'high' })` |
 | Spec-legal monochrome | `createMaterialTheme('#color', { variant: 'monochrome' })` |

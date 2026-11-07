@@ -5,7 +5,7 @@ description: Lays children out vertically, with every Box spacing, alignment, an
 
 # Column
 
-Lays children out vertically. Extends [Box](./box) with all spacing, alignment, and gap props.
+Lays the children out vertically. It extends [Box](./box) with all the spacing, alignment, and gap props.
 
 ## Usage
 
@@ -68,11 +68,11 @@ Reverse the layout direction with `inverted`:
 
 ## Wrapping a child in your own layer
 
-`align` maps straight to flexbox `alignItems`, so `align="center"` sizes every
-child to its own content on the cross axis rather than stretching it to the
-column's width. That is the correct behaviour, and it is invisible until you
-put a wrapper between the `Column` and its child — most often an animation
-layer:
+`align` maps straight to the flexbox `alignItems`, so `align="center"` sizes
+each child to its own content on the cross axis. It doesn't stretch the child
+to the width of the column. That is the correct behaviour, and you don't see
+it until you put a wrapper between the `Column` and its child, most often an
+animation layer:
 
 ```tsx
 // The Typography centres its own text, but the wrapper has shrunk to fit that
@@ -84,8 +84,8 @@ layer:
 </Column>
 ```
 
-The wrapper is now a child of the column, so it — not the text — is what
-`align="center"` sizes. Give the wrapper `alignSelf: 'stretch'` and the inner
+The wrapper is now a child of the column, so `align="center"` sizes the
+wrapper, not the text. Give the wrapper `alignSelf: 'stretch'`, and the inner
 block gets the full width back:
 
 ```tsx
@@ -102,16 +102,15 @@ block gets the full width back:
 // const styles = StyleSheet.create({ stretch: { alignSelf: 'stretch' } })
 ```
 
-This is ordinary flexbox rather than a quirk of `Column`, but it is the
-predictable cost of inserting a layer of your own: any wrapper you add becomes
-the aligned child, and anything the original child did with its own width now
-measures against the wrapper instead. It applies to a child that centres its
-own text, one that lays out its own row, and any block sized as a share of the
-available width.
+This is ordinary flexbox, not a quirk of `Column`. It is the predictable cost
+of a layer of your own. Any wrapper you add becomes the aligned child, and
+anything the original child did with its own width now measures against the
+wrapper. This applies to a child that centres its own text, to one that lays
+out its own row, and to any block sized as a share of the available width.
 
-`Row` behaves the same way on its cross axis, where `align` controls height
-instead — less often noticed, because a wrapper shrinking to its content height
-usually looks correct.
+`Row` behaves the same way on its cross axis, where `align` controls the
+height. You notice it less often there, because a wrapper that shrinks to its
+content height usually looks correct.
 
 ## Props
 

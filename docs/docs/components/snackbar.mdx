@@ -5,17 +5,17 @@ description: Report the outcome of an action in a brief message at the bottom of
 
 # Snackbar
 
-Snackbars report the outcome of an action in a brief message at the bottom of the screen.
-Follows the [Material Design 3 Snackbar](https://m3.material.io/components/snackbar/overview) specification.
+A snackbar reports the outcome of an action in a brief message at the bottom of the screen.
+It follows the [Material Design 3 Snackbar](https://m3.material.io/components/snackbar/overview) specification.
 
-Snackbar is **imperative only**. There is no `<Snackbar visible>` component, because the
-hard part of a snackbar is the queue — one message at a time, in order, each with its own
-timer — and a declarative API pushes that onto you. `SnackbarProvider` owns the queue;
-`useSnackbar()` gives you `show`, `hide`, and `clear`.
+Snackbar is **imperative only**. There is no `<Snackbar visible>` component. The hard part of a
+snackbar is the queue: one message at a time, in order, each with its own timer. A declarative
+API would push that onto you. `SnackbarProvider` owns the queue, and `useSnackbar()` gives you
+`show`, `hide`, and `clear`.
 
 ## Setup
 
-Mount `SnackbarProvider` once, inside `ThemeProvider` and inside your app's [`PortalHost`](./portal.mdx).
+Mount `SnackbarProvider` once, inside `ThemeProvider` and inside the [`PortalHost`](./portal.mdx) of your app.
 Snackbars render into the `PORTAL_LAYERS.snackbar` layer, which puts them above dialogs and bottom sheets.
 
 <SnackExample
@@ -54,11 +54,11 @@ Snackbars render into the `PORTAL_LAYERS.snackbar` layer, which puts them above 
 `}
 />
 
-`useSnackbar()` throws if there is no provider above it — a silent no-op would look like a bug in your own code.
+`useSnackbar()` throws if there is no provider above it. A silent no-op would look like a bug in your own code.
 
 ## Actions
 
-A snackbar takes a single action. Pressing it runs `onAction` and then dismisses with reason `'action'`.
+A snackbar takes one action. A press runs `onAction` and then dismisses the snackbar with the reason `'action'`.
 
 <SnackExample
   name="RootNative Snackbar — Action"
@@ -109,7 +109,7 @@ A snackbar takes a single action. Pressing it runs `onAction` and then dismisses
 
 | `duration` | Meaning |
 |------------|---------|
-| `'short'` | 4s — the MD3 default |
+| `'short'` | 4s, the MD3 default |
 | `'long'` | 10s |
 | `'indefinite'` | Stays until the action, the close button, or `hide()` |
 | `number` | Milliseconds |
@@ -117,17 +117,17 @@ A snackbar takes a single action. Pressing it runs `onAction` and then dismisses
 **A snackbar with an `actionLabel` defaults to `'indefinite'`**, not `'short'`. An undo the
 user never sees is worse than one that waits. A snackbar without an action defaults to `'short'`.
 
-The clock pauses while a pointer is over the snackbar and continues from where it stopped when the
-pointer leaves, so a message is not pulled away from a reader who moved to it.
+The clock pauses while a pointer is over the snackbar. It continues from where it stopped when
+the pointer leaves, so a message doesn't disappear from a reader who moved to it.
 
-Set `showCloseIcon` to add a trailing close button. RootNative warns in development if an
-indefinite snackbar has neither an action nor a close button — that combination is
-undismissable and stalls everything queued behind it.
+Set `showCloseIcon` to add a trailing close button. Root Native warns in development if an
+indefinite snackbar has neither an action nor a close button. That combination can't be
+dismissed, and it stalls everything queued behind it.
 
 ## Queueing
 
-One snackbar is visible at a time. `show()` while one is up queues the new message behind it
-and returns an id; the queue drains in FIFO order as each snackbar's timer expires.
+One snackbar is visible at a time. A `show()` while one is up queues the new message behind it
+and returns an id. The queue drains in FIFO order as the timer of each snackbar expires.
 
 ```tsx
 const first = snackbar.show({ message: 'First' })
@@ -138,17 +138,17 @@ snackbar.hide()        // dismiss whatever is visible
 snackbar.clear()       // dismiss the visible one and drop the queue
 ```
 
-Pass `replace: true` to jump ahead of the visible snackbar instead of queueing. The one it
-replaces dismisses with reason `'replaced'`.
+Pass `replace: true` to jump ahead of the visible snackbar instead of a place in the queue. The
+replaced snackbar dismisses with the reason `'replaced'`.
 
-`onDismiss` receives why the snackbar went away: `'timeout'`, `'action'`, `'close'`,
+`onDismiss` receives the reason the snackbar went away: `'timeout'`, `'action'`, `'close'`,
 `'replaced'`, or `'manual'`.
 
 ## Positioning
 
-The snackbar anchors to the bottom of the screen with 16dp margins and respects the
-safe-area bottom inset. Both are applied by the layer itself, so an offset you pass
-covers only what sits **on top** of them — a FAB or a bottom navigation bar.
+The snackbar anchors to the bottom of the screen with 16dp margins, and it obeys the
+safe-area bottom inset. The layer itself applies both, so an offset you pass covers only
+what sits **on top** of them: a FAB or a bottom navigation bar.
 
 `snackbarOffsetFor(height)` does that arithmetic, and `FAB_SIZES` gives the height:
 
@@ -158,13 +158,13 @@ import { FAB_SIZES, snackbarOffsetFor } from '@rootnative/components'
 snackbarOffsetFor(FAB_SIZES.medium) // 56 + 16 = 72
 ```
 
-Hard-coding the number is the trap this replaces. A literal `88` double-counts the
-16dp margin the layer already added and pushes the snackbar 32dp too high.
+A hard-coded number is the trap this replaces. A literal `88` counts the 16dp margin
+twice, because the layer already added it, and pushes the snackbar 32dp too high.
 
 ### App-wide vs per-screen
 
-Use the provider's `bottomOffset` prop when every screen carries the same bottom
-furniture:
+Use the `bottomOffset` prop of the provider when every screen has the same controls at the
+bottom:
 
 ```tsx
 <SnackbarProvider bottomOffset={snackbarOffsetFor(FAB_SIZES.medium)}>
@@ -173,9 +173,9 @@ furniture:
 ```
 
 When only some screens have a FAB, raise the offset from the screen that owns it.
-`useSnackbarOffset` applies while its component is mounted and reverts on unmount,
-so the constant lives next to the component that determines it rather than in the
-app root two files away:
+`useSnackbarOffset` applies while its component is mounted, and reverts on unmount.
+So the constant lives next to the component that decides it, not in the app root two
+files away:
 
 ```tsx
 import { FAB, FAB_SIZES, snackbarOffsetFor, useSnackbarOffset } from '@rootnative/components'
@@ -186,10 +186,10 @@ function ComposeScreen() {
 }
 ```
 
-A mounted `useSnackbarOffset` wins over the provider's prop. With several mounted —
-which happens during a navigation transition, while the outgoing screen has not
-unmounted yet — the largest applies, so the snackbar clears every FAB on screen.
-Passing `0` is meaningful: it overrides the prop down to zero for that screen.
+A mounted `useSnackbarOffset` wins over the prop of the provider. With several mounted,
+which happens during a navigation transition while the outgoing screen has not unmounted
+yet, the largest applies, so the snackbar clears every FAB on screen. `0` has a meaning:
+it overrides the prop down to zero for that screen.
 
 The layer is `pointerEvents="box-none"`, so a visible snackbar never blocks the UI behind it.
 
@@ -204,21 +204,21 @@ The layer is `pointerEvents="box-none"`, so a visible snackbar never blocks the 
 | Height | 48dp single-line, 68dp two-line |
 | Width | Full width minus 16dp margins, capped at 600dp |
 
-Per-snackbar `containerColor`, `contentColor`, and `actionColor` override the defaults —
-useful for an error-styled message.
+`containerColor`, `contentColor`, and `actionColor` on one snackbar override the defaults,
+for example for an error-styled message.
 
 ## Motion
 
-Snackbars rise 24dp and fade in on `springDefaultSpatial`, and reverse on the way out.
-Both collapse to a hard cut under reduced motion — see [Motion](../motion.md).
+A snackbar rises 24dp and fades in on `springDefaultSpatial`, and reverses on the way out.
+Both collapse to a hard cut under reduced motion; see [Motion](../motion.md).
 
 ## Accessibility
 
 The surface reports `role="alert"` with `accessibilityLiveRegion="polite"`, so
-TalkBack and web screen readers announce the message without stealing focus.
+TalkBack and web screen readers announce the message and don't steal focus.
 iOS has no live region, so the snackbar also calls
 `AccessibilityInfo.announceForAccessibility` for VoiceOver when it mounts and
-when a replacement arrives. The close button is labelled "Dismiss" — override
+when a replacement arrives. The close button is labelled "Dismiss". Override it
 with `closeAccessibilityLabel`.
 
 ## SnackbarProvider Props
@@ -227,30 +227,30 @@ with `closeAccessibilityLabel`.
 
 ## show() options
 
-`SnackbarOptions` is a plain object, not a component, so it is documented here rather than
-generated from the source.
+`SnackbarOptions` is a plain object, not a component, so this page documents it by hand. It is
+not generated from the source.
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `message` | `string` | — | The message. Required. |
-| `actionLabel` | `string` | — | Label for the single trailing action. |
-| `onAction` | `() => void` | — | Runs when the action is pressed; the snackbar then dismisses. |
+| `actionLabel` | `string` | — | The label of the one trailing action. |
+| `onAction` | `() => void` | — | Runs on a press of the action. The snackbar then dismisses. |
 | `duration` | `'short' \| 'long' \| 'indefinite' \| number` | `'short'`, or `'indefinite'` with an `actionLabel` | Visible duration. |
 | `showCloseIcon` | `boolean` | `false` | Show a trailing close button. |
-| `closeIcon` | `IconSource` | `'close'` | Icon for the close button. |
-| `closeAccessibilityLabel` | `string` | `'Dismiss'` | Screen-reader label for the close button. |
+| `closeIcon` | `IconSource` | `'close'` | The icon of the close button. |
+| `closeAccessibilityLabel` | `string` | `'Dismiss'` | The screen-reader label of the close button. |
 | `onDismiss` | `(reason) => void` | — | Called with `'timeout'`, `'action'`, `'close'`, `'replaced'`, or `'manual'`. |
 | `containerColor` | `string` | `inverseSurface` | Override the container color. |
 | `contentColor` | `string` | `inverseOnSurface` | Override the message color. |
 | `actionColor` | `string` | `inversePrimary` | Override the action label color. |
-| `replace` | `boolean` | `false` | Replace the visible snackbar instead of queueing. |
+| `replace` | `boolean` | `false` | Replaces the visible snackbar instead of a place in the queue. |
 
 ## useSnackbar()
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `show` | `(options: SnackbarOptions) => SnackbarId` | Enqueue a snackbar; returns its id. |
-| `hide` | `(id?: SnackbarId) => void` | Dismiss the visible snackbar, or a specific one — visible or queued. |
-| `clear` | `() => void` | Dismiss the visible snackbar and drop the queue. |
+| `show` | `(options: SnackbarOptions) => SnackbarId` | Queues a snackbar and returns its id. |
+| `hide` | `(id?: SnackbarId) => void` | Dismisses the visible snackbar, or a specific one, visible or queued. |
+| `clear` | `() => void` | Dismisses the visible snackbar and drops the queue. |
 
-The returned object is referentially stable, so it is safe in dependency arrays.
+The returned object keeps the same reference, so it is safe in a dependency array.

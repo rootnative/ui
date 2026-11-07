@@ -1,38 +1,38 @@
 ---
 sidebar_label: For AI Agents
-description: LLM-optimized documentation for RootNative UI — llms.txt files hosted on this site and shipped inside every npm package.
+description: LLM-optimized documentation for Root Native UI — llms.txt files hosted on this site and shipped inside every npm package.
 ---
 
 # For AI agents & LLMs
 
-RootNative UI ships documentation in the [llms.txt](https://llmstxt.org/) format, so AI coding agents (Claude Code, Cursor, Copilot, and friends) can look up component props and theme APIs without scraping the docs site.
+Root Native UI ships its documentation in the [llms.txt](https://llmstxt.org/) format. An AI coding agent (Claude Code, Cursor, Copilot, and others) can read component props and theme APIs from these files, without a scrape of the docs site.
 
 ## Hosted on this site
 
-Always reflects the **latest release**:
+These files always match the **latest release**:
 
 | URL | Contents |
 | --- | --- |
-| [https://rootnative.github.io/ui/llms.txt](https://rootnative.github.io/ui/llms.txt) | Quick overview — install, setup, package list, links |
-| [https://rootnative.github.io/ui/llms-full.txt](https://rootnative.github.io/ui/llms-full.txt) | Complete API reference — every component prop, core type, and CLI command in a single file |
+| [https://rootnative.github.io/ui/llms.txt](https://rootnative.github.io/ui/llms.txt) | A short overview: install, setup, the package list, and links |
+| [https://rootnative.github.io/ui/llms-full.txt](https://rootnative.github.io/ui/llms-full.txt) | The complete API reference: every component prop, core type, and CLI command in one file |
 
 ## Inside `node_modules`
 
-Every published package ships its own `llms.txt`, matching the **exact installed version** and readable offline:
+Every published package ships its own `llms.txt`. It matches the **exact installed version**, and you can read it offline:
 
 | Path | Contents |
 | --- | --- |
 | `node_modules/@rootnative/components/llms.txt` | All component props |
-| `node_modules/@rootnative/core/llms.txt` | Theme system API and types |
-| `node_modules/@rootnative/icons/llms.txt` | Icon-library adapters (Lucide, Phosphor, react-native-vector-icons) |
+| `node_modules/@rootnative/core/llms.txt` | The theme system API and types |
+| `node_modules/@rootnative/icons/llms.txt` | The icon-library adapters (Lucide, Phosphor, react-native-vector-icons) |
 | `node_modules/@rootnative/seo/llms.txt` | The SEO checklist and the head, schema, react, expo-router and node APIs |
-| `node_modules/@rootnative/cli/llms.txt` | CLI commands |
+| `node_modules/@rootnative/cli/llms.txt` | The CLI commands |
 
-Prefer these over the hosted files when suggesting code — they can't drift from the version your project actually uses.
+Prefer these files over the hosted files when you suggest code. They can't drift from the version your project uses.
 
 ## Point your agent at the docs
 
-Projects scaffolded with `npx rootnative create` already include a `CLAUDE.md` with this pointer, and `npx rootnative init` offers to add it to existing projects. To set it up by hand, drop this into your `CLAUDE.md`, `AGENTS.md`, or `.cursorrules`:
+A project from `npx rootnative create` already has a `CLAUDE.md` with this pointer, and `npx rootnative init` offers to add it to an existing project. To set it up by hand, put this into your `CLAUDE.md`, `AGENTS.md`, or `.cursorrules`:
 
 ```markdown
 ## RootNative UI docs for AI agents

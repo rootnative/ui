@@ -38,9 +38,9 @@ Avatars represent a user or entity with an image, icon, or text initials.
 
 The avatar renders the first available content in this order:
 
-1. `imageUri` — displays the image
-2. `icon` — displays an icon by name through the theme's `iconResolver` (defaults to `account`)
-3. `label` — displays up to 2 uppercase initials
+1. `imageUri`: shows the image
+2. `icon`: shows an icon by name through the `iconResolver` of the theme (the default is `account`)
+3. `label`: shows up to 2 uppercase initials
 
 ## Sizes
 
@@ -48,7 +48,7 @@ The avatar renders the first available content in this order:
 |------|----------|
 | `extraSmall` | Inline mentions, dense lists |
 | `small` | List items, compact layouts |
-| `medium` | Default — profile cards, headers |
+| `medium` | The default: profile cards, headers |
 | `large` | Profile screens, detail views |
 | `extraLarge` | Hero sections, onboarding |
 
@@ -81,7 +81,7 @@ The avatar renders the first available content in this order:
 
 ## Interactive Avatar
 
-When `onPress` is provided, the avatar renders as a `Pressable` with automatic state-layer feedback (hover and press):
+When you pass `onPress`, the avatar renders as a `Pressable` with state-layer feedback (hover and press):
 
 <SnackExample
   name="RootNative Avatar — Interactive"

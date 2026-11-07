@@ -5,7 +5,7 @@ description: A safe-area wrapper that applies the theme background color automat
 
 # Layout
 
-Layout provides a safe area wrapper with the theme background color applied automatically.
+Layout is a safe-area wrapper that applies the theme background color for you.
 
 ## Usage
 
@@ -34,7 +34,7 @@ Layout provides a safe area wrapper with the theme background color applied auto
 
 ## Immersive Mode
 
-For full-screen layouts that extend behind the status bar:
+For a full-screen layout that extends behind the status bar:
 
 <SnackExample
   name="RootNative Layout — Immersive"
@@ -61,7 +61,7 @@ For full-screen layouts that extend behind the status bar:
 
 ## Custom Edges
 
-Control which safe area edges are applied:
+Choose which safe-area edges apply:
 
 <SnackExample
   name="RootNative Layout — Custom Edges"
@@ -85,7 +85,7 @@ Control which safe area edges are applied:
 `}
 />
 
-By default, only the `bottom` edge is applied. In immersive mode, no edges are applied. `edges` is checked first and overrides `immersive` — `<Layout immersive edges={['top']} />` applies the top inset and ignores `immersive`.
+By default, only the `bottom` edge applies. In immersive mode, no edge applies. Layout reads `edges` first, and it overrides `immersive`: `<Layout immersive edges={['top']} />` applies the top inset and ignores `immersive`.
 
 :::note
 

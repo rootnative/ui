@@ -1,11 +1,11 @@
 ---
 sidebar_position: 2
-description: Scaffold a new React Native project with RootNative UI and render your first themed component.
+description: Make a new React Native project with Root Native UI and render your first themed component.
 ---
 
 # Quick Start
 
-The fastest way to start a new project with RootNative UI.
+The fastest way to start a new project with Root Native UI.
 
 ## Create a new project
 
@@ -13,7 +13,7 @@ The fastest way to start a new project with RootNative UI.
 npx rootnative create
 ```
 
-The CLI walks you through a few prompts:
+The CLI asks a few questions:
 
 ```
 ? Template: Blank
@@ -32,55 +32,55 @@ npx expo start
 
 ## Templates
 
-`blank` is the default — a single-screen app with no navigation library, which
-is the smallest thing that runs. Pick a different one with `-t`:
+`blank` is the default: a single-screen app with no navigation library, the
+smallest thing that runs. Pick a different template with `-t`:
 
 | Template | What you get |
 |----------|--------------|
-| `blank` (default) | One screen in `App.tsx`, `ThemeProvider` already wrapped around it. No router. |
-| `with-router` | [Expo Router](https://docs.expo.dev/router/introduction/) file-based navigation — screens live in `app/`, with `ThemeProvider` in the root layout. |
+| `blank` (default) | One screen in `App.tsx`, with `ThemeProvider` already around it. No router. |
+| `with-router` | [Expo Router](https://docs.expo.dev/router/introduction/) file-based navigation. The screens live in `app/`, with `ThemeProvider` in the root layout. |
 
 ```bash
 npx rootnative create my-app -t with-router
 ```
 
-More templates may be added over time — `npx rootnative create --help` lists
-what the installed CLI supports.
+We may add more templates over time. `npx rootnative create --help` lists the
+templates that the installed CLI supports.
 
 ## What's in the template
 
-The generated project is a ready-to-run Expo app with RootNative UI wired up.
+The generated project is a ready-to-run Expo app with Root Native UI set up.
 For `blank`:
 
 ```
 my-app/
 ├── App.tsx               # Home screen, wrapped in ThemeProvider
 ├── index.ts              # Expo entry point (registerRootComponent)
-├── assets/               # App icons and splash screen, RootNative mark
+├── assets/               # App icons and splash screen, Root Native mark
 ├── app.json              # Expo config with your project name
 ├── package.json
 ├── tsconfig.json
-├── CLAUDE.md             # Points AI agents at the RootNative LLM docs
+├── CLAUDE.md             # Points AI agents at the Root Native LLM docs
 └── .gitignore
 ```
 
 There is no `babel.config.js`. Expo SDK 58 applies `babel-preset-expo` by
 default, so the templates ship no Babel config.
 
-The app icon, adaptive icon, favicon and splash screen carry the RootNative
-mark, declared through the `expo-splash-screen` plugin in `app.json`. Replace the
-files in `assets/` with your own artwork — keep `imageWidth` in step with how
-much of the splash square your mark fills.
+The app icon, the adaptive icon, the favicon and the splash screen carry the
+Root Native mark, declared through the `expo-splash-screen` plugin in
+`app.json`. Replace the files in `assets/` with your own artwork. Keep
+`imageWidth` in step with how much of the splash square your mark fills.
 
-`with-router` swaps `App.tsx` and `index.ts` for an `app/` directory holding
-`_layout.tsx` (the root layout) and `index.tsx` (the home screen).
+`with-router` replaces `App.tsx` and `index.ts` with an `app/` directory that
+holds `_layout.tsx` (the root layout) and `index.tsx` (the home screen).
 
 ### Where ThemeProvider lives
 
-Every component reads the theme through context, so `ThemeProvider` is wrapped
-around your app for you. The `iconResolver` prop renders string icon names
-such as `leadingIcon="check"` with MaterialDesignIcons; both templates install
-the icon package and pass it. In `blank` that's `App.tsx`:
+Every component reads the theme through context, so the template wraps your
+app in `ThemeProvider` for you. The `iconResolver` prop renders string icon
+names such as `leadingIcon="check"` with MaterialDesignIcons. Both templates
+install the icon package and pass the resolver. In `blank` that's `App.tsx`:
 
 ```tsx
 // App.tsx
@@ -98,7 +98,7 @@ export default function App() {
 }
 ```
 
-In `with-router` it's `app/_layout.tsx`, wrapping the `Stack`:
+In `with-router` it's `app/_layout.tsx`, around the `Stack`:
 
 ```tsx
 // app/_layout.tsx
@@ -119,8 +119,8 @@ export default function RootLayout() {
 
 ### Home screen
 
-The home screen demonstrates Typography and Card out of the box. Edit
-`App.tsx` (or `app/index.tsx` on `with-router`) to start building your app.
+The home screen shows Typography and Card. Edit `App.tsx` (or `app/index.tsx`
+on `with-router`) to start your app.
 
 ## Options
 
@@ -130,14 +130,15 @@ You can also pass the project name directly:
 npx rootnative create my-app
 ```
 
-Skip all prompts with `-y` (uses the `blank` template, npm, auto display name, auto install):
+Skip all prompts with `-y`. It uses the `blank` template, npm, an automatic
+display name, and an automatic install:
 
 ```bash
 npx rootnative create my-app -y
 ```
 
-Pass `.` to scaffold into the directory you are already in, instead of a new
-subdirectory. The project name comes from that directory's name:
+Pass `.` to create the project in the directory you are already in, instead of
+a new subdirectory. The project name comes from the name of that directory:
 
 ```bash
 npx rootnative create .
@@ -148,6 +149,6 @@ the template meets a file that is already there.
 
 ## Next steps
 
-- [Theming](./theming) — customize colors, typography, and shape tokens
-- [CLI](./cli) — add more components with `npx rootnative add`
-- [Components](/introduction#components) — browse all available components
+- [Theming](./theming): change the color, typography, and shape tokens
+- [CLI](./cli): add more components with `npx rootnative add`
+- [Components](/introduction#components): see all the components

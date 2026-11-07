@@ -5,24 +5,24 @@ description: The MD3 Expressive spinner — a shape that morphs through soft, ro
 
 # Loading Indicator
 
-The loading indicator is the MD3 Expressive spinner — a shape that morphs
-through a sequence of soft, rounded polygons instead of spinning a plain arc.
-Follows the [Material Design 3 Loading Indicator](https://m3.material.io/components/loading-indicator/overview) specification.
+The loading indicator is the MD3 Expressive spinner: a shape that morphs
+through a sequence of soft, rounded polygons instead of a plain arc that spins.
+It follows the [Material Design 3 Loading Indicator](https://m3.material.io/components/loading-indicator/overview) specification.
 
-Reach for it when a wait has no meaningful progress to report and you want the
-expressive treatment. `CircularProgress` from [Progress](./progress) is still
-the right choice when you need a conventional arc spinner, a determinate ring,
-or a smaller footprint next to text.
+Use it when a wait has no progress to report and you want the expressive
+treatment. `CircularProgress` from [Progress](./progress) is still the right
+choice when you need a conventional arc spinner, a determinate ring, or a
+smaller footprint next to text.
 
 Two variants:
 
-- **Uncontained** (default) — the morphing shape alone, drawn in `primary`
-- **Contained** — the shape centered on a filled `primaryContainer` circle
+- **Uncontained** (default): the morphing shape alone, drawn in `primary`
+- **Contained**: the shape centered on a filled `primaryContainer` circle
 
-And two modes, matching the rest of the library:
+And two modes, the same as the rest of the library:
 
-- **Indeterminate** — omit `progress` to run the continuous morph cycle
-- **Determinate** — pass `progress` between `0` and `1` to morph from a circle
+- **Indeterminate**: omit `progress` to run the continuous morph cycle
+- **Determinate**: pass `progress` between `0` and `1` to morph from a circle
   toward the soft-burst shape as the operation completes
 
 ## Usage
@@ -50,14 +50,14 @@ And two modes, matching the rest of the library:
 `}
 />
 
-`LoadingIndicator` is built on `react-native-svg` — make sure it's installed in
+`LoadingIndicator` is built on `react-native-svg`. Make sure it's installed in
 your app (`npx expo install react-native-svg`).
 
 ## Contained
 
 The contained variant places the shape on a filled circle, so it reads clearly
-against busy or image-backed surfaces. Colors default to
-`onPrimaryContainer` on `primaryContainer`.
+on a busy surface or an image. The colors default to `onPrimaryContainer` on
+`primaryContainer`.
 
 <SnackExample
   name="RootNative LoadingIndicator — Contained"
@@ -85,10 +85,10 @@ against busy or image-backed surfaces. Colors default to
 
 ## Determinate
 
-Pass `progress` to switch modes. The indicator stops cycling and instead maps
-the value onto a single morph — a circle at `0`, the soft-burst shape at `1` —
-with a slow counter-rotation as it advances. There's no global spin in
-determinate mode.
+Pass `progress` to switch modes. The indicator stops the cycle and maps the
+value onto a single morph: a circle at `0`, the soft-burst shape at `1`, with a
+slow counter-rotation as it advances. There's no global spin in determinate
+mode.
 
 <SnackExample
   name="RootNative LoadingIndicator — Determinate"
@@ -124,13 +124,13 @@ determinate mode.
 `}
 />
 
-Values outside `0`–`1` are clamped.
+The indicator clamps a value outside `0`–`1`.
 
 ## Size
 
-`size` sets the container diameter in dp and defaults to `48`, the MD3 value.
-The morphing shape scales with it, always filling about 79% of the container
-(the spec's 38dp-in-48dp ratio).
+`size` sets the container diameter in dp, and defaults to `48`, the MD3 value.
+The morphing shape scales with it, and always fills about 79% of the container
+(the 38dp-in-48dp ratio of the spec).
 
 <SnackExample
   name="RootNative LoadingIndicator — Size"
@@ -159,8 +159,8 @@ The morphing shape scales with it, always filling about 79% of the container
 
 ## Custom colors
 
-`contentColor` overrides the morphing shape's fill. `containerColor`
-overrides the circle behind it and only applies to the contained variant — the
+`contentColor` overrides the fill of the morphing shape. `containerColor`
+overrides the circle behind it, and applies only to the contained variant. The
 uncontained container is always transparent.
 
 <SnackExample
@@ -199,22 +199,22 @@ uncontained container is always transparent.
 
 When the OS reduce-motion setting is on, the smooth morph and the continuous
 rotation both collapse. In indeterminate mode the indicator still advances
-through the shape cycle, but as discrete cuts rather than a fluid morph — so it
-keeps conveying "still working" without the sweeping motion. Determinate mode is
-unaffected apart from losing the tween between values.
+through the shape cycle, but as discrete cuts, not a fluid morph. So it still
+says "still working" without the sweeping motion. Determinate mode only loses
+the tween between values.
 
-Nothing to configure; see [Motion](../motion) for how the gate works and how to
-scope it.
+There is nothing to configure. See [Motion](../motion) for how the gate works
+and how to scope it.
 
 ## Accessibility
 
 The indicator sets `accessibilityRole="progressbar"`. In determinate mode it
-exposes `accessibilityValue` as `{ min: 0, max: 100, now }` (rounded to
-integers — native accessibility APIs require them). In indeterminate mode
-`accessibilityValue` is omitted, which signals to assistive technologies that
-the duration is unknown.
+exposes `accessibilityValue` as `{ min: 0, max: 100, now }`, rounded to
+integers, because the native accessibility APIs require them. In indeterminate
+mode it omits `accessibilityValue`, which tells assistive technology that the
+duration is unknown.
 
-Pass `accessibilityLabel` to describe what's loading.
+Pass `accessibilityLabel` to describe what loads.
 
 ```tsx
 <LoadingIndicator accessibilityLabel="Loading your library" />

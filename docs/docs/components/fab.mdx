@@ -5,10 +5,10 @@ description: The floating action button represents a screen's primary action, pi
 
 # FAB
 
-Floating action buttons (FABs) represent the screen's primary action. They appear in front of all other content, typically pinned to a corner.
-Follows the [Material Design 3 Floating Action Button](https://m3.material.io/components/floating-action-button/overview) specification.
+A floating action button (FAB) represents the primary action of the screen. It appears in front of all other content, usually pinned to a corner.
+It follows the [Material Design 3 Floating Action Button](https://m3.material.io/components/floating-action-button/overview) specification.
 
-The `icon` prop accepts three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for details.
+The `icon` prop accepts three forms: a string name (resolved through the `iconResolver` of the theme, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for details.
 
 ## Usage
 
@@ -83,7 +83,7 @@ The `icon` prop accepts three forms — a string name (resolved via the theme's 
 
 ## Extended
 
-Pass a `label` to render an extended FAB. Extended FABs are always 56dp tall — the `size` prop is unavailable.
+Pass a `label` to render an extended FAB. An extended FAB is always 56dp tall, so the `size` prop is not available.
 
 <SnackExample
   name="RootNative FAB — Extended"
@@ -109,7 +109,7 @@ Pass a `label` to render an extended FAB. Extended FABs are always 56dp tall —
 `}
 />
 
-The label doubles as the accessible name, so `accessibilityLabel` is optional in extended mode (override it if you need a more descriptive name for screen readers).
+The label is also the accessible name, so `accessibilityLabel` is optional in extended mode. Override it when a screen reader needs a more descriptive name.
 
 ## Bring your own icon library
 
@@ -125,7 +125,7 @@ import { Plus } from 'lucide-react-native'
 
 ## Custom Colors
 
-Override `containerColor` and `contentColor` to bypass the variant defaults. State-layer colors (hover, press, focus) are derived automatically.
+Override `containerColor` and `contentColor` to replace the variant defaults. The component derives the state-layer colors (hover, press, focus) for you.
 
 <SnackExample
   name="RootNative FAB — Custom Colors"

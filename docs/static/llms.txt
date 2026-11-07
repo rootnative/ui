@@ -1,17 +1,17 @@
-# RootNative UI
+# Root Native UI
 
-> Design-system agnostic component library for React Native — ships with Material Design 3 out of the box
+> A component library for React Native that follows your design system. Material Design 3 is the default.
 
-RootNative UI (`@rootnative`) is a React Native component library with a pluggable theme engine. It ships with Material Design 3 as the default design system but supports custom design systems via `BaseTheme`, `ThemeProvider`, and `defineTheme`.
+Root Native UI (`@rootnative`) is a React Native component library with a pluggable theme engine. Material Design 3 is the default design system. A custom design system goes through `BaseTheme`, `ThemeProvider`, and `defineTheme`.
 
 ## Packages
 
-- `@rootnative/core`: Theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), MD3 preset (`material`, light/dark themes), responsive breakpoint hooks
-- `@rootnative/utils`: Internal shared utilities — color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, icon resolver. **Not published to npm** — it is bundled into `@rootnative/components`, and the CLI copies the needed files into your project when you `rootnative add`. Do not tell users to install it.
-- `@rootnative/components`: UI components (AppBar, Avatar, Badge, BottomAppBar, BottomSheet, Button, ButtonGroup, Card, Checkbox, Chip, Dialog, Divider, FAB, Icon, IconButton, KeyboardAvoidingWrapper, Layout with Box / Row / Column / Grid / Container, List, LoadingIndicator, Menu, NavigationBar, NavigationDrawer, NavigationRail, Portal, Progress, Radio, SearchBar, SearchView, SideSheet, Skeleton, Slider, Snackbar, Switch, Tabs, TextField, Tooltip, Typography)
-- `@rootnative/inertia`: Animation engine. Required peer of `core` and `components` — every animation in the library routes through it, and it honors the OS reduce-motion setting by default. Docs: https://rootnative.github.io/inertia/
-- `@rootnative/icons`: Icon-library adapters — `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes any `@react-native-vector-icons/*` set.
-- `@rootnative/seo`: What a crawler reads from a web export — `defineSite` + `PageHead` for the head of each page, JSON-LD builders under `/schema`, `Heading` for the outline, `shellTags` for `+html.tsx`, and `writeSitemap` / `writeRobots` / `writeManifest` under `/node`. The core has no dependency. Docs: https://rootnative.github.io/ui/seo/why
+- `@rootnative/core`: the theme engine (`BaseTheme`, `ThemeProvider`, `defineTheme`, `useTheme`), the MD3 preset (`material`, light/dark themes), and the responsive breakpoint hooks
+- `@rootnative/utils`: internal shared utilities: color helpers (`alphaColor`, `blendColor`), elevation styles, RTL support, the icon resolver. **Not published to npm.** It is bundled into `@rootnative/components`, and the CLI copies the needed files into your project on `rootnative add`. Don't tell users to install it.
+- `@rootnative/components`: the UI components (AppBar, Avatar, Badge, BottomAppBar, BottomSheet, Button, ButtonGroup, Card, Checkbox, Chip, Dialog, Divider, FAB, Icon, IconButton, KeyboardAvoidingWrapper, Layout with Box / Row / Column / Grid / Container, List, LoadingIndicator, Menu, NavigationBar, NavigationDrawer, NavigationRail, Portal, Progress, Radio, SearchBar, SearchView, SideSheet, Skeleton, Slider, Snackbar, Switch, Tabs, TextField, Tooltip, Typography)
+- `@rootnative/inertia`: the animation engine. A required peer of `core` and `components`. Every animation in the library routes through it, and it obeys the OS reduce-motion setting by default. Docs: https://rootnative.github.io/inertia/
+- `@rootnative/icons`: icon-library adapters: `createLucideResolver`, `createPhosphorResolver`, `createVectorIconsResolver`, `withLegacyMdiFallback`. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes any `@react-native-vector-icons/*` set.
+- `@rootnative/seo`: what a crawler reads from a web export: `defineSite` + `PageHead` for the head of each page, JSON-LD builders under `/schema`, `Heading` for the outline, `shellTags` for `+html.tsx`, and `writeSitemap` / `writeRobots` / `writeManifest` under `/node`. The core has no dependency. Docs: https://rootnative.github.io/ui/seo/why
 
 ## Quick start
 
@@ -23,7 +23,7 @@ cd my-app
 npx expo start
 ```
 
-The `create` command scaffolds a ready-to-run Expo project with `ThemeProvider` and example components pre-configured. It prompts for project name, display name, and package manager.
+The `create` command makes a ready-to-run Expo project with `ThemeProvider` and example components set up. It asks for the project name, the display name, and the package manager.
 
 ### Existing project
 
@@ -33,11 +33,11 @@ pnpm add @rootnative/core @rootnative/components @rootnative/inertia react-nativ
 
 Add `@react-native-vector-icons/material-design-icons` only when you use the default `mdiResolver` from `@rootnative/components/mdi`.
 
-**Do not use `@expo/vector-icons`.** Expo is retiring it (https://expo.dev/blog/moving-away-from-expo-vector-icons). Use the `@react-native-vector-icons/*` package of the same icon family, and run `npx @react-native-vector-icons/codemod` on app code that imports the old package. Do not keep both installed: they register the same font, and the glyphs render as `?`. An `@expo/vector-icons` set also does not type-check as the `IconSet` of `createVectorIconsResolver`.
+**Don't use `@expo/vector-icons`.** Expo is retiring it (https://expo.dev/blog/moving-away-from-expo-vector-icons). Use the `@react-native-vector-icons/*` package of the same icon family, and run `npx @react-native-vector-icons/codemod` on app code that imports the old package. Don't keep both installed: they register the same font, and the glyphs render as `?`. An `@expo/vector-icons` set also doesn't type-check as the `IconSet` of `createVectorIconsResolver`.
 
 `@rootnative/core` bundles `@material/material-color-utilities`, so `createMaterialTheme` needs no extra install.
 
-Wrap root with provider:
+Wrap the root in the provider:
 ```tsx
 import { ThemeProvider } from '@rootnative/core'
 
@@ -50,13 +50,13 @@ export default function App() {
 }
 ```
 
-Import components via subpath exports (preferred for tree-shaking):
+Import components through the subpath exports (preferred, so the bundler can tree-shake the rest):
 ```tsx
 import { Button } from '@rootnative/components/button'
 import { Card } from '@rootnative/components/card'
 ```
 
-Or from root:
+Or from the root:
 ```tsx
 import { Button, Card } from '@rootnative/components'
 ```
@@ -65,25 +65,25 @@ import { Button, Card } from '@rootnative/components'
 
 - Platforms: iOS, Android, and web through `react-native-web` 0.21 (web also needs `react-dom`). Electron, macOS, Windows, and other React Native hosts are not tested.
 - Expo SDK 58 band: `react >=19.3.0 <20.0.0`, `react-native >=0.88.0 <0.89.0` (developed and tested against RN 0.88.0 / React 19.3.0 / Expo SDK 58). One release line supports one SDK band: SDK 58 takes `0.0.0-alpha.29` and later; SDK 57 takes `0.0.0-alpha.16` to `0.0.0-alpha.28` (`npm install @rootnative/components@0.0.0-alpha.28`).
-- Required peers (npm/pnpm install these for you; Yarn classic users add them by hand): `@rootnative/core` (a peer of `@rootnative/components`), `@rootnative/inertia >=0.0.26 <0.1.0` (animation engine, peer of both `core` and `components`), `react-native-safe-area-context >=4` (AppBar, BottomAppBar, BottomSheet, Dialog, Layout, NavigationBar, NavigationDrawer, SearchView, SideSheet, Snackbar), `react-native-svg >=15` (CircularProgress, LoadingIndicator). The last two are static imports in the built output, so Metro needs them installed even when you never render the component that uses them.
+- Required peers (npm and pnpm install them for you; with Yarn classic, add them by hand): `@rootnative/core` (a peer of `@rootnative/components`), `@rootnative/inertia >=0.0.26 <0.1.0` (the animation engine, a peer of both `core` and `components`), `react-native-safe-area-context >=4` (AppBar, BottomAppBar, BottomSheet, Dialog, Layout, NavigationBar, NavigationDrawer, SearchView, SideSheet, Snackbar), `react-native-svg >=15` (CircularProgress, LoadingIndicator). The last two are static imports in the built output, so Metro needs them installed even when you never render the component that uses them.
 - Optional peers: `react-native-reanimated >=4.5.0 <4.6.0` and `react-native-worklets >=0.10.0 <0.11.0`, version-locked to each other, so keep both inside these ranges; and `@react-native-vector-icons/material-design-icons >=13`, imported only by the `@rootnative/components/mdi` subpath.
-- The *optional* peers are never auto-installed (npm/pnpm only auto-install required peers; Yarn classic installs none). `createMaterialTheme` needs no extra install: `@rootnative/core` bundles `@material/material-color-utilities`.
+- No package manager installs an *optional* peer for you (npm and pnpm install only the required peers; Yarn classic installs none). `createMaterialTheme` needs no extra install: `@rootnative/core` bundles `@material/material-color-utilities`.
 
-`react-native-reanimated` powers state-layer transitions and gesture-driven components (Slider, Switch). Required for any interactive component; safe to skip only if you use Badge, Divider, Icon, KeyboardAvoidingWrapper, Portal and Typography exclusively (the only components with no animated value; `Layout` is not on the list because `Grid` animates through `Stagger`). Bundled with Expo SDK 58 and works in Expo Go.
+`react-native-reanimated` powers the state-layer transitions and the gesture-driven components (Slider, Switch). Every interactive component needs it. You can skip it only when you use Badge, Divider, Icon, KeyboardAvoidingWrapper, Portal and Typography and nothing else (the only components with no animated value; `Layout` is not on the list because `Grid` animates through `Stagger`). Expo SDK 58 bundles it, and it works in Expo Go.
 
-Components never import `react-native-reanimated` directly — they animate through `@rootnative/inertia`, which resolves the theme's motion tokens by name and collapses every transition to a hard cut when the OS reduce-motion setting is on. `ThemeProvider` wires this up; nothing to configure. Override per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
+The components never import `react-native-reanimated` directly. They animate through `@rootnative/inertia`, which resolves the motion tokens of the theme by name and collapses every transition to a hard cut when the OS reduce-motion setting is on. `ThemeProvider` sets this up, so there is nothing to configure. Override it per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
 
-Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 58 bundles its Babel plugin — nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` last in `babel.config.js` plugins.
+Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 58 bundles its Babel plugin, so there is nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` as the last entry of the `plugins` in `babel.config.js`.
 
 ## Docs
 
 - Full docs: https://rootnative.github.io/ui/
-- For AI agents (all LLM-doc locations + CLAUDE.md snippet): https://rootnative.github.io/ui/llms
+- For AI agents (all LLM-doc locations + the CLAUDE.md snippet): https://rootnative.github.io/ui/llms
 - Installation: https://rootnative.github.io/ui/installation
 - Theming: https://rootnative.github.io/ui/theming
 - Motion & reduced motion: https://rootnative.github.io/ui/motion
 - Responsive (`useBreakpoint`, `useBreakpointValue`, MD3 window size classes): https://rootnative.github.io/ui/responsive
-- Accessibility (aria on both platforms, labels you must supply, web focus containment): https://rootnative.github.io/ui/accessibility
+- Accessibility (aria on both platforms, the labels you must supply, web focus containment): https://rootnative.github.io/ui/accessibility
 - SEO for the web export (the checklist, the API, the limits): https://rootnative.github.io/ui/seo/checklist
 - Components: https://rootnative.github.io/ui/components/button
 
@@ -102,20 +102,20 @@ npx rootnative list                      # List available components
 npx rootnative doctor                    # Check project health
 ```
 
-All commands that install packages accept `--package-manager <pm>` to override auto-detection (`npm`, `yarn`, `pnpm`, `bun`).
+Every command that installs packages accepts `--package-manager <pm>` to override the auto-detection (`npm`, `yarn`, `pnpm`, `bun`).
 
-The `create` command is the fastest way to start a new project. The `init` + `add` workflow is for adding components as source files to an existing project (copy-paste workflow, similar to shadcn/ui).
+The `create` command is the fastest way to start a new project. The `init` + `add` workflow adds components as source files to an existing project (the copy-paste workflow, like shadcn/ui).
 
 ## Full API reference
 
-- [llms-full.txt](https://rootnative.github.io/ui/llms-full.txt): Complete API reference with all component props, types, and usage examples in a single file optimized for LLM consumption.
+- [llms-full.txt](https://rootnative.github.io/ui/llms-full.txt): the complete API reference, with all component props, types, and usage examples in one file, written for LLMs.
 
 ## Per-package LLM docs
 
-Each published npm package ships its own `llms.txt` for AI tools to read from `node_modules`:
+Each published npm package ships its own `llms.txt`, which an AI tool can read from `node_modules`:
 
-- `@rootnative/core` → `node_modules/@rootnative/core/llms.txt` (theme system API + types)
+- `@rootnative/core` → `node_modules/@rootnative/core/llms.txt` (the theme system API + types)
 - `@rootnative/components` → `node_modules/@rootnative/components/llms.txt` (all component props)
-- `@rootnative/icons` → `node_modules/@rootnative/icons/llms.txt` (Lucide / Phosphor / vector-icons adapters)
+- `@rootnative/icons` → `node_modules/@rootnative/icons/llms.txt` (the Lucide / Phosphor / vector-icons adapters)
 - `@rootnative/seo` → `node_modules/@rootnative/seo/llms.txt` (the SEO checklist and the head, schema, react, expo-router and node APIs)
-- `@rootnative/cli` → `node_modules/@rootnative/cli/llms.txt` (CLI commands)
+- `@rootnative/cli` → `node_modules/@rootnative/cli/llms.txt` (the CLI commands)

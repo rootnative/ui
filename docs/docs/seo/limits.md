@@ -80,7 +80,7 @@ set:
 - A page that shows the same content as another URL, when a canonical link
   to the other URL is not enough.
 
-Give the route `noindex` and no `url`. Do not list it in `robots.txt`: a
+Give the route `noindex` and no `url`. Don't list it in `robots.txt`: a
 crawler reads the `noindex` tag only on a page it may fetch, and a
 `Disallow` line leaves the URL in the index with no title.
 
@@ -113,12 +113,12 @@ Two limits stay. A server export (`web.output: 'server'`) renders each page
 at request time, so no file holds the page: the first paint has the `lang`
 of the shell, and the page sets its own after hydration. And a `<html>`
 element inside `<Head>` from `expo-router/head` does nothing in an SDK 58
-export; do not add one.
+export; don't add one.
 
 ## The checks that count
 
 The unit tests and the export check prove that the tags reach the HTML. They
-do not prove that a crawler indexes the page. Two checks do, and both run on
+don't prove that a crawler indexes the page. Two checks do, and both run on
 the live host only:
 
 - **Lighthouse** in Chrome, on the deployed URL. The SEO audit reads the

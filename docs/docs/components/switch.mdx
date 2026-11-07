@@ -5,8 +5,8 @@ description: Switches toggle a single item on or off. Follows the Material Desig
 
 # Switch
 
-Switches toggle the state of a single item on or off.
-Follows the [Material Design 3 Switch](https://m3.material.io/components/switch/overview) specification.
+A switch toggles one item on or off.
+It follows the [Material Design 3 Switch](https://m3.material.io/components/switch/overview) specification.
 
 ## Usage
 
@@ -44,15 +44,15 @@ Pass `value` with `onValueChange` to own the state, as above. Omit `value` and
 <Switch defaultValue onValueChange={handleChange} />
 ```
 
-`onValueChange` still fires either way. In earlier prereleases, passing
-`onValueChange` *without* `value` did nothing visually — the callback fired but
-the control never moved. See the changelog if you are upgrading.
+`onValueChange` still fires either way. In earlier prereleases, `onValueChange`
+*without* `value` did nothing visible: the callback fired, but the control never
+moved. See the changelog if you upgrade.
 
 :::
 
 ## With Icons
 
-Icons are opt-in — the MD3 default switch renders none. Pass `selectedIcon` (and optionally `unselectedIcon`) for the spec's "switch with icon" variant.
+Icons are opt-in. The MD3 default switch renders none. Pass `selectedIcon` (and `unselectedIcon` if you want) for the "switch with icon" variant of the spec.
 
 <SnackExample
   name="RootNative Switch — Icons"
@@ -86,7 +86,7 @@ Icons are opt-in — the MD3 default switch renders none. Pass `selectedIcon` (a
 `}
 />
 
-When `unselectedIcon` is provided, the thumb renders at the larger selected size in both states.
+When you pass `unselectedIcon`, the thumb renders at the larger selected size in both states.
 
 ## Disabled
 

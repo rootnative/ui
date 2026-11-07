@@ -5,8 +5,8 @@ description: Buttons help people take actions and make choices with a single tap
 
 # Button
 
-Buttons help people take actions and make choices with a single tap.
-Follows the [Material Design 3 Button](https://m3.material.io/components/buttons/overview) specification.
+Buttons help people take actions and make choices with one tap.
+The component follows the [Material Design 3 Button](https://m3.material.io/components/buttons/overview) specification.
 
 ## Usage
 
@@ -74,7 +74,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 
 ## With Icons
 
-`leadingIcon` and `trailingIcon` accept three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
+`leadingIcon` and `trailingIcon` accept three forms: a string name (resolved through the `iconResolver` of the theme, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for the details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
 
 <SnackExample
   name="RootNative Button — Icons"
@@ -102,7 +102,7 @@ Follows the [Material Design 3 Button](https://m3.material.io/components/buttons
 
 ### Bring your own icon library
 
-Pass any element directly — useful for one-off icons or when you want full control over sizing and color:
+Pass any element directly. This helps for a one-off icon, or when you want full control over the size and the color:
 
 ```tsx
 import { Button } from '@rootnative/components'
@@ -112,9 +112,9 @@ import { Check, ArrowRight } from 'lucide-react-native'
 <Button trailingIcon={<ArrowRight size={18} color="#fff" />}>Continue</Button>
 ```
 
-Or use a render function to receive the icon size and color the button resolved
-from its `size`, `variant` and current state, so the icon tracks them without
-hardcoding:
+Or use a render function. It receives the icon size and color that the button
+resolved from its `size`, its `variant` and its current state, so the icon
+follows them without hard-coded values:
 
 ```tsx
 <Button leadingIcon={({ size, color }) => <Check size={size} color={color} />}>
@@ -228,7 +228,7 @@ import { Link } from 'expo-router'
 
 ### Open a link in a new tab
 
-On the web, `Link` opens an external URL in the same tab. Do not use
+On the web, `Link` opens an external URL in the same tab. Don't use
 `<Link target="_blank">` for a new tab: under `asChild`, `Link` gives `target`
 to the button as a plain prop, and react-native-web drops it. Give the button
 `hrefAttrs`. react-native-web writes it onto the `<a>`, and Expo Router then
@@ -241,7 +241,7 @@ lets the browser open the new tab.
 ```
 
 `hrefAttrs` is web only, and native ignores it. `@rootnative/components`
-declares it on the React Native `ViewProps` type, so you do not need a type
+declares it on the React Native `ViewProps` type, so you don't need a type
 augmentation.
 
 ## Props

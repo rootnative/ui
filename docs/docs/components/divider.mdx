@@ -5,8 +5,8 @@ description: A 1dp line in outlineVariant that groups content in lists and conta
 
 # Divider
 
-Dividers are thin lines that group content in lists and containers.
-Follows the [Material Design 3 Divider](https://m3.material.io/components/divider/overview) specification — 1dp, drawn in `outlineVariant`.
+A divider is a thin line that groups content in lists and containers.
+It follows the [Material Design 3 Divider](https://m3.material.io/components/divider/overview) specification: 1dp, drawn in `outlineVariant`.
 
 ## Usage
 
@@ -36,8 +36,8 @@ Follows the [Material Design 3 Divider](https://m3.material.io/components/divide
 
 ## Insets
 
-`insetStart` insets the leading edge, `insetEnd` the trailing edge. Both take a number in dp.
-`insetStart` also accepts `true`, which applies the MD3 list inset of 56dp — the offset that
+`insetStart` insets the leading edge, and `insetEnd` insets the trailing edge. Both take a number in dp.
+`insetStart` also accepts `true`, which applies the MD3 list inset of 56dp. That offset
 aligns a divider with list text that follows a 24dp leading icon.
 
 | Prop value | Result |
@@ -109,9 +109,9 @@ the top and bottom edges.
 
 ## Thickness and color
 
-`thickness` sets the line weight in dp and `containerColor` overrides the line color.
-Both default to the MD3 values (1dp, `outlineVariant`) — reach for them for emphasis
-rules, not for ordinary content separation.
+`thickness` sets the line weight in dp, and `containerColor` overrides the line color.
+Both default to the MD3 values (1dp, `outlineVariant`). Use them for an emphasis
+rule, not for ordinary content separation.
 
 <SnackExample
   name="RootNative Divider — Thickness & Color"
@@ -146,9 +146,9 @@ rules, not for ordinary content separation.
 
 ## Relationship to `ListDivider`
 
-`ListDivider` — exported from `@rootnative/components/list` — is an alias of `Divider`
-with the same props. It stays exported so existing list code keeps working; new code
-should import `Divider` directly.
+`ListDivider`, exported from `@rootnative/components/list`, is an alias of `Divider`
+with the same props. It stays exported so existing list code keeps working. In new
+code, import `Divider` directly.
 
 ## Props
 

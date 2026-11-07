@@ -4,15 +4,15 @@ description: Supplementary content anchored to the bottom edge, dragged between 
 
 # BottomSheet
 
-Bottom sheets surface supplementary content anchored to the bottom edge, dragged
-between snap points or dismissed with a downward fling.
-Follows the [Material Design 3 Bottom sheet](https://m3.material.io/components/bottom-sheets/overview) specification.
+Bottom sheets show supplementary content anchored to the bottom edge. You drag
+them between snap points, or dismiss them with a downward fling.
+The component follows the [Material Design 3 Bottom sheet](https://m3.material.io/components/bottom-sheets/overview) specification.
 
-BottomSheet renders through [Portal](./portal.mdx), so your app must be wrapped
-in a `PortalHost` once at the root. It claims the `PORTAL_LAYERS.sheet` layer —
-the lowest overlay layer, beneath dialogs, snackbars, menus, and tooltips.
-Percentage snap points resolve against that host's height, so a root-level host
-gives the sheet the whole window.
+BottomSheet renders through [Portal](./portal.mdx), so you must wrap your app
+in a `PortalHost` once at the root. It claims the `PORTAL_LAYERS.sheet` layer:
+the lowest overlay layer, below dialogs, snackbars, menus, and tooltips.
+A percentage snap point resolves against the height of that host, so a
+root-level host gives the sheet the whole window.
 
 ## Usage
 
@@ -59,18 +59,19 @@ gives the sheet the whole window.
 `}
 />
 
-Without `snapPoints` the sheet sizes itself to its content (capped at the host's
-height) and has a single resting position. Content renders below the built-in
-drag handle; the container color extends under the bottom safe-area inset while
-the content is padded above it (disable with `insetBottom={false}`).
+Without `snapPoints`, the sheet sizes itself to its content (capped at the
+height of the host) and has one rest position. The content renders below the
+built-in drag handle. The container color extends under the bottom safe-area
+inset, and the content is padded above it (disable this with
+`insetBottom={false}`).
 
 ## Snap points
 
-`snapPoints` are the sheet's resting heights — numbers in dp, or percentage
-strings of the portal host's height. The sheet is sized to the tallest one and
-translates between them. Indices (for `snapIndex`, `defaultSnapIndex`, and
-`onSnapIndexChange`) refer to the points sorted ascending by resolved height,
-so `0` is always the lowest.
+`snapPoints` are the rest heights of the sheet: numbers in dp, or percentage
+strings of the height of the portal host. The sheet takes the size of the
+tallest one and translates between them. An index (for `snapIndex`,
+`defaultSnapIndex`, and `onSnapIndexChange`) refers to the points sorted by
+resolved height, from low to high, so `0` is always the lowest.
 
 <SnackExample
   name="RootNative BottomSheet — Snap points"
@@ -119,52 +120,52 @@ so `0` is always the lowest.
 `}
 />
 
-A release settles using the MD3 thresholds: a fling faster than 125dp/s commits
-to the next snap in the fling's direction, a slow drag that moved at least 56dp
-settles at the nearest snap, and anything less springs back. Below the lowest
-snap point, settling dismisses the sheet.
+A release settles with the MD3 thresholds. A fling faster than 125dp/s commits
+to the next snap in the direction of the fling. A slow drag that moved at least
+56dp settles at the nearest snap. Anything less springs back. Below the lowest
+snap point, the settle dismisses the sheet.
 
-Change `snapIndex` to move the sheet programmatically — the user can still drag
-to other snaps, reported through `onSnapIndexChange`.
+Change `snapIndex` to move the sheet from code. The user can still drag to
+other snaps, and `onSnapIndexChange` reports them.
 
 ## Standard variant
 
-`variant="standard"` drops the scrim and the modal semantics: the screen behind
-the sheet stays visible and interactive, per the MD3 standard bottom sheet. The
-Android back button is left to navigation, and dismissal happens by dragging the
-handle below the lowest snap (or programmatically).
+`variant="standard"` drops the scrim and the modal semantics. The screen behind
+the sheet stays visible and interactive, as the MD3 standard bottom sheet says.
+The Android back button stays with navigation. To dismiss the sheet, drag the
+handle below the lowest snap, or do it from code.
 
 ## Dragging and scrolling content
 
-The drag gesture lives on the handle's 48dp touch strip, not on the sheet body —
-so a `ScrollView` inside the sheet scrolls freely without fighting the drag.
-Give scrollable content its own `ScrollView` as in the example above; the
-surface bounds it and it scrolls within the sheet. Hiding the handle with
-`showDragHandle={false}` therefore also removes dragging — dismissal falls back
-to the scrim and the back button.
+The drag gesture lives on the 48dp touch strip of the handle, not on the sheet
+body. So a `ScrollView` inside the sheet scrolls freely, with no conflict with
+the drag. Give scrollable content its own `ScrollView`, as in the example
+above. The surface bounds it, and it scrolls inside the sheet. So when you hide
+the handle with `showDragHandle={false}`, you also remove the drag. Dismissal
+then falls back to the scrim and the back button.
 
-Dragging above the tallest snap point rubber-bands, as does dragging below the
+A drag above the tallest snap point rubber-bands. So does a drag below the
 lowest one when `dismissable={false}`.
 
 ## Dismissal
 
-`onDismiss` fires for the *user-initiated* ways out — a settle below the lowest
-snap point, a scrim tap, the Android hardware back button, and the drag handle's
-dismiss accessibility action. Set `visible` to `false` in response; the sheet
-runs its exit slide and unmounts.
+`onDismiss` fires for each way out that the *user* starts: a settle below the
+lowest snap point, a scrim tap, the Android hardware back button, and the
+dismiss accessibility action of the drag handle. Set `visible` to `false` in
+response. The sheet runs its exit slide and unmounts.
 
 Set `dismissable={false}` when the user has to resolve the sheet with one of its
-actions: the scrim stops responding (and stops being announced), the back button
-falls through to navigation, and downward drags rubber-band back to the lowest
-snap.
+actions. The scrim then stops responding (and the screen reader stops
+announcing it), the back button falls through to navigation, and a downward
+drag rubber-bands back to the lowest snap.
 
 ## Motion
 
-The sheet slides in from the bottom edge on `springDefaultSpatial` and settles
-after a drag on the same spring, seeded with the release velocity. The scrim
-fades on `springFastEffects`. Every one of these collapses to a hard cut under
-reduced motion — see [Motion](../motion.md). Position tracking *during* a drag
-follows the finger 1:1 and is unaffected.
+The sheet slides in from the bottom edge on `springDefaultSpatial`. After a
+drag it settles on the same spring, seeded with the release velocity. The scrim
+fades on `springFastEffects`. Each of these collapses to a hard cut under
+reduced motion; see [Motion](../motion.md). The position *during* a drag
+follows the finger 1:1, and reduced motion doesn't change that.
 
 ## Tokens
 
@@ -179,16 +180,17 @@ follows the finger 1:1 and is unaffected.
 | Settle thresholds | 56dp positional, 125dp/s velocity |
 
 > **Intentional deviation.** Older MD3 spec pages draw the drag handle at 40%
-> opacity. Current compose (Expressive-updated) uses `onSurfaceVariant` at full
-> opacity, and per the library's audit convention the Expressive value wins.
+> opacity. Current Compose (updated for Expressive) uses `onSurfaceVariant` at
+> full opacity, and by the audit convention of the library the Expressive
+> value wins.
 
 ## Accessibility
 
-- The modal surface reports `role="dialog"`, `aria-modal`, and `accessibilityViewIsModal`, so assistive tech treats the content beneath as inert. The standard variant reports none of these.
-- The scrim is announced as a button labelled "Close sheet" — override with `scrimAccessibilityLabel`. It disappears from the accessibility tree when `dismissable={false}`.
-- The drag handle announces as adjustable ("Drag handle", override with `dragHandleAccessibilityLabel`) with its snap position as the value. Increment/decrement actions expand and collapse between snap points, and an escape action dismisses.
-- On web the handle is focusable: arrow keys move between snap points and Escape dismisses.
-- **On web**, the modal variant also contains keyboard focus — focus moves into the sheet when it opens, Tab cycles inside it, Escape dismisses a `dismissable` sheet from anywhere in it, and focus returns to the opening control on close. The standard variant does none of this by design, since it lets the content behind it stay usable. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
+- The modal surface reports `role="dialog"`, `aria-modal`, and `accessibilityViewIsModal`, so assistive technology treats the content below as inert. The standard variant reports none of these.
+- The screen reader announces the scrim as a button labelled "Close sheet". Override the label with `scrimAccessibilityLabel`. The scrim leaves the accessibility tree when `dismissable={false}`.
+- The drag handle announces as adjustable ("Drag handle", override with `dragHandleAccessibilityLabel`), with its snap position as the value. The increment and decrement actions expand and collapse between snap points, and an escape action dismisses.
+- On web the handle is focusable: the arrow keys move between snap points, and Escape dismisses.
+- **On web**, the modal variant also keeps keyboard focus inside. Focus moves into the sheet when it opens, Tab cycles inside it, Escape dismisses a `dismissable` sheet from anywhere in it, and focus returns to the opening control on close. The standard variant does none of this, on purpose, because it keeps the content behind it usable. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
 
 ## Props
 

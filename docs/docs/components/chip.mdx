@@ -6,7 +6,7 @@ description: Chips enter information, make selections, filter content, or trigge
 # Chip
 
 Chips help people enter information, make selections, filter content, or trigger actions.
-Follows the [Material Design 3 Chip](https://m3.material.io/components/chips/overview) specification.
+The component follows the [Material Design 3 Chip](https://m3.material.io/components/chips/overview) specification.
 
 ## Usage
 
@@ -41,12 +41,12 @@ Follows the [Material Design 3 Chip](https://m3.material.io/components/chips/ove
 |---------|----------|
 | `assist` | Smart or automated actions |
 | `filter` | Filter content, toggle on/off |
-| `input` | User-entered info like tags |
+| `input` | Information that the user entered, such as tags |
 | `suggestion` | Dynamic suggestions |
 
 ## Elevated
 
-Available on `assist`, `filter`, and `suggestion` variants. Input chips are always outlined, so `elevated` is not part of their props — TypeScript rejects `<Chip variant="input" elevated>` rather than ignoring it.
+Available on the `assist`, `filter`, and `suggestion` variants. An input chip is always outlined, so `elevated` is not one of its props. TypeScript rejects `<Chip variant="input" elevated>`, and doesn't ignore it.
 
 <SnackExample
   name="RootNative Chip — Elevated"
@@ -73,8 +73,8 @@ Available on `assist`, `filter`, and `suggestion` variants. Input chips are alwa
 
 ## Filter Chips
 
-Filter chips support a `selected` state. When selected, a checkmark icon
-appears automatically. `selected` with `onSelectedChange` is the controlled
+A filter chip supports a `selected` state. When it is selected, the chip shows
+a check mark icon. `selected` with `onSelectedChange` is the controlled
 form. `defaultSelected` is the uncontrolled form: the chip flips its own state
 on press and reports the new state through `onSelectedChange`.
 
@@ -107,9 +107,9 @@ on press and reports the new state through `onSelectedChange`.
 
 ## Close / Remove
 
-Pass `onClose` to show a trailing close icon. Only renders on `input` and `filter` (when selected) variants.
+Pass `onClose` to show a trailing close icon. It renders only on the `input` variant, and on the `filter` variant when the chip is selected.
 
-The close icon is a separate accessibility target from the chip itself, so it names itself `Remove {label}` rather than a bare "Remove" — a screen-reader user hears which chip they are about to remove. Override the whole string with `closeAccessibilityLabel` when localizing.
+The close icon is an accessibility target separate from the chip, so it names itself `Remove {label}`, not a bare "Remove". A screen-reader user hears which chip they are about to remove. Override the whole string with `closeAccessibilityLabel` when you localize.
 
 <SnackExample
   name="RootNative Chip — Close"
@@ -163,7 +163,7 @@ The close icon is a separate accessibility target from the chip itself, so it na
 
 ## Avatar
 
-The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` are mutually exclusive on this variant — TypeScript will reject passing both.
+The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` are mutually exclusive on this variant. TypeScript rejects both together.
 
 <SnackExample
   name="RootNative Chip — Avatar"
@@ -229,7 +229,7 @@ The `input` variant supports a custom `avatar` prop. `avatar` and `leadingIcon` 
 A chip is a button only when a press does something. An assist, suggestion or
 input chip with no `onPress`, no `onLongPress` and no `href` renders as a
 static label. It has no button role, no tab stop, no hover layer and no
-pointer cursor. A screen reader reads its text, and a keyboard user does not
+pointer cursor. A screen reader reads its text, and a keyboard user doesn't
 stop on it. An input chip with only `onClose` keeps its close button.
 
 ```tsx
@@ -238,7 +238,7 @@ stop on it. An input chip with only `onClose` keeps its close button.
 
 A filter chip is always a button, because a press toggles it.
 
-A chip inside Expo Router's `<Link asChild>` stays a button with no `onPress`
+A chip inside the `<Link asChild>` of Expo Router stays a button with no `onPress`
 of its own. `Link` gives it an `href`, and on the web the chip renders as an
 `<a href>`.
 

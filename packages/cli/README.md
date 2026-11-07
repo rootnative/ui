@@ -3,7 +3,7 @@
 
 # rootnative
 
-CLI for adding [RootNative UI](https://github.com/rootnative/ui) components directly into your React Native or Expo project. Inspired by [shadcn/ui](https://ui.shadcn.com) — you own the code.
+The CLI that adds [Root Native UI](https://github.com/rootnative/ui) components to your React Native or Expo project as source files. The model comes from [shadcn/ui](https://ui.shadcn.com): you own the code.
 
 ## Quick start
 
@@ -22,27 +22,27 @@ npx rootnative add button card
 
 ## How it works
 
-Instead of installing components as an npm package, the CLI copies the source files into your project. You get full ownership — customize styles, adjust behavior, or remove what you don't need.
+The CLI doesn't install the components as an npm package. It copies the source files into your project. You own the code: change the styles, change the behavior, or remove what you don't need.
 
-The theme system (`@rootnative/core`) stays as an npm dependency so theme updates propagate automatically.
+The theme system (`@rootnative/core`) stays an npm dependency, so a theme update reaches you through npm.
 
 ## Requirements
 
 - Node.js >= 18
-- Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band the published packages declare
-- TypeScript project (recommended)
+- Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band that the published packages declare
+- A TypeScript project (recommended)
 
 ## Commands
 
 ### `rootnative create [name]`
 
-Scaffold a new Expo project with RootNative UI pre-configured (`ThemeProvider` wired up, example components included).
+Makes a new Expo project with Root Native UI set up (`ThemeProvider` in place, example components included).
 
 ```bash
 npx rootnative create my-app
 ```
 
-It prompts for project name, display name, template, and package manager.
+It asks for the project name, the display name, the template, and the package manager.
 
 Options:
 
@@ -60,23 +60,23 @@ npx rootnative create my-app -y --template with-router --package-manager pnpm
 
 ### `rootnative init`
 
-Initialize your project for RootNative UI.
+Sets up your project for Root Native UI.
 
 ```bash
 npx rootnative init
 ```
 
-This will:
+The command does this:
 
-1. Detect your project type (Expo or bare React Native)
-2. Detect your package manager (npm, yarn, pnpm, bun)
-3. Detect path aliases from your `tsconfig.json`
-4. Prompt for component and utility output directories
-5. Create an `rootnative.json` config file
-6. Offer to add the LLM-docs pointer to your project's `CLAUDE.md`
-7. Offer to install `@rootnative/core`
+1. Detects your project type (Expo or bare React Native).
+2. Detects your package manager (npm, yarn, pnpm, bun).
+3. Detects the path aliases in your `tsconfig.json`.
+4. Asks for the component and utility output directories.
+5. Creates a `rootnative.json` config file.
+6. Offers to add the LLM-docs pointer to the `CLAUDE.md` of your project.
+7. Offers to install `@rootnative/core`.
 
-Steps 6 and 7 are confirmation prompts; `-y` accepts both.
+Steps 6 and 7 are confirmation prompts. `-y` accepts both.
 
 Options:
 
@@ -99,7 +99,7 @@ npx rootnative init -y --components-alias "~/ui" --lib-alias "~/utils"
 
 ### `rootnative add <components...>`
 
-Add one or more components to your project.
+Adds one or more components to your project.
 
 ```bash
 npx rootnative add button
@@ -115,17 +115,17 @@ Options:
 | `-d, --dry-run` | Preview what would be installed without writing files |
 | `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
-The `add` command:
+The `add` command does this:
 
-1. Resolves the full dependency graph (e.g. `appbar` requires `button`, `icon-button` and `typography`)
-2. Shows a plan of components, utilities, and npm packages to install
-3. Copies component files with import paths rewritten to match your project
-4. Generates a utility barrel file (`rootnative-utils.ts`)
-5. Installs required npm dependencies
+1. Resolves the full dependency graph (for example, `appbar` requires `button`, `icon-button` and `typography`).
+2. Shows a plan of the components, the utilities, and the npm packages to install.
+3. Copies the component files, with the import paths rewritten to match your project.
+4. Generates a utility barrel file (`rootnative-utils.ts`).
+5. Installs the required npm dependencies.
 
 ### `rootnative update [components...]`
 
-Update installed components to the latest version from the registry.
+Updates the installed components to the latest version from the registry.
 
 ```bash
 npx rootnative update button        # update specific components
@@ -140,11 +140,11 @@ Options:
 | `-a, --all` | Update all installed components |
 | `-d, --dry-run` | Show diff without applying changes |
 
-Local modifications are detected by diffing against the registry source — review the diff with `--dry-run` before applying if you've customized component files.
+The command finds your local changes with a diff against the registry source. If you changed component files, review the diff with `--dry-run` before you apply the update.
 
 ### `rootnative upgrade`
 
-Upgrade `@rootnative/core` to the latest published version and install any new peer dependencies.
+Upgrades `@rootnative/core` to the latest published version and installs each new peer dependency.
 
 ```bash
 npx rootnative upgrade
@@ -158,17 +158,17 @@ Options:
 | `-a, --all` | Also update all installed component files |
 | `--package-manager <pm>` | Package manager to use (npm, yarn, pnpm, bun) |
 
-The `upgrade` command:
+The `upgrade` command does this:
 
-1. Detects the installed `@rootnative/core` version from `node_modules`
-2. Fetches the latest version from the npm registry
-3. Compares peer dependencies between the installed and latest versions
-4. Shows a plan with the version bump, new required peer deps, changed ranges, and removed deps
-5. Upgrades `@rootnative/core` and installs any new required peer dependencies
-6. Reports optional peer deps that aren't installed (does not auto-install them)
-7. Lists peer deps that are no longer required so you can remove them manually
-8. Moves `registryVersion` in `rootnative.json` forward to the new release tag, so subsequent `add`/`update` calls fetch matching sources
-9. With `-a, --all`, also updates the installed component files
+1. Detects the installed `@rootnative/core` version from `node_modules`.
+2. Fetches the latest version from the npm registry.
+3. Compares the peer dependencies of the installed and the latest version.
+4. Shows a plan with the version bump, the new required peer deps, the changed ranges, and the removed deps.
+5. Upgrades `@rootnative/core` and installs each new required peer dependency.
+6. Reports the optional peer deps that aren't installed (it doesn't install them).
+7. Lists the peer deps that are no longer required, so you can remove them by hand.
+8. Moves `registryVersion` in `rootnative.json` forward to the new release tag, so later `add` and `update` calls fetch matching sources.
+9. With `-a, --all`, also updates the installed component files.
 
 Non-interactive mode for CI/automation:
 
@@ -178,7 +178,7 @@ npx rootnative upgrade -y
 
 ### `rootnative list`
 
-Show all available components with their install status.
+Shows all available components with their install status.
 
 ```bash
 npx rootnative list
@@ -186,24 +186,24 @@ npx rootnative list
 
 ### `rootnative doctor`
 
-Check your project for common issues.
+Checks your project for common problems.
 
 ```bash
 npx rootnative doctor
 ```
 
-Checks include:
+The checks include:
 
 - `rootnative.json` exists and is valid
 - `@rootnative/core` is installed
-- React Native version compatibility
-- Installed component file integrity
-- `@rootnative/inertia` — a hard failure when missing, since every animated component needs it
-- Optional peer dependencies (`react-native-safe-area-context`, and `@react-native-vector-icons/material-design-icons` for `mdiResolver`) — reported as warnings
+- The React Native version is compatible
+- The installed component files are complete
+- `@rootnative/inertia` is installed (a hard failure when it is missing, because every animated component needs it)
+- The optional peer dependencies (`react-native-safe-area-context`, and `@react-native-vector-icons/material-design-icons` for `mdiResolver`), reported as warnings
 
 ## Configuration
 
-`rootnative init` creates an `rootnative.json` in your project root:
+`rootnative init` creates a `rootnative.json` in your project root:
 
 ```json
 {
@@ -219,14 +219,14 @@ Checks include:
 
 | Field | Description |
 |-------|-------------|
-| `aliases.components` | Where component directories are created |
-| `aliases.lib` | Where utility files are placed |
-| `registryUrl` | Base URL for fetching component source files |
-| `registryVersion` | Git ref to fetch from (branch, tag, or commit). `init` pins this to the `v<version>` tag of the latest published release, falling back to `main` only when npm is unreachable or the tag isn't pushed yet. `upgrade` moves the pin forward |
+| `aliases.components` | The directory where the CLI creates the component folders |
+| `aliases.lib` | The directory where the CLI puts the utility files |
+| `registryUrl` | The base URL for the component source files |
+| `registryVersion` | The Git ref to fetch from (a branch, a tag, or a commit). `init` pins it to the `v<version>` tag of the latest published release. It falls back to `main` only when npm is unreachable, or when nobody pushed the tag yet. `upgrade` moves the pin forward |
 
 ## Output structure
 
-After running `npx rootnative add button appbar`:
+After `npx rootnative add button appbar`:
 
 ```
 src/
@@ -268,8 +268,8 @@ src/
     rootnative-utils.ts    # generated barrel
 ```
 
-Shared internal hooks (`useStateLayer`, `usePressMorph`, …) are copied into
-*each* component directory that uses them rather than into a shared folder, so
+The CLI copies the shared internal hooks (`useStateLayer`, `usePressMorph`, …)
+into *each* component directory that uses them, not into a shared folder, so
 each installed component stays self-contained.
 
 ## Available components
@@ -307,7 +307,7 @@ each installed component stays self-contained.
 
 ## Import rewriting
 
-The CLI rewrites imports so copied files work in your project:
+The CLI rewrites the imports, so the copied files work in your project:
 
 | Original (library source) | Rewritten to |
 |---------------------------|-------------|
@@ -340,7 +340,7 @@ export default function App() {
 
 Full docs: https://rootnative.github.io/ui/cli
 
-LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/cli/llms.txt` for the exact installed version.
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt. Or read `node_modules/@rootnative/cli/llms.txt` for the exact installed version.
 
 ## License
 

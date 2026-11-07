@@ -1,6 +1,6 @@
-# Contributing to RootNative UI
+# Contributing to Root Native UI
 
-Thanks for contributing. This project is a `pnpm` monorepo with shared packages and an Expo example app, so keeping changes scoped and verifiable is important.
+Thanks for your help. This project is a `pnpm` monorepo with shared packages and an Expo example app. Keep each change small, and make sure a reviewer can check it.
 
 ## Development Stack
 
@@ -25,25 +25,25 @@ pnpm run build
 ## Workflow
 
 1. Create a feature branch from `main`.
-2. Implement or update source in `packages/core/src` or `packages/components/src`.
-3. Build packages with `pnpm run build`.
-4. Validate behavior in the example app (`pnpm run example`).
-5. Run `pnpm run lint` and `pnpm run format` before opening a PR.
+2. Change the source in `packages/core/src` or `packages/components/src`.
+3. Build the packages with `pnpm run build`.
+4. Check the change in the example app (`pnpm run example`).
+5. Run `pnpm run lint` and `pnpm run format` before you open a PR.
 
 ## Useful Commands
 
 | Command | Description |
 | --- | --- |
-| `pnpm run build` | Build all packages. |
-| `pnpm run typecheck` | Type-check all packages. |
-| `pnpm run test` | Run all tests. |
-| `pnpm run lint` | Lint all packages. |
-| `pnpm run format` | Format with Prettier. |
-| `pnpm --filter @rootnative/core build` | Build core package only. |
-| `pnpm --filter @rootnative/components build` | Build components package only. |
+| `pnpm run build` | Builds all packages. |
+| `pnpm run typecheck` | Type-checks all packages. |
+| `pnpm run test` | Runs all tests. |
+| `pnpm run lint` | Lints all packages. |
+| `pnpm run format` | Formats the code with Prettier. |
+| `pnpm --filter @rootnative/core build` | Builds only the core package. |
+| `pnpm --filter @rootnative/components build` | Builds only the components package. |
 
 ## Code Style
 
 - No semicolons, single quotes, trailing commas (see `.prettierrc`).
-- Components export types, styles, and component from separate files (`types.ts`, `styles.ts`, `ComponentName.tsx`).
-- Theme values accessed via `useTheme()` hook from `@rootnative/core`.
+- A component exports its types, its styles, and its component from separate files (`types.ts`, `styles.ts`, `ComponentName.tsx`).
+- Read theme values with the `useTheme()` hook from `@rootnative/core`.

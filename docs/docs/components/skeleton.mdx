@@ -4,14 +4,14 @@ description: Pulsing placeholder blocks that hold the shape of content while it 
 
 # Skeleton
 
-Skeletons are pulsing placeholder blocks that hold the shape of content while
-it loads. Use one where a spinner cannot — when the placeholder must match the
-size of the image, avatar, or text line it stands in for.
+A skeleton is a pulsing placeholder block that holds the shape of content while
+it loads. Use one where a spinner can't: when the placeholder must match the
+size of the image, the avatar, or the text line it stands in for.
 
-The block is drawn in `surfaceContainerHighest` and pulses its opacity on a
+The block is drawn in `surfaceContainerHighest`. It pulses its opacity on a
 repeating timing loop built from `theme.motion.durationExtraLong4` and
 `theme.motion.easingStandard`. Under reduced motion the pulse collapses to a
-static block. The component is hidden from the accessibility tree — announce
+static block. The component is hidden from the accessibility tree. Announce
 the loading state on the container instead (for example with `aria-busy`).
 
 ## Usage
@@ -47,7 +47,7 @@ the loading state on the container instead (for example with `aria-busy`).
 | Prop value | Result |
 |------------|--------|
 | `'rounded'` (default) | `theme.shape.cornerSmall` corners |
-| `'circle'` | Fully rounded — pass an equal `width` and `height` |
+| `'circle'` | Fully rounded. Pass an equal `width` and `height` |
 | `'rectangle'` | Square corners |
 
 <SnackExample
@@ -78,7 +78,7 @@ the loading state on the container instead (for example with `aria-busy`).
 
 ## Card placeholder
 
-Compose skeletons to mirror the layout they replace, then swap in the real
+Compose skeletons to mirror the layout they replace. Then swap in the real
 content when it arrives:
 
 <SnackExample
@@ -117,7 +117,7 @@ content when it arrives:
 
 ## Static and custom color
 
-Set `animated={false}` for a block that does not pulse — for example when many
+Set `animated={false}` for a block that doesn't pulse, for example when many
 skeletons render at once and the motion becomes noise. `containerColor`
 overrides the block color.
 

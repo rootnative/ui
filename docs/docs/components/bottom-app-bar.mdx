@@ -6,7 +6,7 @@ description: Bottom app bars show up to four actions and a FAB at the bottom of 
 # BottomAppBar
 
 Bottom app bars show up to four actions and a floating action button at the bottom of a
-mobile screen. Follows the [Material Design 3 Bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
+mobile screen. The component follows the [Material Design 3 Bottom app bar](https://m3.material.io/components/bottom-app-bar/overview)
 specification.
 
 The bar is 80dp tall on a `surfaceContainer` background at elevation level 2. The actions sit at
@@ -95,8 +95,8 @@ A standard `IconButton` in the slot takes the action color. Other content reads 
 ## Safe area
 
 A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap the row in a
-`SafeAreaView` that adds the bottom inset below the bar's 80dp. Leave it off (the default) when
-an ancestor already applies the bottom edge, or the inset is added twice.
+`SafeAreaView` that adds the bottom inset below the 80dp of the bar. Leave it off (the default)
+when an ancestor already applies the bottom edge. Otherwise the inset applies twice.
 
 ## Hide on scroll
 

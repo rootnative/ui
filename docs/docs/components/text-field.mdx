@@ -5,8 +5,8 @@ description: Text fields let users enter and edit text. Follows the Material Des
 
 # TextField
 
-Text fields let users enter and edit text.
-Follows the [Material Design 3 Text Field](https://m3.material.io/components/text-fields/overview) specification.
+A text field lets the user enter and edit text.
+It follows the [Material Design 3 Text Field](https://m3.material.io/components/text-fields/overview) specification.
 
 ## Usage
 
@@ -43,8 +43,8 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
 
 | Variant | Description |
 |---------|-------------|
-| `filled` | Filled container with bottom border (default) |
-| `outlined` | Outlined border around the field |
+| `filled` | A filled container with a bottom border (default) |
+| `outlined` | An outlined border around the field |
 
 <SnackExample
   name="RootNative TextField — Variants"
@@ -144,10 +144,10 @@ Follows the [Material Design 3 Text Field](https://m3.material.io/components/tex
 
 ## Accessibility
 
-- `label` becomes the input's accessible name.
-- Supporting text — the error message when there is one — is connected to the input rather than left as a loose sibling: `aria-describedby` on web, and the input's `accessibilityHint` on native, which has no equivalent.
-- `error` or `errorText` sets `aria-invalid` on web, so the field is announced as invalid and not merely described. Native has no invalid state to set, so the error message reaching the hint is what a screen reader gets there.
-- The trailing icon is a button when `onTrailingIconPress` is set — label it with `trailingIconAccessibilityLabel`.
+- `label` becomes the accessible name of the input.
+- The component connects the supporting text (the error message when there is one) to the input. It is not a loose sibling. On web that is `aria-describedby`. Native has no equivalent, so there the text becomes the `accessibilityHint` of the input.
+- `error` or `errorText` sets `aria-invalid` on web, so the field is announced as invalid, and not only described. Native has no invalid state to set, so a screen reader there gets the error message through the hint.
+- The trailing icon is a button when you set `onTrailingIconPress`. Label it with `trailingIconAccessibilityLabel`.
 
 ## Props
 

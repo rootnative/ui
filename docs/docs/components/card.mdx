@@ -5,8 +5,8 @@ description: Cards contain content and actions about a single subject. Follows t
 
 # Card
 
-Cards contain content and actions about a single subject.
-Follows the [Material Design 3 Card](https://m3.material.io/components/cards/overview) specification.
+Cards contain content and actions about one subject.
+The component follows the [Material Design 3 Card](https://m3.material.io/components/cards/overview) specification.
 
 ## Usage
 
@@ -48,15 +48,15 @@ Follows the [Material Design 3 Card](https://m3.material.io/components/cards/ove
 
 :::note `elevated` shadows need the New Architecture on iOS
 
-A **non-interactive** elevated card (no `onPress`) paints its shadow through the CSS `boxShadow` surface on iOS. That is deliberate: iOS clips a view's own `shadowOpacity`-style shadow when the view clips its children to the corner radius, and `boxShadow` is the one surface the renderer paints *outside* the clip.
+A **non-interactive** elevated card (no `onPress`) paints its shadow through the CSS `boxShadow` surface on iOS. That is intentional. iOS clips the own `shadowOpacity`-style shadow of a view when the view clips its children to the corner radius, and `boxShadow` is the one surface that the renderer paints *outside* the clip.
 
-The practical consequence is that this shadow needs the New Architecture, which is the default from React Native 0.76 and cannot be turned off in 0.82+. On the old architecture the card renders flat — as it always did. Android and web are unaffected either way, and an interactive elevated card renders correctly everywhere.
+So this shadow needs the New Architecture, which is the default from React Native 0.76, and which you can't turn off in 0.82+. On the old architecture the card renders flat, as it always did. Android and web are not affected either way, and an interactive elevated card renders correctly everywhere.
 
 :::
 
 ## Interactive Card
 
-When `onPress` is provided, the card renders as a `Pressable` with state-layer feedback:
+When you pass `onPress`, the card renders as a `Pressable` with state-layer feedback:
 
 <SnackExample
   name="RootNative Card — Interactive"
@@ -87,7 +87,7 @@ When `onPress` is provided, the card renders as a `Pressable` with state-layer f
 
 ### A card as a link
 
-An interactive card has `role="button"`. A `role` you pass replaces it. Expo Router's `<Link asChild>` passes `role="link"` and `href` to its child, so a card inside it renders as an `<a>` on the web. A crawler follows that link, and a middle click opens it in a new tab.
+An interactive card has `role="button"`. A `role` that you pass replaces it. The `<Link asChild>` of Expo Router passes `role="link"` and `href` to its child, so a card inside it renders as an `<a>` on the web. A crawler follows that link, and a middle click opens it in a new tab.
 
 ```tsx
 import { Link } from 'expo-router'
@@ -101,17 +101,17 @@ import { Link } from 'expo-router'
 </Link>
 ```
 
-The card needs an `onPress` to become interactive. `Link` adds its own navigation handler next to it, so the card's `onPress` still runs, then the navigation.
+The card needs an `onPress` to become interactive. `Link` adds its own navigation handler next to it, so the `onPress` of the card still runs, then the navigation.
 
 ## Regions
 
-`Card` is a surface and applies no padding of its own. Use the region slots to get the Material Design 3 card spacing without repeating it at every call site.
+`Card` is a surface and applies no padding of its own. Use the region slots to get the Material Design 3 card spacing without a repeat at every call site.
 
 | Slot | Role |
 |------|------|
-| `Card.Media` | Edge-to-edge media. No padding, and the card's corner radius clips it. |
-| `Card.Content` | Padded text block (16dp) with a small gap between children. |
-| `Card.Actions` | Row of buttons, aligned to the trailing edge by default. |
+| `Card.Media` | Edge-to-edge media. No padding, and the corner radius of the card clips it. |
+| `Card.Content` | A padded text block (16dp) with a small gap between the children. |
+| `Card.Actions` | A row of buttons, aligned to the trailing edge by default. |
 
 <SnackExample
   name="RootNative Card — Regions"
@@ -161,11 +161,11 @@ The card needs an `onPress` to become interactive. `Link` adds its own navigatio
 
 `Card.Media` needs a height from somewhere, because a React Native `Image` with a remote URI has no intrinsic size:
 
-- `height` — a fixed height in dp.
-- `aspectRatio` — width / height, which keeps the media proportional as the card resizes. Ignored when `height` is set.
-- Neither — the media sizes itself, and its own child provides the height.
+- `height`: a fixed height in dp.
+- `aspectRatio`: width / height, which keeps the media in proportion as the card resizes. The region ignores it when `height` is set.
+- Neither: the media sizes itself, and its own child provides the height.
 
-With `height` or `aspectRatio` set, each child fills the region, so a plain `Image` needs no style of its own. The children stack in order, so a second child is an overlay. A child's own `width` or `height` wins.
+With `height` or `aspectRatio` set, each child fills the region, so a plain `Image` needs no style of its own. The children stack in order, so a second child is an overlay. The own `width` or `height` of a child wins.
 
 ### Images
 
@@ -194,7 +194,7 @@ import { Image } from 'expo-image'
 
 ### Raw children still work
 
-The slots are additive. A card with raw children renders exactly as before and stays unpadded, so you own the spacing:
+The slots are additive. A card with raw children renders exactly as before, with no padding, so you own the spacing:
 
 ```tsx
 <Card>
@@ -204,7 +204,7 @@ The slots are additive. A card with raw children renders exactly as before and s
 </Card>
 ```
 
-Prefer the slots in new code — that is what keeps spacing consistent between cards.
+Prefer the slots in new code. They keep the spacing consistent between cards.
 
 ## Props
 

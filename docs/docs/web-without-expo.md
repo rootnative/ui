@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-description: Use RootNative UI on web with Vite or webpack and no Expo — the react-native-web alias, the worklets Babel plugin on node_modules, the globals, and the Electron notes.
+description: Use Root Native UI on web with Vite or webpack and no Expo — the react-native-web alias, the worklets Babel plugin on node_modules, the globals, and the Electron notes.
 ---
 
 # Web without Expo

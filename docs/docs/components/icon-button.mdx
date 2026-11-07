@@ -5,10 +5,10 @@ description: Icon buttons take supplementary actions with a single tap. Follows 
 
 # IconButton
 
-Icon buttons help people take supplementary actions with a single tap.
-Follows the [Material Design 3 Icon Button](https://m3.material.io/components/icon-buttons/overview) specification.
+An icon button helps people take a supplementary action with one tap.
+It follows the [Material Design 3 Icon Button](https://m3.material.io/components/icon-buttons/overview) specification.
 
-The `icon` and `selectedIcon` props accept three forms — a string name (resolved via the theme's `iconResolver`, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for full details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
+The `icon` and `selectedIcon` props accept three forms: a string name (resolved through the `iconResolver` of the theme, for example `mdiResolver` for [MaterialDesignIcons](https://pictogrammers.com/library/mdi/)), a pre-rendered React element from any icon library, or a render function that receives the resolved `{ size, color }`. See the [Icons guide](../icons) for the details, including how to register a global `iconResolver` for Lucide, SF Symbols, or custom SVGs.
 
 ## Usage
 
@@ -87,12 +87,13 @@ Five MD3 Expressive sizes. `small` is the default.
 
 ## Width and shape
 
-`width` trades horizontal padding at a fixed height — `'narrow'`, `'uniform'`
+`width` changes the horizontal padding at a fixed height: `'narrow'`, `'uniform'`
 (default), or `'wide'`. At `size="small"` that is 32 / 40 / 52dp wide.
 
-`shape` controls the resting container: `'round'` (default) rests as a
-circle/pill, `'square'` rests at a size-dependent corner. Toggle buttons invert
-their shape when selected, so a round toggle squares off to signal the change.
+`shape` controls the container at rest. `'round'` (default) rests as a
+circle or a pill. `'square'` rests at a corner that depends on the size. A
+toggle button inverts its shape when selected, so a round toggle becomes square
+to signal the change.
 
 ```tsx
 <IconButton icon="star" width="wide" accessibilityLabel="Star" />
@@ -111,11 +112,11 @@ import { Heart } from 'lucide-react-native'
 />
 ```
 
-The render-function form receives the size and color the IconButton would have given to its default icon (24dp at the default `small` size, plus the variant + state color), so the icon stays in sync with size/variant changes automatically.
+The render-function form receives the size and the color that the IconButton gives to its default icon (24dp at the default `small` size, plus the variant and state color). So the icon follows each size and variant change for you.
 
 ## Toggle Mode
 
-Use `selected` and `selectedIcon` for toggle behavior. `selected` with
+Use `selected` and `selectedIcon` for a toggle. `selected` with
 `onSelectedChange` is the controlled form. `defaultSelected` is the
 uncontrolled form: the button flips its own state on press and reports the
 new state through `onSelectedChange`.

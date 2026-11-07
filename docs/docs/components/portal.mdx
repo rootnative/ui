@@ -5,11 +5,11 @@ description: Render content into a shared overlay layer above the app — the pr
 
 # Portal
 
-Render content into a shared overlay layer that sits above the rest of the app. Portal is the foundation primitive for dialogs, snackbars, menus, tooltips, and bottom sheets — anything that needs to escape its parent's layout and z-order.
+Portal renders content into a shared overlay layer that sits above the rest of the app. It is the primitive behind dialogs, snackbars, menus, tooltips, and bottom sheets: anything that must escape the layout and the z-order of its parent.
 
 ## Setup
 
-Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in the tree below will mount into this host's overlay layer.
+Wrap your app root in `PortalHost` once. Every `<Portal>` anywhere in the tree below mounts into the overlay layer of this host.
 
 <SnackExample
   name="RootNative Portal — Setup"
@@ -84,7 +84,7 @@ Wrap your app root with `PortalHost` once. Every `<Portal>` rendered anywhere in
 `}
 />
 
-The `Portal` component itself renders nothing inline — its children appear inside the host's overlay layer instead. Mount and unmount as you would any normal React component.
+The `Portal` component itself renders nothing inline. Its children appear inside the overlay layer of the host instead. Mount and unmount it like any other React component.
 
 ## Theme
 
@@ -92,27 +92,27 @@ The content keeps the theme of the place where you write the `Portal`, not the t
 
 ## How it works
 
-`PortalHost` wraps its children in a root `View` and adds an absolutely-positioned overlay layer on top. Each `<Portal>` registers its children with the host via context; the host renders them into that layer, sorted by `priority`.
+`PortalHost` wraps its children in a root `View` and adds an absolutely positioned overlay layer on top. Each `<Portal>` registers its children with the host through context. The host renders them into that layer, sorted by `priority`.
 
-The overlay layer uses `pointerEvents="box-none"`, so empty regions of the overlay pass touches through to the content below. Each Portal entry is responsible for its own positioning and scrim — typically with `position: 'absolute'` and a full-bleed touch-capturing `View`.
+The overlay layer uses `pointerEvents="box-none"`, so an empty region of the overlay passes a touch through to the content below. Each Portal entry positions itself and draws its own scrim, usually with `position: 'absolute'` and a full-bleed `View` that captures touches.
 
-Portal entries are held outside React state, and each host subscribes only to its own entries. Opening or closing an overlay therefore re-renders the overlay layer, not the app tree underneath the host.
+The host holds the Portal entries outside React state, and each host subscribes only to its own entries. So an overlay that opens or closes re-renders the overlay layer, not the app tree under the host.
 
 ## Stacking order
 
-Portals in the same host stack by ascending `priority`. Ties fall back to mount order — open Dialog A then Dialog B at the same priority and B sits above A.
+Portals in the same host stack by ascending `priority`. A tie falls back to the mount order: open Dialog A, then Dialog B at the same priority, and B sits above A.
 
-`PORTAL_LAYERS` is the z-order contract RootNative's own overlay components use:
+`PORTAL_LAYERS` is the z-order contract that the overlay components of Root Native use:
 
 | Layer | Value | Used by |
 |-------|-------|---------|
 | `sheet` | 100 | Bottom sheets and side sheets, plus their scrim |
 | `dialog` | 200 | Dialogs and their scrim |
-| `snackbar` | 300 | Snackbars — stay visible over an open dialog |
+| `snackbar` | 300 | Snackbars. They stay visible over an open dialog |
 | `menu` | 400 | Menus and dropdowns, which can open from any surface below |
-| `tooltip` | 500 | Tooltips — topmost, they can describe a control in any layer |
+| `tooltip` | 500 | Tooltips. They are topmost, so they can describe a control in any layer |
 
-The 100-point gaps are deliberate: slot a custom overlay between two layers with `PORTAL_LAYERS.dialog + 1` without renumbering anything.
+The gaps of 100 points are intentional. Put a custom overlay between two layers with `PORTAL_LAYERS.dialog + 1`, with no change to the other numbers.
 
 ```tsx
 import { Portal, PORTAL_LAYERS } from '@rootnative/components'
@@ -126,7 +126,7 @@ A `<Portal>` with no `priority` defaults to `0`, below every named layer.
 
 ## Named hosts
 
-`<Portal hostName="…">` targets a `<PortalHost name="…">` elsewhere in the tree instead of the root overlay. Use this to scope overlays to a screen or a nested navigator — the named host renders its portals where it sits, so they are clipped and positioned by that subtree rather than by the app root.
+`<Portal hostName="…">` targets a `<PortalHost name="…">` elsewhere in the tree instead of the root overlay. Use it to scope overlays to a screen or a nested navigator. The named host renders its portals where it sits, so that subtree clips and positions them, not the app root.
 
 ```tsx
 <PortalHost>
@@ -139,10 +139,10 @@ A `<Portal>` with no `priority` defaults to `0`, below every named layer.
 
 Two rules follow from that:
 
-- **`priority` orders portals within one host only.** Stacking *between* hosts follows tree position. Anything that must participate in the app-wide z-order belongs in the default host with a `PORTAL_LAYERS` priority — that is what RootNative's own Dialog, Snackbar, Menu, Tooltip, and BottomSheet do.
-- **An unmatched `hostName` falls back to the default host** rather than dropping the content. If the named host mounts later, the portal moves to it; if it unmounts, the portal moves back.
+- **`priority` orders portals inside one host only.** The stack *between* hosts follows the tree position. Anything that must take part in the app-wide z-order belongs in the default host with a `PORTAL_LAYERS` priority. That is what the Dialog, Snackbar, Menu, Tooltip, and BottomSheet of Root Native do.
+- **An unmatched `hostName` falls back to the default host**, and doesn't drop the content. If the named host mounts later, the portal moves to it. If it unmounts, the portal moves back.
 
-The root host's name is exported as `DEFAULT_PORTAL_HOST` (the string `'default'`), so code that needs to target it explicitly — or compare against it — can import the constant instead of repeating the literal:
+The name of the root host is exported as `DEFAULT_PORTAL_HOST` (the string `'default'`). Code that targets it explicitly, or compares against it, can import the constant instead of the literal:
 
 ```tsx
 import { DEFAULT_PORTAL_HOST } from '@rootnative/components/portal'
@@ -152,7 +152,7 @@ import { DEFAULT_PORTAL_HOST } from '@rootnative/components/portal'
 
 ## Without a host
 
-If `<Portal>` is rendered outside a `<PortalHost>`, it logs a development error and falls back to inline rendering so your screen still works. Add a `PortalHost` at the app root to silence the warning and get the overlay behavior.
+A `<Portal>` outside a `<PortalHost>` logs a development error and falls back to inline rendering, so your screen still works. Add a `PortalHost` at the app root to silence the warning and get the overlay behavior.
 
 ## Portal Props
 

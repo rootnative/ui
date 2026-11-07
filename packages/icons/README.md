@@ -3,7 +3,7 @@
 
 # @rootnative/icons
 
-Icon-library adapters for [RootNative UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice — Lucide, Phosphor, any `@react-native-vector-icons/*` set, or your own resolver.
+Icon-library adapters for [Root Native UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice: Lucide, Phosphor, any `@react-native-vector-icons/*` set, or your own resolver.
 
 ## Install
 
@@ -11,7 +11,7 @@ Icon-library adapters for [RootNative UI](https://github.com/rootnative/ui). Pre
 pnpm add @rootnative/icons
 ```
 
-Then install the icon library you actually use — each is an **optional** peer dependency, so nothing is pulled in until you pick one:
+Then install the icon library you use. Each one is an **optional** peer dependency, so nothing installs until you pick one:
 
 ```bash
 pnpm add lucide-react-native      # for createLucideResolver
@@ -28,7 +28,7 @@ pnpm add @react-native-vector-icons/ionicons   # or any set, for createVectorIco
 | `createVectorIconsResolver({ IconSet })` | Any `@react-native-vector-icons/*` set (`Ionicons`, `FontAwesome7`, …), or the MDI `/static` export |
 | `withLegacyMdiFallback(resolver)` | Wrap any custom resolver to add MDI-name compatibility |
 
-Each adapter returns an `IconResolver` you pass straight to `ThemeProvider` from `@rootnative/core`.
+Each adapter returns an `IconResolver` that you pass straight to `ThemeProvider` from `@rootnative/core`.
 
 ## Quick start (Lucide)
 
@@ -72,7 +72,7 @@ const resolver = createPhosphorResolver({
 
 ## @react-native-vector-icons
 
-Use a vector-icon set other than `mdiResolver`, with an optional alias map. Expo recommends these packages in place of `@expo/vector-icons`:
+Use this adapter for a vector-icon set other than `mdiResolver`, with an optional alias map. Expo recommends these packages in place of `@expo/vector-icons`:
 
 ```tsx
 import { Ionicons } from '@react-native-vector-icons/ionicons'
@@ -87,17 +87,17 @@ const resolver = createVectorIconsResolver({
 })
 ```
 
-Names you don't alias are forwarded to the icon set verbatim.
+The adapter forwards a name that you don't alias to the icon set as is.
 
 ## MDI compatibility
 
-`mdiCompat: true` enables a curated alias map so legacy [MaterialCommunityIcons](https://pictogrammers.com/library/mdi/) names keep working after switching libraries (`magnify` → `search`, `delete` → `trash-2`, `dots-vertical` → `more-vertical`, …). Pass an object to extend or suppress entries:
+`mdiCompat: true` enables a curated alias map, so legacy [MaterialCommunityIcons](https://pictogrammers.com/library/mdi/) names keep working after a switch of libraries (`magnify` → `search`, `delete` → `trash-2`, `dots-vertical` → `more-vertical`, …). Pass an object to extend or remove entries:
 
 ```tsx
 mdiCompat: { magnify: 'binoculars', pencil: null }
 ```
 
-For hand-rolled resolvers (SF Symbols, custom SVGs), wrap with `withLegacyMdiFallback` to get the same alias behavior:
+For your own resolver (SF Symbols, custom SVGs), wrap it with `withLegacyMdiFallback` to get the same alias behavior:
 
 ```tsx
 import { withLegacyMdiFallback } from '@rootnative/icons'
@@ -105,13 +105,13 @@ import { withLegacyMdiFallback } from '@rootnative/icons'
 const resolver = withLegacyMdiFallback(myResolver, { target: 'lucide' })
 ```
 
-The base resolver is always tried first; the alias map is only consulted when it returns `null`.
+The wrapper always tries the base resolver first. It reads the alias map only when the base returns `null`.
 
 ## Missing icons
 
-When a name isn't found, the resolver `console.warn`s once per missing name. Override with `onMissing: 'silent'` to mute, or pass another `IconResolver` to chain as a fallback.
+When the resolver can't find a name, it calls `console.warn` once per missing name. Pass `onMissing: 'silent'` to mute it, or pass another `IconResolver` to chain as a fallback.
 
-Note: some components render system icons of their own (`Checkbox` uses `check`; `Chip` uses `check` and `close`). Map those names in your resolver, or the built-in `mdiCompat` map covers them.
+Note: some components render system icons of their own (`Checkbox` uses `check`; `Chip` uses `check` and `close`). Map those names in your resolver, or use the built-in `mdiCompat` map, which covers them.
 
 ## Exports
 
@@ -119,14 +119,14 @@ Note: some components render system icons of their own (`Checkbox` uses `check`;
 - `createPhosphorResolver` / `PhosphorIconComponent` / `PhosphorIconWeight` / `PhosphorResolverOptions`
 - `createVectorIconsResolver` / `VectorIconSet` / `VectorIconsResolverOptions`
 - `withLegacyMdiFallback` / `LegacyMdiTarget` / `WithLegacyMdiFallbackOptions`
-- `mdiToLucideAliases` / `mdiToPhosphorAliases` — the raw alias maps
-- `IconResolver` / `IconRenderProps` — re-exported from `@rootnative/core` for convenience
+- `mdiToLucideAliases` / `mdiToPhosphorAliases`: the raw alias maps
+- `IconResolver` / `IconRenderProps`: also exported here, from `@rootnative/core`
 
 ## Docs
 
 Full guide (per-call icons, SF Symbols, custom SVGs): https://rootnative.github.io/ui/icons
 
-LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt — or read `node_modules/@rootnative/icons/llms.txt` for the exact installed version.
+LLM-optimized reference: https://rootnative.github.io/ui/llms-full.txt. Or read `node_modules/@rootnative/icons/llms.txt` for the exact installed version.
 
 ## License
 

@@ -62,7 +62,7 @@ export default function ShowcaseScreen() {
 The export writes one file per entry and the template too, `[slug].html`,
 rendered with no matching entry. Answer that case with `noindex` and no
 `url`, as above: the template is then not a page a crawler indexes, and
-`rootnative-seo` keeps it out of the sitemap. The audit cannot tell the
+`rootnative-seo` keeps it out of the sitemap. The audit can't tell the
 template from a real page, so the example's check script asserts the
 `noindex` on it by name.
 
@@ -88,7 +88,7 @@ checklist is the same. Four things change:
   `rootnative-seo`, as for a static export: it reads the pages and writes
   `sitemap.xml` and `robots.txt` into `client/`. `audit` and `browse` read
   the same layout.
-- The server export does not run `generateStaticParams`, so `render` does
+- The server export doesn't run `generateStaticParams`, so `render` does
   not know the entries of a dynamic route. Give them in a JSON file, by the
   route as `routes.json` names it. A dynamic route with no entry gets no
   page, and `render` names it.
@@ -116,7 +116,7 @@ Check the status codes with `npx expo serve` before you deploy.
 
 Use `Link` from `expo-router` for every navigation. It renders an `<a href>`
 on the web. A `Pressable` with `router.push` renders a `<div>`, and a crawler
-does not follow it. An external URL has the same trap: a `Button` with
+doesn't follow it. An external URL has the same trap: a `Button` with
 `Linking.openURL` renders a `<button>`.
 
 To make a component a link, put it inside `<Link asChild>`:
@@ -131,7 +131,7 @@ import { Link } from 'expo-router'
 ```
 
 On the web, `Link` opens an external URL in the same tab. `hrefAttrs` opens it
-in a new tab. `<Link target="_blank">` does not work under `asChild`. See
+in a new tab. `<Link target="_blank">` doesn't work under `asChild`. See
 [A button as a link](../components/button.mdx#a-button-as-a-link).
 
 ## 3. The head on every page
@@ -253,13 +253,13 @@ export default function MovieScreen() {
   writes the head after a client navigation. After hydration it removes
   every server tag in a page slot (the description, the robots tag, the
   canonical link, the `hreflang` links, `og:*` and `twitter:*`), so the head
-  does not hold two sets. It removes the slots it leaves empty too: on a
+  doesn't hold two sets. It removes the slots it leaves empty too: on a
   route the export did not write, a `noindex` head takes the canonical link
   and the share card of the shell page out. The charset, the viewport, the
   icons and the manifest stay.
 - On SDK 57 the static export ignores `generateMetadata` and writes the
   `PageHead` tags. You can add the export before you move to SDK 58.
-- A static export does not call the `generateMetadata` of `+not-found`:
+- A static export doesn't call the `generateMetadata` of `+not-found`:
   Expo skips internal routes, so that page has no head. Write the head into
   the file after the export, with `headTagsHtml(toHeadTags(site, meta))`
   before `</head>`. A server export renders that head at request time.
@@ -454,13 +454,13 @@ another deploy owns the file.
 Each sitemap entry holds `<loc>` only. Google ignores `<changefreq>` and
 `<priority>`
 ([Google Search Central](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)),
-and an export does not know when a page last changed, so the command writes
+and an export doesn't know when a page last changed, so the command writes
 no `<lastmod>` either. A deploy script that set these values can drop them
 when it moves to `rootnative-seo`.
 
 ## 5. Headings and `alt`
 
-A `Text` renders a `<div>`. In a RootNative UI app, pass `level` to
+A `Text` renders a `<div>`. In a Root Native UI app, pass `level` to
 `Typography`: it renders `<h1>` to `<h6>` on the web and announces a header
 on native. A display or headline variant with no `level` is a plain element
 on the web, so decorative display text needs nothing.
@@ -501,7 +501,7 @@ the navigator:
 </View>
 ```
 
-In a RootNative UI app, `AppBar` is the `banner`, and `NavigationBar`,
+In a Root Native UI app, `AppBar` is the `banner`, and `NavigationBar`,
 `NavigationRail`, and the standard `NavigationDrawer` are `navigation`, on
 their own. The standard `SideSheet` is `complementary`, an `<aside>`. A bar inside `<main>`, as on a demo page, is a plain header, not
 a landmark. Pass `role` to change any of them.
@@ -529,7 +529,7 @@ const label = imageLabel('Poster', movie.title) // 'Dune poster'
 <Picture source={`/posters/${movie.id}.jpg`} alt={label} width={300} height={450} />
 ```
 
-The export holds one `<img>`, and the server does not know the pixel density
+The export holds one `<img>`, and the server doesn't know the pixel density
 of the screen or the width of the window. When the image server has more than
 one size of the file, list them in `srcSet`, with the width of each file in
 pixels, and give the shown width in `sizes`. The browser then picks the file
@@ -568,7 +568,7 @@ that has no `alt`; pass `alt=""` for a decorative image.
 The builders in `@rootnative/seo/schema` return an object with `@context`
 and `@type` set, and leave every empty field out. They never write `""`,
 `null`, or `[]`. `PageHead` writes each one as a script and escapes `<`, so a
-`</script>` in a title cannot end the tag.
+`</script>` in a title can't end the tag.
 
 The scripts go into the page body, next to the screen, not into the head.
 From Expo SDK 58 the static export writes no `PageHead` tag into the head,
@@ -737,7 +737,7 @@ problem with its file and the rule, and writes nothing. A rule that does not
 apply to your site is skipped with `--ignore <rule>`. From a script, call
 `auditExport({ outDir })` and read `problems`.
 
-The audit reads the file. It cannot see what happens when the script runs:
+The audit reads the file. It can't see what happens when the script runs:
 a hydration mismatch (React error #418), a component that reads the browser
 during the hydrating render, or a bundle that fails to load. A crawler that
 runs the script sees a page that renders twice, and Lighthouse counts the

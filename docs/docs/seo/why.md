@@ -17,7 +17,7 @@ checklist in the order that fixes them, with the function in
 ### 1. One empty page
 
 A single-page export writes one `index.html` with an empty `<div>` and a
-script. Every route renders on the client. A crawler that does not run the
+script. Every route renders on the client. A crawler that doesn't run the
 script sees the same empty page for every URL, and a crawler that does run it
 sees a page with no title, no description, and no share card.
 
@@ -46,9 +46,9 @@ route still needs `generateStaticParams`, or a host rewrite, or both.
 No package can fix this one. The docs say so, and the
 [limits page](./limits.md) explains what to check on the live host.
 
-## What the package does and does not do
+## What the package does and doesn't do
 
-`@rootnative/seo` holds the parts that do not depend on your data:
+`@rootnative/seo` holds the parts that don't depend on your data:
 
 - One `PageMeta` shape for the head of a page, `toHeadTags` to turn it
   into tag records any renderer can write, and `toMetadata` to turn it into
@@ -62,7 +62,7 @@ No package can fix this one. The docs say so, and the
   deploy step.
 
 The app keeps the mapping from its data to the meta. The package knows
-schema.org, not your API. It does not prerender, it does not configure the
-host, and it does not ship an image component.
+schema.org, not your API. It doesn't prerender, it doesn't configure the
+host, and it doesn't ship an image component.
 
 Next: [the checklist](./checklist.md).

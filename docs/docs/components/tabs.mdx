@@ -5,23 +5,23 @@ description: Organize content into groups the user switches between without leav
 
 # Tabs
 
-Tabs organize content into groups the user switches between without leaving the screen.
-Follows the [Material Design 3 Tabs](https://m3.material.io/components/tabs/overview) specification.
+Tabs organize content into groups that the user switches between without a change of screen.
+It follows the [Material Design 3 Tabs](https://m3.material.io/components/tabs/overview) specification.
 
 There are two variants. **Primary** tabs sit directly under an app bar and mark the active tab
-with a short indicator matched to its label. **Secondary** tabs sit inside content — often under a
-primary row — and mark the active tab with a full-width indicator.
+with a short indicator, matched to its label. **Secondary** tabs sit inside content, often under
+a primary row, and mark the active tab with a full-width indicator.
 
 :::info Tabs is a bar, not a navigator
-`Tabs` renders the row and tells you which tab was pressed. It does not own screens, mount panels,
-or integrate with a navigator. Point it at whatever you already use — `useState` for a panel on one
-screen, or your router's state for real routes. See [Wiring it to a navigator](#wiring-it-to-a-navigator).
+`Tabs` renders the row and tells you which tab the user pressed. It doesn't own screens, mount
+panels, or integrate with a navigator. Point it at whatever you already use: `useState` for a
+panel on one screen, or the state of your router for real routes. See [Wiring it to a navigator](#wiring-it-to-a-navigator).
 :::
 
 ## Usage
 
 Pass the tabs as `items` and read the selection from `onValueChange`. With no `value` prop, Tabs
-tracks the active tab itself and starts on the first item.
+keeps the active tab itself and starts on the first item.
 
 <SnackExample
   name="RootNative Tabs — Usage"
@@ -121,17 +121,17 @@ tracks the active tab itself and starts on the first item.
 | `showDivider` | `boolean` | `true` | The 1dp divider along the bottom of the row |
 
 A **fixed** row divides its width equally between the tabs, so a long label truncates to one line.
-Reach for `scrollable` past four tabs, or when the labels are long enough to truncate — scrollable
-tabs take their natural width, floored at 90dp.
+Use `scrollable` past four tabs, or when the labels are long enough to truncate. A scrollable tab
+takes its natural width, with a floor of 90dp.
 
-An **icon** changes the anatomy per variant: a primary tab stacks it above the label and grows to
-64dp, a secondary tab puts it before the label and stays 48dp.
+An **icon** changes the anatomy per variant. A primary tab stacks it above the label and grows to
+64dp. A secondary tab puts it before the label and stays 48dp.
 
 ## Selection
 
-`value` + `onValueChange` is the controlled form; leave `value` off and the row tracks the
-selection itself, starting on `defaultValue` or the first item. A tab row with nothing active reads
-as broken, which is why there is no "no selection" state.
+`value` + `onValueChange` is the controlled form. Leave `value` off, and the row keeps the
+selection itself, from `defaultValue` or the first item. A tab row with nothing active looks
+broken, and that is why there is no "no selection" state.
 
 ```tsx
 {/* Controlled — the row shows what your state says */}
@@ -145,7 +145,7 @@ as broken, which is why there is no "no selection" state.
 
 ### Wiring it to a navigator
 
-Tabs deliberately stops at the bar. With `expo-router`, drive it from the current route:
+Tabs stops at the bar on purpose. With `expo-router`, drive it from the current route:
 
 ```tsx
 import { Tabs } from '@rootnative/components'
@@ -170,16 +170,16 @@ function LibraryTabs() {
 }
 ```
 
-The same shape works for react-navigation (`useNavigationState` + `navigation.navigate`) or for
-nothing at all — a `useState` and a conditional render.
+The same shape works for react-navigation (`useNavigationState` + `navigation.navigate`), or for
+no navigator at all: a `useState` and a conditional render.
 
 ### Following a pager
 
-Above a swipe pager, pass the page position as `position` and the indicator moves with the finger
-between the two tabs on each side of it, in `items` order. The value is the page index plus the
-fraction of the swipe toward the next page, on the UI thread. With `react-native-pager-view`, write
-it from the Reanimated `onPageScroll` handler, so the indicator does not lag behind the finger when
-the JS thread is busy:
+Above a swipe pager, pass the page position as `position`. The indicator then moves with the
+finger between the two tabs on each side of it, in `items` order. The value is the page index plus
+the fraction of the swipe toward the next page, on the UI thread. With `react-native-pager-view`,
+write it from the Reanimated `onPageScroll` handler, so the indicator doesn't lag behind the finger
+when the JS thread is busy:
 
 ```tsx
 import { Tabs } from '@rootnative/components'
@@ -231,42 +231,42 @@ function CategoryPager() {
 }
 ```
 
-Keep `value` in sync from `onPageSelected`: it still drives the active tab colors, and it scrolls a
-scrollable row to the selected tab when the swipe ends. The row does not scroll with the finger.
-`position` takes a Reanimated shared value only; a React Native `Animated` node, such as the
-`position` of `react-native-tab-view`, is not accepted.
+Keep `value` in sync from `onPageSelected`. It still drives the active tab colors, and it scrolls a
+scrollable row to the selected tab when the swipe ends. The row doesn't scroll with the finger.
+`position` takes a Reanimated shared value only. It doesn't accept a React Native `Animated` node,
+such as the `position` of `react-native-tab-view`.
 
 ## The indicator
 
-The indicator is placed from measured geometry, not from a flex rule, because a **primary**
-indicator matches the width of the tab's *content* — the label, or the icon-and-label column when
-an icon stacks above it — rather than the width of the tab (floored at 24dp so a one-character
-label still gets something to see). A **secondary** indicator spans the whole tab.
+The component places the indicator from measured geometry, not from a flex rule. A **primary**
+indicator matches the width of the *content* of the tab (the label, or the icon-and-label column
+when an icon stacks above it), not the width of the tab. The floor is 24dp, so a one-character
+label still gets something to see. A **secondary** indicator spans the whole tab.
 
-It stays unmounted until the active tab reports a layout, so it appears in place instead of sliding
-in from the row's leading edge on first render. After that, both its offset and its width ride
-`springDefaultSpatial` and collapse to a snap under reduced motion — see [Motion](../motion.md).
-With a pager [`position`](#following-a-pager), the indicator follows the finger instead, and
-reduced motion does not gate it: that is the swipe, not an animation.
+The indicator stays unmounted until the active tab reports a layout, so it appears in place. It
+doesn't slide in from the leading edge of the row on the first render. After that, both its offset
+and its width ride `springDefaultSpatial`, and they collapse to a snap under reduced motion; see
+[Motion](../motion.md). With a pager [`position`](#following-a-pager), the indicator follows the
+finger instead, and reduced motion doesn't gate it: that is the swipe, not an animation.
 
-On a scrollable row, selecting a tab that is partly off screen scrolls it into view, centred where
-there is room to centre it.
+On a scrollable row, a tab that is partly off screen scrolls into view when you select it, centred
+where there is room to centre it.
 
 ## Overrides
 
 | Prop | Target |
 |------|--------|
 | `containerColor` | The row background |
-| `contentColor` | Label and icon color of inactive tabs |
-| `selectedContentColor` | Label and icon color of the active tab; the state layers re-derive from it |
+| `contentColor` | The label and icon color of the inactive tabs |
+| `selectedContentColor` | The label and icon color of the active tab. The state layers derive from it |
 | `indicatorColor` | The active indicator |
-| `labelStyle` | Every tab's label `Text` — does not affect the icons |
+| `labelStyle` | The label `Text` of every tab. It doesn't affect the icons |
 | `style` | The row container |
 
-Disabled tabs always use the MD3 disabled treatment (38% content); no override changes that.
+A disabled tab always uses the MD3 disabled treatment (38% content). No override changes that.
 
 When you pass `testID`, the indicator and the divider carry `<testID>-indicator` and
-`<testID>-divider` so a test can assert on them.
+`<testID>-divider`, so a test can assert on them.
 
 ## Tokens
 
@@ -274,27 +274,27 @@ When you pass `testID`, the indicator and the divider carry `<testID>-indicator`
 |-------|---------|-----------|
 | Container | `surface`, elevation 0, square corners | `surface`, elevation 0, square corners |
 | Height | 48dp, 64dp with an icon above the label | 48dp |
-| Label | `titleSmall` — active `primary`, inactive `onSurfaceVariant` | `titleSmall` — active `onSurface`, inactive `onSurfaceVariant` |
-| Icon | 24dp, same colors as the label | 24dp, same colors as the label |
-| Indicator | `primary`, 3dp, matched to the tab's content | `primary`, 2dp, full tab width |
+| Label | `titleSmall`; active `primary`, inactive `onSurfaceVariant` | `titleSmall`; active `onSurface`, inactive `onSurfaceVariant` |
+| Icon | 24dp, the same colors as the label | 24dp, the same colors as the label |
+| Indicator | `primary`, 3dp, matched to the content of the tab | `primary`, 2dp, full tab width |
 | Padding | 16dp horizontal per tab | 16dp horizontal per tab |
 | Divider | 1dp `outlineVariant` along the bottom | 1dp `outlineVariant` along the bottom |
 
-Two values differ from androidx: the secondary indicator is 2dp per the spec, where compose falls
-back to the primary token's 3dp because `SecondaryNavigationTabTokens` declares no indicator; and an
-icon-and-label tab is 64dp per `IconAndLabelTextContainerHeight`, where compose's `Tab` still uses a
-legacy 72dp.
+Two values differ from androidx. The secondary indicator is 2dp, as the spec says, where Compose
+falls back to the 3dp of the primary token, because `SecondaryNavigationTabTokens` declares no
+indicator. An icon-and-label tab is 64dp, as `IconAndLabelTextContainerHeight` says, where the
+Compose `Tab` still uses a legacy 72dp.
 
 ## Accessibility
 
-- The row reports `role="tablist"` and each tab `role="tab"` with `accessibilityState.selected`.
+- The row reports `role="tablist"`, and each tab `role="tab"` with `accessibilityState.selected`.
   Pass `accessibilityLabel` to name the row itself ("Sections", "Library").
-- A tab's screen-reader name falls back to its label; set `accessibilityLabel` on the item for an
-  icon-only tab.
-- Disabled tabs expose `accessibilityState.disabled` and stop responding.
-- On web, tabs show a keyboard focus ring (`secondary`, 3dp) driven by the same focus-visible state
-  as the rest of the library.
-- Because Tabs owns no panels, `aria-controls` is yours to add if you render panels that need it.
+- The screen-reader name of a tab falls back to its label. Set `accessibilityLabel` on the item
+  for an icon-only tab.
+- A disabled tab exposes `accessibilityState.disabled` and stops responding.
+- On web, a tab shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible
+  state as the rest of the library.
+- Tabs owns no panels, so you add `aria-controls` yourself if you render panels that need it.
 
 ## Props
 

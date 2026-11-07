@@ -5,7 +5,7 @@ description: Zero-config wrapper that keeps form content visible when the keyboa
 
 # KeyboardAvoidingWrapper
 
-Zero-config wrapper that keeps form content visible when the keyboard opens. Uses `automaticallyAdjustKeyboardInsets` on iOS and `KeyboardAvoidingView` on Android.
+A wrapper with no configuration that keeps form content visible when the keyboard opens. It uses `automaticallyAdjustKeyboardInsets` on iOS and `KeyboardAvoidingView` on Android.
 
 ## Usage
 
@@ -43,11 +43,11 @@ Zero-config wrapper that keeps form content visible when the keyboard opens. Use
 | iOS | `ScrollView` with `automaticallyAdjustKeyboardInsets` |
 | Android | `KeyboardAvoidingView` with configurable `behavior` |
 
-The inner `ScrollView` uses `keyboardShouldPersistTaps="handled"` so taps on buttons still work while the keyboard is open.
+The inner `ScrollView` uses `keyboardShouldPersistTaps="handled"`, so a tap on a button still works while the keyboard is open.
 
 ## Keyboard events
 
-Listen to keyboard show/hide events:
+Listen to the keyboard show and hide events:
 
 <SnackExample
   name="RootNative KeyboardAvoidingWrapper — Events"
@@ -78,7 +78,7 @@ Listen to keyboard show/hide events:
 `}
 />
 
-On iOS these fire on `keyboardWillShow` / `keyboardWillHide`; on Android they fire on `keyboardDidShow` / `keyboardDidHide`.
+On iOS these fire on `keyboardWillShow` / `keyboardWillHide`. On Android they fire on `keyboardDidShow` / `keyboardDidHide`.
 
 ## Props
 

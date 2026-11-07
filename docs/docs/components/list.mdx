@@ -5,8 +5,8 @@ description: Lists are continuous, vertical indexes of text and images. Follows 
 
 # List
 
-Lists are continuous, vertical indexes of text and images.
-Follows the [Material Design 3 Lists](https://m3.material.io/components/lists/overview) specification.
+A list is a continuous, vertical index of text and images.
+It follows the [Material Design 3 Lists](https://m3.material.io/components/lists/overview) specification.
 
 ## Usage
 
@@ -38,7 +38,7 @@ Follows the [Material Design 3 Lists](https://m3.material.io/components/lists/ov
 
 ## List item templates
 
-List items auto-detect their height from the content provided:
+A list item picks its height from the content you pass:
 
 | Template | Props | Min height |
 |----------|-------|------------|
@@ -87,10 +87,10 @@ On web it renders as `<h2>`. Use `headingLevel` to change the level:
 
 ## Long lists
 
-`List` renders all its children, and it does not scroll. For a long list,
-use a `FlatList` as the scroller, with `ListItem` rows. Do not put the
-`FlatList` inside `List`: there it gets no bounded height, so its end does
-not scroll into view. Put `List.Headline` in `ListHeaderComponent` in place
+`List` renders all its children, and it doesn't scroll. For a long list,
+use a `FlatList` as the scroller, with `ListItem` rows. Don't put the
+`FlatList` inside `List`: there it gets no bounded height, so its end doesn't
+scroll into view. Put `List.Headline` in `ListHeaderComponent` in place
 of the `headline` prop. It takes `headingLevel` and `style`, the same as
 `headingLevel` and `headlineStyle` on `List`. In an edge-to-edge app, add
 the bottom inset to `contentContainerStyle`, so the last row is not under
@@ -180,7 +180,7 @@ Pass any `ReactNode` as `leadingContent` or `trailingContent`:
 
 ## Interactive items
 
-When `onPress` is provided, the item renders as a `Pressable` with state-layer feedback:
+When you pass `onPress`, the item renders as a `Pressable` with state-layer feedback:
 
 <SnackExample
   name="RootNative List — Interactive"
@@ -262,7 +262,7 @@ state in its place.
 
 :::warning Give the row the role and the state
 
-The hidden control does not announce anything. Without `role` and
+The hidden control doesn't announce anything. Without `role` and
 `aria-checked` on the row, a screen reader announces a button and no checked
 state.
 
@@ -320,7 +320,7 @@ Use `insetStart` to align the divider with text that follows a leading icon:
 
 ## ListDivider Props
 
-`ListDivider` is an alias of the standalone [Divider](./divider.mdx) component and
-takes the same props. New code should import `Divider` directly.
+`ListDivider` is an alias of the standalone [Divider](./divider.mdx) component, and
+it takes the same props. In new code, import `Divider` directly.
 
 <PropTable name="ListDivider" />

@@ -6,8 +6,8 @@ description: Render any icon source through the theme's icon resolver.
 # Icon
 
 `Icon` renders an `IconSource` the way every other component renders its icons: a string name
-goes through the theme's `iconResolver`, a pre-rendered element renders as is, and a render
-function receives the resolved `{ size, color }`. Use it in a custom control so the icon set and
+goes through the `iconResolver` of the theme, a pre-rendered element renders as is, and a render
+function receives the resolved `{ size, color }`. Use it in a custom control, so the icon set and
 the color stay consistent with the library.
 
 ## Usage
@@ -49,9 +49,9 @@ square at `size`, so it lines up in a row next to text.
 
 ## Icon sets
 
-A string name resolves through the theme's `iconResolver` — `mdiResolver` from
+A string name resolves through the `iconResolver` of the theme: `mdiResolver` from
 `@rootnative/components/mdi` for MaterialDesignIcons, or a resolver from `@rootnative/icons`.
-See [Icons](../icons.md) for Lucide, Phosphor and `@react-native-vector-icons/*` resolvers. An element or a render function bypasses the resolver:
+See [Icons](../icons.md) for the Lucide, Phosphor and `@react-native-vector-icons/*` resolvers. An element or a render function bypasses the resolver:
 
 ```tsx
 <Icon source={<MySvg width={24} height={24} />} />
@@ -60,9 +60,9 @@ See [Icons](../icons.md) for Lucide, Phosphor and `@react-native-vector-icons/*`
 
 ## Accessibility
 
-Without `accessibilityLabel` the icon is decorative and hidden from assistive technology, which
-is right next to text that carries the meaning. With a label, the icon is exposed as an image
-with that name, and the glyph underneath stays hidden so a screen reader never announces a
+Without `accessibilityLabel`, the icon is decorative and hidden from assistive technology. That
+is correct next to text that carries the meaning. With a label, the icon announces as an image
+with that name, and the glyph under it stays hidden, so a screen reader never announces a
 private-use codepoint.
 
 ## Props
