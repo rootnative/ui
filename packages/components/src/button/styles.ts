@@ -98,15 +98,19 @@ export function getButtonSizeTokens(size: ExpressiveSize): ButtonSizeTokens {
  * Resting and pressed corner radii for the shape morph, in dp. `'round'`
  * rests as a pill (half the container height — never the `cornerFull`
  * sentinel 999, which would park the morph in the clamped range); `'square'`
- * rests at the size's `squareCorner`. Both morph toward `pressedCorner`.
+ * rests at the size's `squareCorner`. A selected toggle inverts the shape
+ * (Compose `ToggleButtonDefaults.shapesFor`). Both morph toward
+ * `pressedCorner`.
  */
 export function getButtonMorphRadii(
   size: ExpressiveSize,
   shape: ButtonShape,
+  selected = false,
 ): { rest: number; pressed: number } {
   const tokens = BUTTON_SIZE_TOKENS[size]
+  const restsRound = (shape === 'round') !== selected
   return {
-    rest: shape === 'round' ? tokens.height / 2 : tokens.squareCorner,
+    rest: restsRound ? tokens.height / 2 : tokens.squareCorner,
     pressed: tokens.pressedCorner,
   }
 }
@@ -199,6 +203,58 @@ function getVariantColors(
   }
 }
 
+/**
+ * Toggle colors per variant (androidx `FilledButtonTokens`,
+ * `TonalButtonTokens`, `OutlinedButtonTokens`, `ElevatedButtonTokens`:
+ * `Unselected*` and `Selected*`). MD3 has no text toggle, so `'text'` keeps
+ * its plain colors. The disabled colors are the same as the plain button.
+ */
+function getToggleColors(
+  theme: MaterialTheme,
+  variant: ButtonVariant,
+  selected: boolean,
+  plain: VariantColors,
+): VariantColors {
+  const { colors } = theme
+
+  if (variant === 'outlined') {
+    if (!selected) return { ...plain, textColor: colors.onSurfaceVariant }
+    // A selected outlined toggle has no outline, so it takes the disabled
+    // treatment of a filled button.
+    return {
+      ...plain,
+      backgroundColor: colors.inverseSurface,
+      textColor: colors.inverseOnSurface,
+      borderColor: colors.inverseSurface,
+      borderWidth: 0,
+      disabledBackgroundColor: plain.disabledBorderColor,
+      disabledBorderColor: plain.disabledBorderColor,
+    }
+  }
+
+  let container: string
+  let content: string
+  if (variant === 'filled') {
+    container = selected ? colors.primary : colors.surfaceContainer
+    content = selected ? colors.onPrimary : colors.onSurfaceVariant
+  } else if (variant === 'tonal') {
+    container = selected ? colors.secondary : colors.secondaryContainer
+    content = selected ? colors.onSecondary : colors.onSecondaryContainer
+  } else if (variant === 'elevated') {
+    container = selected ? colors.primary : colors.surfaceContainerLow
+    content = selected ? colors.onPrimary : colors.primary
+  } else {
+    return plain
+  }
+
+  return {
+    ...plain,
+    backgroundColor: container,
+    textColor: content,
+    borderColor: container,
+  }
+}
+
 function getHorizontalPadding(
   theme: MaterialTheme,
   variant: ButtonVariant,
@@ -254,15 +310,23 @@ function applyColorOverrides(
   return result
 }
 
+/**
+ * `selected` is `undefined` for a plain button, and the toggle state for a
+ * toggle.
+ */
 export function getResolvedButtonColors(
   theme: MaterialTheme,
   variant: ButtonVariant,
+  selected: boolean | undefined,
   containerColor?: string,
   contentColor?: string,
 ): VariantColors {
+  const plain = getVariantColors(theme, variant)
   return applyColorOverrides(
     theme,
-    getVariantColors(theme, variant),
+    selected === undefined
+      ? plain
+      : getToggleColors(theme, variant, selected, plain),
     containerColor,
     contentColor,
   )
@@ -273,6 +337,7 @@ export function createStyles(
   variant: ButtonVariant,
   size: ExpressiveSize,
   shape: ButtonShape,
+  selected: boolean | undefined,
   hasLeadingIcon: boolean,
   hasTrailingIcon: boolean,
   containerColor?: string,
@@ -281,12 +346,13 @@ export function createStyles(
   const colors = getResolvedButtonColors(
     theme,
     variant,
+    selected,
     containerColor,
     contentColor,
   )
   const sizeTokens = getButtonSizeTokens(size)
   const labelStyle: TypographyToken = theme.typography[sizeTokens.labelRole]
-  const restCorner = getButtonMorphRadii(size, shape).rest
+  const restCorner = getButtonMorphRadii(size, shape, selected).rest
   const padding = getHorizontalPadding(
     theme,
     variant,
@@ -295,9 +361,12 @@ export function createStyles(
     hasTrailingIcon,
   )
   // Outlined variant overrides the color-derived border width with the
-  // size-specific outline (1/1/1/2/3 dp); other variants keep 0.
+  // size-specific outline (1/1/1/2/3 dp); other variants keep 0. A selected
+  // outlined toggle has no outline.
   const borderWidth =
-    variant === 'outlined' ? sizeTokens.outlineWidth : colors.borderWidth
+    variant === 'outlined' && colors.borderWidth > 0
+      ? sizeTokens.outlineWidth
+      : colors.borderWidth
   // React Native, and react-native-web with `border-box`, put the border
   // inside the box, outside the padding. MD3 draws the outline inside the
   // token container, so the padding gives up the border width, and an

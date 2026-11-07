@@ -172,6 +172,17 @@ describe('toggle states reach the DOM with the right attribute', () => {
     expect(aria('button', 'aria-selected')).toBeNull()
   })
 
+  it('Button — toggle is a pressed button', () => {
+    renderWeb(<Button selected>Bold</Button>)
+    expect(aria('button', 'aria-pressed')).toBe('true')
+    expect(aria('button', 'aria-selected')).toBeNull()
+  })
+
+  it('Button — a plain button carries no pressed state', () => {
+    renderWeb(<Button>Save</Button>)
+    expect(aria('button', 'aria-pressed')).toBeNull()
+  })
+
   it('ButtonGroup — single selection is a checked radio', () => {
     renderWeb(
       <ButtonGroup items={GROUP_ITEMS} selectionMode="single" value="week" />,

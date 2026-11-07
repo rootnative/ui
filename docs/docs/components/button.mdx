@@ -135,6 +135,65 @@ to depart from the resolved values:
 </Button>
 ```
 
+## Toggle
+
+A toggle button turns an option on or off, for example bold text in an
+editor. Use `selected` with `onSelectedChange` for a controlled toggle. Use
+`defaultSelected` for an uncontrolled toggle: the button flips its own state
+on press and reports the new state through `onSelectedChange`.
+
+A selected toggle takes the selected colors of its variant, and its shape
+changes: a `round` button turns square, and a `square` button turns round.
+The `filled`, `tonal`, `outlined` and `elevated` variants have a toggle. MD3
+has no text toggle, so a `text` button ignores these props.
+
+<SnackExample
+  name="RootNative Button — Toggle"
+  code={`
+  import { Button } from '@rootnative/components'
+  import { mdiResolver } from '@rootnative/components/mdi'
+  import { ThemeProvider } from '@rootnative/core'
+  import { SafeAreaProvider } from 'react-native-safe-area-context'
+  import { useState } from 'react'
+  import { View } from 'react-native'
+
+  export default function App() {
+    const [isBold, setIsBold] = useState(false)
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider iconResolver={mdiResolver}>
+          <View style={{ flex: 1, justifyContent: 'center', padding: 16, gap: 12 }}>
+            <Button leadingIcon="format-bold" selected={isBold} onSelectedChange={setIsBold}>
+              Bold
+            </Button>
+            <Button variant="tonal" leadingIcon="format-italic" defaultSelected={false}>
+              Italic
+            </Button>
+            <Button variant="outlined" shape="square" leadingIcon="format-underline" defaultSelected>
+              Underline
+            </Button>
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    )
+  }
+`}
+/>
+
+`containerColor` and `contentColor` apply in both states. To color the two
+states differently, control the toggle and pass a color for each state:
+
+```tsx
+<Button
+  selected={isBold}
+  onSelectedChange={setIsBold}
+  containerColor={isBold ? '#6750A4' : '#E8DEF8'}
+  contentColor={isBold ? '#FFFFFF' : '#1D192B'}
+>
+  Bold
+</Button>
+```
+
 ## Disabled
 
 <SnackExample

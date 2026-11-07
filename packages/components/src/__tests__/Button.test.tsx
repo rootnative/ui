@@ -1,9 +1,10 @@
 import { lightTheme } from '@rootnative/core'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent, userEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { Button } from '../button/Button'
 import type { ButtonSize, ButtonVariant } from '../button/types'
+import { __resetWarnOnceForTests } from '../internal/warnOnce'
 import { CircularProgress } from '../progress'
 
 describe('Button', () => {
@@ -449,6 +450,265 @@ describe('Button', () => {
       rerender(<Button onPress={onPress}>Save</Button>)
       await userEvent.setup().press(screen.getByRole('button'))
       expect(onPress).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('toggle', () => {
+    const button = () => screen.getByRole('button')
+    const flat = (node = button()) => StyleSheet.flatten(node.props.style)
+
+    it('flips its own state and reports it when uncontrolled', () => {
+      const onSelectedChange = jest.fn()
+      const onPress = jest.fn()
+      renderWithTheme(
+        <Button
+          defaultSelected={false}
+          onSelectedChange={onSelectedChange}
+          onPress={onPress}
+        >
+          Bold
+        </Button>,
+      )
+      expect(button().props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: false }),
+      )
+      fireEvent.press(button())
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(onPress).toHaveBeenCalledTimes(1)
+      expect(button().props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: true }),
+      )
+    })
+
+    it('reports but does not flip when controlled', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <Button selected={false} onSelectedChange={onSelectedChange}>
+          Bold
+        </Button>,
+      )
+      fireEvent.press(button())
+      expect(onSelectedChange).toHaveBeenCalledWith(true)
+      expect(button().props.accessibilityState).toEqual(
+        expect.objectContaining({ selected: false }),
+      )
+    })
+
+    it('is not a toggle without selected or defaultSelected', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(<Button onSelectedChange={onSelectedChange}>Save</Button>)
+      fireEvent.press(button())
+      expect(onSelectedChange).not.toHaveBeenCalled()
+      expect(button().props.accessibilityState?.selected).toBeUndefined()
+    })
+
+    it('does not flip while disabled', () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <Button
+          defaultSelected={false}
+          disabled
+          onSelectedChange={onSelectedChange}
+        >
+          Bold
+        </Button>,
+      )
+      fireEvent.press(button())
+      expect(onSelectedChange).not.toHaveBeenCalled()
+    })
+
+    // `userEvent`, as in the loading block above: `fireEvent` would reach
+    // the `onPress` prop of the `Button` element and skip the toggle.
+    it('does not flip while loading', async () => {
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <Button
+          defaultSelected={false}
+          loading
+          onSelectedChange={onSelectedChange}
+        >
+          Bold
+        </Button>,
+      )
+      await userEvent.setup().press(button())
+      expect(onSelectedChange).not.toHaveBeenCalled()
+    })
+
+    const c = lightTheme.colors
+    it.each([
+      {
+        variant: 'filled',
+        selected: false,
+        container: c.surfaceContainer,
+        content: c.onSurfaceVariant,
+      },
+      {
+        variant: 'filled',
+        selected: true,
+        container: c.primary,
+        content: c.onPrimary,
+      },
+      {
+        variant: 'tonal',
+        selected: false,
+        container: c.secondaryContainer,
+        content: c.onSecondaryContainer,
+      },
+      {
+        variant: 'tonal',
+        selected: true,
+        container: c.secondary,
+        content: c.onSecondary,
+      },
+      {
+        variant: 'outlined',
+        selected: false,
+        container: 'transparent',
+        content: c.onSurfaceVariant,
+      },
+      {
+        variant: 'outlined',
+        selected: true,
+        container: c.inverseSurface,
+        content: c.inverseOnSurface,
+      },
+      {
+        variant: 'elevated',
+        selected: false,
+        container: c.surfaceContainerLow,
+        content: c.primary,
+      },
+      {
+        variant: 'elevated',
+        selected: true,
+        container: c.primary,
+        content: c.onPrimary,
+      },
+    ] as const)(
+      '$variant, selected $selected, takes the MD3 toggle colors',
+      ({ variant, selected, container, content }) => {
+        renderWithTheme(
+          <Button variant={variant} selected={selected}>
+            Bold
+          </Button>,
+        )
+        expect(flat().backgroundColor).toBe(container)
+        expect(flat(screen.getByText('Bold')).color).toBe(content)
+      },
+    )
+
+    it('uses containerColor and contentColor in both states', () => {
+      renderWithTheme(
+        <>
+          <Button
+            testID="off"
+            selected={false}
+            containerColor="#FF0000"
+            contentColor="#00FF00"
+          >
+            Off
+          </Button>
+          <Button
+            testID="on"
+            selected
+            containerColor="#FF0000"
+            contentColor="#00FF00"
+          >
+            On
+          </Button>
+        </>,
+      )
+      for (const id of ['off', 'on']) {
+        expect(flat(screen.getByTestId(id)).backgroundColor).toBe('#FF0000')
+      }
+      expect(flat(screen.getByText('Off')).color).toBe('#00FF00')
+      expect(flat(screen.getByText('On')).color).toBe('#00FF00')
+    })
+
+    it('a selected round toggle rests at the square corner', () => {
+      renderWithTheme(
+        <Button size="medium" selected>
+          Bold
+        </Button>,
+      )
+      expect(flat().borderRadius).toBe(16)
+    })
+
+    it('a selected square toggle rests as a pill', () => {
+      renderWithTheme(
+        <Button size="medium" shape="square" selected>
+          Bold
+        </Button>,
+      )
+      expect(flat().borderRadius).toBe(28)
+    })
+
+    it('morphs the shape when the selection flips', () => {
+      const { flush } = renderSettled(
+        <Button defaultSelected={false}>Bold</Button>,
+      )
+      expect(flat().borderRadius).toBe(20)
+      fireEvent.press(button())
+      flush()
+      expect(flat().borderRadius).toBe(12)
+    })
+
+    it('drops the outline of a selected outlined toggle and keeps the inset', () => {
+      renderWithTheme(
+        <>
+          <Button testID="off" variant="outlined" selected={false}>
+            Bold
+          </Button>
+          <Button testID="on" variant="outlined" selected>
+            Bold
+          </Button>
+        </>,
+      )
+      const inset = (testID: string) => {
+        const s = flat(screen.getByTestId(testID))
+        const border = Number(s.borderWidth ?? 0)
+        return {
+          border,
+          vertical: Number(s.paddingVertical) + border,
+          start: Number(s.paddingStart) + border,
+          end: Number(s.paddingEnd) + border,
+        }
+      }
+      expect(inset('off').border).toBe(1)
+      expect(inset('on').border).toBe(0)
+      expect({ ...inset('on'), border: 1 }).toEqual(inset('off'))
+    })
+
+    it('ignores the toggle props on the text variant and warns once', () => {
+      __resetWarnOnceForTests()
+      const error = jest.spyOn(console, 'error').mockImplementation(() => {})
+      const onSelectedChange = jest.fn()
+      renderWithTheme(
+        <>
+          <Button
+            variant="text"
+            selected
+            onSelectedChange={onSelectedChange}
+            testID="controlled"
+          >
+            Bold
+          </Button>
+          <Button variant="text" defaultSelected testID="uncontrolled">
+            Italic
+          </Button>
+        </>,
+      )
+      fireEvent.press(screen.getByTestId('controlled'))
+      expect(onSelectedChange).not.toHaveBeenCalled()
+      for (const id of ['controlled', 'uncontrolled']) {
+        expect(
+          screen.getByTestId(id).props.accessibilityState?.selected,
+        ).toBeUndefined()
+        expect(flat(screen.getByTestId(id)).backgroundColor).toBe('transparent')
+      }
+      expect(error).toHaveBeenCalledTimes(1)
+      expect(error.mock.calls[0][0]).toContain('text variant')
+      error.mockRestore()
     })
   })
 

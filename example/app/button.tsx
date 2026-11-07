@@ -12,6 +12,7 @@ import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
 
 const variants = ['filled', 'elevated', 'tonal', 'outlined', 'text'] as const
+const toggleVariants = ['filled', 'elevated', 'tonal', 'outlined'] as const
 const sizes = ['extraSmall', 'small', 'medium', 'large', 'extraLarge'] as const
 
 export function generateMetadata() {
@@ -20,6 +21,7 @@ export function generateMetadata() {
 
 export default function ButtonScreen() {
   const [isLoading, setIsLoading] = useState(false)
+  const [isBold, setIsBold] = useState(false)
   const load = () => {
     setIsLoading(true)
     setTimeout(() => setIsLoading(false), 2000)
@@ -62,6 +64,52 @@ export default function ButtonScreen() {
                 onPress={load}
               >
                 {`${variant} button`}
+              </Button>
+            ))}
+          </Row>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleSmall">Toggle</Typography>
+          <Typography variant="bodySmall" style={styles.muted}>
+            A selected toggle takes the selected colors, and its shape inverts:
+            round turns square, square turns round. The first row shares one
+            controlled state, so all four flip together.
+          </Typography>
+          <Row wrap gap="sm" align="center">
+            {toggleVariants.map((variant) => (
+              <Button
+                key={`toggle-${variant}`}
+                variant={variant}
+                leadingIcon="format-bold"
+                selected={isBold}
+                onSelectedChange={setIsBold}
+              >
+                {variant}
+              </Button>
+            ))}
+          </Row>
+          <Row wrap gap="sm" align="center">
+            {toggleVariants.map((variant) => (
+              <Button
+                key={`toggle-square-${variant}`}
+                variant={variant}
+                shape="square"
+                defaultSelected
+              >
+                {`${variant} square`}
+              </Button>
+            ))}
+          </Row>
+          <Row wrap gap="sm" align="center">
+            {toggleVariants.map((variant) => (
+              <Button
+                key={`toggle-disabled-${variant}`}
+                variant={variant}
+                selected
+                disabled
+              >
+                {`${variant} disabled`}
               </Button>
             ))}
           </Row>

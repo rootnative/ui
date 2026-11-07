@@ -124,6 +124,15 @@ const CASES: readonly ReducedMotionCase[] = [
     settle: pressIn('rm-button'),
   },
   {
+    name: 'Button (toggle)',
+    render: () => <Button defaultSelected={false}>Bold</Button>,
+    // The shape progress seeds from the initial state, so the transition
+    // under test starts when the selection flips.
+    settle: () => {
+      fireEvent.press(screen.getByRole('button'))
+    },
+  },
+  {
     name: 'FAB',
     render: () => <FAB icon="plus" accessibilityLabel="Add" testID="rm-fab" />,
     settle: pressIn('rm-fab'),

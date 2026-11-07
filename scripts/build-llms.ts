@@ -636,6 +636,10 @@ import { Link } from 'expo-router'
 <Button variant="outlined">Cancel</Button>
 <Button variant="tonal" containerColor="#E8DEF8" contentColor="#1D192B">Custom</Button>
 
+// A toggle: selected + onSelectedChange (controlled) or defaultSelected
+// (uncontrolled). The text variant has no toggle.
+<Button leadingIcon="format-bold" selected={isBold} onSelectedChange={setIsBold}>Bold</Button>
+
 // A link: Link from expo-router gives the button role="link" and href, so the
 // web renders <a href>, which a crawler follows. hrefAttrs opens a new tab.
 <Link href="https://github.com/rootnative" asChild>

@@ -223,6 +223,10 @@ import { Link } from 'expo-router'
 <Button variant="outlined">Cancel</Button>
 <Button variant="tonal" containerColor="#E8DEF8" contentColor="#1D192B">Custom</Button>
 
+// A toggle: selected + onSelectedChange (controlled) or defaultSelected
+// (uncontrolled). The text variant has no toggle.
+<Button leadingIcon="format-bold" selected={isBold} onSelectedChange={setIsBold}>Bold</Button>
+
 // A link: Link from expo-router gives the button role="link" and href, so the
 // web renders <a href>, which a crawler follows. hrefAttrs opens a new tab.
 <Link href="https://github.com/rootnative" asChild>
@@ -234,12 +238,15 @@ Props:
 - `children: string` — Text label rendered inside the button.
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography.
-- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press.
+- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press. A selected toggle inverts the shape.
+- `selected?: boolean` — Makes the button a toggle and controls it. A selected toggle takes the MD3 selected colors of its variant and inverts its shape. Pair it with `onSelectedChange`, or use `defaultSelected` for an uncontrolled toggle. MD3 has no `'text'` toggle, so a text button ignores the toggle props and warns in development.
+- `defaultSelected?: boolean` — Makes the button a toggle without controlling it: the button flips its own state on press and reports it through `onSelectedChange`.
+- `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a toggle button is pressed.
 - `leadingIcon?: IconSource` — Icon rendered before the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `trailingIcon?: IconSource` — Icon rendered after the label. Accepts a string name (resolved via the theme's `iconResolver`, for example `mdiResolver`), a pre-rendered element, or a render function that receives `{ size, color }`.
 - `iconSize?: number` — Size of leading and trailing icons in dp. Used when resolving string icon names or invoking the render-function form. Pre-rendered elements are not resized. Defaults to the icon size for the current `size` (20 for `extraSmall` and `small`, 24 for `medium`, 32 for `large`, 40 for `extraLarge`).
-- `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically.
-- `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set.
+- `containerColor?: string` — Override the container (background) color. State-layer colors (hover, press) are derived automatically. A toggle uses it in both states, so pass a value for each state if they must differ.
+- `contentColor?: string` — Override the content (label and icon) color. State-layer colors are derived automatically when no containerColor is set. A toggle uses it in both states.
 - `labelStyle?: StyleProp<TextStyle>` — Additional style applied to the label text.
 - `loading?: boolean` — Default: `false`. Show an indeterminate `CircularProgress` in place of `leadingIcon`, at the icon size and in the label color. The button keeps its colors and its focus, ignores `onPress` and `onLongPress`, shows no hover or press state, and sets `aria-busy`. MD3 has no loading button, so this is a library addition. With no `leadingIcon`, the spinner adds the icon and its gap, so the button gets wider while it loads. Give it a `width` in `style` to keep the size. Pass `disabled` as well if the button must also look disabled.
 - `style?: StyleProp<ViewStyle>` — Style for the component. The keys that place or size it in its parent — `alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and `zIndex` — go to the outer wrapper, so the focus ring and the shadow move with it. `minWidth` and `maxWidth` go with a `width`; alone, they style the container. The wrapper sets no `alignSelf`, so the parent's `alignItems` places the component. In a parent that stretches its children, the component keeps its own width at the start edge. Every other key styles the container. Static form only — the function form `(state) => style` is not supported because the component drives its container background through Reanimated. Use `containerColor` / `contentColor` for state-aware styling.

@@ -45,7 +45,8 @@ export type ButtonSize =
 /**
  * MD3 Expressive container shape. `'round'` rests as a full pill; `'square'`
  * rests at a size-dependent rounded-rectangle corner. Both morph one step
- * squarer on press.
+ * squarer on press. A selected toggle inverts the shape: `'round'` turns
+ * square and `'square'` turns round.
  */
 export type ButtonShape = 'round' | 'square'
 
@@ -69,10 +70,26 @@ export interface ButtonProps extends Omit<
   size?: ButtonSize
   /**
    * Container shape. `'round'` is a full pill; `'square'` rests at a
-   * size-dependent rounded corner. Both morph squarer on press.
+   * size-dependent rounded corner. Both morph squarer on press. A selected
+   * toggle inverts the shape.
    * @default 'round'
    */
   shape?: ButtonShape
+  /**
+   * Makes the button a toggle and controls it. A selected toggle takes the
+   * MD3 selected colors of its variant and inverts its shape. Pair it with
+   * `onSelectedChange`, or use `defaultSelected` for an uncontrolled toggle.
+   * MD3 has no `'text'` toggle, so a text button ignores the toggle props and
+   * warns in development.
+   */
+  selected?: boolean
+  /**
+   * Makes the button a toggle without controlling it: the button flips its
+   * own state on press and reports it through `onSelectedChange`.
+   */
+  defaultSelected?: boolean
+  /** Called with the next state when a toggle button is pressed. */
+  onSelectedChange?: (selected: boolean) => void
   /**
    * Icon rendered before the label. Accepts a string name (resolved via the
    * theme's `iconResolver`, for example `mdiResolver`), a
@@ -95,12 +112,15 @@ export interface ButtonProps extends Omit<
   iconSize?: number
   /**
    * Override the container (background) color.
-   * State-layer colors (hover, press) are derived automatically.
+   * State-layer colors (hover, press) are derived automatically. A toggle
+   * uses it in both states, so pass a value for each state if they must
+   * differ.
    */
   containerColor?: string
   /**
    * Override the content (label and icon) color.
    * State-layer colors are derived automatically when no containerColor is set.
+   * A toggle uses it in both states.
    */
   contentColor?: string
   /** Additional style applied to the label text. */
