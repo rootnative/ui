@@ -143,11 +143,13 @@ function getVariantColors(
     theme.stateLayer.disabledContainerOpacity,
   )
 
+  // Expressive tokens (androidx `OutlinedButtonTokens`): a neutral label on an
+  // `outlineVariant` border. The baseline spec used `primary` and `outline`.
   if (variant === 'outlined') {
     return {
       backgroundColor: 'transparent',
-      textColor: theme.colors.primary,
-      borderColor: theme.colors.outline,
+      textColor: theme.colors.onSurfaceVariant,
+      borderColor: theme.colors.outlineVariant,
       borderWidth: 1,
       disabledBackgroundColor: 'transparent',
       disabledTextColor: disabledLabelColor,
@@ -218,7 +220,7 @@ function getToggleColors(
   const { colors } = theme
 
   if (variant === 'outlined') {
-    if (!selected) return { ...plain, textColor: colors.onSurfaceVariant }
+    if (!selected) return plain
     // A selected outlined toggle has no outline, so it takes the disabled
     // treatment of a filled button.
     return {

@@ -180,7 +180,8 @@ export function getIconButtonColors(
       borderWidth = 0
     } else {
       baseBg = 'transparent'
-      borderColor = theme.colors.outline
+      // Expressive token (androidx `OutlinedIconButtonTokens.OutlineColor`).
+      borderColor = theme.colors.outlineVariant
       borderWidth = 1
       disabledBg = 'transparent'
       disabledBorderColor = disabledOutlineColor

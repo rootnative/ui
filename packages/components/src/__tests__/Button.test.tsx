@@ -290,6 +290,14 @@ describe('Button', () => {
     })
   })
 
+  it('outlined has an onSurfaceVariant label on an outlineVariant border', () => {
+    renderWithTheme(<Button variant="outlined">Cancel</Button>)
+    const container = StyleSheet.flatten(screen.getByRole('button').props.style)
+    const label = StyleSheet.flatten(screen.getByText('Cancel').props.style)
+    expect(container.borderColor).toBe(lightTheme.colors.outlineVariant)
+    expect(label.color).toBe(lightTheme.colors.onSurfaceVariant)
+  })
+
   describe('outline width by size', () => {
     it('outlined l uses a 2dp border, xl 3dp', () => {
       renderWithTheme(
@@ -675,6 +683,9 @@ describe('Button', () => {
         }
       }
       expect(inset('off').border).toBe(1)
+      expect(flat(screen.getByTestId('off')).borderColor).toBe(
+        lightTheme.colors.outlineVariant,
+      )
       expect(inset('on').border).toBe(0)
       expect({ ...inset('on'), border: 1 }).toEqual(inset('off'))
     })

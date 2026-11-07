@@ -309,6 +309,14 @@ describe('IconButton', () => {
     })
   })
 
+  it('outlined has an outlineVariant border', () => {
+    renderWithTheme(
+      <IconButton icon="heart" accessibilityLabel="X" variant="outlined" />,
+    )
+    const flat = StyleSheet.flatten(screen.getByRole('button').props.style)
+    expect(flat.borderColor).toBe(lightTheme.colors.outlineVariant)
+  })
+
   describe('outline width by size', () => {
     it('outlined l uses a 2dp border', () => {
       renderWithTheme(
