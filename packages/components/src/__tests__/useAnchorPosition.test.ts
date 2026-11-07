@@ -145,6 +145,66 @@ describe('resolveAnchorPosition — layer bounds', () => {
   })
 })
 
+describe('resolveAnchorPosition — safe area', () => {
+  const NONE = { top: 0, right: 0, bottom: 0, left: 0 }
+
+  it('stops below the status bar when it flips above an anchor', () => {
+    const position = resolve({
+      safeArea: { ...NONE, top: 24 },
+      anchor: { x: 100, y: 600, width: 40, height: 40 },
+      overlay: { width: 200, height: 700 },
+    })
+    // Below: 800 - 8 - 640 = 152. Above: 600 - (24 + 8) = 568.
+    expect(position.side).toBe('top')
+    expect(position.maxHeight).toBe(568)
+    expect(position.top).toBe(32)
+  })
+
+  it('stops above the navigation bar below an anchor', () => {
+    const position = resolve({
+      safeArea: { ...NONE, bottom: 48 },
+      anchor: { x: 100, y: 300, width: 40, height: 40 },
+      overlay: { width: 200, height: 900 },
+    })
+    // Below: 800 - 48 - 8 - 340 = 404, which beats 292 above.
+    expect(position.side).toBe('bottom')
+    expect(position.maxHeight).toBe(404)
+    expect(position.top + position.maxHeight).toBe(744)
+  })
+
+  it('shifts in from a display cutout on either side', () => {
+    const cutouts = { ...NONE, left: 40, right: 40 }
+    const overlay = { width: 200, height: 100 }
+
+    const leading = resolve({
+      safeArea: cutouts,
+      overlay,
+      anchor: { x: 10, y: 300, width: 40, height: 40 },
+    })
+    expect(leading.left).toBe(48)
+
+    const trailing = resolve({
+      safeArea: cutouts,
+      overlay,
+      anchor: { x: 340, y: 300, width: 40, height: 40 },
+    })
+    // 400 - 40 - 8 - 200 = 152.
+    expect(trailing.left).toBe(152)
+  })
+
+  it('does not add the inset to a layer that already starts below it', () => {
+    const position = resolve({
+      safeArea: { ...NONE, top: 24 },
+      layer: { x: 0, y: 100, width: 400, height: 640 },
+      anchor: { x: 100, y: 700, width: 40, height: 40 },
+      overlay: { width: 200, height: 900 },
+    })
+    // The same as with no inset: the layer top at 100 is below the bar at 24.
+    expect(position.maxHeight).toBe(592)
+    expect(position.top).toBe(8)
+  })
+})
+
 describe('resolveAnchorPosition — collision flipping', () => {
   it('flips above the anchor when it does not fit below and above is roomier', () => {
     // spaceBelow 52, spaceAbove 692 — the 150dp overlay only fits above.

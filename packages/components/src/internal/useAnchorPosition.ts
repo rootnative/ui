@@ -1,7 +1,16 @@
 import { selectRTL } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import type { LayoutChangeEvent, ViewInstance } from 'react-native'
 import { useWindowDimensions } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import type { EdgeInsets } from 'react-native-safe-area-context'
 
 /** Side of the anchor the overlay prefers to occupy. */
 export type AnchorSide = 'top' | 'bottom'
@@ -105,6 +114,8 @@ export interface UseAnchorPositionResult {
 
 const DEFAULT_SCREEN_MARGIN = 8
 
+const NO_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+
 function sameRect(a: AnchorRect | null, b: AnchorRect): boolean {
   return (
     a !== null &&
@@ -134,6 +145,10 @@ function sameRect(a: AnchorRect | null, b: AnchorRect): boolean {
  *    overlay a viewport taller than the region it can be seen in, stranding its
  *    last items where no scroll reaches them. The layer's origin is subtracted
  *    last, so the result is in layer coordinates.
+ * 4. The safe-area insets of the nearest `SafeAreaProvider` bound it too. On
+ *    an edge-to-edge window the root host starts under the status bar, so
+ *    without them an overlay that opens above an anchor near the top stops
+ *    under the status bar, and one near the bottom under the navigation bar.
  *
  * Flipping is deliberately conservative: the overlay only moves to the other
  * side when it does not fit *and* that side is roomier. Flipping into an
@@ -159,6 +174,9 @@ export function useAnchorPosition(
   const [layer, setLayer] = useState<AnchorRect | null>(null)
   const [overlay, setOverlay] = useState<AnchorSize | null>(null)
   const { width: windowWidth, height: windowHeight } = useWindowDimensions()
+  // The context, not `useSafeAreaInsets()`, which throws without a provider.
+  // Without one there is no inset to read, and the window bounds still apply.
+  const safeArea = useContext(SafeAreaInsetsContext) ?? NO_INSETS
 
   const measure = useCallback(() => {
     anchorRef.current?.measureInWindow((x, y, width, height) => {
@@ -219,6 +237,7 @@ export function useAnchorPosition(
             },
             windowWidth,
             windowHeight,
+            safeArea,
             preferredSide,
             align,
             offset,
@@ -235,6 +254,7 @@ export function useAnchorPosition(
     layer,
     windowWidth,
     windowHeight,
+    safeArea,
     preferredSide,
     align,
     offset,
@@ -252,6 +272,12 @@ export interface ResolveAnchorPositionArgs {
   layer: AnchorRect
   windowWidth: number
   windowHeight: number
+  /**
+   * The safe-area insets, measured from the window edges. On a window that is
+   * not edge to edge the system bars are outside it, and the insets are 0.
+   * @default { top: 0, right: 0, bottom: 0, left: 0 }
+   */
+  safeArea?: EdgeInsets
   preferredSide: AnchorSide
   align: AnchorAlign
   offset: number
@@ -271,6 +297,7 @@ export function resolveAnchorPosition({
   layer,
   windowWidth,
   windowHeight,
+  safeArea = NO_INSETS,
   preferredSide,
   align,
   offset,
@@ -284,12 +311,17 @@ export function resolveAnchorPosition({
   // stranding its last items where nothing can scroll to them. A layer wider or
   // taller than the window (a host inside a scrolled container) is clamped the
   // other way, since offscreen is offscreen.
-  const boundsTop = Math.max(0, layer.y) + screenMargin
+  //
+  // The safe area narrows the window, so the system bars and a display cutout
+  // count as offscreen. A layer that is already inside the safe area (a host
+  // below an app bar) is not moved again: the larger of the two edges wins.
+  const boundsTop = Math.max(0, layer.y, safeArea.top) + screenMargin
   const boundsBottom =
-    Math.min(windowHeight, layer.y + layer.height) - screenMargin
-  const boundsLeft = Math.max(0, layer.x) + screenMargin
+    Math.min(windowHeight - safeArea.bottom, layer.y + layer.height) -
+    screenMargin
+  const boundsLeft = Math.max(0, layer.x, safeArea.left) + screenMargin
   const boundsRight =
-    Math.min(windowWidth, layer.x + layer.width) - screenMargin
+    Math.min(windowWidth - safeArea.right, layer.x + layer.width) - screenMargin
 
   const spaceBelow = boundsBottom - (anchor.y + anchor.height + offset)
   const spaceAbove = anchor.y - offset - boundsTop

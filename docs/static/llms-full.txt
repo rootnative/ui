@@ -2196,7 +2196,7 @@ Props:
 - `side?: 'top' | 'bottom'` — Default: `'bottom'`. Side of the anchor the menu prefers. It flips to the other side when it does not fit and that side is roomier.
 - `align?: 'start' | 'center' | 'end'` — Default: `'start'`. Cross-axis alignment against the anchor.
 - `offset?: number` — Default: `0`. Gap between the anchor edge and the menu, in dp.
-- `screenMargin?: number` — Default: `8`. Minimum distance the menu keeps from every screen edge, in dp.
+- `screenMargin?: number` — Default: `8`. Minimum distance the menu keeps from every screen edge, in dp. The edges are inside the safe-area insets, so the menu stays off the system bars.
 - `maxHeight?: number` — Cap the menu's height in dp, scrolling past it. Only ever makes the menu shorter: the space available on the resolved side still wins, since a menu taller than that would put items where they cannot be seen. Reach for it when a long menu *could* fill the screen but shouldn't — 30 items with room for all of them is a wall of text, and `maxHeight={280}` reads better.
 - `containerColor?: string` — Default: `surfaceContainer`. Override the container (surface) color.
 - `hostName?: string` — Name of the `PortalHost` to render into. Defaults to the root host, which is what puts the menu above every other layer.
@@ -2273,7 +2273,7 @@ Props:
 - `side?: 'top' | 'bottom'` — Default: `'top'`. Side of the anchor the tooltip prefers. It flips to the other side when it does not fit and that side is roomier.
 - `align?: 'start' | 'center' | 'end'` — Default: `'center'`. Cross-axis alignment against the anchor.
 - `offset?: number` — Default: `4`. Gap between the anchor edge and the tooltip, in dp.
-- `screenMargin?: number` — Default: `8`. Minimum distance the tooltip keeps from every screen edge, in dp.
+- `screenMargin?: number` — Default: `8`. Minimum distance the tooltip keeps from every screen edge, in dp. The edges are inside the safe-area insets, so the tooltip stays off the system bars.
 - `duration?: number` — Default: `1500`. How long a plain tooltip stays up, in milliseconds. `0` keeps it up until something else hides it. Ignored by the rich variant, which is persistent by definition.
 - `containerColor?: string` — Default: `inverseSurface (plain) / surfaceContainer (rich)`. Override the container (surface) color.
 - `contentColor?: string` — Default: `inverseOnSurface (plain) / onSurfaceVariant (rich)`. Override the text color — the supporting text, plus the subhead on a rich tooltip. Nodes passed as `children` or `actions` are yours to color.

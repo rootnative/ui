@@ -151,7 +151,7 @@ and must stay open, such as a sort choice or a "show hidden files" switch.
 | `side` | `'bottom' \| 'top'` | `'bottom'` | Which side of the anchor the menu prefers |
 | `align` | `'start' \| 'center' \| 'end'` | `'start'` | Cross-axis alignment against the anchor |
 | `offset` | `number` | `0` | Gap between the anchor edge and the menu, in dp |
-| `screenMargin` | `number` | `8` | Minimum distance the menu keeps from every screen edge |
+| `screenMargin` | `number` | `8` | Minimum distance the menu keeps from every screen edge. The edges are inside the safe-area insets |
 | `maxHeight` | `number` | — | Caps the height of the menu in dp. The menu scrolls past it |
 
 `align` is **logical**: `'start'` is the left edge of the anchor in LTR and its right edge in RTL.

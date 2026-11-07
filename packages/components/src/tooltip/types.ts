@@ -78,7 +78,9 @@ export interface TooltipProps extends ViewProps {
    */
   offset?: number
   /**
-   * Minimum distance the tooltip keeps from every screen edge, in dp.
+   * Minimum distance the tooltip keeps from every screen edge, in dp. The
+   * edges are inside the safe-area insets, so the tooltip stays off the system
+   * bars.
    * @default 8
    */
   screenMargin?: number

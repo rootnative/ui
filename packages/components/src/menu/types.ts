@@ -50,7 +50,8 @@ export interface MenuProps extends ViewProps {
    */
   offset?: number
   /**
-   * Minimum distance the menu keeps from every screen edge, in dp.
+   * Minimum distance the menu keeps from every screen edge, in dp. The edges
+   * are inside the safe-area insets, so the menu stays off the system bars.
    * @default 8
    */
   screenMargin?: number
