@@ -119,6 +119,31 @@ To keep a project on this hook, add an ESLint rule:
 ],
 ```
 
+## Orientation
+
+An Expo app with `"orientation": "portrait"` in `app.json` doesn't rotate, and Expo's own templates set that value. Set it to `"default"` to let the app rotate. The hooks above update on each rotate.
+
+In landscape, the notch or the Dynamic Island moves to the left or the right side, so the side safe-area insets aren't 0 any more. Each component pads only the edges it touches:
+
+| Component | Edges it pads | Prop and default |
+|---|---|---|
+| [`Layout`](./components/layout.mdx) | Left, right, bottom | `edges`, all three on |
+| `AppBar` | Top, left, right | `insetTop` off, `insetSides` on |
+| `NavigationBar`, `BottomAppBar` | Bottom, left, right | `insetBottom` off, `insetSides` on |
+| Modal `NavigationDrawer` and `SideSheet` | Top, bottom, and the side the surface sits on | `insetTop`, `insetBottom` and `insetSides`, all on |
+| `BottomSheet` | Bottom | `insetBottom` on |
+| `Snackbar` | Bottom | Always |
+| Full-screen `Dialog` | All four | Always |
+| Full-screen `SearchView` | Top, bottom | Always |
+| `Menu`, `Tooltip` | They open inside all four insets | Always |
+| Any other component | None: it sits inside the `Layout` padding | — |
+
+`Layout` owns the sides, so a screen needs the side padding in one place only. Your content inside a `Layout` keeps clear of the notch with no change. In portrait the side insets are 0, so the default costs nothing there.
+
+The bars pad their own content by the side insets. Inside a `Layout` that pads the sides, they also pull their background out through that padding, so a bar at the screen edge stays full width. Give a bar inside content, such as a card, `insetSides={false}`.
+
+Overlays render in the [`PortalHost`](./components/portal.mdx#setup), outside the `Layout`, so each overlay pads its own edges. Put the host outside `Layout`, or an overlay gets its insets twice.
+
 ## Types
 
 ```ts

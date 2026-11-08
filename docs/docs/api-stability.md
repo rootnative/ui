@@ -91,7 +91,8 @@ insets by default (`insetSides`), and inside a `Layout` that pads the sides
 they pull their background back through that padding, so a bar at the edge of
 a screen stays full-bleed in landscape with no extra prop. A bar nested inside
 content passes `insetSides={false}`. Pass `edges` to `Layout` to change the
-sides per screen.
+sides per screen. The edges that each component pads are listed under
+[Orientation](./responsive.md#orientation).
 
 ## What is *not* covered
 
