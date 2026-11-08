@@ -11,8 +11,10 @@ The component follows the [Material Design 3 Bottom sheet](https://m3.material.i
 BottomSheet renders through [Portal](./portal.mdx), so you must wrap your app
 in a `PortalHost` once at the root. It claims the `PORTAL_LAYERS.sheet` layer:
 the lowest overlay layer, below dialogs, snackbars, menus, and tooltips.
-A percentage snap point resolves against the height of that host, so a
-root-level host gives the sheet the whole window.
+A percentage snap point resolves against the height of that host below the
+status bar, so a root-level host gives the sheet the whole window under it.
+The sheet never extends under the status bar or the Dynamic Island; the scrim
+still covers them.
 
 ## Usage
 
@@ -60,7 +62,7 @@ root-level host gives the sheet the whole window.
 />
 
 Without `snapPoints`, the sheet sizes itself to its content (capped at the
-height of the host) and has one rest position. The content renders below the
+height of the host below the status bar) and has one rest position. The content renders below the
 built-in drag handle. The container color extends under the bottom safe-area
 inset, and the content is padded above it (disable this with
 `insetBottom={false}`).
@@ -68,7 +70,7 @@ inset, and the content is padded above it (disable this with
 ## Snap points
 
 `snapPoints` are the rest heights of the sheet: numbers in dp, or percentage
-strings of the height of the portal host. The sheet takes the size of the
+strings of the height of the portal host below the status bar. The sheet takes the size of the
 tallest one and translates between them. An index (for `snapIndex`,
 `defaultSnapIndex`, and `onSnapIndexChange`) refers to the points sorted by
 resolved height, from low to high, so `0` is always the lowest.

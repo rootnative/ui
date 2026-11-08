@@ -1979,7 +1979,7 @@ Props:
 - `onDismiss: () => void` — Called when the user dismisses the sheet — a drag below the lowest snap point, a scrim tap, or the Android back button. Set `visible` to `false` in response, or the sheet stays mounted off screen.
 - `children?: ReactNode` — Sheet content. Renders below the drag handle; scrolling is yours.
 - `variant?: 'modal' | 'standard'` — Default: `'modal'`. Sheet behavior.
-- `snapPoints?: BottomSheetSnapPoint[]` — Resting heights the sheet snaps to, e.g. `[240, '90%']`. The sheet is sized to the tallest one; indices used by `snapIndex` / `defaultSnapIndex` / `onSnapIndexChange` refer to the points sorted ascending by resolved height. Omit to size the sheet to its content with a single snap.
+- `snapPoints?: BottomSheetSnapPoint[]` — Resting heights the sheet snaps to, e.g. `[240, '90%']`. A percentage is of the portal host's height below the status bar. The sheet is sized to the tallest one; indices used by `snapIndex` / `defaultSnapIndex` / `onSnapIndexChange` refer to the points sorted ascending by resolved height. Omit to size the sheet to its content with a single snap.
 - `snapIndex?: number` — Snap index to settle at. Changing it animates the sheet there; the user can still drag to other snaps, reported through `onSnapIndexChange`.
 - `defaultSnapIndex?: number` — Default: `0`. Snap index the sheet opens at.
 - `onSnapIndexChange?: (index: number) => void` — Called when the sheet settles at a different snap point.

@@ -30,7 +30,8 @@ export interface BottomSheetProps extends ViewProps {
    */
   variant?: BottomSheetVariant
   /**
-   * Resting heights the sheet snaps to, e.g. `[240, '90%']`. The sheet is
+   * Resting heights the sheet snaps to, e.g. `[240, '90%']`. A percentage is
+   * of the portal host's height below the status bar. The sheet is
    * sized to the tallest one; indices used by `snapIndex` /
    * `defaultSnapIndex` / `onSnapIndexChange` refer to the points sorted
    * ascending by resolved height. Omit to size the sheet to its content with

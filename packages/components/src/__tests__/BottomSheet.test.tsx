@@ -5,7 +5,9 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import type { MeasureInWindowOnSuccessCallback } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { BottomSheet } from '../bottom-sheet'
 import {
   POSITIONAL_THRESHOLD,
@@ -333,6 +335,91 @@ describe('BottomSheet', () => {
 // update is itself the extra render pass a settle needs. `renderSettled` is kept
 // anyway — the assertion is about the settled offset, and it should not quietly
 // start reading the jumped-to value if that incidental pass ever goes away.
+// The status bar and the Dynamic Island sit inside the top inset. The sheet
+// stops below them; the scrim still covers them.
+describe('BottomSheet — top inset', () => {
+  type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
+  const INSETS = { top: 47, right: 0, bottom: 34, left: 0 }
+
+  function renderWithInsets(ui: React.ReactElement) {
+    return renderWithTheme(
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: INSETS,
+          frame: { x: 0, y: 0, width: 360, height: 800 },
+        }}
+      >
+        <PortalHost>{ui}</PortalHost>
+      </SafeAreaProvider>,
+    )
+  }
+
+  /** Feeds the layer the layout pass the test renderer never runs. */
+  function layOutLayer(height = 800) {
+    const layer = screen.UNSAFE_root.findAll(
+      (node) =>
+        typeof node.type === 'string' &&
+        Boolean(node.props.onLayout) &&
+        StyleSheet.flatten(node.props.style)?.pointerEvents === 'box-none',
+    )[0]
+    fireEvent(layer!, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 360, height } },
+    })
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it('caps a content-sized sheet at the space below the inset', async () => {
+    renderWithInsets(
+      <BottomSheet visible onDismiss={jest.fn()} testID="sheet">
+        <Text>Sheet body</Text>
+      </BottomSheet>,
+    )
+    await screen.findByTestId('sheet')
+    layOutLayer(800)
+    expect(getStyle(screen.getByTestId('sheet')).maxHeight).toBe(753)
+  })
+
+  it('resolves a percentage snap against the space below the inset', async () => {
+    renderWithInsets(
+      <BottomSheet
+        visible
+        onDismiss={jest.fn()}
+        testID="sheet"
+        snapPoints={['50%', '100%']}
+      >
+        <Text>Sheet body</Text>
+      </BottomSheet>,
+    )
+    await screen.findByTestId('sheet')
+    layOutLayer(800)
+    expect(getStyle(screen.getByTestId('sheet')).height).toBe(753)
+  })
+
+  // A named host below an app bar starts under the inset already.
+  it('takes nothing off a layer that starts below the inset', async () => {
+    jest
+      .spyOn(
+        // React Native 0.88 types `View` as a function component, so its
+        // prototype carries no `measureInWindow` in the types. The jest mock
+        // of `View` is still a class, and the spy lands on it.
+        View.prototype as unknown as { measureInWindow: MeasureInWindow },
+        'measureInWindow',
+      )
+      .mockImplementation((callback) => callback(0, 120, 360, 600))
+    renderWithInsets(
+      <BottomSheet visible onDismiss={jest.fn()} testID="sheet">
+        <Text>Sheet body</Text>
+      </BottomSheet>,
+    )
+    await screen.findByTestId('sheet')
+    layOutLayer(600)
+    expect(getStyle(screen.getByTestId('sheet')).maxHeight).toBe(600)
+  })
+})
+
 describe('BottomSheet — settled entrance', () => {
   /** The drag style is axis-agnostic, so it carries both translate keys. */
   function sheetTranslateY() {

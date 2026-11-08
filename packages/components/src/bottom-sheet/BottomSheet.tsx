@@ -11,9 +11,21 @@ import type {
   TouchReleaseInfo,
   TouchReleaseResult,
 } from '@rootnative/inertia/touch'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { AccessibilityActionEvent, LayoutChangeEvent } from 'react-native'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import type {
+  AccessibilityActionEvent,
+  LayoutChangeEvent,
+  ViewInstance,
+} from 'react-native'
 import { Pressable, View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -78,8 +90,19 @@ export function BottomSheet({
   const shouldReduceMotion = useShouldReduceMotion()
   const isModal = variant === 'modal'
 
+  const layerRef = useRef<ViewInstance | null>(null)
   const [layerHeight, setLayerHeight] = useState<number | null>(null)
+  const [layerTop, setLayerTop] = useState<number | null>(null)
   const [sheetHeight, setSheetHeight] = useState<number | null>(null)
+  // The context, not `useSafeAreaInsets()`, which throws without a provider.
+  const safeArea = useContext(SafeAreaInsetsContext)
+  // The sheet stops below the status bar: only the part of the top inset that
+  // overlaps the layer is taken off, so a named host below an app bar keeps
+  // its whole height. Until the layer reports its window position, assume the
+  // root host, which starts at the top of the window.
+  const topOverlap = Math.max(0, (safeArea?.top ?? 0) - (layerTop ?? 0))
+  const availableHeight =
+    layerHeight === null ? null : Math.max(0, layerHeight - topOverlap)
 
   // Keyed on the points' values, not the array's identity — an inline
   // `snapPoints={['50%']}` literal must not re-resolve (and re-settle the
@@ -89,14 +112,14 @@ export function BottomSheet({
   // because the layer is unmeasured.
   const snapHeights = useMemo(() => {
     if (snapPoints && snapPoints.length > 0) {
-      return resolveSnapHeights(snapPoints, layerHeight)
+      return resolveSnapHeights(snapPoints, availableHeight)
     }
     return sheetHeight !== null ? [sheetHeight] : null
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snapPointsKey, layerHeight, sheetHeight])
+  }, [snapPointsKey, availableHeight, sheetHeight])
 
   // With explicit snap points the surface is sized to the tallest one;
-  // without them it sizes to content, capped at the layer.
+  // without them it sizes to content, capped at the space below the inset.
   const fixedHeight =
     snapPoints && snapPoints.length > 0 && snapHeights !== null
       ? snapHeights[snapHeights.length - 1]
@@ -284,6 +307,12 @@ export function BottomSheet({
   const onLayerLayout = useCallback((event: LayoutChangeEvent) => {
     const height = event.nativeEvent.layout.height
     setLayerHeight((current) => (current === height ? current : height))
+    layerRef.current?.measureInWindow((_x, y) => {
+      // A view measured mid-layout reports NaN on Android. Another layout
+      // follows once it settles.
+      if (Number.isNaN(y)) return
+      setLayerTop((current) => (current === y ? current : y))
+    })
   }, [])
   const onSurfaceLayout = useCallback((event: LayoutChangeEvent) => {
     const height = event.nativeEvent.layout.height
@@ -360,8 +389,8 @@ export function BottomSheet({
 
   const heightStyle = useMemo(() => {
     if (fixedHeight !== null) return { height: fixedHeight }
-    return layerHeight !== null ? { maxHeight: layerHeight } : null
-  }, [fixedHeight, layerHeight])
+    return availableHeight !== null ? { maxHeight: availableHeight } : null
+  }, [fixedHeight, availableHeight])
 
   // Exit slides the wrapper down by the sheet's own height, which covers the
   // remaining travel from any snap. The fallbacks only matter if a sheet is
@@ -376,6 +405,7 @@ export function BottomSheet({
   return (
     <Portal priority={PORTAL_LAYERS.sheet} hostName={hostName}>
       <View
+        ref={layerRef}
         style={[styles.layer, pointerEvents.boxNone]}
         onLayout={onLayerLayout}
       >
