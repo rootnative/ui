@@ -88,6 +88,13 @@ interface SideSheetCommonProps extends Omit<ViewProps, 'children' | 'style'> {
    */
   insetBottom?: boolean
   /**
+   * Whether the sheet's content is padded by the safe-area inset of the
+   * screen edge it sits on, which `edge` picks. In landscape this keeps the
+   * content clear of the notch. The inset is 0 in portrait.
+   * @default true for 'modal', false for 'standard'
+   */
+  insetSides?: boolean
+  /**
    * Override the sheet background.
    * @default surfaceContainerLow for 'modal', surface for 'standard'
    */

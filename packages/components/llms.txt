@@ -1395,6 +1395,7 @@ Props:
 - `width?: number` — Default: `256`. Width of the sheet in dp. A modal sheet shrinks on a narrow window, so a strip of scrim stays visible. Set the width here and not in `style`: the slide distance of a modal sheet comes from this value.
 - `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the top safe-area inset. The container color still extends under the inset.
 - `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the bottom safe-area inset.
+- `insetSides?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the safe-area inset of the screen edge it sits on, which `edge` picks. In landscape this keeps the content clear of the notch. The inset is 0 in portrait.
 - `containerColor?: string` — Default: `surfaceContainerLow for 'modal', surface for 'standard'`. Override the sheet background.
 - `contentColor?: string` — Default: `onSurface for the headline, onSurfaceVariant for the icons`. Override the color of the headline and of the back and close icons. The hover and press layers of the two buttons derive from it.
 - `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.
@@ -1947,6 +1948,7 @@ Props:
 - `onValueChange?: (value: string) => void` — Called with the value of the destination that was pressed.
 - `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the drawer's content is padded by the top safe-area inset. The container color still extends under the inset.
 - `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the drawer's content is padded by the bottom safe-area inset.
+- `insetSides?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the drawer's content is padded by the safe-area inset of the screen edge it sits on: the left in LTR, the right in RTL. In landscape this keeps the items clear of the notch. The inset is 0 in portrait.
 - `containerColor?: string` — Default: `surfaceContainerLow for 'modal', surface for 'standard'`. Override the drawer background.
 - `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon, label, and badge color of inactive destinations, and the section headlines.
 - `selectedContentColor?: string` — Default: `onSecondaryContainer`. Override the icon, label, and badge color of the active destination. State-layer colors are derived from it automatically.

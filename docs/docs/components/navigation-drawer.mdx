@@ -123,9 +123,11 @@ the user chooses a destination. Pass `dismissOnSelect={false}` to keep it open. 
 ## Safe area
 
 A modal drawer spans the full screen height. So by default it pads its content by the top and
-bottom insets, and the container color extends under them. A standard drawer defaults both to
-off, because the `Layout` around it usually owns the edges. `insetTop` and `insetBottom`
-override either default.
+bottom insets, and the container color extends under them. It also pads the inset of the screen
+edge it sits on (`insetSides`): the left in LTR, the right in RTL. In landscape this keeps the
+items clear of the notch. A standard drawer defaults all three to off, because the `Layout`
+around it usually owns the edges. `insetTop`, `insetBottom` and `insetSides` override each
+default.
 
 ## In a navigator drawer
 
@@ -133,12 +135,12 @@ A drawer navigator, from `expo-router/drawer` or `@react-navigation/drawer`,
 brings its own sheet and renders your `drawerContent` in it. Neither variant
 fits that host as it is. `'modal'` brings a second scrim and sheet, and
 `'standard'` is a 360dp panel, wider than the navigator sheet on a phone. Use
-`'standard'` at the full width of the sheet, and keep the top inset:
+`'standard'` at the full width of the sheet, and keep the top and side insets:
 
 ```tsx
 <Drawer
   drawerContent={() => (
-    <NavigationDrawer variant="standard" insetTop style={{ width: '100%' }}>
+    <NavigationDrawer variant="standard" insetTop insetSides style={{ width: '100%' }}>
       <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" />
     </NavigationDrawer>
   )}

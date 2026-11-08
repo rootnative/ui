@@ -1,7 +1,8 @@
 import { lightTheme } from '@rootnative/core'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet, Text } from 'react-native'
+import { I18nManager, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationDrawer } from '../navigation-drawer'
 import { PortalHost } from '../portal/PortalHost'
 
@@ -303,5 +304,110 @@ describe('NavigationDrawer — modal', () => {
       </PortalHost>,
     )
     expect(await screen.findByText('Mail app')).toBeTruthy()
+  })
+})
+
+describe('NavigationDrawer — side safe area', () => {
+  // A different inset on each side, so a test can tell which side got the
+  // padding. Only the safe-area view carries the top inset.
+  const SIDE_INSETS = { top: 47, right: 40, bottom: 34, left: 62 }
+
+  function withSideInsets(ui: React.ReactElement) {
+    return (
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: SIDE_INSETS,
+          frame: { x: 0, y: 0, width: 874, height: 402 },
+        }}
+      >
+        {ui}
+      </SafeAreaProvider>
+    )
+  }
+
+  async function renderModalWithInsets(
+    props?: Partial<Exclude<DrawerProps, { variant: 'standard' }>>,
+  ) {
+    renderWithTheme(
+      withSideInsets(
+        <PortalHost>
+          <NavigationDrawer visible onDismiss={jest.fn()} {...props}>
+            <Items />
+          </NavigationDrawer>
+        </PortalHost>,
+      ),
+    )
+    await screen.findByText('Inbox')
+  }
+
+  function sidePadding() {
+    const area = screen
+      .UNSAFE_getAllByType(View)
+      .map((node) => StyleSheet.flatten(node.props.style))
+      .find((style) => style?.paddingTop === SIDE_INSETS.top)
+    if (area === undefined) throw new Error('no safe-area view')
+    return { left: area.paddingLeft, right: area.paddingRight }
+  }
+
+  it('pads a modal drawer on the left only, the edge it sits on', async () => {
+    await renderModalWithInsets()
+    expect(sidePadding()).toEqual({ left: 62, right: 0 })
+  })
+
+  it('leaves the sides alone with insetSides={false}', async () => {
+    await renderModalWithInsets({ insetSides: false })
+    expect(sidePadding()).toEqual({ left: 0, right: 0 })
+  })
+
+  it('leaves the sides of a standard drawer to the Layout around it', () => {
+    renderWithTheme(
+      withSideInsets(
+        <NavigationDrawer variant="standard" insetTop>
+          <Items />
+        </NavigationDrawer>,
+      ),
+    )
+    expect(sidePadding()).toEqual({ left: 0, right: 0 })
+  })
+
+  it('pads a standard drawer that opts in', () => {
+    renderWithTheme(
+      withSideInsets(
+        <NavigationDrawer variant="standard" insetTop insetSides>
+          <Items />
+        </NavigationDrawer>,
+      ),
+    )
+    expect(sidePadding()).toEqual({ left: 62, right: 0 })
+  })
+
+  // In RTL the drawer sits on the physical right, and React Native puts a
+  // `...Left` key on the right side.
+  describe('in RTL', () => {
+    const original = {
+      isRTL: I18nManager.isRTL,
+      doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+    }
+
+    function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: isRTL,
+        configurable: true,
+      })
+      Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+        value: doLeftAndRightSwapInRTL,
+        configurable: true,
+      })
+    }
+
+    beforeEach(() => setDirection(true, true))
+    afterEach(() =>
+      setDirection(original.isRTL, original.doLeftAndRightSwapInRTL),
+    )
+
+    it('pads the right inset into paddingLeft', async () => {
+      await renderModalWithInsets()
+      expect(sidePadding()).toEqual({ left: 40, right: 0 })
+    })
   })
 })

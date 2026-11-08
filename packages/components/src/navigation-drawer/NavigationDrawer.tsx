@@ -31,6 +31,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     variant = 'modal',
     insetTop,
     insetBottom,
+    insetSides,
     containerColor,
     contentColor,
     selectedContentColor,
@@ -84,12 +85,15 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     [selected, select, colors, labelStyle],
   )
 
+  // The drawer sits at the start edge, which is the right edge in RTL.
+  const isRTL = isRTLDirection()
   const edges = useMemo<Edge[]>(() => {
     const result: Edge[] = []
     if (insetTop ?? isModal) result.push('top')
     if (insetBottom ?? isModal) result.push('bottom')
+    if (insetSides ?? isModal) result.push(isRTL ? 'right' : 'left')
     return result
-  }, [insetTop, insetBottom, isModal])
+  }, [insetTop, insetBottom, insetSides, isModal, isRTL])
 
   const open = isModal && visible === true
 
@@ -127,8 +131,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     )
   }
 
-  // The sheet enters from the start edge, which is the right edge in RTL.
-  const hiddenOffset = isRTLDirection() ? DRAWER_WIDTH : -DRAWER_WIDTH
+  const hiddenOffset = isRTL ? DRAWER_WIDTH : -DRAWER_WIDTH
 
   return (
     <Portal priority={PORTAL_LAYERS.sheet} hostName={hostName}>

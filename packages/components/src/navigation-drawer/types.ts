@@ -47,6 +47,13 @@ interface NavigationDrawerCommonProps extends Omit<
    */
   insetBottom?: boolean
   /**
+   * Whether the drawer's content is padded by the safe-area inset of the
+   * screen edge it sits on: the left in LTR, the right in RTL. In landscape
+   * this keeps the items clear of the notch. The inset is 0 in portrait.
+   * @default true for 'modal', false for 'standard'
+   */
+  insetSides?: boolean
+  /**
    * Override the drawer background.
    * @default surfaceContainerLow for 'modal', surface for 'standard'
    */

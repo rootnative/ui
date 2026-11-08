@@ -36,6 +36,7 @@ export function SideSheet(props: SideSheetProps) {
     width = SIDE_SHEET_WIDTH,
     insetTop,
     insetBottom,
+    insetSides,
     containerColor,
     contentColor,
     headlineStyle,
@@ -69,12 +70,15 @@ export function SideSheet(props: SideSheetProps) {
   )
   const iconColor = contentColor ?? theme.colors.onSurfaceVariant
 
+  // 'end' is the right edge in LTR.
+  const isOnRight = (edge === 'end') !== isRTLDirection()
   const edges = useMemo<Edge[]>(() => {
     const result: Edge[] = []
     if (insetTop ?? isModal) result.push('top')
     if (insetBottom ?? isModal) result.push('bottom')
+    if (insetSides ?? isModal) result.push(isOnRight ? 'right' : 'left')
     return result
-  }, [insetTop, insetBottom, isModal])
+  }, [insetTop, insetBottom, insetSides, isModal, isOnRight])
 
   const hasHeader =
     headline !== undefined || onBack !== undefined || onDismiss !== undefined
@@ -175,11 +179,10 @@ export function SideSheet(props: SideSheetProps) {
     )
   }
 
-  // 'end' is the right edge in LTR. The detached margin adds to the travel,
-  // so the sheet leaves the screen completely.
+  // The detached margin adds to the travel, so the sheet leaves the screen
+  // completely.
   const travel = width + (detached ? SIDE_SHEET_DETACHED_MARGIN : 0)
-  const entersFromRight = (edge === 'end') !== isRTLDirection()
-  const hiddenOffset = entersFromRight ? travel : -travel
+  const hiddenOffset = isOnRight ? travel : -travel
 
   return (
     <Portal priority={PORTAL_LAYERS.sheet} hostName={hostName}>

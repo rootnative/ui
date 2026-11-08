@@ -68,10 +68,10 @@ The defaults are not uniform, and that is intentional:
 | `NavigationBar` | `insetBottom` | `false` |
 | `BottomAppBar` | `insetBottom` | `false` |
 | `BottomSheet` | `insetBottom` | **`true`** |
-| `NavigationDrawer` (modal) | `insetTop`, `insetBottom` | **`true`** |
-| `NavigationDrawer` (standard) | `insetTop`, `insetBottom` | `false` |
-| `SideSheet` (modal) | `insetTop`, `insetBottom` | **`true`** |
-| `SideSheet` (standard) | `insetTop`, `insetBottom` | `false` |
+| `NavigationDrawer` (modal) | `insetTop`, `insetBottom`, `insetSides` | **`true`** |
+| `NavigationDrawer` (standard) | `insetTop`, `insetBottom`, `insetSides` | `false` |
+| `SideSheet` (modal) | `insetTop`, `insetBottom`, `insetSides` | **`true`** |
+| `SideSheet` (standard) | `insetTop`, `insetBottom`, `insetSides` | `false` |
 
 `AppBar` and `NavigationBar` default to off, because an ancestor very often
 applies that edge already, and a double inset is the more common bug.
@@ -79,8 +79,9 @@ applies that edge already, and a double inset is the more common bug.
 construction. A sheet that ignores the home indicator is wrong, and no ancestor
 could have applied the inset. A modal `NavigationDrawer` or `SideSheet`
 defaults to on for the same reason: it spans the full screen height through a
-portal. A standard drawer or side sheet renders in place, so the `Layout`
-around it owns the edges, and the inset defaults to off.
+portal. Its `insetSides` pads only the side of the screen edge it sits on. A
+standard drawer or side sheet renders in place, so the `Layout` around it owns
+the edges, and the insets default to off.
 
 `Layout` is the ancestor that owns the edges. Its default `edges` are
 `['left', 'right', 'bottom']`: the side insets are 0 in portrait and keep the

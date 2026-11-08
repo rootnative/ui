@@ -417,3 +417,113 @@ describe('SideSheet — modal', () => {
     )
   })
 })
+
+describe('SideSheet — side safe area', () => {
+  // A different inset on each side, so a test can tell which side got the
+  // padding. Only the safe-area view carries the top inset.
+  const SIDE_INSETS = { top: 47, right: 40, bottom: 34, left: 62 }
+
+  function withSideInsets(ui: React.ReactElement) {
+    return (
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: SIDE_INSETS,
+          frame: { x: 0, y: 0, width: 874, height: 402 },
+        }}
+      >
+        {ui}
+      </SafeAreaProvider>
+    )
+  }
+
+  async function renderModalWithInsets(
+    props?: Partial<Exclude<SheetProps, { variant: 'standard' }>>,
+  ) {
+    renderWithTheme(
+      withSideInsets(
+        <PortalHost>
+          <SideSheet visible onDismiss={jest.fn()} {...props}>
+            <Text>Body</Text>
+          </SideSheet>
+        </PortalHost>,
+      ),
+    )
+    await screen.findByText('Body')
+  }
+
+  function sidePadding() {
+    const area = screen
+      .UNSAFE_getAllByType(View)
+      .map(getStyle)
+      .find((style) => style?.paddingTop === SIDE_INSETS.top)
+    if (area === undefined) throw new Error('no safe-area view')
+    return { left: area.paddingLeft, right: area.paddingRight }
+  }
+
+  it('pads a modal sheet at the end edge on the right only', async () => {
+    await renderModalWithInsets()
+    expect(sidePadding()).toEqual({ left: 0, right: 40 })
+  })
+
+  it('pads a modal sheet at the start edge on the left only', async () => {
+    await renderModalWithInsets({ edge: 'start' })
+    expect(sidePadding()).toEqual({ left: 62, right: 0 })
+  })
+
+  it('leaves the sides alone with insetSides={false}', async () => {
+    await renderModalWithInsets({ insetSides: false })
+    expect(sidePadding()).toEqual({ left: 0, right: 0 })
+  })
+
+  it('leaves the sides of a standard sheet to an ancestor', () => {
+    renderWithTheme(
+      withSideInsets(
+        <SideSheet variant="standard" insetTop>
+          <Text>Body</Text>
+        </SideSheet>,
+      ),
+    )
+    expect(sidePadding()).toEqual({ left: 0, right: 0 })
+  })
+
+  it('pads a standard sheet that opts in', () => {
+    renderWithTheme(
+      withSideInsets(
+        <SideSheet variant="standard" insetTop insetSides>
+          <Text>Body</Text>
+        </SideSheet>,
+      ),
+    )
+    expect(sidePadding()).toEqual({ left: 0, right: 40 })
+  })
+
+  // In RTL the end edge is the physical left, and React Native puts a
+  // `...Right` key on the left side.
+  describe('in RTL', () => {
+    const original = {
+      isRTL: I18nManager.isRTL,
+      doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+    }
+
+    function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: isRTL,
+        configurable: true,
+      })
+      Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+        value: doLeftAndRightSwapInRTL,
+        configurable: true,
+      })
+    }
+
+    beforeEach(() => setDirection(true, true))
+    afterEach(() =>
+      setDirection(original.isRTL, original.doLeftAndRightSwapInRTL),
+    )
+
+    it('pads the left inset of the end edge into paddingRight', async () => {
+      await renderModalWithInsets()
+      expect(sidePadding()).toEqual({ left: 0, right: 62 })
+    })
+  })
+})

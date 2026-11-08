@@ -167,9 +167,10 @@ remove it.
 ## Safe area
 
 A modal sheet spans the full height of the screen. By default, it pads its content by the top
-and bottom insets, and the container color extends under them. A standard sheet sets both off
-by default, because the `Layout` around it usually owns the edges. `insetTop` and
-`insetBottom` override either default.
+and bottom insets, and the container color extends under them. It also pads the inset of the
+screen edge it sits on (`insetSides`), which `edge` picks. In landscape this keeps the content
+clear of the notch. A standard sheet sets all three off by default, because the `Layout` around
+it usually owns the edges. `insetTop`, `insetBottom` and `insetSides` override each default.
 
 ## Overrides
 

@@ -46,6 +46,9 @@ import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
+import { NavigationDrawer } from '../../navigation-drawer'
+import { PortalHost } from '../../portal/PortalHost'
+import { SideSheet } from '../../side-sheet'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
@@ -399,5 +402,54 @@ describe('the safe-area side insets stay physical on web', () => {
     expect(bar.style.marginRight).toBe('0px')
     expect(bar.parentElement?.style.paddingLeft).toBe('54px')
     expect(bar.parentElement?.style.paddingRight).toBe('0px')
+  })
+})
+
+// A modal drawer and a modal sheet render through a portal, outside `Layout`,
+// so each pads the side inset of the screen edge it sits on.
+describe('the modal drawer and sheet pad the inset of their own edge', () => {
+  const insets = { top: 0, right: 40, bottom: 0, left: 62 }
+
+  function withInsets(ui: React.ReactElement) {
+    return (
+      <SafeAreaProvider
+        initialMetrics={{
+          insets,
+          frame: { x: 0, y: 0, width: 874, height: 402 },
+        }}
+      >
+        <PortalHost>{ui}</PortalHost>
+      </SafeAreaProvider>
+    )
+  }
+
+  function safeAreaOf(testID: string) {
+    const area = screen.getByTestId(testID).firstElementChild
+    if (!(area instanceof HTMLElement)) throw new Error('no safe-area view')
+    return { left: area.style.paddingLeft, right: area.style.paddingRight }
+  }
+
+  it('pads a drawer on the right under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(
+      withInsets(
+        <NavigationDrawer visible onDismiss={() => {}} testID="drawer">
+          <NavigationDrawer.Item value="home" label="Home" />
+        </NavigationDrawer>,
+      ),
+    )
+    expect(safeAreaOf('drawer')).toEqual({ left: '0px', right: '40px' })
+  })
+
+  it('pads an end-edge sheet on the left under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(
+      withInsets(
+        <SideSheet visible onDismiss={() => {}} testID="sheet">
+          <Text>Sheet</Text>
+        </SideSheet>,
+      ),
+    )
+    expect(safeAreaOf('sheet')).toEqual({ left: '62px', right: '0px' })
   })
 })
