@@ -125,6 +125,7 @@ export function SideSheet(props: SideSheetProps) {
           {onBack !== undefined ? (
             <IconButton
               icon={backIcon ?? selectRTL('arrow-left', 'arrow-right')}
+              variant="standard"
               accessibilityLabel={backAccessibilityLabel}
               contentColor={iconColor}
               onPress={onBack}
@@ -146,6 +147,7 @@ export function SideSheet(props: SideSheetProps) {
           {onDismiss !== undefined ? (
             <IconButton
               icon={closeIcon}
+              variant="standard"
               accessibilityLabel={closeAccessibilityLabel}
               contentColor={iconColor}
               onPress={onDismiss}

@@ -230,6 +230,16 @@ describe('SideSheet — standard', () => {
     )
   })
 
+  // `IconButton` defaults to `filled`, which paints a primary container.
+  it('renders the header buttons with no container', () => {
+    renderStandard({ onDismiss: jest.fn(), onBack: jest.fn() })
+    const buttons = screen.UNSAFE_getAllByType(IconButton)
+    expect(buttons).toHaveLength(2)
+    for (const button of buttons) {
+      expect(button.props.variant).toBe('standard')
+    }
+  })
+
   it('tints the header icons onSurfaceVariant by default', () => {
     renderStandard({ onDismiss: jest.fn(), onBack: jest.fn() })
     for (const button of screen.UNSAFE_getAllByType(IconButton)) {
