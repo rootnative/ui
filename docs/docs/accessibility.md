@@ -143,6 +143,9 @@ focus inside themselves:
   `BottomSheet` with `dismissable={false}` ignore it, the same as a scrim tap.
 - On close, focus returns to the element that held it before, usually the
   control that opened the surface.
+- Neither move scrolls the page. A sheet or a drawer can take the focus while
+  it still slides in from outside the window, and a scroll there would move
+  the page behind it.
 
 None of this runs on native, where there is no tab order to contain. iOS and
 Android take the screen reader out of the background from

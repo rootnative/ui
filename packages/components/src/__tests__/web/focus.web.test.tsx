@@ -21,6 +21,7 @@ import { useState } from 'react'
 import type { ReactElement } from 'react'
 import { AppBar } from '../../appbar'
 import { BottomAppBar } from '../../bottom-app-bar'
+import { BottomSheet } from '../../bottom-sheet'
 import { Button } from '../../button'
 import { Checkbox } from '../../checkbox'
 import { Dialog } from '../../dialog'
@@ -168,6 +169,117 @@ describe('Dialog focus trap', () => {
     expect(screen.getByRole('dialog').getAttribute('aria-label')).toBe(
       'Reset settings?',
     )
+  })
+})
+
+/**
+ * A surface can take the focus while it is still outside the window, and a
+ * plain `focus()` then scrolls the whole page to show it. jsdom has no layout,
+ * so no scroll is visible here. The tests read the options of each focus
+ * call that the trap makes.
+ */
+describe('a focus trap moves the focus without a scroll', () => {
+  let focusSpy: jest.SpyInstance
+
+  beforeEach(() => {
+    focusSpy = jest.spyOn(HTMLElement.prototype, 'focus')
+  })
+
+  afterEach(() => {
+    focusSpy.mockRestore()
+  })
+
+  /** The options of each focus call on one element. */
+  function focusOptionsOf(element: Element | null) {
+    return focusSpy.mock.calls
+      .filter((_, index) => focusSpy.mock.contexts[index] === element)
+      .map(([options]) => options)
+  }
+
+  it('on entry, to the first focusable element', () => {
+    renderWeb(
+      <PortalHost>
+        <Dialog visible onDismiss={() => {}}>
+          <Dialog.Title>Reset settings?</Dialog.Title>
+          <Dialog.Actions>
+            <Button variant="text">Cancel</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </PortalHost>,
+    )
+
+    expect(document.activeElement?.textContent).toBe('Cancel')
+    expect(focusOptionsOf(document.activeElement)).toEqual([
+      { preventScroll: true },
+    ])
+  })
+
+  it('on entry, to a surface with nothing focusable', () => {
+    renderWeb(
+      <PortalHost>
+        <Dialog visible onDismiss={() => {}}>
+          <Dialog.Title>Working</Dialog.Title>
+          <Dialog.Content>Please wait.</Dialog.Content>
+        </Dialog>
+      </PortalHost>,
+    )
+
+    expect(focusOptionsOf(screen.getByRole('dialog'))).toEqual([
+      { preventScroll: true },
+    ])
+  })
+
+  it('on return, to the control that opened the surface', () => {
+    function Host({ visible }: { visible: boolean }) {
+      return (
+        <PortalHost>
+          <Button>Open</Button>
+          <Dialog visible={visible} onDismiss={() => {}}>
+            <Dialog.Title>Reset settings?</Dialog.Title>
+            <Dialog.Actions>
+              <Button variant="text">Cancel</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </PortalHost>
+      )
+    }
+
+    const { rerender } = renderWeb(<Host visible={false} />)
+    const trigger = screen
+      .getByText('Open')
+      .closest('[tabindex]') as HTMLElement
+    act(() => trigger.focus())
+    rerender(<Host visible />)
+    focusSpy.mockClear()
+
+    rerender(<Host visible={false} />)
+
+    expect(document.activeElement).toBe(trigger)
+    expect(focusOptionsOf(trigger)).toEqual([{ preventScroll: true }])
+  })
+
+  // From the second open, a BottomSheet knows its height and starts its slide
+  // in below the window, so this is where a plain focus moved the page.
+  it('on the second open of a BottomSheet', () => {
+    function Host({ visible }: { visible: boolean }) {
+      return (
+        <PortalHost>
+          <BottomSheet visible={visible} onDismiss={() => {}}>
+            <Button>Apply</Button>
+          </BottomSheet>
+        </PortalHost>
+      )
+    }
+
+    const { rerender } = renderWeb(<Host visible />)
+    rerender(<Host visible={false} />)
+    focusSpy.mockClear()
+
+    rerender(<Host visible />)
+
+    const handle = screen.getByLabelText('Drag handle')
+    expect(document.activeElement).toBe(handle)
+    expect(focusOptionsOf(handle)).toEqual([{ preventScroll: true }])
   })
 })
 

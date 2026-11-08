@@ -65,6 +65,16 @@ function focusableWithin(surface: HTMLElement): HTMLElement[] {
   return Array.from(surface.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
 }
 
+/**
+ * Entry and return move the focus without a scroll. A surface can take the
+ * focus while it is still outside the window: a sheet or a drawer at the start
+ * of its slide in, or a BottomSheet that opens a second time and starts below
+ * the window because it already knows its height. A plain `focus()` then
+ * scrolls the whole document to show the element, and the page behind the
+ * surface jumps by the distance.
+ */
+const IN_PLACE: FocusOptions = { preventScroll: true }
+
 export interface FocusTrapOptions {
   /** Whether the surface is open. Entry runs once the surface has mounted. */
   active: boolean
@@ -85,7 +95,7 @@ export interface FocusTrapOptions {
    * that precedes it in the tree. Read when the surface mounts, so a ref
    * object is enough.
    */
-  initialFocus?: RefObject<{ focus(): void } | null>
+  initialFocus?: RefObject<{ focus(options?: FocusOptions): void } | null>
 }
 
 /**
@@ -133,14 +143,14 @@ export function useFocusTrap({
     const preferred = initialFocus?.current
     const [first] = focusableWithin(surface)
     if (preferred) {
-      preferred.focus()
+      preferred.focus(IN_PLACE)
     } else if (first !== undefined) {
-      first.focus()
+      first.focus(IN_PLACE)
     } else {
       // A surface with nothing focusable inside still has to take focus, or
       // the screen reader stays parked on the trigger behind it.
       surface.setAttribute('tabindex', '-1')
-      surface.focus()
+      surface.focus(IN_PLACE)
     }
 
     return () => {
@@ -156,7 +166,7 @@ export function useFocusTrap({
         previouslyFocused !== null &&
         document.body.contains(previouslyFocused)
       ) {
-        previouslyFocused.focus()
+        previouslyFocused.focus(IN_PLACE)
       }
     }
     // `initialFocus` is a ref object, read once on entry.
@@ -219,6 +229,9 @@ export function useFocusTrap({
             ]
 
       event.preventDefault()
+      // A plain focus, unlike entry: the surface is in place by now, and the
+      // scroll brings a control below the fold of the surface's own scroller
+      // into view.
       next.focus()
     }
 
