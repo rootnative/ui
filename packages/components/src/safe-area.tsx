@@ -58,6 +58,18 @@ export function sideEdgesOfStyleKeys(): readonly [SideEdge, SideEdge] {
   return swaps ? SWAPPED_SIDES : UNSWAPPED_SIDES
 }
 
+/**
+ * The style that puts an absolutely positioned view at a physical distance
+ * from the left edge of its parent, such as a position measured with
+ * `measureInWindow`. Where React Native applies `left` to the right side (see
+ * `sideEdgesOfStyleKeys`), the distance goes into `right`.
+ */
+export function physicalLeftStyle(
+  left: number,
+): { left: number } | { right: number } {
+  return sideEdgesOfStyleKeys()[0] === 'left' ? { left } : { right: left }
+}
+
 // The same additive maths as the package's own `SafeAreaView.web`: each
 // requested edge adds its inset to the padding the style already carries.
 function insetPaddingStyle(

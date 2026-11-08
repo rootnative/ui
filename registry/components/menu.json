@@ -16,7 +16,8 @@
     "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useStateLayer.ts",
-    "packages/components/src/internal/warnOnce.ts"
+    "packages/components/src/internal/warnOnce.ts",
+    "packages/components/src/safe-area.tsx"
   ],
   "utils": ["color", "elevation", "render-icon", "rtl"],
   "componentDependencies": ["portal"],

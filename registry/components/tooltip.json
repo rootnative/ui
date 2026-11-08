@@ -11,7 +11,8 @@
     "packages/components/src/internal/pressableKeyDown.ts",
     "packages/components/src/internal/useAnchorPosition.ts",
     "packages/components/src/internal/useBackHandlerDismiss.ts",
-    "packages/components/src/internal/warnOnce.ts"
+    "packages/components/src/internal/warnOnce.ts",
+    "packages/components/src/safe-area.tsx"
   ],
   "utils": ["elevation", "rtl"],
   "componentDependencies": ["portal"],

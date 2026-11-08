@@ -10,12 +10,32 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { StyleSheet, Text, View } from 'react-native'
+import { I18nManager, StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
 import { PortalHost } from '../portal/PortalHost'
 import { Tooltip } from '../tooltip'
 
 type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
+
+/**
+ * Native RTL. React Native applies `left` to the right side while
+ * `doLeftAndRightSwapInRTL` is on, the default.
+ */
+function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+  Object.defineProperty(I18nManager, 'isRTL', {
+    value: isRTL,
+    configurable: true,
+  })
+  Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+    value: doLeftAndRightSwapInRTL,
+    configurable: true,
+  })
+}
+
+const originalDirection = {
+  isRTL: I18nManager.isRTL,
+  doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+}
 
 function renderTooltip(ui: React.ReactElement) {
   return renderWithTheme(<PortalHost>{ui}</PortalHost>)
@@ -515,6 +535,20 @@ describe('Tooltip — resolved placement', () => {
     anchorRect = { x: 0, y: 300, width: 40, height: 40 }
     const style = openAndLayOut(<PressableAnchor />)
     expect(style.left).toBe(8)
+  })
+
+  it('writes the physical position into right in RTL', () => {
+    setDirection(true, true)
+    try {
+      const style = openAndLayOut(<PressableAnchor />)
+      expect(style.right).toBe(20)
+      expect(style.left).toBeUndefined()
+    } finally {
+      setDirection(
+        originalDirection.isRTL,
+        originalDirection.doLeftAndRightSwapInRTL,
+      )
+    }
   })
 })
 

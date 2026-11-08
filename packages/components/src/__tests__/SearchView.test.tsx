@@ -2,8 +2,19 @@ import { lightTheme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
-import { BackHandler, Platform, StyleSheet, Text } from 'react-native'
-import type { TextInputInstance, ViewInstance } from 'react-native'
+import {
+  BackHandler,
+  I18nManager,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
+import type {
+  MeasureInWindowOnSuccessCallback,
+  TextInputInstance,
+  ViewInstance,
+} from 'react-native'
 import { PortalHost } from '../portal/PortalHost'
 import { SearchView } from '../search-view/SearchView'
 import {
@@ -229,6 +240,69 @@ describe('SearchView — layout', () => {
   it('applies the container color to the surface', () => {
     renderView({ containerColor: '#123456' })
     expect(styleOf('view').backgroundColor).toBe('#123456')
+  })
+})
+
+// `measureInWindow` is a no-op under the RN jest preset, so feed the anchor
+// and the layer in to reach the frame a docked view takes from its anchor.
+describe('SearchView — anchored docked frame', () => {
+  type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
+  const original = {
+    isRTL: I18nManager.isRTL,
+    doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+  }
+
+  function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: isRTL,
+      configurable: true,
+    })
+    Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+      value: doLeftAndRightSwapInRTL,
+      configurable: true,
+    })
+  }
+
+  function renderAnchored() {
+    jest
+      .spyOn(
+        // React Native 0.88 types `View` as a function component, so its
+        // prototype carries no `measureInWindow` in the types. The jest mock
+        // of `View` is still a class, and the spy lands on it.
+        View.prototype as unknown as { measureInWindow: MeasureInWindow },
+        'measureInWindow',
+      )
+      .mockImplementation((callback) => callback(0, 0, 874, 402))
+    const anchorNode = {
+      measureInWindow: (callback: MeasureInWindowOnSuccessCallback) =>
+        callback(300, 40, 240, 56),
+    }
+    const anchor = {
+      current: anchorNode,
+    } as unknown as React.RefObject<ViewInstance>
+    renderView({ layout: 'docked', anchor })
+    return styleOf('view-layer')
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    setDirection(original.isRTL, original.doLeftAndRightSwapInRTL)
+  })
+
+  it('takes the left offset and the width of the anchor', () => {
+    const style = renderAnchored()
+    expect(style.top).toBe(40)
+    expect(style.left).toBe(300)
+    expect(style.width).toBe(240)
+  })
+
+  // React Native applies `left` to the right side in RTL, so the measured
+  // physical offset goes into `right` there.
+  it('writes the offset into right in RTL', () => {
+    setDirection(true, true)
+    const style = renderAnchored()
+    expect(style.right).toBe(300)
+    expect(style.left).toBeUndefined()
   })
 })
 

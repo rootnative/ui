@@ -14,7 +14,7 @@ import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
-import { SafeAreaView } from '../safe-area'
+import { SafeAreaView, physicalLeftStyle } from '../safe-area'
 import { SEARCH_VIEW_SLIDE, createStyles } from './styles'
 import type { SearchViewProps } from './types'
 
@@ -221,7 +221,7 @@ export function SearchView({
         : {
             position: 'absolute' as const,
             top: frame.top,
-            left: frame.left,
+            ...physicalLeftStyle(frame.left),
             width: frame.width,
           },
     [frame],

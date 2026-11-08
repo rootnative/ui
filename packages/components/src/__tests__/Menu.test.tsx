@@ -10,13 +10,33 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { StyleSheet, View } from 'react-native'
+import { I18nManager, StyleSheet, View } from 'react-native'
 import { Button } from '../button'
 import { Divider } from '../divider'
 import { Menu } from '../menu'
 import { PortalHost } from '../portal/PortalHost'
 
 type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
+
+/**
+ * Native RTL. React Native applies `left` to the right side while
+ * `doLeftAndRightSwapInRTL` is on, the default.
+ */
+function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+  Object.defineProperty(I18nManager, 'isRTL', {
+    value: isRTL,
+    configurable: true,
+  })
+  Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+    value: doLeftAndRightSwapInRTL,
+    configurable: true,
+  })
+}
+
+const originalDirection = {
+  isRTL: I18nManager.isRTL,
+  doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+}
 
 function renderMenu(ui: React.ReactElement) {
   return renderWithTheme(<PortalHost>{ui}</PortalHost>)
@@ -246,6 +266,10 @@ describe('Menu — resolved placement', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    setDirection(
+      originalDirection.isRTL,
+      originalDirection.doLeftAndRightSwapInRTL,
+    )
   })
 
   /** Reports a menu taller than the space below the anchor. */
@@ -265,6 +289,19 @@ describe('Menu — resolved placement', () => {
     // 800 window - 8 margin - 340 top.
     expect(style.maxHeight).toBe(452)
     expect(style.transformOrigin).toBe('left top')
+  })
+
+  // `start` is the anchor's right edge in RTL: 140 - 200 leaves the screen,
+  // so the menu pins to the 8dp margin, at the physical left.
+  it('writes the physical position into right in RTL', async () => {
+    setDirection(true, true)
+    renderMenu(<UncontrolledMenu />)
+    layOutSurface(await open())
+
+    const style = StyleSheet.flatten(screen.getByTestId('menu').props.style)
+    expect(style.right).toBe(8)
+    expect(style.left).toBeUndefined()
+    expect(style.transformOrigin).toBe('right top')
   })
 
   it('caps the surface at maxHeight when the consumer asks for less', async () => {

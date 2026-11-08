@@ -48,6 +48,7 @@ import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
+import { physicalLeftStyle } from '../../safe-area'
 import { SideSheet } from '../../side-sheet'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
@@ -402,6 +403,11 @@ describe('the safe-area side insets stay physical on web', () => {
     expect(bar.style.marginRight).toBe('0px')
     expect(bar.parentElement?.style.paddingLeft).toBe('54px')
     expect(bar.parentElement?.style.paddingRight).toBe('0px')
+  })
+
+  it('places a measured offset with left under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    expect(physicalLeftStyle(30)).toEqual({ left: 30 })
   })
 })
 

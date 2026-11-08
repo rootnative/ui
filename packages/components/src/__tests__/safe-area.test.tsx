@@ -5,7 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../appbar/AppBar'
 import { Layout } from '../layout/Layout'
 import { NavigationBar } from '../navigation-bar/NavigationBar'
-import { SafeAreaView } from '../safe-area'
+import { SafeAreaView, physicalLeftStyle } from '../safe-area'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 
 const insets = { top: 47, right: 0, bottom: 34, left: 0 }
@@ -294,6 +294,14 @@ describe('SafeAreaView', () => {
         paddingLeft: 0,
         paddingRight: 54,
       })
+    })
+
+    it('puts a physical left offset into the key that lands on the left', () => {
+      expect(physicalLeftStyle(30)).toEqual({ right: 30 })
+      setDirection(true, false)
+      expect(physicalLeftStyle(30)).toEqual({ left: 30 })
+      setDirection(false, true)
+      expect(physicalLeftStyle(30)).toEqual({ left: 30 })
     })
 
     it('keeps the keys physical when the app turns the swap off', () => {

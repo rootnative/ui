@@ -26,6 +26,7 @@ import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
+import { physicalLeftStyle } from '../safe-area'
 import {
   PLAIN_TOOLTIP_DURATION,
   TOOLTIP_ANCHOR_SPACING,
@@ -287,7 +288,7 @@ export function Tooltip({
         ? null
         : {
             top: position.top,
-            left: position.left,
+            ...physicalLeftStyle(position.left),
             maxHeight: position.maxHeight,
           },
     [position],

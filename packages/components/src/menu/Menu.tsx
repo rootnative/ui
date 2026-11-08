@@ -17,6 +17,7 @@ import { useFocusTrap } from '../internal/useFocusTrap'
 import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
+import { physicalLeftStyle } from '../safe-area'
 import { MenuContext } from './context'
 import type { MenuContextValue } from './context'
 import { MenuItem } from './MenuItem'
@@ -139,7 +140,7 @@ export function Menu({
         ? null
         : {
             top: position.top,
-            left: position.left,
+            ...physicalLeftStyle(position.left),
             maxHeight: position.maxHeight,
             transformOrigin: position.transformOrigin,
           },
