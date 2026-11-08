@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../appbar/AppBar'
 import { Layout } from '../layout/Layout'
+import { NavigationBar } from '../navigation-bar/NavigationBar'
 import { SafeAreaView } from '../safe-area'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 
@@ -21,6 +22,28 @@ function withProvider(ui: React.ReactElement) {
     </SafeAreaProvider>
   )
 }
+
+// Landscape on a phone with a Dynamic Island: the island is on one side, and
+// the home indicator inset shrinks.
+const landscapeInsets = { top: 0, right: 62, bottom: 21, left: 62 }
+
+function inLandscape(ui: React.ReactElement) {
+  return (
+    <SafeAreaProvider
+      initialMetrics={{
+        insets: landscapeInsets,
+        frame: { x: 0, y: 0, width: 874, height: 402 },
+      }}
+    >
+      {ui}
+    </SafeAreaProvider>
+  )
+}
+
+const NAV_ITEMS = [
+  { value: 'home', label: 'Home', icon: 'home' },
+  { value: 'search', label: 'Search', icon: 'magnify' },
+]
 
 function flatStyle(testID: string) {
   return StyleSheet.flatten(screen.getByTestId(testID).props.style)
@@ -87,6 +110,122 @@ describe('SafeAreaView', () => {
     expect(StyleSheet.flatten(rootOf(toJSON()).props.style)).toMatchObject({
       paddingTop: 47,
       paddingBottom: 34,
+    })
+  })
+
+  it('Layout pads the sides and the bottom by default, not the top', () => {
+    const { toJSON } = renderWithTheme(inLandscape(<Layout>{null}</Layout>))
+    expect(StyleSheet.flatten(rootOf(toJSON()).props.style)).toMatchObject({
+      paddingTop: 0,
+      paddingRight: 62,
+      paddingBottom: 21,
+      paddingLeft: 62,
+    })
+  })
+
+  describe('the bars in landscape', () => {
+    it('AppBar pads its content by the side insets outside a Layout', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(<AppBar title="About" testID="bar" />),
+      )
+      const bar = rootOf(toJSON())
+      const barStyle = StyleSheet.flatten(bar.props.style)
+      expect(barStyle.marginLeft).toBeUndefined()
+      expect(barStyle.marginRight).toBeUndefined()
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingTop: 0,
+        paddingLeft: 62,
+        paddingRight: 62,
+      })
+    })
+
+    it('AppBar bleeds through the side padding of a Layout', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout>
+            <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: -62,
+        marginRight: -62,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 62,
+        paddingRight: 62,
+      })
+    })
+
+    it('AppBar bleeds only through the sides the Layout pads', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout edges={['left', 'bottom']}>
+            <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      const barStyle = StyleSheet.flatten(bar.props.style)
+      expect(barStyle).toMatchObject({ marginLeft: -62, marginRight: 0 })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 62,
+        paddingRight: 62,
+      })
+    })
+
+    it('a Layout with no side edge adds no margin to the bar', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout edges={['bottom']}>
+            <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const barStyle = StyleSheet.flatten(
+        childrenOf(rootOf(toJSON()))[0].props.style,
+      )
+      expect(barStyle.marginLeft).toBeUndefined()
+      expect(barStyle.marginRight).toBeUndefined()
+    })
+
+    it('insetSides={false} turns the side padding and the bleed off', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout>
+            <AppBar title="About" insetSides={false} testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      const barStyle = StyleSheet.flatten(bar.props.style)
+      expect(barStyle.marginLeft).toBeUndefined()
+      expect(barStyle.marginRight).toBeUndefined()
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 0,
+        paddingRight: 0,
+      })
+    })
+
+    it('NavigationBar bleeds through the side padding of a Layout', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout>
+            <NavigationBar items={NAV_ITEMS} testID="nav" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: -62,
+        marginRight: -62,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 62,
+        paddingRight: 62,
+        paddingBottom: 0,
+      })
     })
   })
 })

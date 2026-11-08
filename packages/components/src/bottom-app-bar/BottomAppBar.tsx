@@ -12,12 +12,10 @@ import type { LayoutChangeEvent, ViewProps } from 'react-native'
 import { FAB } from '../fab'
 import { IconButton } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
+import { barEdges, useSideInsetBleed } from '../layout/edgesContext'
 import { SafeAreaView } from '../safe-area'
-import type { Edge } from '../safe-area'
 import { BOTTOM_APP_BAR_HEIGHT, createStyles } from './styles'
 import type { BottomAppBarProps } from './types'
-
-const BOTTOM_EDGE: Edge[] = ['bottom']
 
 type FocusEvent = Parameters<NonNullable<ViewProps['onFocus']>>[0]
 
@@ -54,6 +52,7 @@ export function BottomAppBar({
   leading,
   fab,
   insetBottom = false,
+  insetSides = true,
   scrollOffset,
   containerColor,
   contentColor,
@@ -63,6 +62,13 @@ export function BottomAppBar({
   ...rest
 }: BottomAppBarProps) {
   const theme = useTheme()
+  const sideInsetBleed = useSideInsetBleed(insetSides)
+  // The side insets keep the actions clear of the notch in landscape, see
+  // `insetSides`. The bottom inset is opt-in, see `insetBottom`.
+  const insetEdges = useMemo(
+    () => barEdges(insetSides, insetBottom ? 'bottom' : undefined),
+    [insetSides, insetBottom],
+  )
   const styles = useMemo(
     () => createStyles(theme, containerColor),
     [theme, containerColor],
@@ -160,13 +166,14 @@ export function BottomAppBar({
       {...rest}
       onLayout={handleLayout}
       onFocus={handleFocus}
-      style={[styles.root, hidesOnScroll ? hideStyle : null, style]}
+      style={[
+        styles.root,
+        hidesOnScroll ? hideStyle : null,
+        style,
+        sideInsetBleed,
+      ]}
     >
-      {insetBottom ? (
-        <SafeAreaView edges={BOTTOM_EDGE}>{row}</SafeAreaView>
-      ) : (
-        row
-      )}
+      <SafeAreaView edges={insetEdges}>{row}</SafeAreaView>
     </Animated.View>
   )
 }

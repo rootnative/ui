@@ -434,10 +434,10 @@ what `npx rootnative list` prints, because both read the same registry.
 
 | Component | Dependencies | Description |
 |-----------|-------------|-------------|
-| `appbar` | button, icon-button, portal, tooltip, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
+| `appbar` | button, icon-button, layout, portal, tooltip, typography | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support |
 | `avatar` | — | Circular avatar with image, icon, or text initials and 5 sizes (extraSmall to extraLarge) |
 | `badge` | — | Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support |
-| `bottom-app-bar` | fab, icon-button | MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end |
+| `bottom-app-bar` | fab, icon-button, layout | MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end |
 | `bottom-sheet` | portal | MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss |
 | `button` | progress | MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support |
 | `button-group` | — | Standard and connected button groups with single or multi-select toggle behavior; replaces the deprecated MD3 segmented button |
@@ -456,7 +456,7 @@ what `npx rootnative list` prints, because both read the same registry.
 | `loading-indicator` | — | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
 | `menu` | portal | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility |
 | `navigation-drawer` | divider, portal | MD3 navigation drawer — modal (scrim, slide from the start edge) and standard variants with sections, headlines, badges, and dividers |
-| `navigation-bar` | badge | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
+| `navigation-bar` | badge, layout | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
 | `navigation-rail` | navigation-bar | MD3 navigation rail — 80dp side rail of destinations with an optional header, three alignments, and the NavigationBar indicator pill |
 | `portal` | — | Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips |
 | `progress` | — | Linear and circular progress indicators with determinate and indeterminate modes |

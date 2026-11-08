@@ -85,7 +85,7 @@ Choose which safe-area edges apply:
 `}
 />
 
-By default, only the `bottom` edge applies. In immersive mode, no edge applies. Layout reads `edges` first, and it overrides `immersive`: `<Layout immersive edges={['top']} />` applies the top inset and ignores `immersive`.
+By default, the `left`, `right` and `bottom` edges apply, and `top` does not, because an `AppBar` usually owns the top inset. The side insets are 0 in portrait; in landscape they keep the content clear of the notch or the Dynamic Island. In immersive mode, no edge applies. Layout reads `edges` first, and it overrides `immersive`: `<Layout immersive edges={['top']} />` applies the top inset and ignores `immersive`.
 
 :::note
 

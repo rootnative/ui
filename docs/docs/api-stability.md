@@ -82,6 +82,16 @@ defaults to on for the same reason: it spans the full screen height through a
 portal. A standard drawer or side sheet renders in place, so the `Layout`
 around it owns the edges, and the inset defaults to off.
 
+`Layout` is the ancestor that owns the edges. Its default `edges` are
+`['left', 'right', 'bottom']`: the side insets are 0 in portrait and keep the
+content clear of the notch in landscape, and the top is left to `AppBar`. The
+bars (`AppBar`, `NavigationBar`, `BottomAppBar`) pad their content by the side
+insets by default (`insetSides`), and inside a `Layout` that pads the sides
+they pull their background back through that padding, so a bar at the edge of
+a screen stays full-bleed in landscape with no extra prop. A bar nested inside
+content passes `insetSides={false}`. Pass `edges` to `Layout` to change the
+sides per screen.
+
 ## What is *not* covered
 
 ### Copy-pasted component source

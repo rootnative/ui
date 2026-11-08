@@ -182,7 +182,7 @@ function RootLayoutContent() {
         bar now; the AppBar's top inset is what keeps content clear of it.
       */}
       <StatusBar animated={false} style={statusBarStyle} />
-      <Layout edges={['bottom']}>
+      <Layout>
         {/*
           One host at the root, above the AppBar, so overlays get the whole
           window. A per-screen host would sit below the AppBar and give anchored

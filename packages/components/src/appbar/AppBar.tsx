@@ -21,8 +21,10 @@ import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
+import { barEdges, useSideInsetBleed } from '../layout/edgesContext'
 import { PortalContext } from '../portal/context'
 import { SafeAreaView } from '../safe-area'
+import type { Edge } from '../safe-area'
 import { Tooltip } from '../tooltip'
 import { Typography } from '../typography'
 import type { TypographyVariant } from '../typography'
@@ -109,20 +111,18 @@ function resolveSize(variant: AppBarProps['variant']): AppBarSize {
   return 'small'
 }
 
-function withTopInset(
-  enabled: boolean,
+// The side insets keep the title and the actions clear of the notch in
+// landscape, see `insetSides`. The top inset is opt-in, see `insetTop`.
+function withInsets(
+  edges: Edge[],
   content: ReactNode,
   style: AnimatedViewStyle,
 ) {
-  if (enabled) {
-    return (
-      <AnimatedSafeAreaView edges={['top']} style={style}>
-        {content}
-      </AnimatedSafeAreaView>
-    )
-  }
-
-  return <Animated.View style={style}>{content}</Animated.View>
+  return (
+    <AnimatedSafeAreaView edges={edges} style={style}>
+      {content}
+    </AnimatedSafeAreaView>
+  )
 }
 
 function measureWidth(event: LayoutChangeEvent): number {
@@ -139,6 +139,7 @@ export function AppBar({
   onBackPress,
   tooltipHostName,
   insetTop = false,
+  insetSides = true,
   elevated = false,
   leading,
   trailing,
@@ -507,11 +508,17 @@ export function AppBar({
   const containerOverride = containerColor
     ? ({ backgroundColor: containerColor } as ViewStyle)
     : undefined
+  const sideInsetBleed = useSideInsetBleed(insetSides)
+  const insetEdges = useMemo(
+    () => barEdges(insetSides, insetTop ? 'top' : undefined),
+    [insetSides, insetTop],
+  )
   const rootStyle: AnimatedViewStyle = [
     styles.root,
     animatedSurfaceStyle,
     containerOverride,
     style,
+    sideInsetBleed,
   ]
   const safeAreaStyle: AnimatedViewStyle = [
     styles.safeArea,
@@ -627,7 +634,7 @@ export function AppBar({
     // props replaces it.
     return (
       <Animated.View role="banner" {...rest} style={rootStyle}>
-        {withTopInset(insetTop, content, safeAreaStyle)}
+        {withInsets(insetEdges, content, safeAreaStyle)}
       </Animated.View>
     )
   }
@@ -672,7 +679,7 @@ export function AppBar({
 
   return (
     <Animated.View role="banner" {...rest} style={rootStyle}>
-      {withTopInset(insetTop, content, safeAreaStyle)}
+      {withInsets(insetEdges, content, safeAreaStyle)}
     </Animated.View>
   )
 }

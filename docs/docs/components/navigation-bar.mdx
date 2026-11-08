@@ -142,6 +142,12 @@ A bar at the bottom must clear the home indicator. Pass `insetBottom` to wrap th
 `SafeAreaView` that adds the bottom inset below the 80dp of the bar. Leave it off (the default)
 when an ancestor already applies the bottom edge, or the inset applies twice.
 
+The side insets are on by default (`insetSides`). The bar pads its row by the left and
+right insets, and inside a `Layout` that pads the sides it pulls its background back
+through that padding, so in landscape the bar stays full-bleed and the destinations stay
+clear of the notch. Pass `insetSides={false}` for a bar nested inside content, where the
+pulled-out background would show beyond its container.
+
 ## Overrides
 
 | Prop | Target |

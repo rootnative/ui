@@ -9,7 +9,7 @@
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["elevation"],
-  "componentDependencies": ["fab", "icon-button"],
+  "componentDependencies": ["fab", "icon-button", "layout"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.35",
     "react-native-safe-area-context": ">=4.0.0",

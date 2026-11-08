@@ -98,6 +98,12 @@ A bottom-anchored bar must clear the home indicator. Pass `insetBottom` to wrap 
 `SafeAreaView` that adds the bottom inset below the 80dp of the bar. Leave it off (the default)
 when an ancestor already applies the bottom edge. Otherwise the inset applies twice.
 
+The side insets are on by default (`insetSides`). The bar pads its row by the left and
+right insets, and inside a `Layout` that pads the sides it pulls its background back
+through that padding, so in landscape the bar stays full-bleed and the actions stay clear
+of the notch. Pass `insetSides={false}` for a bar nested inside content, where the
+pulled-out background would show beyond its container.
+
 ## Hide on scroll
 
 Pass the scroll offset of the content as `scrollOffset`, and the bar follows the MD3

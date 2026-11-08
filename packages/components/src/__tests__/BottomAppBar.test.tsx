@@ -120,7 +120,9 @@ describe('BottomAppBar', () => {
     expect(StyleSheet.flatten(bar.props.style).backgroundColor).toBe(
       lightTheme.colors.surfaceContainer,
     )
-    expect(StyleSheet.flatten(bar.props.children.props.style).height).toBe(
+    // root > side-inset SafeAreaView > row
+    const row = bar.props.children.props.children
+    expect(StyleSheet.flatten(row.props.style).height).toBe(
       BOTTOM_APP_BAR_HEIGHT,
     )
   })
@@ -132,10 +134,21 @@ describe('BottomAppBar', () => {
     expect(screen.getByTestId('bar').props.role).toBe('navigation')
   })
 
-  it('wraps the row in a bottom SafeAreaView with insetBottom', () => {
+  it('pads the sides by default', () => {
+    renderWithTheme(<BottomAppBar actions={ACTIONS} testID="bar" />)
+    expect(screen.getByTestId('bar').props.children.props.edges).toEqual([
+      'left',
+      'right',
+    ])
+  })
+
+  it('pads the bottom too with insetBottom', () => {
     renderWithTheme(<BottomAppBar actions={ACTIONS} insetBottom testID="bar" />)
-    const safeArea = screen.getByTestId('bar').props.children
-    expect(safeArea.props.edges).toEqual(['bottom'])
+    expect(screen.getByTestId('bar').props.children.props.edges).toEqual([
+      'left',
+      'right',
+      'bottom',
+    ])
   })
 
   describe('overrides', () => {

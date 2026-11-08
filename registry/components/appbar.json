@@ -12,6 +12,7 @@
   "componentDependencies": [
     "button",
     "icon-button",
+    "layout",
     "portal",
     "tooltip",
     "typography"

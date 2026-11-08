@@ -5,6 +5,7 @@ import type { StyleProp, ViewStyle } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
+import { LayoutEdgesContext } from './edgesContext'
 
 export interface LayoutProps extends PropsWithChildren {
   /**
@@ -14,10 +15,13 @@ export interface LayoutProps extends PropsWithChildren {
   immersive?: boolean
   /**
    * Explicit set of safe-area edges to apply. Overrides `immersive` when
-   * provided. Only the bottom edge is applied by default, because `AppBar`
-   * usually owns the top inset — pass `['top', 'bottom']` on a screen with no
-   * AppBar, or a title placed under the status bar will be clipped.
-   * @default ['bottom']
+   * provided. The top edge is left out by default, because `AppBar` usually
+   * owns the top inset — pass `['top', 'left', 'right', 'bottom']` on a
+   * screen with no AppBar, or a title placed under the status bar will be
+   * clipped. The side edges are in the default: they are 0 in portrait, and
+   * in landscape they keep the content clear of the notch or the Dynamic
+   * Island.
+   * @default ['left', 'right', 'bottom']
    */
   edges?: Edge[]
   /**
@@ -28,7 +32,7 @@ export interface LayoutProps extends PropsWithChildren {
   style?: StyleProp<ViewStyle>
 }
 
-const defaultEdges: Edge[] = ['bottom']
+const defaultEdges: Edge[] = ['left', 'right', 'bottom']
 
 function resolveEdges(immersive?: boolean, edges?: Edge[]): Edge[] {
   if (edges) {
@@ -85,7 +89,9 @@ export function Layout({ immersive, edges, children, style }: LayoutProps) {
       style={[styles.root, themeBackgroundStyle, styleWithoutBackground]}
       edges={safeAreaEdges}
     >
-      {children}
+      <LayoutEdgesContext.Provider value={safeAreaEdges}>
+        {children}
+      </LayoutEdgesContext.Provider>
     </SafeAreaView>
   )
 }

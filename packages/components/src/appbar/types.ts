@@ -141,6 +141,16 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    */
   insetTop?: boolean
   /**
+   * When `true`, pads the bar by the left and right safe-area insets, and
+   * inside a `Layout` that pads the sides pulls the background back through
+   * that padding. In landscape the bar stays full-bleed and the title and the
+   * actions stay clear of the notch; in portrait both insets are 0. Set it to
+   * `false` for a bar nested inside content, where the pulled-out background
+   * would show beyond its container.
+   * @default true
+   */
+  insetSides?: boolean
+  /**
    * When `true`, applies the MD3 on-scroll tonal shift: the container color
    * animates from its resting color to its elevated color (`surface` →
    * `surfaceContainer` for the default `'surface'` color scheme). No shadow

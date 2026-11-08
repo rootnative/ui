@@ -5,7 +5,7 @@
     "scheme": "rootnative",
     "version": "0.0.0",
     "platforms": ["ios", "android", "web"],
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "primaryColor": "#2563eb",
