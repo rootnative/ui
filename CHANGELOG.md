@@ -9,6 +9,146 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.36 — 2026-11-09
+
+**No breaking change.** No export and no prop is removed. Some defaults
+change, and they can move a screen. In landscape, `Layout`, the three bars,
+and a modal `NavigationDrawer` or `SideSheet` now pad the side safe-area
+insets. In portrait those insets are 0, so nothing moves there. An outlined
+`Button` and `IconButton` take the Expressive outline colors, and a tall
+`BottomSheet` stops below the status bar. Each of these entries ends with
+what to check. New in this release: a toggle on `Button`, and `insetSides`
+on five components. No peer range moves. The `@rootnative/inertia` floor
+stays at `0.0.26`. inertia `0.0.28` is inside the range and fixes
+`useHideOnScroll`, which `BottomAppBar` uses for `scrollOffset`: when the
+`scrollOffset` changes to another list, as on a tab screen, the bar shows
+and counts from the position of the new list. Upgrade inertia in the app to
+get it.
+
+- **New: a toggle on `Button`.** Pass `selected` with `onSelectedChange`
+  for a controlled toggle. Pass `defaultSelected` for an uncontrolled one:
+  the button flips its own state on press and reports the new state through
+  `onSelectedChange`. `onPress` still fires. A selected toggle takes the MD3
+  selected colors of its variant, and its shape inverts: a `round` button
+  turns square, and a `square` button turns round. The `filled`, `tonal`,
+  `outlined` and `elevated` variants have a toggle. MD3 has no text toggle,
+  so a `text` button ignores these props and warns in development. A screen
+  reader gets the state: `aria-pressed` on web, and the selected state on
+  native. `containerColor` and `contentColor` apply in both states. To color
+  the two states differently, control the toggle and pass a color for each
+  state.
+
+- **`Layout` pads the left and right safe-area insets by default.** The
+  default `edges` are now `['left', 'right', 'bottom']`, not `['bottom']`.
+  In landscape the notch or the Dynamic Island moves to one side, and the
+  content of a `Layout` went under it. The side insets are 0 in portrait,
+  so an app that doesn't rotate sees no change. What to check: a screen
+  that pads the side insets itself gets them twice in landscape. Remove
+  your own padding, or pass `edges={['bottom']}` to keep the old default.
+
+- **New: `insetSides` on `AppBar`, `NavigationBar` and `BottomAppBar`, on
+  by default.** Each bar pads its content by the left and right insets, so
+  in landscape the title, the actions and the destinations stay clear of
+  the notch. Inside a `Layout` that pads the sides, the bar also pulls its
+  background back out through that padding, so the bar still reaches the
+  screen edges. What to check: a bar nested inside content, such as a card,
+  in landscape. Pass `insetSides={false}` there, or its background shows
+  past its container. `rootnative add appbar`, `add navigation-bar` and
+  `add bottom-app-bar` now also install `layout`.
+
+- **New: `insetSides` on `NavigationDrawer` and `SideSheet`.** It pads the
+  inset of the screen edge that the surface sits on: the start edge for a
+  drawer (the left in LTR, the right in RTL), and the edge that `edge`
+  picks for a sheet. It's on by default for the `modal` variant and off for
+  `standard`, the same as `insetTop` and `insetBottom`, because a standard
+  surface renders inside a `Layout` that owns the edges. What to check: a
+  modal drawer or sheet in landscape, with the notch on its side, has its
+  items one inset further in.
+
+- **The side safe-area insets go on the correct side in RTL on iOS and
+  Android.** The insets are physical, but in RTL React Native applies
+  `paddingLeft` and `marginLeft` to the right side. So in landscape the
+  components padded the side without the notch, and left the side with the
+  notch bare. react-native-web doesn't swap the sides, so web was correct.
+
+- **A `Menu`, a `Tooltip` and a `layout="docked"` `SearchView` open at
+  their anchor in RTL on iOS and Android.** Each one takes its position as
+  a distance from the left edge of the window. In RTL React Native applies
+  `left` to the right side, so the overlay opened at the mirrored position,
+  away from its anchor. Web was correct.
+
+- **A `Menu` and a `Tooltip` stay inside the safe-area insets.** On an
+  edge-to-edge window the root `PortalHost` starts under the status bar. A
+  menu that opened above an anchor near the top stopped 8 dp
+  (`screenMargin`) from the window top, under the status bar, and one near
+  the bottom went under the navigation bar. `screenMargin` now counts from
+  the edges of the safe area. The insets come from the nearest
+  `SafeAreaProvider`. With no provider, the window edges still apply. A host
+  that is already inside the safe area, such as one below an app bar, does
+  not move again. `rootnative add menu` and `add tooltip` now also install
+  `react-native-safe-area-context`.
+
+- **An outlined `Button` and an outlined `IconButton` take the Expressive
+  outline colors.** The border is `outlineVariant`, not `outline`, and the
+  label of a `Button` is `onSurfaceVariant`, not `primary`. These are the
+  MD3 Expressive tokens. The old values came from the baseline spec. What
+  to check: an outlined button that needs a primary label. Pass
+  `contentColor` to keep it.
+
+- **A tall `BottomSheet` stops below the status bar.** A percentage snap
+  point resolved against the whole height of the portal host, so a sheet at
+  `'100%'`, or one that sized to tall content, went under the status bar
+  and the Dynamic Island. A percentage now resolves against the height of
+  the host below the status bar, and a sheet that sizes to its content
+  stops there too. The scrim still covers the status bar. A named host that
+  starts below the status bar, such as one below an app bar, keeps its
+  whole height. What to check: with the root host, a `'90%'` sheet is now
+  90% of a slightly smaller height.
+
+- **The title of a `center-aligned` `AppBar` is at the centre on a wide
+  bar.** The title row kept `justifyContent: 'center'` from its container.
+  That added half the free space of the row to the start margin that
+  centres the title on the screen. So on a wide bar, such as a tablet or a
+  phone in landscape, the title sat off the centre.
+
+- **The back and close buttons of a `SideSheet` are standard icon
+  buttons.** They used the `IconButton` default, `filled`, so each one had a
+  filled container. MD3 draws them with no container.
+
+- **A `ListItem` with `supportingTextNumberOfLines={0}` uses the
+  three-line template.** `0` removes the line limit, so the supporting text
+  can wrap to any length, but the item kept the two-line template. The
+  leading and the trailing content stayed at the centre of a tall item.
+  MD3 puts them at the top of a three-line item. `0` now counts the same as
+  a limit above 1.
+
+- **On web, an overlay takes the focus with no scroll of the page.** The
+  focus trap of `BottomSheet`, `Dialog`, `Menu`, `NavigationDrawer`,
+  `SearchView` and `SideSheet` called `focus()` with no options. A surface
+  can take the focus while it's still outside the window: a sheet or a
+  drawer at the start of its slide in, or a `BottomSheet` that opens a
+  second time and starts below the window because it already knows its
+  height. A plain `focus()` then scrolled the whole document, and the page
+  behind the surface jumped. The trap now moves the focus with
+  `preventScroll`, when it enters and when it returns.
+
+- **`rootnative create` makes an app that rotates.** The `blank` and
+  `with-router` templates set `"orientation": "default"` in `app.json`, not
+  `"portrait"`. Set it back to `"portrait"` for an app that must not
+  rotate.
+
+- **Docs: an Orientation section on the Responsive page.** It says that an
+  Expo app with `"orientation": "portrait"` doesn't rotate, and it lists
+  the edges that each component pads, with the prop and its default.
+
+- **Docs: put the `PortalHost` outside `Layout`.** Each overlay pads its
+  own safe-area insets, so a host inside the `Layout` padding gets them
+  twice: the snackbar sits one inset too high, and a modal drawer one inset
+  too far in. The Portal page says this now.
+
+- **Docs: plainer wording.** The docs pages and the package READMEs use
+  shorter sentences. The API and the facts are the same.
+
 ## 0.0.0-alpha.35 — 2026-11-06
 
 **No breaking change.** One new hook in `@rootnative/seo`, one new prop on
