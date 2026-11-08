@@ -178,10 +178,13 @@ export function createStyles(
       textAlign: 'center',
     },
     // The centred title is a row so the title node keeps its natural width
-    // and a start margin can place it at the screen's centre.
+    // and a start margin can place it at the screen's centre. The container's
+    // `justifyContent: 'center'` would centre along the row as well, and add
+    // half the free space to that margin on a wide bar.
     centeredTitleRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'flex-start',
     },
     centeredTitleNode: {
       flexShrink: 1,

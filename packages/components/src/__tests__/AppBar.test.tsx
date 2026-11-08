@@ -306,6 +306,17 @@ describe('AppBar', () => {
         const marginStart = layoutBarAndTitle(400, 300)
         expect(marginStart()).toBe(0)
       })
+
+      // A row that centred its children would add half the free width to the
+      // margin, so on a wide bar the title sat right of centre.
+      it('packs the title at the start of its row, so the margin alone places it', () => {
+        const { toJSON } = renderCentered()
+        layoutSideSlots(48, 96)
+        const row = collectFlattenedStyles(rootOf(toJSON())).find(
+          (s) => s.start !== undefined && s.flexDirection === 'row',
+        )
+        expect(row?.justifyContent).toBe('flex-start')
+      })
     })
 
     it('aligns an expanded title under the navigation icon', () => {
