@@ -11,6 +11,8 @@ Portal renders content into a shared overlay layer that sits above the rest of t
 
 Wrap your app root in `PortalHost` once. Every `<Portal>` anywhere in the tree below mounts into the overlay layer of this host.
 
+Put the host outside `Layout`, not inside it. Each overlay pads its own safe-area insets, so a host inside the `Layout` padding gets them twice: the snackbar sits one inset too high, and a modal drawer one inset too far in.
+
 <SnackExample
   name="RootNative Portal — Setup"
   code={`

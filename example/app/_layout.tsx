@@ -182,15 +182,17 @@ function RootLayoutContent() {
         bar now; the AppBar's top inset is what keeps content clear of it.
       */}
       <StatusBar animated={false} style={statusBarStyle} />
-      <Layout>
-        {/*
-          One host at the root, above the AppBar, so overlays get the whole
-          window. A per-screen host would sit below the AppBar and give anchored
-          overlays (Menu, Tooltip) a shorter layer to open into. Screens that
-          demonstrate Portal itself still mount their own — an unnamed host
-          inside another one shadows it with a store of its own.
-        */}
-        <PortalHost>
+      {/*
+        One host at the root, around the Layout, so overlays get the whole
+        window. Each overlay pads its own safe-area insets, so a host inside
+        the Layout padding would get them twice. A per-screen host would sit
+        below the AppBar and give anchored overlays (Menu, Tooltip) a shorter
+        layer to open into. Screens that demonstrate Portal itself still mount
+        their own — an unnamed host inside another one shadows it with a store
+        of its own.
+      */}
+      <PortalHost>
+        <Layout>
           <AppBar
             elevated
             title={title}
@@ -209,8 +211,8 @@ function RootLayoutContent() {
           {/* After the navigator: the screen renders first, so its PageHead
               claims the route before RouteHead reads the claim. */}
           <RouteHead defaults={routeDefaults} />
-        </PortalHost>
-      </Layout>
+        </Layout>
+      </PortalHost>
     </>
   )
 }
