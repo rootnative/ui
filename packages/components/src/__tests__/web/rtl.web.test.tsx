@@ -39,11 +39,13 @@ import {
 import { act, screen } from '@testing-library/react'
 import { createRef } from 'react'
 import { Text } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
 import { Carousel } from '../../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
+import { Layout } from '../../layout/Layout'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
@@ -370,5 +372,32 @@ describe('Carousel scrolls to an index for the document direction', () => {
   it('scrolls to the negative offset under dir="rtl"', () => {
     document.documentElement.setAttribute('dir', 'rtl')
     expect(scrollLeftForIndex(3)).toBe(-snapOffsets[3])
+  })
+})
+
+// The native side swaps the left and right insets in RTL, because React Native
+// applies `paddingLeft` to the start edge there. react-native-web keeps an
+// inline `paddingLeft` on the left under `dir="rtl"`, so the web must not
+// swap. A swap that reads `isRTLDirection()` would fail here.
+describe('the safe-area side insets stay physical on web', () => {
+  it('pads and bleeds on the side of the inset under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: { top: 0, right: 0, bottom: 0, left: 54 },
+          frame: { x: 0, y: 0, width: 923, height: 411 },
+        }}
+      >
+        <Layout>
+          <AppBar title="About" testID="bar" />
+        </Layout>
+      </SafeAreaProvider>,
+    )
+    const bar = screen.getByTestId('bar')
+    expect(bar.style.marginLeft).toBe('-54px')
+    expect(bar.style.marginRight).toBe('0px')
+    expect(bar.parentElement?.style.paddingLeft).toBe('54px')
+    expect(bar.parentElement?.style.paddingRight).toBe('0px')
   })
 })

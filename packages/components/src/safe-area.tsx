@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react'
 import type { ComponentProps, ComponentType } from 'react'
-import { Platform, StyleSheet, View } from 'react-native'
+import { I18nManager, Platform, StyleSheet, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import {
   SafeAreaInsetsContext,
@@ -37,6 +37,27 @@ const NativeSafeAreaView: ComponentType<SafeAreaViewProps> =
 
 const ALL_EDGES: Edge[] = ['top', 'right', 'bottom', 'left']
 
+type SideEdge = 'left' | 'right'
+const UNSWAPPED_SIDES: readonly [SideEdge, SideEdge] = ['left', 'right']
+const SWAPPED_SIDES: readonly [SideEdge, SideEdge] = ['right', 'left']
+
+/**
+ * The physical edges that a `...Left` and a `...Right` style key land on, in
+ * that order. The safe-area insets are physical, but in RTL React Native
+ * applies `paddingLeft` and `marginLeft` to the start edge, which is the
+ * right side, while `I18nManager.doLeftAndRightSwapInRTL` is on (the default
+ * on iOS and Android). With a cutout on one side only, as on Android, an
+ * unswapped inset pads the side without the cutout. react-native-web never
+ * swaps.
+ */
+export function sideEdgesOfStyleKeys(): readonly [SideEdge, SideEdge] {
+  const swaps =
+    Platform.OS !== 'web' &&
+    I18nManager.isRTL &&
+    I18nManager.doLeftAndRightSwapInRTL
+  return swaps ? SWAPPED_SIDES : UNSWAPPED_SIDES
+}
+
 // The same additive maths as the package's own `SafeAreaView.web`: each
 // requested edge adds its inset to the padding the style already carries.
 function insetPaddingStyle(
@@ -51,19 +72,20 @@ function insetPaddingStyle(
   const paddingVertical = num(flat.paddingVertical, padding)
   const paddingHorizontal = num(flat.paddingHorizontal, padding)
   const has = (edge: Edge) => edges.includes(edge)
+  const [leftKeyEdge, rightKeyEdge] = sideEdgesOfStyleKeys()
 
   return {
     paddingTop:
       num(flat.paddingTop, paddingVertical) + (has('top') ? insets.top : 0),
     paddingRight:
       num(flat.paddingRight, paddingHorizontal) +
-      (has('right') ? insets.right : 0),
+      (has(rightKeyEdge) ? insets[rightKeyEdge] : 0),
     paddingBottom:
       num(flat.paddingBottom, paddingVertical) +
       (has('bottom') ? insets.bottom : 0),
     paddingLeft:
       num(flat.paddingLeft, paddingHorizontal) +
-      (has('left') ? insets.left : 0),
+      (has(leftKeyEdge) ? insets[leftKeyEdge] : 0),
   }
 }
 

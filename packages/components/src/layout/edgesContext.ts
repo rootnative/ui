@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { sideEdgesOfStyleKeys } from '../safe-area'
 import type { Edge } from '../safe-area'
 
 /**
@@ -39,8 +40,11 @@ export function useSideInsetBleed(insetSides: boolean): ViewStyle | undefined {
     if (!insetSides || !edges || !insets) {
       return undefined
     }
-    const marginLeft = edges.includes('left') ? -insets.left : 0
-    const marginRight = edges.includes('right') ? -insets.right : 0
+    const bleed = (edge: 'left' | 'right') =>
+      edges.includes(edge) && insets[edge] > 0 ? -insets[edge] : 0
+    const [leftKeyEdge, rightKeyEdge] = sideEdgesOfStyleKeys()
+    const marginLeft = bleed(leftKeyEdge)
+    const marginRight = bleed(rightKeyEdge)
     if (marginLeft === 0 && marginRight === 0) {
       return undefined
     }

@@ -1,6 +1,6 @@
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
+import { I18nManager, StyleSheet } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../appbar/AppBar'
 import { Layout } from '../layout/Layout'
@@ -225,6 +225,95 @@ describe('SafeAreaView', () => {
         paddingLeft: 62,
         paddingRight: 62,
         paddingBottom: 0,
+      })
+    })
+  })
+
+  // An Android cutout sits on one side only, here the physical left. In RTL,
+  // React Native puts a `...Right` key on the left side, so the inset of the
+  // left edge must go into `paddingRight` and `marginRight`.
+  describe('in RTL with a cutout on one side', () => {
+    const cutoutInsets = { top: 0, right: 0, bottom: 24, left: 54 }
+    const original = {
+      isRTL: I18nManager.isRTL,
+      doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+    }
+
+    function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: isRTL,
+        configurable: true,
+      })
+      Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+        value: doLeftAndRightSwapInRTL,
+        configurable: true,
+      })
+    }
+
+    function withCutout(ui: React.ReactElement) {
+      return (
+        <SafeAreaProvider
+          initialMetrics={{
+            insets: cutoutInsets,
+            frame: { x: 0, y: 0, width: 923, height: 411 },
+          }}
+        >
+          {ui}
+        </SafeAreaProvider>
+      )
+    }
+
+    beforeEach(() => setDirection(true, true))
+    afterEach(() =>
+      setDirection(original.isRTL, original.doLeftAndRightSwapInRTL),
+    )
+
+    it('Layout writes the left inset into the key that lands on the left', () => {
+      const { toJSON } = renderWithTheme(withCutout(<Layout>{null}</Layout>))
+      expect(StyleSheet.flatten(rootOf(toJSON()).props.style)).toMatchObject({
+        paddingLeft: 0,
+        paddingRight: 54,
+        paddingBottom: 24,
+      })
+    })
+
+    it('AppBar bleeds and pads on the side of the cutout', () => {
+      const { toJSON } = renderWithTheme(
+        withCutout(
+          <Layout>
+            <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: 0,
+        marginRight: -54,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 0,
+        paddingRight: 54,
+      })
+    })
+
+    it('keeps the keys physical when the app turns the swap off', () => {
+      setDirection(true, false)
+      const { toJSON } = renderWithTheme(
+        withCutout(
+          <Layout>
+            <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const layout = rootOf(toJSON())
+      expect(StyleSheet.flatten(layout.props.style)).toMatchObject({
+        paddingLeft: 54,
+        paddingRight: 0,
+      })
+      const bar = childrenOf(layout)[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: -54,
+        marginRight: 0,
       })
     })
   })
