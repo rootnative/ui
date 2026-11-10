@@ -15,7 +15,7 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--rn-fg-subtle);
+  color: var(--rn-accent-strong);
   margin-bottom: 0.9rem;
 }
 
@@ -44,6 +44,18 @@
   overflow: hidden;
   background: var(--ifm-background-color);
   border-bottom: 1px solid var(--rn-border);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 45% 60% at 78% 30%,
+    var(--rn-accent-tint),
+    transparent 70%
+  );
 }
 
 /* Subtle grid backdrop that fades toward the bottom */
@@ -97,6 +109,19 @@
   border-radius: 100px;
   background: var(--rn-surface-muted);
   margin-bottom: 1.5rem;
+}
+
+.eyebrowDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rn-accent-strong);
+}
+
+/* A flat accent, no gradient: the mark is flat tones only
+   (scripts/build-brand.mjs). */
+.heroHighlight {
+  color: var(--rn-accent-strong);
 }
 
 .heroTitle {
@@ -170,7 +195,7 @@
 .ctaSecondary:hover {
   color: var(--rn-fg);
   text-decoration: none;
-  border-color: var(--rn-fg);
+  border-color: var(--rn-accent-strong);
   transform: translateY(-1px);
 }
 
@@ -191,11 +216,11 @@
 }
 
 .copyCommand:hover {
-  border-color: var(--rn-border-strong);
+  border-color: var(--rn-accent-strong);
 }
 
 .copyPrompt {
-  color: var(--rn-fg-subtle);
+  color: var(--rn-accent-strong);
   font-size: 0.85rem;
   user-select: none;
 }
@@ -306,7 +331,7 @@
 }
 
 .demoOpenLink:hover {
-  color: var(--rn-fg);
+  color: var(--rn-accent-strong);
   text-decoration: none;
 }
 
@@ -345,7 +370,7 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--rn-fg);
+  color: var(--rn-accent-strong);
   line-height: 1;
 }
 
@@ -378,7 +403,7 @@
 }
 
 .featureCard:hover {
-  border-color: var(--rn-border-strong);
+  border-color: var(--rn-accent-strong);
   transform: translateY(-2px);
   box-shadow: 0 12px 32px -20px rgba(10, 10, 10, 0.25);
 }
@@ -390,9 +415,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: var(--rn-surface-muted);
-  border: 1px solid var(--rn-border);
-  color: var(--rn-fg);
+  background: var(--rn-accent-tint);
+  color: var(--rn-accent-strong);
   margin-bottom: 1.1rem;
 }
 
@@ -442,7 +466,7 @@
 }
 
 .stepCard:hover {
-  border-color: var(--rn-border-strong);
+  border-color: var(--rn-accent-strong);
   transform: translateY(-2px);
 }
 
@@ -450,7 +474,7 @@
   display: inline-block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--rn-fg-subtle);
+  color: var(--rn-accent-strong);
   font-family: var(--ifm-font-family-monospace);
   margin-bottom: 0.9rem;
 }
@@ -506,13 +530,17 @@
   overflow: hidden;
   background: #0f1117;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 60px -30px rgba(10, 10, 10, 0.5);
+  box-shadow:
+    0 24px 60px -30px rgba(10, 10, 10, 0.5),
+    0 24px 64px -32px var(--rn-accent-strong);
 }
 
 :global([data-theme='light']) .codePreviewCode {
   background: #ffffff;
   border: 1px solid var(--rn-border);
-  box-shadow: 0 24px 60px -34px rgba(15, 23, 42, 0.25);
+  box-shadow:
+    0 24px 60px -34px rgba(15, 23, 42, 0.25),
+    0 24px 64px -36px var(--rn-accent-strong);
 }
 
 .codeHeader {
@@ -618,7 +646,13 @@
 .bottomCta {
   padding: 6rem 2rem;
   text-align: center;
-  background: var(--rn-surface-muted);
+  background:
+    radial-gradient(
+      ellipse 50% 80% at 50% 0%,
+      var(--rn-accent-tint),
+      transparent 70%
+    ),
+    var(--rn-surface-muted);
   border-top: 1px solid var(--rn-border);
 }
 

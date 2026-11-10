@@ -47,6 +47,7 @@
      WCAG 1.4.11 (focus rings, borders) takes `--rn-accent-strong` at 5.17:1. */
   --rn-accent: #60a5fa;
   --rn-accent-strong: #2563eb;
+  --rn-accent-tint: rgba(37, 99, 235, 0.08);
 }
 
 [data-theme='dark'] {
@@ -72,6 +73,7 @@
   --rn-fg-subtle: #8a8a93;
   --rn-accent: #bfdbfe;
   --rn-accent-strong: #60a5fa;
+  --rn-accent-tint: rgba(96, 165, 250, 0.14);
 }
 
 html {

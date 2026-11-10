@@ -157,10 +157,12 @@ function Hero() {
       <div className={styles.heroInner}>
         <div className={styles.heroContent}>
           <span className={styles.eyebrow}>
+            <span className={styles.eyebrowDot} aria-hidden="true" />
             Material Design 3 · React Native
           </span>
           <h1 className={styles.heroTitle}>
-            Beautiful React Native apps, out of the box.
+            Beautiful React Native apps,{' '}
+            <span className={styles.heroHighlight}>out of the box.</span>
           </h1>
           <p className={styles.heroTagline}>
             A design-system agnostic component library. Ships with Material
