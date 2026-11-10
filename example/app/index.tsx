@@ -49,7 +49,7 @@ import { useHydrated } from '../src/use-hydrated'
 const HOME_META: PageMeta = {
   title: site.name,
   description:
-    'Material Design 3 components for React Native — copy, paste, ship. Browse every component of RootNative UI in the browser.',
+    'Material Design 3 components for React Native — copy, paste, ship. Browse every component of Root Native UI in the browser.',
   url: '/',
   jsonLd: [webSite({ name: site.name, url: site.url })],
 }
@@ -897,7 +897,7 @@ export default function HomeScreen() {
                 </Typography>
               </Row>
               <Typography level={2} variant={heroVariant}>
-                RootNative UI
+                Root Native UI
               </Typography>
               <Typography variant={taglineVariant} style={captionStyle}>
                 Beautiful Material Design 3 components for React Native — copy,

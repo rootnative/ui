@@ -14,7 +14,7 @@ Wrap your app root in `PortalHost` once. Every `<Portal>` anywhere in the tree b
 Put the host outside `Layout`, not inside it. Each overlay pads its own safe-area insets, so a host inside the `Layout` padding gets them twice: the snackbar sits one inset too high, and a modal drawer one inset too far in.
 
 <SnackExample
-  name="RootNative Portal — Setup"
+  name="Root Native Portal — Setup"
   code={`
   import { PortalHost, Typography } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -41,7 +41,7 @@ Put the host outside `Layout`, not inside it. Each overlay pads its own safe-are
 ## Usage
 
 <SnackExample
-  name="RootNative Portal — Usage"
+  name="Root Native Portal — Usage"
   code={`
   import { Button, Portal, PortalHost, Typography } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'

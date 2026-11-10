@@ -40,7 +40,7 @@ export interface PortalProps {
   hostName?: string
   /**
    * Stack order within the host — higher renders above lower, ties broken by
-   * mount order. Use the `PORTAL_LAYERS` constants for the layers RootNative
+   * mount order. Use the `PORTAL_LAYERS` constants for the layers Root Native
    * itself defines.
    * @default 0
    */

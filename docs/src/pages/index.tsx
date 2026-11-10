@@ -185,7 +185,7 @@ function Hero() {
             <iframe
               ref={iframeRef}
               src={`${demoUrl}?embed=1`}
-              title="RootNative UI live demo"
+              title="Root Native UI live demo"
               className={styles.phoneScreen}
               loading="lazy"
               onLoad={() => {
@@ -276,7 +276,7 @@ function Features() {
   return (
     <section className={styles.features}>
       <div className={styles.sectionInner}>
-        <span className={styles.sectionEyebrow}>Why RootNative</span>
+        <span className={styles.sectionEyebrow}>Why Root Native</span>
         <h2 className={styles.sectionTitle}>
           Everything you need to ship, nothing you don&apos;t.
         </h2>

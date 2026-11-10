@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds every RootNative UI brand asset from the one geometry definition below.
+// Builds every Root Native UI brand asset from the one geometry definition below.
 //
 // The mark is a stack of three isometric cubes: two on the base row, one resting
 // on top. It says what the library is -- composable blocks you assemble into an
@@ -329,8 +329,8 @@ function markSvg({ faces, shapeList, note, size = MARK_VIEWBOX }) {
 
   return [
     note ? `<!--\n${note}\n-->` : null,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${MARK_VIEWBOX} ${MARK_VIEWBOX}" fill="none" role="img" aria-label="RootNative UI">`,
-    `  <title>RootNative UI</title>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${MARK_VIEWBOX} ${MARK_VIEWBOX}" fill="none" role="img" aria-label="Root Native UI">`,
+    `  <title>Root Native UI</title>`,
     centred ? `  <g transform="translate(${round(dx)} ${round(dy)})">` : null,
     shapes(faces, shapeList, centred ? '    ' : '  '),
     centred ? `  </g>` : null,
@@ -369,7 +369,7 @@ function socialCardSvg({ square = false } = {}) {
   so the font stack only has to resolve on the machine running this script.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="${CARD_WIDTH}" height="${height}" viewBox="0 0 ${CARD_WIDTH} ${height}" fill="none">
-  <title>RootNative UI — design-system agnostic components for React Native</title>
+  <title>Root Native UI — design-system agnostic components for React Native</title>
   <defs>
     <linearGradient id="cardBar" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${CARD_WIDTH}" y2="0">
       <stop offset="0" stop-color="${DARK_FACES.top}" />
@@ -397,7 +397,7 @@ function socialCardSvg({ square = false } = {}) {
 ${cardMark}
     </g>
 
-    <text x="110" y="392" font-family="${FONT_STACK}" font-size="90" font-weight="800" letter-spacing="-3" fill="#fafafa">RootNative UI</text>
+    <text x="110" y="392" font-family="${FONT_STACK}" font-size="90" font-weight="800" letter-spacing="-3" fill="#fafafa">Root Native UI</text>
     <text x="110" y="448" font-family="${FONT_STACK}" font-size="34" font-weight="500" fill="#a1a1aa">Design-system agnostic components for React Native</text>
     <text x="110" y="524" font-family="${FONT_STACK}" font-size="26" font-weight="500" letter-spacing="0.4" fill="#71717a">@rootnative/components</text>
   </g>

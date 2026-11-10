@@ -2,8 +2,8 @@
   Single-block reduction for sizes where the gaps between the three blocks fill
   in: favicons, and anything below roughly 24 px.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-label="RootNative UI">
-  <title>RootNative UI</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-label="Root Native UI">
+  <title>Root Native UI</title>
   <g transform="translate(0 0.5)">
     <g>
       <path d="M 32 12.5 L 51 22 L 32 31.5 L 13 22 Z" fill="#60a5fa" />

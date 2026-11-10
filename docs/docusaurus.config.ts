@@ -47,7 +47,7 @@ const config: Config = {
     },
   },
 
-  title: 'RootNative UI',
+  title: 'Root Native UI',
   tagline:
     'Design-system agnostic components for React Native on iOS, Android, and web',
   url: 'https://rootnative.github.io',
@@ -156,9 +156,9 @@ const config: Config = {
     },
     image: 'img/social-card.png',
     navbar: {
-      title: 'RootNative UI',
+      title: 'Root Native UI',
       logo: {
-        alt: 'RootNative UI',
+        alt: 'Root Native UI',
         src: 'img/logo.svg',
         srcDark: 'img/logo-dark.svg',
       },
@@ -227,7 +227,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `© ${new Date().getFullYear()} RootNative · MIT Licensed`,
+      copyright: `© ${new Date().getFullYear()} Root Native · MIT Licensed`,
     },
     prism: {
       additionalLanguages: ['bash'],

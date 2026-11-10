@@ -2,7 +2,7 @@
  * Z-order contract for overlays rendered through `Portal`.
  *
  * Entries in the same host are stacked by ascending `priority`, ties broken by
- * mount order. These constants are the layers RootNative's own overlay
+ * mount order. These constants are the layers Root Native's own overlay
  * components use; consumers can slot custom overlays between them by passing
  * any number (e.g. `PORTAL_LAYERS.dialog + 1`).
  *

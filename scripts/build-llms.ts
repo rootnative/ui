@@ -1142,7 +1142,7 @@ import { Divider } from '@rootnative/components/divider'
 import { Tooltip } from '@rootnative/components/tooltip'
 
 // Plain: hover on web, long press on touch, down again after 1.5s. The anchor
-// must accept \`onLongPress\` (every RootNative pressable does); its own
+// must accept \`onLongPress\` (every Root Native pressable does); its own
 // onLongPress still fires. A press on the anchor hides the tooltip.
 <Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
   Add to favourites
@@ -3040,7 +3040,7 @@ function cliContent(): string {
 
 #### \`rootnative create [name]\`
 
-Create a new project with RootNative UI pre-configured. Fetches the quickstart template, applies your project name to \`package.json\` and \`app.json\`, and optionally installs dependencies.
+Create a new project with Root Native UI pre-configured. Fetches the quickstart template, applies your project name to \`package.json\` and \`app.json\`, and optionally installs dependencies.
 
 \`\`\`bash
 npx rootnative create            # Interactive
@@ -3414,7 +3414,7 @@ ${iconsContent()}`
 }
 
 function generateCliLlms(): string {
-  return `# @rootnative/cli — CLI for RootNative UI
+  return `# @rootnative/cli — CLI for Root Native UI
 
 > Version: ${CLI_VERSION}
 > Binary: \`rootnative\`
@@ -3426,7 +3426,7 @@ ${cliContent()}`
 }
 
 function generateIconsLlms(): string {
-  return `# @rootnative/icons — Icon Library Adapters for RootNative UI
+  return `# @rootnative/icons — Icon Library Adapters for Root Native UI
 
 > Version: ${ICONS_VERSION}
 > Peer deps: @rootnative/core >=${CORE_VERSION}, react ${ICONS_REACT}, react-native ${ICONS_RN}
@@ -3601,7 +3601,7 @@ ${seoApiContent()}
 }
 
 function generateFullLlms(): string {
-  return `# RootNative UI — Full API Reference
+  return `# Root Native UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/seo\` ${SEO_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}

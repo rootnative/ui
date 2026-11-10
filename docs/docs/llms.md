@@ -35,9 +35,9 @@ Prefer these files over the hosted files when you suggest code. They can't drift
 A project from `npx rootnative create` already has a `CLAUDE.md` with this pointer, and `npx rootnative init` offers to add it to an existing project. To set it up by hand, put this into your `CLAUDE.md`, `AGENTS.md`, or `.cursorrules`:
 
 ```markdown
-## RootNative UI docs for AI agents
+## Root Native UI docs for AI agents
 
-This project uses RootNative UI (`@rootnative/*`). LLM-optimized docs:
+This project uses Root Native UI (`@rootnative/*`). LLM-optimized docs:
 
 - `node_modules/@rootnative/components/llms.txt` — all component props for the exact installed version (works offline)
 - `node_modules/@rootnative/core/llms.txt` — theme system API (`ThemeProvider`, `useTheme`, `defineTheme`)

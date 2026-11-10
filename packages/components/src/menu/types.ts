@@ -18,7 +18,7 @@ export interface MenuProps extends ViewProps {
    *
    * When `visible` is omitted the menu manages its own open state, and it needs
    * to hook the trigger's press: pass a single element that accepts `onPress`
-   * (any RootNative pressable does). The element's own `onPress` still fires.
+   * (any Root Native pressable does). The element's own `onPress` still fires.
    */
   anchor: ReactNode
   /** `Menu.Item`s, `Divider`s, or arbitrary content. */

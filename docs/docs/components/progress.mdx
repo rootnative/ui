@@ -21,7 +21,7 @@ Both indicators have two modes:
 ## Linear
 
 <SnackExample
-  name="RootNative LinearProgress — Usage"
+  name="Root Native LinearProgress — Usage"
   code={`
   import { LinearProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -58,7 +58,7 @@ In determinate mode the bar has three parts: the **active indicator** (the fille
 ## Circular
 
 <SnackExample
-  name="RootNative CircularProgress — Usage"
+  name="Root Native CircularProgress — Usage"
   code={`
   import { CircularProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -97,7 +97,7 @@ In determinate mode the bar has three parts: the **active indicator** (the fille
 When the duration of an operation is unknown, omit `progress` to show a continuous animation. `LinearProgress` slides one segment across the track. `CircularProgress` spins an arc of fixed length.
 
 <SnackExample
-  name="RootNative Progress — Indeterminate"
+  name="Root Native Progress — Indeterminate"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -131,7 +131,7 @@ They also stop when the OS reduce-motion setting is on. That's the point of the 
 `LinearProgress` takes `thickness` to set the track height. `CircularProgress` takes both `size` (the outer diameter) and `thickness` (the stroke width), so you can put a small spinner next to text, or a large one as a page-level indicator.
 
 <SnackExample
-  name="RootNative Progress — Sizing"
+  name="Root Native Progress — Sizing"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -166,7 +166,7 @@ They also stop when the OS reduce-motion setting is on. That's the point of the 
 Pass `wavy` to draw the active indicator as a travelling wave, the MD3 Expressive form of both indicators. The inactive track stays flat. The wave is flat below 10% and above 95%, so a nearly empty or nearly full indicator looks like a plain bar. Between those points the wave grows in with a spring.
 
 <SnackExample
-  name="RootNative Progress — Wavy"
+  name="Root Native Progress — Wavy"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'
@@ -223,7 +223,7 @@ The dot is hidden in indeterminate mode, and when `progress` reaches `1`.
 `containerColor` overrides the inactive track, the container of the indicator. `contentColor` overrides the active indicator drawn on it. Both indicators accept the same overrides, and the pair matches every other component in the library.
 
 <SnackExample
-  name="RootNative Progress — Custom colors"
+  name="Root Native Progress — Custom colors"
   code={`
   import { CircularProgress, LinearProgress } from '@rootnative/components'
   import { mdiResolver } from '@rootnative/components/mdi'

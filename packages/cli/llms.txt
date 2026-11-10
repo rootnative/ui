@@ -1,4 +1,4 @@
-# @rootnative/cli — CLI for RootNative UI
+# @rootnative/cli — CLI for Root Native UI
 
 > Version: 0.0.0-alpha.36
 > Binary: `rootnative`
@@ -22,7 +22,7 @@
 
 #### `rootnative create [name]`
 
-Create a new project with RootNative UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
+Create a new project with Root Native UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
 
 ```bash
 npx rootnative create            # Interactive

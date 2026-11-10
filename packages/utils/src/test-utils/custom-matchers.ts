@@ -17,7 +17,7 @@ interface TestElement {
 }
 
 /**
- * Custom Jest matchers for RootNative component testing.
+ * Custom Jest matchers for Root Native component testing.
  *
  * @example
  * // In jest.setup.js:

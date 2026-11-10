@@ -15,7 +15,7 @@ export default function HomeScreen() {
       <Column gap="lg" style={styles.content}>
         <Column gap="sm">
           <Typography variant="headlineMedium">
-            Welcome to RootNative
+            Welcome to Root Native
           </Typography>
           <Typography
             variant="bodyLarge"

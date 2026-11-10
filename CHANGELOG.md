@@ -1645,7 +1645,7 @@ change.
 
 A navigator draws its screen container, and can draw a header, a drawer sheet
 and a tab bar, from its own navigation theme. With no navigation theme, a dark
-RootNative theme showed a light screen behind content that paints no
+Root Native theme showed a light screen behind content that paints no
 background. No docs page said how to connect the two.
 
 The theming page has a new section, "With Expo Router and React Navigation".
@@ -3177,7 +3177,7 @@ held nothing but `babel-preset-expo`. The blank template's entry point is
 `index.ts`.
 
 The icon, adaptive icon, favicon and splash mark in both templates now carry
-the RootNative mark. `scripts/build-brand.mjs` renders them into the template
+the Root Native mark. `scripts/build-brand.mjs` renders them into the template
 asset directories as well as the example app, from one source, so a scaffolded
 project cannot drift from the example it is modelled on.
 
@@ -3580,7 +3580,7 @@ Android audit.
   fixes two animations that never ran (`animate={{ boxShadow }}` under the
   default spring, and any colour key resting at its `'transparent'` default).
 
-  No RootNative API change, and the floor is a correctness floor rather than a
+  No Root Native API change, and the floor is a correctness floor rather than a
   feature one: nothing here animates a colour key or a `boxShadow` through
   `animate`, and every colour this library moves goes through
   `useColorTransition` / `useGestureLayer`, which interpolate rather than

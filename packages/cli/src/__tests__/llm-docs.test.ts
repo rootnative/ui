@@ -36,7 +36,7 @@ describe('ensureLlmDocsPointer', () => {
     expect(result).toBe('appended')
     const content = await fs.readFile(claudeMdPath(), 'utf8')
     expect(content.startsWith(existing)).toBe(true)
-    expect(content).toContain('## RootNative UI docs for AI agents')
+    expect(content).toContain('## Root Native UI docs for AI agents')
   })
 
   it('appends cleanly when the existing file has no trailing newline', async () => {
@@ -46,7 +46,7 @@ describe('ensureLlmDocsPointer', () => {
 
     expect(result).toBe('appended')
     const content = await fs.readFile(claudeMdPath(), 'utf8')
-    expect(content).toContain('# My Project\n\n## RootNative UI docs')
+    expect(content).toContain('# My Project\n\n## Root Native UI docs')
   })
 
   it('does nothing when the pointer is already present', async () => {

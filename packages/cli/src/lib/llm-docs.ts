@@ -6,9 +6,9 @@ const CLAUDE_MD = 'CLAUDE.md'
 // Presence of this path in CLAUDE.md means the pointer is already there
 const POINTER_MARKER = '@rootnative/components/llms.txt'
 
-export const LLM_DOCS_POINTER = `## RootNative UI docs for AI agents
+export const LLM_DOCS_POINTER = `## Root Native UI docs for AI agents
 
-This project uses RootNative UI (\`@rootnative/*\`). LLM-optimized docs:
+This project uses Root Native UI (\`@rootnative/*\`). LLM-optimized docs:
 
 - \`node_modules/@rootnative/components/llms.txt\` — all component props for the exact installed version (works offline)
 - \`node_modules/@rootnative/core/llms.txt\` — theme system API (\`ThemeProvider\`, \`useTheme\`, \`defineTheme\`)
@@ -21,9 +21,9 @@ Prefer the \`node_modules\` copies — they match the installed version exactly.
 export type LlmDocsPointerResult = 'created' | 'appended' | 'already-present'
 
 /**
- * Creates CLAUDE.md with the RootNative LLM-docs pointer, or appends the
+ * Creates CLAUDE.md with the Root Native LLM-docs pointer, or appends the
  * pointer section to an existing CLAUDE.md. No-op when the file already
- * references the RootNative llms.txt docs.
+ * references the Root Native llms.txt docs.
  */
 export async function ensureLlmDocsPointer(
   cwd: string,

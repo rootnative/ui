@@ -5,7 +5,7 @@ import CodeBlock from '@theme/CodeBlock'
 import { useMemo, useState } from 'react'
 
 /**
- * RootNative package versions injected by `docusaurus.config.ts`, read from
+ * Root Native package versions injected by `docusaurus.config.ts`, read from
  * the workspace at build time. Never hardcode them here — a pin in this file
  * boots every live preview on an old release the moment one ships.
  */
@@ -15,7 +15,7 @@ interface SnackVersions {
   inertia: string
 }
 
-/** Versioned outside the RootNative release cycle, so pinned by hand. */
+/** Versioned outside the Root Native release cycle, so pinned by hand. */
 const EXTERNAL_DEPENDENCIES = [
   '@material/material-color-utilities@^0.4.0',
   '@react-native-vector-icons/material-design-icons@^13.1.4',
@@ -65,7 +65,7 @@ interface SnackExampleProps {
 
 export default function SnackExample({
   code,
-  name = 'RootNative UI Example',
+  name = 'Root Native UI Example',
   description,
   dependencies,
   platform,

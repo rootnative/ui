@@ -2,7 +2,7 @@
  * Registry Build Script
  *
  * Scans packages/components/src/ and packages/utils/src/ to auto-generate
- * all registry JSON files for the RootNative CLI.
+ * all registry JSON files for the Root Native CLI.
  *
  * Usage:
  *   npx tsx scripts/build-registry.ts            # regenerate

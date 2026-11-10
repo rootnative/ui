@@ -1,7 +1,7 @@
 {
   "name": "@rootnative/utils",
   "version": "0.0.0-alpha.0",
-  "description": "Shared utilities for RootNative — color helpers, elevation styles, RTL support, and more.",
+  "description": "Shared utilities for Root Native — color helpers, elevation styles, RTL support, and more.",
   "private": true,
   "sideEffects": false,
   "main": "dist/index.mjs",

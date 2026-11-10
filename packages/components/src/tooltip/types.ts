@@ -23,7 +23,7 @@ export interface TooltipProps extends ViewProps {
    * the tree, wrapped in a measuring view that watches for hover.
    *
    * Touch devices open the tooltip on a long press, which needs the anchor to
-   * accept `onLongPress` — every RootNative pressable does. Its own
+   * accept `onLongPress` — every Root Native pressable does. Its own
    * `onLongPress` still fires. On web, react-native-web cancels the click of a
    * mouse press that is held for the long-press delay, so the tooltip adds the
    * long press only on a device with no hover, or to an anchor that has its

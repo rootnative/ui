@@ -1,7 +1,7 @@
 {
   "name": "@rootnative/components",
   "version": "0.0.0-alpha.36",
-  "description": "Material Design 3 UI components for React Native, part of RootNative UI.",
+  "description": "Material Design 3 UI components for React Native, part of Root Native UI.",
   "private": false,
   "type": "module",
   "sideEffects": false,

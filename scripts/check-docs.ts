@@ -472,7 +472,7 @@ function checkComponentProps() {
     )) {
       const tag = match[1]
       const allowed = props.get(tag.replace('.', ''))
-      if (!allowed) continue // not a RootNative component
+      if (!allowed) continue // not a Root Native component
 
       const attributes = tagAttributes(text, match.index + 1 + tag.length)
       if (attributes === null) continue
@@ -491,7 +491,7 @@ function checkComponentProps() {
     }
   }
   notes.push(
-    `component props: ${tags} RootNative tag(s) across ${files.length} docs file(s), ${props.size} props types resolved`,
+    `component props: ${tags} Root Native tag(s) across ${files.length} docs file(s), ${props.size} props types resolved`,
   )
 }
 

@@ -1,4 +1,4 @@
-# @rootnative/icons — Icon Library Adapters for RootNative UI
+# @rootnative/icons — Icon Library Adapters for Root Native UI
 
 > Version: 0.0.0-alpha.36
 > Peer deps: @rootnative/core >=0.0.0-alpha.36, react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0

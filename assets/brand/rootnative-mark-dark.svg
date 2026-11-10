@@ -2,8 +2,8 @@
   Lighter face tones, for the dark navbar and any dark surface where the
   #1d4ed8 shaded face loses contrast.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-label="RootNative UI">
-  <title>RootNative UI</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-label="Root Native UI">
+  <title>Root Native UI</title>
   <g transform="translate(0 4)">
     <g>
       <path d="M 17 25.5 L 30 32 L 17 38.5 L 4 32 Z" fill="#bfdbfe" />

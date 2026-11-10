@@ -14,12 +14,12 @@ const program = new Command()
 
 program
   .name('rootnative')
-  .description('Add RootNative UI components to your React Native project')
+  .description('Add Root Native UI components to your React Native project')
   .version(getCliVersion())
 
 program
   .command('create')
-  .description('Create a new project with RootNative UI pre-configured')
+  .description('Create a new project with Root Native UI pre-configured')
   .argument('[name]', 'Project name, or "." to use the current directory')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('-t, --template <name>', 'Template to use (blank, with-router)')
@@ -44,7 +44,7 @@ program
 
 program
   .command('init')
-  .description('Initialize your project for RootNative UI')
+  .description('Initialize your project for Root Native UI')
   .option('-y, --yes', 'Skip prompts and use defaults', false)
   .option('--components-alias <alias>', 'Components install path alias')
   .option('--lib-alias <alias>', 'Utility files path alias')

@@ -1,4 +1,4 @@
-# RootNative UI — Full API Reference
+# Root Native UI — Full API Reference
 
 > Design-system agnostic component library for React Native — ships with Material Design 3
 > Versions: `@rootnative/core` 0.0.0-alpha.36 · `@rootnative/components` 0.0.0-alpha.36 · `@rootnative/icons` 0.0.0-alpha.36 · `@rootnative/seo` 0.0.0-alpha.36 · `@rootnative/cli` 0.0.0-alpha.36
@@ -257,7 +257,7 @@ tested host.
 
 #### `rootnative create [name]`
 
-Create a new project with RootNative UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
+Create a new project with Root Native UI pre-configured. Fetches the quickstart template, applies your project name to `package.json` and `app.json`, and optionally installs dependencies.
 
 ```bash
 npx rootnative create            # Interactive
@@ -1832,7 +1832,7 @@ Teleports its children into a host overlay layer. Renders nothing inline. With n
 Props:
 - `children: ReactNode` — Content teleported into the host's overlay layer.
 - `hostName?: string` — Default: `'default'`. Name of the host to render into. Falls back to the default host when no host with this name is mounted.
-- `priority?: number` — Default: `0`. Stack order within the host — higher renders above lower, ties broken by mount order. Use the `PORTAL_LAYERS` constants for the layers RootNative itself defines.
+- `priority?: number` — Default: `0`. Stack order within the host — higher renders above lower, ties broken by mount order. Use the `PORTAL_LAYERS` constants for the layers Root Native itself defines.
 
 #### PortalHost
 
@@ -2192,7 +2192,7 @@ import { Divider } from '@rootnative/components/divider'
 ```
 
 Props:
-- `anchor: ReactNode` — The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a measuring `View`. When `visible` is omitted the menu manages its own open state, and it needs to hook the trigger's press: pass a single element that accepts `onPress` (any RootNative pressable does). The element's own `onPress` still fires.
+- `anchor: ReactNode` — The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a measuring `View`. When `visible` is omitted the menu manages its own open state, and it needs to hook the trigger's press: pass a single element that accepts `onPress` (any Root Native pressable does). The element's own `onPress` still fires.
 - `children?: ReactNode` — `Menu.Item`s, `Divider`s, or arbitrary content.
 - `visible?: boolean` — Controlled visibility. Omit to let the menu open itself on an anchor press and close itself on an outside press, an item press, or Android back.
 - `onDismiss?: () => void` — Called when the menu closes — outside press, item press, or Android back. Required to close a controlled menu; optional otherwise.
@@ -2235,7 +2235,7 @@ Props:
 import { Tooltip } from '@rootnative/components/tooltip'
 
 // Plain: hover on web, long press on touch, down again after 1.5s. The anchor
-// must accept `onLongPress` (every RootNative pressable does); its own
+// must accept `onLongPress` (every Root Native pressable does); its own
 // onLongPress still fires. A press on the anchor hides the tooltip.
 <Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
   Add to favourites
@@ -2266,7 +2266,7 @@ import { Tooltip } from '@rootnative/components/tooltip'
 ```
 
 Props:
-- `anchor: ReactNode` — The control the tooltip describes. Rendered where the `<Tooltip>` sits in the tree, wrapped in a measuring view that watches for hover. Touch devices open the tooltip on a long press, which needs the anchor to accept `onLongPress` — every RootNative pressable does. Its own `onLongPress` still fires. On web, react-native-web cancels the click of a mouse press that is held for the long-press delay, so the tooltip adds the long press only on a device with no hover, or to an anchor that has its own `onLongPress`.
+- `anchor: ReactNode` — The control the tooltip describes. Rendered where the `<Tooltip>` sits in the tree, wrapped in a measuring view that watches for hover. Touch devices open the tooltip on a long press, which needs the anchor to accept `onLongPress` — every Root Native pressable does. Its own `onLongPress` still fires. On web, react-native-web cancels the click of a mouse press that is held for the long-press delay, so the tooltip adds the long press only on a device with no hover, or to an anchor that has its own `onLongPress`.
 - `children?: ReactNode` — Supporting text, or arbitrary nodes when a plain string isn't enough. Strings and numbers, also text with `{expressions}`, are wrapped in the variant's supporting-text styling. Text beside an element needs its own `Text`.
 - `variant?: 'plain' | 'rich'` — Default: `'plain'`. Tooltip anatomy.
 - `subhead?: string` — Subhead above the supporting text. Rich tooltips only.

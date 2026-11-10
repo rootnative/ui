@@ -207,7 +207,7 @@ export function Tooltip({
   // anchor's own press handling. Focus comes from the anchor too: on web a
   // Pressable reports only its own focus, not one that bubbles up from a
   // child, so the wrapper never sees the anchor take a Tab stop. Hover is
-  // caught on the wrapper below, because every RootNative pressable drives
+  // caught on the wrapper below, because every Root Native pressable drives
   // its state layer from `onHoverIn` / `onHoverOut` and would overwrite an
   // injected pair.
   // The description is pointed at only while the tooltip is mounted — an

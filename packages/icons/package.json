@@ -1,7 +1,7 @@
 {
   "name": "@rootnative/icons",
   "version": "0.0.0-alpha.36",
-  "description": "Icon library adapters for RootNative — Lucide, Phosphor, and vector-icons resolvers with MDI-name compatibility.",
+  "description": "Icon library adapters for Root Native — Lucide, Phosphor, and vector-icons resolvers with MDI-name compatibility.",
   "private": false,
   "sideEffects": false,
   "main": "dist/index.mjs",

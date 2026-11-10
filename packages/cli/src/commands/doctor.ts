@@ -27,7 +27,7 @@ function logCheck(status: Status, message: string): void {
  * a peer, but the barrel `dist/index.js` has an unconditional top-level
  * `require` for it (from `CircularProgress` and `LoadingIndicator`), so any
  * import from `@rootnative/components` fails to resolve without it. The bundler
- * reports it against an Expo-internal path, which names neither RootNative nor
+ * reports it against an Expo-internal path, which names neither Root Native nor
  * the fix — so a new user has nothing to go on.
  */
 const REQUIRED_BARREL_PEERS = [
@@ -40,7 +40,7 @@ const REQUIRED_BARREL_PEERS = [
 
 export async function doctorCommand(cwd: string): Promise<void> {
   logger.break()
-  console.log(chalk.bold('RootNative Doctor'))
+  console.log(chalk.bold('Root Native Doctor'))
   logger.break()
 
   let issues = 0
@@ -121,7 +121,7 @@ export async function doctorCommand(cwd: string): Promise<void> {
   } else {
     logCheck(
       'warn',
-      'TypeScript not detected. RootNative components use TypeScript.',
+      'TypeScript not detected. Root Native components use TypeScript.',
     )
   }
 
@@ -215,7 +215,7 @@ export async function doctorCommand(cwd: string): Promise<void> {
 
   // 9. Check peers the components barrel requires at load time. A missing one
   // is a hard bundling failure, and the bundler's own message points at an
-  // Expo-internal path rather than at RootNative.
+  // Expo-internal path rather than at Root Native.
   for (const peer of REQUIRED_BARREL_PEERS) {
     if (await fs.pathExists(path.join(nodeModules, peer.name))) {
       logCheck('pass', `${peer.name} installed`)

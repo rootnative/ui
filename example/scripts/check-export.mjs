@@ -57,15 +57,15 @@ const SITE_URL = 'https://rootnative.github.io/ui/demo'
 const pages = [
   {
     file: 'index.html',
-    title: 'RootNative UI',
+    title: 'Root Native UI',
     canonical: `${SITE_URL}/`,
     h1: 'Home',
-    h2: 'RootNative UI',
+    h2: 'Root Native UI',
     jsonLdType: 'WebSite',
   },
   {
     file: 'button.html',
-    title: 'Button | RootNative UI',
+    title: 'Button | Root Native UI',
     canonical: `${SITE_URL}/button`,
     h1: 'Button',
     h2: 'Button',
@@ -75,7 +75,7 @@ const pages = [
   // `generateStaticParams`. The bar names the parent segment.
   {
     file: 'showcase/settings-screen.html',
-    title: 'Settings screen | RootNative UI',
+    title: 'Settings screen | Root Native UI',
     canonical: `${SITE_URL}/showcase/settings-screen`,
     h1: 'Showcase',
     h2: 'Settings screen',
@@ -85,7 +85,7 @@ const pages = [
   // label, the same in both languages.
   {
     file: 'de/i18n.html',
-    title: 'Eine Seite in zwei Sprachen | RootNative UI',
+    title: 'Eine Seite in zwei Sprachen | Root Native UI',
     canonical: `${SITE_URL}/de/i18n`,
     h1: 'i18n',
     h2: 'Eine Seite in zwei Sprachen',
@@ -171,7 +171,7 @@ const notFound = resolve(pagesDir, '+not-found.html')
 if (existsSync(notFound)) {
   const html = readFileSync(notFound, 'utf8')
   const title = decode(html.match(/<title[^>]*>([^<]*)<\/title>/)?.[1] ?? '')
-  if (title !== 'Page not found | RootNative UI') {
+  if (title !== 'Page not found | Root Native UI') {
     problems.push(`+not-found.html: title is "${title}"`)
   }
   if (count(html, /<meta[^>]*name="robots"[^>]*content="noindex"/g) !== 1) {

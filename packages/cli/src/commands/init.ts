@@ -61,7 +61,7 @@ export async function initCommand(
 
   if (!project.hasTypeScript) {
     logger.warn(
-      'TypeScript not detected. RootNative components use TypeScript.',
+      'TypeScript not detected. Root Native components use TypeScript.',
     )
   }
 
@@ -175,7 +175,7 @@ export async function initCommand(
     const answer = await prompts({
       type: 'confirm',
       name: 'addLlmDocs',
-      message: 'Add RootNative LLM docs pointer to CLAUDE.md (for AI agents)?',
+      message: 'Add Root Native LLM docs pointer to CLAUDE.md (for AI agents)?',
       initial: true,
     })
     addLlmDocs = answer.addLlmDocs
@@ -188,7 +188,7 @@ export async function initCommand(
     } else if (result === 'appended') {
       logger.success('Added LLM docs pointer to CLAUDE.md')
     } else {
-      logger.info('CLAUDE.md already points to the RootNative LLM docs')
+      logger.info('CLAUDE.md already points to the Root Native LLM docs')
     }
   }
 

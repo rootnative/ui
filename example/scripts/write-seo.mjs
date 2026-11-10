@@ -36,7 +36,7 @@ if (!existsSync(dist)) {
 // The site of `src/site.ts`. This script does not import that file: the
 // example package has no `"type": "module"`, so Node warns on the import.
 const site = defineSite({
-  name: 'RootNative UI',
+  name: 'Root Native UI',
   url: 'https://rootnative.github.io/ui/demo',
   locale: 'en_US',
 })
@@ -91,8 +91,8 @@ if (existsSync(resolve(dist, 'server', '_expo', 'routes.json'))) {
 const { sitemap, urls } = await writeSeoFiles({ outDir: dist, robots: false })
 const manifest = await writeManifest({
   outDir: dirname(sitemap),
-  name: 'RootNative UI',
-  shortName: 'RootNative',
+  name: 'Root Native UI',
+  shortName: 'Root Native',
   description: 'Material Design 3 components for React Native, in the browser.',
   themeColor: '#2563eb',
   backgroundColor: '#ffffff',
