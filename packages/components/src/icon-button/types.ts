@@ -25,9 +25,9 @@ export type IconButtonWidth = 'narrow' | 'uniform' | 'wide'
 
 /**
  * Container shape. `'round'` rests as a pill/circle; `'square'` rests at a
- * size-dependent rounded corner. Both morph squarer on press. For toggle
- * buttons the selected state inverts the shape (round → squarer, square →
- * pill) per MD3 Expressive.
+ * `theme.shape` corner that depends on the size. Both morph squarer on
+ * press. For toggle buttons the selected state inverts the shape (round →
+ * squarer, square → pill) per MD3 Expressive.
  */
 export type IconButtonShape = 'round' | 'square'
 
@@ -112,8 +112,10 @@ export interface IconButtonProps extends Omit<
    */
   width?: IconButtonWidth
   /**
-   * Container shape. `'round'` is a pill/circle; `'square'` rests at a
-   * size-dependent corner. Toggle buttons invert the shape when selected.
+   * Container shape. `'round'` is a pill/circle; `'square'` rests at the
+   * theme corner of the size: `cornerMedium` at `extraSmall` and `small`,
+   * `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and
+   * `extraLarge`. Toggle buttons invert the shape when selected.
    * @default 'round'
    */
   shape?: IconButtonShape

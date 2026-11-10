@@ -200,9 +200,15 @@ export function IconButton({
   // to signal its state. Rest radii come from the size/width/shape tokens
   // for both the unselected and selected states; the selected progress
   // interpolates between them and the press morph squashes on top.
-  const unselectedRest = getIconButtonMorphRadii(size, shape, width, false).rest
+  const unselectedRest = getIconButtonMorphRadii(
+    theme,
+    size,
+    shape,
+    width,
+    false,
+  ).rest
   const { rest: selectedRest, pressed: pressedRadius } =
-    getIconButtonMorphRadii(size, shape, width, true)
+    getIconButtonMorphRadii(theme, size, shape, width, true)
   const morph = usePressMorph({
     rest: unselectedRest,
     pressed: pressedRadius,

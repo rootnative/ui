@@ -1,3 +1,4 @@
+import { lightTheme } from '@rootnative/core'
 import {
   getStyle,
   renderSettled,
@@ -157,7 +158,7 @@ describe('a control that becomes disabled during a press', () => {
   )
 
   it('Button: puts the pressed corner back to rest', () => {
-    const { rest } = getButtonMorphRadii('small', 'round')
+    const { rest } = getButtonMorphRadii(lightTheme, 'small', 'round')
     const { rerender } = renderSettled(
       <Button testID="target" size="small">
         Next

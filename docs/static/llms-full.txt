@@ -898,7 +898,7 @@ Props:
 - `children: string` — Text label rendered inside the button.
 - `variant?: 'filled' | 'elevated' | 'outlined' | 'text' | 'tonal'` — Default: `'filled'`. Visual variant. Controls background, border, and text color.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height, padding, icon size, and label typography.
-- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at a size-dependent rounded corner. Both morph squarer on press. A selected toggle inverts the shape.
+- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a full pill; `'square'` rests at the theme corner of the size: `cornerMedium` at `extraSmall` and `small`, `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and `extraLarge`. Both morph squarer on press. A selected toggle inverts the shape.
 - `selected?: boolean` — Makes the button a toggle and controls it. A selected toggle takes the MD3 selected colors of its variant and inverts its shape. Pair it with `onSelectedChange`, or use `defaultSelected` for an uncontrolled toggle. MD3 has no `'text'` toggle, so a text button ignores the toggle props and warns in development.
 - `defaultSelected?: boolean` — Makes the button a toggle without controlling it: the button flips its own state on press and reports it through `onSelectedChange`.
 - `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a toggle button is pressed.
@@ -1010,7 +1010,7 @@ Props:
 - `onSelectedChange?: (selected: boolean) => void` — Called with the next state when a toggle button is pressed.
 - `size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'` — Default: `'small'`. MD3 Expressive size — one of `'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge'`. Sets container height and icon size.
 - `width?: 'narrow' | 'uniform' | 'wide'` — Default: `'uniform'`. Width variant. `'uniform'` is a square container; `'narrow'`/`'wide'` adjust horizontal padding around the icon.
-- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at a size-dependent corner. Toggle buttons invert the shape when selected.
+- `shape?: 'round' | 'square'` — Default: `'round'`. Container shape. `'round'` is a pill/circle; `'square'` rests at the theme corner of the size: `cornerMedium` at `extraSmall` and `small`, `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and `extraLarge`. Toggle buttons invert the shape when selected.
 - `accessibilityLabel: string` — Required — icon-only buttons must have a label for screen readers.
 - Inherits `PressableProps` (except `children`, `onPress`, `style`, `accessibilityLabel`)
 

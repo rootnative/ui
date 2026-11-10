@@ -44,9 +44,9 @@ export type ButtonSize =
 
 /**
  * MD3 Expressive container shape. `'round'` rests as a full pill; `'square'`
- * rests at a size-dependent rounded-rectangle corner. Both morph one step
- * squarer on press. A selected toggle inverts the shape: `'round'` turns
- * square and `'square'` turns round.
+ * rests at a `theme.shape` corner that depends on the size. Both morph one
+ * step squarer on press. A selected toggle inverts the shape: `'round'`
+ * turns square and `'square'` turns round.
  */
 export type ButtonShape = 'round' | 'square'
 
@@ -69,9 +69,11 @@ export interface ButtonProps extends Omit<
    */
   size?: ButtonSize
   /**
-   * Container shape. `'round'` is a full pill; `'square'` rests at a
-   * size-dependent rounded corner. Both morph squarer on press. A selected
-   * toggle inverts the shape.
+   * Container shape. `'round'` is a full pill; `'square'` rests at the
+   * theme corner of the size: `cornerMedium` at `extraSmall` and `small`,
+   * `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and
+   * `extraLarge`. Both morph squarer on press. A selected toggle inverts the
+   * shape.
    * @default 'round'
    */
   shape?: ButtonShape

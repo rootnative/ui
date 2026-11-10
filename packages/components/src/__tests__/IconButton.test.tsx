@@ -1,6 +1,6 @@
-import { lightTheme } from '@rootnative/core'
+import { applyRoundness, lightTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
 import { IconButton } from '../icon-button/IconButton'
@@ -306,6 +306,66 @@ describe('IconButton', () => {
         expect(flat.height).toBe(56)
         unmount()
       }
+    })
+  })
+
+  describe('reads the corners from the theme', () => {
+    // cornerSmall 4, cornerMedium 6, cornerLarge 8, cornerExtraLarge 14.
+    const theme = { ...lightTheme, shape: applyRoundness(0.5) }
+    const radius = () =>
+      StyleSheet.flatten(screen.getByRole('button').props.style).borderRadius
+
+    it.each<[IconButtonSize, number]>([
+      ['extraSmall', 6],
+      ['small', 6],
+      ['medium', 8],
+      ['large', 14],
+      ['extraLarge', 14],
+    ])('square %s rests at %i', (size, expected) => {
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          accessibilityLabel="X"
+          size={size}
+          shape="square"
+        />,
+        { theme },
+      )
+      expect(radius()).toBe(expected)
+    })
+
+    it('a selected round toggle rests at the theme corner', () => {
+      renderWithTheme(
+        <IconButton icon="heart" accessibilityLabel="X" selected />,
+        { theme },
+      )
+      expect(radius()).toBe(6)
+    })
+
+    it('a press squashes toward the theme corner', () => {
+      const { flush } = renderSettled(
+        <IconButton icon="heart" accessibilityLabel="X" shape="square" />,
+        { theme },
+      )
+      fireEvent(screen.getByRole('button'), 'pressIn')
+      flush()
+      expect(radius()).toBe(4)
+    })
+
+    it('a theme corner above the pill radius stops at the pill', () => {
+      // cornerMedium 36, on a 28dp wide button.
+      const rounder = { ...lightTheme, shape: applyRoundness(3) }
+      renderWithTheme(
+        <IconButton
+          icon="heart"
+          accessibilityLabel="X"
+          size="extraSmall"
+          width="narrow"
+          shape="square"
+        />,
+        { theme: rounder },
+      )
+      expect(radius()).toBe(14)
     })
   })
 

@@ -15,6 +15,8 @@ export const BUTTON_FOCUS_RING_WIDTH = 3
  */
 export const BUTTON_LOADING_STROKE_RATIO = 0.1
 
+type ShapeCorner = Exclude<keyof MaterialTheme['shape'], 'roundness'>
+
 /**
  * Per-size Expressive geometry (androidx `Button<Size>Tokens.kt`). `height`,
  * `iconSize`, and `paddingVertical` are absolute dp; `padding` is the base
@@ -22,9 +24,10 @@ export const BUTTON_LOADING_STROKE_RATIO = 0.1
  * (icon-bearing sizes step down to the icon-adjacent role where the spec
  * uses the emphasized/label form — here we keep one role per size, matching
  * Compose's `textStyleFor(height)`); `outlineWidth` is the outlined-variant
- * border. `squareCorner` is the resting corner of the `'square'` shape;
- * `pressedCorner` is the morph target both shapes squash toward on press.
- * `'round'` always rests as a pill (radius = height / 2).
+ * border. `squareCorner` names the `theme.shape` token of the resting corner
+ * of the `'square'` shape; `pressedCorner` names the token of the morph
+ * target both shapes squash toward on press. `'round'` always rests as a
+ * pill (radius = height / 2).
  */
 export interface ButtonSizeTokens {
   height: number
@@ -33,8 +36,8 @@ export interface ButtonSizeTokens {
   paddingVertical: number
   labelRole: keyof MaterialTheme['typography']
   outlineWidth: number
-  squareCorner: number
-  pressedCorner: number
+  squareCorner: ShapeCorner
+  pressedCorner: ShapeCorner
 }
 
 const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
@@ -45,8 +48,8 @@ const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
     paddingVertical: 6,
     labelRole: 'labelLarge',
     outlineWidth: 1,
-    squareCorner: 12,
-    pressedCorner: 8,
+    squareCorner: 'cornerMedium',
+    pressedCorner: 'cornerSmall',
   },
   small: {
     height: 40,
@@ -55,8 +58,8 @@ const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
     paddingVertical: 10,
     labelRole: 'labelLarge',
     outlineWidth: 1,
-    squareCorner: 12,
-    pressedCorner: 8,
+    squareCorner: 'cornerMedium',
+    pressedCorner: 'cornerSmall',
   },
   medium: {
     height: 56,
@@ -65,8 +68,8 @@ const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
     paddingVertical: 16,
     labelRole: 'titleMedium',
     outlineWidth: 1,
-    squareCorner: 16,
-    pressedCorner: 12,
+    squareCorner: 'cornerLarge',
+    pressedCorner: 'cornerMedium',
   },
   large: {
     height: 96,
@@ -75,8 +78,8 @@ const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
     paddingVertical: 32,
     labelRole: 'headlineSmall',
     outlineWidth: 2,
-    squareCorner: 28,
-    pressedCorner: 16,
+    squareCorner: 'cornerExtraLarge',
+    pressedCorner: 'cornerLarge',
   },
   extraLarge: {
     height: 136,
@@ -85,8 +88,8 @@ const BUTTON_SIZE_TOKENS: Record<ExpressiveSize, ButtonSizeTokens> = {
     paddingVertical: 48,
     labelRole: 'headlineLarge',
     outlineWidth: 3,
-    squareCorner: 28,
-    pressedCorner: 16,
+    squareCorner: 'cornerExtraLarge',
+    pressedCorner: 'cornerLarge',
   },
 }
 
@@ -98,20 +101,24 @@ export function getButtonSizeTokens(size: ExpressiveSize): ButtonSizeTokens {
  * Resting and pressed corner radii for the shape morph, in dp. `'round'`
  * rests as a pill (half the container height — never the `cornerFull`
  * sentinel 999, which would park the morph in the clamped range); `'square'`
- * rests at the size's `squareCorner`. A selected toggle inverts the shape
- * (Compose `ToggleButtonDefaults.shapesFor`). Both morph toward
- * `pressedCorner`.
+ * rests at the theme corner that `squareCorner` names. A selected toggle
+ * inverts the shape (Compose `ToggleButtonDefaults.shapesFor`). Both morph
+ * toward the `pressedCorner` corner. A theme corner above the pill radius
+ * stops at the pill, for the same reason.
  */
 export function getButtonMorphRadii(
+  theme: MaterialTheme,
   size: ExpressiveSize,
   shape: ButtonShape,
   selected = false,
 ): { rest: number; pressed: number } {
   const tokens = BUTTON_SIZE_TOKENS[size]
+  const pill = tokens.height / 2
+  const corner = (token: ShapeCorner) => Math.min(theme.shape[token], pill)
   const restsRound = (shape === 'round') !== selected
   return {
-    rest: restsRound ? tokens.height / 2 : tokens.squareCorner,
-    pressed: tokens.pressedCorner,
+    rest: restsRound ? pill : corner(tokens.squareCorner),
+    pressed: corner(tokens.pressedCorner),
   }
 }
 
@@ -354,7 +361,7 @@ export function createStyles(
   )
   const sizeTokens = getButtonSizeTokens(size)
   const labelStyle: TypographyToken = theme.typography[sizeTokens.labelRole]
-  const restCorner = getButtonMorphRadii(size, shape, selected).rest
+  const restCorner = getButtonMorphRadii(theme, size, shape, selected).rest
   const padding = getHorizontalPadding(
     theme,
     variant,

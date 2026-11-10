@@ -12,14 +12,17 @@ import type {
 export const ICON_BUTTON_FOCUS_RING_OFFSET = 2
 export const ICON_BUTTON_FOCUS_RING_WIDTH = 3
 
+type ShapeCorner = Exclude<keyof MaterialTheme['shape'], 'roundness'>
+
 /**
  * Per-size Expressive geometry (androidx `*IconButtonTokens.kt`). `height`
  * is the container height (and the `uniform` width); `narrow`/`wide` are the
  * alternate container widths; `iconSize` is the glyph size; `outlineWidth`
- * is the outlined-variant border. `squareCorner` is the resting corner of
- * the `'square'` shape, `pressedCorner` the press morph target, and
- * `selectedCorner` the resting corner a *round* toggle adopts when selected
- * (the square selected state inverts to a pill — handled in the component).
+ * is the outlined-variant border. The three corners name a `theme.shape`
+ * token: `squareCorner` is the resting corner of the `'square'` shape,
+ * `pressedCorner` the press morph target, and `selectedCorner` the resting
+ * corner a *round* toggle adopts when selected (the square selected state
+ * inverts to a pill — handled in the component).
  */
 export interface IconButtonSizeTokens {
   height: number
@@ -28,9 +31,9 @@ export interface IconButtonSizeTokens {
   wide: number
   iconSize: number
   outlineWidth: number
-  squareCorner: number
-  pressedCorner: number
-  selectedCorner: number
+  squareCorner: ShapeCorner
+  pressedCorner: ShapeCorner
+  selectedCorner: ShapeCorner
 }
 
 const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
@@ -41,9 +44,9 @@ const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
     wide: 40,
     iconSize: 20,
     outlineWidth: 1,
-    squareCorner: 12,
-    pressedCorner: 8,
-    selectedCorner: 12,
+    squareCorner: 'cornerMedium',
+    pressedCorner: 'cornerSmall',
+    selectedCorner: 'cornerMedium',
   },
   small: {
     height: 40,
@@ -52,9 +55,9 @@ const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
     wide: 52,
     iconSize: 24,
     outlineWidth: 1,
-    squareCorner: 12,
-    pressedCorner: 8,
-    selectedCorner: 12,
+    squareCorner: 'cornerMedium',
+    pressedCorner: 'cornerSmall',
+    selectedCorner: 'cornerMedium',
   },
   medium: {
     height: 56,
@@ -63,9 +66,9 @@ const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
     wide: 72,
     iconSize: 24,
     outlineWidth: 1,
-    squareCorner: 16,
-    pressedCorner: 12,
-    selectedCorner: 16,
+    squareCorner: 'cornerLarge',
+    pressedCorner: 'cornerMedium',
+    selectedCorner: 'cornerLarge',
   },
   large: {
     height: 96,
@@ -74,9 +77,9 @@ const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
     wide: 128,
     iconSize: 32,
     outlineWidth: 2,
-    squareCorner: 28,
-    pressedCorner: 16,
-    selectedCorner: 28,
+    squareCorner: 'cornerExtraLarge',
+    pressedCorner: 'cornerLarge',
+    selectedCorner: 'cornerExtraLarge',
   },
   extraLarge: {
     height: 136,
@@ -85,9 +88,9 @@ const ICON_BUTTON_SIZE_TOKENS: Record<ExpressiveSize, IconButtonSizeTokens> = {
     wide: 184,
     iconSize: 40,
     outlineWidth: 3,
-    squareCorner: 28,
-    pressedCorner: 16,
-    selectedCorner: 28,
+    squareCorner: 'cornerExtraLarge',
+    pressedCorner: 'cornerLarge',
+    selectedCorner: 'cornerExtraLarge',
   },
 }
 
@@ -107,11 +110,15 @@ export function getIconButtonWidth(
 /**
  * Resting and pressed corner radii for the shape morph, in dp, accounting
  * for the toggle-selected shape inversion. `'round'` rests as a pill
- * (min(height,width)/2) unless selected, when it adopts the size's
- * `selectedCorner` (squarer). `'square'` rests at `squareCorner` unless
- * selected, when it inverts to a pill. Both morph toward `pressedCorner`.
+ * (min(height,width)/2) unless selected, when it adopts the theme corner
+ * that `selectedCorner` names (squarer). `'square'` rests at the
+ * `squareCorner` corner unless selected, when it inverts to a pill. Both
+ * morph toward the `pressedCorner` corner. A theme corner above the pill
+ * radius stops at the pill, so the morph never runs in the range that the
+ * renderer clamps.
  */
 export function getIconButtonMorphRadii(
+  theme: MaterialTheme,
   size: ExpressiveSize,
   shape: IconButtonShape,
   width: IconButtonWidth,
@@ -119,13 +126,14 @@ export function getIconButtonMorphRadii(
 ): { rest: number; pressed: number } {
   const tokens = ICON_BUTTON_SIZE_TOKENS[size]
   const pill = Math.min(tokens.height, tokens[width]) / 2
+  const corner = (token: ShapeCorner) => Math.min(theme.shape[token], pill)
   let rest: number
   if (shape === 'round') {
-    rest = selected ? tokens.selectedCorner : pill
+    rest = selected ? corner(tokens.selectedCorner) : pill
   } else {
-    rest = selected ? pill : tokens.squareCorner
+    rest = selected ? pill : corner(tokens.squareCorner)
   }
-  return { rest, pressed: tokens.pressedCorner }
+  return { rest, pressed: corner(tokens.pressedCorner) }
 }
 
 export interface IconButtonColors {

@@ -1,4 +1,4 @@
-import { lightTheme } from '@rootnative/core'
+import { applyRoundness, lightTheme } from '@rootnative/core'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { screen, fireEvent, userEvent } from '@testing-library/react-native'
 import { StyleSheet, Text } from 'react-native'
@@ -287,6 +287,53 @@ describe('Button', () => {
         screen.getByRole('button').props.style,
       )
       expect(flatStyle.borderRadius).toBe(16)
+    })
+
+    describe('reads the corners from the theme', () => {
+      // cornerSmall 4, cornerMedium 6, cornerLarge 8, cornerExtraLarge 14.
+      const theme = { ...lightTheme, shape: applyRoundness(0.5) }
+      const radius = () =>
+        StyleSheet.flatten(screen.getByRole('button').props.style).borderRadius
+
+      it.each<[ButtonSize, number]>([
+        ['extraSmall', 6],
+        ['small', 6],
+        ['medium', 8],
+        ['large', 14],
+        ['extraLarge', 14],
+      ])('square %s rests at %i', (size, expected) => {
+        renderWithTheme(
+          <Button size={size} shape="square">
+            Square
+          </Button>,
+          { theme },
+        )
+        expect(radius()).toBe(expected)
+      })
+
+      it('a press squashes toward the theme corner', () => {
+        const { flush } = renderSettled(
+          <Button size="small" shape="square">
+            Square
+          </Button>,
+          { theme },
+        )
+        fireEvent(screen.getByRole('button'), 'pressIn')
+        flush()
+        expect(radius()).toBe(4)
+      })
+
+      it('a theme corner above the pill radius stops at the pill', () => {
+        // cornerMedium 36, on a 40dp button.
+        const rounder = { ...lightTheme, shape: applyRoundness(3) }
+        renderWithTheme(
+          <Button size="small" shape="square">
+            Square
+          </Button>,
+          { theme: rounder },
+        )
+        expect(radius()).toBe(20)
+      })
     })
   })
 

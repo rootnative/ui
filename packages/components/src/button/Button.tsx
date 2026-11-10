@@ -155,8 +155,9 @@ export function Button({
   // stays on 'state-press'). A selected toggle inverts the rest shape (pill
   // for `round`, size corner for `square`), and a press squashes toward the
   // size's pressed corner on top of it.
-  const unselectedRadius = getButtonMorphRadii(size, shape, false).rest
+  const unselectedRadius = getButtonMorphRadii(theme, size, shape, false).rest
   const { rest: selectedRadius, pressed: pressedRadius } = getButtonMorphRadii(
+    theme,
     size,
     shape,
     true,
