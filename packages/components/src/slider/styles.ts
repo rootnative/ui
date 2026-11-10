@@ -153,6 +153,15 @@ export function createStyles(
     pressableWrapper: {
       flex: 1,
     },
+    // The screen reader and keyboard target of one thumb in range mode: a
+    // 48dp square around the thumb, so a screen reader frames the thumb and
+    // not the whole track. It draws nothing.
+    thumbControl: {
+      position: 'absolute',
+      top: 0,
+      width: SLIDER_TOUCH_HEIGHT,
+      height: SLIDER_TOUCH_HEIGHT,
+    },
     stopIndicator: {
       position: 'absolute',
       width: SLIDER_STOP_INDICATOR,

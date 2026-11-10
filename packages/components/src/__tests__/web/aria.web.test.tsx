@@ -201,6 +201,26 @@ describe('aria-value* reaches the DOM', () => {
     expect(aria('slider', 'aria-valuemax')).toBe('100')
   })
 
+  it('Slider — range, one slider per thumb', () => {
+    renderWeb(
+      <Slider
+        accessibilityLabel="Runtime"
+        value={[90, 120]}
+        minimumValue={60}
+        maximumValue={180}
+      />,
+    )
+    expect(screen.getAllByRole('slider')).toHaveLength(2)
+    expect(aria('slider', 'aria-label', { index: 0 })).toBe('Runtime, Minimum')
+    expect(aria('slider', 'aria-valuenow', { index: 0 })).toBe('90')
+    expect(aria('slider', 'aria-valuemin', { index: 0 })).toBe('60')
+    expect(aria('slider', 'aria-valuemax', { index: 0 })).toBe('120')
+    expect(aria('slider', 'aria-label', { index: 1 })).toBe('Runtime, Maximum')
+    expect(aria('slider', 'aria-valuenow', { index: 1 })).toBe('120')
+    expect(aria('slider', 'aria-valuemin', { index: 1 })).toBe('90')
+    expect(aria('slider', 'aria-valuemax', { index: 1 })).toBe('180')
+  })
+
   it('LinearProgress — determinate', () => {
     renderWeb(<LinearProgress progress={0.25} />)
     expect(aria('progressbar', 'aria-valuenow')).toBe('25')
@@ -271,6 +291,12 @@ describe('aria-disabled reaches the DOM', () => {
   it('Slider', () => {
     renderWeb(<Slider value={10} disabled />)
     expect(aria('slider', 'aria-disabled')).toBe('true')
+  })
+
+  it('Slider — range, on each thumb', () => {
+    renderWeb(<Slider value={[10, 20]} disabled />)
+    expect(aria('slider', 'aria-disabled', { index: 0 })).toBe('true')
+    expect(aria('slider', 'aria-disabled', { index: 1 })).toBe('true')
   })
 
   it('TextField — the input itself, not a wrapper', () => {

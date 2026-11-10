@@ -32,6 +32,7 @@ import { PortalHost } from '../../portal/PortalHost'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
 import { SearchView } from '../../search-view'
+import { Slider } from '../../slider'
 import { Switch } from '../../switch'
 import { TextField } from '../../text-field'
 import { Tooltip } from '../../tooltip'
@@ -432,6 +433,67 @@ describe('TextField tab order', () => {
     )
     expect(stops).toHaveLength(0)
     expect(screen.getAllByRole('textbox')).toHaveLength(2)
+  })
+})
+
+describe('Slider range mode on the keyboard', () => {
+  /**
+   * Each thumb of a range slider is its own `role="slider"` tab stop, so Tab
+   * moves from one thumb to the other, and a key moves the thumb that has the
+   * focus. The track wrapper is a `Pressable`, which react-native-web makes a
+   * tab stop unless it passes `tabIndex={-1}`. A key on a thumb bubbles up to
+   * the wrapper, which must not handle it a second time.
+   */
+  const renderRange = () => {
+    const onValueChange = jest.fn()
+    renderWeb(
+      <Slider
+        minimumValue={0}
+        maximumValue={100}
+        step={10}
+        defaultValue={[20, 80]}
+        onValueChange={onValueChange}
+      />,
+    )
+    const [start, end] = screen.getAllByRole('slider')
+    return { start: start!, end: end!, onValueChange }
+  }
+
+  it('gives each thumb a tab stop, and the wrapper none', () => {
+    const { start, end } = renderRange()
+    const stops = [...document.querySelectorAll('[tabindex]')].filter(
+      (el) => el.getAttribute('tabindex') !== '-1',
+    )
+    expect(stops).toStrictEqual([start, end])
+  })
+
+  it('an arrow key moves the thumb that has the focus, once', () => {
+    const { start, end, onValueChange } = renderRange()
+    fireEvent.keyDown(end, { key: 'ArrowRight' })
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    expect(onValueChange).toHaveBeenLastCalledWith([20, 90])
+
+    fireEvent.keyDown(start, { key: 'ArrowLeft' })
+    expect(onValueChange).toHaveBeenCalledTimes(2)
+    expect(onValueChange).toHaveBeenLastCalledWith([10, 90])
+  })
+
+  it('Home and End stop a thumb at the other thumb', () => {
+    const { start, end, onValueChange } = renderRange()
+    fireEvent.keyDown(start, { key: 'End' })
+    expect(onValueChange).toHaveBeenLastCalledWith([80, 80])
+
+    fireEvent.keyDown(end, { key: 'Home' })
+    expect(onValueChange).toHaveBeenLastCalledWith([80, 80])
+    fireEvent.keyDown(end, { key: 'End' })
+    expect(onValueChange).toHaveBeenLastCalledWith([80, 100])
+  })
+
+  it('a key on the wrapper, which a click on the track focuses, moves the start thumb', () => {
+    const { start, onValueChange } = renderRange()
+    const wrapper = start.parentElement!.closest('[tabindex="-1"]')!
+    fireEvent.keyDown(wrapper, { key: 'ArrowRight' })
+    expect(onValueChange).toHaveBeenLastCalledWith([30, 80])
   })
 })
 

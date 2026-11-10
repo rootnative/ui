@@ -15,6 +15,21 @@ export interface SliderProps extends Omit<ViewProps, 'children'> {
    * enable range mode.
    */
   defaultValue?: SliderValue
+  /**
+   * Screen reader label of the start thumb of a range slider, the thumb of
+   * `value[0]`. Each thumb is its own control, so a screen reader can move
+   * either one. With `accessibilityLabel`, the thumb reads
+   * "<accessibilityLabel>, <this label>". Range mode only.
+   * @default 'Minimum'
+   */
+  startThumbAccessibilityLabel?: string
+  /**
+   * Screen reader label of the end thumb of a range slider, the thumb of
+   * `value[1]`. With `accessibilityLabel`, the thumb reads
+   * "<accessibilityLabel>, <this label>". Range mode only.
+   * @default 'Maximum'
+   */
+  endThumbAccessibilityLabel?: string
   /** Called continuously during a drag with the latest value. */
   onValueChange?: (value: SliderValue) => void
   /** Called once when the user releases the thumb. */

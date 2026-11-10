@@ -9,6 +9,7 @@ import {
   SLIDER_THUMB_WIDTH,
   SLIDER_THUMB_WIDTH_PRESSED,
 } from '../slider/styles'
+import type { SliderProps } from '../slider/types'
 
 // Spy on the real hook rather than replacing it: the assertion below is about
 // the options `ThumbSlot` passes, and the component must still render.
@@ -154,14 +155,95 @@ describe('Slider', () => {
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
-  it('supports range mode with [low, high] defaultValue', () => {
-    renderWithTheme(
-      <Slider minimumValue={0} maximumValue={100} defaultValue={[20, 80]} />,
-    )
-    const slider = screen.getByRole('adjustable')
-    expect(slider.props.accessibilityValue).toEqual(
-      expect.objectContaining({ min: 0, max: 100, now: 20 }),
-    )
+  describe('range mode', () => {
+    const renderRange = (props: Partial<SliderProps> = {}) => {
+      const onValueChange = jest.fn()
+      renderWithTheme(
+        <Slider
+          minimumValue={0}
+          maximumValue={100}
+          step={10}
+          defaultValue={[20, 80]}
+          onValueChange={onValueChange}
+          {...props}
+        />,
+      )
+      const [start, end] = screen.getAllByRole('adjustable')
+      return { start: start!, end: end!, onValueChange }
+    }
+    const perform = (node: ReturnType<typeof screen.getByRole>, name: string) =>
+      fireEvent(node, 'accessibilityAction', {
+        nativeEvent: { actionName: name },
+      })
+
+    it('gives each thumb its own control, with a range that ends at the other thumb', () => {
+      const { start, end } = renderRange()
+      expect(screen.getAllByRole('adjustable')).toHaveLength(2)
+      expect(start.props.accessibilityLabel).toBe('Minimum')
+      expect(start.props.accessibilityValue).toEqual({
+        min: 0,
+        max: 80,
+        now: 20,
+        text: '20',
+      })
+      expect(end.props.accessibilityLabel).toBe('Maximum')
+      expect(end.props.accessibilityValue).toEqual({
+        min: 20,
+        max: 100,
+        now: 80,
+        text: '80',
+      })
+    })
+
+    it('an increment on the end thumb moves the high value only', () => {
+      const { end, onValueChange } = renderRange()
+      perform(end, 'increment')
+      expect(onValueChange).toHaveBeenLastCalledWith([20, 90])
+    })
+
+    it('a decrement on the start thumb moves the low value only', () => {
+      const { start, onValueChange } = renderRange()
+      perform(start, 'decrement')
+      expect(onValueChange).toHaveBeenLastCalledWith([10, 80])
+    })
+
+    it('a thumb stops at the other thumb', () => {
+      const { start, onValueChange } = renderRange({
+        defaultValue: [70, 80],
+      })
+      perform(start, 'increment')
+      perform(start, 'increment')
+      expect(onValueChange).toHaveBeenLastCalledWith([80, 80])
+    })
+
+    it('joins the slider label and the thumb label', () => {
+      const { start, end } = renderRange({
+        accessibilityLabel: 'Runtime',
+        endThumbAccessibilityLabel: 'Longest',
+      })
+      expect(start.props.accessibilityLabel).toBe('Runtime, Minimum')
+      expect(end.props.accessibilityLabel).toBe('Runtime, Longest')
+    })
+
+    it('keeps the thumbs out of a wrapper that VoiceOver would read as one element', () => {
+      const { start, end } = renderRange()
+      const wrappers = screen.root.findAll(
+        (node) =>
+          typeof node.type === 'string' && node.props.accessible === false,
+      )
+      const wrapper = wrappers.find(
+        (node) => node.findAll((child) => child === start).length > 0,
+      )
+      expect(wrapper).toBeDefined()
+      expect(wrapper!.findAll((child) => child === end)).toHaveLength(1)
+    })
+
+    it('a disabled range slider ignores the actions of both thumbs', () => {
+      const { start, end, onValueChange } = renderRange({ disabled: true })
+      perform(start, 'increment')
+      perform(end, 'decrement')
+      expect(onValueChange).not.toHaveBeenCalled()
+    })
   })
 
   it('emits onSlidingComplete on accessibility action', () => {

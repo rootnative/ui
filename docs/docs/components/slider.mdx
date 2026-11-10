@@ -116,6 +116,20 @@ Pass a `[low, high]` tuple for a range slider with two thumbs. Both thumbs obey 
 `}
 />
 
+Each thumb is its own control for a screen reader and for the keyboard. A screen reader user moves each thumb with its own adjust gesture, and on the web Tab moves from one thumb to the other. The thumbs read "Minimum" and "Maximum" by default. Change them with `startThumbAccessibilityLabel` and `endThumbAccessibilityLabel`. When you also pass `accessibilityLabel`, each thumb reads both labels, for example "Runtime, Shortest".
+
+```tsx
+<Slider
+  accessibilityLabel="Runtime"
+  startThumbAccessibilityLabel="Shortest"
+  endThumbAccessibilityLabel="Longest"
+  value={runtime}
+  onValueChange={(v) => setRuntime(v)}
+  minimumValue={60}
+  maximumValue={180}
+/>
+```
+
 ## Centered
 
 Pass `centered` for a slider whose active track fills out from the midpoint, not from the start. Use it for a symmetric value such as a balance, an EQ band, or a zoom adjustment.

@@ -2106,6 +2106,8 @@ import { Slider } from '@rootnative/components/slider'
 Props:
 - `value?: number | [number, number]` — Current value. Pass a number for single-thumb mode or `[low, high]` for range mode. Use `defaultValue` for uncontrolled usage.
 - `defaultValue?: number | [number, number]` — Initial value for uncontrolled usage. Pass a `[low, high]` tuple to enable range mode.
+- `startThumbAccessibilityLabel?: string` — Default: `'Minimum'`. Screen reader label of the start thumb of a range slider, the thumb of `value[0]`. Each thumb is its own control, so a screen reader can move either one. With `accessibilityLabel`, the thumb reads "<accessibilityLabel>, <this label>". Range mode only.
+- `endThumbAccessibilityLabel?: string` — Default: `'Maximum'`. Screen reader label of the end thumb of a range slider, the thumb of `value[1]`. With `accessibilityLabel`, the thumb reads "<accessibilityLabel>, <this label>". Range mode only.
 - `onValueChange?: (value: SliderValue) => void` — Called continuously during a drag with the latest value.
 - `onSlidingComplete?: (value: SliderValue) => void` — Called once when the user releases the thumb.
 - `minimumValue?: number` — Default: `0`. Lowest allowed value.

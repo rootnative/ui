@@ -14,6 +14,7 @@ import type {
   GestureResponderEvent,
   LayoutChangeEvent,
   NativeSyntheticEvent,
+  PressableProps,
   TargetedEvent,
 } from 'react-native'
 import { PanResponder, Platform, Pressable, View } from 'react-native'
@@ -25,6 +26,7 @@ import { PanResponder, Platform, Pressable, View } from 'react-native'
 // reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
 import { webOutlineReset } from '../internal/focusOutline'
+import { pointerEvents } from '../internal/pointerEvents'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import {
@@ -45,6 +47,7 @@ import {
 } from './slots'
 import {
   SLIDER_THUMB_WIDTH,
+  SLIDER_TOUCH_HEIGHT,
   SLIDER_TRACK_CORNER_INNER,
   SLIDER_TRACK_CORNER_OUTER,
   createStyles,
@@ -64,6 +67,24 @@ const ACCESSIBILITY_ACTIONS = [
   { name: 'increment' as const },
   { name: 'decrement' as const },
 ]
+
+interface ThumbValue {
+  min: number
+  max: number
+  now: number
+  text: string
+}
+
+// `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only
+// the ARIA spelling, while RN merges the two for native.
+function ariaValueOf(value: ThumbValue) {
+  return {
+    'aria-valuemin': value.min,
+    'aria-valuemax': value.max,
+    'aria-valuenow': value.now,
+    'aria-valuetext': value.text,
+  }
+}
 
 export function Slider({
   value: controlledValue,
@@ -85,6 +106,8 @@ export function Slider({
   disabled = false,
   style,
   accessibilityLabel,
+  startThumbAccessibilityLabel = 'Minimum',
+  endThumbAccessibilityLabel = 'Maximum',
   ...rest
 }: SliderProps) {
   const theme = useTheme()
@@ -315,10 +338,11 @@ export function Slider({
   // hand-written unmount effect is needed even when the slider unmounts
   // mid-drag (route transition, orientation change).
 
-  // The single Pressable wrapper has one focus target. For range sliders we
-  // route keyboard adjustments and focus indication to the thumb the user is
-  // currently interacting with — `keyboardThumb`. It defaults to 'low', flips
-  // to whichever thumb pan-gestured last, and can be toggled with Enter/Space.
+  // The thumb that the hover halo, the focus ring, and a key on the track
+  // wrapper act on. It defaults to 'low', and it follows the thumb that was
+  // dragged or focused last. In range mode each thumb is also its own control
+  // with its own keys, and the wrapper takes keys only after a click on the
+  // track, which focuses it.
   const [keyboardThumb, setKeyboardThumb] = useState<ThumbId>('low')
   const isHovered = useRef(false)
   const isFocused = useRef(false)
@@ -436,11 +460,11 @@ export function Slider({
   const keyStep = step > 0 ? step : range / 100
 
   const adjustValue = useCallback(
-    (delta: number) => {
+    (delta: number, thumb: ThumbId) => {
       const current = valueRef.current
       if (Array.isArray(current)) {
         const [low, high] = current
-        if (keyboardThumb === 'low') {
+        if (thumb === 'low') {
           const next = clamp(
             snapToStep(low + delta, step, minimumValue),
             minimumValue,
@@ -464,7 +488,7 @@ export function Slider({
         commitValue(next, true)
       }
     },
-    [commitValue, keyboardThumb, maximumValue, minimumValue, step],
+    [commitValue, maximumValue, minimumValue, step],
   )
 
   const handleHoverIn = useCallback(() => {
@@ -484,16 +508,14 @@ export function Slider({
   }, [lowHovered, highHovered, animate])
 
   const handleFocus = useCallback(
-    (event: NativeSyntheticEvent<TargetedEvent>) => {
-      if (isDisabled || !isFocusVisible(event)) return
+    (thumb: ThumbId, event: NativeSyntheticEvent<TargetedEvent>) => {
+      if (isDisabled) return
+      setKeyboardThumb(thumb)
+      if (!isFocusVisible(event)) return
       isFocused.current = true
-      if (keyboardThumb === 'low') {
-        animate(lowFocused, 1, 'state-focus')
-      } else {
-        animate(highFocused, 1, 'state-focus')
-      }
+      animate(thumb === 'low' ? lowFocused : highFocused, 1, 'state-focus')
     },
-    [isDisabled, keyboardThumb, lowFocused, highFocused, animate],
+    [isDisabled, lowFocused, highFocused, animate],
   )
 
   const handleBlur = useCallback(() => {
@@ -503,14 +525,14 @@ export function Slider({
   }, [lowFocused, highFocused, animate])
 
   const handleAccessibilityAction = useCallback(
-    (e: AccessibilityActionEvent) => {
+    (thumb: ThumbId, e: AccessibilityActionEvent) => {
       if (isDisabled) return
       // "Increment" means a larger value in every writing direction. Only
       // the arrow keys below follow the layout direction.
       if (e.nativeEvent.actionName === 'increment') {
-        adjustValue(keyStep)
+        adjustValue(keyStep, thumb)
       } else if (e.nativeEvent.actionName === 'decrement') {
-        adjustValue(-keyStep)
+        adjustValue(-keyStep, thumb)
       }
     },
     [adjustValue, isDisabled, keyStep],
@@ -522,7 +544,7 @@ export function Slider({
   // `preventDefault`, or the browser also scrolls the page on End, Home,
   // Page Up/Down and the arrows.
   const handleKeyDown = useCallback(
-    (e: PressableKeyDownEvent) => {
+    (thumb: ThumbId, e: PressableKeyDownEvent) => {
       if (isDisabled) return
       const key = e.nativeEvent.key
       if (!key) return
@@ -530,27 +552,27 @@ export function Slider({
       let handled = true
       switch (key) {
         case 'ArrowRight':
-          adjustValue(isRTL ? -keyStep : keyStep)
+          adjustValue(isRTL ? -keyStep : keyStep, thumb)
           break
         case 'ArrowLeft':
-          adjustValue(isRTL ? keyStep : -keyStep)
+          adjustValue(isRTL ? keyStep : -keyStep, thumb)
           break
         case 'ArrowUp':
-          adjustValue(keyStep)
+          adjustValue(keyStep, thumb)
           break
         case 'ArrowDown':
-          adjustValue(-keyStep)
+          adjustValue(-keyStep, thumb)
           break
         case 'PageUp':
-          adjustValue(bigStep)
+          adjustValue(bigStep, thumb)
           break
         case 'PageDown':
-          adjustValue(-bigStep)
+          adjustValue(-bigStep, thumb)
           break
         case 'Home':
           commitValue(
             arrValue
-              ? keyboardThumb === 'low'
+              ? thumb === 'low'
                 ? [minimumValue, arrValue[1]]
                 : [arrValue[0], Math.max(minimumValue, arrValue[0])]
               : minimumValue,
@@ -560,22 +582,12 @@ export function Slider({
         case 'End':
           commitValue(
             arrValue
-              ? keyboardThumb === 'low'
+              ? thumb === 'low'
                 ? [Math.min(maximumValue, arrValue[1]), arrValue[1]]
                 : [arrValue[0], maximumValue]
               : maximumValue,
             true,
           )
-          break
-        case 'Enter':
-        case ' ':
-          // Toggle which thumb the keyboard adjusts in range mode. No-op for
-          // single-thumb sliders.
-          if (arrValue) {
-            setKeyboardThumb((t) => (t === 'low' ? 'high' : 'low'))
-          } else {
-            handled = false
-          }
           break
         default:
           handled = false
@@ -589,36 +601,67 @@ export function Slider({
       isDisabled,
       isRTL,
       keyStep,
-      keyboardThumb,
       maximumValue,
       minimumValue,
       range,
     ],
   )
 
+  // A key on a thumb control bubbles up to the wrapper too. The thumb has
+  // handled it already.
+  const handleWrapperKeyDown = useCallback(
+    (e: PressableKeyDownEvent) => {
+      if (e.target !== e.currentTarget) return
+      handleKeyDown(keyboardThumb, e)
+    },
+    [handleKeyDown, keyboardThumb],
+  )
+
   // Not rounded: a 0 to 1 slider at 0.4 reported `now: 0`, which a screen
   // reader turns into "0 percent".
-  const accessibilityValue = arrValue
-    ? {
-        min: minimumValue,
-        max: maximumValue,
-        now: arrValue[0],
-        text: `${formatLabel(arrValue[0])} to ${formatLabel(arrValue[1])}`,
-      }
+  const valueOf = (now: number, min: number, max: number): ThumbValue => ({
+    min,
+    max,
+    now,
+    text: formatLabel(now),
+  })
+
+  // In range mode each thumb is its own control, so the wrapper is not one.
+  // On iOS an accessible wrapper hides its children from VoiceOver, and on
+  // the web the wrapper leaves the tab order.
+  const singleValue = valueOf(lowValue, minimumValue, maximumValue)
+  const wrapperAccessibility: PressableProps = arrValue
+    ? { accessible: false, tabIndex: -1 }
     : {
-        min: minimumValue,
-        max: maximumValue,
-        now: lowValue,
-        text: formatLabel(lowValue),
+        accessibilityRole: 'adjustable',
+        accessibilityLabel,
+        'aria-disabled': isDisabled,
+        ...ariaValueOf(singleValue),
+        accessibilityValue: singleValue,
+        accessibilityActions: ACCESSIBILITY_ACTIONS,
+        onAccessibilityAction: (e) => handleAccessibilityAction('low', e),
       }
-  // `aria-*` alongside `accessibilityValue`: react-native-web 0.21 reads only
-  // the ARIA spelling, while RN merges the two for native.
-  const ariaValue = {
-    'aria-valuemin': accessibilityValue.min,
-    'aria-valuemax': accessibilityValue.max,
-    'aria-valuenow': accessibilityValue.now,
-    'aria-valuetext': accessibilityValue.text,
-  }
+
+  // Each thumb stops at the other one, so its range ends there, as in the
+  // WAI-ARIA multi-thumb slider pattern.
+  const thumbLabel = (part: string) =>
+    accessibilityLabel ? `${accessibilityLabel}, ${part}` : part
+  const thumbControls = arrValue
+    ? [
+        {
+          id: 'low' as const,
+          label: thumbLabel(startThumbAccessibilityLabel),
+          value: valueOf(lowValue, minimumValue, highValue),
+          position: { left: lowPos - SLIDER_TOUCH_HEIGHT / 2 },
+        },
+        {
+          id: 'high' as const,
+          label: thumbLabel(endThumbAccessibilityLabel),
+          value: valueOf(highValue, lowValue, maximumValue),
+          position: { left: highPos - SLIDER_TOUCH_HEIGHT / 2 },
+        },
+      ]
+    : []
 
   return (
     <View {...rest} style={[styles.root, style]}>
@@ -638,20 +681,14 @@ export function Slider({
       ) : null}
 
       <Pressable
-        accessibilityRole="adjustable"
-        accessibilityLabel={accessibilityLabel}
-        aria-disabled={isDisabled}
-        {...ariaValue}
-        accessibilityValue={accessibilityValue}
-        accessibilityActions={ACCESSIBILITY_ACTIONS}
-        onAccessibilityAction={handleAccessibilityAction}
+        {...wrapperAccessibility}
         onHoverIn={handleHoverIn}
         onHoverOut={handleHoverOut}
-        onFocus={handleFocus}
+        onFocus={(e) => handleFocus(keyboardThumb, e)}
         onBlur={handleBlur}
-        // Web only: arrow / Page / Home / End / Enter handling. Native ignores
-        // the prop because RN's Pressable doesn't dispatch onKeyDown there.
-        onKeyDown={handleKeyDown}
+        // Web only: arrow / Page / Home / End handling. Native ignores the
+        // prop because RN's Pressable doesn't dispatch onKeyDown there.
+        onKeyDown={handleWrapperKeyDown}
         disabled={isDisabled}
         style={[styles.pressableWrapper, webOutlineReset]}
       >
@@ -789,6 +826,33 @@ export function Slider({
               text={formatLabel(highValue)}
             />
           ) : null}
+
+          {thumbControls.map((control) => (
+            <Pressable
+              key={control.id}
+              accessibilityRole="adjustable"
+              accessibilityLabel={control.label}
+              aria-disabled={isDisabled}
+              {...ariaValueOf(control.value)}
+              accessibilityValue={control.value}
+              accessibilityActions={ACCESSIBILITY_ACTIONS}
+              onAccessibilityAction={(e) =>
+                handleAccessibilityAction(control.id, e)
+              }
+              onFocus={(e) => handleFocus(control.id, e)}
+              onBlur={handleBlur}
+              onKeyDown={(e) => handleKeyDown(control.id, e)}
+              disabled={isDisabled}
+              // The track takes every touch: it reads the position of a drag
+              // relative to itself.
+              style={[
+                styles.thumbControl,
+                control.position,
+                webOutlineReset,
+                pointerEvents.none,
+              ]}
+            />
+          ))}
         </View>
       </Pressable>
 

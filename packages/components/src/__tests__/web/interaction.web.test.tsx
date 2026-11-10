@@ -449,6 +449,26 @@ describe('focus feedback follows the browser :focus-visible', () => {
     expect(sliderRingOpacity()).toBe('1')
   })
 
+  it('a focus on the end thumb of a range Slider shows the ring of that thumb only', () => {
+    const { flush } = renderWebSettled(
+      <Slider accessibilityLabel="Price" defaultValue={[0.2, 0.8]} />,
+    )
+    const [start, end] = screen.getAllByRole('slider')
+
+    act(() => end!.focus())
+    flush()
+
+    // The two focus rings are the first nodes in the track with an opacity:
+    // the start ring, then the end ring.
+    const rings = Array.from(
+      start!.parentElement!.querySelectorAll<HTMLElement>('*'),
+    )
+      .map((node) => node.style.opacity)
+      .filter((value) => value !== '')
+      .slice(0, 2)
+    expect(rings).toEqual(['0', '1'])
+  })
+
   it('a dispatched focus on a Slider after a pointer press shows no ring', () => {
     const { flush } = renderWebSettled(
       <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
