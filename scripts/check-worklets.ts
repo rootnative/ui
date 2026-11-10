@@ -44,14 +44,35 @@
  * The only way to catch it is to read the built output and assert no hook call
  * was emitted in the un-workletizable form.
  *
+ * A second form broke alpha.33 to alpha.36. When two files in one chunk import
+ * the same hook, esbuild keeps both imports and renames the second binding:
+ *
+ *   import { useAnimatedProps as useAnimatedProps2 } from '…/reanimated'
+ *   useAnimatedProps2(cb)                       renamed — DOES NOT match
+ *
+ * The plugin reads `useAnimatedProps2`, and `CircularProgress` aborted the app
+ * on native. A `'worklet'` directive makes the plugin convert the callback
+ * whatever the callee is called, so every hook callback in the source starts
+ * with one, and this check fails on a callback in the build that does not.
+ *
  * Usage:
  *   npx tsx scripts/check-worklets.ts        # requires a prior build
+ *   npx tsx scripts/check-worklets.ts <dir>  # checks the bundles in <dir>
  */
 import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
-const DIST = path.join(ROOT, 'packages/components/dist')
+const DIST = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(ROOT, 'packages/components/dist')
+
+/**
+ * A callback that opens with the directive, as esbuild emits it: an arrow with
+ * a block body, or a function expression.
+ */
+const DIRECTIVE_CALLBACK =
+  /^\s*(?:(?:\([^()]*\)|[A-Za-z_$][\w$]*)\s*=>|function\b[^{]*)\s*\{\s*["']worklet["']/
 
 /**
  * The hooks whose callback the plugin auto-workletizes. Taken from
@@ -83,7 +104,7 @@ function bundles(dir: string): string[] {
 
 if (!fs.existsSync(DIST)) {
   console.error(
-    'packages/components/dist not found — run `pnpm run build` first.',
+    `${path.relative(ROOT, DIST)} not found — run \`pnpm run build\` first.`,
   )
   process.exit(1)
 }
@@ -99,12 +120,34 @@ for (const hook of WORKLETIZED_HOOKS) {
 
   // Every call of the hook, in any shape, so we can tell "no broken calls"
   // apart from "the hook is no longer used and this check is now vacuous".
-  const any = new RegExp(`\\b${hook}\\s*[).]?\\s*\\(`, 'g')
+  // `\d*` counts a binding that esbuild renamed, such as `useAnimatedProps2`.
+  const any = new RegExp(`\\b${hook}\\d*\\s*[).]?\\s*\\(`, 'g')
+
+  // A call in a shape the plugin can parse: bare, renamed, or `(0, ns.hook)(`.
+  const call = new RegExp(`\\b(${hook}\\d*)\\s*\\)?\\s*\\(`, 'g')
 
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf8')
 
     totalCalls += source.match(any)?.length ?? 0
+
+    const plain: string[] = []
+    for (const match of source.matchAll(call)) {
+      const rest = source.slice(match.index + match[0].length)
+      if (DIRECTIVE_CALLBACK.test(rest)) continue
+      const line = source.slice(0, match.index).split('\n').length
+      plain.push(`${match[1]} at line ${line}`)
+    }
+    if (plain.length > 0) {
+      problems.push(
+        `${path.relative(DIST, file)}: ${plain.length} \`${hook}\` ` +
+          `callback(s) with no 'worklet' directive (${plain.join(', ')}). ` +
+          'With no directive the plugin converts the callback only when the ' +
+          'callee is named exactly like the hook, and esbuild renames an ' +
+          'import that two files in one chunk share. Start the callback with ' +
+          "'worklet', in a block body.",
+      )
+    }
 
     const hits = source.match(broken)?.length ?? 0
     if (hits > 0) {

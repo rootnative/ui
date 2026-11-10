@@ -162,6 +162,7 @@ export function Switch({
   // press-grow progress together — position, size, and radius in one
   // progress-driven worklet.
   const animatedThumbStyle = useAnimatedStyle(() => {
+    'worklet'
     const baseSize = interpolate(
       progress.value,
       [0, 1],
@@ -209,6 +210,7 @@ export function Switch({
   ])
 
   const animatedHaloStyle = useAnimatedStyle(() => {
+    'worklet'
     const baseSize = interpolate(
       progress.value,
       [0, 1],

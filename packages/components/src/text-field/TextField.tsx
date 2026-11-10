@@ -188,6 +188,7 @@ export function TextField({
     { progress: focused, color: borderFocusColor },
   ])
   const animatedIndicatorHeightStyle = useAnimatedStyle(() => {
+    'worklet'
     const focusedHeight = interpolate(focused.value, [0, 1], [1, 2])
     return { height: interpolate(errored.value, [0, 1], [focusedHeight, 2]) }
   })
@@ -208,6 +209,7 @@ export function TextField({
     { key: 'borderColor' },
   )
   const animatedBorderWidthStyle = useAnimatedStyle(() => {
+    'worklet'
     const focusedWidth = interpolate(focused.value, [0, 1], [1, 2])
     return {
       borderWidth: interpolate(errored.value, [0, 1], [focusedWidth, 2]),

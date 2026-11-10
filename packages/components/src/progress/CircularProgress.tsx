@@ -128,6 +128,7 @@ export function CircularProgress({
   const startRotation = `rotate(-90 ${center} ${center})`
 
   const trackAnimatedProps = useAnimatedProps(() => {
+    'worklet'
     if (indeterminate) {
       return { strokeDasharray: `${circumference} 0`, strokeDashoffset: 0 }
     }
@@ -153,6 +154,7 @@ export function CircularProgress({
   })
 
   const indicatorAnimatedProps = useAnimatedProps(() => {
+    'worklet'
     if (indeterminate) {
       const len = circumference * INDETERMINATE_ARC_RATIO
       return {
@@ -183,6 +185,7 @@ export function CircularProgress({
   const capAngle = (thickness / 2 / circumference) * 2 * Math.PI
 
   const waveAnimatedProps = useAnimatedProps(() => {
+    'worklet'
     if (indeterminate) {
       const sweep = INDETERMINATE_ARC_RATIO * 2 * Math.PI - capAngle * 2
       return {

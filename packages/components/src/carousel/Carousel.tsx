@@ -208,9 +208,10 @@ export function Carousel<T>({
   }, [geometry, snapOffsets])
 
   // In RTL a browser reports a negative offset from the start.
-  const frontIndex = useDerivedValue(() =>
-    indexAtScroll(snapOffsets.value, Math.abs(offset.value)),
-  )
+  const frontIndex = useDerivedValue(() => {
+    'worklet'
+    return indexAtScroll(snapOffsets.value, Math.abs(offset.value))
+  })
 
   // The index that was last reported, so a repeat is quiet.
   const lastIndex = useRef(index ?? defaultIndex)
@@ -480,6 +481,7 @@ function MaskedSlot<T>({
   surface,
 }: MaskedSlotProps<T>) {
   const placement = useDerivedValue(() => {
+    'worklet'
     const current = strategy.value
     if (current === null) return { size: 0, shift: 0, large: 0 }
     const placed = placeItem(current, index, offset.value)
@@ -496,6 +498,7 @@ function MaskedSlot<T>({
   })
 
   const progress = useDerivedValue(() => {
+    'worklet'
     const current = strategy.value
     if (current === null || current.smallSize <= 0) return 1
     const range = current.itemSize - current.smallSize
@@ -505,6 +508,7 @@ function MaskedSlot<T>({
   })
 
   const maskStyle = useAnimatedStyle(() => {
+    'worklet'
     const { size, shift, large } = placement.value
     return {
       width: size,
@@ -513,6 +517,7 @@ function MaskedSlot<T>({
   })
 
   const contentStyle = useAnimatedStyle(() => {
+    'worklet'
     const { size, large } = placement.value
     return {
       width: large,

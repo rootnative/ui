@@ -155,6 +155,7 @@ export function LinearProgress({
   // value tween, with per-frame branching (mid gap) no declarative prop can
   // express.
   const activeStyle = useAnimatedStyle(() => {
+    'worklet'
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const w = Math.max(0, v * (progressArea - midGap))
@@ -162,6 +163,7 @@ export function LinearProgress({
   })
 
   const inactiveStyle = useAnimatedStyle(() => {
+    'worklet'
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const aw = Math.max(0, v * (progressArea - midGap))
@@ -188,6 +190,7 @@ export function LinearProgress({
   const capInset = thickness / 2
 
   const determinateWaveProps = useAnimatedProps(() => {
+    'worklet'
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const w = Math.max(0, v * (progressArea - midGap))
@@ -203,16 +206,19 @@ export function LinearProgress({
     }
   })
 
-  const indeterminateWaveProps = useAnimatedProps(() => ({
-    d: linearWavePath(
-      capInset,
-      segmentWidth - capInset,
-      centerY,
-      amplitude,
-      PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
-      wave.phase.value,
-    ),
-  }))
+  const indeterminateWaveProps = useAnimatedProps(() => {
+    'worklet'
+    return {
+      d: linearWavePath(
+        capInset,
+        segmentWidth - capInset,
+        centerY,
+        amplitude,
+        PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
+        wave.phase.value,
+      ),
+    }
+  })
 
   const staticWaveD = useMemo(
     () =>

@@ -324,6 +324,7 @@ function TabIndicator({
   const animatedWidth = useAnimation(width, 'spring-default-spatial')
 
   const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
     if (position !== undefined) {
       const list = rects.value
       const last = list.length - 1

@@ -283,6 +283,7 @@ function ButtonGroupItemImpl({
   // animated styles beat later static styles in the array, so we must encode
   // the disabled color here rather than relying on `disabledContainer`.
   const animatedContainerStyle = useAnimatedStyle(() => {
+    'worklet'
     const topLeft = interpolate(
       selectedProgress.value,
       [0, 1],
@@ -369,33 +370,36 @@ function ButtonGroupItemImpl({
     }
   })
 
-  const animatedFocusRingStyle = useAnimatedStyle(() => ({
-    opacity: focusVisible.value,
-    borderTopLeftRadius:
-      interpolate(
-        selectedProgress.value,
-        [0, 1],
-        [unselectedRadii.topLeft, selectedRadii.topLeft],
-      ) + 3,
-    borderTopRightRadius:
-      interpolate(
-        selectedProgress.value,
-        [0, 1],
-        [unselectedRadii.topRight, selectedRadii.topRight],
-      ) + 3,
-    borderBottomLeftRadius:
-      interpolate(
-        selectedProgress.value,
-        [0, 1],
-        [unselectedRadii.bottomLeft, selectedRadii.bottomLeft],
-      ) + 3,
-    borderBottomRightRadius:
-      interpolate(
-        selectedProgress.value,
-        [0, 1],
-        [unselectedRadii.bottomRight, selectedRadii.bottomRight],
-      ) + 3,
-  }))
+  const animatedFocusRingStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      opacity: focusVisible.value,
+      borderTopLeftRadius:
+        interpolate(
+          selectedProgress.value,
+          [0, 1],
+          [unselectedRadii.topLeft, selectedRadii.topLeft],
+        ) + 3,
+      borderTopRightRadius:
+        interpolate(
+          selectedProgress.value,
+          [0, 1],
+          [unselectedRadii.topRight, selectedRadii.topRight],
+        ) + 3,
+      borderBottomLeftRadius:
+        interpolate(
+          selectedProgress.value,
+          [0, 1],
+          [unselectedRadii.bottomLeft, selectedRadii.bottomLeft],
+        ) + 3,
+      borderBottomRightRadius:
+        interpolate(
+          selectedProgress.value,
+          [0, 1],
+          [unselectedRadii.bottomRight, selectedRadii.bottomRight],
+        ) + 3,
+    }
+  })
 
   const resolvedIconColor = useMemo(
     () =>

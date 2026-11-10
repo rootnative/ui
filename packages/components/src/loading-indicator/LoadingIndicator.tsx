@@ -128,6 +128,7 @@ export function LoadingIndicator({
   // which react-native-svg-web maps poorly. Rotation = global spin (2π*phase)
   // + per-morph +90° kick (indeterminate), or -progress*180° (determinate).
   const animatedPathProps = useAnimatedProps(() => {
+    'worklet'
     const n = SAMPLE_COUNT
     const count = flatShapes.length
     const pos = indeterminate ? morphSpring.value : determinateValue

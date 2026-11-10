@@ -120,10 +120,13 @@ export function Checkbox({
   // applies one mode to both ends, so `scale: [0, 1]` clamps the overshoot
   // away too. Hence the hand-rolled worklet, per the CLAUDE.md rule that keeps
   // one when `useInterpolatedStyle` has no way to say it.
-  const animatedIconStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ scale: Math.max(0, progress.value) }],
-  }))
+  const animatedIconStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      opacity: progress.value,
+      transform: [{ scale: Math.max(0, progress.value) }],
+    }
+  })
 
   const handlePress = useCallback(() => {
     if (isDisabled) return

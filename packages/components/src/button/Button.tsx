@@ -182,6 +182,7 @@ export function Button({
   // One radius for the container and the shadow carrier, so the shadow keeps
   // the container's shape.
   const animatedRadiusStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
@@ -204,6 +205,7 @@ export function Button({
     BUTTON_FOCUS_RING_OFFSET + BUTTON_FOCUS_RING_WIDTH,
   )
   const animatedFocusRingStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],

@@ -89,9 +89,12 @@ export function Radio({
   // applies one mode to both ends, so `scale: [0, 1]` clamps the overshoot
   // away too. Hence the hand-rolled worklet, per the CLAUDE.md rule that keeps
   // one when `useInterpolatedStyle` has no way to say it.
-  const animatedInnerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: Math.max(0, dotProgress.value) }],
-  }))
+  const animatedInnerStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      transform: [{ scale: Math.max(0, dotProgress.value) }],
+    }
+  })
 
   // Radios are select-only: pressing an already-selected radio is a no-op —
   // deselection only happens by selecting another radio in the group.

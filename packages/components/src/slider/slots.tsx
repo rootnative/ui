@@ -72,6 +72,7 @@ export function SegmentSlot({
   disabledStyle,
 }: SegmentSlotProps) {
   const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
     const start = evalEdge(segment.start, lowPressed, highPressed)
     const end = evalEdge(segment.end, lowPressed, highPressed)
     const w = Math.max(0, end - start)
@@ -116,6 +117,7 @@ export function StopIndicatorSlot({
   disabledStyle,
 }: StopIndicatorSlotProps) {
   const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
     const stop = segment.stopAt
     if (!stop) return { opacity: 0 }
     const center = stop.fromStart
@@ -199,6 +201,7 @@ export function ValueLabelSlot({
   // animated opacity and pop the label up by LABEL_POP dp as it fades in,
   // per MD3's emphasized-decelerate enter motion.
   const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
     const o = labelWidth > 0 ? opacity.value : 0
     return {
       opacity: o,
@@ -245,14 +248,17 @@ export function StateLayerSlot({
     pressedOpacity: PRESS_OPACITY,
   } = theme.stateLayer
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
-    opacity: Math.max(
-      Math.max(0, Math.min(1, hovered.value)) * HOVER_OPACITY,
-      Math.max(0, Math.min(1, focused.value)) * FOCUS_OPACITY,
-      Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
-    ),
-  }))
+  const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
+      opacity: Math.max(
+        Math.max(0, Math.min(1, hovered.value)) * HOVER_OPACITY,
+        Math.max(0, Math.min(1, focused.value)) * FOCUS_OPACITY,
+        Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
+      ),
+    }
+  })
   return (
     <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
@@ -271,10 +277,13 @@ export function FocusRingSlot({
   focused,
   baseStyle,
 }: FocusRingSlotProps) {
-  const animatedStyle = useAnimatedStyle(() => ({
-    left: centerX - SLIDER_FOCUS_RING_SIZE / 2,
-    opacity: focused.value,
-  }))
+  const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      left: centerX - SLIDER_FOCUS_RING_SIZE / 2,
+      opacity: focused.value,
+    }
+  })
   return (
     <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
   )
@@ -307,6 +316,7 @@ export function TickSlot({
   const lowDist = Math.abs(cx - lowPos)
   const highDist = Math.abs(cx - highPos)
   const animatedStyle = useAnimatedStyle(() => {
+    'worklet'
     const lowGap =
       REST_HALF +
       SLIDER_THUMB_GAP +

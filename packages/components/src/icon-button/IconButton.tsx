@@ -227,6 +227,7 @@ export function IconButton({
   )
 
   const animatedRadiusStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
@@ -248,6 +249,7 @@ export function IconButton({
     ICON_BUTTON_FOCUS_RING_OFFSET + ICON_BUTTON_FOCUS_RING_WIDTH,
   )
   const animatedFocusRingStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],

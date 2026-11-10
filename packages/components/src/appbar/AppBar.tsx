@@ -292,28 +292,31 @@ export function AppBar({
   // resolved outside the worklet, see `resolveLogical` above.
   const collapseStartKey = resolveLogicalKey('start')
   const collapseEndKey = resolveLogicalKey('end')
-  const titleContainerCollapseStyle = useAnimatedStyle(() => ({
-    [collapseStartKey]: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleStartInset, titleStartInset],
-    ),
-    top: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleTop, collapsedTitleTop],
-    ),
-    height: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleBlockHeight, collapsedTitleBlockHeight],
-    ),
-    [collapseEndKey]: interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [expandedTitleEndInset, compactTitleEndInset],
-    ),
-  }))
+  const titleContainerCollapseStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      [collapseStartKey]: interpolate(
+        collapseProgress.value,
+        [0, 1],
+        [expandedTitleStartInset, titleStartInset],
+      ),
+      top: interpolate(
+        collapseProgress.value,
+        [0, 1],
+        [expandedTitleTop, collapsedTitleTop],
+      ),
+      height: interpolate(
+        collapseProgress.value,
+        [0, 1],
+        [expandedTitleBlockHeight, collapsedTitleBlockHeight],
+      ),
+      [collapseEndKey]: interpolate(
+        collapseProgress.value,
+        [0, 1],
+        [expandedTitleEndInset, compactTitleEndInset],
+      ),
+    }
+  })
   const titleTextCollapseStyle = useInterpolatedStyle(collapseProgress, {
     fontSize: [expandedTitleType.fontSize, collapsedTitleType.fontSize],
     lineHeight: [expandedTitleType.lineHeight, collapsedTitleType.lineHeight],

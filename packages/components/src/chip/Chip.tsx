@@ -201,6 +201,7 @@ export function Chip(props: ChipProps) {
   )
 
   const animatedRadiusStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
@@ -220,6 +221,7 @@ export function Chip(props: ChipProps) {
   // the shape morphs (offset outward) so it keeps hugging the container.
   const ringOutset = focusRingOutset(CHIP_FOCUS_RING_OFFSET)
   const animatedFocusRingStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
@@ -262,6 +264,7 @@ export function Chip(props: ChipProps) {
   // covers shadow keys. It repeats `animatedRadiusStyle`'s body rather than
   // reusing it because one animated style must not be mounted on two nodes.
   const animatedElevationRadiusStyle = useAnimatedStyle(() => {
+    'worklet'
     const rest = interpolate(
       selectedProgress.value,
       [0, 1],
