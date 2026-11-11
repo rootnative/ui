@@ -1,7 +1,11 @@
 import { useTheme } from '@rootnative/core'
 import { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
-import { barEdges, useSideInsetBleed } from '../layout/edgesContext'
+import {
+  barEdges,
+  barSideEdges,
+  useSideInsetBleed,
+} from '../layout/edgesContext'
 import { SafeAreaView } from '../safe-area'
 import { NavigationItem } from './NavigationItem'
 import { createNavigationBarStyles, getNavigationBarColors } from './styles'
@@ -26,12 +30,13 @@ export function NavigationBar({
   ...rest
 }: NavigationBarProps) {
   const theme = useTheme()
-  const sideInsetBleed = useSideInsetBleed(insetSides)
+  const sideEdges = barSideEdges(insetSides)
+  const sideInsetBleed = useSideInsetBleed(sideEdges)
   // The side insets keep the destinations clear of the notch in landscape,
   // see `insetSides`. The bottom inset is opt-in, see `insetBottom`.
   const insetEdges = useMemo(
-    () => barEdges(insetSides, insetBottom ? 'bottom' : undefined),
-    [insetSides, insetBottom],
+    () => barEdges(sideEdges, insetBottom ? 'bottom' : undefined),
+    [sideEdges, insetBottom],
   )
   const colors = useMemo(
     () =>

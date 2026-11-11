@@ -390,6 +390,31 @@ const styles = StyleSheet.create({
 The title then starts 32dp from the start edge, and the last action ends 32dp
 from the end edge. The `TopAppBarTokens` type documents each token.
 
+## Beside a Navigation Rail
+
+In landscape the bar pads both side safe-area insets, and inside a `Layout` it
+pulls its background out to both screen edges. A bar beside a
+[`NavigationRail`](./navigation-rail.mdx) touches the screen at its end edge
+only, so give it `insetSides="end"`. It then pads and bleeds on that side
+only, and its background doesn't cover the rail. Start and end follow the
+layout direction, so the same prop works in RTL.
+
+```tsx
+import { AppBar } from '@rootnative/components/appbar'
+import { Layout } from '@rootnative/components/layout'
+import { NavigationRail } from '@rootnative/components/navigation-rail'
+import { View } from 'react-native'
+
+<Layout>
+  <View style={{ flex: 1, flexDirection: 'row' }}>
+    <NavigationRail items={DESTINATIONS} />
+    <View style={{ flex: 1 }}>
+      <AppBar title="Library" insetSides="end" />
+    </View>
+  </View>
+</Layout>
+```
+
 ## Props
 
 <PropTable name="AppBar" />

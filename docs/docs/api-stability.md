@@ -90,7 +90,8 @@ bars (`AppBar`, `NavigationBar`, `BottomAppBar`) pad their content by the side
 insets by default (`insetSides`), and inside a `Layout` that pads the sides
 they pull their background back through that padding, so a bar at the edge of
 a screen stays full-bleed in landscape with no extra prop. A bar nested inside
-content passes `insetSides={false}`. Pass `edges` to `Layout` to change the
+content passes `insetSides={false}`, and an `AppBar` beside a `NavigationRail`
+passes `insetSides="end"`. Pass `edges` to `Layout` to change the
 sides per screen. The edges that each component pads are listed under
 [Orientation](./responsive.md#orientation).
 

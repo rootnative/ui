@@ -12,7 +12,11 @@ import type { LayoutChangeEvent, ViewProps } from 'react-native'
 import { FAB } from '../fab'
 import { IconButton } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
-import { barEdges, useSideInsetBleed } from '../layout/edgesContext'
+import {
+  barEdges,
+  barSideEdges,
+  useSideInsetBleed,
+} from '../layout/edgesContext'
 import { SafeAreaView } from '../safe-area'
 import { BOTTOM_APP_BAR_HEIGHT, createStyles } from './styles'
 import type { BottomAppBarProps } from './types'
@@ -62,12 +66,13 @@ export function BottomAppBar({
   ...rest
 }: BottomAppBarProps) {
   const theme = useTheme()
-  const sideInsetBleed = useSideInsetBleed(insetSides)
+  const sideEdges = barSideEdges(insetSides)
+  const sideInsetBleed = useSideInsetBleed(sideEdges)
   // The side insets keep the actions clear of the notch in landscape, see
   // `insetSides`. The bottom inset is opt-in, see `insetBottom`.
   const insetEdges = useMemo(
-    () => barEdges(insetSides, insetBottom ? 'bottom' : undefined),
-    [insetSides, insetBottom],
+    () => barEdges(sideEdges, insetBottom ? 'bottom' : undefined),
+    [sideEdges, insetBottom],
   )
   const styles = useMemo(
     () => createStyles(theme, containerColor),

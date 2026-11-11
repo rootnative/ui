@@ -21,7 +21,11 @@ import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
-import { barEdges, useSideInsetBleed } from '../layout/edgesContext'
+import {
+  barEdges,
+  barSideEdges,
+  useSideInsetBleed,
+} from '../layout/edgesContext'
 import { PortalContext } from '../portal/context'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
@@ -511,10 +515,11 @@ export function AppBar({
   const containerOverride = containerColor
     ? ({ backgroundColor: containerColor } as ViewStyle)
     : undefined
-  const sideInsetBleed = useSideInsetBleed(insetSides)
+  const sideEdges = barSideEdges(insetSides)
+  const sideInsetBleed = useSideInsetBleed(sideEdges)
   const insetEdges = useMemo(
-    () => barEdges(insetSides, insetTop ? 'top' : undefined),
-    [insetSides, insetTop],
+    () => barEdges(sideEdges, insetTop ? 'top' : undefined),
+    [sideEdges, insetTop],
   )
   const rootStyle: AnimatedViewStyle = [
     styles.root,

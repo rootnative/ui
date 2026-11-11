@@ -146,10 +146,13 @@ interface AppBarCommonProps extends Omit<ViewProps, 'children'> {
    * that padding. In landscape the bar stays full-bleed and the title and the
    * actions stay clear of the notch; in portrait both insets are 0. Set it to
    * `false` for a bar nested inside content, where the pulled-out background
-   * would show beyond its container.
+   * would show beyond its container. Set it to `'start'` or `'end'` for a bar
+   * that touches one screen edge only: a bar beside a `NavigationRail` takes
+   * `'end'`, so its background doesn't cover the rail. Start and end follow
+   * the layout direction.
    * @default true
    */
-  insetSides?: boolean
+  insetSides?: boolean | 'start' | 'end'
   /**
    * When `true`, applies the MD3 on-scroll tonal shift: the container color
    * animates from its resting color to its elevated color (`surface` →

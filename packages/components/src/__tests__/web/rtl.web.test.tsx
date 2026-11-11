@@ -405,6 +405,31 @@ describe('the safe-area side insets stay physical on web', () => {
     expect(bar.parentElement?.style.paddingRight).toBe('0px')
   })
 
+  // The end of a bar is the left side under `dir="rtl"`. `I18nManager` on
+  // web always reports LTR, so a side picked from it would be the right.
+  it('pads and bleeds an end-side bar on the left under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: { top: 0, right: 40, bottom: 0, left: 54 },
+          frame: { x: 0, y: 0, width: 923, height: 411 },
+        }}
+      >
+        <Layout>
+          <AppBar title="About" insetSides="end" testID="bar" />
+        </Layout>
+      </SafeAreaProvider>,
+    )
+    const bar = screen.getByTestId('bar')
+    expect(bar.style.marginLeft).toBe('-54px')
+    expect(bar.style.marginRight).toBe('0px')
+    const area = bar.firstElementChild
+    if (!(area instanceof HTMLElement)) throw new Error('no safe-area view')
+    expect(area.style.paddingLeft).toBe('54px')
+    expect(area.style.paddingRight).toBe('0px')
+  })
+
   it('places a measured offset with left under dir="rtl"', () => {
     document.documentElement.setAttribute('dir', 'rtl')
     expect(physicalLeftStyle(30)).toEqual({ left: 30 })

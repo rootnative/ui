@@ -140,7 +140,7 @@ In landscape, the notch or the Dynamic Island moves to the left or the right sid
 
 `Layout` owns the sides, so a screen needs the side padding in one place only. Your content inside a `Layout` keeps clear of the notch with no change. In portrait the side insets are 0, so the default costs nothing there.
 
-The bars pad their own content by the side insets. Inside a `Layout` that pads the sides, they also pull their background out through that padding, so a bar at the screen edge stays full width. Give a bar inside content, such as a card, `insetSides={false}`.
+The bars pad their own content by the side insets. Inside a `Layout` that pads the sides, they also pull their background out through that padding, so a bar at the screen edge stays full width. Give a bar inside content, such as a card, `insetSides={false}`. Give an `AppBar` beside a `NavigationRail` `insetSides="end"`: it then pads and bleeds on its end side only, and doesn't cover the rail.
 
 Overlays render in the [`PortalHost`](./components/portal.mdx#setup), outside the `Layout`, so each overlay pads its own edges. Put the host outside `Layout`, or an overlay gets its insets twice.
 

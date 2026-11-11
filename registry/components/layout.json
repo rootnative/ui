@@ -16,7 +16,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": [],
+  "utils": ["rtl"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.36",

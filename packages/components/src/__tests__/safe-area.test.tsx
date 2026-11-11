@@ -208,6 +208,46 @@ describe('SafeAreaView', () => {
       })
     })
 
+    // A bar beside a start-edge rail touches the screen at its end only. A
+    // bleed through the start padding would pull its background over the rail.
+    it('insetSides="end" pads and bleeds through the end side only', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout>
+            <AppBar title="About" insetSides="end" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: 0,
+        marginRight: -62,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 0,
+        paddingRight: 62,
+      })
+    })
+
+    it('insetSides="start" pads and bleeds through the start side only', () => {
+      const { toJSON } = renderWithTheme(
+        inLandscape(
+          <Layout>
+            <AppBar title="About" insetSides="start" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: -62,
+        marginRight: 0,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 62,
+        paddingRight: 0,
+      })
+    })
+
     it('NavigationBar bleeds through the side padding of a Layout', () => {
       const { toJSON } = renderWithTheme(
         inLandscape(
@@ -282,6 +322,27 @@ describe('SafeAreaView', () => {
         withCutout(
           <Layout>
             <AppBar title="About" testID="bar" />
+          </Layout>,
+        ),
+      )
+      const bar = childrenOf(rootOf(toJSON()))[0]
+      expect(StyleSheet.flatten(bar.props.style)).toMatchObject({
+        marginLeft: 0,
+        marginRight: -54,
+      })
+      expect(StyleSheet.flatten(childrenOf(bar)[0].props.style)).toMatchObject({
+        paddingLeft: 0,
+        paddingRight: 54,
+      })
+    })
+
+    // In RTL the rail sits on the right, so the end of the bar is the left
+    // side, where the cutout is.
+    it('insetSides="end" pads and bleeds on the left side', () => {
+      const { toJSON } = renderWithTheme(
+        withCutout(
+          <Layout>
+            <AppBar title="About" insetSides="end" testID="bar" />
           </Layout>,
         ),
       )
