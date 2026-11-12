@@ -139,7 +139,7 @@ optional except the label. Anything else you put in a Menu renders as given. Tha
 | `trailingText` | `labelLarge` / `onSurfaceVariant`: a keyboard shortcut or a short status |
 | `trailingIcon` | 24dp / `onSurfaceVariant` |
 | `disabled` | The label and both icons dim together at 38% opacity, and keep their own colors. The item stops responding |
-| `selected` | One choice of a single-choice group. `true` gives the item a `secondaryContainer` background, and `onSecondaryContainer` for the label, the icons, and the trailing text |
+| `selected` | One choice of a single-choice group. `true` gives the item a `secondaryContainer` background, and `onSecondaryContainer` for the label, the icons, and the trailing text. A [vertical menu](#vertical-menu) uses its own colors |
 | `checked` | An on/off setting. The same colors as `selected` |
 
 **An item press closes the menu.** Set `closeOnPress={false}` on an item that toggles something
@@ -176,6 +176,39 @@ when the difference must not rest on color alone.
 
 A disabled selected or checked item keeps the plain colors at 38% opacity, on a 12% `onSurface`
 background, and a screen reader still hears its state.
+
+## Vertical menu
+
+`variant="vertical"` gives the MD3 Expressive vertical menu. The default, `'baseline'`, is the
+original MD3 menu.
+
+```tsx
+<Menu variant="vertical" anchor={anchor}>
+  <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={edit} />
+  <Menu.Item label="Duplicate" leadingIcon="content-copy" onPress={duplicate} />
+  <Menu.Item label="Delete" leadingIcon="trash-can-outline" onPress={remove} />
+</Menu>
+```
+
+| Part | Baseline | Vertical |
+|------|----------|----------|
+| Container | `surfaceContainer`, corner 4dp | `surfaceContainerLow`, corner 16dp |
+| Block padding | 8dp | 2dp |
+| Item | Spans the full width, 48dp minimum height | 4dp in from each side, 44dp minimum height |
+| Item corners | None | 12dp on the outer corners of the first and the last item, 4dp on the others |
+| Label | `labelLarge` | `bodyLarge` |
+| Leading / trailing icon | 24dp | 20dp |
+| Trailing text | `labelLarge` | `labelSmall` |
+| Selected or checked item | `secondaryContainer`, `onSecondaryContainer` content | `tertiaryContainer`, `onTertiaryContainer` content, 12dp corners on every side |
+| Disabled selected item | Plain colors at 38% on 12% `onSurface` | `tertiaryContainer` and `onTertiaryContainer`, both at 38% |
+| Disabled item content | Its own colors at 38% | `onSurface` at 38% |
+
+The menu finds the place of each item to set its corners. It sees an item that is a direct
+child, in an array from `.map`, or in a fragment. An item inside a component of your own takes
+the 4dp corners.
+
+When an item becomes selected, its corners morph to 12dp on `springFastSpatial`. Reduced motion
+cuts the morph.
 
 ## Placement
 
@@ -264,6 +297,8 @@ A disabled item always uses the MD3 disabled treatment. Neither override changes
 | Leading / trailing icon | 24dp / `onSurfaceVariant` |
 | Selected or checked item | `secondaryContainer`, with `onSecondaryContainer` for the label and the icons |
 | Scrim | None. An MD3 menu doesn't dim what is behind it |
+
+These are the baseline tokens. The [vertical menu](#vertical-menu) table gives the other variant.
 
 ## Motion
 

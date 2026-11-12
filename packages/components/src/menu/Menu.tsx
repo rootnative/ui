@@ -21,6 +21,7 @@ import { physicalLeftStyle } from '../safe-area'
 import { MenuContext } from './context'
 import type { MenuContextValue } from './context'
 import { MenuItem } from './MenuItem'
+import { placeItems } from './placeItems'
 import { createMenuStyles } from './styles'
 import type { MenuProps } from './types'
 
@@ -49,6 +50,7 @@ interface AnchorPressProps {
 export function Menu({
   anchor,
   children,
+  variant = 'baseline',
   visible,
   onDismiss,
   side = 'bottom',
@@ -66,8 +68,8 @@ export function Menu({
 }: MenuProps) {
   const theme = useTheme()
   const styles = useMemo(
-    () => createMenuStyles(theme, containerColor),
-    [theme, containerColor],
+    () => createMenuStyles(theme, containerColor, variant),
+    [theme, containerColor, variant],
   )
 
   const isControlled = visible !== undefined
@@ -89,7 +91,10 @@ export function Menu({
       maxHeight,
     })
 
-  const contextValue = useMemo<MenuContextValue>(() => ({ dismiss }), [dismiss])
+  const contextValue = useMemo<MenuContextValue>(
+    () => ({ dismiss, variant }),
+    [dismiss, variant],
+  )
 
   // Web keyboard containment. Arrow keys move between items because that is
   // what `role="menu"` promises; Escape closes. No-op on native, where the
@@ -208,7 +213,7 @@ export function Menu({
                     contentContainerStyle={styles.listContent}
                     bounces={false}
                   >
-                    {children}
+                    {variant === 'vertical' ? placeItems(children) : children}
                   </ScrollView>
                 </Motion.View>
               ) : null}

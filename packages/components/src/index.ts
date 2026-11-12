@@ -132,7 +132,13 @@ export { Divider } from './divider'
 export type { DividerProps, DividerOrientation } from './divider'
 
 export { Menu, MenuItem } from './menu'
-export type { MenuProps, MenuItemProps, MenuAlign, MenuSide } from './menu'
+export type {
+  MenuProps,
+  MenuItemProps,
+  MenuAlign,
+  MenuSide,
+  MenuVariant,
+} from './menu'
 
 export { Tooltip } from './tooltip'
 export type {

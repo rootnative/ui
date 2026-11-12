@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { MenuVariant } from './types'
 
 /**
  * MD3 menu metrics.
@@ -25,13 +26,48 @@ export const MENU_ITEM_HORIZONTAL_PADDING = 12
 export const MENU_ITEM_HEIGHT = 48
 export const MENU_ITEM_ICON_SIZE = 24
 
-const ITEM_FOCUS_RING_INSET = 2
+/**
+ * MD3 Expressive vertical menu metrics.
+ * Source: androidx.compose.material3 `SegmentedMenuTokens` 24.1.2, with
+ * `MenuDefaults` and `Menu.kt` —
+ * `ContainerShape = CornerLarge`, `GroupContainerColor = SurfaceContainerLow`,
+ * `DropdownMenuGroupVerticalPadding = 2.dp`,
+ * `DropdownMenuSelectableItemPadding = 4.dp` (the item inset),
+ * `Item = 44.dp`, `ItemLeadingSpace = ItemTrailingSpace = 16.dp` from the
+ * group edge (the inset plus 12), `ItemTopSpace = ItemBottomSpace = 8.dp`,
+ * `ItemBetweenSpace = 12.dp`, `ItemLabelTextFont = BodyLarge`,
+ * `ItemTrailingSupportingTextFont = LabelSmall`,
+ * `ItemLeadingIconSize = ItemTrailingIconSize = 20.dp`,
+ * `ItemShape = CornerExtraSmall`, `ItemSelectedShape = CornerMedium`, and
+ * `CornerMedium` outer corners on the first and the last item
+ * (`MenuDefaults.leadingItemShape`, `trailingItemShape`).
+ *
+ * Where the Compose code still differs from the tokens (each place is marked
+ * "TODO replace with token"), these values follow the tokens.
+ */
+export const VERTICAL_MENU_VERTICAL_PADDING = 2
+export const VERTICAL_MENU_ITEM_INSET = 4
+export const VERTICAL_MENU_ITEM_HEIGHT = 44
+export const VERTICAL_MENU_ITEM_HORIZONTAL_PADDING = 12
+export const VERTICAL_MENU_ITEM_VERTICAL_PADDING = 8
+export const VERTICAL_MENU_ITEM_GAP = 12
+export const VERTICAL_MENU_ITEM_ICON_SIZE = 20
+
+export const ITEM_FOCUS_RING_INSET = 2
 const ITEM_FOCUS_RING_WIDTH = 3
 
 export function createMenuStyles(
   theme: MaterialTheme,
-  containerColor?: string,
+  containerColor: string | undefined,
+  variant: MenuVariant,
 ) {
+  const isVertical = variant === 'vertical'
+  const corner = isVertical
+    ? theme.shape.cornerLarge
+    : theme.shape.cornerExtraSmall
+  const defaultContainerColor = isVertical
+    ? theme.colors.surfaceContainerLow
+    : theme.colors.surfaceContainer
   return StyleSheet.create({
     // Absolute-fills the portal layer, giving the anchor-relative surface a
     // coordinate space and the dismiss region something to cover.
@@ -46,8 +82,8 @@ export function createMenuStyles(
       position: 'absolute',
       minWidth: MENU_MIN_WIDTH,
       maxWidth: MENU_MAX_WIDTH,
-      borderRadius: theme.shape.cornerExtraSmall,
-      backgroundColor: containerColor ?? theme.colors.surfaceContainer,
+      borderRadius: corner,
+      backgroundColor: containerColor ?? defaultContainerColor,
       ...elevationStyle(theme.elevation.level2),
     },
     // `flexShrink` is what makes the height cap work. The cap sits on the
@@ -62,21 +98,25 @@ export function createMenuStyles(
     // the iOS elevation shadow that sits on the same view.
     list: {
       flexShrink: 1,
-      borderRadius: theme.shape.cornerExtraSmall,
+      borderRadius: corner,
       overflow: 'hidden',
     },
     // MD3's 8dp block padding scrolls with the items, so the surface carries
     // none of it and the list's maxHeight is the whole vertical budget.
     listContent: {
-      paddingVertical: MENU_VERTICAL_PADDING,
+      paddingVertical: isVertical
+        ? VERTICAL_MENU_VERTICAL_PADDING
+        : MENU_VERTICAL_PADDING,
     },
   })
 }
 
 export function createMenuItemStyles(
   theme: MaterialTheme,
-  contentColor?: string,
+  contentColor: string | undefined,
+  variant: MenuVariant,
 ) {
+  const isVertical = variant === 'vertical'
   return StyleSheet.create({
     // No `flexGrow` in an item. React Native's default layout conformance
     // keeps a legacy Yoga rule: a `flexGrow` child grows a row that is as
@@ -84,12 +124,23 @@ export function createMenuItemStyles(
     // at its 280dp maximum. The item is a column, so the content row
     // stretches to the menu width only after the menu has its width, and the
     // trailing content takes the free space with an auto start margin.
-    container: {
-      justifyContent: 'center',
-      minHeight: MENU_ITEM_HEIGHT,
-      minWidth: MENU_MIN_WIDTH,
-      paddingHorizontal: MENU_ITEM_HORIZONTAL_PADDING,
-    },
+    // The vertical item sits 4dp in from each side of the menu, so its own
+    // minimum width is the menu minimum less the two insets.
+    container: isVertical
+      ? {
+          justifyContent: 'center',
+          minHeight: VERTICAL_MENU_ITEM_HEIGHT,
+          minWidth: MENU_MIN_WIDTH - 2 * VERTICAL_MENU_ITEM_INSET,
+          marginHorizontal: VERTICAL_MENU_ITEM_INSET,
+          paddingHorizontal: VERTICAL_MENU_ITEM_HORIZONTAL_PADDING,
+          paddingVertical: VERTICAL_MENU_ITEM_VERTICAL_PADDING,
+        }
+      : {
+          justifyContent: 'center',
+          minHeight: MENU_ITEM_HEIGHT,
+          minWidth: MENU_MIN_WIDTH,
+          paddingHorizontal: MENU_ITEM_HORIZONTAL_PADDING,
+        },
     interactiveContainer: {
       cursor: 'pointer',
     },
@@ -99,7 +150,7 @@ export function createMenuItemStyles(
     content: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: MENU_ITEM_HORIZONTAL_PADDING,
+      gap: isVertical ? VERTICAL_MENU_ITEM_GAP : MENU_ITEM_HORIZONTAL_PADDING,
     },
     // Label and both icons dim together — MD3's disabled treatment, never
     // derived from `containerColor` / `contentColor`.
@@ -107,12 +158,16 @@ export function createMenuItemStyles(
       opacity: theme.stateLayer.disabledOpacity,
     },
     label: {
-      ...theme.typography.labelLarge,
+      ...(isVertical
+        ? theme.typography.bodyLarge
+        : theme.typography.labelLarge),
       color: contentColor ?? theme.colors.onSurface,
       flexShrink: 1,
     },
     trailingText: {
-      ...theme.typography.labelLarge,
+      ...(isVertical
+        ? theme.typography.labelSmall
+        : theme.typography.labelLarge),
       color: contentColor ?? theme.colors.onSurfaceVariant,
     },
     trailingStart: {

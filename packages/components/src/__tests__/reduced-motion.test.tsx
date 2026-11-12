@@ -38,6 +38,19 @@ import { Tabs } from '../tabs'
 import { TextField } from '../text-field'
 import { Tooltip } from '../tooltip'
 
+/** A vertical menu item that becomes selected on its first press. */
+function SelectOnPressMenuItem() {
+  const [selected, setSelected] = useState(false)
+  return (
+    <Menu.Item
+      label="Name"
+      selected={selected}
+      closeOnPress={false}
+      onPress={() => setSelected(true)}
+    />
+  )
+}
+
 /** Shows a snackbar on mount so the enter transition is under test. */
 function SnackbarOnMount() {
   const snackbar = useSnackbar()
@@ -302,6 +315,19 @@ const CASES: readonly ReducedMotionCase[] = [
         </Menu>
       </PortalHost>
     ),
+  },
+  {
+    name: 'Menu.Item — vertical selected shape',
+    render: () => (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}} variant="vertical">
+          <SelectOnPressMenuItem />
+        </Menu>
+      </PortalHost>
+    ),
+    // RNTL's press calls `onPress` only, so no press layer runs. The control
+    // counts what the selection starts: the shape morph and the new container.
+    settle: () => fireEvent.press(screen.getByText('Name')),
   },
   {
     name: 'Tabs',

@@ -6,12 +6,13 @@ import {
   renderWithTheme,
 } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
+import { useState } from 'react'
 import type {
   MeasureInWindowOnSuccessCallback,
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { I18nManager, StyleSheet, View } from 'react-native'
+import { I18nManager, ScrollView, StyleSheet, View } from 'react-native'
 import { Button } from '../button'
 import { Divider } from '../divider'
 import { Menu } from '../menu'
@@ -642,6 +643,241 @@ describe('Menu.Item — selected and checked', () => {
     expect(screen.getByTestId('item').props.accessibilityState.checked).toBe(
       false,
     )
+  })
+})
+
+/**
+ * The MD3 Expressive vertical menu. The values come from the Compose
+ * `SegmentedMenuTokens` and `StandardMenuTokens`; see `menu/styles.ts`.
+ */
+describe('Menu — vertical', () => {
+  const { colors, shape, stateLayer, typography } = lightTheme
+
+  function renderVertical(items: React.ReactNode) {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu" variant="vertical">
+        {items}
+      </Menu>,
+    )
+    return open()
+  }
+
+  function corners(testID: string) {
+    const style = getStyle(screen.getByTestId(testID))
+    return [
+      style.borderTopLeftRadius,
+      style.borderTopRightRadius,
+      style.borderBottomLeftRadius,
+      style.borderBottomRightRadius,
+    ]
+  }
+
+  function iconOf(name: string) {
+    return screen.getByText(name, { includeHiddenElements: true }).props
+  }
+
+  it('applies the vertical container tokens', async () => {
+    const surface = await renderVertical(<Menu.Item label="Edit" />)
+
+    const style = getStyle(surface)
+    expect(style.backgroundColor).toBe(colors.surfaceContainerLow)
+    expect(style.borderRadius).toBe(shape.cornerLarge)
+    const list = screen.UNSAFE_getByType(ScrollView)
+    expect(StyleSheet.flatten(list.props.contentContainerStyle)).toEqual({
+      paddingVertical: 2,
+    })
+  })
+
+  it('applies the vertical item metrics and type', async () => {
+    await renderVertical(
+      <Menu.Item
+        label="Edit"
+        leadingIcon="pencil"
+        trailingText="⌘E"
+        testID="item"
+      />,
+    )
+
+    const container = getStyle(screen.getByTestId('item'))
+    expect(container.minHeight).toBe(44)
+    expect(container.minWidth).toBe(104)
+    expect(container.marginHorizontal).toBe(4)
+    expect(container.paddingHorizontal).toBe(12)
+    expect(container.paddingVertical).toBe(8)
+
+    const label = getStyle(screen.getByText('Edit'))
+    expect(label.fontSize).toBe(typography.bodyLarge.fontSize)
+    expect(label.color).toBe(colors.onSurface)
+    expect(getStyle(screen.getByText('⌘E')).fontSize).toBe(
+      typography.labelSmall.fontSize,
+    )
+    expect(iconOf('pencil').size).toBe(20)
+    expect(iconOf('pencil').color).toBe(colors.onSurfaceVariant)
+  })
+
+  it('rounds the outer corners of the first and the last item', async () => {
+    const small = shape.cornerExtraSmall
+    const outer = shape.cornerMedium
+    await renderVertical(
+      <>
+        {['first', 'middle'].map((id) => (
+          <Menu.Item key={id} label={id} testID={id} />
+        ))}
+        <Divider />
+        <Menu.Item label="last" testID="last" />
+      </>,
+    )
+
+    expect(corners('first')).toEqual([outer, outer, small, small])
+    expect(corners('middle')).toEqual([small, small, small, small])
+    expect(corners('last')).toEqual([small, small, outer, outer])
+  })
+
+  it('sees the items in two fragments, and keeps their keys apart', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const small = shape.cornerExtraSmall
+    const outer = shape.cornerMedium
+    await renderVertical(
+      <>
+        <>
+          <Menu.Item key="same" label="A" testID="a" />
+        </>
+        <>
+          <Menu.Item key="same" label="B" testID="b" />
+        </>
+      </>,
+    )
+
+    expect(corners('a')).toEqual([outer, outer, small, small])
+    expect(corners('b')).toEqual([small, small, outer, outer])
+    const keyWarnings = errorSpy.mock.calls.filter((call) =>
+      String(call[0]).includes('same key'),
+    )
+    expect(keyWarnings).toEqual([])
+    errorSpy.mockRestore()
+  })
+
+  it('gives one item alone the small corners on every side', async () => {
+    await renderVertical(<Menu.Item label="Edit" testID="item" />)
+    const small = shape.cornerExtraSmall
+    expect(corners('item')).toEqual([small, small, small, small])
+  })
+
+  it('places only the items it can see, and gives an item inside another component the middle shape', async () => {
+    function OwnItem() {
+      return <Menu.Item label="Own" testID="own" />
+    }
+    const small = shape.cornerExtraSmall
+    const outer = shape.cornerMedium
+    await renderVertical(
+      <>
+        <Menu.Item label="A" testID="a" />
+        <OwnItem />
+        <Menu.Item label="B" testID="b" />
+      </>,
+    )
+
+    expect(corners('a')).toEqual([outer, outer, small, small])
+    expect(corners('own')).toEqual([small, small, small, small])
+    expect(corners('b')).toEqual([small, small, outer, outer])
+  })
+
+  it.each([
+    ['selected', { selected: true }],
+    ['checked', { checked: true }],
+  ] as const)(
+    'draws a %s item on tertiaryContainer, with 12dp corners',
+    async (_, state) => {
+      await renderVertical(
+        <Menu.Item label="Name" leadingIcon="sort" testID="item" {...state} />,
+      )
+
+      expect(getStyle(screen.getByTestId('item')).backgroundColor).toBe(
+        colors.tertiaryContainer,
+      )
+      expect(getStyle(screen.getByText('Name')).color).toBe(
+        colors.onTertiaryContainer,
+      )
+      expect(iconOf('sort').color).toBe(colors.onTertiaryContainer)
+      const selected = shape.cornerMedium
+      expect(corners('item')).toEqual([selected, selected, selected, selected])
+    },
+  )
+
+  it('morphs an item to the selected shape when it becomes selected', async () => {
+    function SelectOnPress() {
+      const [on, setOn] = useState(false)
+      return (
+        <Menu.Item
+          label="Name"
+          selected={on}
+          closeOnPress={false}
+          onPress={() => setOn(true)}
+          testID="item"
+        />
+      )
+    }
+    const { flush } = renderSettled(
+      <PortalHost>
+        <Menu
+          anchor={<Button>Actions</Button>}
+          testID="menu"
+          variant="vertical"
+        >
+          <SelectOnPress />
+        </Menu>
+      </PortalHost>,
+    )
+    await open()
+    const small = shape.cornerExtraSmall
+    expect(corners('item')).toEqual([small, small, small, small])
+
+    fireEvent.press(screen.getByTestId('item'))
+    flush()
+
+    const selected = shape.cornerMedium
+    expect(corners('item')).toEqual([selected, selected, selected, selected])
+  })
+
+  it('keeps a disabled selected item on tertiaryContainer, at 38%', async () => {
+    await renderVertical(
+      <Menu.Item label="Name" selected disabled testID="item" />,
+    )
+
+    expect(getStyle(screen.getByTestId('item')).backgroundColor).toBe(
+      alphaColor(colors.tertiaryContainer, stateLayer.disabledOpacity),
+    )
+    expect(getStyle(screen.getByText('Name')).color).toBe(
+      colors.onTertiaryContainer,
+    )
+  })
+
+  it('gives the disabled content of an unselected item onSurface', async () => {
+    await renderVertical(
+      <Menu.Item label="Edit" leadingIcon="pencil" disabled testID="item" />,
+    )
+
+    expect(getStyle(screen.getByText('Edit')).color).toBe(colors.onSurface)
+    expect(iconOf('pencil').color).toBe(colors.onSurface)
+  })
+
+  it('leaves the baseline menu as it was', async () => {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu">
+        <Menu.Item label="Edit" leadingIcon="pencil" selected testID="item" />
+      </Menu>,
+    )
+    const surface = await open()
+
+    expect(getStyle(surface).borderRadius).toBe(shape.cornerExtraSmall)
+    const item = getStyle(screen.getByTestId('item'))
+    expect(item.backgroundColor).toBe(colors.secondaryContainer)
+    expect(item.minHeight).toBe(48)
+    expect(item.borderTopLeftRadius).toBeUndefined()
+    expect(getStyle(screen.getByText('Edit')).fontSize).toBe(
+      typography.labelLarge.fontSize,
+    )
+    expect(iconOf('pencil').size).toBe(24)
   })
 })
 

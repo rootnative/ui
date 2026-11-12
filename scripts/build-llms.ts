@@ -1131,6 +1131,15 @@ import { Divider } from '@rootnative/components/divider'
   <Menu.Item label="Show hidden files" checked={showHidden} closeOnPress={false} onPress={() => setShowHidden(!showHidden)} />
 </Menu>
 
+// The MD3 Expressive vertical menu: a 16dp corner, items 4dp in from the edge,
+// 12dp outer corners on the first and the last item, and a tertiaryContainer
+// selection. The menu sets each item's corners from its place, so pass the
+// items directly, in an array, or in a fragment.
+<Menu variant="vertical" anchor={anchor}>
+  <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={edit} />
+  <Menu.Item label="Delete" leadingIcon="trash-can-outline" onPress={del} />
+</Menu>
+
 // Placement is a preference: a menu that doesn't fit flips to the roomier side,
 // shifts back inside the screen margin horizontally, and scrolls when capped.
 // \`align\` is logical — 'start' is the left edge in LTR, the right edge in RTL.
@@ -2192,8 +2201,10 @@ import { Grid } from '@rootnative/components/layout'
       output +=
         '- `selected?: boolean` — Makes the item one choice of a ' +
         'single-choice group, such as a sort order. `true` draws the MD3 ' +
-        'selected item (`secondaryContainer`, `onSecondaryContainer` ' +
-        'content). A screen reader hears `aria-checked`; the web renders ' +
+        'selected item: `secondaryContainer` with `onSecondaryContainer` ' +
+        'content, or in a vertical menu `tertiaryContainer` with ' +
+        '`onTertiaryContainer` content and 12dp corners. A screen reader ' +
+        'hears `aria-checked`; the web renders ' +
         '`role="menuitemradio"`. Set it on every item of the group. ' +
         'Controlled only. Mutually exclusive with `checked`.\n' +
         '- `checked?: boolean` — Makes the item an on/off setting, such as ' +

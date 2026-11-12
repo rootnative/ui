@@ -2184,6 +2184,15 @@ import { Divider } from '@rootnative/components/divider'
   <Menu.Item label="Show hidden files" checked={showHidden} closeOnPress={false} onPress={() => setShowHidden(!showHidden)} />
 </Menu>
 
+// The MD3 Expressive vertical menu: a 16dp corner, items 4dp in from the edge,
+// 12dp outer corners on the first and the last item, and a tertiaryContainer
+// selection. The menu sets each item's corners from its place, so pass the
+// items directly, in an array, or in a fragment.
+<Menu variant="vertical" anchor={anchor}>
+  <Menu.Item label="Edit" leadingIcon="pencil-outline" onPress={edit} />
+  <Menu.Item label="Delete" leadingIcon="trash-can-outline" onPress={del} />
+</Menu>
+
 // Placement is a preference: a menu that doesn't fit flips to the roomier side,
 // shifts back inside the screen margin horizontally, and scrolls when capped.
 // `align` is logical — 'start' is the left edge in LTR, the right edge in RTL.
@@ -2198,6 +2207,7 @@ import { Divider } from '@rootnative/components/divider'
 Props:
 - `anchor: ReactNode` — The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a measuring `View`. When `visible` is omitted the menu manages its own open state, and it needs to hook the trigger's press: pass a single element that accepts `onPress` (any Root Native pressable does). The element's own `onPress` still fires.
 - `children?: ReactNode` — `Menu.Item`s, `Divider`s, or arbitrary content.
+- `variant?: 'baseline' | 'vertical'` — Default: `'baseline'`. The MD3 menu style. `'baseline'` has a 4dp corner, and its items span the full width. `'vertical'`, the MD3 Expressive menu, has a 16dp corner, and its items sit 4dp in from the edge with their own rounded corners. In a vertical menu, the place of a `Menu.Item` sets its corners. The menu sees an item that is a direct child, in an array, or in a fragment. An item inside another component of yours takes the middle shape.
 - `visible?: boolean` — Controlled visibility. Omit to let the menu open itself on an anchor press and close itself on an outside press, an item press, or Android back.
 - `onDismiss?: () => void` — Called when the menu closes — outside press, item press, or Android back. Required to close a controlled menu; optional otherwise.
 - `side?: 'top' | 'bottom'` — Default: `'bottom'`. Side of the anchor the menu prefers. It flips to the other side when it does not fit and that side is roomier.
@@ -2205,7 +2215,7 @@ Props:
 - `offset?: number` — Default: `0`. Gap between the anchor edge and the menu, in dp.
 - `screenMargin?: number` — Default: `8`. Minimum distance the menu keeps from every screen edge, in dp. The edges are inside the safe-area insets, so the menu stays off the system bars.
 - `maxHeight?: number` — Cap the menu's height in dp, scrolling past it. Only ever makes the menu shorter: the space available on the resolved side still wins, since a menu taller than that would put items where they cannot be seen. Reach for it when a long menu *could* fill the screen but shouldn't — 30 items with room for all of them is a wall of text, and `maxHeight={280}` reads better.
-- `containerColor?: string` — Default: `surfaceContainer`. Override the container (surface) color.
+- `containerColor?: string` — Override the container (surface) color. The default is `surfaceContainer`, or `surfaceContainerLow` in the vertical variant.
 - `hostName?: string` — Name of the `PortalHost` to render into. Defaults to the root host, which is what puts the menu above every other layer.
 - `style?: StyleProp<ViewStyle>` — Style applied to the menu surface.
 - `anchorStyle?: StyleProp<ViewStyle>` — Style applied to the `View` wrapping the anchor.
@@ -2219,18 +2229,18 @@ One choice. Pressing it closes the menu unless `closeOnPress` is `false`.
 
 Props:
 - `label: string` — Item text.
-- `leadingIcon?: IconSource` — Leading icon at 24dp. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
-- `trailingIcon?: IconSource` — Trailing icon at 24dp. Mutually exclusive with `trailingText` in practice.
+- `leadingIcon?: IconSource` — Leading icon at 24dp, or 20dp in a vertical menu. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
+- `trailingIcon?: IconSource` — Trailing icon at 24dp, or 20dp in a vertical menu. Mutually exclusive with `trailingText` in practice.
 - `trailingText?: string` — Trailing text — a keyboard shortcut or a short status.
 - `onPress?: () => void` — Called when the item is pressed.
 - `closeOnPress?: boolean` — Default: `true`. Whether pressing the item closes the menu. Set `false` for an item that toggles something and should stay open.
 - `disabled?: boolean` — Greys the item out at 38% and stops it responding.
-- `containerColor?: string` — Override the item's container background. Hover/press/focus state-layer colors are derived from it automatically. It also replaces the `secondaryContainer` of a selected or checked item.
-- `contentColor?: string` — Override every piece of content the item renders — label, both icons, and trailing text — and the state-layer colors derived from it. Defaults are `onSurface` for the label and `onSurfaceVariant` for the rest, and `onSecondaryContainer` for all of it on a selected or checked item.
+- `containerColor?: string` — Override the item's container background. Hover/press/focus state-layer colors are derived from it automatically. It also replaces the container of a selected or checked item.
+- `contentColor?: string` — Override every piece of content the item renders — label, both icons, and trailing text — and the state-layer colors derived from it. Defaults are `onSurface` for the label and `onSurfaceVariant` for the rest. On a selected or checked item, all of it is `onSecondaryContainer`, or `onTertiaryContainer` in a vertical menu.
 - `labelStyle?: StyleProp<TextStyle>` — Style applied to the label `Text` only — does not affect the icons.
 - `style?: StyleProp<ViewStyle>` — Style applied to the item container. Static form only — the function form `(state) => style` is not supported because the item drives its background through Reanimated. Use `containerColor` / `contentColor` instead.
 - `testID?: string` — Test id applied to the item container.
-- `selected?: boolean` — Makes the item one choice of a single-choice group, such as a sort order. `true` draws the MD3 selected item (`secondaryContainer`, `onSecondaryContainer` content). A screen reader hears `aria-checked`; the web renders `role="menuitemradio"`. Set it on every item of the group. Controlled only. Mutually exclusive with `checked`.
+- `selected?: boolean` — Makes the item one choice of a single-choice group, such as a sort order. `true` draws the MD3 selected item: `secondaryContainer` with `onSecondaryContainer` content, or in a vertical menu `tertiaryContainer` with `onTertiaryContainer` content and 12dp corners. A screen reader hears `aria-checked`; the web renders `role="menuitemradio"`. Set it on every item of the group. Controlled only. Mutually exclusive with `checked`.
 - `checked?: boolean` — Makes the item an on/off setting, such as "Show hidden files". Same colors and `aria-checked`; the web renders `role="menuitemcheckbox"`. Controlled only: flip it in `onPress`. Mutually exclusive with `selected` — the type rejects both together.
 
 ---

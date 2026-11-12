@@ -24,6 +24,9 @@ function MenuScreenContent() {
   const [controlledOpen, setControlledOpen] = useState(false)
   const [sort, setSort] = useState<(typeof SORTS)[number]>('Name')
   const [showHidden, setShowHidden] = useState(false)
+  const [verticalSort, setVerticalSort] =
+    useState<(typeof SORTS)[number]>('Name')
+  const [verticalShowHidden, setVerticalShowHidden] = useState(false)
 
   const scrollStyle = useMemo(
     () => [styles.scroll, { backgroundColor: theme.colors.surface }],
@@ -132,6 +135,47 @@ function MenuScreenContent() {
               <Typography variant="bodySmall" style={mutedText}>
                 Hidden files: {showHidden ? 'shown' : 'hidden'}
               </Typography>
+            </Column>
+          </Card>
+        </Column>
+
+        <Column gap="sm">
+          <Typography variant="titleMedium">Vertical</Typography>
+          <Card variant="outlined">
+            <Column p="md" gap="sm">
+              <Typography variant="bodySmall" style={mutedText}>
+                variant=&quot;vertical&quot; is the MD3 Expressive menu. The
+                first and the last item round their outer corners, and a
+                selected item morphs to 12dp corners.
+              </Typography>
+              <Row gap="sm" align="center">
+                <Menu
+                  variant="vertical"
+                  anchor={
+                    <Button variant="outlined" trailingIcon="chevron-down">
+                      {`Sort: ${verticalSort}`}
+                    </Button>
+                  }
+                >
+                  {SORTS.map((option) => (
+                    <Menu.Item
+                      key={option}
+                      label={option}
+                      selected={option === verticalSort}
+                      closeOnPress={false}
+                      onPress={() => setVerticalSort(option)}
+                    />
+                  ))}
+                  <Menu.Item
+                    label="Show hidden files"
+                    leadingIcon="eye-outline"
+                    checked={verticalShowHidden}
+                    closeOnPress={false}
+                    onPress={() => setVerticalShowHidden((prev) => !prev)}
+                  />
+                  <Menu.Item label="Archive" leadingIcon="archive" disabled />
+                </Menu>
+              </Row>
             </Column>
           </Card>
         </Column>

@@ -11,6 +11,12 @@ export type MenuSide = 'top' | 'bottom'
  */
 export type MenuAlign = 'start' | 'center' | 'end'
 
+/**
+ * The MD3 menu style. `'baseline'` is the original MD3 menu. `'vertical'` is
+ * the MD3 Expressive menu.
+ */
+export type MenuVariant = 'baseline' | 'vertical'
+
 export interface MenuProps extends ViewProps {
   /**
    * The trigger. Rendered where the `<Menu>` sits in the tree, wrapped in a
@@ -23,6 +29,16 @@ export interface MenuProps extends ViewProps {
   anchor: ReactNode
   /** `Menu.Item`s, `Divider`s, or arbitrary content. */
   children?: ReactNode
+  /**
+   * The MD3 menu style. `'baseline'` has a 4dp corner, and its items span the
+   * full width. `'vertical'`, the MD3 Expressive menu, has a 16dp corner, and
+   * its items sit 4dp in from the edge with their own rounded corners. In a
+   * vertical menu, the place of a `Menu.Item` sets its corners. The menu sees
+   * an item that is a direct child, in an array, or in a fragment. An item
+   * inside another component of yours takes the middle shape.
+   * @default 'baseline'
+   */
+  variant?: MenuVariant
   /**
    * Controlled visibility. Omit to let the menu open itself on an anchor press
    * and close itself on an outside press, an item press, or Android back.
@@ -64,8 +80,8 @@ export interface MenuProps extends ViewProps {
    */
   maxHeight?: number
   /**
-   * Override the container (surface) color.
-   * @default surfaceContainer
+   * Override the container (surface) color. The default is `surfaceContainer`,
+   * or `surfaceContainerLow` in the vertical variant.
    */
   containerColor?: string
   /**
@@ -91,11 +107,15 @@ interface MenuItemCommonProps {
   /** Item text. */
   label: string
   /**
-   * Leading icon at 24dp. Accepts a string name (resolved via the theme's
-   * `iconResolver`), a pre-rendered element, or a render function.
+   * Leading icon at 24dp, or 20dp in a vertical menu. Accepts a string name
+   * (resolved via the theme's `iconResolver`), a pre-rendered element, or a
+   * render function.
    */
   leadingIcon?: IconSource
-  /** Trailing icon at 24dp. Mutually exclusive with `trailingText` in practice. */
+  /**
+   * Trailing icon at 24dp, or 20dp in a vertical menu. Mutually exclusive with
+   * `trailingText` in practice.
+   */
   trailingIcon?: IconSource
   /** Trailing text — a keyboard shortcut or a short status. */
   trailingText?: string
@@ -111,15 +131,16 @@ interface MenuItemCommonProps {
   disabled?: boolean
   /**
    * Override the item's container background. Hover/press/focus state-layer
-   * colors are derived from it automatically. It also replaces the
-   * `secondaryContainer` of a selected or checked item.
+   * colors are derived from it automatically. It also replaces the container
+   * of a selected or checked item.
    */
   containerColor?: string
   /**
    * Override every piece of content the item renders — label, both icons, and
    * trailing text — and the state-layer colors derived from it. Defaults are
-   * `onSurface` for the label and `onSurfaceVariant` for the rest, and
-   * `onSecondaryContainer` for all of it on a selected or checked item.
+   * `onSurface` for the label and `onSurfaceVariant` for the rest. On a
+   * selected or checked item, all of it is `onSecondaryContainer`, or
+   * `onTertiaryContainer` in a vertical menu.
    */
   contentColor?: string
   /** Style applied to the label `Text` only — does not affect the icons. */
@@ -144,8 +165,9 @@ export type MenuItemProps = MenuItemCommonProps &
     | {
         /**
          * Makes the item one choice of a single-choice group, such as a sort
-         * order. `true` draws the MD3 selected item (`secondaryContainer`).
-         * A screen reader hears the state through `aria-checked`, and the web
+         * order. `true` draws the MD3 selected item: `secondaryContainer`, or
+         * in a vertical menu `tertiaryContainer` with 12dp corners. A screen
+         * reader hears the state through `aria-checked`, and the web
          * renders `role="menuitemradio"`. Set it on every item of the group,
          * `false` on the others.
          */
@@ -155,8 +177,8 @@ export type MenuItemProps = MenuItemCommonProps &
     | {
         /**
          * Makes the item an on/off setting, such as "Show hidden files".
-         * `true` draws the MD3 selected item (`secondaryContainer`). A screen
-         * reader hears the state through `aria-checked`, and the web renders
+         * `true` draws the same selected item as `selected`. A screen reader
+         * hears the state through `aria-checked`, and the web renders
          * `role="menuitemcheckbox"`. Flip it in `onPress`.
          */
         checked?: boolean
