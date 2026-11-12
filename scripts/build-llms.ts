@@ -1122,9 +1122,13 @@ import { Divider } from '@rootnative/components/divider'
   onDismiss={() => setOpen(false)}
   anchor={<Button onPress={() => setOpen(true)}>Sort</Button>}
 >
-  {/* closeOnPress={false} keeps the menu open for a toggle-style item */}
-  <Menu.Item label="Name" leadingIcon={sort === 'name' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('name')} />
-  <Menu.Item label="Size" leadingIcon={sort === 'size' ? 'check' : undefined} closeOnPress={false} onPress={() => setSort('size')} />
+  {/* selected draws the MD3 selected item and sets aria-checked;
+      closeOnPress={false} keeps the menu open while you choose */}
+  <Menu.Item label="Name" selected={sort === 'name'} closeOnPress={false} onPress={() => setSort('name')} />
+  <Menu.Item label="Size" selected={sort === 'size'} closeOnPress={false} onPress={() => setSort('size')} />
+  <Divider />
+  {/* checked is an on/off setting; flip it in onPress */}
+  <Menu.Item label="Show hidden files" checked={showHidden} closeOnPress={false} onPress={() => setShowHidden(!showHidden)} />
 </Menu>
 
 // Placement is a preference: a menu that doesn't fit flips to the roomier side,
@@ -2174,7 +2178,10 @@ import { Grid } from '@rootnative/components/layout'
       output += '\n'
     }
 
-    const itemIface = interfaces.find((i) => i.name === 'MenuItemProps')
+    // `MenuItemProps` is a type alias: `MenuItemCommonProps` intersected with
+    // a union that makes `selected` and `checked` mutually exclusive. The
+    // parser reads interfaces, so the exclusive pair is described here.
+    const itemIface = interfaces.find((i) => i.name === 'MenuItemCommonProps')
     if (itemIface) {
       output += formatSubInterface(
         itemIface,
@@ -2182,6 +2189,18 @@ import { Grid } from '@rootnative/components/layout'
         '#### Menu.Item',
         'One choice. Pressing it closes the menu unless `closeOnPress` is `false`.',
       )
+      output +=
+        '- `selected?: boolean` — Makes the item one choice of a ' +
+        'single-choice group, such as a sort order. `true` draws the MD3 ' +
+        'selected item (`secondaryContainer`, `onSecondaryContainer` ' +
+        'content). A screen reader hears `aria-checked`; the web renders ' +
+        '`role="menuitemradio"`. Set it on every item of the group. ' +
+        'Controlled only. Mutually exclusive with `checked`.\n' +
+        '- `checked?: boolean` — Makes the item an on/off setting, such as ' +
+        '"Show hidden files". Same colors and `aria-checked`; the web ' +
+        'renders `role="menuitemcheckbox"`. Controlled only: flip it in ' +
+        '`onPress`. Mutually exclusive with `selected` — the type rejects ' +
+        'both together.\n'
     }
 
     return output

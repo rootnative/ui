@@ -29,9 +29,11 @@ import { FAB } from '../../fab'
 import { IconButton } from '../../icon-button'
 import { ListItem } from '../../list'
 import { LoadingIndicator } from '../../loading-indicator'
+import { Menu } from '../../menu'
 import { NavigationBar } from '../../navigation-bar'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { NavigationRail } from '../../navigation-rail'
+import { PortalHost } from '../../portal/PortalHost'
 import { CircularProgress, LinearProgress } from '../../progress'
 import { Radio } from '../../radio'
 import { SearchBar } from '../../search-bar'
@@ -98,6 +100,29 @@ describe('aria-checked reaches the DOM', () => {
     )
     expect(aria('checkbox', 'aria-checked', { index: 0 })).toBe('false')
     expect(aria('checkbox', 'aria-checked', { index: 1 })).toBe('true')
+  })
+
+  // A `menu` owns only `menuitem`, `menuitemradio`, `menuitemcheckbox` and
+  // `group`, so a choice in a menu can't borrow the `radio` or `checkbox` role.
+  it('Menu.Item — a choice is a menuitemradio, a setting a menuitemcheckbox', () => {
+    renderWeb(
+      <PortalHost>
+        <Menu anchor={null} visible onDismiss={jest.fn()}>
+          <Menu.Item label="Name" selected />
+          <Menu.Item label="Size" selected={false} />
+          <Menu.Item label="Show hidden" checked />
+          <Menu.Item label="Wrap lines" checked={false} />
+          <Menu.Item label="Done" />
+        </Menu>
+      </PortalHost>,
+    )
+
+    expect(aria('menuitemradio', 'aria-checked', { index: 0 })).toBe('true')
+    expect(aria('menuitemradio', 'aria-checked', { index: 1 })).toBe('false')
+    expect(aria('menuitemcheckbox', 'aria-checked', { index: 0 })).toBe('true')
+    expect(aria('menuitemcheckbox', 'aria-checked', { index: 1 })).toBe('false')
+    expect(screen.getByRole('menuitem').textContent).toBe('Done')
+    expect(aria('menuitem', 'aria-checked')).toBeNull()
   })
 })
 

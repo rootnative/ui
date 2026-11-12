@@ -109,6 +109,7 @@ function MenuScreenContent() {
                     <Menu.Item
                       key={option}
                       label={option}
+                      selected={option === sort}
                       leadingIcon={option === sort ? 'check' : undefined}
                       closeOnPress={false}
                       onPress={() => setSort(option)}
@@ -117,6 +118,7 @@ function MenuScreenContent() {
                   <Divider />
                   <Menu.Item
                     label="Show hidden files"
+                    checked={showHidden}
                     leadingIcon={showHidden ? 'check' : undefined}
                     closeOnPress={false}
                     onPress={() => setShowHidden((prev) => !prev)}

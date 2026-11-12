@@ -87,7 +87,7 @@ export interface MenuProps extends ViewProps {
   testID?: string
 }
 
-export interface MenuItemProps {
+interface MenuItemCommonProps {
   /** Item text. */
   label: string
   /**
@@ -111,13 +111,15 @@ export interface MenuItemProps {
   disabled?: boolean
   /**
    * Override the item's container background. Hover/press/focus state-layer
-   * colors are derived from it automatically.
+   * colors are derived from it automatically. It also replaces the
+   * `secondaryContainer` of a selected or checked item.
    */
   containerColor?: string
   /**
    * Override every piece of content the item renders — label, both icons, and
    * trailing text — and the state-layer colors derived from it. Defaults are
-   * `onSurface` for the label and `onSurfaceVariant` for the rest.
+   * `onSurface` for the label and `onSurfaceVariant` for the rest, and
+   * `onSecondaryContainer` for all of it on a selected or checked item.
    */
   contentColor?: string
   /** Style applied to the label `Text` only — does not affect the icons. */
@@ -131,3 +133,33 @@ export interface MenuItemProps {
   /** Test id applied to the item container. */
   testID?: string
 }
+
+/**
+ * `selected` and `checked` are two kinds of choice, so an item takes one or
+ * the other. Each is controlled only: the items unmount when the menu closes,
+ * so state kept in an item would reset on the next open.
+ */
+export type MenuItemProps = MenuItemCommonProps &
+  (
+    | {
+        /**
+         * Makes the item one choice of a single-choice group, such as a sort
+         * order. `true` draws the MD3 selected item (`secondaryContainer`).
+         * A screen reader hears the state through `aria-checked`, and the web
+         * renders `role="menuitemradio"`. Set it on every item of the group,
+         * `false` on the others.
+         */
+        selected?: boolean
+        checked?: never
+      }
+    | {
+        /**
+         * Makes the item an on/off setting, such as "Show hidden files".
+         * `true` draws the MD3 selected item (`secondaryContainer`). A screen
+         * reader hears the state through `aria-checked`, and the web renders
+         * `role="menuitemcheckbox"`. Flip it in `onPress`.
+         */
+        checked?: boolean
+        selected?: never
+      }
+  )

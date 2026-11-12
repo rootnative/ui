@@ -1,4 +1,5 @@
 import { lightTheme } from '@rootnative/core'
+import { alphaColor } from '@rootnative/utils'
 import {
   getStyle,
   renderSettled,
@@ -494,6 +495,153 @@ describe('Menu.Item', () => {
       /must be rendered inside a <Menu>/,
     )
     errorSpy.mockRestore()
+  })
+})
+
+/**
+ * The MD3 menu tokens give a selected item `secondaryContainer` and
+ * `onSecondaryContainer`. The web roles are in `web/aria.web.test.tsx`; native
+ * keeps `menuitem`, because Android drops a role it doesn't know.
+ */
+describe('Menu.Item — selected and checked', () => {
+  function renderItems(items: React.ReactNode) {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu">
+        {items}
+      </Menu>,
+    )
+    return open()
+  }
+
+  function iconColor(name: string) {
+    return screen.getByText(name, { includeHiddenElements: true }).props.color
+  }
+
+  it.each([
+    ['selected', { selected: true }],
+    ['checked', { checked: true }],
+  ] as const)(
+    'draws a %s item on secondaryContainer, with onSecondaryContainer content',
+    async (_, state) => {
+      await renderItems(
+        <Menu.Item
+          label="Name"
+          leadingIcon="sort"
+          trailingText="A–Z"
+          trailingIcon="check"
+          testID="item"
+          {...state}
+        />,
+      )
+
+      const { colors } = lightTheme
+      expect(getStyle(screen.getByTestId('item')).backgroundColor).toBe(
+        colors.secondaryContainer,
+      )
+      expect(getStyle(screen.getByText('Name')).color).toBe(
+        colors.onSecondaryContainer,
+      )
+      expect(getStyle(screen.getByText('A–Z')).color).toBe(
+        colors.onSecondaryContainer,
+      )
+      expect(iconColor('sort')).toBe(colors.onSecondaryContainer)
+      expect(iconColor('check')).toBe(colors.onSecondaryContainer)
+    },
+  )
+
+  it.each([
+    ['selected', { selected: false }],
+    ['checked', { checked: false }],
+  ] as const)(
+    'keeps the plain item colors on an item that is not %s',
+    async (_, state) => {
+      await renderItems(
+        <Menu.Item label="Size" leadingIcon="sort" testID="item" {...state} />,
+      )
+
+      const { colors } = lightTheme
+      expect(getStyle(screen.getByTestId('item')).backgroundColor).toBe(
+        'transparent',
+      )
+      expect(getStyle(screen.getByText('Size')).color).toBe(colors.onSurface)
+      expect(iconColor('sort')).toBe(colors.onSurfaceVariant)
+    },
+  )
+
+  it('reports the state through aria-checked and keeps role="menuitem"', async () => {
+    await renderItems(
+      <>
+        <Menu.Item label="Name" selected testID="selected" />
+        <Menu.Item label="Size" selected={false} testID="unselected" />
+        <Menu.Item label="Show hidden" checked testID="checked" />
+        <Menu.Item label="Wrap lines" checked={false} testID="unchecked" />
+        <Menu.Item label="Done" testID="plain" />
+      </>,
+    )
+
+    const checkedOf = (testID: string) =>
+      screen.getByTestId(testID).props.accessibilityState.checked
+    expect(checkedOf('selected')).toBe(true)
+    expect(checkedOf('unselected')).toBe(false)
+    expect(checkedOf('checked')).toBe(true)
+    expect(checkedOf('unchecked')).toBe(false)
+    expect(checkedOf('plain')).toBeUndefined()
+    expect(screen.getAllByRole('menuitem')).toHaveLength(5)
+  })
+
+  it('draws a disabled selected item on the MD3 disabled container, with the plain colors', async () => {
+    await renderItems(
+      <Menu.Item
+        label="Name"
+        leadingIcon="sort"
+        selected
+        disabled
+        testID="item"
+      />,
+    )
+
+    const { colors, stateLayer } = lightTheme
+    const item = screen.getByTestId('item')
+    expect(getStyle(item).backgroundColor).toBe(
+      alphaColor(colors.onSurface, stateLayer.disabledContainerOpacity),
+    )
+    expect(getStyle(screen.getByText('Name')).color).toBe(colors.onSurface)
+    expect(iconColor('sort')).toBe(colors.onSurfaceVariant)
+    expect(item.props.accessibilityState).toEqual({
+      disabled: true,
+      checked: true,
+    })
+  })
+
+  it('lets containerColor and contentColor replace the selected colors', async () => {
+    await renderItems(
+      <Menu.Item
+        label="Name"
+        leadingIcon="sort"
+        selected
+        containerColor="#FF0000"
+        contentColor="#00FF00"
+        testID="item"
+      />,
+    )
+
+    expect(getStyle(screen.getByTestId('item')).backgroundColor).toBe('#FF0000')
+    expect(getStyle(screen.getByText('Name')).color).toBe('#00FF00')
+    expect(iconColor('sort')).toBe('#00FF00')
+  })
+
+  // `selected` and `checked` are two kinds of choice, so the type takes one.
+  // The directive below is the assertion: it fails the type check if the
+  // union stops rejecting the pair.
+  it('rejects selected and checked together at the type level', async () => {
+    await renderItems(
+      // @ts-expect-error - an item is a radio choice or a checkbox, not both
+      <Menu.Item label="Name" selected={false} checked testID="item" />,
+    )
+    // A consumer on plain JS gets no type error, so `selected` wins.
+    expect(screen.getByTestId('item').props.accessibilityState.checked).toBe(
+      false,
+    )
   })
 })
 

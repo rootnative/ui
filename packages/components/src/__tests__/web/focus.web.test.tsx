@@ -332,6 +332,24 @@ describe('Menu popup semantics', () => {
     expect(document.activeElement?.textContent).toBe('Delete')
   })
 
+  it('moves through selected and checked items with the arrow keys', () => {
+    renderWeb(
+      <PortalHost>
+        <Menu anchor={<Button>Sort</Button>} visible onDismiss={() => {}}>
+          <Menu.Item label="Name" selected />
+          <Menu.Item label="Size" selected={false} />
+          <Menu.Item label="Show hidden" checked={false} />
+        </Menu>
+      </PortalHost>,
+    )
+
+    expect(document.activeElement?.textContent).toBe('Name')
+    press('ArrowDown')
+    expect(document.activeElement?.textContent).toBe('Size')
+    press('ArrowDown')
+    expect(document.activeElement?.textContent).toBe('Show hidden')
+  })
+
   it('dismisses on Escape', () => {
     const onDismiss = jest.fn()
     renderWeb(

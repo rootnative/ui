@@ -1,8 +1,9 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
-import { renderIcon } from '@rootnative/utils'
+import { alphaColor, renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Text, View } from 'react-native'
+import { Platform, Text, View } from 'react-native'
+import type { ViewProps } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -10,6 +11,19 @@ import { useStateLayer } from '../internal/useStateLayer'
 import { useMenuContext } from './context'
 import { MENU_ITEM_ICON_SIZE, createMenuItemStyles } from './styles'
 import type { MenuItemProps } from './types'
+
+type CheckKind = 'radio' | 'checkbox'
+type Role = NonNullable<ViewProps['role']>
+
+// React Native's role type has no `menuitemradio` or `menuitemcheckbox`, and
+// Android drops a role it doesn't know, which would lose "menu item". So
+// native keeps `menuitem`, where `aria-checked` alone reads the state.
+// react-native-web writes the role string to the DOM as it is.
+function itemRole(kind: CheckKind | undefined): Role {
+  if (kind === undefined || Platform.OS !== 'web') return 'menuitem'
+  const webRole: string = `menuitem${kind}`
+  return webRole as Role
+}
 
 export function MenuItem({
   label,
@@ -19,6 +33,8 @@ export function MenuItem({
   onPress,
   closeOnPress = true,
   disabled = false,
+  selected,
+  checked,
   containerColor,
   contentColor,
   labelStyle,
@@ -28,9 +44,24 @@ export function MenuItem({
   const { dismiss } = useMenuContext('Menu.Item')
   const theme = useTheme()
   const resolver = useIconResolver()
+
+  const checkKind: CheckKind | undefined =
+    selected !== undefined
+      ? 'radio'
+      : checked !== undefined
+        ? 'checkbox'
+        : undefined
+  const isChecked = (selected ?? checked) === true
+  // A disabled item keeps the plain colors under the MD3 disabled treatment,
+  // and shows its state through the disabled container only.
+  const showsSelected = isChecked && !disabled
+  const resolvedContentColor =
+    contentColor ??
+    (showsSelected ? theme.colors.onSecondaryContainer : undefined)
+
   const styles = useMemo(
-    () => createMenuItemStyles(theme, contentColor),
-    [theme, contentColor],
+    () => createMenuItemStyles(theme, resolvedContentColor),
+    [theme, resolvedContentColor],
   )
 
   const {
@@ -38,15 +69,24 @@ export function MenuItem({
     handlers,
     focusRingStyle: animatedFocusRingStyle,
   } = useStateLayer({
-    rest: 'transparent',
-    content: contentColor ?? theme.colors.onSurface,
+    rest: showsSelected ? theme.colors.secondaryContainer : 'transparent',
+    content: resolvedContentColor ?? theme.colors.onSurface,
     containerColor,
     disabled,
+    disabledContainerColor: isChecked
+      ? alphaColor(
+          theme.colors.onSurface,
+          theme.stateLayer.disabledContainerOpacity,
+        )
+      : undefined,
   })
+
+  const checkedState =
+    checkKind === undefined ? undefined : { 'aria-checked': isChecked }
 
   // Icon color derives from the item's content color, not from `labelStyle` —
   // `labelStyle` is text-only per the override contract.
-  const iconColor = contentColor ?? theme.colors.onSurfaceVariant
+  const iconColor = resolvedContentColor ?? theme.colors.onSurfaceVariant
   const iconProps = useMemo(
     () => ({ size: MENU_ITEM_ICON_SIZE, color: iconColor }),
     [iconColor],
@@ -71,8 +111,9 @@ export function MenuItem({
   return (
     <AnimatedPressable
       testID={testID}
-      role="menuitem"
+      role={itemRole(checkKind)}
       aria-disabled={disabled}
+      {...checkedState}
       disabled={disabled}
       onPress={() => {
         onPress?.()
