@@ -1,14 +1,14 @@
 import { Children, Fragment, cloneElement, isValidElement } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { MenuItemPlaceContext } from './context'
-import type { MenuItemPlace } from './context'
+import type { MenuPlace } from './context'
 import { MenuItem } from './MenuItem'
 
 function isMenuItem(node: ReactNode): node is ReactElement {
   return isValidElement(node) && node.type === MenuItem
 }
 
-function placeOf(index: number, count: number): MenuItemPlace {
+export function placeOf(index: number, count: number): MenuPlace {
   if (count === 1) return 'alone'
   if (index === 0) return 'first'
   if (index === count - 1) return 'last'
@@ -20,7 +20,7 @@ function placeOf(index: number, count: number): MenuItemPlace {
  * Each node from inside a fragment gets the fragment key as a prefix, so two
  * fragments can't give the same key twice.
  */
-function flatten(children: ReactNode, prefix = ''): ReactNode[] {
+export function flatten(children: ReactNode, prefix = ''): ReactNode[] {
   return Children.toArray(children).flatMap((node) => {
     if (!isValidElement(node)) return [node]
     const key = `${prefix}${node.key ?? ''}`

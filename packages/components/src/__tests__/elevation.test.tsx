@@ -209,6 +209,20 @@ const STATIC_CASES = [
     rest: lightTheme.elevation.level2,
   },
   {
+    // One group stays on the menu surface, so the group adds no shadow.
+    name: 'Menu (vertical, one group)',
+    ui: (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}} variant="vertical">
+          <Menu.Group label="Sort by">
+            <Menu.Item label="Name" />
+          </Menu.Group>
+        </Menu>
+      </PortalHost>
+    ),
+    rest: lightTheme.elevation.level2,
+  },
+  {
     name: 'Dialog',
     ui: (
       <PortalHost>
@@ -316,6 +330,47 @@ describe.each(STATIC_CASES)('$name elevation', ({ ui, rest }) => {
       shadowRadius: rest.shadowRadius,
       elevation: rest.elevation,
     })
+  })
+
+  it('emits no boxShadow alongside the native shadow keys', () => {
+    renderWithTheme(ui)
+    for (const style of styles(screen.toJSON())) {
+      expect(style.boxShadow).toBeUndefined()
+    }
+  })
+})
+
+// A vertical menu of two or more groups draws a surface for each group, so it
+// paints one shadow for each group, and the menu surface paints none.
+describe('Menu (vertical, two groups) elevation', () => {
+  const ui = (
+    <PortalHost>
+      <Menu visible anchor={null} onDismiss={() => {}} variant="vertical">
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </Menu>
+    </PortalHost>
+  )
+  const rest = lightTheme.elevation.level2
+
+  it('paints one shadow on each group, and no group clips', () => {
+    renderWithTheme(ui)
+    const layers = shadowed()
+    expect(layers).toHaveLength(2)
+    for (const layer of layers) {
+      expect(layer.overflow).not.toBe('hidden')
+      expect(layer).toMatchObject({
+        shadowColor: rest.shadowColor,
+        shadowOffset: rest.shadowOffset,
+        shadowOpacity: rest.shadowOpacity,
+        shadowRadius: rest.shadowRadius,
+        elevation: rest.elevation,
+      })
+    }
   })
 
   it('emits no boxShadow alongside the native shadow keys', () => {

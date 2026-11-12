@@ -53,13 +53,45 @@ export const VERTICAL_MENU_ITEM_VERTICAL_PADDING = 8
 export const VERTICAL_MENU_ITEM_GAP = 12
 export const VERTICAL_MENU_ITEM_ICON_SIZE = 20
 
+/**
+ * MD3 Expressive menu groups.
+ * Source: androidx.compose.material3 `MenuDefaults` and `Menu.kt` —
+ * `GroupSpacing = SegmentedMenuTokens.SegmentedGap = 2.dp`,
+ * `leadingGroupShape` = `CornerLarge` top and `CornerSmall` bottom,
+ * `middleGroupShape = SegmentedMenuTokens.GroupShape = CornerSmall`,
+ * `trailingGroupShape` = `CornerSmall` top and `CornerLarge` bottom,
+ * `DropdownMenuGroupLabel`: `labelLarge` (the Compose code, no token yet),
+ * `DropdownMenuGroupDefaultMinHeight = 32.dp`,
+ * `DropdownMenuGroupLabelHorizontalPadding` = 12.dp start and 4.dp end.
+ */
+export const VERTICAL_MENU_GROUP_GAP = 2
+export const VERTICAL_MENU_GROUP_LABEL_MIN_HEIGHT = 32
+export const VERTICAL_MENU_GROUP_LABEL_PADDING_START = 12
+export const VERTICAL_MENU_GROUP_LABEL_PADDING_END = 4
+
 export const ITEM_FOCUS_RING_INSET = 2
 const ITEM_FOCUS_RING_WIDTH = 3
 
+/**
+ * A scroll view clips what it holds, the shadow of each group too. In a menu
+ * of groups, the groups sit this far inside the scroll view, and the scroll
+ * view reaches this far past the menu box. So the shadows fit, and the
+ * groups stay where the menu box is.
+ */
+export function groupShadowRoom(theme: MaterialTheme) {
+  const { shadowRadius, shadowOffset } = theme.elevation.level2
+  return shadowRadius + Math.abs(shadowOffset.height)
+}
+
+/**
+ * `stacked` is a vertical menu of two or more groups. Its surface is a clear
+ * column, and each group draws its own surface.
+ */
 export function createMenuStyles(
   theme: MaterialTheme,
   containerColor: string | undefined,
   variant: MenuVariant,
+  stacked: boolean,
 ) {
   const isVertical = variant === 'vertical'
   const corner = isVertical
@@ -68,6 +100,7 @@ export function createMenuStyles(
   const defaultContainerColor = isVertical
     ? theme.colors.surfaceContainerLow
     : theme.colors.surfaceContainer
+  const room = groupShadowRoom(theme)
   return StyleSheet.create({
     // Absolute-fills the portal layer, giving the anchor-relative surface a
     // coordinate space and the dismiss region something to cover.
@@ -78,14 +111,20 @@ export function createMenuStyles(
     dismissRegion: {
       ...StyleSheet.absoluteFill,
     },
-    surface: {
-      position: 'absolute',
-      minWidth: MENU_MIN_WIDTH,
-      maxWidth: MENU_MAX_WIDTH,
-      borderRadius: corner,
-      backgroundColor: containerColor ?? defaultContainerColor,
-      ...elevationStyle(theme.elevation.level2),
-    },
+    surface: stacked
+      ? {
+          position: 'absolute',
+          minWidth: MENU_MIN_WIDTH,
+          maxWidth: MENU_MAX_WIDTH,
+        }
+      : {
+          position: 'absolute',
+          minWidth: MENU_MIN_WIDTH,
+          maxWidth: MENU_MAX_WIDTH,
+          borderRadius: corner,
+          backgroundColor: containerColor ?? defaultContainerColor,
+          ...elevationStyle(theme.elevation.level2),
+        },
     // `flexShrink` is what makes the height cap work. The cap sits on the
     // surface, not here: a ScrollView reports its content height to its parent,
     // so a cap applied only to the ScrollView leaves the surface free to grow to
@@ -96,17 +135,67 @@ export function createMenuStyles(
     // surface: a first/last item's state layer would otherwise paint square over
     // the surface's corners, and `overflow: 'hidden'` on the surface would clip
     // the iOS elevation shadow that sits on the same view.
-    list: {
-      flexShrink: 1,
-      borderRadius: corner,
-      overflow: 'hidden',
-    },
+    list: stacked
+      ? {
+          flexShrink: 1,
+          margin: -room,
+        }
+      : {
+          flexShrink: 1,
+          borderRadius: corner,
+          overflow: 'hidden',
+        },
     // MD3's 8dp block padding scrolls with the items, so the surface carries
     // none of it and the list's maxHeight is the whole vertical budget.
-    listContent: {
-      paddingVertical: isVertical
-        ? VERTICAL_MENU_VERTICAL_PADDING
-        : MENU_VERTICAL_PADDING,
+    listContent: stacked
+      ? {
+          padding: room,
+          gap: VERTICAL_MENU_GROUP_GAP,
+        }
+      : {
+          paddingVertical: isVertical
+            ? VERTICAL_MENU_VERTICAL_PADDING
+            : MENU_VERTICAL_PADDING,
+        },
+  })
+}
+
+function corners(top: number, bottom: number) {
+  return {
+    borderTopLeftRadius: top,
+    borderTopRightRadius: top,
+    borderBottomLeftRadius: bottom,
+    borderBottomRightRadius: bottom,
+  }
+}
+
+export function createMenuGroupStyles(
+  theme: MaterialTheme,
+  containerColor: string | undefined,
+) {
+  const large = theme.shape.cornerLarge
+  const small = theme.shape.cornerSmall
+  return StyleSheet.create({
+    // A group surface doesn't clip: its items keep inside the corners with
+    // their own shapes, and a clip would take the iOS shadow away.
+    surface: {
+      backgroundColor: containerColor ?? theme.colors.surfaceContainerLow,
+      paddingVertical: VERTICAL_MENU_VERTICAL_PADDING,
+      ...elevationStyle(theme.elevation.level2),
+    },
+    first: corners(large, small),
+    middle: corners(small, small),
+    last: corners(small, large),
+    alone: corners(large, large),
+    labelRow: {
+      justifyContent: 'center',
+      minHeight: VERTICAL_MENU_GROUP_LABEL_MIN_HEIGHT,
+      paddingStart: VERTICAL_MENU_GROUP_LABEL_PADDING_START,
+      paddingEnd: VERTICAL_MENU_GROUP_LABEL_PADDING_END,
+    },
+    label: {
+      ...theme.typography.labelLarge,
+      color: theme.colors.onSurface,
     },
   })
 }

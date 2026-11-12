@@ -1,11 +1,13 @@
 {
   "name": "menu",
-  "description": "Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility.",
+  "description": "Anchored dropdown menu (Menu, Menu.Item, Menu.Group) that flips and shifts to stay on screen, with self-managing or controlled visibility.",
   "files": [
     "packages/components/src/menu/Menu.tsx",
+    "packages/components/src/menu/MenuGroup.tsx",
     "packages/components/src/menu/MenuItem.tsx",
     "packages/components/src/menu/context.ts",
     "packages/components/src/menu/index.ts",
+    "packages/components/src/menu/placeGroups.tsx",
     "packages/components/src/menu/placeItems.tsx",
     "packages/components/src/menu/styles.ts",
     "packages/components/src/menu/types.ts",

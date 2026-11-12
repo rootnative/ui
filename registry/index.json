@@ -83,7 +83,7 @@
     },
     {
       "name": "menu",
-      "description": "Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility."
+      "description": "Anchored dropdown menu (Menu, Menu.Item, Menu.Group) that flips and shifts to stay on screen, with self-managing or controlled visibility."
     },
     {
       "name": "navigation-bar",

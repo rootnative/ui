@@ -210,6 +210,41 @@ the 4dp corners.
 When an item becomes selected, its corners morph to 12dp on `springFastSpatial`. Reduced motion
 cuts the morph.
 
+### Groups
+
+`Menu.Group` splits a vertical menu into groups. A group takes an optional `label`.
+
+```tsx
+<Menu variant="vertical" anchor={anchor}>
+  <Menu.Group label="Sort by">
+    <Menu.Item label="Name" selected={sort === 'name'} onPress={() => setSort('name')} />
+    <Menu.Item label="Size" selected={sort === 'size'} onPress={() => setSort('size')} />
+  </Menu.Group>
+  <Menu.Group>
+    <Menu.Item label="Show hidden files" checked={showHidden} onPress={toggleHidden} />
+  </Menu.Group>
+</Menu>
+```
+
+| Part | Value |
+|------|-------|
+| Group | `surfaceContainerLow`, elevation level 2, 2dp block padding |
+| Gap between groups | 2dp |
+| First group | 16dp top corners, 8dp bottom corners |
+| Middle group | 8dp corners |
+| Last group | 8dp top corners, 16dp bottom corners |
+| Label | `labelLarge` / `onSurface`, 32dp minimum height, 12dp start and 4dp end padding |
+
+With two or more groups, each group draws its own surface, and the menu surface is a clear
+column. With one group, the menu surface is the group. The items of each group get their
+corners from their place in that group.
+
+The menu sees a group that is a direct child, in an array, or in a fragment. Children outside a
+`Menu.Group` form a group of their own, so each item is on a group surface.
+
+`Menu.Group` works in a vertical menu only. The MD3 baseline menu has no groups, so a baseline
+menu renders the children of a group with no label, and warns in development.
+
 ## Placement
 
 `side` and `align` are preferences, not commands.
@@ -269,9 +304,10 @@ to open into.
 
 | Prop | Target |
 |------|--------|
-| `containerColor` | The menu surface background |
-| `style` | The menu surface |
+| `containerColor` | The menu surface background. In a vertical menu of two or more groups, the background of each group |
+| `style` | The menu surface. In a vertical menu of two or more groups, the clear column that holds the groups |
 | `anchorStyle` | The `View` wrapping the anchor |
+| `Menu.Group` `style` | The group. In a menu of two or more groups, the group surface |
 | `Menu.Item` `containerColor` | The item background, also on a selected or checked item. The hover, press and focus layers derive from it again |
 | `Menu.Item` `contentColor` | The label, both icons, and the trailing text of the item, also on a selected or checked item |
 | `Menu.Item` `labelStyle` | The label `Text` only. It doesn't affect the icons |
@@ -316,6 +352,9 @@ decides which side it lands on, so the layout must run before the placement.
   item is a `menuitemradio` and a `checked` item a `menuitemcheckbox`. Native keeps `menuitem`,
   and TalkBack and VoiceOver read the checked state from `aria-checked`.
 - An item exposes `accessibilityState.disabled`.
+- On web, a `Menu.Group` reports `role="group"`, and its `label` is the name of the group. The
+  label text itself is hidden from the screen reader, so it isn't read twice. On native, the
+  screen reader reads the label as text before the items of the group.
 - The anchor is annotated for you, in both the controlled and the uncontrolled form: `aria-haspopup="menu"` plus an `aria-expanded` that follows the menu. So a screen reader announces the trigger as a control that opens a menu, not as a plain button.
 - **On web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between the items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web). The surface is *not* marked modal on native, on purpose. A modal mark would also take the dismiss region below out of the accessibility tree.
 - The region that catches outside presses announces as a button labelled "Close menu". Override it with `dismissAccessibilityLabel`. An MD3 menu has no scrim, so this region is transparent. It exists to catch outside presses and to give a screen reader a way out.
@@ -328,3 +367,7 @@ decides which side it lands on, so the layout must run before the placement.
 ### Menu.Item
 
 <PropTable name="MenuItem" />
+
+### Menu.Group
+
+<PropTable name="MenuGroup" />

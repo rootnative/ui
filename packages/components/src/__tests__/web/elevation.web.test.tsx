@@ -152,6 +152,19 @@ it.each([
     level: lightTheme.elevation.level2,
   },
   {
+    name: 'Menu (vertical, one group)',
+    ui: (
+      <PortalHost>
+        <Menu visible anchor={null} onDismiss={() => {}} variant="vertical">
+          <Menu.Group label="Sort by">
+            <Menu.Item label="Name" />
+          </Menu.Group>
+        </Menu>
+      </PortalHost>
+    ),
+    level: lightTheme.elevation.level2,
+  },
+  {
     name: 'Dialog',
     ui: (
       <PortalHost>
@@ -243,6 +256,30 @@ it.each([
 ])('renders the $name elevation as a CSS box-shadow', ({ ui, level }) => {
   const { container } = renderWeb(ui)
   expect(computedBoxShadows(container)).toEqual([elevationBoxShadow(level)])
+})
+
+it('renders a box-shadow on each group of a vertical menu, and none on the menu surface', () => {
+  const { container } = renderWeb(
+    <PortalHost>
+      <Menu visible anchor={null} onDismiss={() => {}} variant="vertical">
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </Menu>
+    </PortalHost>,
+  )
+  const shadow = elevationBoxShadow(lightTheme.elevation.level2)
+  expect(computedBoxShadows(container)).toEqual([shadow, shadow])
+  const groups = Array.from(
+    container.querySelectorAll<HTMLElement>('[role="group"]'),
+  )
+  expect(groups.map((group) => getComputedStyle(group).boxShadow)).toEqual([
+    shadow,
+    shadow,
+  ])
 })
 
 it('renders no box-shadow on a FAB with elevated={false}', () => {

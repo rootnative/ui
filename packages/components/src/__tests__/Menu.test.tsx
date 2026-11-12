@@ -5,17 +5,18 @@ import {
   renderSettled,
   renderWithTheme,
 } from '@rootnative/utils/test'
-import { fireEvent, screen } from '@testing-library/react-native'
+import { fireEvent, screen, within } from '@testing-library/react-native'
 import { useState } from 'react'
 import type {
   MeasureInWindowOnSuccessCallback,
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { I18nManager, ScrollView, StyleSheet, View } from 'react-native'
+import { I18nManager, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
 import { Divider } from '../divider'
-import { Menu } from '../menu'
+import { __resetWarnOnceForTests } from '../internal/warnOnce'
+import { Menu, MenuGroup } from '../menu'
 import { PortalHost } from '../portal/PortalHost'
 
 type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
@@ -63,6 +64,21 @@ function UncontrolledMenu(props: Partial<React.ComponentProps<typeof Menu>>) {
 async function open() {
   fireEvent.press(screen.getByRole('button', { name: 'Actions' }))
   return screen.findByTestId('menu')
+}
+
+/** Top-left, top-right, bottom-left and bottom-right radius. */
+function cornersOf(node: { props: { style?: unknown } }) {
+  const style = getStyle(node)
+  return [
+    style.borderTopLeftRadius,
+    style.borderTopRightRadius,
+    style.borderBottomLeftRadius,
+    style.borderBottomRightRadius,
+  ]
+}
+
+function corners(testID: string) {
+  return cornersOf(screen.getByTestId(testID))
 }
 
 describe('Menu', () => {
@@ -662,16 +678,6 @@ describe('Menu — vertical', () => {
     return open()
   }
 
-  function corners(testID: string) {
-    const style = getStyle(screen.getByTestId(testID))
-    return [
-      style.borderTopLeftRadius,
-      style.borderTopRightRadius,
-      style.borderBottomLeftRadius,
-      style.borderBottomRightRadius,
-    ]
-  }
-
   function iconOf(name: string) {
     return screen.getByText(name, { includeHiddenElements: true }).props
   }
@@ -881,6 +887,315 @@ describe('Menu — vertical', () => {
   })
 })
 
+const styles = StyleSheet.create({
+  marked: { marginTop: 7 },
+})
+
+/**
+ * The groups of the MD3 Expressive vertical menu. The values come from the
+ * Compose `MenuDefaults` and `Menu.kt`; see `menu/styles.ts`.
+ */
+describe('Menu.Group', () => {
+  const { colors, elevation, shape, typography } = lightTheme
+  const large = shape.cornerLarge
+  const small = shape.cornerSmall
+  const itemOuter = shape.cornerMedium
+  const itemInner = shape.cornerExtraSmall
+
+  function renderGroups(
+    groups: React.ReactNode,
+    props: Partial<React.ComponentProps<typeof Menu>> = {},
+  ) {
+    renderMenu(
+      <Menu
+        anchor={<Button>Actions</Button>}
+        testID="menu"
+        variant="vertical"
+        {...props}
+      >
+        {groups}
+      </Menu>,
+    )
+    return open()
+  }
+
+  /** The root view of each `Menu.Group`, in order, implicit groups too. */
+  function groupRoots() {
+    return screen
+      .UNSAFE_getAllByType(MenuGroup)
+      .map((group) => group.findAllByType(View)[0])
+  }
+
+  function hostView(node: ReturnType<typeof screen.getByText>) {
+    for (let n = node.parent; n; n = n.parent) {
+      const type: unknown = n.type
+      if (type === 'View') return n
+    }
+    throw new Error('no host View above the node')
+  }
+
+  it('draws each group on its own elevated surface, with its position shape', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Name" />
+          <Menu.Item label="Size" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Show hidden files" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+    )
+
+    const roots = groupRoots()
+    expect(roots.map(cornersOf)).toEqual([
+      [large, large, small, small],
+      [small, small, small, small],
+      [small, small, large, large],
+    ])
+    for (const root of roots) {
+      const style = getStyle(root)
+      expect(style.backgroundColor).toBe(colors.surfaceContainerLow)
+      expect(style.paddingVertical).toBe(2)
+      expect(style.shadowOpacity).toBe(elevation.level2.shadowOpacity)
+      expect(style.overflow).toBeUndefined()
+    }
+  })
+
+  it('makes the menu surface a clear column, with the groups 2dp apart', async () => {
+    const surface = await renderGroups(
+      <>
+        <Menu.Group>
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+    )
+
+    const style = getStyle(surface)
+    expect(style.backgroundColor).toBeUndefined()
+    expect(style.borderRadius).toBeUndefined()
+    expect(style.shadowOpacity).toBeUndefined()
+    const list = screen.UNSAFE_getByType(ScrollView)
+    const room =
+      elevation.level2.shadowRadius +
+      Math.abs(elevation.level2.shadowOffset.height)
+    expect(StyleSheet.flatten(list.props.style)).toEqual({
+      flexShrink: 1,
+      margin: -room,
+    })
+    expect(StyleSheet.flatten(list.props.contentContainerStyle)).toEqual({
+      padding: room,
+      gap: 2,
+    })
+  })
+
+  it('places the items of each group on their own', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group>
+          <Menu.Item label="A" testID="a" />
+          <Menu.Item label="B" testID="b" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="C" testID="c" />
+        </Menu.Group>
+      </>,
+    )
+
+    expect(corners('a')).toEqual([itemOuter, itemOuter, itemInner, itemInner])
+    expect(corners('b')).toEqual([itemInner, itemInner, itemOuter, itemOuter])
+    expect(corners('c')).toEqual([itemInner, itemInner, itemInner, itemInner])
+  })
+
+  it('renders the label above the items, in labelLarge and onSurface', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group label="Sort by" testID="sort">
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+    )
+
+    const texts = within(screen.getByTestId('sort'))
+      .getAllByText(/.+/)
+      .map((node) => node.props.children)
+    expect(texts).toEqual(['Sort by', 'Name'])
+    const label = screen.getByText('Sort by')
+    expect(getStyle(label)).toMatchObject({
+      fontSize: typography.labelLarge.fontSize,
+      fontWeight: typography.labelLarge.fontWeight,
+      color: colors.onSurface,
+    })
+    expect(getStyle(hostView(label))).toEqual({
+      justifyContent: 'center',
+      minHeight: 32,
+      paddingStart: 12,
+      paddingEnd: 4,
+    })
+  })
+
+  it('puts the children outside a group in a group of their own', async () => {
+    await renderGroups(
+      <>
+        <Menu.Item label="Edit" testID="edit" />
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Item label="Copy" testID="copy" />
+        <Menu.Item label="Paste" testID="paste" />
+      </>,
+    )
+
+    const roots = groupRoots()
+    expect(roots).toHaveLength(3)
+    expect(roots.map((root) => getStyle(root).backgroundColor)).toEqual([
+      colors.surfaceContainerLow,
+      colors.surfaceContainerLow,
+      colors.surfaceContainerLow,
+    ])
+    expect(corners('edit')).toEqual([
+      itemInner,
+      itemInner,
+      itemInner,
+      itemInner,
+    ])
+    expect(corners('copy')).toEqual([
+      itemOuter,
+      itemOuter,
+      itemInner,
+      itemInner,
+    ])
+    expect(corners('paste')).toEqual([
+      itemInner,
+      itemInner,
+      itemOuter,
+      itemOuter,
+    ])
+  })
+
+  it('sees the groups in an array and in a fragment', async () => {
+    await renderGroups(
+      <>
+        {['A', 'B'].map((name) => (
+          <Menu.Group key={name} label={name}>
+            <Menu.Item label={`${name} item`} />
+          </Menu.Group>
+        ))}
+        <>
+          <Menu.Group label="C">
+            <Menu.Item label="C item" />
+          </Menu.Group>
+        </>
+      </>,
+    )
+
+    expect(groupRoots().map(cornersOf)).toEqual([
+      [large, large, small, small],
+      [small, small, small, small],
+      [small, small, large, large],
+    ])
+  })
+
+  it('keeps one group on the menu surface', async () => {
+    const surface = await renderGroups(
+      <Menu.Group label="Sort by" testID="group">
+        <Menu.Item label="Name" testID="a" />
+        <Menu.Item label="Size" testID="b" />
+      </Menu.Group>,
+    )
+
+    expect(getStyle(surface)).toMatchObject({
+      backgroundColor: colors.surfaceContainerLow,
+      borderRadius: large,
+    })
+    const group = getStyle(screen.getByTestId('group'))
+    expect(group.backgroundColor).toBeUndefined()
+    expect(group.shadowOpacity).toBeUndefined()
+    expect(group.borderTopLeftRadius).toBeUndefined()
+    expect(screen.getByText('Sort by')).toBeTruthy()
+    expect(corners('a')).toEqual([itemOuter, itemOuter, itemInner, itemInner])
+    expect(corners('b')).toEqual([itemInner, itemInner, itemOuter, itemOuter])
+  })
+
+  it('colors each group with the containerColor of the menu', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group>
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+      { containerColor: '#123456' },
+    )
+
+    expect(groupRoots().map((root) => getStyle(root).backgroundColor)).toEqual([
+      '#123456',
+      '#123456',
+    ])
+  })
+
+  it('applies style to the group', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group testID="group" style={styles.marked}>
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+    )
+
+    expect(getStyle(screen.getByTestId('group'))).toMatchObject({
+      backgroundColor: colors.surfaceContainerLow,
+      marginTop: 7,
+    })
+  })
+
+  it('renders its children with no label in a baseline menu, and warns', async () => {
+    __resetWarnOnceForTests()
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu">
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Name" />
+        </Menu.Group>
+      </Menu>,
+    )
+    await open()
+
+    expect(screen.getByText('Name')).toBeTruthy()
+    expect(screen.queryByText('Sort by')).toBeNull()
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('<Menu.Group> works in a vertical menu only'),
+    )
+    errorSpy.mockRestore()
+  })
+
+  it('throws when used outside a Menu', () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    expect(() =>
+      renderWithTheme(
+        <Menu.Group>
+          <Text>Orphan</Text>
+        </Menu.Group>,
+      ),
+    ).toThrow('<Menu.Group> must be rendered inside a <Menu>.')
+    errorSpy.mockRestore()
+  })
+})
+
 /**
  * React Native's default layout conformance keeps a legacy Yoga rule: a
  * `flexGrow` child grows a row that is as wide as its content to all the
@@ -926,6 +1241,25 @@ describe('Menu — the width follows the items', () => {
     )
     const surface = await open()
     for (const text of ['Developer', '⌘D', 'Help']) {
+      expect(growsInARow(hostChain(screen.getByText(text), surface))).toEqual(
+        [],
+      )
+    }
+  })
+
+  it('no node between an item or a group label and the surface grows a row, in a menu of groups', async () => {
+    renderMenu(
+      <Menu anchor={<Button>Actions</Button>} testID="menu" variant="vertical">
+        <Menu.Group label="Sort by">
+          <Menu.Item label="Developer" leadingIcon="cog" trailingText="⌘D" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Help" trailingIcon="open-in-new" />
+        </Menu.Group>
+      </Menu>,
+    )
+    const surface = await open()
+    for (const text of ['Sort by', 'Developer', '⌘D', 'Help']) {
       expect(growsInARow(hostChain(screen.getByText(text), surface))).toEqual(
         [],
       )

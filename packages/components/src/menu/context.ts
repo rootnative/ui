@@ -6,6 +6,8 @@ export interface MenuContextValue {
   dismiss: () => void
   /** Sets the metrics, the colors and the shape of each item. */
   variant: MenuVariant
+  /** The `containerColor` of the menu, which a group surface takes too. */
+  containerColor: string | undefined
 }
 
 export const MenuContext = createContext<MenuContextValue | null>(null)
@@ -21,10 +23,20 @@ export function useMenuContext(component: string): MenuContextValue {
 }
 
 /**
- * Where an item sits among the items of a vertical menu. The first and the
- * last item round their outer corners. An item that the menu can't place,
- * because it is inside another component, takes the middle shape.
+ * Where an item sits among the items of its group, or a group among the
+ * groups of a vertical menu. The first and the last round their outer corners.
  */
-export type MenuItemPlace = 'first' | 'middle' | 'last' | 'alone'
+export type MenuPlace = 'first' | 'middle' | 'last' | 'alone'
 
-export const MenuItemPlaceContext = createContext<MenuItemPlace>('middle')
+/**
+ * An item that the menu can't place, because it is inside another component,
+ * takes the middle shape.
+ */
+export const MenuItemPlaceContext = createContext<MenuPlace>('middle')
+
+/**
+ * The place of a group that draws its own surface. `null` when the menu
+ * surface draws the group: the menu has one group, or the menu can't see the
+ * group because it is inside another component.
+ */
+export const MenuGroupPlaceContext = createContext<MenuPlace | null>(null)

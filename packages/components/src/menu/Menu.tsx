@@ -20,8 +20,9 @@ import { Portal } from '../portal/Portal'
 import { physicalLeftStyle } from '../safe-area'
 import { MenuContext } from './context'
 import type { MenuContextValue } from './context'
+import { MenuGroup } from './MenuGroup'
 import { MenuItem } from './MenuItem'
-import { placeItems } from './placeItems'
+import { placeGroups } from './placeGroups'
 import { createMenuStyles } from './styles'
 import type { MenuProps } from './types'
 
@@ -67,9 +68,13 @@ export function Menu({
   ...rest
 }: MenuProps) {
   const theme = useTheme()
+  const layout =
+    variant === 'vertical'
+      ? placeGroups(children)
+      : { stacked: false, content: children }
   const styles = useMemo(
-    () => createMenuStyles(theme, containerColor, variant),
-    [theme, containerColor, variant],
+    () => createMenuStyles(theme, containerColor, variant, layout.stacked),
+    [theme, containerColor, variant, layout.stacked],
   )
 
   const isControlled = visible !== undefined
@@ -92,8 +97,8 @@ export function Menu({
     })
 
   const contextValue = useMemo<MenuContextValue>(
-    () => ({ dismiss, variant }),
-    [dismiss, variant],
+    () => ({ dismiss, variant, containerColor }),
+    [dismiss, variant, containerColor],
   )
 
   // Web keyboard containment. Arrow keys move between items because that is
@@ -213,7 +218,7 @@ export function Menu({
                     contentContainerStyle={styles.listContent}
                     bounces={false}
                   >
-                    {variant === 'vertical' ? placeItems(children) : children}
+                    {layout.content}
                   </ScrollView>
                 </Motion.View>
               ) : null}
@@ -226,3 +231,4 @@ export function Menu({
 }
 
 Menu.Item = MenuItem
+Menu.Group = MenuGroup

@@ -27,14 +27,18 @@ export interface MenuProps extends ViewProps {
    * (any Root Native pressable does). The element's own `onPress` still fires.
    */
   anchor: ReactNode
-  /** `Menu.Item`s, `Divider`s, or arbitrary content. */
+  /**
+   * `Menu.Item`s, `Divider`s, or arbitrary content. A vertical menu also takes
+   * `Menu.Group`s.
+   */
   children?: ReactNode
   /**
    * The MD3 menu style. `'baseline'` has a 4dp corner, and its items span the
    * full width. `'vertical'`, the MD3 Expressive menu, has a 16dp corner, and
    * its items sit 4dp in from the edge with their own rounded corners. In a
-   * vertical menu, the place of a `Menu.Item` sets its corners. The menu sees
-   * an item that is a direct child, in an array, or in a fragment. An item
+   * vertical menu, the place of a `Menu.Item` sets its corners, and the place
+   * of a `Menu.Group` sets the corners of its surface. The menu sees an item
+   * or a group that is a direct child, in an array, or in a fragment. An item
    * inside another component of yours takes the middle shape.
    * @default 'baseline'
    */
@@ -81,7 +85,8 @@ export interface MenuProps extends ViewProps {
   maxHeight?: number
   /**
    * Override the container (surface) color. The default is `surfaceContainer`,
-   * or `surfaceContainerLow` in the vertical variant.
+   * or `surfaceContainerLow` in the vertical variant. In a vertical menu of two
+   * or more groups, it colors each group.
    */
   containerColor?: string
   /**
@@ -89,7 +94,10 @@ export interface MenuProps extends ViewProps {
    * is what puts the menu above every other layer.
    */
   hostName?: string
-  /** Style applied to the menu surface. */
+  /**
+   * Style applied to the menu surface. In a vertical menu of two or more
+   * groups, the surface is a clear column, and each group draws its own.
+   */
   style?: StyleProp<ViewStyle>
   /** Style applied to the `View` wrapping the anchor. */
   anchorStyle?: StyleProp<ViewStyle>
@@ -100,6 +108,23 @@ export interface MenuProps extends ViewProps {
    */
   dismissAccessibilityLabel?: string
   /** Test id applied to the menu surface. */
+  testID?: string
+}
+
+export interface MenuGroupProps extends ViewProps {
+  /**
+   * The group label, in `labelLarge`, above the items. A screen reader hears
+   * it as the name of the group.
+   */
+  label?: string
+  /** The `Menu.Item`s of the group, `Divider`s, or arbitrary content. */
+  children?: ReactNode
+  /**
+   * Style applied to the group. In a menu of two or more groups, that is the
+   * group surface.
+   */
+  style?: StyleProp<ViewStyle>
+  /** Test id applied to the group. */
   testID?: string
 }
 

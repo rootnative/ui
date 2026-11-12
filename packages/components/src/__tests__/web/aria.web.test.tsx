@@ -124,6 +124,40 @@ describe('aria-checked reaches the DOM', () => {
     expect(screen.getByRole('menuitem').textContent).toBe('Done')
     expect(aria('menuitem', 'aria-checked')).toBeNull()
   })
+
+  // The same rule: a `menu` owns no plain text, so the label names the group
+  // and its own text is hidden.
+  it('Menu.Group — a group named by its label, and the label text hidden', () => {
+    renderWeb(
+      <PortalHost>
+        <Menu anchor={null} visible onDismiss={jest.fn()} variant="vertical">
+          <Menu.Group label="Sort by">
+            <Menu.Item label="Name" selected />
+            <Menu.Item label="Size" selected={false} />
+          </Menu.Group>
+          <Menu.Group>
+            <Menu.Item label="Archive" />
+          </Menu.Group>
+        </Menu>
+      </PortalHost>,
+    )
+
+    const groups = screen.getAllByRole('group')
+    expect(groups).toHaveLength(2)
+    expect(groups[0].getAttribute('aria-label')).toBe('Sort by')
+    expect(groups[1].hasAttribute('aria-label')).toBe(false)
+    expect(
+      screen.getByText('Sort by').closest('[aria-hidden="true"]'),
+    ).not.toBeNull()
+    expect(
+      Array.from(groups[0].querySelectorAll('[role="menuitemradio"]')).map(
+        (item) => item.textContent,
+      ),
+    ).toEqual(['Name', 'Size'])
+    expect(screen.getByRole('menuitem').closest('[role="group"]')).toBe(
+      groups[1],
+    )
+  })
 })
 
 describe('aria-selected reaches the DOM', () => {

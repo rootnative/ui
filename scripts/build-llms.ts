@@ -1140,6 +1140,20 @@ import { Divider } from '@rootnative/components/divider'
   <Menu.Item label="Delete" leadingIcon="trash-can-outline" onPress={del} />
 </Menu>
 
+// Groups, in a vertical menu only. Two or more groups each get their own
+// surface, 2dp apart, and the menu surface is a clear column. The label is the
+// group name for a screen reader. Children outside a Menu.Group form a group
+// of their own.
+<Menu variant="vertical" anchor={anchor}>
+  <Menu.Group label="Sort by">
+    <Menu.Item label="Name" selected={sort === 'name'} closeOnPress={false} onPress={() => setSort('name')} />
+    <Menu.Item label="Size" selected={sort === 'size'} closeOnPress={false} onPress={() => setSort('size')} />
+  </Menu.Group>
+  <Menu.Group>
+    <Menu.Item label="Show hidden files" checked={showHidden} closeOnPress={false} onPress={() => setShowHidden(!showHidden)} />
+  </Menu.Group>
+</Menu>
+
 // Placement is a preference: a menu that doesn't fit flips to the roomier side,
 // shifts back inside the screen margin horizontally, and scrolls when capped.
 // \`align\` is logical — 'start' is the left edge in LTR, the right edge in RTL.
@@ -2212,6 +2226,20 @@ import { Grid } from '@rootnative/components/layout'
         'renders `role="menuitemcheckbox"`. Controlled only: flip it in ' +
         '`onPress`. Mutually exclusive with `selected` — the type rejects ' +
         'both together.\n'
+    }
+
+    const groupIface = interfaces.find((i) => i.name === 'MenuGroupProps')
+    if (groupIface) {
+      output += '\n'
+      output += formatSubInterface(
+        groupIface,
+        typeAliases,
+        '#### Menu.Group',
+        'A group of items with an optional label, in a vertical menu only. ' +
+          'Two or more groups each draw their own surface with their position ' +
+          'shape. One group stays on the menu surface. In a baseline menu it ' +
+          'renders its children with no label, and warns in dev.',
+      )
     }
 
     return output

@@ -225,6 +225,8 @@
         "LoadingIndicatorProps",
         "Menu",
         "MenuAlign",
+        "MenuGroup",
+        "MenuGroupProps",
         "MenuItem",
         "MenuItemProps",
         "MenuProps",

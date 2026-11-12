@@ -15,7 +15,7 @@ import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import { MenuItemPlaceContext, useMenuContext } from './context'
-import type { MenuItemPlace } from './context'
+import type { MenuPlace } from './context'
 import {
   ITEM_FOCUS_RING_INSET,
   MENU_ITEM_ICON_SIZE,
@@ -82,7 +82,7 @@ function resolveItemColors(
 }
 
 /** Top and bottom corner radius of a vertical menu item at rest. */
-function restCorners(theme: MaterialTheme, place: MenuItemPlace) {
+function restCorners(theme: MaterialTheme, place: MenuPlace) {
   const inner = theme.shape.cornerExtraSmall
   const outer = theme.shape.cornerMedium
   if (place === 'first') return { top: outer, bottom: inner }

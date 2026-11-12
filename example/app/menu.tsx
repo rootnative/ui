@@ -146,7 +146,8 @@ function MenuScreenContent() {
               <Typography variant="bodySmall" style={mutedText}>
                 variant=&quot;vertical&quot; is the MD3 Expressive menu. The
                 first and the last item round their outer corners, and a
-                selected item morphs to 12dp corners.
+                selected item morphs to 12dp corners. Menu.Group splits it into
+                groups, each on its own surface, 2dp apart.
               </Typography>
               <Row gap="sm" align="center">
                 <Menu
@@ -174,6 +175,47 @@ function MenuScreenContent() {
                     onPress={() => setVerticalShowHidden((prev) => !prev)}
                   />
                   <Menu.Item label="Archive" leadingIcon="archive" disabled />
+                </Menu>
+                <Menu
+                  variant="vertical"
+                  anchor={
+                    <Button variant="outlined" trailingIcon="chevron-down">
+                      Groups
+                    </Button>
+                  }
+                >
+                  <Menu.Group label="Sort by">
+                    {SORTS.map((option) => (
+                      <Menu.Item
+                        key={option}
+                        label={option}
+                        selected={option === verticalSort}
+                        closeOnPress={false}
+                        onPress={() => setVerticalSort(option)}
+                      />
+                    ))}
+                  </Menu.Group>
+                  <Menu.Group label="View">
+                    <Menu.Item
+                      label="Show hidden files"
+                      leadingIcon="eye-outline"
+                      checked={verticalShowHidden}
+                      closeOnPress={false}
+                      onPress={() => setVerticalShowHidden((prev) => !prev)}
+                    />
+                  </Menu.Group>
+                  <Menu.Group>
+                    <Menu.Item
+                      label="Archive"
+                      leadingIcon="archive"
+                      onPress={() => setLastAction('Archive')}
+                    />
+                    <Menu.Item
+                      label="Delete"
+                      leadingIcon="trash-can-outline"
+                      onPress={() => setLastAction('Delete')}
+                    />
+                  </Menu.Group>
                 </Menu>
               </Row>
             </Column>

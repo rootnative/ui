@@ -200,6 +200,25 @@ describe('RN prop passthrough reaches the root node', () => {
     expect(screen.getByTestId('menu').props.nativeID).toBe('probe')
   })
 
+  it('Menu.Group', () => {
+    renderHosted(
+      <Menu
+        visible
+        onDismiss={jest.fn()}
+        anchor={<Text>Open</Text>}
+        variant="vertical"
+      >
+        <Menu.Group testID="group" nativeID="probe">
+          <Menu.Item label="One" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Two" />
+        </Menu.Group>
+      </Menu>,
+    )
+    expect(screen.getByTestId('group').props.nativeID).toBe('probe')
+  })
+
   it('Tooltip', () => {
     renderHosted(
       <Tooltip

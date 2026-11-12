@@ -76,6 +76,7 @@ const PACKAGES: PackageSpec[] = [
       'DialogContext',
       'MenuContext',
       'MenuItemPlaceContext',
+      'MenuGroupPlaceContext',
       'NavigationDrawerContext',
       'AppBarContentColorContext',
       'LayoutEdgesContext',
