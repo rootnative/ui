@@ -85,13 +85,16 @@ export function groupShadowRoom(theme: MaterialTheme) {
 
 /**
  * `stacked` is a vertical menu of two or more groups. Its surface is a clear
- * column, and each group draws its own surface.
+ * column, and each group draws its own surface. `scrolls` is a stacked menu
+ * whose groups are taller than the menu: it keeps the shadow room at the
+ * sides only.
  */
 export function createMenuStyles(
   theme: MaterialTheme,
   containerColor: string | undefined,
   variant: MenuVariant,
   stacked: boolean,
+  scrolls: boolean,
 ) {
   const isVertical = variant === 'vertical'
   const corner = isVertical
@@ -138,7 +141,8 @@ export function createMenuStyles(
     list: stacked
       ? {
           flexShrink: 1,
-          margin: -room,
+          marginHorizontal: -room,
+          marginVertical: scrolls ? 0 : -room,
         }
       : {
           flexShrink: 1,
@@ -149,7 +153,8 @@ export function createMenuStyles(
     // none of it and the list's maxHeight is the whole vertical budget.
     listContent: stacked
       ? {
-          padding: room,
+          paddingHorizontal: room,
+          paddingVertical: scrolls ? 0 : room,
           gap: VERTICAL_MENU_GROUP_GAP,
         }
       : {
@@ -187,15 +192,19 @@ export function createMenuGroupStyles(
     middle: corners(small, small),
     last: corners(small, large),
     alone: corners(large, large),
+    // A row, as the item content is: react-native-web gives a text
+    // `dir="auto"`, so a text that fills the width aligns by its own script,
+    // not by the page. In a row it is as wide as its content, at the start.
+    // The side padding is in `MenuGroup`, through `resolveLogical`.
     labelRow: {
-      justifyContent: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
       minHeight: VERTICAL_MENU_GROUP_LABEL_MIN_HEIGHT,
-      paddingStart: VERTICAL_MENU_GROUP_LABEL_PADDING_START,
-      paddingEnd: VERTICAL_MENU_GROUP_LABEL_PADDING_END,
     },
     label: {
       ...theme.typography.labelLarge,
       color: theme.colors.onSurface,
+      flexShrink: 1,
     },
   })
 }

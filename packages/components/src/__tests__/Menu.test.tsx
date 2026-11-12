@@ -987,12 +987,59 @@ describe('Menu.Group', () => {
       Math.abs(elevation.level2.shadowOffset.height)
     expect(StyleSheet.flatten(list.props.style)).toEqual({
       flexShrink: 1,
-      margin: -room,
+      marginHorizontal: -room,
+      marginVertical: -room,
     })
     expect(StyleSheet.flatten(list.props.contentContainerStyle)).toEqual({
-      padding: room,
+      paddingHorizontal: room,
+      paddingVertical: room,
       gap: 2,
     })
+  })
+
+  it('keeps the shadow room at the sides only while the groups scroll', async () => {
+    await renderGroups(
+      <>
+        <Menu.Group>
+          <Menu.Item label="Name" />
+        </Menu.Group>
+        <Menu.Group>
+          <Menu.Item label="Archive" />
+        </Menu.Group>
+      </>,
+    )
+    const room =
+      elevation.level2.shadowRadius +
+      Math.abs(elevation.level2.shadowOffset.height)
+    const list = () => screen.UNSAFE_getByType(ScrollView)
+    const layout = (height: number) => ({
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height } },
+    })
+
+    // The groups fit: the scroll view is as tall as its content.
+    fireEvent(list(), 'contentSizeChange', 200, 300)
+    fireEvent(list(), 'layout', layout(300))
+    expect(StyleSheet.flatten(list().props.style).marginVertical).toBe(-room)
+
+    // The menu caps below the groups, so they scroll.
+    fireEvent(list(), 'layout', layout(200))
+    expect(StyleSheet.flatten(list().props.style)).toEqual({
+      flexShrink: 1,
+      marginHorizontal: -room,
+      marginVertical: 0,
+    })
+    expect(StyleSheet.flatten(list().props.contentContainerStyle)).toEqual({
+      paddingHorizontal: room,
+      paddingVertical: 0,
+      gap: 2,
+    })
+  })
+
+  it('leaves the scroll view of a menu with no groups as it was', async () => {
+    await renderGroups(<Menu.Item label="Name" />)
+    const list = screen.UNSAFE_getByType(ScrollView)
+    expect(list.props.onContentSizeChange).toBeUndefined()
+    expect(list.props.onLayout).toBeUndefined()
   })
 
   it('places the items of each group on their own', async () => {
@@ -1036,7 +1083,8 @@ describe('Menu.Group', () => {
       color: colors.onSurface,
     })
     expect(getStyle(hostView(label))).toEqual({
-      justifyContent: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
       minHeight: 32,
       paddingStart: 12,
       paddingEnd: 4,

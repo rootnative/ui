@@ -46,6 +46,7 @@ import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
+import { Menu } from '../../menu'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
 import { physicalLeftStyle } from '../../safe-area'
@@ -198,6 +199,33 @@ describe('resolveLogical writes the physical key for the document direction', ()
     const label = screen.getByText('Name').parentElement as HTMLElement
     expect(label.style.right).toBe('16px')
     expect(label.style.left).toBe('')
+  })
+
+  it('swaps the menu group label insets between the edges under dir="rtl"', () => {
+    const menu = (
+      <PortalHost>
+        <Menu anchor={null} visible onDismiss={() => {}} variant="vertical">
+          <Menu.Group label="Sort by">
+            <Menu.Item label="Name" />
+          </Menu.Group>
+          <Menu.Group>
+            <Menu.Item label="Archive" />
+          </Menu.Group>
+        </Menu>
+      </PortalHost>
+    )
+    const insets = () => {
+      const row = screen.getByText('Sort by').parentElement as HTMLElement
+      return [row.style.paddingLeft, row.style.paddingRight]
+    }
+
+    const ltr = renderWeb(menu)
+    expect(insets()).toEqual(['12px', '4px'])
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(menu)
+    expect(insets()).toEqual(['4px', '12px'])
   })
 })
 

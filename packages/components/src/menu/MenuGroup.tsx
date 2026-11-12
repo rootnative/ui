@@ -1,10 +1,15 @@
 import { useTheme } from '@rootnative/core'
+import { resolveLogical } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { warnOnce } from '../internal/warnOnce'
 import { MenuGroupPlaceContext, useMenuContext } from './context'
 import { placeItems } from './placeItems'
-import { createMenuGroupStyles } from './styles'
+import {
+  VERTICAL_MENU_GROUP_LABEL_PADDING_END,
+  VERTICAL_MENU_GROUP_LABEL_PADDING_START,
+  createMenuGroupStyles,
+} from './styles'
 import type { MenuGroupProps } from './types'
 
 const isWeb = Platform.OS === 'web'
@@ -27,6 +32,21 @@ export function MenuGroup({
     () => [place === null ? undefined : [styles.surface, styles[place]], style],
     [place, styles, style],
   )
+  // react-native-web writes a `paddingStart` to the left edge, also under
+  // `dir="rtl"`, so the one-sided insets resolve against the document.
+  const labelRowStyle = useMemo(
+    () => [
+      styles.labelRow,
+      {
+        ...resolveLogical(
+          'paddingStart',
+          VERTICAL_MENU_GROUP_LABEL_PADDING_START,
+        ),
+        ...resolveLogical('paddingEnd', VERTICAL_MENU_GROUP_LABEL_PADDING_END),
+      },
+    ],
+    [styles],
+  )
 
   if (variant !== 'vertical') {
     warnOnce(
@@ -47,7 +67,7 @@ export function MenuGroup({
   return (
     <View {...rest} {...webGroup} testID={testID} style={groupStyle}>
       {label !== undefined ? (
-        <View style={styles.labelRow} aria-hidden={isWeb}>
+        <View style={labelRowStyle} aria-hidden={isWeb}>
           <Text style={styles.label}>{label}</Text>
         </View>
       ) : null}

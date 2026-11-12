@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react'
 import type { ReactElement } from 'react'
-import type { GestureResponderEvent } from 'react-native'
+import type { GestureResponderEvent, LayoutChangeEvent } from 'react-native'
 import { Pressable, ScrollView, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
@@ -72,9 +72,28 @@ export function Menu({
     variant === 'vertical'
       ? placeGroups(children)
       : { stacked: false, content: children }
+
+  // A menu of groups has room for the group shadows above and below them in
+  // the scroll view. While the groups scroll, that room would show items past
+  // the menu box, over the anchor, so it goes. The two heights compare the
+  // same way with or without the room, so the switch can't flip back.
+  const [contentHeight, setContentHeight] = useState(0)
+  const [viewportHeight, setViewportHeight] = useState(0)
+  const scrolls = layout.stacked && contentHeight > viewportHeight + 0.5
+  const onContentSizeChange = useCallback(
+    (_width: number, height: number) => setContentHeight(height),
+    [],
+  )
+  const onListLayout = useCallback(
+    (event: LayoutChangeEvent) =>
+      setViewportHeight(event.nativeEvent.layout.height),
+    [],
+  )
+
   const styles = useMemo(
-    () => createMenuStyles(theme, containerColor, variant, layout.stacked),
-    [theme, containerColor, variant, layout.stacked],
+    () =>
+      createMenuStyles(theme, containerColor, variant, layout.stacked, scrolls),
+    [theme, containerColor, variant, layout.stacked, scrolls],
   )
 
   const isControlled = visible !== undefined
@@ -217,6 +236,10 @@ export function Menu({
                     style={styles.list}
                     contentContainerStyle={styles.listContent}
                     bounces={false}
+                    onContentSizeChange={
+                      layout.stacked ? onContentSizeChange : undefined
+                    }
+                    onLayout={layout.stacked ? onListLayout : undefined}
                   >
                     {layout.content}
                   </ScrollView>
