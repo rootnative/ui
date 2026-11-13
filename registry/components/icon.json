@@ -10,7 +10,7 @@
   "utils": ["render-icon"],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.36"
+    "@rootnative/core": ">=0.0.0-alpha.37"
   },
   "optionalDependencies": {}
 }

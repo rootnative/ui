@@ -18,7 +18,7 @@
     "typography"
   ],
   "dependencies": {
-    "@rootnative/core": ">=0.0.0-alpha.36",
+    "@rootnative/core": ">=0.0.0-alpha.37",
     "react-native-safe-area-context": ">=4.0.0",
     "@rootnative/inertia": ">=0.0.26",
     "react-native-reanimated": ">=4.7.0 <4.8.0",

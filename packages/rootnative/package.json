@@ -1,6 +1,6 @@
 {
   "name": "rootnative",
-  "version": "0.0.0-alpha.36",
+  "version": "0.0.0-alpha.37",
   "description": "CLI for Root Native UI — shorthand for @rootnative/cli",
   "bin": {
     "rootnative": "bin/cli.mjs"
