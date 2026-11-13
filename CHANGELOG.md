@@ -9,6 +9,97 @@ and read the whole release rather than scanning for a label.
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
 
+## 0.0.0-alpha.37 — 2026-11-14
+
+**No breaking change, and one fix that matters for every app.** From
+alpha.33 to alpha.36, a screen with a `CircularProgress` aborted the app on
+native, and a `Button` with `loading` crashed the page on the Expo web dev
+server. This release fixes both, so an app that stayed on alpha.32 can
+upgrade. New in this release: the MD3 Expressive vertical menu with
+`Menu.Group`, a selected and a checked state on `Menu.Item`, and
+`insetSides="start"` or `"end"` on `AppBar`. One keyboard behavior changes:
+on the web, Tab moves between the two thumbs of a range `Slider`, and Enter
+and Space don't switch the thumb. No peer range moves. The
+`@rootnative/inertia` floor stays at `0.0.26`; inertia `0.0.29` is inside
+the range and this release needs nothing from it.
+
+- **Fix: `CircularProgress` doesn't abort the app.** The build renamed one
+  import of a Reanimated hook to `useAnimatedProps2`, and the Worklets Babel
+  plugin doesn't recognize a hook under another name. So the three callbacks
+  of `CircularProgress` shipped as plain functions. On native, the error on
+  the UI thread aborted the app. It was seen in Expo Go on iOS. On the Expo
+  web dev server, Reanimated threw, so each screen with a
+  `CircularProgress` crashed, and a `Button` with `loading` too. A
+  production web export didn't crash. Each Reanimated hook callback in
+  `@rootnative/components` now starts with a `'worklet'` directive, so it's
+  a worklet under any import name.
+
+- **New: the MD3 Expressive vertical menu.** Pass `variant="vertical"` to
+  `Menu`. The container takes `surfaceContainerLow` and a 16dp corner. Each
+  item sits 4dp in from the sides, with a 44dp minimum height, a `bodyLarge`
+  label and 20dp icons. The first and the last item take 12dp outer corners.
+  A selected or checked item takes `tertiaryContainer` with
+  `onTertiaryContainer` content, and its corners morph to 12dp. Reduced
+  motion cuts the morph. The default, `'baseline'`, is the menu as before,
+  with no change. The menu sets the corners of an item that is a direct
+  child, in an array, or in a fragment. The Menu page has the full table.
+  New type: `MenuVariant`.
+
+- **New: `Menu.Group` for a vertical menu.** A group takes an optional
+  `label`. With two or more groups, each group draws its own surface, 2dp
+  apart, and the menu surface is a clear column. The first group has 16dp
+  top corners, the last group has 16dp bottom corners, and the other corners
+  are 8dp. Children outside a `Menu.Group` form a group of their own. The
+  menu `containerColor` colors each group. On web, a group reports
+  `role="group"` with the label as its name. On native, a screen reader
+  reads the label before the items. The label follows the layout direction.
+  The MD3 baseline menu has no groups, so a baseline menu renders the
+  children of a group with no label, and warns in development. New exports:
+  `MenuGroup` and the `MenuGroupProps` type.
+
+- **New: `selected` and `checked` on `Menu.Item`.** Use `selected` for one
+  choice of a group, such as a sort order, and `checked` for an on/off
+  setting. The type rejects both together. In a baseline menu the item takes
+  `secondaryContainer` with `onSecondaryContainer` content. Both props are
+  controlled only: the items unmount when the menu closes, so keep the state
+  and change it in `onPress`. Pass `closeOnPress={false}` to keep the menu
+  open. A screen reader gets the state through `aria-checked`. On web, a
+  `selected` item is a `menuitemradio` and a `checked` item is a
+  `menuitemcheckbox`. Before, a menu had no way to show the current choice,
+  and a screen reader didn't hear it.
+
+- **New: `insetSides` on `AppBar` takes `'start'` or `'end'`.** In
+  landscape, a bar inside a `Layout` pulls its background out to both screen
+  edges. A bar beside a `NavigationRail` touches the screen at its end edge
+  only, so its background covered the rail, and `insetSides={false}` turned
+  off both sides. Pass `insetSides="end"`: the bar then pads and bleeds on
+  that side only. Start and end follow the layout direction. `BottomAppBar`
+  and `NavigationBar` keep a boolean.
+
+- **A range `Slider` gives each thumb its own control.** A screen reader got
+  one control for the two thumbs, and its increment and decrement actions
+  moved the low thumb only. So a TalkBack or VoiceOver user couldn't set the
+  upper bound. Each thumb is now its own adjustable control, with its own
+  value. The thumbs read "Minimum" and "Maximum". Change them with the new
+  `startThumbAccessibilityLabel` and `endThumbAccessibilityLabel` props.
+  With `accessibilityLabel`, a thumb reads both, for example "Runtime,
+  Shortest". What to check: on the web, each thumb is a tab stop now, and
+  Enter and Space don't switch the thumb that the arrow keys move.
+
+- **The `square` shape of `Button` and `IconButton` reads the corners of the
+  theme.** The square corner was a fixed number (12, 16 or 28), so
+  `roundness` and your own corner tokens didn't reach a square button. The
+  corner now comes from `theme.shape`: `cornerMedium` at `extraSmall` and
+  `small`, `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and
+  `extraLarge`. The pressed corner, and the corner of a selected round
+  `IconButton`, come from the theme too. The default MD3 theme gives the
+  same values as before. What to check: with a theme that changes
+  `roundness` or the corner tokens, a square button now follows it.
+
+- **Docs: a grouped sidebar and the name Root Native.** The sidebar has two
+  groups, Guides and Reference. The docs and the package READMEs write the
+  name as two words. The package names and the imports don't change.
+
 ## 0.0.0-alpha.36 — 2026-11-09
 
 **No breaking change.** No export and no prop is removed. Some defaults
