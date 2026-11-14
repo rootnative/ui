@@ -21,6 +21,7 @@ pnpm add @rootnative/seo
 | `@rootnative/seo/expo-router` | `expo-router` | `PageHead`, `RouteHead`, `shellTags` |
 | `@rootnative/seo/expo-image` | `expo-image` | `Picture`: a plain `<img>` on the web, `expo-image` on native |
 | `@rootnative/seo/dom` | `react`, `react-native` | `PageHead` for an app with no Expo Router: writes the same tags to `document.head` |
+| `@rootnative/seo/web` | `react`, `react-native` | `PageHead` for an app with no Expo Router that renders on a server or prerenders: the same tags as elements, which React moves into the head |
 | `@rootnative/seo/node` | Node | `writeSeoFiles`, `auditExport`, `browseExport`, `serveExport`, the `rootnative-seo` command, `readExport`, `writeSitemap`, `writeRobots`, `writeManifest` |
 
 ## Quick start (Expo Router)

@@ -44,6 +44,12 @@
       "import": "./dist/dom/index.mjs",
       "default": "./dist/dom/index.mjs"
     },
+    "./web": {
+      "types": "./dist/web/index.d.mts",
+      "react-native": "./dist/web/index.mjs",
+      "import": "./dist/web/index.mjs",
+      "default": "./dist/web/index.mjs"
+    },
     "./expo-image": {
       "types": "./dist/expo-image/index.d.mts",
       "react-native": "./dist/expo-image/index.mjs",
@@ -69,6 +75,9 @@
       ],
       "dom": [
         "dist/dom/index.d.mts"
+      ],
+      "web": [
+        "dist/web/index.d.mts"
       ],
       "expo-image": [
         "dist/expo-image/index.d.mts"
