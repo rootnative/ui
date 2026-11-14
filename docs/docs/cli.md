@@ -470,7 +470,7 @@ what `npx rootnative list` prints, because both read the same registry.
 | `switch` | — | Toggle control with optional icons and customizable thumb/track colors |
 | `tabs` | divider | Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator |
 | `text-field` | — | Text input with animated floating label, 2 variants (filled, outlined), and icon support |
-| `tooltip` | portal | Plain and rich tooltips anchored to a control, shown on hover or a long press |
+| `tooltip` | portal, typography | Plain and rich tooltips anchored to a control, shown on hover or a long press |
 | `typography` | — | Text component using MD3 type scale with 15 variants (displayLarge to labelSmall) |
 
 ## Comparison with npm packages

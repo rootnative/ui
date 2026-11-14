@@ -83,6 +83,30 @@ function TooltipScreenContent() {
         </Column>
 
         <Column gap="sm">
+          <Typography variant="titleMedium">On text</Typography>
+          <Card variant="outlined">
+            <Column p="md" gap="sm">
+              <Typography variant="bodySmall" style={mutedText}>
+                A text anchor stays text. A screen reader does not read it as a
+                link, and it is not a tab stop. Hover or a long press shows the
+                tooltip.
+              </Typography>
+              <Row>
+                <Tooltip
+                  anchor={
+                    <Typography variant="bodyMedium">
+                      Updated 2 hours ago
+                    </Typography>
+                  }
+                >
+                  15 November 2026, 08:30
+                </Tooltip>
+              </Row>
+            </Column>
+          </Card>
+        </Column>
+
+        <Column gap="sm">
           <Typography variant="titleMedium">Placement</Typography>
           <Card variant="outlined">
             <Column p="md" gap="sm">

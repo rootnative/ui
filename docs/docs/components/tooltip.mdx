@@ -79,10 +79,14 @@ needs its own `Text`.
 | Timeout | Hides a plain tooltip after `duration` (1500ms). Rich tooltips never time out |
 | Outside press / Android back | Hides a rich tooltip. A plain one has no dismiss region to press |
 
-The tooltip injects the long press and the focus pair into the anchor itself, so the anchor must
-accept `onLongPress`, `onFocus` and `onBlur`. Every Root Native pressable does, and its own
-handlers still fire. The wrapper catches hover instead, because every Root Native pressable drives
-its state layer from `onHoverIn`/`onHoverOut` and would overwrite an injected pair.
+The tooltip injects the press, the long press and the focus pair into the anchor itself, so the
+anchor must accept `onPress`, `onLongPress`, `onFocus` and `onBlur`. Every Root Native pressable
+does, and its own handlers still fire. A plain text anchor is different: a `Text` or a `Typography`
+with no `onPress`, `onLongPress`, `onPressIn`, `onPressOut` or `href` gets only the focus pair, and
+the wrapper takes its long press and its tap. A press handler would change what it is: React Native
+reads a `Text` with `onPress` or `onLongPress` as a link. The wrapper catches hover for every
+anchor, because every Root Native pressable drives its state layer from `onHoverIn`/`onHoverOut`
+and would overwrite an injected pair.
 
 On web, react-native-web cancels the click of a mouse press that is held for the long-press delay.
 So on web the tooltip adds the long press only when no input can hover, or when the anchor has an

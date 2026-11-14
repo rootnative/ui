@@ -27,6 +27,7 @@ import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { physicalLeftStyle } from '../safe-area'
+import { Typography } from '../typography/Typography'
 import {
   PLAIN_TOOLTIP_DURATION,
   TOOLTIP_ANCHOR_SPACING,
@@ -60,6 +61,32 @@ interface AnchorTriggerProps {
   onFocus?: (event: AnchorFocusEvent) => void
   onBlur?: (event: AnchorFocusEvent) => void
   'aria-describedby'?: string
+}
+
+/**
+ * Whether the anchor is plain text: a `Text` or a `Typography` with no press
+ * of its own. It keeps its props, and the wrapper takes its long press and its
+ * tap. A press handler would change what it is: React Native gives a `Text`
+ * with `onPress` or `onLongPress` the `link` role, so a screen reader reads it
+ * as a link, and a web runtime that follows React Native makes it a tab stop.
+ * Any other anchor gets the press handlers, because a control takes the touch
+ * before the wrapper can, also when it has no handler of its own.
+ */
+const TEXT_TYPES: ReadonlySet<unknown> = new Set([Text, Typography])
+const PRESS_PROPS = [
+  'onPress',
+  'onLongPress',
+  'onPressIn',
+  'onPressOut',
+  'href',
+]
+
+function isPlainTextAnchor(element: ReactElement): boolean {
+  const props = element.props as Record<string, unknown>
+  return (
+    TEXT_TYPES.has(element.type) &&
+    !PRESS_PROPS.some((name) => props[name] !== undefined)
+  )
 }
 
 /**
@@ -203,10 +230,11 @@ export function Tooltip({
   }
 
   // Touch opens a tooltip with a long press, which has to come from the anchor
-  // itself: wrapping it in a second pressable would lose the gesture to the
-  // anchor's own press handling. Focus comes from the anchor too: on web a
-  // Pressable reports only its own focus, not one that bubbles up from a
-  // child, so the wrapper never sees the anchor take a Tab stop. Hover is
+  // itself: the wrapper would lose the gesture to the anchor's own press
+  // handling. A plain text anchor has none, so the wrapper gets its long press
+  // and its tap. Focus comes from the anchor too: on web a Pressable reports only
+  // its own focus, not one that bubbles up from a child, so the wrapper never
+  // sees the anchor take a Tab stop. Hover is
   // caught on the wrapper below, because every Root Native pressable drives
   // its state layer from `onHoverIn` / `onHoverOut` and would overwrite an
   // injected pair.
@@ -216,6 +244,7 @@ export function Tooltip({
   // that repeats the name makes a screen reader say it two times.
   const plainText = plainTextOf(children)
   const longPressOpens = !isControlled && canOpenOnLongPress()
+  const anchorIsPlainText = isValidElement(anchor) && isPlainTextAnchor(anchor)
   const trigger = useMemo(() => {
     if (!isValidElement(anchor)) return anchor
     const element = anchor as ReactElement<AnchorTriggerProps>
@@ -228,6 +257,19 @@ export function Tooltip({
     const describedBy =
       open && !repeatsLabel ? { 'aria-describedby': tooltipId } : {}
     if (isControlled) return cloneElement(element, describedBy)
+    const focusHandlers = {
+      onFocus: (event: AnchorFocusEvent) => {
+        element.props.onFocus?.(event)
+        show()
+      },
+      onBlur: (event: AnchorFocusEvent) => {
+        element.props.onBlur?.(event)
+        hideOnHoverOut?.()
+      },
+    }
+    if (anchorIsPlainText) {
+      return cloneElement(element, { ...describedBy, ...focusHandlers })
+    }
     const ownLongPress = element.props.onLongPress
     // An anchor with a long press of its own loses its click to it anyway.
     const longPress =
@@ -247,17 +289,11 @@ export function Tooltip({
         element.props.onPress?.(event)
         hide()
       },
-      onFocus: (event: AnchorFocusEvent) => {
-        element.props.onFocus?.(event)
-        show()
-      },
-      onBlur: (event: AnchorFocusEvent) => {
-        element.props.onBlur?.(event)
-        hideOnHoverOut?.()
-      },
+      ...focusHandlers,
     })
   }, [
     anchor,
+    anchorIsPlainText,
     isControlled,
     isRich,
     plainText,
@@ -317,8 +353,8 @@ export function Tooltip({
         style={wrapperStyle}
         collapsable={false}
         onLayout={measure}
-        // The wrapper exists to measure the anchor and to catch hover — it is
-        // not a control. Leaving it out of the accessibility tree keeps the
+        // The wrapper exists to measure the anchor and to catch hover, and the
+        // press of a plain text anchor. It is not a control. Leaving it out of the accessibility tree keeps the
         // anchor's own role and label as the only thing a screen reader sees,
         // and `tabIndex={-1}` keeps react-native-web from giving every anchor a
         // second tab stop (RNW makes an enabled Pressable focusable).
@@ -329,6 +365,7 @@ export function Tooltip({
         // A key press on the anchor bubbles up to the wrapper, unlike focus.
         onKeyDown={handleKeyDown}
         onLongPress={longPressOpens ? show : undefined}
+        onPress={anchorIsPlainText && !isControlled ? hide : undefined}
       >
         {trigger}
       </Pressable>

@@ -14,6 +14,7 @@ import { I18nManager, StyleSheet, Text, View } from 'react-native'
 import { Button } from '../button'
 import { PortalHost } from '../portal/PortalHost'
 import { Tooltip } from '../tooltip'
+import { Typography } from '../typography'
 
 type MeasureInWindow = (callback: MeasureInWindowOnSuccessCallback) => void
 
@@ -152,6 +153,60 @@ describe('Tooltip', () => {
 
     fireEvent(screen.getByText('Info'), 'hoverOut')
     expect(onDismiss).not.toHaveBeenCalled()
+  })
+
+  it('leaves a text anchor without press handlers, so it is not a link', () => {
+    // React Native gives a Text with `onPress` or `onLongPress` the `link` role.
+    renderTooltip(<TextAnchor />)
+    const info = screen.getByText('Info')
+    expect(info.props.onPress).toBeUndefined()
+    expect(info.props.onLongPress).toBeUndefined()
+  })
+
+  it('shows on a long press of a text anchor, and hides on a tap', () => {
+    const onDismiss = jest.fn()
+    renderTooltip(<TextAnchor onDismiss={onDismiss} />)
+
+    fireEvent(screen.getByText('Info'), 'longPress')
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+
+    fireEvent.press(screen.getByText('Info'))
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves a Typography anchor without press handlers too', () => {
+    renderTooltip(
+      <Tooltip anchor={<Typography>Dec 14</Typography>} testID="tooltip">
+        Sunday, December 14
+      </Tooltip>,
+    )
+    expect(screen.getByText('Dec 14').props.onPress).toBeUndefined()
+  })
+
+  it('clones the press handlers into a text that presses itself', () => {
+    const onPress = jest.fn()
+    const onDismiss = jest.fn()
+    renderTooltip(
+      <Tooltip
+        anchor={<Text onPress={onPress}>Learn more</Text>}
+        onDismiss={onDismiss}
+        testID="tooltip"
+      >
+        Opens the guide
+      </Tooltip>,
+    )
+    fireEvent(screen.getByText('Learn more'), 'longPress')
+    expect(screen.getByTestId('tooltip')).toBeTruthy()
+
+    fireEvent.press(screen.getByText('Learn more'))
+    expect(onPress).toHaveBeenCalledTimes(1)
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives the long press to a control with no handler of its own', () => {
+    // On a device the button takes the touch, so the wrapper never sees it.
+    renderTooltip(<PressableAnchor />)
+    expect(screen.UNSAFE_getByType(Button).props.onLongPress).toBeDefined()
   })
 
   it("hides when the anchor is pressed, after running the anchor's onPress", () => {
