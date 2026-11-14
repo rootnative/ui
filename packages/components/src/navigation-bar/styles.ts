@@ -152,8 +152,12 @@ export function createNavigationItemStyles(
       alignItems: 'center',
       justifyContent: 'center',
     },
+    // Width and `left` animate from NavigationItem, so only the vertical
+    // insets are static.
     indicator: {
-      ...StyleSheet.absoluteFill,
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
       borderRadius: theme.shape.cornerFull,
       backgroundColor: colors.indicator,
     },

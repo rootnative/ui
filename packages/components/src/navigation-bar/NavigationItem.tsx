@@ -1,6 +1,6 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
-import { Animated } from '@rootnative/inertia/reanimated'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { StyleProp, TextStyle } from 'react-native'
@@ -13,6 +13,7 @@ import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   NAV_INDICATOR_LABEL_GAP,
+  NAV_INDICATOR_WIDTH,
   NAV_ITEM_ICON_SIZE,
   createNavigationItemStyles,
 } from './styles'
@@ -66,10 +67,11 @@ export function NavigationItem({
     [theme, selected, colors, placement, labelVisibility],
   )
 
-  // One progress drives the indicator, and — in 'selected' label mode — the
-  // label fade and the content shift, so everything below stays in the
-  // `useInterpolatedStyle` family instead of hand-rolled worklets.
-  const progress = useBooleanProgress(selected, 'spring-default-spatial')
+  // Two springs, as in Compose's NavigationBar: an effects spring fades the
+  // indicator and the 'selected' label, and a fast spatial spring sizes the
+  // indicator and shifts the content.
+  const alphaProgress = useBooleanProgress(selected, 'spring-default-effects')
+  const sizeProgress = useBooleanProgress(selected, 'spring-fast-spatial')
 
   const contentColor = selected ? colors.selectedIcon : colors.content
   const {
@@ -82,27 +84,39 @@ export function NavigationItem({
     disabled,
   })
 
-  // The pill fades in while expanding from its centre, per the MD3 indicator
-  // motion. Extrapolation clamps, so a spatial spring's overshoot never
-  // pushes opacity past 1.
-  const animatedIndicatorStyle = useInterpolatedStyle(progress, {
-    opacity: [0, 1],
-    scaleX: [0.4, 1],
+  // The pill grows its width from 0 around its center, per the MD3 indicator
+  // motion. `width`, not `scaleX`, so the ends stay round. The size spring
+  // may overshoot past full width, but never below 0, as in Compose.
+  const animatedIndicatorStyle = useAnimatedStyle(() => {
+    'worklet'
+    const width = NAV_INDICATOR_WIDTH * Math.max(0, sizeProgress.value)
+    return {
+      width,
+      left: (NAV_INDICATOR_WIDTH - width) / 2,
+      opacity: alphaProgress.value,
+    }
   })
 
   // In 'selected' mode an inactive destination has no visible label, so its
   // icon block sits centred as if unlabeled: the whole column shifts down by
-  // half the label block while the label rides the same progress to
-  // transparent. Both collapse to a snap under reduced motion because the
-  // driving progress does.
+  // half the label block while the label fades. Both collapse to a snap under
+  // reduced motion because the driving progress does. Hand-rolled for the
+  // one-sided clamp: the shift overshoots past rest but not past centred.
   const labelBlockShift =
     (NAV_INDICATOR_LABEL_GAP +
       (theme.typography.labelMedium.lineHeight ?? 16)) /
     2
-  const animatedShiftStyle = useInterpolatedStyle(progress, {
-    translateY: [labelBlockShift, 0],
+  const animatedShiftStyle = useAnimatedStyle(() => {
+    'worklet'
+    return {
+      transform: [
+        {
+          translateY: labelBlockShift * (1 - Math.max(0, sizeProgress.value)),
+        },
+      ],
+    }
   })
-  const animatedLabelStyle = useInterpolatedStyle(progress, {
+  const animatedLabelStyle = useInterpolatedStyle(alphaProgress, {
     opacity: [0, 1],
   })
 

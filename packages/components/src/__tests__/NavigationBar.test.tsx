@@ -111,6 +111,20 @@ describe('NavigationBar — indicator', () => {
     expect(inactive.opacity).toBe(0)
   })
 
+  // MD3: the 56 dp pill grows its width from 0 around its center.
+  function indicatorBox(value: string) {
+    const style = StyleSheet.flatten(
+      screen.getByTestId(`nav-item-${value}-indicator`).props.style,
+    )
+    return { width: style.width, left: style.left }
+  }
+
+  it('sizes the active pill at 56 dp and the inactive ones at 0, centred', () => {
+    renderSettled(<NavigationBar items={ITEMS} testID="nav" />)
+    expect(indicatorBox('home')).toEqual({ width: 56, left: 0 })
+    expect(indicatorBox('search')).toEqual({ width: 0, left: 28 })
+  })
+
   it('moves to the pressed destination', () => {
     // `renderSettled` rather than `renderBar`: the press is its own render pass
     // and runs the worklet before its effect writes the new progress, so the
@@ -131,6 +145,8 @@ describe('NavigationBar — indicator', () => {
         screen.getByTestId('nav-item-home-indicator').props.style,
       ).opacity,
     ).toBe(0)
+    expect(indicatorBox('search')).toEqual({ width: 56, left: 0 })
+    expect(indicatorBox('home')).toEqual({ width: 0, left: 28 })
   })
 })
 
