@@ -481,6 +481,44 @@ describe('focus feedback follows the browser :focus-visible', () => {
   })
 
   /**
+   * The low thumb: the one node whose inline radius is half its inline width.
+   * Static styles such as its height compile to classes, so only the animated
+   * width and radius are inline.
+   */
+  function sliderHandleWidth() {
+    const slider = screen.getByRole('slider')
+    return Array.from(slider.querySelectorAll<HTMLElement>('*')).find(
+      ({ style }) =>
+        style.width !== '' &&
+        parseFloat(style.borderTopLeftRadius) * 2 === parseFloat(style.width),
+    )?.style.width
+  }
+
+  it('a visible focus narrows the Slider handle to 2 dp, as a press does', () => {
+    const { flush } = renderWebSettled(
+      <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
+    )
+    expect(sliderHandleWidth()).toBe('4px')
+
+    act(() => screen.getByRole('slider').focus())
+    flush()
+
+    expect(sliderHandleWidth()).toBe('2px')
+  })
+
+  it('a focus with no visible ring keeps the 4 dp Slider handle', () => {
+    const { flush } = renderWebSettled(
+      <Slider accessibilityLabel="Volume" defaultValue={0.5} />,
+    )
+
+    fireEvent.pointerDown(document)
+    fireEvent.focus(screen.getByRole('slider'))
+    flush()
+
+    expect(sliderHandleWidth()).toBe('4px')
+  })
+
+  /**
    * After a click on nothing, Chromium shows the focus that a script moves
    * next, so the `Button` must show its focus layer. inertia's tracker is in
    * pointer modality here. The layer shows because inertia's `useGesture`

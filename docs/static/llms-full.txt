@@ -2820,7 +2820,7 @@ Props:
 - `formatValueLabel?: (value: number) => string` — Custom formatter for the value-label text. Defaults to integer rounding for discrete sliders and 2-decimal rounding for continuous sliders.
 - `startIcon?: IconSource` — Optional icon decoration shown at the start (leading edge) of the track. Accepts a string name (resolved via the theme's `iconResolver`), a pre-rendered element, or a render function.
 - `endIcon?: IconSource` — Optional icon decoration shown at the end (trailing edge) of the track.
-- `containerColor?: string` — Override the active track color. Hover/press state-layer colors on the thumb are derived from `contentColor` (or the active track color when unset).
+- `containerColor?: string` — Override the active track color.
 - `contentColor?: string` — Override the thumb color.
 - `inactiveTrackColor?: string` — Override the inactive track color.
 - `disabled?: boolean` — Default: `false`. Disable interaction. Renders the standard MD3 disabled treatment (38% `onSurface`); `containerColor`/`contentColor` are ignored.

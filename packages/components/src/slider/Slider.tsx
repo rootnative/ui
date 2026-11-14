@@ -18,12 +18,11 @@ import type {
   TargetedEvent,
 } from 'react-native'
 import { PanResponder, Platform, Pressable, View } from 'react-native'
-// Sanctioned escape hatch: the slider's hover/focus/label progress is routed
+// Sanctioned escape hatch: the slider's focus/label progress is routed
 // imperatively between two thumbs from one Pressable (`keyboardThumb`), a
 // shape inertia's gesture hooks don't express. `useAnimator` drives the raw
-// motion values with the theme's registered named transitions ('state-hover'
-// / 'state-focus'), resolving them through `<MotionConfig>` and honouring
-// reduced motion. The slot worklets (`./slots`) hand these values to
+// motion values with the theme's registered named transition ('state-focus'),
+// resolving it through `<MotionConfig>` and honouring reduced motion. The slot worklets (`./slots`) hand these values to
 // `useAnimatedStyle` directly.
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -39,7 +38,6 @@ import {
 import {
   FocusRingSlot,
   SegmentSlot,
-  StateLayerSlot,
   StopIndicatorSlot,
   ThumbSlot,
   TickSlot,
@@ -117,12 +115,12 @@ export function Slider({
     [theme, containerColor, contentColor, inactiveTrackColor],
   )
 
-  // Imperative writer for the hover/focus/label progress values. Resolves the
+  // Imperative writer for the focus/label progress values. Resolves the
   // registered names below through the nearest `<MotionConfig>` and applies
   // the reduced-motion downgrade — the two things a bare `resolveTransition`
   // write in an event handler silently gets wrong. The timing policy lives in
-  // the theme (label/focus → 'state-focus' short4, hover → 'state-hover'
-  // short3), so there are no per-component motion configs to keep in sync.
+  // the theme (label/focus → 'state-focus' short4), so there are no
+  // per-component motion configs to keep in sync.
   const animate = useAnimator()
 
   const isRange = Array.isArray(controlledValue) || Array.isArray(defaultValue)
@@ -313,20 +311,27 @@ export function Slider({
   const highPos = valueToPosition(highValue)
   const centerPos = trackWidth / 2
 
+  // The thumb that the focus ring and a key on the track wrapper act on. It
+  // defaults to 'low', and it follows the thumb that was dragged or focused
+  // last. In range mode each thumb is also its own control with its own keys,
+  // and the wrapper takes keys only after a click on the track, which
+  // focuses it.
+  const [keyboardThumb, setKeyboardThumb] = useState<ThumbId>('low')
+  const [focusVisible, setFocusVisible] = useState(false)
+  const ringThumb = focusVisible && !isDisabled ? keyboardThumb : null
+
   // Press progress per thumb (0 → 1) lives on the UI thread so the thumb's
   // 4 → 2 dp narrowing can run in lockstep with the surrounding segments and
-  // stop indicators that depend on the same value. Hover and focus drive the
-  // same state-layer halo at lower opacities and don't affect layout.
+  // stop indicators that depend on the same value. MD3 narrows the handle on
+  // a visible focus too, so the ring's thumb counts as pressed.
   const lowPressed = useBooleanProgress(
-    activeThumb === 'low',
+    activeThumb === 'low' || ringThumb === 'low',
     'spring-fast-spatial',
   )
   const highPressed = useBooleanProgress(
-    activeThumb === 'high',
+    activeThumb === 'high' || ringThumb === 'high',
     'spring-fast-spatial',
   )
-  const lowHovered = useMotionValue(0)
-  const highHovered = useMotionValue(0)
   const lowFocused = useMotionValue(0)
   const highFocused = useMotionValue(0)
   const lowLabelOpacity = useMotionValue(0)
@@ -337,15 +342,6 @@ export function Slider({
   // register the `cancelAnimation` teardown themselves (inertia 0.0.2), so no
   // hand-written unmount effect is needed even when the slider unmounts
   // mid-drag (route transition, orientation change).
-
-  // The thumb that the hover halo, the focus ring, and a key on the track
-  // wrapper act on. It defaults to 'low', and it follows the thumb that was
-  // dragged or focused last. In range mode each thumb is also its own control
-  // with its own keys, and the wrapper takes keys only after a click on the
-  // track, which focuses it.
-  const [keyboardThumb, setKeyboardThumb] = useState<ThumbId>('low')
-  const isHovered = useRef(false)
-  const isFocused = useRef(false)
 
   useEffect(() => {
     // Mirrors the thumb the pan gesture last touched so the keyboard acts on
@@ -439,21 +435,12 @@ export function Slider({
     animate(highLabelOpacity, showHighLabel ? 1 : 0, 'state-focus')
   }, [showHighLabel, highLabelOpacity, animate])
 
-  // Hover/focus indicator routing: only the keyboardThumb shows the halo
+  // Focus ring routing: only the keyboardThumb shows the ring
   // (single-thumb mode → always 'low'; range mode → most-recent thumb).
   useEffect(() => {
-    const lowOn = isHovered.current && keyboardThumb === 'low' && !isDisabled
-    const highOn = isHovered.current && keyboardThumb === 'high' && !isDisabled
-    animate(lowHovered, lowOn ? 1 : 0, 'state-hover')
-    animate(highHovered, highOn ? 1 : 0, 'state-hover')
-  }, [keyboardThumb, isDisabled, lowHovered, highHovered, animate])
-
-  useEffect(() => {
-    const lowOn = isFocused.current && keyboardThumb === 'low' && !isDisabled
-    const highOn = isFocused.current && keyboardThumb === 'high' && !isDisabled
-    animate(lowFocused, lowOn ? 1 : 0, 'state-focus')
-    animate(highFocused, highOn ? 1 : 0, 'state-focus')
-  }, [keyboardThumb, isDisabled, lowFocused, highFocused, animate])
+    animate(lowFocused, ringThumb === 'low' ? 1 : 0, 'state-focus')
+    animate(highFocused, ringThumb === 'high' ? 1 : 0, 'state-focus')
+  }, [ringThumb, lowFocused, highFocused, animate])
 
   // Keyboard / a11y action step. For continuous sliders, MD3 spec calls for
   // ~1 % of the range per arrow tap; for discrete sliders, one step.
@@ -491,38 +478,16 @@ export function Slider({
     [commitValue, maximumValue, minimumValue, step],
   )
 
-  const handleHoverIn = useCallback(() => {
-    if (isDisabled) return
-    isHovered.current = true
-    if (keyboardThumb === 'low') {
-      animate(lowHovered, 1, 'state-hover')
-    } else {
-      animate(highHovered, 1, 'state-hover')
-    }
-  }, [isDisabled, keyboardThumb, lowHovered, highHovered, animate])
-
-  const handleHoverOut = useCallback(() => {
-    isHovered.current = false
-    animate(lowHovered, 0, 'state-hover')
-    animate(highHovered, 0, 'state-hover')
-  }, [lowHovered, highHovered, animate])
-
   const handleFocus = useCallback(
     (thumb: ThumbId, event: NativeSyntheticEvent<TargetedEvent>) => {
       if (isDisabled) return
       setKeyboardThumb(thumb)
-      if (!isFocusVisible(event)) return
-      isFocused.current = true
-      animate(thumb === 'low' ? lowFocused : highFocused, 1, 'state-focus')
+      if (isFocusVisible(event)) setFocusVisible(true)
     },
-    [isDisabled, lowFocused, highFocused, animate],
+    [isDisabled],
   )
 
-  const handleBlur = useCallback(() => {
-    isFocused.current = false
-    animate(lowFocused, 0, 'state-focus')
-    animate(highFocused, 0, 'state-focus')
-  }, [lowFocused, highFocused, animate])
+  const handleBlur = useCallback(() => setFocusVisible(false), [])
 
   const handleAccessibilityAction = useCallback(
     (thumb: ThumbId, e: AccessibilityActionEvent) => {
@@ -682,8 +647,6 @@ export function Slider({
 
       <Pressable
         {...wrapperAccessibility}
-        onHoverIn={handleHoverIn}
-        onHoverOut={handleHoverOut}
         onFocus={(e) => handleFocus(keyboardThumb, e)}
         onBlur={handleBlur}
         // Web only: arrow / Page / Home / End handling. Native ignores the
@@ -765,25 +728,6 @@ export function Slider({
               centerX={highPos}
               focused={highFocused}
               baseStyle={styles.focusRing}
-            />
-          ) : null}
-
-          {!isDisabled ? (
-            <StateLayerSlot
-              centerX={lowPos}
-              hovered={lowHovered}
-              focused={lowFocused}
-              pressed={lowPressed}
-              baseStyle={styles.stateLayer}
-            />
-          ) : null}
-          {!isDisabled && arrValue ? (
-            <StateLayerSlot
-              centerX={highPos}
-              hovered={highHovered}
-              focused={highFocused}
-              pressed={highPressed}
-              baseStyle={styles.stateLayer}
             />
           ) : null}
 

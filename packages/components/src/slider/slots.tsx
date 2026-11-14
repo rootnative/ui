@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import {
   Animated,
@@ -16,8 +15,7 @@ import {
   type ThumbId,
 } from './geometry'
 import {
-  SLIDER_FOCUS_RING_SIZE,
-  SLIDER_STATE_LAYER_SIZE,
+  SLIDER_FOCUS_RING_OUTER_WIDTH,
   SLIDER_STOP_INDICATOR,
   SLIDER_THUMB_GAP,
   SLIDER_THUMB_WIDTH,
@@ -223,47 +221,6 @@ export function ValueLabelSlot({
   )
 }
 
-interface StateLayerSlotProps {
-  centerX: number
-  hovered: SharedValue<number>
-  focused: SharedValue<number>
-  pressed: SharedValue<number>
-  baseStyle: ViewStyle
-}
-
-// MD3 tonal halo around the thumb. Combines the theme's hover, focus, and
-// press state-layer opacity tokens and stays centered on the thumb while the
-// press-state 4 → 2 dp width change runs.
-export function StateLayerSlot({
-  centerX,
-  hovered,
-  focused,
-  pressed,
-  baseStyle,
-}: StateLayerSlotProps) {
-  const theme = useTheme()
-  const {
-    hoveredOpacity: HOVER_OPACITY,
-    focusedOpacity: FOCUS_OPACITY,
-    pressedOpacity: PRESS_OPACITY,
-  } = theme.stateLayer
-
-  const animatedStyle = useAnimatedStyle(() => {
-    'worklet'
-    return {
-      left: centerX - SLIDER_STATE_LAYER_SIZE / 2,
-      opacity: Math.max(
-        Math.max(0, Math.min(1, hovered.value)) * HOVER_OPACITY,
-        Math.max(0, Math.min(1, focused.value)) * FOCUS_OPACITY,
-        Math.max(0, Math.min(1, pressed.value)) * PRESS_OPACITY,
-      ),
-    }
-  })
-  return (
-    <Animated.View style={[baseStyle, animatedStyle, pointerEvents.none]} />
-  )
-}
-
 interface FocusRingSlotProps {
   centerX: number
   focused: SharedValue<number>
@@ -280,7 +237,7 @@ export function FocusRingSlot({
   const animatedStyle = useAnimatedStyle(() => {
     'worklet'
     return {
-      left: centerX - SLIDER_FOCUS_RING_SIZE / 2,
+      left: centerX - SLIDER_FOCUS_RING_OUTER_WIDTH / 2,
       opacity: focused.value,
     }
   })

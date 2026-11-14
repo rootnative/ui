@@ -82,11 +82,7 @@ export interface SliderProps extends Omit<ViewProps, 'children'> {
   startIcon?: IconSource
   /** Optional icon decoration shown at the end (trailing edge) of the track. */
   endIcon?: IconSource
-  /**
-   * Override the active track color. Hover/press state-layer colors on the
-   * thumb are derived from `contentColor` (or the active track color when
-   * unset).
-   */
+  /** Override the active track color. */
   containerColor?: string
   /** Override the thumb color. */
   contentColor?: string

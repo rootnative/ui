@@ -4,17 +4,12 @@ import { StyleSheet } from 'react-native'
 
 // Material Design 3 (expressive) slider dimensions.
 // https://m3.material.io/components/sliders/specs
-//
-// Spec calls for a 44dp tall thumb on a 16dp track, but because the thumb is
-// the same color as the active track it visually fuses with the filled side
-// and the slider reads as ~2.75× taller on the filled side. We use a 20dp
-// thumb (a 2dp poke above and below the track) for a balanced look that
-// still keeps the thumb clearly grabbable.
 export const SLIDER_TRACK_HEIGHT = 16
 export const SLIDER_THUMB_WIDTH = 4
-// Per the MD3 expressive spec the handle NARROWS from 4 to 2 dp while pressed.
+// Per the MD3 expressive spec the handle NARROWS from 4 to 2 dp while pressed
+// or focused.
 export const SLIDER_THUMB_WIDTH_PRESSED = 2
-export const SLIDER_THUMB_HEIGHT = 20
+export const SLIDER_THUMB_HEIGHT = 44
 export const SLIDER_THUMB_GAP = 6
 export const SLIDER_STOP_INDICATOR = 4
 export const SLIDER_TICK_SIZE = 4
@@ -22,16 +17,17 @@ export const SLIDER_TOUCH_HEIGHT = 48
 export const SLIDER_TRACK_CORNER_OUTER = SLIDER_TRACK_HEIGHT / 2
 export const SLIDER_TRACK_CORNER_INNER = 2
 export const SLIDER_LABEL_GAP = 12
-// MD3 state-layer halo around the thumb during hover/focus/press.
-export const SLIDER_STATE_LAYER_SIZE = 40
 // MD3 focus ring around the focused thumb.
 export const SLIDER_FOCUS_RING_OFFSET = 2
 export const SLIDER_FOCUS_RING_WIDTH = 3
-// Outside diameter of the ring — used by the JSX layer to size the absolute
-// positioned ring around the thumb's center. Sized off the thumb's HEIGHT
-// (its larger dimension) so the ring always encircles the handle.
-export const SLIDER_FOCUS_RING_SIZE =
-  SLIDER_THUMB_HEIGHT + (SLIDER_FOCUS_RING_OFFSET + SLIDER_FOCUS_RING_WIDTH) * 2
+// The ring is a pill around the focused handle, which focus narrows to 2 dp.
+// Its outer edge stays inside the 6 dp gap to the track.
+const SLIDER_FOCUS_RING_OUTSET =
+  SLIDER_FOCUS_RING_OFFSET + SLIDER_FOCUS_RING_WIDTH
+export const SLIDER_FOCUS_RING_OUTER_WIDTH =
+  SLIDER_THUMB_WIDTH_PRESSED + SLIDER_FOCUS_RING_OUTSET * 2
+export const SLIDER_FOCUS_RING_OUTER_HEIGHT =
+  SLIDER_THUMB_HEIGHT + SLIDER_FOCUS_RING_OUTSET * 2
 
 interface SliderColors {
   activeTrack: string
@@ -133,20 +129,12 @@ export function createStyles(
       top: (SLIDER_TOUCH_HEIGHT - SLIDER_THUMB_HEIGHT) / 2,
       backgroundColor: c.thumb,
     },
-    stateLayer: {
-      position: 'absolute',
-      width: SLIDER_STATE_LAYER_SIZE,
-      height: SLIDER_STATE_LAYER_SIZE,
-      borderRadius: SLIDER_STATE_LAYER_SIZE / 2,
-      top: (SLIDER_TOUCH_HEIGHT - SLIDER_STATE_LAYER_SIZE) / 2,
-      backgroundColor: c.thumb,
-    },
     focusRing: {
       position: 'absolute',
-      width: SLIDER_FOCUS_RING_SIZE,
-      height: SLIDER_FOCUS_RING_SIZE,
-      borderRadius: SLIDER_FOCUS_RING_SIZE / 2,
-      top: (SLIDER_TOUCH_HEIGHT - SLIDER_FOCUS_RING_SIZE) / 2,
+      width: SLIDER_FOCUS_RING_OUTER_WIDTH,
+      height: SLIDER_FOCUS_RING_OUTER_HEIGHT,
+      borderRadius: SLIDER_FOCUS_RING_OUTER_WIDTH / 2,
+      top: (SLIDER_TOUCH_HEIGHT - SLIDER_FOCUS_RING_OUTER_HEIGHT) / 2,
       borderWidth: SLIDER_FOCUS_RING_WIDTH,
       borderColor: theme.colors.secondary,
     },

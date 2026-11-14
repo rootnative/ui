@@ -93,6 +93,7 @@ export default function SliderScreen() {
             maximumValue={30}
             step={1}
             showValueLabel="always"
+            style={styles.alwaysLabel}
             formatValueLabel={formatTemperature}
             startIcon="snowflake"
             endIcon="white-balance-sunny"
@@ -127,6 +128,7 @@ export default function SliderScreen() {
             step={5}
             centered
             showValueLabel="always"
+            style={styles.alwaysLabel}
           />
           <Typography variant="bodySmall" style={captionStyle}>
             Balance: {centered}
@@ -158,6 +160,7 @@ export default function SliderScreen() {
             maximumValue={10}
             step={1}
             showValueLabel="always"
+            style={styles.alwaysLabel}
           />
           <Typography variant="bodySmall" style={captionStyle}>
             Range: {rangeDiscrete[0]} – {rangeDiscrete[1]}
@@ -188,5 +191,10 @@ export default function SliderScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  // An always-visible value label sits 42 dp above the slider (12 dp above
+  // the 44 dp handle), outside its box, so leave room under the title.
+  alwaysLabel: {
+    marginTop: 38,
   },
 })
