@@ -52,6 +52,9 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
     accessibilityLabel,
     testID,
     onItemPress,
+    value,
+    defaultValue,
+    onValueChange,
     ...rest
   } = props
 
@@ -62,12 +65,12 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
   )
 
   const [internalValue, setInternalValue] = useState<string[]>(() =>
-    normalizeValue(selectionMode, props.defaultValue ?? props.value ?? null),
+    normalizeValue(selectionMode, defaultValue ?? value ?? null),
   )
 
-  const isControlled = selectionMode !== 'none' && props.value !== undefined
+  const isControlled = selectionMode !== 'none' && value !== undefined
   const selectedValues = isControlled
-    ? normalizeValue(selectionMode, props.value ?? null)
+    ? normalizeValue(selectionMode, value ?? null)
     : internalValue
 
   const handleItemPress = useCallback(
@@ -82,20 +85,12 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
 
       if (selectionMode === 'single') {
         const single: string | null = next[0] ?? null
-        ;(props.onValueChange as ((v: string | null) => void) | undefined)?.(
-          single,
-        )
+        ;(onValueChange as ((v: string | null) => void) | undefined)?.(single)
       } else {
-        ;(props.onValueChange as ((v: string[]) => void) | undefined)?.(next)
+        ;(onValueChange as ((v: string[]) => void) | undefined)?.(next)
       }
     },
-    [
-      isControlled,
-      onItemPress,
-      props.onValueChange,
-      selectedValues,
-      selectionMode,
-    ],
+    [isControlled, onItemPress, onValueChange, selectedValues, selectionMode],
   )
 
   return (

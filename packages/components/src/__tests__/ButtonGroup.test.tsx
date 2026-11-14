@@ -339,6 +339,26 @@ describe('ButtonGroup', () => {
     expect(container.props.accessibilityLabel).toBe('View options')
   })
 
+  it('keeps its own value props off the container, and spreads the rest', () => {
+    // A renderer that passes unknown props to the DOM would log `onValueChange`.
+    renderWithTheme(
+      <ButtonGroup
+        items={ITEMS}
+        selectionMode="single"
+        value="one"
+        defaultValue="two"
+        onValueChange={jest.fn()}
+        nativeID="bg-native"
+        testID="bg-root"
+      />,
+    )
+    const container = screen.getByTestId('bg-root')
+    expect(container.props.value).toBeUndefined()
+    expect(container.props.defaultValue).toBeUndefined()
+    expect(container.props.onValueChange).toBeUndefined()
+    expect(container.props.nativeID).toBe('bg-native')
+  })
+
   it('uses item.accessibilityLabel as a fallback for the item label', () => {
     renderWithTheme(
       <ButtonGroup
