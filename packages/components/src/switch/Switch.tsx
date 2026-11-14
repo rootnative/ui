@@ -1,24 +1,17 @@
 import { useIconResolver, useTheme } from '@rootnative/core'
 import {
-  resolveTransition,
+  useAnimation,
   useColorTransition,
   useInterpolatedStyle,
-  useMotionValue,
-  useNamedTransitions,
-  useShouldReduceMotion,
 } from '@rootnative/inertia'
-import {
-  Animated,
-  interpolate,
-  useAnimatedStyle,
-} from '@rootnative/inertia/reanimated'
+import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import {
   isRTLDirection,
   renderIcon,
   resolveColorFromStyle,
   resolveLogical,
 } from '@rootnative/utils'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -40,15 +33,16 @@ import {
   SWITCH_THUMB_PRESSED_SIZE,
   SWITCH_TRACK_BORDER_WIDTH,
   SWITCH_TRACK_HEIGHT,
-  SWITCH_TRACK_PADDING,
   SWITCH_TRACK_WIDTH,
   createStyles,
   getResolvedColors,
 } from './styles'
 import type { SwitchProps } from './types'
 
-const THUMB_TRANSLATE_X =
-  SWITCH_TRACK_WIDTH - SWITCH_TRACK_PADDING * 2 - SWITCH_THUMB_ON_SIZE
+// MD3 places the thumb by its center, 16 dp from the start edge when off and
+// 36 dp when on, so each size (16, 24, pressed 28) keeps the same center.
+const THUMB_CENTER_OFF = SWITCH_TRACK_HEIGHT / 2
+const THUMB_TRAVEL = SWITCH_TRACK_WIDTH - SWITCH_TRACK_HEIGHT
 
 const ICON_SIZE = 16
 
@@ -73,9 +67,6 @@ export function Switch({
   const isSelected = isControlled ? Boolean(value) : selfValue
   const isPassive = isPassiveControl(isControlled, onValueChange, isDisabled)
   const hasUnselectedIcon = Boolean(unselectedIcon)
-  const offThumbSize = hasUnselectedIcon
-    ? SWITCH_THUMB_ON_SIZE
-    : SWITCH_THUMB_OFF_SIZE
 
   const theme = useTheme()
   const iconResolver = useIconResolver()
@@ -94,14 +85,13 @@ export function Switch({
   )
 
   // Toggle progress — the theme's fast-spatial spring (Expressive bounce,
-  // 0.6 damping ratio), driving thumb travel and size per Compose's Switch.
+  // 0.6 damping ratio), driving the thumb travel per Compose's Switch.
   const progress = useBooleanProgress(isSelected, 'spring-fast-spatial')
 
-  // The thumb rests at the start edge (`marginStart`) and `translateX` is a
-  // physical offset, so in RTL it has to travel toward negative x or the
-  // thumb leaves the track on the right.
+  // The thumb rests at the start edge and `translateX` is a physical offset,
+  // so in RTL it has to travel toward negative x or the thumb leaves the
+  // track on the right.
   const travelSign = isRTLDirection() ? -1 : 1
-  const thumbTravel = travelSign * THUMB_TRANSLATE_X
 
   const {
     style: haloOpacityStyle,
@@ -109,28 +99,13 @@ export function Switch({
     focusRingStyle: animatedFocusRingStyle,
   } = useHaloLayer(isDisabled)
 
-  // Thumb press-grow per Expressive Switch: the grow to 28dp is a *snap*
-  // (Compose uses SnapSpec while pressed) and the release springs back on
-  // fast-spatial. Direction-dependent, so it can't ride the gesture layer's
-  // single pressed transition — a dedicated progress with hand-rolled
-  // handlers instead. Reduced motion already snaps by construction.
-  const pressed = useMotionValue(0)
-  const namedTransitions = useNamedTransitions()
-  const shouldReduceMotion = useShouldReduceMotion()
+  const [isPressed, setIsPressed] = useState(false)
   const pressGrowHandlers = useMemo(
     () => ({
-      onPressIn: () => {
-        pressed.value = 1
-      },
-      onPressOut: () => {
-        const spring = namedTransitions['spring-fast-spatial']
-        pressed.value =
-          shouldReduceMotion || !spring
-            ? 0
-            : (resolveTransition(spring, 0) as never)
-      },
+      onPressIn: () => setIsPressed(true),
+      onPressOut: () => setIsPressed(false),
     }),
-    [pressed, namedTransitions, shouldReduceMotion],
+    [],
   )
   const handlers = useMemo(
     () => composePressHandlers(layerHandlers, pressGrowHandlers),
@@ -138,10 +113,20 @@ export function Switch({
   )
 
   // A press has no matching release once the component disables mid-press —
-  // pin the grow back to rest so re-enabling doesn't resume mid-grow.
-  useEffect(() => {
-    if (isDisabled) pressed.value = 0
-  }, [isDisabled, pressed])
+  // drop it so re-enabling doesn't resume at the pressed size.
+  if (isDisabled && isPressed) setIsPressed(false)
+
+  // One size spring toward one target, as in Compose's Switch. A separate
+  // press spring would add its undershoot to the toggle's and double the
+  // size dip at the end of a toggle off.
+  const restThumbSize =
+    isSelected || hasUnselectedIcon
+      ? SWITCH_THUMB_ON_SIZE
+      : SWITCH_THUMB_OFF_SIZE
+  const thumbSize = useAnimation(
+    isPressed && !isDisabled ? SWITCH_THUMB_PRESSED_SIZE : restThumbSize,
+    'spring-fast-spatial',
+  )
 
   const trackColorStyle = useColorTransition(progress, [
     offColors.trackColor,
@@ -158,49 +143,38 @@ export function Switch({
     onColors.thumbColor,
   ])
 
-  // Interop escape hatch: the thumb morph reads the toggle spring and the
-  // press-grow progress together — position, size, and radius in one
-  // progress-driven worklet.
+  // Interop escape hatch: the thumb reads the toggle progress and its size
+  // spring together. It is placed by its center, so a size change grows it
+  // in both directions. It lays out inside the track border, so the offset
+  // from the outer start edge loses the border width.
   const animatedThumbStyle = useAnimatedStyle(() => {
     'worklet'
-    const baseSize = interpolate(
-      progress.value,
-      [0, 1],
-      [offThumbSize, SWITCH_THUMB_ON_SIZE],
-    )
-    const size = interpolate(
-      pressed.value,
-      [0, 1],
-      [baseSize, SWITCH_THUMB_PRESSED_SIZE],
-    )
+    const size = thumbSize.value
+    const center = THUMB_CENTER_OFF + progress.value * THUMB_TRAVEL
     return {
       width: size,
       height: size,
       borderRadius: size / 2,
       transform: [
         {
-          translateX: interpolate(progress.value, [0, 1], [0, thumbTravel]),
+          translateX:
+            travelSign * (center - size / 2 - SWITCH_TRACK_BORDER_WIDTH),
         },
       ],
     }
   })
 
-  // Halo center should track the thumb's center. The static `start` is
-  // calibrated for the off position; `translateX` adds (a) the toggle
-  // progress shift and (b) any thumb-grow shift on press (the thumb's start
-  // edge is fixed, so its center moves toward the end by half the size
-  // delta). Both follow `thumbTravel`'s sign, so the halo mirrors in RTL too.
-  // The inset is an inline style, so it goes through `resolveLogical`.
+  // The halo sits on the thumb's center, so only the toggle progress moves
+  // it. The inset is an inline style, so it goes through `resolveLogical`.
   const haloPositionStyle = useMemo(
     () =>
       resolveLogical(
         'start',
-        SWITCH_TRACK_PADDING -
-          SWITCH_TRACK_BORDER_WIDTH +
-          offThumbSize / 2 -
+        THUMB_CENTER_OFF -
+          SWITCH_TRACK_BORDER_WIDTH -
           SWITCH_STATE_LAYER_SIZE / 2,
       ),
-    [offThumbSize],
+    [],
   )
 
   // The halo color crossfades with the toggle progress (same as the thumb).
@@ -209,28 +183,13 @@ export function Switch({
     onColors.thumbColor,
   ])
 
-  const animatedHaloStyle = useAnimatedStyle(() => {
-    'worklet'
-    const baseSize = interpolate(
-      progress.value,
-      [0, 1],
-      [offThumbSize, SWITCH_THUMB_ON_SIZE],
-    )
-    const size = interpolate(
-      pressed.value,
-      [0, 1],
-      [baseSize, SWITCH_THUMB_PRESSED_SIZE],
-    )
-    return {
-      transform: [
-        {
-          translateX:
-            progress.value * thumbTravel +
-            (travelSign * (size - offThumbSize)) / 2,
-        },
-      ],
-    }
-  })
+  // `extend`, not the default clamp, keeps the halo on the thumb through the
+  // spring's overshoot.
+  const animatedHaloStyle = useInterpolatedStyle(
+    progress,
+    { translateX: [0, travelSign * THUMB_TRAVEL] },
+    { extrapolate: 'extend' },
+  )
 
   // The two icons cross-fade on one progress value: the selected icon follows
   // it, the unselected icon runs the inverted range.

@@ -4,7 +4,6 @@ import { StyleSheet } from 'react-native'
 
 export const SWITCH_TRACK_WIDTH = 52
 export const SWITCH_TRACK_HEIGHT = 32
-export const SWITCH_TRACK_PADDING = 4
 export const SWITCH_TRACK_BORDER_WIDTH = 2
 export const SWITCH_THUMB_ON_SIZE = 24
 export const SWITCH_THUMB_OFF_SIZE = 16
@@ -163,7 +162,6 @@ export function createStyles(
       top: (SWITCH_TRACK_HEIGHT - SWITCH_STATE_LAYER_SIZE) / 2,
     },
     thumbBase: {
-      marginStart: SWITCH_TRACK_PADDING - SWITCH_TRACK_BORDER_WIDTH,
       alignItems: 'center' as const,
       justifyContent: 'center' as const,
     },

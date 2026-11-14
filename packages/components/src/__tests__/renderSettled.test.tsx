@@ -9,8 +9,10 @@ import { Portal } from '../portal/Portal'
 import { PortalHost } from '../portal/PortalHost'
 import { Switch } from '../switch'
 
-// 52 track - 2 * 4 padding - 24 on-thumb.
-const THUMB_TRANSLATE_X = 20
+// The thumb lays out inside the 2 dp outline and sits by its center: 16 dp
+// from the start edge when off (16 dp thumb), 36 dp when on (24 dp thumb).
+const THUMB_OFF_X = 16 - 16 / 2 - 2
+const THUMB_ON_X = 36 - 24 / 2 - 2
 
 const entrance = (
   <Motion.View
@@ -61,17 +63,17 @@ describe('renderSettled', () => {
   describe('progress-driven transitions', () => {
     it('is already settled at mount, like renderWithTheme', () => {
       renderSettled(<Switch onValueChange={jest.fn()} value />)
-      expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
+      expect(thumbTranslateX()).toBe(THUMB_ON_X)
     })
 
     it('settles after a prop change, without an explicit flush', () => {
       const { rerender } = renderSettled(
         <Switch onValueChange={jest.fn()} value={false} />,
       )
-      expect(thumbTranslateX()).toBe(0)
+      expect(thumbTranslateX()).toBe(THUMB_OFF_X)
 
       rerender(<Switch onValueChange={jest.fn()} value />)
-      expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
+      expect(thumbTranslateX()).toBe(THUMB_ON_X)
     })
 
     it('settles after an interaction, once flushed', () => {
@@ -81,7 +83,7 @@ describe('renderSettled', () => {
       // more pass on top.
       fireEvent.press(screen.getByRole('switch'))
       flush()
-      expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
+      expect(thumbTranslateX()).toBe(THUMB_ON_X)
     })
 
     it('flushes what is mounted, not the element first passed in', () => {
@@ -93,7 +95,7 @@ describe('renderSettled', () => {
       // A flush that re-rendered the original element would revert the switch
       // to its off position here.
       view.flush()
-      expect(thumbTranslateX()).toBe(THUMB_TRANSLATE_X)
+      expect(thumbTranslateX()).toBe(THUMB_ON_X)
     })
   })
 })
