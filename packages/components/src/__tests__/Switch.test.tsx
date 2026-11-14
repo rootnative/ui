@@ -104,6 +104,77 @@ describe('Switch', () => {
     })
   })
 
+  // MD3 track: 52 x 32 dp with a 2 dp outline. The thumb center sits 16 dp
+  // from the start edge when off and 36 dp when on, at every thumb size.
+  describe('thumb geometry', () => {
+    const BORDER = 2
+
+    function thumb() {
+      const style = getStyle(screen.getByTestId('switch-thumb'))
+      const transform = style.transform as { translateX?: number }[]
+      const translateX = transform.find(
+        (t) => t.translateX !== undefined,
+      )?.translateX
+      const size = style.width as number
+      const start = BORDER + (translateX as number)
+      return { size, start, center: start + size / 2, end: start + size }
+    }
+
+    it('centers the 16 dp off thumb 16 dp from the start edge', () => {
+      renderSettled(<Switch value={false} onValueChange={() => {}} />)
+      expect(thumb()).toMatchObject({ size: 16, center: 16 })
+    })
+
+    it('centers the 24 dp on thumb 36 dp from the start edge', () => {
+      renderSettled(<Switch value onValueChange={() => {}} />)
+      expect(thumb()).toMatchObject({ size: 24, center: 36 })
+    })
+
+    it('centers a 24 dp off thumb with an unselected icon at 16 dp', () => {
+      renderSettled(
+        <Switch
+          value={false}
+          onValueChange={() => {}}
+          unselectedIcon="close"
+        />,
+      )
+      expect(thumb()).toMatchObject({ size: 24, center: 16 })
+    })
+
+    it.each([
+      ['off', false, 16],
+      ['on', true, 36],
+    ])(
+      'grows the pressed %s thumb to 28 dp around its center',
+      (_, value, center) => {
+        const { flush } = renderSettled(
+          <Switch value={value} onValueChange={() => {}} />,
+        )
+        fireEvent(screen.getByRole('switch'), 'pressIn')
+        flush()
+        expect(thumb()).toMatchObject({ size: 28, center })
+      },
+    )
+
+    it('keeps the pressed on thumb inside the outline', () => {
+      const { flush } = renderSettled(<Switch value onValueChange={() => {}} />)
+      fireEvent(screen.getByRole('switch'), 'pressIn')
+      flush()
+      expect(thumb().end).toBe(52 - BORDER)
+    })
+
+    it('returns to the rest size on release', () => {
+      const { flush } = renderSettled(
+        <Switch value={false} onValueChange={() => {}} />,
+      )
+      fireEvent(screen.getByRole('switch'), 'pressIn')
+      flush()
+      fireEvent(screen.getByRole('switch'), 'pressOut')
+      flush()
+      expect(thumb()).toMatchObject({ size: 16, center: 16 })
+    })
+  })
+
   describe('overrides', () => {
     it('applies containerColor to the track background', () => {
       renderWithTheme(<Switch containerColor="#FF0000" />)
