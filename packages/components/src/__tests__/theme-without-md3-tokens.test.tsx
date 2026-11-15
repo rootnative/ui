@@ -62,7 +62,7 @@ const bareTheme = {
   },
 } as unknown as Theme
 
-/** The MD3 groups, with role names of its own: the theme shape before the split of the contract. */
+/** The MD3 groups, with role names of its own. */
 const ownRolesTheme = {
   ...bareTheme,
   shape: lightTheme.shape,

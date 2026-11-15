@@ -2824,7 +2824,7 @@ const theme = useTheme<MyTheme>()
 
 ### defineTheme(theme)
 
-Identity function that validates a custom theme object against \`BaseTheme\`. Provides type-checking and autocompletion. The theme below has its own role names, so it is for your own components. For the library components, spread \`lightTheme\` and add your tokens beside the MD3 roles.
+Identity function that validates a custom theme object against \`BaseTheme\`. Provides type-checking and autocompletion. The theme below has its own role names, so it is for your own components. \`BaseTheme\` needs only \`colors\` and \`typography\`; the other token groups of such a theme are your own. For the library components, spread \`lightTheme\` and add your tokens beside the MD3 roles.
 
 \`\`\`tsx
 import { defineTheme } from '@rootnative/core'
@@ -2832,7 +2832,7 @@ import type { BaseTheme, TypographyToken } from '@rootnative/core'
 
 interface MyColors { [key: string]: string; brand: string; background: string; text: string }
 interface MyTypography { [key: string]: TypographyToken; heading: TypographyToken; body: TypographyToken }
-interface MyTheme extends BaseTheme { colors: MyColors; typography: MyTypography }
+interface MyTheme extends BaseTheme { colors: MyColors; typography: MyTypography; radius: { control: number; card: number } }
 
 const myTheme = defineTheme<MyTheme>({
   colors: { brand: '#FF6B00', background: '#FFFFFF', text: '#1A1A1A' },
@@ -2840,11 +2840,7 @@ const myTheme = defineTheme<MyTheme>({
     heading: { fontFamily: 'Inter', fontSize: 24, fontWeight: '700', lineHeight: 32, letterSpacing: 0 },
     body: { fontFamily: 'Inter', fontSize: 16, fontWeight: '400', lineHeight: 24, letterSpacing: 0.5 },
   },
-  shape: { roundness: 1, cornerNone: 0, cornerExtraSmall: 4, cornerSmall: 8, cornerMedium: 12, cornerLarge: 16, cornerExtraLarge: 28, cornerFull: 999 },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
-  stateLayer: { pressedOpacity: 0.1, focusedOpacity: 0.1, hoveredOpacity: 0.08, draggedOpacity: 0.16, disabledOpacity: 0.38, disabledContainerOpacity: 0.12 },
-  elevation: { ... },
-  motion: { ... },
+  radius: { control: 8, card: 16 },
 })
 \`\`\`
 
@@ -2966,8 +2962,8 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- \`BaseTheme\` — Generic base interface. All design systems extend this. Has \`colors: Record<string, string>\`, \`typography: Record<string, TypographyToken>\`, plus shape, spacing, stateLayer, elevation, motion.
-- \`Theme\` — Material Design 3 theme. Extends \`BaseTheme\` with 49 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional \`topAppBar\` tokens. \`MaterialTheme\` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
+- \`BaseTheme\` — Generic base interface. All design systems extend this. Has \`colors: Record<string, string>\`, \`typography: Record<string, TypographyToken>\`, and an index signature for token groups of your own. It has no MD3 group.
+- \`Theme\` — Material Design 3 theme. Extends \`BaseTheme\` with 49 MD3 color roles, 30 typography variants (15 base + 15 emphasized), the \`shape\`, \`spacing\`, \`stateLayer\`, \`elevation\` and \`motion\` groups, and optional \`topAppBar\` tokens. \`MaterialTheme\` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
 
@@ -2975,16 +2971,17 @@ material.defaultTopAppBarTokens
 BaseTheme {
   colors: Record<string, string>
   typography: Record<string, TypographyToken>
-  shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
-  spacing: Spacing       — xs, sm, md, lg, xl
-  elevation: Elevation   — level0..level5 (shadow properties)
-  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, draggedOpacity, disabledOpacity, disabledContainerOpacity
-  motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
+  [key: string]: unknown — token groups of your own
 }
 
 Theme extends BaseTheme {
   colors: Colors         — 49 MD3 color roles
   typography: Typography — 30 type scale variants: 15 base (displayLarge..labelSmall) + 15 MD3 Expressive emphasized (displayLargeEmphasized..labelSmallEmphasized)
+  shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
+  spacing: Spacing       — xs, sm, md, lg, xl
+  elevation: Elevation   — level0..level5 (shadow properties)
+  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, draggedOpacity, disabledOpacity, disabledContainerOpacity
+  motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
   topAppBar?: TopAppBarTokens — horizontalPadding, titleStartInset, smallContainerHeight, mediumContainerHeight, largeContainerHeight, topRowHeight, sideSlotMinHeight, iconFrameSize, mediumTitleBottomPadding, largeTitleBottomPadding (AppBar geometry in dp)
 }
 \`\`\`

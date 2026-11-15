@@ -661,19 +661,15 @@ All themes extend `BaseTheme`:
 interface BaseTheme {
   colors: Record<string, string>
   typography: Record<string, TypographyToken>
-  shape: Shape
-  spacing: Spacing
-  stateLayer: StateLayer
-  elevation: Elevation
-  motion: Motion
-  // Escape hatch for your own token groups — this is what lets a custom theme
-  // carry extra keys and still satisfy `BaseTheme`.
+  // Your own token groups. This is what lets a custom theme carry extra keys
+  // and still satisfy `BaseTheme`.
   [key: string]: unknown
 }
 ```
 
-`colors` and `typography` take any role names. The other five groups have the
-MD3 names and the MD3 models, and a custom theme must supply them too.
+`colors` and `typography` take any role names. `BaseTheme` has no other
+group. `shape`, `spacing`, `stateLayer`, `elevation` and `motion` are MD3
+groups, and they belong to the MD3 [`Theme`](#type-hierarchy).
 
 ### Define a custom theme
 
@@ -681,7 +677,7 @@ Use `defineTheme` to make a theme with full type checks. This theme is for
 your own components, which read it through `useTheme<BrandTheme>()`:
 
 ```tsx
-import { defineTheme, lightTheme } from '@rootnative/core'
+import { defineTheme } from '@rootnative/core'
 import type { BaseTheme, TypographyToken } from '@rootnative/core'
 
 interface BrandTheme extends BaseTheme {
@@ -704,16 +700,13 @@ interface BrandTheme extends BaseTheme {
     caption: TypographyToken
     [key: string]: TypographyToken
   }
+  // Token groups of your own, with your own names
+  radius: { control: number; card: number }
+  space: { sm: number; md: number; lg: number }
 }
 
 // A `TypographyToken` needs all five fields.
 const font = { fontFamily: 'Inter', letterSpacing: 0 }
-
-// `shape`, `spacing`, `stateLayer`, `elevation` and `motion` are required by
-// `BaseTheme`, and each has a fixed token set. Take them from the MD3 theme
-// and change only what your brand changes. Don't spread the whole
-// `lightTheme`: its `colors` and `typography` would replace yours.
-const { shape, spacing, stateLayer, elevation, motion } = lightTheme
 
 const brandTheme = defineTheme<BrandTheme>({
   colors: {
@@ -733,25 +726,15 @@ const brandTheme = defineTheme<BrandTheme>({
     body: { ...font, fontSize: 16, fontWeight: '400', lineHeight: 22 },
     caption: { ...font, fontSize: 12, fontWeight: '400', lineHeight: 16 },
   },
-  shape: { ...shape, cornerMedium: 10 },
-  spacing,
-  stateLayer,
-  elevation,
-  motion,
+  radius: { control: 8, card: 16 },
+  space: { sm: 8, md: 16, lg: 24 },
 })
 ```
 
-:::caution
-
-`shape`, `stateLayer`, `elevation` and `motion` are **not** free-form
-objects. Each one is a fixed interface. `shape` is `roundness` plus
-`cornerNone` through `cornerFull`. `stateLayer` is the six `*Opacity` keys.
-`elevation` is `level0` to `level5`, and every level needs all five shadow
-fields. `motion` is a flat set of 16 `duration*`, 7 `easing*` and 6 `spring*`
-tokens. If you omit or rename any of them, the type check fails. Take them
-from a preset. That is the supported way.
-
-:::
+`ThemeProvider` registers the MD3 [motion](./motion) transition names only
+for a theme that has the MD3 spring tokens. A custom theme starts with no
+transition name. To add your own, put a `MotionConfig` from
+`@rootnative/inertia` below the provider.
 
 ### Add your own tokens to the MD3 theme
 
@@ -811,6 +794,9 @@ function MyComponent() {
 
 ## Theme structure reference
 
+Each theme has `colors` and `typography`. The other groups are part of the
+MD3 `Theme`.
+
 | Token group | Description |
 |-------------|-------------|
 | `colors` | The color roles of the design system (`Record<string, string>`) |
@@ -824,8 +810,8 @@ function MyComponent() {
 
 ## Type hierarchy
 
-- **`BaseTheme`**: the generic base. Each theme extends it. Its `colors` and `typography` take any role names.
-- **`Theme`**: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), and the optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
+- **`BaseTheme`**: the generic base. Each theme extends it. It has `colors` and `typography`, which take any role names, and room for token groups of your own.
+- **`Theme`**: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), the `shape`, `spacing`, `stateLayer`, `elevation` and `motion` groups, and the optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
 
 ## Summary
 

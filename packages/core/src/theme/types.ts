@@ -1,25 +1,23 @@
 /**
- * Base theme interface that all design systems must implement.
- * Provides a generic contract for colors, typography, and shared tokens.
- * Extend this to create a custom design system theme.
+ * Base theme interface that all design systems must implement: color roles
+ * and typography roles, with any role names. Extend this to create a custom
+ * design system theme, and add token groups of your own on the theme root.
  *
- * `colors` and `typography` take any role names. The components of
- * `@rootnative/components` read the MD3 roles, so they need a {@link Theme}.
+ * It has no Material Design group. `shape`, `spacing`, `stateLayer`,
+ * `elevation` and `motion` belong to {@link Theme}. The components of
+ * `@rootnative/components` read the MD3 roles and groups, so they need a
+ * {@link Theme}.
  *
  * @example
  * interface MyTheme extends BaseTheme {
  *   colors: { brand: string; background: string; text: string }
  *   typography: { heading: TypographyToken; body: TypographyToken }
+ *   radius: { card: number; control: number }
  * }
  */
 export interface BaseTheme {
   colors: Record<string, string>
   typography: Record<string, TypographyToken>
-  shape: Shape
-  spacing: Spacing
-  stateLayer: StateLayer
-  elevation: Elevation
-  motion: Motion
   [key: string]: unknown
 }
 
@@ -32,6 +30,11 @@ export interface BaseTheme {
 export interface Theme extends BaseTheme {
   colors: Colors
   typography: Typography
+  shape: Shape
+  spacing: Spacing
+  stateLayer: StateLayer
+  elevation: Elevation
+  motion: Motion
   topAppBar?: TopAppBarTokens
 }
 

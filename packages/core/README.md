@@ -70,13 +70,11 @@ const theme = useTheme<MyTheme>()
 
 A helper that makes a custom theme with full type checks.
 
-A theme with your own role names is for your own components. Take the five
-fixed token groups from the MD3 theme:
+A theme with your own role names is for your own components. It needs
+`colors` and `typography`, and it can carry token groups of your own:
 
 ```tsx
-import { defineTheme, lightTheme } from '@rootnative/core'
-
-const { shape, spacing, stateLayer, elevation, motion } = lightTheme
+import { defineTheme } from '@rootnative/core'
 
 const myTheme = defineTheme({
   colors: { brand: '#FF6B00', background: '#FFF', text: '#1A1A1A' },
@@ -89,11 +87,7 @@ const myTheme = defineTheme({
       letterSpacing: 0,
     },
   },
-  shape,
-  spacing,
-  stateLayer,
-  elevation,
-  motion,
+  radius: { control: 8, card: 16 },
 })
 ```
 
@@ -101,6 +95,8 @@ The components of `@rootnative/components` read the MD3 color and typography
 roles. For them, keep the MD3 theme and add your tokens beside it:
 
 ```tsx
+import { defineTheme, lightTheme } from '@rootnative/core'
+
 const appTheme = defineTheme({
   ...lightTheme,
   status: { success: '#388E3C', onSuccess: '#FFFFFF' },
@@ -148,8 +144,8 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- `BaseTheme`: the generic base. Colors as `Record<string, string>`, typography as `Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
-- `Theme`: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 emphasized), and the optional `topAppBar` tokens. `MaterialTheme` is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
+- `BaseTheme`: the generic base. Colors as `Record<string, string>`, typography as `Record<string, TypographyToken>`, and room for token groups of your own.
+- `Theme`: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 emphasized), the shape, spacing, stateLayer, elevation and motion groups, and the optional `topAppBar` tokens. `MaterialTheme` is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
 
 ### Theme structure
 

@@ -13,11 +13,7 @@ import type { BaseTheme } from './types'
  * const myTheme = defineTheme({
  *   colors: { brand: '#FF6B00', background: '#FFFFFF', text: '#1A1A1A' },
  *   typography: { heading: { fontFamily: 'Inter', fontSize: 24, fontWeight: '700', lineHeight: 32, letterSpacing: 0 } },
- *   shape: lightTheme.shape,
- *   spacing: lightTheme.spacing,
- *   stateLayer: lightTheme.stateLayer,
- *   elevation: lightTheme.elevation,
- *   motion: lightTheme.motion,
+ *   radius: { control: 8, card: 16 },
  * })
  *
  * @example

@@ -5,7 +5,6 @@ import { ThemeProvider } from '../provider/ThemeProvider'
 import { darkTheme } from '../theme/dark'
 import { lightTheme } from '../theme/light'
 import { motionTransitions } from '../theme/motionAdapter'
-import type { BaseTheme } from '../theme/types'
 
 describe('motionTransitions', () => {
   const transitions = motionTransitions(lightTheme.motion)
@@ -128,7 +127,7 @@ describe('ThemeProvider motion registration', () => {
       colors: { brand: '#FF6B00' },
       typography: {},
       motion: { fast: 100 },
-    } as unknown as BaseTheme
+    }
     function wrapper({ children }: { children: ReactNode }) {
       return <ThemeProvider theme={ownTheme}>{children}</ThemeProvider>
     }
@@ -140,7 +139,7 @@ describe('ThemeProvider motion registration', () => {
     const ownTheme = {
       colors: { brand: '#FF6B00' },
       typography: {},
-    } as unknown as BaseTheme
+    }
     function wrapper({ children }: { children: ReactNode }) {
       return (
         <ThemeProvider>
