@@ -385,6 +385,27 @@ function analyzeImports(componentDir: string): {
     }
   }
 
+  // A util can import a sibling util (`./color`). `rootnative add` copies only
+  // the utils that an entry lists, so the entry must list the sibling too.
+  const pendingUtils = Array.from(utils)
+  while (pendingUtils.length > 0) {
+    const name = pendingUtils.pop() as string
+    const content = fs.readFileSync(
+      path.join(
+        ROOT,
+        `packages/utils/src/${name}.${UTIL_EXTENSIONS[name] || 'ts'}`,
+      ),
+      'utf-8',
+    )
+    for (const match of content.matchAll(/from\s+['"]\.\/([^/'"]+)['"]/g)) {
+      const sibling = match[1]
+      if (sibling && sibling in UTIL_EXPORTS && !utils.has(sibling)) {
+        utils.add(sibling)
+        pendingUtils.push(sibling)
+      }
+    }
+  }
+
   return {
     utils,
     componentDeps,

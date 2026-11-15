@@ -1,5 +1,6 @@
 import type { ElevationLevel } from '@rootnative/core'
 import { Platform } from 'react-native'
+import { alphaColor } from './color'
 
 /**
  * The style `elevationStyle` returns. It names only the keys it sets, with
@@ -20,7 +21,7 @@ export interface ElevationStyle {
 /**
  * Converts a theme elevation level into platform-appropriate shadow styles.
  * - Native: returns { shadowColor, shadowOffset, shadowOpacity, shadowRadius, elevation }
- * - Web: returns { boxShadow }
+ * - Web: returns { boxShadow }, in `shadowColor` at `shadowOpacity`
  *
  * Gotcha: the return shape differs by platform. Both are typed as ViewStyle,
  * but spreading the result and overriding individual shadow* props silently
@@ -29,14 +30,14 @@ export interface ElevationStyle {
  */
 export function elevationStyle(level: ElevationLevel): ElevationStyle {
   if (Platform.OS === 'web') {
-    const { shadowOffset, shadowOpacity, shadowRadius } = level
+    const { shadowColor, shadowOffset, shadowOpacity, shadowRadius } = level
 
     if (shadowOpacity === 0) {
       return { boxShadow: 'none' }
     }
 
     return {
-      boxShadow: `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(0, 0, 0, ${shadowOpacity})`,
+      boxShadow: `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px ${alphaColor(shadowColor, shadowOpacity)}`,
     }
   }
 

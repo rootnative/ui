@@ -12,6 +12,7 @@
  * `box-shadow` declaration on a real element.
  */
 import { lightTheme } from '@rootnative/core'
+import { elevationStyle } from '@rootnative/utils'
 import { useEffect } from 'react'
 import { Text } from 'react-native'
 import { BottomAppBar } from '../../bottom-app-bar'
@@ -315,4 +316,13 @@ it('gives the web branch boxShadow and none of the shadow* keys', () => {
   ]) {
     expect(config).not.toHaveProperty(key)
   }
+})
+
+it('paints a static web shadow in the color of the level', () => {
+  const level = { ...lightTheme.elevation.level2, shadowColor: '#1A73E8' }
+  const { shadowOffset, shadowRadius, shadowOpacity } = level
+  const shadow = `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(26, 115, 232, ${shadowOpacity})`
+
+  expect(elevationStyle(level)).toEqual({ boxShadow: shadow })
+  expect(elevationShadowConfig(level)).toEqual({ boxShadow: shadow })
 })

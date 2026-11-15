@@ -571,6 +571,15 @@ describe('elevationBoxShadow', () => {
     )
   })
 
+  it('paints the shadow in the color of the level', () => {
+    const level = { ...lightTheme.elevation.level1, shadowColor: '#1A73E8' }
+    const { shadowOffset, shadowRadius, shadowOpacity } = level
+
+    expect(elevationBoxShadow(level)).toBe(
+      `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(26, 115, 232, ${shadowOpacity})`,
+    )
+  })
+
   it("maps a zero-opacity level to 'none'", () => {
     // inertia parses `'none'` to zero layers, so paired against a real level
     // it pads with an invisible layer and fades in rather than popping.

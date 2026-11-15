@@ -14,7 +14,7 @@
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["elevation", "render-icon"],
+  "utils": ["color", "elevation", "render-icon"],
   "componentDependencies": ["button", "icon-button", "portal"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",

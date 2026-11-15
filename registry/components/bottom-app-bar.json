@@ -8,7 +8,7 @@
     "packages/components/src/bottom-app-bar/types.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["elevation"],
+  "utils": ["color", "elevation"],
   "componentDependencies": ["fab", "icon-button", "layout"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",

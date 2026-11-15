@@ -14,7 +14,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["elevation", "rtl"],
+  "utils": ["color", "elevation", "rtl"],
   "componentDependencies": ["portal", "typography"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",

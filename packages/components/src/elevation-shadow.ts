@@ -1,5 +1,6 @@
 import type { ElevationLevel } from '@rootnative/core'
 import type { ShadowConfig } from '@rootnative/inertia'
+import { alphaColor } from '@rootnative/utils'
 import { Platform } from 'react-native'
 
 /**
@@ -25,14 +26,17 @@ import { Platform } from 'react-native'
  * with a `boxShadow` — see {@link elevationBoxShadowForFabric}, which is the
  * one caller that must compensate.
  *
+ * The color is `shadowColor` at `shadowOpacity`, as the native `shadow*` keys
+ * paint it.
+ *
  * `shadowOpacity: 0` maps to `'none'`, which inertia parses to zero layers.
  */
 export function elevationBoxShadow(level: ElevationLevel): string {
-  const { shadowOffset, shadowOpacity, shadowRadius } = level
+  const { shadowColor, shadowOffset, shadowOpacity, shadowRadius } = level
 
   if (shadowOpacity === 0) return 'none'
 
-  return `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px rgba(0, 0, 0, ${shadowOpacity})`
+  return `${shadowOffset.width}px ${shadowOffset.height}px ${shadowRadius}px ${alphaColor(shadowColor, shadowOpacity)}`
 }
 
 /**
