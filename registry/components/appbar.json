@@ -6,6 +6,8 @@
     "packages/components/src/appbar/index.ts",
     "packages/components/src/appbar/styles.ts",
     "packages/components/src/appbar/types.ts",
+    "packages/components/src/internal/typographyRole.ts",
+    "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["rtl"],

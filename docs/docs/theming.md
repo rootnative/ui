@@ -647,7 +647,8 @@ two cases:
 :::caution
 
 Don't give a library component a theme that has no MD3 roles. The component
-can't find its colors and its text styles, so it draws wrong, or it throws.
+can't find its colors and its text styles, so it draws wrong. In development,
+the console names the first typography role that is missing.
 
 :::
 

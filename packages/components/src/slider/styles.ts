@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { typographyRole } from '../internal/typographyRole'
 
 // Material Design 3 (expressive) slider dimensions.
 // https://m3.material.io/components/sliders/specs
@@ -94,7 +95,7 @@ export function createStyles(
 ) {
   const c = getColors(theme, containerColor, contentColor, inactiveTrackColor)
   // MD3 value-label typography token.
-  const labelTypography = theme.typography.labelLarge
+  const labelTypography = typographyRole(theme, 'labelLarge')
 
   return StyleSheet.create({
     root: {

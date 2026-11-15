@@ -2,6 +2,7 @@ import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
+import { typographyRole } from '../internal/typographyRole'
 import type { ChipVariant } from './types'
 
 export const CHIP_FOCUS_RING_OFFSET = 2
@@ -173,7 +174,7 @@ export function createStyles(
     containerColor,
     contentColor,
   )
-  const labelStyle = theme.typography.labelLarge
+  const labelStyle = typographyRole(theme, 'labelLarge')
   const elevationLevel0 = elevationStyle(theme.elevation.level0)
   const elevationLevel1 = elevationStyle(theme.elevation.level1)
   const restRadius = getChipRestRadius(theme, variant)

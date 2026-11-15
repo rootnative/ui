@@ -2,6 +2,7 @@ import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
+import { typographyRole } from '../internal/typographyRole'
 import type { FABSize, FABVariant } from './types'
 
 export const FAB_FOCUS_RING_OFFSET = 2
@@ -110,7 +111,7 @@ export function getFABIconPixelSize(size: FABSize): number {
 export function createStyles(theme: MaterialTheme) {
   const ringOutset = focusRingOutset(FAB_FOCUS_RING_OFFSET)
   const elevationLevel3 = elevationStyle(theme.elevation.level3)
-  const labelStyle = theme.typography.labelLarge
+  const labelStyle = typographyRole(theme, 'labelLarge')
 
   return StyleSheet.create({
     wrapper: {

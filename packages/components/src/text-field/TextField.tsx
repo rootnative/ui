@@ -20,6 +20,7 @@ import type {
   TextInputInstance,
 } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { typographyRole } from '../internal/typographyRole'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
 
@@ -139,7 +140,8 @@ export function TextField({
 
   // Label is rendered at bodySmall and scaled up to bodyLarge when at rest.
   const restingScale =
-    theme.typography.bodyLarge.fontSize / theme.typography.bodySmall.fontSize
+    typographyRole(theme, 'bodyLarge').fontSize /
+    typographyRole(theme, 'bodySmall').fontSize
 
   const restingTop = isFilled
     ? labelPositions.filledRestingTop

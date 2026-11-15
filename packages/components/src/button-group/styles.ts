@@ -1,6 +1,7 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import { typographyRole } from '../internal/typographyRole'
 import type { ButtonGroupSize, ButtonGroupVariant } from './types'
 
 export const BUTTON_GROUP_FOCUS_RING_OFFSET = 2
@@ -268,7 +269,10 @@ export function createItemStyles(
   colors: ItemColors,
 ) {
   const tokens = getSizeTokens(size)
-  const labelStyle: TypographyToken = theme.typography[tokens.labelStyleKey]
+  const labelStyle: TypographyToken = typographyRole(
+    theme,
+    tokens.labelStyleKey,
+  )
   const focusRingInset = -(
     BUTTON_GROUP_FOCUS_RING_OFFSET + BUTTON_GROUP_FOCUS_RING_WIDTH
   )

@@ -9,6 +9,7 @@ import { Badge } from '../badge'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressOnSpace } from '../internal/pressableKeyDown'
+import { typographyRole } from '../internal/typographyRole'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -104,7 +105,7 @@ export function NavigationItem({
   // one-sided clamp: the shift overshoots past rest but not past centred.
   const labelBlockShift =
     (NAV_INDICATOR_LABEL_GAP +
-      (theme.typography.labelMedium.lineHeight ?? 16)) /
+      typographyRole(theme, 'labelMedium').lineHeight) /
     2
   const animatedShiftStyle = useAnimatedStyle(() => {
     'worklet'

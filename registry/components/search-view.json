@@ -8,8 +8,10 @@
     "packages/components/src/search-view/types.ts",
     "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/typographyRole.ts",
     "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useFocusTrap.ts",
+    "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["render-icon"],

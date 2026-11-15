@@ -2,6 +2,7 @@ import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import { webOutlineReset } from '../internal/focusOutline'
+import { typographyRole } from '../internal/typographyRole'
 import type { SearchBarDensity } from './types'
 
 export const SEARCH_BAR_HEIGHT = 56
@@ -23,7 +24,7 @@ export function createStyles(
   theme: MaterialTheme,
   density: SearchBarDensity = 0,
 ) {
-  const bodyLarge = theme.typography.bodyLarge
+  const bodyLarge = typographyRole(theme, 'bodyLarge')
   const disabledContent = alphaColor(
     theme.colors.onSurface,
     theme.stateLayer.disabledOpacity,

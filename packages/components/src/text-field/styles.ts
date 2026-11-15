@@ -2,6 +2,7 @@ import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, transformOrigin } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import { webOutlineReset } from '../internal/focusOutline'
+import { typographyRole } from '../internal/typographyRole'
 import type { TextFieldVariant } from './types'
 
 const CONTAINER_HEIGHT = 56
@@ -108,8 +109,8 @@ function getVariantColors(
 
 export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
   const colors = getVariantColors(theme, variant)
-  const bodyLarge = theme.typography.bodyLarge
-  const bodySmall = theme.typography.bodySmall
+  const bodyLarge = typographyRole(theme, 'bodyLarge')
+  const bodySmall = typographyRole(theme, 'bodySmall')
   const isFilled = variant === 'filled'
 
   return {

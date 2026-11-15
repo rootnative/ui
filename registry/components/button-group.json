@@ -10,7 +10,9 @@
     "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/pressableKeyDown.ts",
-    "packages/components/src/internal/touchTarget.ts"
+    "packages/components/src/internal/touchTarget.ts",
+    "packages/components/src/internal/typographyRole.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "pressable", "render-icon"],
   "componentDependencies": [],
