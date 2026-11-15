@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
-import type { PropsWithChildren } from 'react'
-import type { StyleProp, ViewStyle } from 'react-native'
+import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import { StyleSheet } from 'react-native'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
 import { LayoutEdgesContext } from './edgesContext'
 
-export interface LayoutProps extends PropsWithChildren {
+export interface LayoutProps extends ViewProps {
   /**
    * When `true`, removes all safe area insets for full-screen layout.
    * @default false
@@ -69,7 +68,13 @@ function removeBackgroundColor(style?: StyleProp<ViewStyle>) {
   return styleWithoutBackground
 }
 
-export function Layout({ immersive, edges, children, style }: LayoutProps) {
+export function Layout({
+  immersive,
+  edges,
+  children,
+  style,
+  ...props
+}: LayoutProps) {
   const theme = useMaterialTheme()
   const themeBackgroundStyle = useMemo(
     () => ({ backgroundColor: theme.colors.background }),
@@ -86,6 +91,7 @@ export function Layout({ immersive, edges, children, style }: LayoutProps) {
 
   return (
     <SafeAreaView
+      {...props}
       style={[styles.root, themeBackgroundStyle, styleWithoutBackground]}
       edges={safeAreaEdges}
     >

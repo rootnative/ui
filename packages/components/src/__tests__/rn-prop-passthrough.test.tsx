@@ -25,6 +25,7 @@ import { Carousel } from '../carousel'
 import { Dialog } from '../dialog'
 import { Icon } from '../icon'
 import { KeyboardAvoidingWrapper } from '../keyboard-avoiding-wrapper'
+import { Layout } from '../layout'
 import { Menu } from '../menu'
 import { NavigationBar } from '../navigation-bar'
 import { NavigationDrawer } from '../navigation-drawer'
@@ -51,6 +52,11 @@ function renderHosted(ui: React.ReactElement) {
 }
 
 describe('RN prop passthrough reaches the root node', () => {
+  it('Layout', () => {
+    renderWithTheme(<Layout testID="layout" nativeID="probe" />)
+    expect(screen.getByTestId('layout').props.nativeID).toBe('probe')
+  })
+
   it('Tabs', () => {
     renderWithTheme(<Tabs items={ITEMS} testID="tabs" nativeID="probe" />)
     expect(screen.getByTestId('tabs').props.nativeID).toBe('probe')
