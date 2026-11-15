@@ -58,6 +58,34 @@ the surface for overlays (`Dialog`, `Menu`, `Tooltip`, `BottomSheet`,
 `NavigationBar` / `ButtonGroup`, the rail for `NavigationRail`, and the overlay
 layer for a named `PortalHost`.
 
+## Where `style` lands
+
+`style` reaches the node that you would place in a layout. The rule has
+three cases, and each one is part of the promise:
+
+| Component | Where `style` lands |
+|---|---|
+| A component in the flow of its parent | The outer node, which the parent lays out |
+| `Button`, `IconButton`, `FAB`, `Chip`, `Switch`, and `Card` with `onPress` | The layout keys go to the outer node. Each other key goes to the pressable |
+| An overlay: `Dialog`, `Menu`, `Tooltip`, `BottomSheet`, `SearchView`, and the modal `NavigationDrawer` and `SideSheet` | The surface. The component positions an overlay, so no parent lays it out |
+
+The components in the second row put the pressable in an outer view, with
+the focus ring and the shadow beside it. So the keys that place or size the
+component go to the outer view: `flex`, `flexGrow`, `flexShrink`,
+`flexBasis`, `alignSelf`, `width`, each margin, `position` with its offsets,
+and `zIndex`. `minWidth` and `maxWidth` go with `width`, and stay on the
+pressable when you set them alone. Each other key, such as `backgroundColor`
+or `borderRadius`, stays on the pressable. The React Native props (`testID`,
+`nativeID`, `onLayout`) go to the pressable too.
+
+Two notes:
+
+- **`TextField` and `SearchBar`** take the props of a text input, and they
+  forward those props to the input. `style` goes to the outer node, which
+  is the box around the field.
+- **A standard `NavigationDrawer` or `SideSheet`** renders in place, so it
+  is a component in the flow, and `style` lands on its outer node.
+
 ## Safe-area insets are opt-in, except on BottomSheet
 
 The defaults are not uniform, and that is intentional:
@@ -109,9 +137,10 @@ They are internal to the library, and the CLI flattens them into the directory
 of each component on install. Their shape is **not** part of the promise.
 Build on the props of the components, not on these files:
 
-`useStateLayer.ts`, `useBooleanProgress.ts`, `usePressMorph.ts`,
-`elevationShadow.ts`, `useFocusTrap.ts`, `useAnchorPosition.ts` and
-`safe-area.tsx`. The registry entry of a component
+each file of `internal/`, such as `useStateLayer.ts`, `useMaterialTheme.ts`,
+`useBooleanProgress.ts`, `useFocusTrap.ts` and `useAnchorPosition.ts`, and
+the two shared modules `elevation-shadow.ts` and `safe-area.tsx`. The
+registry entry of a component
 (`registry/components/<name>.json`, the `files` array) records which of them
 the component uses. The registry is generated from the source, so it stays
 accurate when a component changes.
