@@ -1,11 +1,11 @@
 ---
 sidebar_position: 5
-description: Customize MD3, generate a branded theme from a seed color, or replace the design system entirely — the theme engine is design-system agnostic.
+description: Change MD3, make a branded theme from a seed color, or give the theme engine the tokens of your own design system.
 ---
 
 # Theming
 
-Root Native UI ships with Material Design 3, but the theme engine works with any design system. You can change MD3, make a branded theme from a seed color, or build your own design system.
+Root Native UI ships with Material Design 3. You can change MD3, or make a branded theme from a seed color. The theme engine also takes the tokens of your own design system, for your own components. The library components need the MD3 roles; see [Custom design systems](#custom-design-systems).
 
 ## Material Design 3 (default)
 
@@ -630,7 +630,26 @@ material.defaultTopAppBarTokens
 
 ## Custom design systems
 
-The theme engine supports any design system, not only MD3. Use `BaseTheme`, `defineTheme`, and `ThemeProvider` to build your own.
+The theme engine isn't tied to MD3. `ThemeProvider`, the light and dark pair,
+`useThemeMode`, the storage, and `useTheme<T>()` work with any color role names
+and any typography role names.
+
+The components in `@rootnative/components` are MD3 components. Each one reads
+the MD3 color roles (`primary`, `surface`, `onSurface`, ...) and the MD3
+typography roles (`bodyLarge`, `labelLarge`, ...) from the theme. So there are
+two cases:
+
+| You want | Do this |
+| --- | --- |
+| The library components in your brand | Keep the MD3 role names and change their values: [override tokens](#override-specific-tokens), or [make a theme from a seed color](#generate-a-theme-from-a-seed-color). Add your own tokens beside them; see [Add your own tokens to the MD3 theme](#add-your-own-tokens-to-the-md3-theme) |
+| Your own components on your own tokens | Define a theme with your own role names; see [Define a custom theme](#define-a-custom-theme) |
+
+:::caution
+
+Don't give a library component a theme that has no MD3 roles. The component
+can't find its colors and its text styles, so it draws wrong, or it throws.
+
+:::
 
 ### BaseTheme
 
@@ -651,13 +670,17 @@ interface BaseTheme {
 }
 ```
 
+`colors` and `typography` take any role names. The other five groups have the
+MD3 names and the MD3 models, and a custom theme must supply them too.
+
 ### Define a custom theme
 
-Use `defineTheme` to make a theme with full type checks:
+Use `defineTheme` to make a theme with full type checks. This theme is for
+your own components, which read it through `useTheme<BrandTheme>()`:
 
 ```tsx
-import { defineTheme, material } from '@rootnative/core'
-import type { BaseTheme } from '@rootnative/core'
+import { defineTheme, lightTheme } from '@rootnative/core'
+import type { BaseTheme, TypographyToken } from '@rootnative/core'
 
 interface BrandTheme extends BaseTheme {
   colors: {
@@ -681,6 +704,15 @@ interface BrandTheme extends BaseTheme {
   }
 }
 
+// A `TypographyToken` needs all five fields.
+const font = { fontFamily: 'Inter', letterSpacing: 0 }
+
+// `shape`, `spacing`, `stateLayer`, `elevation` and `motion` are required by
+// `BaseTheme`, and each has a fixed token set. Take them from the MD3 theme
+// and change only what your brand changes. Don't spread the whole
+// `lightTheme`: its `colors` and `typography` would replace yours.
+const { shape, spacing, stateLayer, elevation, motion } = lightTheme
+
 const brandTheme = defineTheme<BrandTheme>({
   colors: {
     brand: '#FF6B00',
@@ -694,17 +726,16 @@ const brandTheme = defineTheme<BrandTheme>({
     success: '#388E3C',
   },
   typography: {
-    heading: { fontSize: 24, fontWeight: '700', lineHeight: 32 },
-    subheading: { fontSize: 18, fontWeight: '600', lineHeight: 24 },
-    body: { fontSize: 16, fontWeight: '400', lineHeight: 22 },
-    caption: { fontSize: 12, fontWeight: '400', lineHeight: 16 },
+    heading: { ...font, fontSize: 24, fontWeight: '700', lineHeight: 32 },
+    subheading: { ...font, fontSize: 18, fontWeight: '600', lineHeight: 24 },
+    body: { ...font, fontSize: 16, fontWeight: '400', lineHeight: 22 },
+    caption: { ...font, fontSize: 12, fontWeight: '400', lineHeight: 16 },
   },
-  // `shape`, `spacing`, `stateLayer`, `elevation` and `motion` are required by
-  // `BaseTheme` and each has a fixed token set. Spread the MD3 defaults and
-  // override only what your brand changes, rather than spelling them out —
-  // `motion` alone is 29 tokens, and components read every one of them.
-  ...material.lightTheme,
-  shape: { ...material.lightTheme.shape, roundness: 1, cornerMedium: 10 },
+  shape: { ...shape, cornerMedium: 10 },
+  spacing,
+  stateLayer,
+  elevation,
+  motion,
 })
 ```
 
@@ -715,15 +746,38 @@ objects. Each one is a fixed interface. `shape` is `roundness` plus
 `cornerNone` through `cornerFull`. `stateLayer` is the six `*Opacity` keys.
 `elevation` is `level0` to `level5`, and every level needs all five shadow
 fields. `motion` is a flat set of 16 `duration*`, 7 `easing*` and 6 `spring*`
-tokens. If you omit or rename any of them, the type check fails, and a token
-set with gaps breaks the components that read it at runtime. Spread a preset
-to supply them. That is the supported way.
+tokens. If you omit or rename any of them, the type check fails. Take them
+from a preset. That is the supported way.
 
 :::
 
-### ThemeProvider
+### Add your own tokens to the MD3 theme
 
-Use `ThemeProvider` for a custom design system too:
+To use the library components and your own tokens together, extend the MD3
+`Theme`. Keep each MD3 role, and put your tokens in a group of their own on
+the theme root:
+
+```tsx
+import { defineTheme, lightTheme } from '@rootnative/core'
+import type { Theme } from '@rootnative/core'
+
+interface AppTheme extends Theme {
+  status: { success: string; onSuccess: string }
+}
+
+const appTheme = defineTheme<AppTheme>({
+  ...lightTheme,
+  colors: { ...lightTheme.colors, primary: '#FF6B00', onPrimary: '#FFFFFF' },
+  status: { success: '#388E3C', onSuccess: '#FFFFFF' },
+})
+```
+
+The library components read the MD3 roles, and your components read
+`useTheme<AppTheme>().status`.
+
+### Provide a custom theme
+
+Use `ThemeProvider` for a custom theme too:
 
 ```tsx
 import { ThemeProvider } from '@rootnative/core'
@@ -768,7 +822,7 @@ function MyComponent() {
 
 ## Type hierarchy
 
-- **`BaseTheme`**: the generic base. Any design system extends it.
+- **`BaseTheme`**: the generic base. Each theme extends it. Its `colors` and `typography` take any role names.
 - **`Theme`**: the MD3 theme. It extends `BaseTheme` with 49 color roles, 30 typography variants (15 base + 15 MD3 Expressive emphasized), and the optional `topAppBar` tokens. **`MaterialTheme`** is an identical alias. Use it to tell the themes apart in a codebase with more than one design system.
 
 ## Summary

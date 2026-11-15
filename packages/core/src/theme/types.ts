@@ -3,6 +3,9 @@
  * Provides a generic contract for colors, typography, and shared tokens.
  * Extend this to create a custom design system theme.
  *
+ * `colors` and `typography` take any role names. The components of
+ * `@rootnative/components` read the MD3 roles, so they need a {@link Theme}.
+ *
  * @example
  * interface MyTheme extends BaseTheme {
  *   colors: { brand: string; background: string; text: string }

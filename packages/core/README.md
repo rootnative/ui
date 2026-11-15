@@ -6,7 +6,7 @@
 
 # @rootnative/core
 
-The theme engine of [Root Native UI](https://github.com/rootnative/ui), a React Native component library. It works with any design system, and ships with Material Design 3.
+The theme engine of [Root Native UI](https://github.com/rootnative/ui), a React Native component library. It ships with Material Design 3, and it takes the tokens of your own design system too.
 
 ## Install
 
@@ -44,7 +44,7 @@ export default function App() {
 
 ### ThemeProvider
 
-Provides the theme context to all child components. It works with any design system: Material Design 3 or a custom theme. The default is the MD3 light theme.
+Provides the theme context to all child components. It takes an MD3 theme or a theme with your own roles. The default is the MD3 light theme.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -68,20 +68,42 @@ const theme = useTheme<MyTheme>()
 
 ### defineTheme(theme)
 
-A helper that makes a custom theme with full type checks:
+A helper that makes a custom theme with full type checks.
+
+A theme with your own role names is for your own components. Take the five
+fixed token groups from the MD3 theme:
 
 ```tsx
-import { defineTheme } from '@rootnative/core'
-import type { BaseTheme } from '@rootnative/core'
+import { defineTheme, lightTheme } from '@rootnative/core'
+
+const { shape, spacing, stateLayer, elevation, motion } = lightTheme
 
 const myTheme = defineTheme({
   colors: { brand: '#FF6B00', background: '#FFF', text: '#1A1A1A' },
-  typography: { heading: { ... }, body: { ... } },
-  shape: { ... },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
-  stateLayer: { ... },
-  elevation: { ... },
-  motion: { ... },
+  typography: {
+    body: {
+      fontFamily: 'Inter',
+      fontSize: 16,
+      fontWeight: '400',
+      lineHeight: 24,
+      letterSpacing: 0,
+    },
+  },
+  shape,
+  spacing,
+  stateLayer,
+  elevation,
+  motion,
+})
+```
+
+The components of `@rootnative/components` read the MD3 color and typography
+roles. For them, keep the MD3 theme and add your tokens beside it:
+
+```tsx
+const appTheme = defineTheme({
+  ...lightTheme,
+  status: { success: '#388E3C', onSuccess: '#FFFFFF' },
 })
 ```
 

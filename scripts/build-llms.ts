@@ -2681,14 +2681,15 @@ Ask this first. Every path below ends in the same \`<ThemeProvider theme={...}>\
 | A full MD3 palette from one brand color | \`createMaterialTheme(seed)\` from \`@rootnative/core/create-theme\` |
 | MD3 with a few token overrides | Spread over \`lightTheme\` / \`darkTheme\` (see the custom-theme example under ThemeProvider) |
 | MD3 with sharper or rounder corners | The \`roundness\` option on \`createMaterialTheme\`, or \`applyRoundness()\` on an existing theme |
-| A fully custom design system (your own tokens) | \`defineTheme<MyTheme>()\` + \`useTheme<MyTheme>()\` |
+| MD3 components plus your own tokens | Spread \`lightTheme\` in \`defineTheme<AppTheme>()\` and add a token group on the theme root |
+| Your own role names, for your own components only (the library components need the MD3 roles) | \`defineTheme<MyTheme>()\` + \`useTheme<MyTheme>()\` |
 | Light/dark switching and persistence | The \`{ light, dark }\` pair + \`useThemeMode()\`; add \`storage\` to persist |
 | One part of the app with its own colors | A nested \`ThemeProvider\` with its own pair (see Nested providers) |
 | No light flash for dark readers of a static web export | \`schemeGuardScript\` + \`schemeGuardCss\` from \`@rootnative/core/static-export\` in the HTML shell |
 
 ### ThemeProvider
 
-Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
+Wrap your app root to supply the theme to all components. Takes an MD3 theme, or a theme with your own role names for your own components. The components of \`@rootnative/components\` read the MD3 color and typography roles, so they need a theme that keeps them. Defaults to the MD3 light theme when no theme is provided.
 
 \`\`\`tsx
 import { ThemeProvider, darkTheme } from '@rootnative/core'
@@ -2823,7 +2824,7 @@ const theme = useTheme<MyTheme>()
 
 ### defineTheme(theme)
 
-Identity function that validates a custom theme object against \`BaseTheme\`. Provides type-checking and autocompletion.
+Identity function that validates a custom theme object against \`BaseTheme\`. Provides type-checking and autocompletion. The theme below has its own role names, so it is for your own components. For the library components, spread \`lightTheme\` and add your tokens beside the MD3 roles.
 
 \`\`\`tsx
 import { defineTheme } from '@rootnative/core'
