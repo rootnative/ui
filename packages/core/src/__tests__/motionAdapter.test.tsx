@@ -5,6 +5,7 @@ import { ThemeProvider } from '../provider/ThemeProvider'
 import { darkTheme } from '../theme/dark'
 import { lightTheme } from '../theme/light'
 import { motionTransitions } from '../theme/motionAdapter'
+import type { BaseTheme } from '../theme/types'
 
 describe('motionTransitions', () => {
   const transitions = motionTransitions(lightTheme.motion)
@@ -120,5 +121,34 @@ describe('ThemeProvider motion registration', () => {
       tension: 1234,
       friction: 70,
     })
+  })
+
+  it('registers no name for a theme with no MD3 motion tokens', () => {
+    const ownTheme = {
+      colors: { brand: '#FF6B00' },
+      typography: {},
+      motion: { fast: 100 },
+    } as unknown as BaseTheme
+    function wrapper({ children }: { children: ReactNode }) {
+      return <ThemeProvider theme={ownTheme}>{children}</ThemeProvider>
+    }
+    const { result } = renderHook(() => useNamedTransitions(), { wrapper })
+    expect(result.current).toEqual({})
+  })
+
+  it('keeps the names of a parent provider below such a theme', () => {
+    const ownTheme = {
+      colors: { brand: '#FF6B00' },
+      typography: {},
+    } as unknown as BaseTheme
+    function wrapper({ children }: { children: ReactNode }) {
+      return (
+        <ThemeProvider>
+          <ThemeProvider theme={ownTheme}>{children}</ThemeProvider>
+        </ThemeProvider>
+      )
+    }
+    const { result } = renderHook(() => useNamedTransitions(), { wrapper })
+    expect(result.current['state-hover']).toMatchObject({ type: 'spring' })
   })
 })

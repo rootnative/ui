@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { NavigationItem } from '../navigation-bar/NavigationItem'
 import { getNavigationBarColors } from '../navigation-bar/styles'
 import { createNavigationRailStyles } from './styles'
@@ -24,7 +24,7 @@ export function NavigationRail({
   testID,
   ...rest
 }: NavigationRailProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const colors = useMemo(
     () =>
       getNavigationBarColors(

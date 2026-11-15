@@ -8,7 +8,7 @@
     "packages/components/src/text-field/types.ts",
     "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
-    "packages/components/src/internal/typographyRole.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "render-icon", "rtl"],

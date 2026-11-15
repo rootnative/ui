@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useShadow } from '@rootnative/inertia'
 import {
   Animated,
@@ -18,6 +18,7 @@ import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import { warnOnce } from '../internal/warnOnce'
@@ -63,7 +64,7 @@ export function Button({
   const isInert = isDisabled || isLoading
   const hasLeading = Boolean(leadingIcon) || isLoading
   const hasTrailing = Boolean(trailingIcon)
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const sizeTokens = getButtonSizeTokens(size)
   const resolvedIconSize = iconSize ?? sizeTokens.iconSize

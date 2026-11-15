@@ -19,6 +19,7 @@
     "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/useFocusTrap.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/useStateLayer.ts",
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"

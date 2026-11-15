@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { useColorTransition } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { useCallback, useMemo, useState } from 'react'
@@ -12,6 +11,7 @@ import {
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createStyles, getResolvedRadioColors } from './styles'
 import type { RadioProps } from './types'
 
@@ -37,7 +37,7 @@ export function Radio({
   const isSelected = isControlled ? Boolean(value) : selfValue
   const isPassive = isPassiveControl(isControlled, onValueChange, isDisabled)
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const offColors = useMemo(

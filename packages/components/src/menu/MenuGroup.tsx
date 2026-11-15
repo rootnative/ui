@@ -1,7 +1,7 @@
-import { useTheme } from '@rootnative/core'
 import { resolveLogical } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { warnOnce } from '../internal/warnOnce'
 import { MenuGroupPlaceContext, useMenuContext } from './context'
 import { placeItems } from './placeItems'
@@ -23,7 +23,7 @@ export function MenuGroup({
 }: MenuGroupProps) {
   const { variant, containerColor } = useMenuContext('Menu.Group')
   const place = useContext(MenuGroupPlaceContext)
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createMenuGroupStyles(theme, containerColor),
     [theme, containerColor],

@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
@@ -10,6 +10,7 @@ import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   createStyles,
@@ -63,7 +64,7 @@ export function FAB({
   const resolvedHitSlop =
     hitSlop ?? (size === 'small' && !isExtended ? 4 : undefined)
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
   const isDisabled = Boolean(disabled)

@@ -1,7 +1,8 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { ICON_SIZE, createIconStyles } from './styles'
 import type { IconProps } from './types'
 
@@ -18,7 +19,7 @@ export function Icon({
   style,
   ...rest
 }: IconProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const styles = useMemo(() => createIconStyles(size), [size])
   const resolvedColor = color ?? theme.colors.onSurface

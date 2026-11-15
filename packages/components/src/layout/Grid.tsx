@@ -1,8 +1,9 @@
-import { useBreakpointValue, useTheme } from '@rootnative/core'
+import { useBreakpointValue } from '@rootnative/core'
 import { Stagger, type StaggerProps } from '@rootnative/inertia'
 import React, { cloneElement, isValidElement, useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { GridCell } from './GridCell'
 import { resolveSpacing } from './resolveSpacing'
 import { Row } from './Row'
@@ -17,7 +18,7 @@ export function Grid({
   style,
   ...rowProps
 }: GridProps) {
-  const { spacing } = useTheme()
+  const { spacing } = useMaterialTheme()
   // The hook call must stay unconditional, so a plain number becomes a
   // constant one-entry map instead of skipping the hook.
   const resolvedColumns = useBreakpointValue(

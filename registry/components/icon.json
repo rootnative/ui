@@ -5,7 +5,9 @@
     "packages/components/src/icon/Icon.tsx",
     "packages/components/src/icon/index.ts",
     "packages/components/src/icon/styles.ts",
-    "packages/components/src/icon/types.ts"
+    "packages/components/src/icon/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["render-icon"],
   "componentDependencies": [],

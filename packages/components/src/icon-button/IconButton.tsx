@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import {
   Animated,
   interpolate,
@@ -16,6 +16,7 @@ import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import { AppBarContentColorContext } from './context'
@@ -36,7 +37,7 @@ import type { IconButtonProps, IconButtonVariant } from './types'
 // selected toggle keeps `primary`.
 function getIconColor(
   variant: IconButtonVariant,
-  theme: ReturnType<typeof useTheme>,
+  theme: ReturnType<typeof useMaterialTheme>,
   isToggle: boolean,
   selected: boolean,
   barContentColor: string | undefined,
@@ -98,7 +99,7 @@ export function IconButton({
   accessibilityLabel,
   ...props
 }: IconButtonProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const barContentColor = useContext(AppBarContentColorContext)
   const styles = useMemo(() => createStyles(theme), [theme])

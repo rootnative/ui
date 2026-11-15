@@ -3,7 +3,6 @@ import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { ExpressiveSize } from '../internal/size'
-import { typographyRole } from '../internal/typographyRole'
 import type { ButtonShape, ButtonVariant } from './types'
 
 export const BUTTON_FOCUS_RING_OFFSET = 2
@@ -361,10 +360,7 @@ export function createStyles(
     contentColor,
   )
   const sizeTokens = getButtonSizeTokens(size)
-  const labelStyle: TypographyToken = typographyRole(
-    theme,
-    sizeTokens.labelRole,
-  )
+  const labelStyle: TypographyToken = theme.typography[sizeTokens.labelRole]
   const restCorner = getButtonMorphRadii(theme, size, shape, selected).rest
   const padding = getHorizontalPadding(
     theme,

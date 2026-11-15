@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   cubicBezier,
   useAnimation,
@@ -14,6 +13,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   DETERMINATE_POINTS,
   INDETERMINATE_POINTS,
@@ -58,7 +58,7 @@ export function LoadingIndicator({
   accessibilityLabel,
   ...rest
 }: LoadingIndicatorProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const indeterminate = progress === undefined
   const styles = useMemo(() => createStyles(size), [size])
   const colors = useMemo(

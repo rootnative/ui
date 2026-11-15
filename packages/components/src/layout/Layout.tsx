@@ -1,8 +1,8 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import type { PropsWithChildren } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { StyleSheet } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
 import { LayoutEdgesContext } from './edgesContext'
@@ -70,7 +70,7 @@ function removeBackgroundColor(style?: StyleProp<ViewStyle>) {
 }
 
 export function Layout({ immersive, edges, children, style }: LayoutProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const themeBackgroundStyle = useMemo(
     () => ({ backgroundColor: theme.colors.background }),
     [theme.colors.background],

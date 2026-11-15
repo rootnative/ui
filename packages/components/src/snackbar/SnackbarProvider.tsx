@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import {
   useCallback,
@@ -9,6 +8,7 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -25,7 +25,7 @@ interface SnackbarHostProps {
 }
 
 function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const entry = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,

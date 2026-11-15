@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
@@ -9,8 +9,8 @@ import { Badge } from '../badge'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressOnSpace } from '../internal/pressableKeyDown'
-import { typographyRole } from '../internal/typographyRole'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   NAV_INDICATOR_LABEL_GAP,
@@ -52,7 +52,7 @@ export function NavigationItem({
   testID,
   placement = 'bar',
 }: NavigationItemProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const disabled = Boolean(item.disabled)
 
@@ -105,7 +105,7 @@ export function NavigationItem({
   // one-sided clamp: the shift overshoots past rest but not past centred.
   const labelBlockShift =
     (NAV_INDICATOR_LABEL_GAP +
-      typographyRole(theme, 'labelMedium').lineHeight) /
+      (theme.typography.labelMedium.lineHeight ?? 16)) /
     2
   const animatedShiftStyle = useAnimatedStyle(() => {
     'worklet'

@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   Motion,
   cubicBezier,
@@ -14,6 +13,7 @@ import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
   PROGRESS_LINEAR_WAVE_AMPLITUDE,
@@ -59,7 +59,7 @@ export function LinearProgress({
   onLayout: onLayoutProp,
   ...rest
 }: LinearProgressProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const indeterminate = progress === undefined
   const value = indeterminate ? 0 : clamp(progress as number, 0, 1)
 

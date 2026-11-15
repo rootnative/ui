@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useShadow } from '@rootnative/inertia'
 import { useGestureLayer } from '@rootnative/inertia/gesture-layer'
 import {
@@ -31,6 +31,7 @@ import { pointerEvents } from '../internal/pointerEvents'
 import { pressedState } from '../internal/pressedState'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
@@ -122,7 +123,7 @@ export function Chip(props: ChipProps) {
     (variant === 'filter' && isSelected),
   )
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(
     () =>

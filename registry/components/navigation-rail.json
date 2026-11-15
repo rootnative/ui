@@ -5,7 +5,9 @@
     "packages/components/src/navigation-rail/NavigationRail.tsx",
     "packages/components/src/navigation-rail/index.ts",
     "packages/components/src/navigation-rail/styles.ts",
-    "packages/components/src/navigation-rail/types.ts"
+    "packages/components/src/navigation-rail/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": ["navigation-bar"],

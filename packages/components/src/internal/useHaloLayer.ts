@@ -1,9 +1,9 @@
-import { useTheme } from '@rootnative/core'
 import {
   useGestureLayer,
   type GestureLayerStates,
 } from '@rootnative/inertia/gesture-layer'
 import { useMemo } from 'react'
+import { useMaterialTheme } from './useMaterialTheme'
 import { useFocusRingStyle } from './useStateLayer'
 import type { UseStateLayerResult } from './useStateLayer'
 
@@ -20,7 +20,7 @@ import type { UseStateLayerResult } from './useStateLayer'
  * Internal — not exported from the package.
  */
 export function useHaloLayer(disabled: boolean): UseStateLayerResult {
-  const { stateLayer } = useTheme()
+  const { stateLayer } = useMaterialTheme()
   const layers = useMemo<GestureLayerStates>(
     () => ({
       rest: { opacity: 0 },

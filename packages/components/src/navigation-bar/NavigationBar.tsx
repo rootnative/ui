@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useCallback, useMemo, useState } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   barEdges,
   barSideEdges,
@@ -29,7 +29,7 @@ export function NavigationBar({
   testID,
   ...rest
 }: NavigationBarProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const sideEdges = barSideEdges(insetSides)
   const sideInsetBleed = useSideInsetBleed(sideEdges)
   // The side insets keep the destinations clear of the notch in landscape,

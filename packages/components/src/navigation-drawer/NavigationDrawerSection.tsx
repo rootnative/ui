@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { Text, View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useNavigationDrawerContext } from './context'
 import { createNavigationDrawerSectionStyles } from './styles'
 import type { NavigationDrawerSectionProps } from './types'
@@ -17,7 +17,7 @@ export function NavigationDrawerSection({
   ...rest
 }: NavigationDrawerSectionProps) {
   const { colors } = useNavigationDrawerContext('NavigationDrawer.Section')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createNavigationDrawerSectionStyles(theme, colors),
     [theme, colors],

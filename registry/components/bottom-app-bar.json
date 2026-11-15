@@ -6,6 +6,8 @@
     "packages/components/src/bottom-app-bar/index.ts",
     "packages/components/src/bottom-app-bar/styles.ts",
     "packages/components/src/bottom-app-bar/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["color", "elevation"],

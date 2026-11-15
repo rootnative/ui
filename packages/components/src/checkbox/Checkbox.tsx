@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useColorTransition } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
@@ -14,6 +14,7 @@ import {
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   CHECKBOX_ICON_SIZE,
   createStyles,
@@ -47,7 +48,7 @@ export function Checkbox({
   // Indeterminate wins over checked visually — both fill the box.
   const isActive = isIndeterminate || isChecked
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
 

@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { isRTLDirection, selectRTL } from '@rootnative/utils'
 import { useMemo } from 'react'
@@ -8,6 +7,7 @@ import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -54,7 +54,7 @@ export function SideSheet(props: SideSheetProps) {
     ...rest
   } = props
   const isModal = variant === 'modal'
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () =>
       createSideSheetStyles(

@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import {
   useAnimation,
   useColorCascade,
@@ -20,7 +20,7 @@ import type {
   TextInputInstance,
 } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
-import { typographyRole } from '../internal/typographyRole'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
 
@@ -71,7 +71,7 @@ export function TextField({
   accessibilityState,
   ...textInputProps
 }: TextFieldProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const isDisabled = Boolean(disabled)
   const isError = Boolean(error) || Boolean(errorText)
@@ -140,8 +140,7 @@ export function TextField({
 
   // Label is rendered at bodySmall and scaled up to bodyLarge when at rest.
   const restingScale =
-    typographyRole(theme, 'bodyLarge').fontSize /
-    typographyRole(theme, 'bodySmall').fontSize
+    theme.typography.bodyLarge.fontSize / theme.typography.bodySmall.fontSize
 
   const restingTop = isFilled
     ? labelPositions.filledRestingTop

@@ -13,6 +13,7 @@
     "packages/components/src/layout/index.ts",
     "packages/components/src/layout/resolveSpacing.ts",
     "packages/components/src/layout/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],

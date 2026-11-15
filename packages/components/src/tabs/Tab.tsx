@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo } from 'react'
@@ -7,6 +7,7 @@ import { Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { TAB_ICON_SIZE, createTabStyles } from './styles'
 import type { TabColors } from './styles'
@@ -45,7 +46,7 @@ export function Tab({
   onPress,
   onMeasure,
 }: TabProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const disabled = Boolean(item.disabled)
   const hasIcon = item.icon !== undefined

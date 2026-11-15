@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   useAnimation,
   useMotionValue,
@@ -17,6 +16,7 @@ import type {
 import { ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PRIMARY_INDICATOR_MIN_WIDTH,
   SCROLLABLE_EDGE_PADDING,
@@ -121,7 +121,7 @@ export function Tabs({
   testID,
   ...rest
 }: TabsProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const colors = useMemo(
     () =>
       getTabColors(

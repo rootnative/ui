@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   useAnimator,
   useHideOnScroll,
@@ -12,6 +11,7 @@ import type { LayoutChangeEvent, ViewProps } from 'react-native'
 import { FAB } from '../fab'
 import { IconButton } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   barEdges,
   barSideEdges,
@@ -65,7 +65,7 @@ export function BottomAppBar({
   onFocus,
   ...rest
 }: BottomAppBarProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const sideEdges = barSideEdges(insetSides)
   const sideInsetBleed = useSideInsetBleed(sideEdges)
   // The side insets keep the actions clear of the notch in landscape, see

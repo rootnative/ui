@@ -1,7 +1,7 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { Text, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createStyles } from './styles'
 import type { BadgeProps } from './types'
 
@@ -31,7 +31,7 @@ export function Badge({
   testID,
   ...props
 }: BadgeProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createStyles(theme), [theme])
 
   const text = formatBadgeLabel(label, max)

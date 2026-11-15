@@ -1,7 +1,7 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, cubicBezier } from '@rootnative/inertia'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   SKELETON_DEFAULT_HEIGHT,
   SKELETON_PULSE_MIN_OPACITY,
@@ -18,7 +18,7 @@ export function Skeleton({
   style,
   ...rest
 }: SkeletonProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
 
   const styles = useMemo(
     () => createSkeletonStyles(theme, shape, containerColor),

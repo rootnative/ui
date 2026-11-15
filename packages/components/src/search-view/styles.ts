@@ -1,7 +1,6 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
 import { webOutlineReset } from '../internal/focusOutline'
-import { typographyRole } from '../internal/typographyRole'
 import { SEARCH_BAR_MAX_WIDTH } from '../search-bar/styles'
 
 /**
@@ -26,7 +25,7 @@ export const SEARCH_VIEW_SLIDE = 24
 const SLOT_SIZE = 40
 
 export function createStyles(theme: MaterialTheme, containerColor?: string) {
-  const bodyLarge = typographyRole(theme, 'bodyLarge')
+  const bodyLarge = theme.typography.bodyLarge
 
   const colors = {
     container: containerColor ?? theme.colors.surfaceContainerHigh,

@@ -4,7 +4,7 @@ import { useColorScheme } from 'react-native'
 import { useIsHydrating } from '../internal/useIsHydrating'
 import { useMarkThemeReady } from '../internal/useMarkThemeReady'
 import { lightTheme } from '../theme/light'
-import { motionTransitions } from '../theme/motionAdapter'
+import { hasMotionSprings, motionTransitions } from '../theme/motionAdapter'
 import type { BaseTheme } from '../theme/types'
 import { IconResolverContext } from './IconResolverContext'
 import type { IconResolver } from './IconResolverContext'
@@ -42,7 +42,8 @@ function isThemeMode(value: unknown): value is ThemeMode {
 export interface ThemeProviderProps {
   /**
    * Theme object to provide to all child components via context.
-   * Accepts any theme extending `BaseTheme` — Material, Apple, or custom.
+   * Accepts any theme extending `BaseTheme`: Material Design 3, or a theme
+   * with your own roles for your own components.
    *
    * Pass a `{ light, dark }` pair to enable light/dark switching: the provider
    * then resolves which one to use from `mode` plus the OS setting, and
@@ -307,9 +308,14 @@ export function ThemeProvider({
   // accessibility setting is respected app-wide for free. Consumers can nest
   // their own <MotionConfig> to add names or scope reduced motion — nested
   // providers merge, child wins.
+  //
+  // Only an MD3 theme has these tokens. A theme of another design system
+  // registers no name here, so the MD3 names don't reach its subtree unless
+  // a parent provider registered them.
+  const motion: unknown = resolvedTheme.motion
   const transitions = React.useMemo(
-    () => motionTransitions(resolvedTheme.motion),
-    [resolvedTheme.motion],
+    () => (hasMotionSprings(motion) ? motionTransitions(motion) : undefined),
+    [motion],
   )
 
   return (

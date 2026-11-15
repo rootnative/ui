@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import { cubicBezier, useAnimation, useGesture } from '@rootnative/inertia'
 import {
@@ -20,6 +20,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { getDefaultHitSlop } from '../internal/touchTarget'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   createGroupStyles,
   createItemStyles,
@@ -58,7 +59,7 @@ export function ButtonGroup(props: ButtonGroupProps): ReactElement {
     ...rest
   } = props
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const groupStyles = useMemo(
     () => createGroupStyles(theme, variant),
     [theme, variant],

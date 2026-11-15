@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { ListHeadline } from './ListHeadline'
 import { createListStyles } from './styles'
 import type { ListProps } from './types'
@@ -13,7 +13,7 @@ export function List({
   style,
   ...props
 }: ListProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createListStyles(theme), [theme])
 
   return (

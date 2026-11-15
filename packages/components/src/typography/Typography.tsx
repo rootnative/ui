@@ -1,10 +1,8 @@
-import { useTheme } from '@rootnative/core'
-import type { MaterialTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import type { ComponentType, ReactNode } from 'react'
 import type { StyleProp, TextProps, TextStyle } from 'react-native'
 import { Platform, StyleSheet, Text } from 'react-native'
-import { typographyRole } from '../internal/typographyRole'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createStyles } from './styles'
 import type { TypographyVariant } from './types'
 
@@ -51,8 +49,8 @@ export function Typography({
   level,
   ...textProps
 }: TypographyProps) {
-  const theme = useTheme() as MaterialTheme
-  const typographyStyle = typographyRole(theme, variant)
+  const theme = useMaterialTheme()
+  const typographyStyle = theme.typography[variant]
   const styles = useMemo(() => createStyles(theme), [theme])
   // RN's `TextProps` has no `aria-level`, but react-native-web reads it, and a
   // wrapper such as `Heading` from `@rootnative/seo` passes it with the header

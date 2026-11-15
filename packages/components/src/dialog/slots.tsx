@@ -1,9 +1,10 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { renderIcon } from '@rootnative/utils'
 import { isValidElement, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { Text, View } from 'react-native'
 import { plainTextOf } from '../internal/plainText'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useDialogContext } from './context'
 import { DIALOG_ICON_SIZE, createDialogStyles } from './styles'
 import type {
@@ -33,7 +34,7 @@ export function slotKindOf(node: ReactNode): DialogSlotKind | null {
 
 export function DialogIcon({ icon, color, size, style }: DialogIconProps) {
   const { variant } = useDialogContext('Dialog.Icon')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const styles = useMemo(
     () => createDialogStyles(theme, variant),
@@ -60,7 +61,7 @@ DialogIcon.dialogSlot = 'icon' satisfies DialogSlotKind
 
 export function DialogTitle({ children, color, style }: DialogTitleProps) {
   const { variant, hasIcon } = useDialogContext('Dialog.Title')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createDialogStyles(theme, variant),
     [theme, variant],
@@ -88,7 +89,7 @@ DialogTitle.dialogSlot = 'title' satisfies DialogSlotKind
 
 export function DialogContent({ children, color, style }: DialogContentProps) {
   const { variant, contentIsFlush } = useDialogContext('Dialog.Content')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createDialogStyles(theme, variant),
     [theme, variant],
@@ -117,7 +118,7 @@ DialogContent.dialogSlot = 'content' satisfies DialogSlotKind
 
 export function DialogActions({ children, style }: DialogActionsProps) {
   const { variant } = useDialogContext('Dialog.Actions')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createDialogStyles(theme, variant),
     [theme, variant],

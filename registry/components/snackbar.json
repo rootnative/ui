@@ -12,6 +12,8 @@
     "packages/components/src/snackbar/useSnackbar.ts",
     "packages/components/src/snackbar/useSnackbarOffset.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
   "utils": ["color", "elevation", "render-icon"],

@@ -1,8 +1,9 @@
-import { defineTheme, lightTheme } from '@rootnative/core'
+import { lightTheme } from '@rootnative/core'
 import type { Theme } from '@rootnative/core'
 import { renderWithTheme } from '@rootnative/utils/test'
+import { screen } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { AppBar } from '../appbar'
 import { Avatar } from '../avatar'
 import { Badge } from '../badge'
@@ -42,15 +43,14 @@ import { Tooltip } from '../tooltip'
 import { Typography } from '../typography'
 
 /**
- * A theme with its own role names is valid for `ThemeProvider`, and it is for
- * the app's own components. A library component that gets it must say so, and
- * must not throw a `TypeError` that doesn't name the theme. The cast is the
- * point: `useTheme()` returns the MD3 type for any theme at runtime.
+ * A theme with its own role names and no MD3 token group is valid for
+ * `ThemeProvider`, and it is for the app's own components. A library component
+ * that gets it must say so, and must not throw a `TypeError` that doesn't name
+ * the theme. The cast is the point: `useTheme()` returns the MD3 type for any
+ * theme at runtime.
  */
-const { shape, spacing, stateLayer, elevation, motion } = lightTheme
-
-const bareTheme = defineTheme({
-  colors: { background: '#FFFFFF', text: '#1A1A1A', accent: '#FF6B00' },
+const bareTheme = {
+  colors: { background: '#101010', text: '#1A1A1A', accent: '#FF6B00' },
   typography: {
     body: {
       fontFamily: 'Inter',
@@ -60,12 +60,17 @@ const bareTheme = defineTheme({
       letterSpacing: 0,
     },
   },
-  shape,
-  spacing,
-  stateLayer,
-  elevation,
-  motion,
-}) as unknown as Theme
+} as unknown as Theme
+
+/** The MD3 groups, with role names of its own: the theme shape before the split of the contract. */
+const ownRolesTheme = {
+  ...bareTheme,
+  shape: lightTheme.shape,
+  spacing: lightTheme.spacing,
+  stateLayer: lightTheme.stateLayer,
+  elevation: lightTheme.elevation,
+  motion: lightTheme.motion,
+} as unknown as Theme
 
 const ITEMS = [
   { value: 'a', label: 'A' },
@@ -200,7 +205,7 @@ const CASES: { name: string; ui: ReactElement }[] = [
   { name: 'FAB', ui: <FAB icon="plus" label="Compose" /> },
 ]
 
-describe('a theme with no MD3 roles', () => {
+describe('a theme that is not an MD3 theme', () => {
   let errorSpy: jest.SpyInstance
 
   beforeEach(() => {
@@ -211,22 +216,28 @@ describe('a theme with no MD3 roles', () => {
     errorSpy.mockRestore()
   })
 
-  it.each(CASES)('$name renders and does not throw', ({ ui }) => {
+  it.each(CASES)('$name renders with no token group', ({ ui }) => {
     expect(() =>
       renderWithTheme(<PortalHost>{ui}</PortalHost>, { theme: bareTheme }),
     ).not.toThrow()
   })
 
-  it('names the missing role and the cause, one time', () => {
+  it.each(CASES)('$name renders with role names of its own', ({ ui }) => {
+    expect(() =>
+      renderWithTheme(<PortalHost>{ui}</PortalHost>, { theme: ownRolesTheme }),
+    ).not.toThrow()
+  })
+
+  it('names the cause, one time', () => {
     __resetWarnOnceForTests()
-    renderWithTheme(<Button>OK</Button>, { theme: bareTheme })
-    renderWithTheme(<Chip>Tag</Chip>, { theme: bareTheme })
+    // New objects: a theme that was resolved before is cached and is quiet.
+    renderWithTheme(<Button>OK</Button>, { theme: { ...bareTheme } })
+    renderWithTheme(<Chip>Tag</Chip>, { theme: { ...ownRolesTheme } })
 
     const warnings = errorSpy.mock.calls
       .map(([message]) => String(message))
-      .filter((message) => message.includes('MD3 typography role'))
+      .filter((message) => message.includes('not a Material Design 3 theme'))
     expect(warnings).toHaveLength(1)
-    expect(warnings[0]).toContain('"labelLarge"')
     expect(warnings[0]).toContain('theming#custom-design-systems')
   })
 
@@ -234,5 +245,17 @@ describe('a theme with no MD3 roles', () => {
     __resetWarnOnceForTests()
     renderWithTheme(<Button>OK</Button>)
     expect(errorSpy).not.toHaveBeenCalled()
+  })
+
+  it('keeps the tokens that the theme has, and takes the MD3 default for the others', () => {
+    renderWithTheme(<Layout />, { theme: bareTheme })
+    expect(StyleSheet.flatten(screen.root.props.style)).toMatchObject({
+      backgroundColor: '#101010',
+    })
+
+    renderWithTheme(<Divider testID="divider" />, { theme: bareTheme })
+    expect(
+      StyleSheet.flatten(screen.getByTestId('divider').props.style),
+    ).toMatchObject({ backgroundColor: lightTheme.colors.outlineVariant })
   })
 })

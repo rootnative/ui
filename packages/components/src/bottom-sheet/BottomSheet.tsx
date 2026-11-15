@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   Motion,
   Presence,
@@ -29,6 +28,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -81,7 +81,7 @@ export function BottomSheet({
   testID,
   ...rest
 }: BottomSheetProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createBottomSheetStyles(theme, containerColor),
     [theme, containerColor],

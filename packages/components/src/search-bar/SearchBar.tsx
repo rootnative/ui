@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useCallback, useMemo, useRef, useState } from 'react'
@@ -11,6 +11,7 @@ import type {
 } from 'react-native'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { warnOnce } from '../internal/warnOnce'
 import { createStyles, SEARCH_BAR_ICON_SIZE } from './styles'
@@ -50,7 +51,7 @@ export function SearchBar({
   ref,
   ...textInputProps
 }: SearchBarProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const { colors, styles } = useMemo(
     () => createStyles(theme, density),

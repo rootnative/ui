@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import type { MaterialTheme } from '@rootnative/core'
 import {
   Motion,
@@ -34,6 +33,7 @@ import { Platform, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { buildStrategy, indexAtScroll, placeItem } from './strategy'
 import type { CarouselStrategy } from './strategy'
@@ -119,7 +119,7 @@ export function Carousel<T>({
   ref,
   ...rest
 }: CarouselProps<T>) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const vertical = variant === 'full-screen'
   const masked = variant === 'multi-browse' || variant === 'hero'
   const styles = useMemo(

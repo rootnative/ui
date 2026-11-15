@@ -1,8 +1,8 @@
-import { useTheme } from '@rootnative/core'
 import { resolveLogical } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { resolveSpacing } from './resolveSpacing'
 import type { BoxProps, SpacingValue } from './types'
 
@@ -31,7 +31,7 @@ export function Box({
   style,
   ...viewProps
 }: BoxProps) {
-  const { spacing } = useTheme()
+  const { spacing } = useMaterialTheme()
 
   // The one-sided insets go through `resolveLogical`: this object is an
   // inline style, and react-native-web resolves an inline `paddingStart` to

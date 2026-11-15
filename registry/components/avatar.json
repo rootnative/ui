@@ -13,7 +13,9 @@
     "packages/components/src/internal/pressableKeyDown.ts",
     "packages/components/src/internal/size.ts",
     "packages/components/src/internal/touchTarget.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "render-icon"],
   "componentDependencies": [],

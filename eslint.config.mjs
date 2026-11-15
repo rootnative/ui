@@ -159,6 +159,31 @@ export default [
       'react-native/no-color-literals': 'off',
     },
   },
+  {
+    // A component reads the theme through `useMaterialTheme`. `useTheme`
+    // casts any theme to the MD3 type, so a component that got a theme of
+    // another design system threw on the first token it read.
+    files: ['packages/components/src/**/*.{ts,tsx}'],
+    ignores: [
+      '**/__tests__/**',
+      'packages/components/src/internal/useMaterialTheme.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@rootnative/core',
+              importNames: ['useTheme'],
+              message:
+                'Use useMaterialTheme from internal/useMaterialTheme. It completes a theme that is not an MD3 theme.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   prettierConfig,
   {
     // React Compiler rules off in tests. A test harness deliberately does the

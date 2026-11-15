@@ -646,9 +646,10 @@ two cases:
 
 :::caution
 
-Don't give a library component a theme that has no MD3 roles. The component
-can't find its colors and its text styles, so it draws wrong. In development,
-the console names the first typography role that is missing.
+Don't give a library component a theme that isn't an MD3 theme. The component
+then takes the default MD3 light theme for each token that your theme doesn't
+have, so it doesn't match your design. In development, the console says so
+one time.
 
 :::
 

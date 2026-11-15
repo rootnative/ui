@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
@@ -6,6 +5,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createListItemStyles } from './styles'
 import type { ListItemLines, ListItemProps } from './types'
@@ -42,7 +42,7 @@ export function ListItem({
 }: ListItemProps) {
   const isDisabled = Boolean(disabled)
   const isInteractive = onPress !== undefined
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const lines = getLines(
     supportingText,
     overlineText,

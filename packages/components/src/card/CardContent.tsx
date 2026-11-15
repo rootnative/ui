@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createCardRegionStyles } from './styles'
 import type { CardContentProps } from './types'
 
@@ -12,7 +12,7 @@ import type { CardContentProps } from './types'
  * of its own.
  */
 export function CardContent({ children, style, ...props }: CardContentProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createCardRegionStyles(theme), [theme])
 
   return (

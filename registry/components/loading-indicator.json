@@ -6,7 +6,9 @@
     "packages/components/src/loading-indicator/index.ts",
     "packages/components/src/loading-indicator/shapes.ts",
     "packages/components/src/loading-indicator/styles.ts",
-    "packages/components/src/loading-indicator/types.ts"
+    "packages/components/src/loading-indicator/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": [],

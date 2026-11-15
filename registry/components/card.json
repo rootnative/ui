@@ -15,7 +15,9 @@
     "packages/components/src/internal/pointerEvents.ts",
     "packages/components/src/internal/pressableKeyDown.ts",
     "packages/components/src/internal/splitLayoutStyle.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/elevation-shadow.ts"
   ],
   "utils": ["color", "elevation"],

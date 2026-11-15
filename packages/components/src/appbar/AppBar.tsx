@@ -1,4 +1,4 @@
-import { defaultTopAppBarTokens, useTheme } from '@rootnative/core'
+import { defaultTopAppBarTokens } from '@rootnative/core'
 import {
   cubicBezier,
   useAnimation,
@@ -21,7 +21,7 @@ import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
-import { typographyRole } from '../internal/typographyRole'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   barEdges,
   barSideEdges,
@@ -158,7 +158,7 @@ export function AppBar({
   style,
   ...rest
 }: AppBarProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const topAppBar = theme.topAppBar ?? defaultTopAppBarTokens
   const hasPortalHost = useContext(PortalContext) !== null
   const schemeColors = useMemo(
@@ -265,10 +265,10 @@ export function AppBar({
     [0, 1],
   )
 
-  const expandedTitleType = typographyRole(theme, titleVariant)
-  const collapsedTitleType = typographyRole(theme, 'titleLarge')
-  const expandedSubtitleType = typographyRole(theme, subtitleVariant)
-  const collapsedSubtitleType = typographyRole(theme, 'labelMedium')
+  const expandedTitleType = theme.typography[titleVariant]
+  const collapsedTitleType = theme.typography.titleLarge
+  const expandedSubtitleType = theme.typography[subtitleVariant]
+  const collapsedSubtitleType = theme.typography.labelMedium
   const expandedTitleBlockHeight =
     expandedTitleType.lineHeight +
     (hasSubtitle ? expandedSubtitleType.lineHeight : 0)

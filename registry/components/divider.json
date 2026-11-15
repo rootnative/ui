@@ -5,7 +5,9 @@
     "packages/components/src/divider/Divider.tsx",
     "packages/components/src/divider/index.ts",
     "packages/components/src/divider/styles.ts",
-    "packages/components/src/divider/types.ts"
+    "packages/components/src/divider/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": [],

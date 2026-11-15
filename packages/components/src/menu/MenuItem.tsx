@@ -1,5 +1,5 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import {
   Animated,
   interpolate,
@@ -13,6 +13,7 @@ import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { MenuItemPlaceContext, useMenuContext } from './context'
 import type { MenuPlace } from './context'
@@ -108,7 +109,7 @@ export function MenuItem({
 }: MenuItemProps) {
   const { dismiss, variant } = useMenuContext('Menu.Item')
   const place = useContext(MenuItemPlaceContext)
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const isVertical = variant === 'vertical'
 

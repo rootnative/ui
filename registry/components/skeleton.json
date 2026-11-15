@@ -5,7 +5,9 @@
     "packages/components/src/skeleton/Skeleton.tsx",
     "packages/components/src/skeleton/index.ts",
     "packages/components/src/skeleton/styles.ts",
-    "packages/components/src/skeleton/types.ts"
+    "packages/components/src/skeleton/types.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": [],

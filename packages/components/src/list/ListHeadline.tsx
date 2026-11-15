@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { Text } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createListStyles } from './styles'
 import type { ListHeadlineProps } from './types'
 
@@ -10,7 +10,7 @@ export function ListHeadline({
   style,
   ...props
 }: ListHeadlineProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createListStyles(theme), [theme])
   const resolvedStyle = useMemo(
     () => [styles.headline, style],

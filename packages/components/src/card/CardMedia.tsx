@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   Children,
   cloneElement,
@@ -9,6 +8,7 @@ import {
 import type { ReactNode } from 'react'
 import { StyleSheet, View } from 'react-native'
 import type { StyleProp, ViewStyle } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createCardRegionStyles } from './styles'
 import type { CardMediaProps } from './types'
 
@@ -42,7 +42,7 @@ export function CardMedia({
   style,
   ...props
 }: CardMediaProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createCardRegionStyles(theme), [theme])
 
   // `height` wins over `aspectRatio`: a fixed height and a ratio together are

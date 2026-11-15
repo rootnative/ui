@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import {
   useGestureLayer,
@@ -7,6 +6,7 @@ import {
 } from '@rootnative/inertia/gesture-layer'
 import { alphaColor, blendColor } from '@rootnative/utils'
 import { useEffect, useMemo } from 'react'
+import { useMaterialTheme } from './useMaterialTheme'
 
 export interface UseStateLayerOptions {
   /**
@@ -92,7 +92,7 @@ export function useStateLayer(
     disabled = false,
     disabledContainerColor,
   } = options
-  const { stateLayer } = useTheme()
+  const { stateLayer } = useMaterialTheme()
 
   const layers = useMemo<GestureLayerStates>(() => {
     const disabledBase = disabledContainerColor ?? rest

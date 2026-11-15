@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   DIVIDER_LIST_INSET,
   DIVIDER_THICKNESS,
@@ -23,7 +23,7 @@ export function Divider({
   style,
   ...props
 }: DividerProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const startInset = resolveInset(insetStart)
   const endInset = resolveInset(insetEnd)
 

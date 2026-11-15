@@ -1,4 +1,4 @@
-import { useBreakpoint, useTheme, useWindowDimensions } from '@rootnative/core'
+import { useBreakpoint, useWindowDimensions } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
@@ -12,6 +12,7 @@ import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView, physicalLeftStyle } from '../safe-area'
@@ -65,7 +66,7 @@ export function SearchView({
   testID,
   ...rest
 }: SearchViewProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const breakpoint = useBreakpoint()
   const { width: windowWidth, height: windowHeight } = useWindowDimensions()
   const { colors, styles } = useMemo(

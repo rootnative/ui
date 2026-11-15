@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
@@ -9,6 +9,7 @@ import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { pressOnSpace } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useNavigationDrawerContext } from './context'
 import { DRAWER_ICON_SIZE, createNavigationDrawerItemStyles } from './styles'
@@ -39,7 +40,7 @@ export function NavigationDrawerItem({
     colors,
     labelStyle: drawerLabelStyle,
   } = useNavigationDrawerContext('NavigationDrawer.Item')
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const resolver = useIconResolver()
   const selected = selectedValue === value
 

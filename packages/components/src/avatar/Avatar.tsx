@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
@@ -9,6 +9,7 @@ import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { ExpressiveSize } from '../internal/size'
 import { getDefaultHitSlop } from '../internal/touchTarget'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { createStyles } from './styles'
 import type { AvatarProps } from './types'
@@ -71,7 +72,7 @@ export function Avatar({
 }: AvatarProps) {
   const isDisabled = Boolean(disabled)
   const isInteractive = onPress !== undefined
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(() => createStyles(theme), [theme])
 

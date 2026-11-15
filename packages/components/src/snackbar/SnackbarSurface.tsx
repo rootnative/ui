@@ -1,9 +1,9 @@
-import { useTheme } from '@rootnative/core'
 import { useEffect, useMemo } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { AccessibilityInfo, Platform, Text, View } from 'react-native'
 import { Button } from '../button'
 import { IconButton } from '../icon-button'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import type { SnackbarEntry } from './store'
 import {
   createSnackbarStyles,
@@ -28,7 +28,7 @@ export function SnackbarSurface({
   onClose,
   onHoverChange,
 }: SnackbarSurfaceProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const actionLabel = entry.actionLabel
   const showClose = entry.showCloseIcon === true
   const hasTrailing = actionLabel !== undefined || showClose

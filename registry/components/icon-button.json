@@ -18,8 +18,10 @@
     "packages/components/src/internal/splitLayoutStyle.ts",
     "packages/components/src/internal/touchTarget.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/usePressMorph.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "render-icon"],
   "componentDependencies": [],

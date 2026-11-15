@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import {
   useAnimation,
   useColorTransition,
@@ -25,6 +25,7 @@ import { splitLayoutStyle } from '../internal/splitLayoutStyle'
 import { getDefaultHitSlop } from '../internal/touchTarget'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useHaloLayer } from '../internal/useHaloLayer'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { composePressHandlers } from '../internal/usePressMorph'
 import {
   SWITCH_STATE_LAYER_SIZE,
@@ -68,7 +69,7 @@ export function Switch({
   const isPassive = isPassiveControl(isControlled, onValueChange, isDisabled)
   const hasUnselectedIcon = Boolean(unselectedIcon)
 
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(
     () => createStyles(theme, containerColor, contentColor),

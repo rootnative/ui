@@ -1,4 +1,4 @@
-import { useIconResolver, useTheme } from '@rootnative/core'
+import { useIconResolver } from '@rootnative/core'
 import { useAnimator, useMotionValue } from '@rootnative/inertia'
 import { isFocusVisible, isRTLDirection, renderIcon } from '@rootnative/utils'
 import {
@@ -28,6 +28,7 @@ import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useBooleanProgress } from '../internal/useBooleanProgress'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   clamp,
   computeSegments,
@@ -108,7 +109,7 @@ export function Slider({
   endThumbAccessibilityLabel = 'Maximum',
   ...rest
 }: SliderProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const iconResolver = useIconResolver()
   const styles = useMemo(
     () => createStyles(theme, containerColor, contentColor, inactiveTrackColor),

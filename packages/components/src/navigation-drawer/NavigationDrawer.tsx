@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { isRTLDirection } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
@@ -6,6 +5,7 @@ import { Pressable, ScrollView, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -51,7 +51,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     ...rest
   } = props
   const isModal = variant === 'modal'
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const colors = useMemo(
     () =>
       getNavigationDrawerColors(

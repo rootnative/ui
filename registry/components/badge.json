@@ -6,7 +6,9 @@
     "packages/components/src/badge/index.ts",
     "packages/components/src/badge/styles.ts",
     "packages/components/src/badge/types.ts",
-    "packages/components/src/internal/pointerEvents.ts"
+    "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": [],
   "componentDependencies": [],

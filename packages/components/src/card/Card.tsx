@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
@@ -9,6 +8,7 @@ import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { splitLayoutStyle } from '../internal/splitLayoutStyle'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { CardActions } from './CardActions'
 import { CardContent } from './CardContent'
@@ -28,7 +28,7 @@ export function Card({
 }: CardProps) {
   const isDisabled = Boolean(disabled)
   const isInteractive = onPress !== undefined
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createStyles(theme, variant, containerColor),
     [theme, variant, containerColor],

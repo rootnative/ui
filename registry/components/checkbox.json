@@ -14,7 +14,9 @@
     "packages/components/src/internal/pressableKeyDown.ts",
     "packages/components/src/internal/useBooleanProgress.ts",
     "packages/components/src/internal/useHaloLayer.ts",
-    "packages/components/src/internal/useStateLayer.ts"
+    "packages/components/src/internal/useMaterialTheme.ts",
+    "packages/components/src/internal/useStateLayer.ts",
+    "packages/components/src/internal/warnOnce.ts"
   ],
   "utils": ["color", "render-icon"],
   "componentDependencies": [],

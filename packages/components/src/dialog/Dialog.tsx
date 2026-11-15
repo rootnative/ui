@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import { Children, Fragment, isValidElement, useMemo } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
@@ -9,6 +8,7 @@ import { plainTextOf } from '../internal/plainText'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
@@ -176,7 +176,7 @@ export function Dialog({
   testID,
   ...rest
 }: DialogProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(
     () => createDialogStyles(theme, variant, containerColor),
     [theme, variant, containerColor],

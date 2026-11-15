@@ -1,5 +1,5 @@
 import type { NamedTransitions, TransitionConfig } from '@rootnative/inertia'
-import type { Motion } from './types'
+import type { Motion, MotionSpring } from './types'
 
 // Registered so the names autocomplete (and typos are compile errors)
 // anywhere inertia accepts a `TransitionName` — the `transition` prop,
@@ -18,6 +18,28 @@ declare module '@rootnative/inertia' {
   }
 }
 
+const SPRING_TOKENS = [
+  'springFastSpatial',
+  'springDefaultSpatial',
+  'springSlowSpatial',
+  'springFastEffects',
+  'springDefaultEffects',
+  'springSlowEffects',
+] as const satisfies readonly (keyof Motion)[]
+
+type MotionSprings = Pick<Motion, (typeof SPRING_TOKENS)[number]>
+
+/**
+ * True when `motion` carries the six MD3 spring tokens that
+ * {@link motionTransitions} reads. A theme of another design system has no
+ * `motion` group, or one of its own shape, and gets no MD3 transition names.
+ */
+export function hasMotionSprings(motion: unknown): motion is MotionSprings {
+  if (typeof motion !== 'object' || motion === null) return false
+  const tokens = motion as Record<string, MotionSpring | undefined>
+  return SPRING_TOKENS.every((name) => typeof tokens[name] === 'object')
+}
+
 /**
  * Map a theme's motion tokens into inertia's named-transition registry.
  * `ThemeProvider` feeds the result to `<MotionConfig transitions>`, making
@@ -30,7 +52,7 @@ declare module '@rootnative/inertia' {
  * fast-effects spring (small-element effects, critically damped). The
  * spring names expose the theme's `MotionSpring` tokens verbatim.
  */
-export function motionTransitions(motion: Motion): NamedTransitions {
+export function motionTransitions(motion: MotionSprings): NamedTransitions {
   return {
     'state-hover': { type: 'spring', ...motion.springFastEffects },
     'state-press': { type: 'spring', ...motion.springFastEffects },

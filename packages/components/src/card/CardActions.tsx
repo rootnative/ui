@@ -1,6 +1,6 @@
-import { useTheme } from '@rootnative/core'
 import { useMemo } from 'react'
 import { View } from 'react-native'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { cardActionsJustify, createCardRegionStyles } from './styles'
 import type { CardActionsProps } from './types'
 
@@ -17,7 +17,7 @@ export function CardActions({
   style,
   ...props
 }: CardActionsProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const styles = useMemo(() => createCardRegionStyles(theme), [theme])
 
   const alignStyle = useMemo(

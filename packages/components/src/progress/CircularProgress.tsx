@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import {
   Motion,
   cubicBezier,
@@ -9,6 +8,7 @@ import { Animated, useAnimatedProps } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
 import { View } from 'react-native'
 import Svg, { Circle, Path } from 'react-native-svg'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PROGRESS_CIRCULAR_SIZE,
   PROGRESS_CIRCULAR_STROKE,
@@ -53,7 +53,7 @@ export function CircularProgress({
   accessibilityLabel,
   ...rest
 }: CircularProgressProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const indeterminate = progress === undefined
   const value = indeterminate ? 0 : clamp(progress as number, 0, 1)
 

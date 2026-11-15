@@ -1,4 +1,3 @@
-import { useTheme } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
 import {
   cloneElement,
@@ -23,6 +22,7 @@ import { pointerEvents } from '../internal/pointerEvents'
 import type { PressableKeyDownEvent } from '../internal/pressableKeyDown'
 import { useAnchorPosition } from '../internal/useAnchorPosition'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
+import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { warnOnce } from '../internal/warnOnce'
 import { PORTAL_LAYERS } from '../portal/layers'
 import { Portal } from '../portal/Portal'
@@ -125,7 +125,7 @@ export function Tooltip({
   testID,
   ...rest
 }: TooltipProps) {
-  const theme = useTheme()
+  const theme = useMaterialTheme()
   const isRich = variant === 'rich'
   const hasActions = isRich && Boolean(actions)
   const styles = useMemo(
