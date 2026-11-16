@@ -331,3 +331,42 @@ describe('SearchView — Android back', () => {
     spy.mockRestore()
   })
 })
+
+// The back arrow points at the start edge: left in LTR, right in RTL.
+describe('SearchView — back arrow', () => {
+  // Icons are hidden from assistive technology, so the query must include them.
+  const HIDDEN = { includeHiddenElements: true }
+  const wasRTL = I18nManager.isRTL
+  afterEach(() => {
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: wasRTL,
+      configurable: true,
+    })
+  })
+  function setRTL() {
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: true,
+      configurable: true,
+    })
+  }
+
+  it('points left in LTR', () => {
+    renderView()
+    expect(screen.getByText('arrow-left', HIDDEN)).toBeTruthy()
+    expect(screen.queryByText('arrow-right', HIDDEN)).toBeNull()
+  })
+
+  it('points right in RTL', () => {
+    setRTL()
+    renderView()
+    expect(screen.getByText('arrow-right', HIDDEN)).toBeTruthy()
+    expect(screen.queryByText('arrow-left', HIDDEN)).toBeNull()
+  })
+
+  it('keeps a custom backIcon in RTL', () => {
+    setRTL()
+    renderView({ backIcon: 'keyboard-backspace' })
+    expect(screen.getByText('keyboard-backspace', HIDDEN)).toBeTruthy()
+    expect(screen.queryByText('arrow-right', HIDDEN)).toBeNull()
+  })
+})

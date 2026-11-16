@@ -14,7 +14,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["render-icon"],
+  "utils": ["render-icon", "rtl"],
   "componentDependencies": ["divider", "icon-button", "portal", "search-bar"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",

@@ -862,7 +862,7 @@ Props:
 - `placeholder?: string` — Placeholder of the input, and its accessible name by default.
 - `placeholderTextColor?: string` — Default: `theme.colors.onSurfaceVariant`. Override the placeholder color.
 - `onSearch?: (query: string) => void` — Called with the current query when the user submits from the keyboard.
-- `backIcon?: IconSource` — Default: `'arrow-left'`. Icon of the back button at the start of the header.
+- `backIcon?: IconSource` — Default: `'arrow-left' ('arrow-right' in RTL)`. Icon of the back button at the start of the header.
 - `backAccessibilityLabel?: string` — Default: `'Back'`. Accessibility label of the back button.
 - `showClearButton?: boolean` — Default: `true`. Shows a clear button while the input holds text.
 - `clearButtonAccessibilityLabel?: string` — Default: `'Clear search'`. Accessibility label of the clear button.

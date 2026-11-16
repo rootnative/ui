@@ -51,6 +51,7 @@ import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
 import { LinearProgress } from '../../progress/LinearProgress'
 import { physicalLeftStyle } from '../../safe-area'
+import { SearchView } from '../../search-view'
 import { SideSheet } from '../../side-sheet'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
@@ -147,6 +148,33 @@ describe('AppBar back affordance points the right way', () => {
     renderBackBar()
     // The icon mirrors; the accessible name must not.
     expect(screen.getByLabelText('Go back')).toBeTruthy()
+  })
+})
+
+/**
+ * The back arrow of a `SearchView` points at the start edge. Its default was a
+ * fixed `arrow-left`, so under `dir="rtl"` it pointed away from the start.
+ */
+describe('SearchView back arrow points the right way', () => {
+  function renderSearchView() {
+    return renderWeb(
+      <PortalHost>
+        <SearchView visible onDismiss={() => {}} placeholder="Search mail" />
+      </PortalHost>,
+    )
+  }
+
+  it('points left in LTR', () => {
+    const { container } = renderSearchView()
+    expect(container.innerHTML).toContain('arrow-left')
+    expect(container.innerHTML).not.toContain('arrow-right')
+  })
+
+  it('points right under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const { container } = renderSearchView()
+    expect(container.innerHTML).toContain('arrow-right')
+    expect(container.innerHTML).not.toContain('arrow-left')
   })
 })
 

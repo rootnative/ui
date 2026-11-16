@@ -72,7 +72,7 @@ export interface SearchViewProps extends Omit<ViewProps, 'style'> {
   onSearch?: (query: string) => void
   /**
    * Icon of the back button at the start of the header.
-   * @default 'arrow-left'
+   * @default 'arrow-left' ('arrow-right' in RTL)
    */
   backIcon?: IconSource
   /**

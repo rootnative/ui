@@ -1,5 +1,6 @@
 import { useBreakpoint, useWindowDimensions } from '@rootnative/core'
 import { Motion, Presence } from '@rootnative/inertia'
+import { selectRTL } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Platform, Pressable, TextInput, View } from 'react-native'
 import type {
@@ -47,7 +48,7 @@ export function SearchView({
   placeholder,
   placeholderTextColor,
   onSearch,
-  backIcon = 'arrow-left',
+  backIcon,
   backAccessibilityLabel = 'Back',
   showClearButton = true,
   clearButtonAccessibilityLabel = 'Clear search',
@@ -242,7 +243,7 @@ export function SearchView({
     <View accessibilityRole="search" style={styles.header}>
       <View style={styles.slot}>
         <IconButton
-          icon={backIcon}
+          icon={backIcon ?? selectRTL('arrow-left', 'arrow-right')}
           size="small"
           variant="standard"
           iconColor={leadingIconColor}
