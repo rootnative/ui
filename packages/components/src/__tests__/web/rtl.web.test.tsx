@@ -280,37 +280,38 @@ describe('overlay placement resolves logical alignment against the document', ()
   })
 })
 
+const TAB_ITEMS = [
+  { value: 'flights', label: 'Flights' },
+  { value: 'trips', label: 'Trips' },
+  { value: 'explore', label: 'Explore' },
+]
+
+/**
+ * jsdom has no `ResizeObserver`, so react-native-web never fires `onLayout`
+ * here. This calls the handler that react-native-web keeps on the node for its
+ * observer, with the layout a browser would report.
+ */
+function fireLayout(node: Element, width: number) {
+  const handler = (node as Element & { __reactLayoutHandler?: unknown })
+    .__reactLayoutHandler
+  if (typeof handler !== 'function') {
+    throw new Error('react-native-web set no layout handler on the node')
+  }
+  act(() => {
+    handler({ nativeEvent: { layout: { x: 0, y: 0, width, height: 48 } } })
+  })
+}
+
 /**
  * `Tabs` places its indicator from the physical left, so in RTL it counts each
  * tab offset back from the right edge of the row. The native suite covers the
  * same geometry with `I18nManager.isRTL` stubbed, which does nothing on web.
- *
- * jsdom has no `ResizeObserver`, so react-native-web never fires `onLayout`
- * here. These tests call the handler that react-native-web keeps on the node
- * for its observer, with the layout a browser would report.
  */
 describe('Tabs places the indicator for the document direction', () => {
-  const ITEMS = [
-    { value: 'flights', label: 'Flights' },
-    { value: 'trips', label: 'Trips' },
-    { value: 'explore', label: 'Explore' },
-  ]
-
-  function fireLayout(node: Element, width: number) {
-    const handler = (node as Element & { __reactLayoutHandler?: unknown })
-      .__reactLayoutHandler
-    if (typeof handler !== 'function') {
-      throw new Error('react-native-web set no layout handler on the node')
-    }
-    act(() => {
-      handler({ nativeEvent: { layout: { x: 0, y: 0, width, height: 48 } } })
-    })
-  }
-
   function renderLaidOutTabs() {
     renderWeb(
       <Tabs
-        items={ITEMS}
+        items={TAB_ITEMS}
         testID="tabs"
         scrollable
         edgePadding={16}
@@ -320,7 +321,7 @@ describe('Tabs places the indicator for the document direction', () => {
     const tabs = screen.getAllByRole('tab')
     for (const [index, tab] of tabs.entries()) {
       fireLayout(tab, 120)
-      const label = screen.getByText(ITEMS[index]?.label ?? '')
+      const label = screen.getByText(TAB_ITEMS[index]?.label ?? '')
       fireLayout(label.parentElement as HTMLElement, 40)
     }
     fireLayout(tabs[0]?.parentElement as HTMLElement, 500)
@@ -336,6 +337,62 @@ describe('Tabs places the indicator for the document direction', () => {
     document.documentElement.setAttribute('dir', 'rtl')
     // 500 - 16 - 240 + (120 - 40) / 2.
     expect(renderLaidOutTabs().style.transform).toBe('translateX(284px)')
+  })
+})
+
+/**
+ * A browser in RTL counts the scroll offset down from 0 at the right edge, and
+ * clamps a positive value to 0. `Tabs` passed the offset from the left edge,
+ * so under `dir="rtl"` the row didn't scroll to a selected tab out of view.
+ */
+describe('Tabs scrolls to the selected tab for the document direction', () => {
+  const scroll = jest.fn()
+  beforeEach(() => {
+    scroll.mockClear()
+    Object.defineProperty(HTMLElement.prototype, 'scroll', {
+      configurable: true,
+      value: scroll,
+    })
+  })
+  afterEach(() => {
+    delete (HTMLElement.prototype as Partial<HTMLElement>).scroll
+  })
+
+  // 16 + 200 + 120 + 120 + 16 = 472 wide in a 200 viewport.
+  function scrollLeftForTrips() {
+    renderWeb(
+      <Tabs
+        items={TAB_ITEMS}
+        testID="tabs"
+        scrollable
+        edgePadding={16}
+        defaultValue="trips"
+      />,
+    )
+    const tabs = screen.getAllByRole('tab')
+    const row = tabs[0]?.parentElement as HTMLElement
+    const content = row.parentElement as HTMLElement
+    fireLayout(content.parentElement as HTMLElement, 200)
+    fireLayout(content, 472)
+    for (const [index, tab] of tabs.entries()) {
+      fireLayout(tab, index === 0 ? 200 : 120)
+      const label = screen.getByText(TAB_ITEMS[index]?.label ?? '')
+      fireLayout(label.parentElement as HTMLElement, 40)
+    }
+    fireLayout(row, 472)
+    return scroll.mock.lastCall?.[0]?.left
+  }
+
+  it('scrolls to the offset from the left edge in LTR', () => {
+    // 16 + 200 + 120 / 2 - 200 / 2.
+    expect(scrollLeftForTrips()).toBe(176)
+  })
+
+  it('scrolls to the negative offset from the start under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    // 96 from the left edge (472 - 16 - 200 - 120 + 120 / 2 - 200 / 2), then
+    // minus the scroll range of 472 - 200.
+    expect(scrollLeftForTrips()).toBe(-176)
   })
 })
 

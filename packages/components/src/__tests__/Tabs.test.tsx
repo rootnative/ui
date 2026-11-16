@@ -2,7 +2,7 @@ import { lightTheme } from '@rootnative/core'
 import type { SharedValue } from '@rootnative/inertia'
 import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { I18nManager, ScrollView, StyleSheet } from 'react-native'
+import { I18nManager, Platform, ScrollView, StyleSheet } from 'react-native'
 import { Tabs } from '../tabs'
 import type { TabItem } from '../tabs'
 
@@ -426,6 +426,70 @@ describe('Tabs — tab offsets', () => {
       expect(style.left).toBeUndefined()
     })
   })
+})
+
+// iOS and Android take a `scrollTo` offset from the left edge of the content,
+// in RTL too. Only a browser in RTL needs another value: the `web` suite
+// covers it.
+describe('Tabs — scroll to the selected tab', () => {
+  const os = Platform.OS
+  const wasRTL = I18nManager.isRTL
+  afterEach(() => {
+    Object.defineProperty(Platform, 'OS', { value: os, configurable: true })
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: wasRTL,
+      configurable: true,
+    })
+  })
+
+  // 16 + 200 + 120 + 120 + 16 = 472 wide in a 200 viewport.
+  function scrollToTrips() {
+    const scrollTo = jest.spyOn(
+      ScrollView.prototype as unknown as { scrollTo: () => void },
+      'scrollTo',
+    )
+    scrollTo.mockClear()
+    renderTabs({ scrollable: true, edgePadding: 16, defaultValue: 'trips' })
+    const scrollView = screen.UNSAFE_getByType(ScrollView)
+    fireEvent(scrollView, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height: 48 } },
+    })
+    fireEvent(scrollView, 'contentSizeChange', 472, 48)
+    layOutTab('Flights', 200, 60)
+    layOutTab('Trips', 120, 40)
+    layOutTab('Explore', 120, 70)
+    fireEvent(rowNode(), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 472, height: 48 } },
+    })
+    return scrollTo
+  }
+
+  it('centres the selected tab in LTR', () => {
+    // 16 + 200 + 120 / 2 - 200 / 2.
+    expect(scrollToTrips()).toHaveBeenLastCalledWith({
+      x: 176,
+      animated: false,
+    })
+  })
+
+  it.each(['ios', 'android'])(
+    'scrolls to the offset from the left edge on %s in RTL',
+    (platform) => {
+      Object.defineProperty(Platform, 'OS', {
+        value: platform,
+        configurable: true,
+      })
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      // Trips starts at 472 - 16 - 200 - 120 = 136, then 120 / 2 - 200 / 2.
+      expect(scrollToTrips()).toHaveBeenLastCalledWith({
+        x: 96,
+        animated: false,
+      })
+    },
+  )
 })
 
 describe('Tabs — overrides', () => {

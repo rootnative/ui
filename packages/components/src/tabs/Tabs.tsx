@@ -13,7 +13,7 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { ScrollView, View } from 'react-native'
+import { Platform, ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
 import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
@@ -301,6 +301,16 @@ function physicalLeftEdge(): ViewStyle {
   return swapsLeftAndRight() ? { right: 0 } : { left: 0 }
 }
 
+/**
+ * The `scrollTo` value for an offset from the left edge of the content. iOS
+ * and Android take that offset in RTL too. A browser in RTL counts the scroll
+ * offset down from 0 at the right edge, and clamps a positive value to 0, so
+ * the row didn't scroll there.
+ */
+function scrollToValue(fromLeft: number, range: number): number {
+  return Platform.OS === 'web' && isRTLDirection() ? fromLeft - range : fromLeft
+}
+
 interface TabIndicatorProps {
   x: number
   width: number
@@ -412,12 +422,13 @@ function ScrollableRow({
     // Centre the tab where there is room to, and stop at either end rather
     // than scrolling into empty space.
     const centred = selectedX + selectedWidth / 2 - viewport / 2
-    const x = Math.min(Math.max(centred, 0), content - viewport)
+    const range = content - viewport
+    const x = Math.min(Math.max(centred, 0), range)
 
     // The first pass is the row settling into its initial selection, not a
     // change the user made — jump, don't slide.
     scrollRef.current?.scrollTo({
-      x,
+      x: scrollToValue(x, range),
       animated: hasScrolled.current && !reduceMotion,
     })
     hasScrolled.current = true
