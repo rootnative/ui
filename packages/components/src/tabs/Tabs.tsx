@@ -13,7 +13,7 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { ScrollView, View } from 'react-native'
+import { I18nManager, Platform, ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -290,6 +290,20 @@ export function Tabs({
   )
 }
 
+/**
+ * The style that puts an absolute view at the physical left edge of its
+ * parent. In native RTL, React Native applies `left` to the right side, so
+ * the left edge is `right: 0` there. A plain `left: 0` put the indicator at
+ * the right edge, and its offset then moved it out of the row.
+ */
+function physicalLeftEdge(): ViewStyle {
+  const swaps =
+    Platform.OS !== 'web' &&
+    I18nManager.isRTL &&
+    I18nManager.doLeftAndRightSwapInRTL
+  return swaps ? { right: 0 } : { left: 0 }
+}
+
 interface TabIndicatorProps {
   x: number
   width: number
@@ -311,6 +325,9 @@ interface TabIndicatorProps {
  * rects are physical positions in either layout direction (`placeTabs`
  * counts from the right edge in RTL), so no mirroring is needed. A neighbour
  * that is not measured yet falls back to the springs for that frame.
+ *
+ * `translateX` is physical, so the view starts at the physical left edge of
+ * the row (`physicalLeftEdge`).
  */
 function TabIndicator({
   x,
@@ -352,7 +369,7 @@ function TabIndicator({
   return (
     <Animated.View
       testID={testID}
-      style={[style, animatedStyle, pointerEvents.none]}
+      style={[style, physicalLeftEdge(), animatedStyle, pointerEvents.none]}
     />
   )
 }

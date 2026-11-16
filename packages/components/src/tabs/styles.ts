@@ -133,9 +133,9 @@ export function createTabsStyles(
     // the tab offsets are physical too, and `placeTabs` counts them from the
     // right edge in RTL. Both top corners take the same radius, so the
     // physical spelling is RTL-safe here too.
+    // No `left` here: `TabIndicator` adds `physicalLeftEdge()`.
     indicator: {
       position: 'absolute',
-      left: 0,
       bottom: 0,
       height: indicatorHeight,
       borderTopLeftRadius: indicatorRadius,

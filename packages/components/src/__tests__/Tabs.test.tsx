@@ -404,6 +404,27 @@ describe('Tabs — tab offsets', () => {
       // Trips starts at 500 - 16 - 240 = 244, then (120 - 40) / 2.
       expect(indicatorTransform()).toEqual([{ translateX: 284 }])
     })
+
+    // React Native applies `left` to the right side in RTL, and `translateX`
+    // is physical. So the indicator takes `right: 0`, which is the physical
+    // left edge there. With `left: 0` it started at the right edge and the
+    // offset moved it out of the row.
+    it('starts the indicator at the physical left edge of the row', () => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      renderTabs()
+      layOutRow()
+      fireEvent(rowNode(), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 48 } },
+      })
+      const style = StyleSheet.flatten(
+        screen.getByTestId('tabs-indicator').props.style,
+      )
+      expect(style.right).toBe(0)
+      expect(style.left).toBeUndefined()
+    })
   })
 })
 
