@@ -24,7 +24,7 @@ Everything that you can reach through the declared `exports` of a package:
 | Package | Covered |
 |---|---|
 | `@rootnative/core` | `.`, `./create-theme` and `./static-export` |
-| `@rootnative/components` | the root barrel and all 28 component subpaths |
+| `@rootnative/components` | the root barrel, each component subpath, and `./mdi` |
 | `@rootnative/icons` | `.` |
 | `@rootnative/cli` | command names, their flags, and the shape of `rootnative.json` |
 
