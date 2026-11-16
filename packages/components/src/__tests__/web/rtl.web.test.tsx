@@ -49,6 +49,7 @@ import { Layout } from '../../layout/Layout'
 import { Menu } from '../../menu'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
+import { LinearProgress } from '../../progress/LinearProgress'
 import { physicalLeftStyle } from '../../safe-area'
 import { SideSheet } from '../../side-sheet'
 import { Tabs } from '../../tabs'
@@ -393,6 +394,66 @@ describe('Tabs scrolls to the selected tab for the document direction', () => {
     // 96 from the left edge (472 - 16 - 200 - 120 + 120 / 2 - 200 / 2), then
     // minus the scroll range of 472 - 200.
     expect(scrollLeftForTrips()).toBe(-176)
+  })
+})
+
+/**
+ * react-native-web keeps `left` physical under `dir="rtl"`, so `LinearProgress`
+ * mirrors each part of the bar itself on the web. Before, the bar filled from
+ * the left edge of an RTL page, and the stop dot sat at the right edge.
+ */
+describe('LinearProgress mirrors the bar for the document direction', () => {
+  /** The parts of the bar, in render order, in a 200 wide root. */
+  function partsOf(bar: React.ReactElement) {
+    renderWeb(bar)
+    const root = screen.getByTestId('linear')
+    fireLayout(root, 200)
+    return Array.from(root.children) as HTMLElement[]
+  }
+
+  // At 25%: 200 - 4 (stop dot) - 4 (gap) = 192 for the bar, so the active
+  // part is 0.25 * (192 - 4) = 47 wide and the inactive part 192 - 47 - 4.
+  it('fills the determinate bar from the left edge in LTR', () => {
+    const [active, inactive, stop] = partsOf(
+      <LinearProgress progress={0.25} testID="linear" />,
+    )
+    expect([active?.style.left, active?.style.width]).toEqual(['0px', '47px'])
+    expect([inactive?.style.left, inactive?.style.width]).toEqual([
+      '51px',
+      '141px',
+    ])
+    expect([stop?.style.left, stop?.style.right]).toEqual(['', '0px'])
+  })
+
+  it('fills the determinate bar from the right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const [active, inactive, stop] = partsOf(
+      <LinearProgress progress={0.25} testID="linear" />,
+    )
+    expect([active?.style.left, active?.style.width]).toEqual(['153px', '47px'])
+    expect([inactive?.style.left, inactive?.style.width]).toEqual([
+      '8px',
+      '141px',
+    ])
+    expect([stop?.style.left, stop?.style.right]).toEqual(['0px', ''])
+  })
+
+  // The slide of the indeterminate segment changes its sign on the same flag.
+  // The mocked `Motion.View` doesn't write its keyframes to the DOM, so this
+  // case is the web witness for both.
+  it('flips the wave under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const [wave] = partsOf(
+      <LinearProgress progress={0.5} wavy testID="linear" />,
+    )
+    expect(wave?.style.transform).toBe('scaleX(-1)')
+  })
+
+  it('starts the indeterminate segment at the right edge under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    const [, segment] = partsOf(<LinearProgress testID="linear" />)
+    // The segment is 40% of 200 wide.
+    expect(segment?.style.left).toBe('120px')
   })
 })
 

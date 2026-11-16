@@ -4,6 +4,7 @@ import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { I18nManager, StyleSheet } from 'react-native'
 import Svg, { Circle, Path } from 'react-native-svg'
+import type { ReactTestInstance } from 'react-test-renderer'
 import { CircularProgress } from '../progress/CircularProgress'
 import { LinearProgress } from '../progress/LinearProgress'
 
@@ -251,6 +252,19 @@ describe('LinearProgress in native RTL', () => {
   it('does not flip the wave in LTR', () => {
     renderWithTheme(<LinearProgress progress={0.5} wavy testID="linear" />)
     expect(waveTransform()).toBeUndefined()
+  })
+
+  // A second mirror here would put the bar back on the left edge.
+  it('leaves `left` and `right` to React Native to mirror', () => {
+    setRTL(true)
+    renderWithTheme(<LinearProgress progress={0.25} testID="linear" />)
+    const bar = screen.getByTestId('linear')
+    fireEvent(bar, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height: 4 } },
+    })
+    const [active, , stop] = bar.children as ReactTestInstance[]
+    expect(StyleSheet.flatten(active?.props.style).left).toBe(0)
+    expect(StyleSheet.flatten(stop?.props.style)).toMatchObject({ right: 0 })
   })
 
   it('moves the indeterminate segment from the right to the left', () => {

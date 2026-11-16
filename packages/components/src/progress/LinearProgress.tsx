@@ -9,9 +9,10 @@ import {
   useAnimatedProps,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
+import { isRTLDirection } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent, ViewStyle } from 'react-native'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -102,9 +103,11 @@ export function LinearProgress({
   const segmentWidth = Math.max(width * INDETERMINATE_SEGMENT_RATIO, 0)
 
   // In native RTL, React Native applies `left` to the right side, so the
-  // views mirror. A `translateX` and an SVG path are physical: the slide
-  // changes its sign, and each wave flips.
-  const mirrored = swapsLeftAndRight()
+  // views mirror. react-native-web keeps `left` physical, so on the web in
+  // RTL each `left` below is mirrored here. A `translateX` and an SVG path are
+  // physical on both: the slide changes its sign, and each wave flips.
+  const mirrorsLeftOnWeb = Platform.OS === 'web' && isRTLDirection()
+  const mirrored = swapsLeftAndRight() || mirrorsLeftOnWeb
   const slideSign = mirrored ? -1 : 1
   const waveMirror = mirrored ? MIRRORED : undefined
 
@@ -112,8 +115,11 @@ export function LinearProgress({
   // it across, repeat forever. Declared on a Motion primitive so the loop is
   // cancelled by unmount (mode switches swap the subtree below).
   const indeterminateSegmentStyle = useMemo(
-    () => ({ left: 0, width: segmentWidth }),
-    [segmentWidth],
+    () => ({
+      left: mirrorsLeftOnWeb ? width - segmentWidth : 0,
+      width: segmentWidth,
+    }),
+    [mirrorsLeftOnWeb, width, segmentWidth],
   )
   const indeterminateAnimate = useMemo(
     () => ({
@@ -175,7 +181,7 @@ export function LinearProgress({
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const w = Math.max(0, v * (progressArea - midGap))
-    return { left: 0, width: w }
+    return { left: mirrorsLeftOnWeb ? width - w : 0, width: w }
   })
 
   const inactiveStyle = useAnimatedStyle(() => {
@@ -183,9 +189,9 @@ export function LinearProgress({
     const v = progressShared.value
     const midGap = v > 0 && v < 1 ? PROGRESS_TRACK_GAP : 0
     const aw = Math.max(0, v * (progressArea - midGap))
-    const left = aw + midGap
+    const start = aw + midGap
     const w = Math.max(0, progressArea - aw - midGap)
-    return { left, width: w }
+    return { left: mirrorsLeftOnWeb ? width - start - w : start, width: w }
   })
 
   // Wavy variant. The active indicator is a stroked SVG path whose wave
@@ -261,9 +267,10 @@ export function LinearProgress({
   const stopStyle = useMemo(
     () => [
       styles.stopDot,
-      { right: 0, top: svgHeight / 2 - PROGRESS_STOP_INDICATOR / 2 },
+      mirrorsLeftOnWeb ? { left: 0 } : { right: 0 },
+      { top: svgHeight / 2 - PROGRESS_STOP_INDICATOR / 2 },
     ],
-    [styles.stopDot, svgHeight],
+    [styles.stopDot, mirrorsLeftOnWeb, svgHeight],
   )
 
   const renderActive = () => {
