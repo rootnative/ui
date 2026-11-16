@@ -1,8 +1,9 @@
 import { lightTheme } from '@rootnative/core'
+import { Motion } from '@rootnative/inertia'
 import { renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
-import { Circle, Path } from 'react-native-svg'
+import { I18nManager, StyleSheet } from 'react-native'
+import Svg, { Circle, Path } from 'react-native-svg'
 import { CircularProgress } from '../progress/CircularProgress'
 import { LinearProgress } from '../progress/LinearProgress'
 
@@ -213,5 +214,53 @@ describe('Progress wavy variant', () => {
     const flat = StyleSheet.flatten(screen.getByTestId('c').props.style)
     expect(flat.width).toBe(48)
     expect(flat.height).toBe(48)
+  })
+})
+
+// In native RTL, React Native applies `left` to the right side, so the plain
+// bar mirrors with no code. A wave and a `translateX` are physical.
+describe('LinearProgress in native RTL', () => {
+  const original = I18nManager.isRTL
+  function setRTL(value: boolean) {
+    Object.defineProperty(I18nManager, 'isRTL', { value, configurable: true })
+  }
+  afterEach(() => setRTL(original))
+
+  function waveTransform() {
+    const svg = screen.getByTestId('linear').findByType(Svg as never)
+    return StyleSheet.flatten(svg.props.style)?.transform
+  }
+
+  function slideKeyframes() {
+    const bar = screen.getByTestId('linear')
+    fireEvent(bar, 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 200, height: 4 } },
+    })
+    const segment = bar.findByType(Motion.View as never)
+    return (segment.props.animate.translateX as { to: number }[]).map(
+      (step) => step.to,
+    )
+  }
+
+  it('flips the wave of a determinate bar', () => {
+    setRTL(true)
+    renderWithTheme(<LinearProgress progress={0.5} wavy testID="linear" />)
+    expect(waveTransform()).toEqual([{ scaleX: -1 }])
+  })
+
+  it('does not flip the wave in LTR', () => {
+    renderWithTheme(<LinearProgress progress={0.5} wavy testID="linear" />)
+    expect(waveTransform()).toBeUndefined()
+  })
+
+  it('moves the indeterminate segment from the right to the left', () => {
+    setRTL(true)
+    renderWithTheme(<LinearProgress testID="linear" />)
+    expect(slideKeyframes()).toEqual([80, -200])
+  })
+
+  it('moves the indeterminate segment from the left to the right in LTR', () => {
+    renderWithTheme(<LinearProgress testID="linear" />)
+    expect(slideKeyframes()).toEqual([-80, 200])
   })
 })

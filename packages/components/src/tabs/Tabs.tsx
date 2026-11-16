@@ -13,9 +13,10 @@ import type {
   StyleProp,
   ViewStyle,
 } from 'react-native'
-import { I18nManager, Platform, ScrollView, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
+import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PRIMARY_INDICATOR_MIN_WIDTH,
@@ -297,11 +298,7 @@ export function Tabs({
  * the right edge, and its offset then moved it out of the row.
  */
 function physicalLeftEdge(): ViewStyle {
-  const swaps =
-    Platform.OS !== 'web' &&
-    I18nManager.isRTL &&
-    I18nManager.doLeftAndRightSwapInRTL
-  return swaps ? { right: 0 } : { left: 0 }
+  return swapsLeftAndRight() ? { right: 0 } : { left: 0 }
 }
 
 interface TabIndicatorProps {

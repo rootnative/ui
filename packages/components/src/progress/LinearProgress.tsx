@@ -10,9 +10,10 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import { useMemo, useState } from 'react'
-import type { LayoutChangeEvent } from 'react-native'
+import type { LayoutChangeEvent, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
@@ -43,6 +44,10 @@ const INDETERMINATE_DURATION_MS = 1800
 // Cubic in-out for the indeterminate slide (matches the prior
 // Easing.inOut(Easing.cubic) curve from the RN-Animated implementation).
 const INDETERMINATE_EASING = cubicBezier(0.42, 0, 0.58, 1)
+
+// A wave is drawn in the coordinates of its SVG, from the left. Where the
+// platform mirrors the views around it, the SVG flips to match.
+const MIRRORED: ViewStyle = { transform: [{ scaleX: -1 }] }
 
 const clamp = (v: number, min: number, max: number) =>
   Math.min(Math.max(v, min), max)
@@ -96,6 +101,13 @@ export function LinearProgress({
 
   const segmentWidth = Math.max(width * INDETERMINATE_SEGMENT_RATIO, 0)
 
+  // In native RTL, React Native applies `left` to the right side, so the
+  // views mirror. A `translateX` and an SVG path are physical: the slide
+  // changes its sign, and each wave flips.
+  const mirrored = swapsLeftAndRight()
+  const slideSign = mirrored ? -1 : 1
+  const waveMirror = mirrored ? MIRRORED : undefined
+
   // Indeterminate slide: snap the segment back off-track (0 ms step), tween
   // it across, repeat forever. Declared on a Motion primitive so the loop is
   // cancelled by unmount (mode switches swap the subtree below).
@@ -106,11 +118,15 @@ export function LinearProgress({
   const indeterminateAnimate = useMemo(
     () => ({
       translateX: [
-        { to: -segmentWidth, type: 'timing' as const, duration: 0 },
-        { to: width },
+        {
+          to: -segmentWidth * slideSign,
+          type: 'timing' as const,
+          duration: 0,
+        },
+        { to: width * slideSign },
       ],
     }),
-    [segmentWidth, width],
+    [segmentWidth, width, slideSign],
   )
   const indeterminateTransition = useMemo(
     () => ({
@@ -255,7 +271,7 @@ export function LinearProgress({
       return <Animated.View style={[styles.activeIndicator, activeStyle]} />
     }
     return (
-      <Svg width={width} height={svgHeight} style={styles.wave}>
+      <Svg width={width} height={svgHeight} style={[styles.wave, waveMirror]}>
         <AnimatedPath
           stroke={colors.indicator}
           strokeWidth={thickness}
@@ -304,7 +320,7 @@ export function LinearProgress({
         animate={indeterminateAnimate}
         transition={indeterminateTransition}
       >
-        <Svg width={segmentWidth} height={svgHeight}>
+        <Svg width={segmentWidth} height={svgHeight} style={waveMirror}>
           <AnimatedPath
             stroke={colors.indicator}
             strokeWidth={thickness}
