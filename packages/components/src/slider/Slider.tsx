@@ -183,8 +183,9 @@ export function Slider({
   // (`I18nManager.doLeftAndRightSwapInRTL`), so on native the platform
   // mirrors the rendered position and mirroring it here as well put the fill
   // back on the left. react-native-web never swaps, so the web keeps the
-  // manual mirror. Gesture coordinates are physical on both, so
-  // `positionToValue` always mirrors.
+  // manual mirror. The segments follow the same rule: `computeSegments` puts
+  // the active side after the thumb only where this file mirrors. Gesture
+  // coordinates are physical on both, so `positionToValue` always mirrors.
   const mirrorRenderedPosition = isRTL && Platform.OS === 'web'
   const valueToPosition = useCallback(
     (v: number) => {
@@ -370,7 +371,7 @@ export function Slider({
         centerPos,
         isRange: arrValue !== null,
         centered,
-        isRTL,
+        isRTL: mirrorRenderedPosition,
         showStopIndicators: !ticksEnabled,
         outerCorner: SLIDER_TRACK_CORNER_OUTER,
         innerCorner: SLIDER_TRACK_CORNER_INNER,
@@ -380,8 +381,8 @@ export function Slider({
       centered,
       centerPos,
       highPos,
-      isRTL,
       lowPos,
+      mirrorRenderedPosition,
       ticksEnabled,
       trackWidth,
     ],

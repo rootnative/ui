@@ -1,13 +1,15 @@
+import { lightTheme } from '@rootnative/core'
 import { useInterpolatedStyle, useMotionValue } from '@rootnative/inertia'
-import { renderWithTheme } from '@rootnative/utils/test'
+import { renderSettled, renderWithTheme } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
-import { I18nManager } from 'react-native'
+import { I18nManager, StyleSheet } from 'react-native'
 import { PRESSED_HALF, REST_HALF } from '../slider/geometry'
 import { Slider } from '../slider/Slider'
 import { ThumbSlot } from '../slider/slots'
 import {
   SLIDER_THUMB_WIDTH,
   SLIDER_THUMB_WIDTH_PRESSED,
+  SLIDER_TRACK_HEIGHT,
 } from '../slider/styles'
 import type { SliderProps } from '../slider/types'
 
@@ -346,7 +348,7 @@ describe('Slider thumb extrapolation', () => {
     ])
   })
 
-  describe('accessibility actions in RTL', () => {
+  describe('in RTL', () => {
     const original = I18nManager.isRTL
     afterEach(() => {
       Object.defineProperty(I18nManager, 'isRTL', {
@@ -374,6 +376,43 @@ describe('Slider thumb extrapolation', () => {
         nativeEvent: { actionName: 'increment' },
       })
       expect(onValueChange).toHaveBeenLastCalledWith(51)
+    })
+
+    // React Native swaps `left` in RTL, so the platform mirrors the track.
+    // The segments stay in LTR order here: the active one starts at 0.
+    it('keeps the active track before the thumb, for the platform to mirror', () => {
+      Object.defineProperty(I18nManager, 'isRTL', {
+        value: true,
+        configurable: true,
+      })
+      const { root, flush } = renderSettled(<Slider defaultValue={0.25} />)
+      const track = root.findAll(
+        (node) =>
+          typeof node.type === 'string' &&
+          typeof node.props.onLayout === 'function',
+      )[0]
+      fireEvent(track, 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 300, height: 48 } },
+      })
+      flush()
+
+      const leftOf = (color: string) =>
+        root
+          .findAll((node) => typeof node.type === 'string')
+          .map((node) => StyleSheet.flatten(node.props.style))
+          .filter(
+            (style) =>
+              style?.backgroundColor === color &&
+              style.height === SLIDER_TRACK_HEIGHT &&
+              typeof style.left === 'number',
+          )
+          .map((style) => style.left)
+
+      const active = leftOf(lightTheme.colors.primary)
+      const inactive = leftOf(lightTheme.colors.surfaceContainerHighest)
+      expect(active).toEqual([0])
+      expect(inactive).toHaveLength(1)
+      expect(inactive[0]).toBeGreaterThan(70)
     })
   })
 })
