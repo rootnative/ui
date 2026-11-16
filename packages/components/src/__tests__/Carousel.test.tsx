@@ -2,7 +2,13 @@ import { lightTheme } from '@rootnative/core'
 import { renderSettled } from '@rootnative/utils/test'
 import { fireEvent, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import {
+  I18nManager,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+} from 'react-native'
 import type { ReactTestInstance } from 'react-test-renderer'
 import { Carousel } from '../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../carousel'
@@ -457,5 +463,65 @@ describe('Carousel', () => {
     const root = screen.getByTestId('carousel')
     expect(root.props.nativeID).toBe('probe')
     expect(root.props.accessibilityLabel).toBe('Places')
+  })
+})
+
+// Android reports a horizontal offset from the left edge in RTL, and the
+// start of the content is the right end. So the row rests at its scroll
+// range, with no scroll event, and `scrollTo` takes the same physical value.
+describe('Carousel on Android in RTL', () => {
+  const os = Platform.OS
+  const wasRTL = I18nManager.isRTL
+  beforeEach(() => {
+    Object.defineProperty(Platform, 'OS', {
+      value: 'android',
+      configurable: true,
+    })
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: true,
+      configurable: true,
+    })
+  })
+  afterEach(() => {
+    Object.defineProperty(Platform, 'OS', { value: os, configurable: true })
+    Object.defineProperty(I18nManager, 'isRTL', {
+      value: wasRTL,
+      configurable: true,
+    })
+  })
+
+  function scrollRange() {
+    const { itemSize } = strategyFor()
+    const count = PLACES.length
+    const content = PADDING * 2 + count * itemSize + (count - 1) * GAP
+    return content - VIEWPORT
+  }
+
+  it('draws the first item at its large size at rest', () => {
+    const { flush } = renderCarousel()
+    layOut(VIEWPORT, 205, flush)
+    expect(flat(maskOf(0)).width).toBeCloseTo(strategyFor().itemSize)
+  })
+
+  it('reads the front item from the physical offset', () => {
+    const onIndexChange = jest.fn()
+    const { flush } = renderCarousel({ onIndexChange })
+    layOut(VIEWPORT, 205, flush)
+
+    scrollToOffset(scrollRange() - strategyFor().snapOffsets[3], flush)
+    expect(onIndexChange).toHaveBeenCalledWith(3)
+  })
+
+  it('scrollToIndex scrolls to the physical offset', () => {
+    const ref = createRef<CarouselRef>()
+    const { flush } = renderCarousel({ ref })
+    layOut(VIEWPORT, 205, flush)
+    const scrollTo = scrollToSpy()
+
+    ref.current?.scrollToIndex(3)
+    expect(scrollTo).toHaveBeenLastCalledWith({
+      x: scrollRange() - strategyFor().snapOffsets[3],
+      animated: true,
+    })
   })
 })

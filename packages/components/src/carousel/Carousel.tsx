@@ -74,13 +74,43 @@ const webSnap = {
 
 /**
  * The scroll geometry of one variant: the size of a slot along the scroll
- * axis, the offset that brings each item to the front, and the keyline
- * strategy of a masked variant.
+ * axis, the offset that brings each item to the front, the distance that
+ * the content can scroll, and the keyline strategy of a masked variant.
  */
 interface Geometry {
   itemSize: number
   snapOffsets: number[]
+  scrollRange: number
   strategy: CarouselStrategy | null
+}
+
+/** The distance that a row of `count` slots can scroll in the viewport. */
+function scrollRangeOf(
+  viewport: number,
+  itemSize: number,
+  gap: number,
+  padding: number,
+  count: number,
+): number {
+  const contentSize = padding * 2 + count * itemSize + (count - 1) * gap
+  return Math.max(0, contentSize - viewport)
+}
+
+/**
+ * How the platform reports the scroll offset of a horizontal row, and what
+ * `scrollTo` takes.
+ * - `start`: the distance from the start of the content.
+ * - `negative`: a browser in RTL counts down from 0 at the start.
+ * - `physical`: Android in RTL gives the distance from the left edge, and
+ *   the start is the right end. So the offset at rest is the scroll range.
+ *   iOS converts the value, Android does not.
+ */
+type OffsetMode = 'start' | 'negative' | 'physical'
+
+function offsetModeOf(vertical: boolean): OffsetMode {
+  if (vertical || !isRTLDirection()) return 'start'
+  if (Platform.OS === 'web') return 'negative'
+  return Platform.OS === 'android' ? 'physical' : 'start'
 }
 
 function plainGeometry(
@@ -90,13 +120,12 @@ function plainGeometry(
   padding: number,
   count: number,
 ): Geometry {
-  const contentSize = padding * 2 + count * itemSize + (count - 1) * gap
-  const maxScroll = Math.max(0, contentSize - viewport)
+  const maxScroll = scrollRangeOf(viewport, itemSize, gap, padding, count)
   const snapOffsets: number[] = []
   for (let i = 0; i < count; i++) {
     snapOffsets.push(Math.min(i * (itemSize + gap), maxScroll))
   }
-  return { itemSize, snapOffsets, strategy: null }
+  return { itemSize, snapOffsets, scrollRange: maxScroll, strategy: null }
 }
 
 export function Carousel<T>({
@@ -161,6 +190,13 @@ export function Carousel<T>({
       return {
         itemSize: strategy.itemSize,
         snapOffsets: strategy.snapOffsets,
+        scrollRange: scrollRangeOf(
+          extent,
+          strategy.itemSize,
+          gap,
+          contentPadding,
+          count,
+        ),
         strategy,
       }
     }
@@ -190,6 +226,16 @@ export function Carousel<T>({
   const { scrollX, scrollY, onScroll } = useScroll()
   const offset = vertical ? scrollY : scrollX
 
+  // The keyline maths and the snap offsets count from the start of the
+  // content, so the items read this value, not the raw offset.
+  const offsetMode = offsetModeOf(vertical)
+  const scrollRange = useMotionValue(geometry?.scrollRange ?? 0)
+  const fromStart = useDerivedValue(() => {
+    'worklet'
+    if (offsetMode === 'physical') return scrollRange.value - offset.value
+    return offsetMode === 'negative' ? -offset.value : offset.value
+  })
+
   // The item that a `scrollToIndex` scroll lands on. That scroll reports only
   // this item, not each item that it passes. A parent that writes each report
   // back into `index` would otherwise drop a second tap on its next button.
@@ -201,16 +247,24 @@ export function Carousel<T>({
   const snapOffsets = useMotionValue<number[]>(geometry?.snapOffsets ?? [])
   // A layout effect, so that the index effect below reads the new geometry
   // in the same commit.
+  // A `physical` row rests at its scroll range, and it sends no scroll event
+  // for that, so the first geometry sets the offset. Each later value comes
+  // from a scroll event.
+  const seeded = useRef(false)
   useLayoutEffect(() => {
     geometryRef.current = geometry
     snapOffsets.value = geometry?.snapOffsets ?? []
+    scrollRange.value = geometry?.scrollRange ?? 0
+    if (offsetMode === 'physical' && geometry !== null && !seeded.current) {
+      seeded.current = true
+      offset.value = geometry.scrollRange
+    }
     landing.current = null
-  }, [geometry, snapOffsets])
+  }, [geometry, snapOffsets, scrollRange, offset, offsetMode])
 
-  // In RTL a browser reports a negative offset from the start.
   const frontIndex = useDerivedValue(() => {
     'worklet'
-    return indexAtScroll(snapOffsets.value, Math.abs(offset.value))
+    return indexAtScroll(snapOffsets.value, Math.abs(fromStart.value))
   })
 
   // The index that was last reported, so a repeat is quiet.
@@ -260,15 +314,18 @@ export function Carousel<T>({
       // is the later one.
       const lands = indexAtScroll(current.snapOffsets, scroll)
       if (lands !== frontIndex.value) landing.current = lands
-      // In RTL a browser counts the offset down from 0 and clamps a positive
-      // offset to 0. Native is not checked in RTL.
-      const x = Platform.OS === 'web' && isRTLDirection() ? -scroll : scroll
+      const x =
+        offsetMode === 'physical'
+          ? current.scrollRange - scroll
+          : offsetMode === 'negative'
+            ? -scroll
+            : scroll
       scrollRef.current?.scrollTo(
         vertical ? { y: scroll, animated } : { x, animated },
       )
       report(clamped)
     },
-    [vertical, report, frontIndex],
+    [vertical, report, frontIndex, offsetMode],
   )
 
   useImperativeHandle(ref, () => ({ scrollToIndex }), [scrollToIndex])
@@ -373,7 +430,7 @@ export function Carousel<T>({
                   item={item}
                   index={itemIndex}
                   strategy={strategyValue}
-                  offset={offset}
+                  offset={fromStart}
                   direction={direction}
                   slotStyle={slotStyle}
                   styles={styles}
@@ -458,6 +515,7 @@ function PlainSlot<T>({
 
 interface MaskedSlotProps<T> extends SlotProps<T> {
   strategy: SharedValue<CarouselStrategy | null>
+  /** The scroll offset, counted from the start of the content. */
   offset: SharedValue<number>
   direction: 1 | -1
 }
