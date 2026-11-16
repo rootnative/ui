@@ -26,6 +26,7 @@ Everything that you can reach through the declared `exports` of a package:
 | `@rootnative/core` | `.`, `./create-theme` and `./static-export` |
 | `@rootnative/components` | the root barrel, each component subpath, and `./mdi` |
 | `@rootnative/icons` | `.` |
+| `@rootnative/seo` | `.`, `./schema`, `./react`, `./expo-router`, `./dom`, `./expo-image` and `./node`, and the commands of `rootnative-seo` with their flags |
 | `@rootnative/cli` | command names, their flags, and the shape of `rootnative.json` |
 
 There is no deep import. The `exports` maps resolve only the subpaths listed
