@@ -201,7 +201,42 @@ describe('Chip', () => {
       const flatStyle = StyleSheet.flatten(chip.props.style)
       expect(flatStyle.backgroundColor).toBe('transparent')
       expect(flatStyle.borderWidth).toBe(1)
-      expect(flatStyle.borderColor).toBe(lightTheme.colors.outline)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outlineVariant)
+    })
+
+    it.each([
+      ['assist', () => <Chip testID="chip">Flat</Chip>],
+      [
+        'filter',
+        () => (
+          <Chip variant="filter" testID="chip">
+            Flat
+          </Chip>
+        ),
+      ],
+      [
+        'input',
+        () => (
+          <Chip variant="input" testID="chip">
+            Flat
+          </Chip>
+        ),
+      ],
+      [
+        'suggestion',
+        () => (
+          <Chip variant="suggestion" testID="chip">
+            Flat
+          </Chip>
+        ),
+      ],
+    ])('a flat %s chip draws its outline in outlineVariant', (_variant, ui) => {
+      renderWithTheme(ui())
+      const flatStyle = StyleSheet.flatten(
+        screen.getByTestId('chip').props.style,
+      )
+      expect(flatStyle.borderWidth).toBe(1)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outlineVariant)
     })
 
     it('disabled flat chips stay transparent with a 12% onSurface outline', () => {
@@ -586,7 +621,7 @@ describe('Chip', () => {
       )
       expect(flatStyle.backgroundColor).toBe('transparent')
       expect(flatStyle.borderWidth).toBe(1)
-      expect(flatStyle.borderColor).toBe(lightTheme.colors.outline)
+      expect(flatStyle.borderColor).toBe(lightTheme.colors.outlineVariant)
     })
 
     it('keeps the containerColor override', () => {

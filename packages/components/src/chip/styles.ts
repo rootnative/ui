@@ -109,7 +109,7 @@ function getVariantColors(
   return {
     backgroundColor: 'transparent',
     textColor,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     borderWidth: 1,
     disabledBackgroundColor: 'transparent',
     disabledTextColor: disabledLabelColor,
