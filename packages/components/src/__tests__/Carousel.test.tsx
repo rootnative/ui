@@ -466,15 +466,15 @@ describe('Carousel', () => {
   })
 })
 
-// Android reports a horizontal offset from the left edge in RTL, and the
-// start of the content is the right end. So the row rests at its scroll
+// iOS and Android report a horizontal offset from the left edge in RTL, and
+// the start of the content is the right end. So the row rests at its scroll
 // range, with no scroll event, and `scrollTo` takes the same physical value.
-describe('Carousel on Android in RTL', () => {
+describe.each(['android', 'ios'])('Carousel on %s in RTL', (platform) => {
   const os = Platform.OS
   const wasRTL = I18nManager.isRTL
   beforeEach(() => {
     Object.defineProperty(Platform, 'OS', {
-      value: 'android',
+      value: platform,
       configurable: true,
     })
     Object.defineProperty(I18nManager, 'isRTL', {

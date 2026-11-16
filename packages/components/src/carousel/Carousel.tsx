@@ -101,16 +101,16 @@ function scrollRangeOf(
  * `scrollTo` takes.
  * - `start`: the distance from the start of the content.
  * - `negative`: a browser in RTL counts down from 0 at the start.
- * - `physical`: Android in RTL gives the distance from the left edge, and
- *   the start is the right end. So the offset at rest is the scroll range.
- *   iOS converts the value, Android does not.
+ * - `physical`: iOS and Android in RTL give the distance from the left edge,
+ *   and the start is the right end. So the offset at rest is the scroll
+ *   range. iOS converts its native offset, which counts from the start, to
+ *   this value. The snap offsets still count from the start on both.
  */
 type OffsetMode = 'start' | 'negative' | 'physical'
 
 function offsetModeOf(vertical: boolean): OffsetMode {
   if (vertical || !isRTLDirection()) return 'start'
-  if (Platform.OS === 'web') return 'negative'
-  return Platform.OS === 'android' ? 'physical' : 'start'
+  return Platform.OS === 'web' ? 'negative' : 'physical'
 }
 
 function plainGeometry(
