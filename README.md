@@ -10,8 +10,8 @@
 <h1 align="center">Root Native UI</h1>
 
 <p align="center">
-  Components for React Native that follow your design system.<br />
-  Material Design 3 is the default. One codebase for iOS, Android, and the web.
+  Material Design 3 components for React Native, on a theme engine that takes your own design.<br />
+  One codebase for iOS, Android, and the web.
 </p>
 
 <p align="center">
@@ -49,7 +49,7 @@
 | Feature | What it does |
 | --- | --- |
 | **More than 35 components** | Buttons, cards, chips, dialogs, menus, sheets, tabs, text fields, sliders, and navigation bars, rails, and drawers. Each one has its own subpath export. |
-| **Any design system** | The theme engine takes your own tokens and your own theme type. Material Design 3 is only the default theme. |
+| **Design-system agnostic theme** | The components read the Material Design 3 roles. Give those roles your own values, add your own tokens beside them, or define a theme type for your own components. |
 | **A theme from one colour** | `createMaterialTheme('#006A6A')` makes a full Material light and dark theme from one seed colour. |
 | **Light and dark** | Give `ThemeProvider` a light and a dark theme. It follows the system, and `useThemeMode()` lets the user choose. |
 | **Expressive motion** | Spring transitions and a shape morph on press come from the Material 3 Expressive motion tokens. Each animation obeys the reduced-motion setting. |

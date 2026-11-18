@@ -49,7 +49,7 @@ const config: Config = {
 
   title: 'Root Native UI',
   tagline:
-    'Design-system agnostic components for React Native on iOS, Android, and web',
+    'React Native components on a design-system agnostic theme engine. Material Design 3 out of the box.',
   url: 'https://rootnative.github.io',
   baseUrl,
   onBrokenLinks: 'throw',

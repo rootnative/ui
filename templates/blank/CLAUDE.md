@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This project uses [Root Native UI](https://rootnative.github.io/ui/) (`@rootnative/*`) — a design-system agnostic component library for React Native, with Material Design 3 out of the box.
+This project uses [Root Native UI](https://rootnative.github.io/ui/) (`@rootnative/*`) — Material Design 3 components for React Native, on a design-system agnostic theme engine.
 
 ## Root Native UI docs for AI agents
 

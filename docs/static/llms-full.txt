@@ -1,6 +1,6 @@
 # Root Native UI — Full API Reference
 
-> Design-system agnostic component library for React Native — ships with Material Design 3
+> React Native components on a design-system agnostic theme engine. Material Design 3 out of the box.
 > Versions: `@rootnative/core` 0.0.0-alpha.37 · `@rootnative/components` 0.0.0-alpha.37 · `@rootnative/icons` 0.0.0-alpha.37 · `@rootnative/seo` 0.0.0-alpha.37 · `@rootnative/cli` 0.0.0-alpha.37
 > Requirements: react-native >=0.88.0 <0.89.0, react >=19.3.0 <20.0.0, Expo SDK 58
 > Platforms: iOS, Android, and web through `react-native-web` (web also needs `react-dom`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.

@@ -1,12 +1,12 @@
 ---
 slug: /introduction
 sidebar_position: 1
-description: Design-system agnostic component library for React Native, with Material Design 3 out of the box.
+description: React Native components on a design-system agnostic theme engine. Material Design 3 out of the box.
 ---
 
 # Root Native UI
 
-Root Native UI is a component library for React Native that follows your design system. Material Design 3 is the default.
+Root Native UI gives you Material Design 3 components for React Native, on a design-system agnostic theme engine. You restyle each component through the theme.
 
 It runs on iOS, Android, and the web (through `react-native-web`), on the Expo SDK 58 runtime. See [Installation](./installation#platforms) for the platform table.
 

@@ -3659,7 +3659,7 @@ ${seoApiContent()}
 function generateFullLlms(): string {
   return `# Root Native UI — Full API Reference
 
-> Design-system agnostic component library for React Native — ships with Material Design 3
+> React Native components on a design-system agnostic theme engine. Material Design 3 out of the box.
 > Versions: \`@rootnative/core\` ${CORE_VERSION} · \`@rootnative/components\` ${COMPONENTS_VERSION} · \`@rootnative/icons\` ${ICONS_VERSION} · \`@rootnative/seo\` ${SEO_VERSION} · \`@rootnative/cli\` ${CLI_VERSION}
 > Requirements: react-native ${COMPONENTS_RN}, react ${COMPONENTS_REACT}, Expo SDK ${EXPO_SDK}
 > Platforms: iOS, Android, and web through \`react-native-web\` (web also needs \`react-dom\`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.

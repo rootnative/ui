@@ -369,7 +369,7 @@ function socialCardSvg({ square = false } = {}) {
   so the font stack only has to resolve on the machine running this script.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="${CARD_WIDTH}" height="${height}" viewBox="0 0 ${CARD_WIDTH} ${height}" fill="none">
-  <title>Root Native UI — design-system agnostic components for React Native</title>
+  <title>Root Native UI — React Native components on a design-system agnostic theme engine</title>
   <defs>
     <linearGradient id="cardBar" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${CARD_WIDTH}" y2="0">
       <stop offset="0" stop-color="${DARK_FACES.top}" />
@@ -398,7 +398,7 @@ ${cardMark}
     </g>
 
     <text x="110" y="392" font-family="${FONT_STACK}" font-size="90" font-weight="800" letter-spacing="-3" fill="#fafafa">Root Native UI</text>
-    <text x="110" y="448" font-family="${FONT_STACK}" font-size="34" font-weight="500" fill="#a1a1aa">Design-system agnostic components for React Native</text>
+    <text x="110" y="448" font-family="${FONT_STACK}" font-size="34" font-weight="500" fill="#a1a1aa">React Native components on an agnostic theme engine</text>
     <text x="110" y="524" font-family="${FONT_STACK}" font-size="26" font-weight="500" letter-spacing="0.4" fill="#71717a">@rootnative/components</text>
   </g>
 </svg>

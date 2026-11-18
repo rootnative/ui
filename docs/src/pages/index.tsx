@@ -165,9 +165,10 @@ function Hero() {
             <span className={styles.heroHighlight}>out of the box.</span>
           </h1>
           <p className={styles.heroTagline}>
-            A design-system agnostic component library. Ships with Material
-            Design 3, runs on iOS, Android, and web, works with Expo and bare
-            React Native, and stays out of your way when you want to customize.
+            Material Design 3 components on a design-system agnostic theme
+            engine. Restyle every component through the theme, add your own
+            tokens, and ship to iOS, Android, and the web, with Expo or bare
+            React Native.
           </p>
           <div className={styles.heroCtas}>
             <Link className={styles.ctaPrimary} to="/introduction">
@@ -235,9 +236,9 @@ function Stats() {
 
 const features = [
   {
-    title: 'Design-system agnostic',
+    title: 'Design-system agnostic theme',
     description:
-      'Use Material Design 3 out of the box, build your own theme system, or mix both. The theme engine adapts to your design language.',
+      'The components read the Material Design 3 roles. Give those roles your own values, add your own tokens beside them, or define a theme type for your own components.',
     Icon: IconTheme,
   },
   {
