@@ -280,8 +280,6 @@ We state these, because they affect what you can promise your own users:
 - **`role="menu"` items are Tab stops on web, not a roving-tabindex group.**
   The arrow keys work. The strict ARIA menu pattern would also make the item
   group a single tab stop.
-- **We did not sweep RTL.** Everything routes through `selectRTL`, but we ran
-  no platform pass against a right-to-left locale.
 - **Touch targets are corrected only on native.** The `hitSlop` that lifts
   the smallest size tokens to 48dp is a no-op under react-native-web, so a
   touch-capable web build gets the token size. See "Touch targets" above.
