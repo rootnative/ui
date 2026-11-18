@@ -11,6 +11,7 @@ import type {
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -197,9 +198,10 @@ export function SearchView({
     () => (contentColor ? { color: contentColor } : undefined),
     [contentColor],
   )
+  const startAlign = startTextAlignStyle()
   const inputStyleArr = useMemo(
-    () => [styles.input, inputContentColor, inputStyle],
-    [styles.input, inputContentColor, inputStyle],
+    () => [styles.input, startAlign, inputContentColor, inputStyle],
+    [styles.input, startAlign, inputContentColor, inputStyle],
   )
   const dockedMaxHeight = useMemo(
     () =>

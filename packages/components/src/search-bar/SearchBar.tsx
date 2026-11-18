@@ -11,6 +11,7 @@ import type {
 } from 'react-native'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { warnOnce } from '../internal/warnOnce'
@@ -166,15 +167,18 @@ export function SearchBar({
     () => (contentColor && !disabled ? { color: contentColor } : undefined),
     [contentColor, disabled],
   )
+  const startAlign = startTextAlignStyle()
   const inputStyleArr = useMemo(
     () => [
       styles.input,
+      startAlign,
       inputContentColor,
       disabled ? styles.inputDisabled : undefined,
       inputStyle,
     ],
     [
       styles.input,
+      startAlign,
       styles.inputDisabled,
       inputContentColor,
       disabled,

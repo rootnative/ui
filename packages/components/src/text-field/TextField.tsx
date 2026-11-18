@@ -20,6 +20,7 @@ import type {
   TextInputInstance,
 } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { createStyles, labelPositions } from './styles'
 import type { TextFieldProps } from './types'
@@ -391,14 +392,16 @@ export function TextField({
     [contentColor, isDisabled],
   )
 
+  const startAlign = startTextAlignStyle()
   const inputStyleArr = useMemo(
     () => [
       styles.input,
+      startAlign,
       isDisabled ? styles.inputDisabled : undefined,
       inputContentColor,
       inputStyle,
     ],
-    [styles, isDisabled, inputContentColor, inputStyle],
+    [styles, startAlign, isDisabled, inputContentColor, inputStyle],
   )
 
   const supportingTextStyleArr = useMemo(

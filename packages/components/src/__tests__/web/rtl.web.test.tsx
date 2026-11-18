@@ -51,6 +51,7 @@ import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
 import { LinearProgress } from '../../progress/LinearProgress'
 import { physicalLeftStyle } from '../../safe-area'
+import { SearchBar } from '../../search-bar'
 import { SearchView } from '../../search-view'
 import { SideSheet } from '../../side-sheet'
 import { Tabs } from '../../tabs'
@@ -176,6 +177,47 @@ describe('SearchView back arrow points the right way', () => {
     expect(container.innerHTML).toContain('arrow-right')
     expect(container.innerHTML).not.toContain('arrow-left')
   })
+})
+
+/**
+ * react-native-web gives each input `dir="auto"`, so Latin text in an RTL
+ * page aligns left. Each input of the library sets a physical `textAlign`
+ * from the document direction, so the value and the placeholder start at
+ * the start edge of the page.
+ */
+describe('the inputs align with the start edge of the document', () => {
+  const INPUTS: [string, () => React.ReactElement][] = [
+    ['TextField', () => <TextField label="Email" />],
+    ['SearchBar', () => <SearchBar placeholder="Search mail" />],
+    [
+      'SearchView',
+      () => (
+        <PortalHost>
+          <SearchView visible onDismiss={() => {}} placeholder="Search mail" />
+        </PortalHost>
+      ),
+    ],
+  ]
+
+  function textAlignOfInput(container: HTMLElement) {
+    const input = container.querySelector('input')
+    if (input === null) throw new Error('no input')
+    return input.style.textAlign
+  }
+
+  it.each(INPUTS)('aligns the %s input left in LTR', (_name, render) => {
+    const { container } = renderWeb(render())
+    expect(textAlignOfInput(container)).toBe('left')
+  })
+
+  it.each(INPUTS)(
+    'aligns the %s input right under dir="rtl"',
+    (_name, render) => {
+      document.documentElement.setAttribute('dir', 'rtl')
+      const { container } = renderWeb(render())
+      expect(textAlignOfInput(container)).toBe('right')
+    },
+  )
 })
 
 /**

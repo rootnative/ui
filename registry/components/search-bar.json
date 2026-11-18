@@ -8,11 +8,12 @@
     "packages/components/src/search-bar/types.ts",
     "packages/components/src/internal/focusOutline.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/startTextAlign.ts",
     "packages/components/src/internal/useMaterialTheme.ts",
     "packages/components/src/internal/useStateLayer.ts",
     "packages/components/src/internal/warnOnce.ts"
   ],
-  "utils": ["color", "render-icon"],
+  "utils": ["color", "render-icon", "rtl"],
   "componentDependencies": ["icon-button"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",
