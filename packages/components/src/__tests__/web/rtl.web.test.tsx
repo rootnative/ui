@@ -657,4 +657,21 @@ describe('the modal drawer and sheet pad the inset of their own edge', () => {
     )
     expect(safeAreaOf('sheet')).toEqual({ left: '62px', right: '0px' })
   })
+
+  it('adds the inset to the left margin of a detached end-edge sheet under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(
+      withInsets(
+        <SideSheet visible onDismiss={() => {}} detached testID="sheet">
+          <Text>Sheet</Text>
+        </SideSheet>,
+      ),
+    )
+    const sheet = screen.getByTestId('sheet')
+    expect({
+      left: sheet.style.marginLeft,
+      right: sheet.style.marginRight,
+    }).toEqual({ left: '78px', right: '16px' })
+    expect(safeAreaOf('sheet')).toEqual({ left: '0px', right: '0px' })
+  })
 })

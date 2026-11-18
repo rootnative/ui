@@ -1,6 +1,10 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { StyleProp, ViewStyle } from 'react-native'
+import type { EdgeInsets } from 'react-native-safe-area-context'
+import { sideEdgesOfStyleKeys } from '../safe-area'
+import type { Edge } from '../safe-area'
 import type { SideSheetEdge, SideSheetVariant } from './types'
 
 /**
@@ -73,6 +77,45 @@ function surfaceShape(
         borderTopEndRadius: theme.shape.cornerLarge,
         borderBottomEndRadius: theme.shape.cornerLarge,
       }
+}
+
+export interface DetachedMargin {
+  /** The margin on each physical side. */
+  sides: Record<Edge, number>
+  /** The same margins as style keys. */
+  style: ViewStyle
+}
+
+/**
+ * The margins of a detached sheet: the margin that `style` carries, plus the
+ * safe-area inset of each edge in `edges`. So the whole sheet, and not only
+ * its content, stays clear of the status bar and a notch. The same additive
+ * maths as the padding of `SafeAreaView`.
+ */
+export function detachedMargin(
+  style: StyleProp<ViewStyle>,
+  insets: EdgeInsets,
+  edges: Edge[],
+): DetachedMargin {
+  const flat = StyleSheet.flatten(style) ?? {}
+  const num = (value: unknown, fallback: number) =>
+    typeof value === 'number' ? value : fallback
+  const margin = num(flat.margin, 0)
+  const vertical = num(flat.marginVertical, margin)
+  const horizontal = num(flat.marginHorizontal, margin)
+  const inset = (edge: Edge) => (edges.includes(edge) ? insets[edge] : 0)
+  const [leftKeyEdge, rightKeyEdge] = sideEdgesOfStyleKeys()
+  const marginLeft = num(flat.marginLeft, horizontal) + inset(leftKeyEdge)
+  const marginRight = num(flat.marginRight, horizontal) + inset(rightKeyEdge)
+  const marginTop = num(flat.marginTop, vertical) + inset('top')
+  const marginBottom = num(flat.marginBottom, vertical) + inset('bottom')
+  const sides = { top: marginTop, right: 0, bottom: marginBottom, left: 0 }
+  sides[leftKeyEdge] = marginLeft
+  sides[rightKeyEdge] = marginRight
+  return {
+    sides,
+    style: { marginTop, marginRight, marginBottom, marginLeft },
+  }
 }
 
 export function createSideSheetStyles(

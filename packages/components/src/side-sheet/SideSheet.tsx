@@ -1,7 +1,9 @@
 import { Motion, Presence } from '@rootnative/inertia'
 import { isRTLDirection, selectRTL } from '@rootnative/utils'
-import { useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import type { EdgeInsets } from 'react-native-safe-area-context'
 import { Divider } from '../divider/Divider'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -13,11 +15,14 @@ import { Portal } from '../portal/Portal'
 import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
 import {
-  SIDE_SHEET_DETACHED_MARGIN,
   SIDE_SHEET_WIDTH,
   createSideSheetStyles,
+  detachedMargin,
 } from './styles'
 import type { SideSheetProps } from './types'
+
+const NO_INSETS: EdgeInsets = { top: 0, right: 0, bottom: 0, left: 0 }
+const NO_EDGES: Edge[] = []
 
 export function SideSheet(props: SideSheetProps) {
   const {
@@ -72,13 +77,35 @@ export function SideSheet(props: SideSheetProps) {
 
   // 'end' is the right edge in LTR.
   const isOnRight = (edge === 'end') !== isRTLDirection()
-  const edges = useMemo<Edge[]>(() => {
+  const insetEdges = useMemo<Edge[]>(() => {
     const result: Edge[] = []
     if (insetTop ?? isModal) result.push('top')
     if (insetBottom ?? isModal) result.push('bottom')
     if (insetSides ?? isModal) result.push(isOnRight ? 'right' : 'left')
     return result
   }, [insetTop, insetBottom, insetSides, isModal, isOnRight])
+
+  // The context, not `useSafeAreaInsets()`, which throws without a provider.
+  const safeArea = useContext(SafeAreaInsetsContext)
+  // A detached sheet adds the insets to its margin, so its content needs no
+  // inset padding. Without a provider the insets are unknown here: the
+  // margin starts at the screen edge, and the safe-area view pads the content.
+  const contentEdges = detached && safeArea !== null ? NO_EDGES : insetEdges
+  const margin = useMemo(
+    () =>
+      detached
+        ? detachedMargin(
+            [styles.surface, style],
+            safeArea ?? NO_INSETS,
+            insetEdges,
+          )
+        : null,
+    [detached, styles.surface, style, safeArea, insetEdges],
+  )
+  const surfaceStyle = useMemo(
+    () => [styles.surface, style, margin?.style],
+    [styles.surface, style, margin],
+  )
 
   const hasHeader =
     headline !== undefined || onBack !== undefined || onDismiss !== undefined
@@ -119,7 +146,7 @@ export function SideSheet(props: SideSheetProps) {
   useBackHandlerDismiss(open && dismissable, onDismiss)
 
   const content = (
-    <SafeAreaView edges={edges} style={styles.safeArea}>
+    <SafeAreaView edges={contentEdges} style={styles.safeArea}>
       {hasHeader ? (
         <View style={headerStyle}>
           {onBack !== undefined ? (
@@ -172,7 +199,7 @@ export function SideSheet(props: SideSheetProps) {
       <View
         {...rest}
         testID={testID}
-        style={[styles.surface, style]}
+        style={surfaceStyle}
         role={role ?? 'complementary'}
         accessibilityLabel={accessibleName}
       >
@@ -183,7 +210,7 @@ export function SideSheet(props: SideSheetProps) {
 
   // The detached margin adds to the travel, so the sheet leaves the screen
   // completely.
-  const travel = width + (detached ? SIDE_SHEET_DETACHED_MARGIN : 0)
+  const travel = width + (margin?.sides[isOnRight ? 'right' : 'left'] ?? 0)
   const hiddenOffset = isOnRight ? travel : -travel
 
   return (
@@ -227,7 +254,7 @@ export function SideSheet(props: SideSheetProps) {
                 {...rest}
                 ref={surfaceRef}
                 testID={testID}
-                style={[styles.surface, style]}
+                style={surfaceStyle}
                 role={role ?? 'dialog'}
                 aria-modal
                 accessibilityViewIsModal

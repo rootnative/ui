@@ -65,7 +65,9 @@ interface SideSheetCommonProps extends Omit<ViewProps, 'children' | 'style'> {
   showActionsDivider?: boolean
   /**
    * Whether the sheet is detached from the screen edges by a 16dp margin,
-   * with all four corners rounded.
+   * with all four corners rounded. On each edge that `insetTop`,
+   * `insetBottom` or `insetSides` turns on, the margin starts at the
+   * safe-area inset, so the whole sheet stays clear of the notch.
    * @default false
    */
   detached?: boolean
@@ -78,19 +80,22 @@ interface SideSheetCommonProps extends Omit<ViewProps, 'children' | 'style'> {
   width?: number
   /**
    * Whether the sheet's content is padded by the top safe-area inset. The
-   * container color still extends under the inset.
+   * container color still extends under the inset. A detached sheet adds the
+   * inset to its margin instead.
    * @default true for 'modal', false for 'standard'
    */
   insetTop?: boolean
   /**
-   * Whether the sheet's content is padded by the bottom safe-area inset.
+   * Whether the sheet's content is padded by the bottom safe-area inset. A
+   * detached sheet adds the inset to its margin instead.
    * @default true for 'modal', false for 'standard'
    */
   insetBottom?: boolean
   /**
    * Whether the sheet's content is padded by the safe-area inset of the
    * screen edge it sits on, which `edge` picks. In landscape this keeps the
-   * content clear of the notch. The inset is 0 in portrait.
+   * content clear of the notch. The inset is 0 in portrait. A detached sheet
+   * adds the inset to its margin instead.
    * @default true for 'modal', false for 'standard'
    */
   insetSides?: boolean

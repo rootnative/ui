@@ -153,7 +153,8 @@ remove it.
 
 - **`edge`** (modal only) sets the screen edge that the sheet enters from. `'end'` (the
   default) is the right edge in LTR and the left edge in RTL. `'start'` is the other edge.
-- **`detached`** adds a 16dp margin on all four sides and rounds all four corners.
+- **`detached`** adds a 16dp margin on all four sides and rounds all four corners. On an edge
+  with a safe-area inset, the margin starts at the inset (see [Safe area](#safe-area)).
 - **`width`** sets the width of the sheet. The default is 256dp. Set the width with this prop,
   not with `style`: the slide distance of a modal sheet comes from `width`. On a narrow
   window, a modal sheet shrinks, so a 56dp strip of scrim stays visible.
@@ -171,6 +172,11 @@ and bottom insets, and the container color extends under them. It also pads the 
 screen edge it sits on (`insetSides`), which `edge` picks. In landscape this keeps the content
 clear of the notch. A standard sheet sets all three off by default, because the `Layout` around
 it usually owns the edges. `insetTop`, `insetBottom` and `insetSides` override each default.
+
+A detached sheet adds each of these insets to its margin, not to its content padding. So the
+whole sheet, and not only its content, stays clear of the status bar and the notch. This needs a
+`SafeAreaProvider` above the sheet. Without one, a detached sheet pads its content, as an
+attached sheet does.
 
 ## Overrides
 
@@ -190,7 +196,7 @@ When you pass `testID`, the sheet surface carries it. A modal sheet's scrim carr
 | Token | Value |
 |-------|-------|
 | Sheet | 256dp wide. Modal: `surfaceContainerLow` at level 1, 16dp corners on the inner edge. Standard: `surface` at level 0, no corners |
-| Detached | 16dp margin, 16dp corners on all four sides |
+| Detached | 16dp margin, from the safe area on each inset edge. 16dp corners on all four sides |
 | Scrim | `scrim` at 32% |
 | Headline | `titleLarge`, `onSurface` |
 | Back and close icons | 24dp, `onSurfaceVariant`, in a 40dp icon button |

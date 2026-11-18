@@ -2051,11 +2051,11 @@ Props:
 - `closeAccessibilityLabel?: string` — Default: `'Close'`. Screen-reader label for the close button.
 - `actions?: ReactNode` — Action buttons in a row below the content, such as a filled "Save" and an outlined "Cancel". The row stays in place while the content scrolls.
 - `showActionsDivider?: boolean` — Default: `true`. Whether a divider separates the actions from the content. Ignored without `actions`.
-- `detached?: boolean` — Default: `false`. Whether the sheet is detached from the screen edges by a 16dp margin, with all four corners rounded.
+- `detached?: boolean` — Default: `false`. Whether the sheet is detached from the screen edges by a 16dp margin, with all four corners rounded. On each edge that `insetTop`, `insetBottom` or `insetSides` turns on, the margin starts at the safe-area inset, so the whole sheet stays clear of the notch.
 - `width?: number` — Default: `256`. Width of the sheet in dp. A modal sheet shrinks on a narrow window, so a strip of scrim stays visible. Set the width here and not in `style`: the slide distance of a modal sheet comes from this value.
-- `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the top safe-area inset. The container color still extends under the inset.
-- `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the bottom safe-area inset.
-- `insetSides?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the safe-area inset of the screen edge it sits on, which `edge` picks. In landscape this keeps the content clear of the notch. The inset is 0 in portrait.
+- `insetTop?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the top safe-area inset. The container color still extends under the inset. A detached sheet adds the inset to its margin instead.
+- `insetBottom?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the bottom safe-area inset. A detached sheet adds the inset to its margin instead.
+- `insetSides?: boolean` — Default: `true for 'modal', false for 'standard'`. Whether the sheet's content is padded by the safe-area inset of the screen edge it sits on, which `edge` picks. In landscape this keeps the content clear of the notch. The inset is 0 in portrait. A detached sheet adds the inset to its margin instead.
 - `containerColor?: string` — Default: `surfaceContainerLow for 'modal', surface for 'standard'`. Override the sheet background.
 - `contentColor?: string` — Default: `onSurface for the headline, onSurfaceVariant for the icons`. Override the color of the headline and of the back and close icons. The hover and press layers of the two buttons derive from it.
 - `headlineStyle?: StyleProp<TextStyle>` — Style applied to the headline `Text`.

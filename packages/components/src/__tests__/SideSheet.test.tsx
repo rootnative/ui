@@ -507,6 +507,128 @@ describe('SideSheet — side safe area', () => {
     expect(sidePadding()).toEqual({ left: 0, right: 40 })
   })
 
+  function surfaceMargins() {
+    const surface = getStyle(screen.getByTestId('sheet'))
+    return {
+      top: surface.marginTop,
+      right: surface.marginRight,
+      bottom: surface.marginBottom,
+      left: surface.marginLeft,
+    }
+  }
+
+  function viewsPaddedByAnInset() {
+    return screen.UNSAFE_getAllByType(View).filter((node) => {
+      const style = getStyle(node)
+      return (
+        style?.paddingTop === SIDE_INSETS.top ||
+        style?.paddingRight === SIDE_INSETS.right ||
+        style?.paddingBottom === SIDE_INSETS.bottom ||
+        style?.paddingLeft === SIDE_INSETS.left
+      )
+    })
+  }
+
+  // The 16dp margin starts at the safe area, so the whole card stays clear of
+  // the status bar and the notch. The insets leave the content padding.
+  describe('on a detached sheet', () => {
+    it('adds the insets to the margin at the end edge', async () => {
+      await renderModalWithInsets({ detached: true, testID: 'sheet' })
+      expect(surfaceMargins()).toEqual({
+        top: 63,
+        right: 56,
+        bottom: 50,
+        left: 16,
+      })
+      expect(viewsPaddedByAnInset()).toHaveLength(0)
+    })
+
+    it('adds the left inset at the start edge', async () => {
+      await renderModalWithInsets({
+        detached: true,
+        edge: 'start',
+        testID: 'sheet',
+      })
+      expect(surfaceMargins()).toEqual({
+        top: 63,
+        right: 16,
+        bottom: 50,
+        left: 78,
+      })
+    })
+
+    it('keeps 16dp at the side with insetSides={false}', async () => {
+      await renderModalWithInsets({
+        detached: true,
+        insetSides: false,
+        testID: 'sheet',
+      })
+      expect(surfaceMargins()).toEqual({
+        top: 63,
+        right: 16,
+        bottom: 50,
+        left: 16,
+      })
+    })
+
+    it('adds the insets to a margin from style', async () => {
+      const style = { margin: 8 }
+      await renderModalWithInsets({ detached: true, style, testID: 'sheet' })
+      expect(surfaceMargins()).toEqual({
+        top: 55,
+        right: 48,
+        bottom: 42,
+        left: 8,
+      })
+    })
+
+    it('travels the width and the margin of its side', async () => {
+      await renderModalWithInsets({ detached: true, testID: 'sheet' })
+      const layer = getStyle(screen.getByTestId('sheet-layer'))
+      expect(layer.transform).toEqual([{ translateX: 256 + 56 }])
+    })
+
+    it('adds the insets of a standard sheet that opts in', () => {
+      renderWithTheme(
+        withSideInsets(
+          <SideSheet
+            variant="standard"
+            detached
+            insetTop
+            insetSides
+            testID="sheet"
+          >
+            <Text>Body</Text>
+          </SideSheet>,
+        ),
+      )
+      expect(surfaceMargins()).toEqual({
+        top: 63,
+        right: 56,
+        bottom: 16,
+        left: 16,
+      })
+      expect(viewsPaddedByAnInset()).toHaveLength(0)
+    })
+
+    // With no provider the insets are unknown, so the native safe-area view
+    // still pads the content.
+    it('pads the content outside a SafeAreaProvider', async () => {
+      renderModal({ detached: true })
+      await screen.findByText('Body')
+      expect(surfaceMargins()).toEqual({
+        top: 16,
+        right: 16,
+        bottom: 16,
+        left: 16,
+      })
+      const [area] = screen.UNSAFE_root.findAll((node) =>
+        Array.isArray(node.props.edges),
+      )
+      expect(area?.props.edges).toEqual(['top', 'bottom', 'right'])
+    })
+  })
+
   // In RTL the end edge is the physical left, and React Native puts a
   // `...Right` key on the left side.
   describe('in RTL', () => {
@@ -534,6 +656,18 @@ describe('SideSheet — side safe area', () => {
     it('pads the left inset of the end edge into paddingRight', async () => {
       await renderModalWithInsets()
       expect(sidePadding()).toEqual({ left: 0, right: 62 })
+    })
+
+    it('adds the left inset of a detached end edge to marginRight', async () => {
+      await renderModalWithInsets({ detached: true, testID: 'sheet' })
+      expect(surfaceMargins()).toEqual({
+        top: 63,
+        right: 78,
+        bottom: 50,
+        left: 16,
+      })
+      const layer = getStyle(screen.getByTestId('sheet-layer'))
+      expect(layer.transform).toEqual([{ translateX: -(256 + 78) }])
     })
   })
 })
