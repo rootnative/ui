@@ -8,6 +8,7 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import {
+  isRTLDirection,
   renderIcon,
   resolveColorFromStyle,
   resolveLogicalKey,
@@ -32,6 +33,7 @@ import {
   getResolvedItemColors,
   getSizeTokens,
   iconGapStyle,
+  mirrorItemCornerRadii,
 } from './styles'
 import type {
   ButtonGroupItem,
@@ -264,15 +266,18 @@ function ButtonGroupItemImpl({
     [size, marginStartKey],
   )
 
-  const unselectedRadii = useMemo(
-    () => getItemCornerRadii(theme, variant, size, index, total, false),
-    [theme, variant, size, index, total],
-  )
+  // Read on each render, not in a memo, so the corners follow a runtime change
+  // of the document `dir`. See `mirrorItemCornerRadii`.
+  const mirrorsOnWeb = Platform.OS === 'web' && isRTLDirection()
+  const unselectedRadii = useMemo(() => {
+    const radii = getItemCornerRadii(theme, variant, size, index, total, false)
+    return mirrorsOnWeb ? mirrorItemCornerRadii(radii) : radii
+  }, [theme, variant, size, index, total, mirrorsOnWeb])
 
-  const selectedRadii = useMemo(
-    () => getItemCornerRadii(theme, variant, size, index, total, true),
-    [theme, variant, size, index, total],
-  )
+  const selectedRadii = useMemo(() => {
+    const radii = getItemCornerRadii(theme, variant, size, index, total, true)
+    return mirrorsOnWeb ? mirrorItemCornerRadii(radii) : radii
+  }, [theme, variant, size, index, total, mirrorsOnWeb])
 
   const selectedProgress = useAnimation(isSelected ? 1 : 0, selectedTransition)
 

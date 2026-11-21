@@ -205,6 +205,21 @@ export interface ItemCornerRadii {
  * edges square down. The selected item morphs all four corners to a
  * smaller "selected" radius defined by the size token.
  */
+/**
+ * The radii of an item, mirrored left for right. The connected corners are
+ * physical keys. React Native swaps them in an RTL layout on native, and
+ * react-native-web never does, so under an RTL document on the web the first
+ * item, which sits at the right, needs the corners of the last.
+ */
+export function mirrorItemCornerRadii(radii: ItemCornerRadii): ItemCornerRadii {
+  return {
+    topLeft: radii.topRight,
+    topRight: radii.topLeft,
+    bottomLeft: radii.bottomRight,
+    bottomRight: radii.bottomLeft,
+  }
+}
+
 export function getItemCornerRadii(
   theme: MaterialTheme,
   variant: ButtonGroupVariant,

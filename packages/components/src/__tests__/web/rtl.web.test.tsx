@@ -1794,3 +1794,63 @@ describe('Box and Switch follow a change of the document dir', () => {
     expect(haloNode()?.style.right).toBe(halo)
   })
 })
+
+// A connected group rounds the outer corners of its first and last items. The
+// radii are physical keys: React Native swaps them in an RTL layout on native,
+// and react-native-web never does. In a browser in RTL the first item sat at
+// the right with its round corners on its inner side.
+describe('ButtonGroup rounds the outer corners of a connected group', () => {
+  const group = () => (
+    <ButtonGroup
+      variant="connected"
+      items={[
+        { value: 'day', label: 'Day' },
+        { value: 'week', label: 'Week' },
+        { value: 'month', label: 'Month' },
+      ]}
+    />
+  )
+  // The item is the nearest ancestor of its label with inline radii.
+  const corners = (label: string) => {
+    let node = screen.getByText(label) as HTMLElement | null
+    while (node && !node.style.borderTopLeftRadius) node = node.parentElement
+    const style = (node as HTMLElement).style
+    return {
+      left: [style.borderTopLeftRadius, style.borderBottomLeftRadius],
+      right: [style.borderTopRightRadius, style.borderBottomRightRadius],
+    }
+  }
+  const outer = `${lightTheme.shape.cornerFull}px`
+  const inner = `${lightTheme.shape.cornerExtraSmall}px`
+
+  it('in LTR and under dir="rtl"', () => {
+    const ltr = renderWeb(group())
+    expect(corners('Day')).toEqual({
+      left: [outer, outer],
+      right: [inner, inner],
+    })
+    expect(corners('Month')).toEqual({
+      left: [inner, inner],
+      right: [outer, outer],
+    })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(group())
+    expect(corners('Day')).toEqual({
+      left: [inner, inner],
+      right: [outer, outer],
+    })
+    expect(corners('Month')).toEqual({
+      left: [outer, outer],
+      right: [inner, inner],
+    })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(group())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(group())
+    expect(corners('Day').right).toEqual([outer, outer])
+  })
+})
