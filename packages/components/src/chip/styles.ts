@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { ChipVariant } from './types'
 
@@ -160,8 +161,6 @@ export function createStyles(
   variant: ChipVariant,
   elevated: boolean,
   selected: boolean,
-  hasLeadingContent: boolean,
-  hasTrailingContent: boolean,
   containerColor?: string,
   contentColor?: string,
 ) {
@@ -187,8 +186,6 @@ export function createStyles(
       alignItems: 'center',
       flexDirection: 'row',
       height: CHIP_HEIGHT,
-      paddingStart: hasLeadingContent ? 8 : 16,
-      paddingEnd: hasTrailingContent ? 8 : 16,
       borderRadius: restRadius,
       borderColor: colors.borderColor,
       borderWidth: colors.borderWidth,
@@ -247,11 +244,8 @@ export function createStyles(
     disabledLabel: {
       color: colors.disabledTextColor,
     },
-    leadingIcon: {
-      marginEnd: theme.spacing.sm,
-    },
+    // `contentGapStyle` adds the gap to the label.
     avatar: {
-      marginEnd: theme.spacing.sm,
       width: 24,
       height: 24,
       borderRadius: 12,
@@ -263,9 +257,9 @@ export function createStyles(
     // the chip would render <button> inside <button> on web (invalid DOM).
     // Position mirrors the flex layout: trailing padding is 8 when a close
     // target is shown, and the 24dp circle centers in the 32dp chip height.
+    // `closeButtonPositionStyle` gives the 8dp from the end edge.
     closeButton: {
       position: 'absolute' as const,
-      end: 8,
       top: 4,
       width: 24,
       height: 24,
@@ -280,9 +274,46 @@ export function createStyles(
     // In-flow placeholder that keeps the chip's width identical to the old
     // nested layout (close icon width + its 8dp leading margin).
     closeSpacer: {
-      marginStart: theme.spacing.sm,
       width: 24,
       height: 24,
     },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/**
+ * The side padding of the container: 8dp on a side with an icon, an avatar or
+ * a close target, 16dp otherwise. A `StyleSheet` style, as before, so a
+ * consumer `style` keeps its precedence on the web: react-native-web puts an
+ * inline key above each of its classes.
+ */
+export function containerInsetStyle(
+  startKey: string,
+  endKey: string,
+  hasLeadingContent: boolean,
+  hasTrailingContent: boolean,
+): ViewStyle {
+  return StyleSheet.create({
+    inset: {
+      [startKey]: hasLeadingContent ? 8 : 16,
+      [endKey]: hasTrailingContent ? 8 : 16,
+    },
+  }).inset
+}
+
+/** The 8dp gap between the label and the content beside it. */
+export function contentGapStyle(
+  theme: MaterialTheme,
+  labelSideKey: string,
+): ViewStyle {
+  return { [labelSideKey]: theme.spacing.sm }
+}
+
+/** The close target sits 8dp from the end edge, in the trailing padding. */
+export function closeButtonPositionStyle(endKey: string): ViewStyle {
+  return { [endKey]: 8 }
 }

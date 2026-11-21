@@ -47,6 +47,7 @@ import { ButtonGroup } from '../../button-group'
 import { Carousel } from '../../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
+import { Chip } from '../../chip'
 import { FAB } from '../../fab'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
@@ -1242,5 +1243,98 @@ describe('FAB places its one-sided styles for the document direction', () => {
     view.rerender(fab())
     expect(padding()).toEqual({ left: '20px', right: '16px' })
     expect(iconGap().left).toBe('12px')
+  })
+})
+
+// A chip pads 8dp on a side with content and 16dp otherwise, keeps 8dp between
+// the label and an icon, an avatar or the close spacer, and places its close
+// target 8dp from the end edge. In RTL each stayed on its LTR side, so the
+// close target sat at the right, on top of the avatar or the check icon. The
+// container padding is a `StyleSheet` class, read with `getComputedStyle`.
+describe('Chip places its one-sided styles for the document direction', () => {
+  const assist = () => (
+    <Chip variant="assist" leadingIcon="star" testID="chip">
+      Favorite
+    </Chip>
+  )
+  const input = () => (
+    <Chip
+      variant="input"
+      avatar={<Text>JD</Text>}
+      onClose={() => {}}
+      testID="chip"
+    >
+      Ada
+    </Chip>
+  )
+  const padding = () => {
+    const computed = getComputedStyle(screen.getByTestId('chip'))
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
+  const margins = (element: Element | null) => {
+    const { style } = element as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('pads 8dp on the side of the icon and 16dp on the other side', () => {
+    const ltr = renderWeb(assist())
+    expect(padding()).toEqual({ left: '8px', right: '16px' })
+    expect(screen.getByTestId('chip').style.paddingLeft).toBe('')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(assist())
+    expect(padding()).toEqual({ left: '16px', right: '8px' })
+  })
+
+  it('keeps the icon and avatar gaps on the side of the label', () => {
+    const ltr = renderWeb(assist())
+    expect(margins(screen.getByText('star').parentElement)).toEqual({
+      left: '',
+      right: '8px',
+    })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    const rtl = renderWeb(assist())
+    expect(margins(screen.getByText('star').parentElement)).toEqual({
+      left: '8px',
+      right: '',
+    })
+    rtl.unmount()
+
+    renderWeb(input())
+    expect(margins(screen.getByText('JD').parentElement)).toEqual({
+      left: '8px',
+      right: '',
+    })
+  })
+
+  it('places the close target and its spacer at the end', () => {
+    const ltr = renderWeb(input())
+    const ltrClose = screen.getByLabelText('Remove Ada')
+    expect([ltrClose.style.left, ltrClose.style.right]).toEqual(['', '8px'])
+    expect(margins(screen.getByTestId('chip').lastElementChild)).toEqual({
+      left: '8px',
+      right: '',
+    })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(input())
+    const rtlClose = screen.getByLabelText('Remove Ada')
+    expect([rtlClose.style.left, rtlClose.style.right]).toEqual(['8px', ''])
+    expect(margins(screen.getByTestId('chip').lastElementChild)).toEqual({
+      left: '',
+      right: '8px',
+    })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(assist())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(assist())
+    expect(padding()).toEqual({ left: '16px', right: '8px' })
+    expect(margins(screen.getByText('star').parentElement).left).toBe('8px')
   })
 })

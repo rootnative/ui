@@ -10,6 +10,7 @@ import {
   alphaColor,
   renderIcon,
   resolveColorFromStyle,
+  resolveLogicalKey,
 } from '@rootnative/utils'
 import type { IconSource } from '@rootnative/utils'
 import { type ReactNode, useCallback, useMemo, useState } from 'react'
@@ -36,6 +37,9 @@ import { composePressHandlers, usePressMorph } from '../internal/usePressMorph'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   CHIP_FOCUS_RING_OFFSET,
+  closeButtonPositionStyle,
+  containerInsetStyle,
+  contentGapStyle,
   getChipSelectedRadius,
   createStyles,
   getChipRestRadius,
@@ -132,21 +136,40 @@ export function Chip(props: ChipProps) {
         variant,
         elevated,
         isSelected,
-        hasLeadingContent,
-        showCloseIcon,
         containerColor,
         contentColor,
       ),
-    [
-      theme,
-      variant,
-      elevated,
-      isSelected,
-      hasLeadingContent,
-      showCloseIcon,
-      containerColor,
-      contentColor,
-    ],
+    [theme, variant, elevated, isSelected, containerColor, contentColor],
+  )
+
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const endKey = resolveLogicalKey('end')
+  const containerInset = useMemo(
+    () =>
+      containerInsetStyle(
+        paddingStartKey,
+        paddingEndKey,
+        hasLeadingContent,
+        showCloseIcon,
+      ),
+    [paddingStartKey, paddingEndKey, hasLeadingContent, showCloseIcon],
+  )
+  const leadingGap = useMemo(
+    () => contentGapStyle(theme, marginEndKey),
+    [theme, marginEndKey],
+  )
+  const closeSpacerGap = useMemo(
+    () => contentGapStyle(theme, marginStartKey),
+    [theme, marginStartKey],
+  )
+  const closePosition = useMemo(
+    () => closeButtonPositionStyle(endKey),
+    [endKey],
   )
 
   const colors = useMemo(
@@ -353,18 +376,18 @@ export function Chip(props: ChipProps) {
 
   const renderLeadingContent = () => {
     if (variant === 'input' && avatar) {
-      return <View style={styles.avatar}>{avatar}</View>
+      return <View style={[styles.avatar, leadingGap]}>{avatar}</View>
     }
     if (leadingIcon) {
       return (
-        <View aria-hidden style={styles.leadingIcon}>
+        <View aria-hidden style={leadingGap}>
           {renderIcon(leadingIcon, leadingIconRenderProps, iconResolver)}
         </View>
       )
     }
     if (variant === 'filter' && isSelected) {
       return (
-        <View aria-hidden style={styles.leadingIcon}>
+        <View aria-hidden style={leadingGap}>
           {renderIcon('check', leadingIconRenderProps, iconResolver)}
         </View>
       )
@@ -387,7 +410,9 @@ export function Chip(props: ChipProps) {
       <Text numberOfLines={1} style={computedLabelStyle}>
         {children}
       </Text>
-      {showCloseIcon ? <View style={styles.closeSpacer} /> : null}
+      {showCloseIcon ? (
+        <View style={[styles.closeSpacer, closeSpacerGap]} />
+      ) : null}
     </>
   )
 
@@ -428,6 +453,7 @@ export function Chip(props: ChipProps) {
               : composeHandlers(composedHandlers, rest))}
             style={[
               styles.container,
+              containerInset,
               webOutlineReset,
               // The gesture-layer style owns backgroundColor, also while
               // disabled: removing an animated style leaves its last value on
@@ -454,6 +480,7 @@ export function Chip(props: ChipProps) {
             {...rest}
             style={[
               styles.container,
+              containerInset,
               animatedRadiusStyle,
               styles.staticContainer,
               isDisabled ? styles.disabledContainer : undefined,
@@ -483,6 +510,7 @@ export function Chip(props: ChipProps) {
             {...(isDisabled ? undefined : closeHandlers)}
             style={[
               styles.closeButton,
+              closePosition,
               isDisabled ? styles.disabledCloseButton : undefined,
               animatedCloseStyle,
             ]}
