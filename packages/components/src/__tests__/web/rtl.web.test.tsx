@@ -749,16 +749,20 @@ describe('SideSheet places its one-sided styles for the document direction', () 
     )
   }
 
+  // The corners are a `StyleSheet` class, so they are read with
+  // `getComputedStyle`. The layer and the header padding are inline.
   function sides(element: HTMLElement, key: 'padding' | 'corners') {
-    const { style } = element
-    return key === 'padding'
-      ? { left: style.paddingLeft, right: style.paddingRight }
-      : {
-          topLeft: style.borderTopLeftRadius,
-          bottomLeft: style.borderBottomLeftRadius,
-          topRight: style.borderTopRightRadius,
-          bottomRight: style.borderBottomRightRadius,
-        }
+    if (key === 'padding') {
+      const { style } = element
+      return { left: style.paddingLeft, right: style.paddingRight }
+    }
+    const computed = getComputedStyle(element)
+    return {
+      topLeft: computed.borderTopLeftRadius,
+      bottomLeft: computed.borderBottomLeftRadius,
+      topRight: computed.borderTopRightRadius,
+      bottomRight: computed.borderBottomRightRadius,
+    }
   }
 
   const layer = () => screen.getByTestId('sheet-layer')
@@ -909,17 +913,23 @@ describe('NavigationDrawer places its one-sided styles for the document directio
       </PortalHost>
     </SafeAreaProvider>
   )
+  // The layer padding is inline. The corners and the item padding are
+  // `StyleSheet` classes, so they are read with `getComputedStyle`.
   const padding = (testID: string) => {
     const { style } = screen.getByTestId(testID)
     return { left: style.paddingLeft, right: style.paddingRight }
   }
+  const itemPadding = () => {
+    const computed = getComputedStyle(screen.getByTestId('home'))
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
   const corners = () => {
-    const { style } = screen.getByTestId('drawer')
+    const computed = getComputedStyle(screen.getByTestId('drawer'))
     return {
-      topLeft: style.borderTopLeftRadius,
-      bottomLeft: style.borderBottomLeftRadius,
-      topRight: style.borderTopRightRadius,
-      bottomRight: style.borderBottomRightRadius,
+      topLeft: computed.borderTopLeftRadius,
+      bottomLeft: computed.borderBottomLeftRadius,
+      topRight: computed.borderTopRightRadius,
+      bottomRight: computed.borderBottomRightRadius,
     }
   }
   const endCorners = {
@@ -957,23 +967,23 @@ describe('NavigationDrawer places its one-sided styles for the document directio
 
   it('pads an item 16dp at the start and 24dp at the end', () => {
     const ltr = renderWeb(drawer())
-    expect(padding('home')).toEqual({ left: '16px', right: '24px' })
+    expect(itemPadding()).toEqual({ left: '16px', right: '24px' })
     ltr.unmount()
 
     document.documentElement.setAttribute('dir', 'rtl')
     renderWeb(drawer())
-    expect(padding('home')).toEqual({ left: '24px', right: '16px' })
+    expect(itemPadding()).toEqual({ left: '24px', right: '16px' })
   })
 
-  // jsdom 20 doesn't remove a padding key that React empties, so this reads
-  // the item padding (both keys stay) and the corners (a radius key clears).
+  // jsdom 20 doesn't remove an inline padding key that React empties, so the
+  // layer check reads only the new side.
   it('follows a change of the document dir on the next render', () => {
     const view = renderWeb(drawer())
-    expect(padding('home')).toEqual({ left: '16px', right: '24px' })
+    expect(itemPadding()).toEqual({ left: '16px', right: '24px' })
 
     document.documentElement.setAttribute('dir', 'rtl')
     view.rerender(drawer())
-    expect(padding('home')).toEqual({ left: '24px', right: '16px' })
+    expect(itemPadding()).toEqual({ left: '24px', right: '16px' })
     expect(corners()).toEqual(endCornersRtl)
     expect(padding('drawer-layer').left).toBe('56px')
   })
@@ -982,7 +992,7 @@ describe('NavigationDrawer places its one-sided styles for the document directio
 // react-native-web merges styles by key name. In LTR the library writes the
 // logical key, so a consumer style with the same key replaces it. A physical
 // `paddingLeft` would stay inline and win over the consumer's class.
-describe('a consumer style replaces a one-sided key of the same name in LTR', () => {
+describe('a consumer style keeps its precedence over a one-sided key in LTR', () => {
   const consumer = StyleSheet.create({
     item: { paddingStart: 4 },
     sheet: { borderTopStartRadius: 4 },
@@ -1007,11 +1017,11 @@ describe('a consumer style replaces a one-sided key of the same name in LTR', ()
         </PortalHost>
       </SafeAreaProvider>,
     )
-    const { style } = screen.getByTestId('home')
-    expect({ left: style.paddingLeft, right: style.paddingRight }).toEqual({
-      left: '',
-      right: '24px',
-    })
+    const computed = getComputedStyle(screen.getByTestId('home'))
+    expect({
+      left: computed.paddingLeft,
+      right: computed.paddingRight,
+    }).toEqual({ left: '4px', right: '24px' })
   })
 
   it('lets a borderTopStartRadius replace the sheet corner', () => {
@@ -1029,11 +1039,48 @@ describe('a consumer style replaces a one-sided key of the same name in LTR', ()
         </PortalHost>
       </SafeAreaProvider>,
     )
-    const { style } = screen.getByTestId('sheet')
+    const computed = getComputedStyle(screen.getByTestId('sheet'))
     expect({
-      topLeft: style.borderTopLeftRadius,
-      bottomLeft: style.borderBottomLeftRadius,
-    }).toEqual({ topLeft: '', bottomLeft: '16px' })
+      topLeft: computed.borderTopLeftRadius,
+      bottomLeft: computed.borderBottomLeftRadius,
+    }).toEqual({ topLeft: '4px', bottomLeft: '16px' })
+  })
+
+  // react-native-web ranks a physical class above a logical one, and an inline
+  // key above every class. So these styles stay classes, as they were with
+  // logical keys, and a consumer `paddingLeft` class still wins. A direct check
+  // with a consumer class would depend on rule order: the rule cache can give
+  // the library class the rank of a physical rule from an earlier RTL render.
+  it('keeps the item padding and the corners out of the inline style', () => {
+    const view = renderWeb(
+      <SafeAreaProvider initialMetrics={zeroInsets}>
+        <PortalHost>
+          <NavigationDrawer visible onDismiss={() => {}} testID="drawer">
+            <NavigationDrawer.Item value="home" label="Home" testID="home" />
+          </NavigationDrawer>
+        </PortalHost>
+      </SafeAreaProvider>,
+    )
+    const item = screen.getByTestId('home')
+    expect(item.style.paddingLeft).toBe('')
+    expect(getComputedStyle(item).paddingLeft).toBe('16px')
+    const drawer = screen.getByTestId('drawer')
+    expect(drawer.style.borderTopRightRadius).toBe('')
+    expect(getComputedStyle(drawer).borderTopRightRadius).toBe('16px')
+    view.unmount()
+
+    renderWeb(
+      <SafeAreaProvider initialMetrics={zeroInsets}>
+        <PortalHost>
+          <SideSheet visible onDismiss={() => {}} testID="sheet">
+            <Text>Sheet</Text>
+          </SideSheet>
+        </PortalHost>
+      </SafeAreaProvider>,
+    )
+    const sheet = screen.getByTestId('sheet')
+    expect(sheet.style.borderTopLeftRadius).toBe('')
+    expect(getComputedStyle(sheet).borderTopLeftRadius).toBe('16px')
   })
 })
 

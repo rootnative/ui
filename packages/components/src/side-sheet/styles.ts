@@ -82,16 +82,22 @@ export function headerInsetStyle(
   }
 }
 
-/** The rounded corners of a docked modal sheet, on the side of the content. */
+/**
+ * The rounded corners of a docked modal sheet, on the side of the content. A
+ * `StyleSheet` style, so a consumer `style` keeps its precedence on the web:
+ * react-native-web puts an inline key above each of its classes.
+ */
 export function contentCornerStyle(
   theme: MaterialTheme,
   topKey: string,
   bottomKey: string,
 ): ViewStyle {
-  return {
-    [topKey]: theme.shape.cornerLarge,
-    [bottomKey]: theme.shape.cornerLarge,
-  }
+  return StyleSheet.create({
+    corners: {
+      [topKey]: theme.shape.cornerLarge,
+      [bottomKey]: theme.shape.cornerLarge,
+    },
+  }).corners
 }
 
 export interface DetachedMargin {

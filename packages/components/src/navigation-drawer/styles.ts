@@ -134,24 +134,32 @@ export function scrimGapStyle(endKey: string): ViewStyle {
   return { [endKey]: DRAWER_MIN_SCRIM_WIDTH }
 }
 
+// The two styles below go on nodes that take a consumer `style`, so they are
+// `StyleSheet` styles: react-native-web puts an inline key above each of its
+// classes, and an inline style here would beat a consumer `paddingLeft`.
+
 /** The rounded end corners of a modal drawer. */
 export function endCornerStyle(
   theme: MaterialTheme,
   topEndKey: string,
   bottomEndKey: string,
 ): ViewStyle {
-  return {
-    [topEndKey]: theme.shape.cornerLarge,
-    [bottomEndKey]: theme.shape.cornerLarge,
-  }
+  return StyleSheet.create({
+    corners: {
+      [topEndKey]: theme.shape.cornerLarge,
+      [bottomEndKey]: theme.shape.cornerLarge,
+    },
+  }).corners
 }
 
 /** The side padding of an item: 16dp at the start, 24dp at the end. */
 export function itemInsetStyle(startKey: string, endKey: string): ViewStyle {
-  return {
-    [startKey]: DRAWER_ITEM_PADDING_START,
-    [endKey]: DRAWER_ITEM_PADDING_END,
-  }
+  return StyleSheet.create({
+    inset: {
+      [startKey]: DRAWER_ITEM_PADDING_START,
+      [endKey]: DRAWER_ITEM_PADDING_END,
+    },
+  }).inset
 }
 
 export function createNavigationDrawerItemStyles(
