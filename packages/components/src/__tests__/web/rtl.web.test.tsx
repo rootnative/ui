@@ -6,14 +6,18 @@
  * (`react-native-web/dist/cjs/exports/I18nManager/index.js`). It is wired to
  * nothing, so it reports LTR forever regardless of how the page is laid out.
  *
- * That is not a cosmetic gap, because RNW mirrors *layout* perfectly well
- * without it: it emits CSS logical properties (`padding-inline-start`, never
- * `padding-left`), which the browser resolves against the inherited
- * `direction`. The result was a page whose boxes mirrored correctly under
- * `dir="rtl"` while every JS `isRTL` branch still answered "LTR" — a back arrow
- * pointing the wrong way inside a correctly mirrored app bar, a Slider whose
- * drag maths ran backwards, and Menu/Tooltip `align="start"` resolving to the
- * wrong physical edge.
+ * That is not a cosmetic gap, because the browser mirrors part of the layout
+ * without it: a flex row runs from the right under the inherited `direction`.
+ * The result was a page whose rows mirrored under `dir="rtl"` while every JS
+ * `isRTL` branch still answered "LTR" — a back arrow pointing the wrong way
+ * inside a mirrored app bar, a Slider whose drag maths ran backwards, and
+ * Menu/Tooltip `align="start"` resolving to the wrong physical edge.
+ *
+ * react-native-web doesn't mirror a logical style key, such as `paddingStart`.
+ * It resolves the key in JavaScript from its locale context, which is LTR
+ * unless a `View` has a `dir` or `lang` prop, and it writes the physical
+ * property (`padding-left`). A `StyleSheet.create` class gets the same result.
+ * So a one-sided inset takes its key from `resolveLogicalKey`.
  *
  * The fix reads the browser's real direction on web (`packages/utils/src/rtl.ts`),
  * so these tests set `dir` on the document and read the outcome back. The native
@@ -21,13 +25,10 @@
  * which stubs `I18nManager` directly — it cannot see this, and this cannot see
  * that.
  *
- * **jsdom caveat, and why these assert on behaviour rather than on CSS.** jsdom
- * does not implement logical properties or `direction` inheritance: under
- * `dir="rtl"` it still reports `padding-left` unchanged and computes
- * `direction` as `''`. So the *mirroring* itself is not observable here — only
- * a real browser resolves it, and it is Chromium-verified rather than asserted
- * in this file. What these tests do cover is the part that was actually broken:
- * the JS branches that pick an icon, an edge, or a direction sign.
+ * **jsdom caveat.** jsdom doesn't lay out, and it computes `direction` as
+ * `''`. So the mirroring of a row isn't observable here; it is checked in
+ * Chromium. These tests assert the JS branches that pick an icon, an edge, a
+ * direction sign, or the physical key that reaches the element.
  */
 import {
   isRTLDirection,
@@ -221,12 +222,12 @@ describe('the inputs align with the start edge of the document', () => {
 })
 
 /**
- * A style from `StyleSheet.create` mirrors through CSS, but react-native-web
- * resolves the logical keys of an *inline* style object in JavaScript, from a
- * locale context that defaults to LTR and that `dir` never updates. So an
- * inline `{ start: 56 }` is `left: 56px` under `dir="rtl"`. `resolveLogical`
- * writes the physical key for the document direction instead. jsdom cannot
- * show the mirroring, but it does show which key reached the element.
+ * react-native-web resolves a logical key in JavaScript, from a locale context
+ * that defaults to LTR and that the document `dir` never updates. That's true
+ * for an inline style object and for a `StyleSheet.create` class. So
+ * `{ start: 56 }` is `left: 56px` under `dir="rtl"`. `resolveLogical` writes the
+ * physical key for the document direction instead, and jsdom shows which key
+ * reached the element.
  */
 describe('resolveLogical writes the physical key for the document direction', () => {
   it('resolves to the left edge in LTR', () => {

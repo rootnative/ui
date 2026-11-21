@@ -12,16 +12,16 @@ import { I18nManager, Platform } from 'react-native'
  * wired to anything, so on web it reports LTR forever no matter how the page is
  * actually laid out.
  *
- * That mattered because RNW *does* mirror layout correctly on its own: it emits
- * CSS logical properties (`padding-inline-start`, not `padding-left`), which the
- * browser resolves against the inherited `direction`. So a page under
- * `<html dir="rtl">` mirrored its boxes while every JS `isRTL` branch in the
+ * That mattered because the browser mirrors part of the layout on its own: a
+ * flex row runs from the right under the inherited `direction`. So a page under
+ * `<html dir="rtl">` mirrored its rows while every JS `isRTL` branch in the
  * library still answered "LTR" — a back arrow pointing the wrong way inside a
- * correctly mirrored bar.
+ * mirrored bar.
  *
  * So on web the browser is the source of truth, read from the document element's
- * resolved `direction`. That is the same value the logical properties resolve
- * against, which is what keeps the JS branches and the CSS agreeing.
+ * resolved `direction`. The browser lays out the rows from the same value, so
+ * the JS branches and the layout agree. react-native-web doesn't follow it for
+ * a logical style key: see `resolveLogicalKey`.
  *
  * Deliberately read per call rather than cached: `dir` is a DOM attribute a
  * consumer can flip at runtime (a language switcher), unlike the native flag
@@ -40,8 +40,8 @@ function isRTL(): boolean {
   // `getComputedStyle` resolves inheritance and the UA default, so this is
   // right whether the consumer sets `dir="rtl"`, `style="direction:rtl"`, or a
   // stylesheet rule. It reports the *document* direction — a subtree that opts
-  // into the opposite direction mirrors via CSS, but is not detectable here
-  // without an element to measure against, which these call sites do not have.
+  // into the opposite direction is not detectable here without an element to
+  // measure against, which these call sites do not have.
   if (typeof getComputedStyle === 'function') {
     const direction = getComputedStyle(element).direction
     // jsdom leaves this empty rather than resolving the UA default, so fall
@@ -83,7 +83,8 @@ export function isRTLDirection(): boolean {
 }
 
 /**
- * The logical style keys that an inline style object cannot carry on web.
+ * The logical style keys that a style cannot carry on web under
+ * `<html dir="rtl">`.
  */
 export type LogicalStyleKey =
   | 'start'
@@ -114,19 +115,18 @@ const PHYSICAL_KEYS: Record<
 }
 
 /**
- * The key to write for a logical inset in an inline style object.
+ * The key to write for a logical inset in a style.
  *
- * A style from `StyleSheet.create` mirrors on web through CSS: react-native-web
- * compiles `start` into one rule for `[dir="ltr"]` and one for `[dir="rtl"]`,
- * and the browser picks. An inline style object, which is any object built
- * during render, takes a different path: react-native-web resolves its logical
- * keys in JavaScript from a locale context that defaults to LTR and that no
- * `dir` attribute updates. So `{ start: 56 }` in an inline style is
- * `left: 56px` under `<html dir="rtl">`, and the element sits at the wrong
+ * react-native-web resolves a logical key in JavaScript, from the `dir` or
+ * `lang` prop of the nearest `View` or from its locale context, which is LTR
+ * by default. The `dir` attribute of the document doesn't change it. A style
+ * from `StyleSheet.create` is no exception: react-native-web compiles one class
+ * for each direction and picks one from the same context. So `{ start: 56 }`
+ * is `left: 56px` under `<html dir="rtl">`, and the element sits at the wrong
  * edge.
  *
  * This returns the physical key for the document direction on web, and the
- * logical key itself on native, where inline logical keys work.
+ * logical key itself on native, where logical keys work.
  */
 export function resolveLogicalKey(key: LogicalStyleKey): string {
   if (Platform.OS !== 'web') return key

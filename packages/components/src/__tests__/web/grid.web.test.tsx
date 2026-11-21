@@ -12,8 +12,8 @@
  * takes the *inline* path, not the `StyleSheet`-class path — and the inline
  * path resolves logical properties to **physical** ones at render time against
  * RNW's locale context (LTR by default): the DOM shows `padding-left`, never
- * `padding-inline-start`. The logical-property emission documented for RNW
- * applies to class-based styles only.
+ * `padding-inline-start`. The class path does the same: RNW compiles one class
+ * for each direction and picks one from the same context.
  *
  * The consequence: the gutter's direction-correctness on web does NOT come
  * from logical CSS reaching the browser. It comes from the gutter being
