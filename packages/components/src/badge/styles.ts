@@ -1,5 +1,6 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 
 /**
  * MD3 badge metrics.
@@ -51,21 +52,20 @@ export function createStyles(theme: MaterialTheme) {
       height: BADGE_LARGE_SIZE,
       paddingHorizontal: BADGE_LARGE_HORIZONTAL_PADDING,
     },
+    // `anchorPointEndStyle` and `anchoredOffsetStyle` give the end and start
+    // insets.
     anchorPoint: {
       position: 'absolute',
       top: 0,
-      end: 0,
       flexDirection: 'row',
     },
     anchoredSmall: {
       position: 'absolute',
       top: 0,
-      start: -BADGE_SMALL_OFFSET,
     },
     anchoredLarge: {
       position: 'absolute',
       top: -BADGE_LARGE_SIZE + BADGE_LARGE_VERTICAL_OFFSET,
-      start: -BADGE_LARGE_HORIZONTAL_OFFSET,
     },
     label: {
       ...theme.typography.labelSmall,
@@ -76,4 +76,33 @@ export function createStyles(theme: MaterialTheme) {
       textAlign: 'center',
     },
   })
+}
+
+// The one-sided insets take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `start`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/** Puts the anchor point at the top-end corner of the anchor. */
+export function anchorPointEndStyle(endKey: string): ViewStyle {
+  return { [endKey]: 0 }
+}
+
+/**
+ * The negative start inset that pulls the badge back over the anchor's
+ * corner. A `StyleSheet` style, as before, so a consumer `style` keeps its
+ * precedence on the web: react-native-web puts an inline key above each of
+ * its classes.
+ */
+export function anchoredOffsetStyle(
+  startKey: string,
+  isLarge: boolean,
+): ViewStyle {
+  return StyleSheet.create({
+    offset: {
+      [startKey]: isLarge
+        ? -BADGE_LARGE_HORIZONTAL_OFFSET
+        : -BADGE_SMALL_OFFSET,
+    },
+  }).offset
 }

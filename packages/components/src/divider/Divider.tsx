@@ -1,3 +1,4 @@
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { View } from 'react-native'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -5,6 +6,7 @@ import {
   DIVIDER_LIST_INSET,
   DIVIDER_THICKNESS,
   createDividerStyles,
+  horizontalInsetStyle,
 } from './styles'
 import type { DividerProps } from './types'
 
@@ -39,5 +41,17 @@ export function Divider({
     [theme, startInset, endInset, thickness, containerColor],
   )
 
-  return <View {...props} style={[styles[orientation], style]} />
+  // Keys resolved on each render, not in a memo, so the insets follow a
+  // runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('marginStart')
+  const endKey = resolveLogicalKey('marginEnd')
+  const insetStyle = useMemo(
+    () =>
+      orientation === 'horizontal'
+        ? horizontalInsetStyle(startKey, endKey, startInset, endInset)
+        : undefined,
+    [orientation, startKey, endKey, startInset, endInset],
+  )
+
+  return <View {...props} style={[styles[orientation], insetStyle, style]} />
 }

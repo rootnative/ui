@@ -1,8 +1,13 @@
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Text, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
-import { createStyles } from './styles'
+import {
+  anchorPointEndStyle,
+  anchoredOffsetStyle,
+  createStyles,
+} from './styles'
 import type { BadgeProps } from './types'
 
 export const BADGE_MAX_DEFAULT = 999
@@ -46,6 +51,18 @@ export function Badge({
     () => [styles.label, { color: contentColor ?? theme.colors.onError }],
     [styles.label, contentColor, theme.colors.onError],
   )
+  // Keys resolved on each render, not in a memo, so the badge follows a
+  // runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('start')
+  const endKey = resolveLogicalKey('end')
+  const anchoredOffset = useMemo(
+    () => anchoredOffsetStyle(startKey, isLarge),
+    [startKey, isLarge],
+  )
+  const anchorPointStyle = useMemo(
+    () => [styles.anchorPoint, anchorPointEndStyle(endKey), pointerEvents.none],
+    [styles.anchorPoint, endKey],
+  )
 
   const badge = visible ? (
     <View
@@ -62,6 +79,7 @@ export function Badge({
             ? styles.anchoredLarge
             : styles.anchoredSmall
           : undefined,
+        hasAnchor ? anchoredOffset : undefined,
         style,
         hasAnchor ? pointerEvents.none : undefined,
       ]}
@@ -82,9 +100,7 @@ export function Badge({
       testID={testID === undefined ? undefined : `${testID}-wrapper`}
     >
       {children}
-      {badge === null ? null : (
-        <View style={[styles.anchorPoint, pointerEvents.none]}>{badge}</View>
-      )}
+      {badge === null ? null : <View style={anchorPointStyle}>{badge}</View>}
     </View>
   )
 }

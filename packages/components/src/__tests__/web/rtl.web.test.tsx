@@ -47,6 +47,7 @@ import { createRef, useEffect } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
+import { Badge } from '../../badge'
 import { BottomAppBar } from '../../bottom-app-bar'
 import { Button } from '../../button'
 import { ButtonGroup } from '../../button-group'
@@ -55,6 +56,7 @@ import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
 import { Chip } from '../../chip'
 import { Dialog } from '../../dialog'
+import { Divider } from '../../divider'
 import { FAB } from '../../fab'
 import { resolveAnimatedInsetKey } from '../../internal/resolveAnimatedInsetKey'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
@@ -1668,5 +1670,79 @@ describe('BottomAppBar places its one-sided styles for the document direction', 
     view.rerender(bar())
     expect(fabFrame().style.paddingLeft).toBe('16px')
     expect(row().style.paddingRight).toBe('4px')
+  })
+})
+
+// A divider with `insetStart` keeps 56dp at the start and none at the end. In
+// RTL the inset stayed on the left. The insets are a `StyleSheet` class, read
+// with `getComputedStyle`.
+describe('Divider places its insets for the document direction', () => {
+  const divider = () => <Divider insetStart testID="divider" />
+  const margins = () => {
+    const computed = getComputedStyle(screen.getByTestId('divider'))
+    return { left: computed.marginLeft, right: computed.marginRight }
+  }
+
+  it('in LTR and under dir="rtl"', () => {
+    const ltr = renderWeb(divider())
+    expect(margins()).toEqual({ left: '56px', right: '0px' })
+    expect(screen.getByTestId('divider').style.marginLeft).toBe('')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(divider())
+    expect(margins()).toEqual({ left: '0px', right: '56px' })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(divider())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(divider())
+    expect(margins()).toEqual({ left: '0px', right: '56px' })
+  })
+})
+
+// An anchored badge sits on the top-end corner of its anchor: a zero-size
+// point at the end, and the badge pulled 12dp (6dp small) back from it. In RTL
+// both stayed on the LTR side, so the badge sat on the wrong corner. The pull
+// is a `StyleSheet` class, read with `getComputedStyle`.
+describe('Badge sits on the top-end corner for the document direction', () => {
+  const badge = (label?: string) => (
+    <Badge label={label} testID="badge">
+      <Text>Inbox</Text>
+    </Badge>
+  )
+  const offset = () => {
+    const computed = getComputedStyle(screen.getByTestId('badge'))
+    return { left: computed.left, right: computed.right }
+  }
+  const point = () => {
+    const { style } = screen.getByTestId('badge').parentElement as HTMLElement
+    return { left: style.left, right: style.right }
+  }
+
+  it('in LTR and under dir="rtl"', () => {
+    const ltr = renderWeb(badge('3'))
+    expect(offset().left).toBe('-12px')
+    expect(point()).toEqual({ left: '', right: '0px' })
+    expect(screen.getByTestId('badge').style.left).toBe('')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    const rtl = renderWeb(badge('3'))
+    expect(offset().right).toBe('-12px')
+    expect(point()).toEqual({ left: '0px', right: '' })
+    rtl.unmount()
+
+    renderWeb(badge())
+    expect(offset().right).toBe('-6px')
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(badge('3'))
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(badge('3'))
+    expect(offset().right).toBe('-12px')
+    expect(point().left).toBe('0px')
   })
 })
