@@ -1,6 +1,7 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { ExpressiveSize } from '../internal/size'
 import type { ButtonShape, ButtonVariant } from './types'
@@ -341,14 +342,27 @@ export function getResolvedButtonColors(
   )
 }
 
+/**
+ * Outlined variant overrides the color-derived border width with the
+ * size-specific outline (1/1/1/2/3 dp); other variants keep 0. A selected
+ * outlined toggle has no outline.
+ */
+function getBorderWidth(
+  variant: ButtonVariant,
+  size: ExpressiveSize,
+  colors: VariantColors,
+): number {
+  return variant === 'outlined' && colors.borderWidth > 0
+    ? getButtonSizeTokens(size).outlineWidth
+    : colors.borderWidth
+}
+
 export function createStyles(
   theme: MaterialTheme,
   variant: ButtonVariant,
   size: ExpressiveSize,
   shape: ButtonShape,
   selected: boolean | undefined,
-  hasLeadingIcon: boolean,
-  hasTrailingIcon: boolean,
   containerColor?: string,
   contentColor?: string,
 ) {
@@ -362,20 +376,7 @@ export function createStyles(
   const sizeTokens = getButtonSizeTokens(size)
   const labelStyle: TypographyToken = theme.typography[sizeTokens.labelRole]
   const restCorner = getButtonMorphRadii(theme, size, shape, selected).rest
-  const padding = getHorizontalPadding(
-    theme,
-    variant,
-    size,
-    hasLeadingIcon,
-    hasTrailingIcon,
-  )
-  // Outlined variant overrides the color-derived border width with the
-  // size-specific outline (1/1/1/2/3 dp); other variants keep 0. A selected
-  // outlined toggle has no outline.
-  const borderWidth =
-    variant === 'outlined' && colors.borderWidth > 0
-      ? sizeTokens.outlineWidth
-      : colors.borderWidth
+  const borderWidth = getBorderWidth(variant, size, colors)
   // React Native, and react-native-web with `border-box`, put the border
   // inside the box, outside the padding. MD3 draws the outline inside the
   // token container, so the padding gives up the border width, and an
@@ -393,8 +394,6 @@ export function createStyles(
       justifyContent: 'center',
       minWidth: 58,
       minHeight: sizeTokens.height,
-      paddingStart: padding.paddingStart - borderWidth,
-      paddingEnd: padding.paddingEnd - borderWidth,
       paddingVertical: sizeTokens.paddingVertical - borderWidth,
       borderRadius: restCorner,
       borderColor: colors.borderColor,
@@ -445,18 +444,64 @@ export function createStyles(
     // Button.tsx gives each icon slot a box of the icon size. On the web, a
     // glyph from an icon font can be 1 px taller than its font size
     // (`line-height: normal`, 21 px at 20 px), and the button grew with it.
+    // `iconGapStyle` adds the gap to the label.
     leadingIcon: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginEnd: theme.spacing.sm,
     },
     trailingIcon: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginStart: theme.spacing.sm,
     },
     disabledLabel: {
       color: colors.disabledTextColor,
     },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/**
+ * The side padding of the container: smaller on the side of an icon, less the
+ * border width (see `createStyles`).
+ *
+ * A `StyleSheet` style, as the padding was in `createStyles`, so a consumer
+ * `style` keeps its precedence on the web: react-native-web ranks a physical
+ * key above a logical one in its classes, and an inline style above both.
+ */
+export function containerInsetStyle(
+  theme: MaterialTheme,
+  variant: ButtonVariant,
+  size: ExpressiveSize,
+  colors: VariantColors,
+  hasLeadingIcon: boolean,
+  hasTrailingIcon: boolean,
+  startKey: string,
+  endKey: string,
+): ViewStyle {
+  const padding = getHorizontalPadding(
+    theme,
+    variant,
+    size,
+    hasLeadingIcon,
+    hasTrailingIcon,
+  )
+  const borderWidth = getBorderWidth(variant, size, colors)
+  return StyleSheet.create({
+    inset: {
+      [startKey]: padding.paddingStart - borderWidth,
+      [endKey]: padding.paddingEnd - borderWidth,
+    },
+  }).inset
+}
+
+/** The 8dp gap between an icon and the label, on the side of the label. */
+export function iconGapStyle(
+  theme: MaterialTheme,
+  labelSideKey: string,
+): ViewStyle {
+  return { [labelSideKey]: theme.spacing.sm }
 }

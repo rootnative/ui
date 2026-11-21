@@ -42,6 +42,7 @@ import { createRef } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
+import { Button } from '../../button'
 import { Carousel } from '../../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
@@ -1033,5 +1034,74 @@ describe('a consumer style replaces a one-sided key of the same name in LTR', ()
       topLeft: style.borderTopLeftRadius,
       bottomLeft: style.borderBottomLeftRadius,
     }).toEqual({ topLeft: '', bottomLeft: '16px' })
+  })
+})
+
+// A filled button pads 24dp, and 16dp on the side of an icon, with an 8dp gap
+// between the icon and the label. In a browser in RTL, both stayed on their
+// LTR sides. The container padding is a `StyleSheet` class, so it is read
+// with `getComputedStyle`.
+describe('Button places its one-sided styles for the document direction', () => {
+  const button = (style?: object) => (
+    <Button leadingIcon="check" testID="btn" style={style}>
+      Save
+    </Button>
+  )
+  const padding = () => {
+    const computed = getComputedStyle(screen.getByTestId('btn'))
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
+  const iconGap = () => {
+    const { style } = screen.getByText('check').parentElement as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('pads the icon side 16dp and the other side 24dp', () => {
+    const ltr = renderWeb(button())
+    expect(padding()).toEqual({ left: '16px', right: '24px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(button())
+    expect(padding()).toEqual({ left: '24px', right: '16px' })
+  })
+
+  it('puts the icon gap on the side of the label', () => {
+    const ltr = renderWeb(button())
+    expect(iconGap()).toEqual({ left: '', right: '8px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(button())
+    expect(iconGap()).toEqual({ left: '8px', right: '' })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(button())
+    expect(padding()).toEqual({ left: '16px', right: '24px' })
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(button())
+    expect(padding()).toEqual({ left: '24px', right: '16px' })
+    expect(iconGap().left).toBe('8px')
+  })
+
+  // The padding was a class with a logical key before. react-native-web ranks
+  // a physical key above a logical one, so a consumer `paddingLeft` won, and a
+  // consumer `paddingStart` replaced the key of the same name. Both still do.
+  // Trap: react-native-web caches a rule by its physical property and value,
+  // so a `paddingLeft: 4` reuses the class and the rank of an earlier
+  // `paddingStart: 4`. These values appear in no other test.
+  it('lets a consumer padding class win in LTR', () => {
+    const consumer = StyleSheet.create({
+      physical: { paddingLeft: 3 },
+      logical: { paddingStart: 5 },
+    })
+    const physical = renderWeb(button(consumer.physical))
+    expect(padding().left).toBe('3px')
+    physical.unmount()
+
+    renderWeb(button(consumer.logical))
+    expect(padding().left).toBe('5px')
   })
 })

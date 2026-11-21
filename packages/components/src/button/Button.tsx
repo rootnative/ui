@@ -5,7 +5,11 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import {
+  renderIcon,
+  resolveColorFromStyle,
+  resolveLogicalKey,
+} from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, Text, View, type GestureResponderEvent } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
@@ -27,10 +31,12 @@ import {
   BUTTON_FOCUS_RING_OFFSET,
   BUTTON_FOCUS_RING_WIDTH,
   BUTTON_LOADING_STROKE_RATIO,
+  containerInsetStyle,
   createStyles,
   getButtonMorphRadii,
   getButtonSizeTokens,
   getResolvedButtonColors,
+  iconGapStyle,
 } from './styles'
 import type { ButtonProps } from './types'
 
@@ -102,22 +108,10 @@ export function Button({
         size,
         shape,
         toggleState,
-        hasLeading,
-        hasTrailing,
         containerColor,
         contentColor,
       ),
-    [
-      theme,
-      variant,
-      size,
-      shape,
-      toggleState,
-      hasLeading,
-      hasTrailing,
-      containerColor,
-      contentColor,
-    ],
+    [theme, variant, size, shape, toggleState, containerColor, contentColor],
   )
 
   const colors = useMemo(
@@ -130,6 +124,44 @@ export function Button({
         contentColor,
       ),
     [theme, variant, toggleState, containerColor, contentColor],
+  )
+
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const containerInset = useMemo(
+    () =>
+      containerInsetStyle(
+        theme,
+        variant,
+        size,
+        colors,
+        hasLeading,
+        hasTrailing,
+        paddingStartKey,
+        paddingEndKey,
+      ),
+    [
+      theme,
+      variant,
+      size,
+      colors,
+      hasLeading,
+      hasTrailing,
+      paddingStartKey,
+      paddingEndKey,
+    ],
+  )
+  const leadingIconGap = useMemo(
+    () => iconGapStyle(theme, marginEndKey),
+    [theme, marginEndKey],
+  )
+  const trailingIconGap = useMemo(
+    () => iconGapStyle(theme, marginStartKey),
+    [theme, marginStartKey],
   )
 
   // State-layer crossfade (rest → focus → hover → press, press wins) with
@@ -320,6 +352,7 @@ export function Button({
             : composeHandlers(composedHandlers, props))}
           style={[
             styles.container,
+            containerInset,
             webOutlineReset,
             // The gesture-layer style owns backgroundColor, also while
             // disabled: removing an animated style leaves its last value on
@@ -334,7 +367,10 @@ export function Button({
           ]}
         >
           {isLoading ? (
-            <View aria-hidden style={[styles.leadingIcon, iconBoxStyle]}>
+            <View
+              aria-hidden
+              style={[styles.leadingIcon, leadingIconGap, iconBoxStyle]}
+            >
               <CircularProgress
                 size={resolvedIconSize}
                 thickness={resolvedIconSize * BUTTON_LOADING_STROKE_RATIO}
@@ -343,13 +379,19 @@ export function Button({
               />
             </View>
           ) : leadingIcon ? (
-            <View aria-hidden style={[styles.leadingIcon, iconBoxStyle]}>
+            <View
+              aria-hidden
+              style={[styles.leadingIcon, leadingIconGap, iconBoxStyle]}
+            >
               {renderIcon(leadingIcon, iconRenderProps, iconResolver)}
             </View>
           ) : null}
           <Text style={computedLabelStyle}>{children}</Text>
           {trailingIcon ? (
-            <View aria-hidden style={[styles.trailingIcon, iconBoxStyle]}>
+            <View
+              aria-hidden
+              style={[styles.trailingIcon, trailingIconGap, iconBoxStyle]}
+            >
               {renderIcon(trailingIcon, iconRenderProps, iconResolver)}
             </View>
           ) : null}
