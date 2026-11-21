@@ -18,7 +18,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/elevation-shadow.ts"
   ],
-  "utils": ["color", "elevation", "render-icon"],
+  "utils": ["color", "elevation", "render-icon", "rtl"],
   "componentDependencies": [],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",

@@ -100,13 +100,20 @@ const UTIL_EXPORTS: Record<string, string[]> = {
   'focus-visible': ['useFocusVisible', 'isFocusVisible'],
   pressable: ['resolvePressableStyle', 'resolveColorFromStyle'],
   'render-icon': ['renderIcon'],
-  rtl: ['transformOrigin', 'selectRTL', 'isRTLDirection'],
+  rtl: [
+    'transformOrigin',
+    'selectRTL',
+    'isRTLDirection',
+    'resolveLogicalKey',
+    'resolveLogical',
+  ],
 }
 
 // Utility type-only exports (emitted as `export type {...}` from the barrel)
 const UTIL_TYPE_EXPORTS: Record<string, string[]> = {
   pressable: ['PressableState', 'PressableStyleProp'],
   'render-icon': ['IconSource'],
+  rtl: ['LogicalStyleKey'],
 }
 
 // File extension override — defaults to .ts when omitted.
@@ -126,6 +133,10 @@ const UTIL_DEPS: Record<string, Record<string, string>> = {
 
 // Map from any util export name (value or type) to util file stem
 const EXPORT_TO_UTIL: Record<string, string> = {}
+// `@rootnative/utils` names that a component imports and the two maps above
+// don't list. The CLI writes the utils barrel from those maps, so an installed
+// component that imports such a name doesn't compile.
+const unknownUtilImports = new Set<string>()
 for (const [util, exports] of Object.entries(UTIL_EXPORTS)) {
   for (const exp of exports) {
     EXPORT_TO_UTIL[exp] = util
@@ -338,10 +349,15 @@ function analyzeImports(componentDir: string): {
           const match = line.match(/{([^}]+)}/)
           if (match?.[1]) {
             const names = match[1].split(',').map((s) => s.trim())
-            for (const name of names) {
+            for (const raw of names) {
+              // `type X` and `X as Y` name the export `X`.
+              const name = raw.replace(/^type\s+/, '').split(/\s+as\s+/)[0]
+              if (!name) continue
               const utilFile = EXPORT_TO_UTIL[name]
               if (utilFile) {
                 utils.add(utilFile)
+              } else {
+                unknownUtilImports.add(`${componentDir}: \`${name}\``)
               }
             }
           }
@@ -605,6 +621,20 @@ function findOrphans(generated: Map<string, string>): string[] {
 }
 
 async function main(): Promise<void> {
+  if (unknownUtilImports.size > 0) {
+    console.error(
+      '\nComponents that import a @rootnative/utils name with no map\n',
+    )
+    for (const problem of unknownUtilImports)
+      console.error(`  \u2717 ${problem}`)
+    console.error(
+      '\nAdd the name to UTIL_EXPORTS or UTIL_TYPE_EXPORTS. The CLI writes ' +
+        'the utils barrel from those maps, so an installed component that ' +
+        'imports the name does not compile.\n',
+    )
+    process.exit(1)
+  }
+
   if (unresolvedImports.length > 0) {
     console.error(
       '\nRegistry entries with an import the install cannot resolve\n',

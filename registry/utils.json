@@ -28,7 +28,14 @@
   },
   "rtl": {
     "file": "packages/utils/src/rtl.ts",
-    "exports": ["transformOrigin", "selectRTL", "isRTLDirection"],
-    "dependencies": {}
+    "exports": [
+      "transformOrigin",
+      "selectRTL",
+      "isRTLDirection",
+      "resolveLogicalKey",
+      "resolveLogical"
+    ],
+    "dependencies": {},
+    "typeExports": ["LogicalStyleKey"]
   }
 }
