@@ -102,16 +102,14 @@ type PhysicalStyleKey =
   | 'paddingLeft'
   | 'paddingRight'
 
-const PHYSICAL_KEYS: Record<
-  LogicalStyleKey,
-  readonly [ltr: PhysicalStyleKey, rtl: PhysicalStyleKey]
-> = {
-  start: ['left', 'right'],
-  end: ['right', 'left'],
-  marginStart: ['marginLeft', 'marginRight'],
-  marginEnd: ['marginRight', 'marginLeft'],
-  paddingStart: ['paddingLeft', 'paddingRight'],
-  paddingEnd: ['paddingRight', 'paddingLeft'],
+/** The physical key of each logical key in an RTL layout. */
+const RTL_PHYSICAL_KEYS: Record<LogicalStyleKey, PhysicalStyleKey> = {
+  start: 'right',
+  end: 'left',
+  marginStart: 'marginRight',
+  marginEnd: 'marginLeft',
+  paddingStart: 'paddingRight',
+  paddingEnd: 'paddingLeft',
 }
 
 /**
@@ -125,13 +123,16 @@ const PHYSICAL_KEYS: Record<
  * is `left: 56px` under `<html dir="rtl">`, and the element sits at the wrong
  * edge.
  *
- * This returns the physical key for the document direction on web, and the
- * logical key itself on native, where logical keys work.
+ * So on web under an RTL document this returns the physical key. In each other
+ * case it returns the logical key itself: native resolves it, and on web in
+ * LTR react-native-web puts it on the correct side. The logical key keeps the
+ * precedence of a later style that sets the same key. react-native-web merges
+ * styles by key name, so a consumer `paddingStart` replaces a `paddingStart`
+ * of the library, but not a `paddingLeft`.
  */
 export function resolveLogicalKey(key: LogicalStyleKey): string {
-  if (Platform.OS !== 'web') return key
-  const [ltr, rtl] = PHYSICAL_KEYS[key]
-  return isRTL() ? rtl : ltr
+  if (Platform.OS !== 'web' || !isRTL()) return key
+  return RTL_PHYSICAL_KEYS[key]
 }
 
 /**

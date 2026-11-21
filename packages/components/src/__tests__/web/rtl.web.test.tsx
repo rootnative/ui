@@ -39,7 +39,7 @@ import {
 } from '@rootnative/utils'
 import { act, screen } from '@testing-library/react'
 import { createRef } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
 import { Carousel } from '../../carousel'
@@ -226,15 +226,16 @@ describe('the inputs align with the start edge of the document', () => {
  * that defaults to LTR and that the document `dir` never updates. That's true
  * for an inline style object and for a `StyleSheet.create` class. So
  * `{ start: 56 }` is `left: 56px` under `dir="rtl"`. `resolveLogical` writes the
- * physical key for the document direction instead, and jsdom shows which key
- * reached the element.
+ * physical key under `dir="rtl"` instead, and jsdom shows which key reached the
+ * element. In LTR it keeps the logical key, which react-native-web resolves
+ * to the correct side.
  */
-describe('resolveLogical writes the physical key for the document direction', () => {
-  it('resolves to the left edge in LTR', () => {
-    expect(resolveLogicalKey('start')).toBe('left')
-    expect(resolveLogical('end', 8)).toEqual({ right: 8 })
-    expect(resolveLogical('marginStart', 8)).toEqual({ marginLeft: 8 })
-    expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingRight: 8 })
+describe('resolveLogical writes a key for the document direction', () => {
+  it('keeps the logical key in LTR', () => {
+    expect(resolveLogicalKey('start')).toBe('start')
+    expect(resolveLogical('end', 8)).toEqual({ end: 8 })
+    expect(resolveLogical('marginStart', 8)).toEqual({ marginStart: 8 })
+    expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingEnd: 8 })
   })
 
   it('resolves to the right edge under dir="rtl"', () => {
@@ -974,5 +975,63 @@ describe('NavigationDrawer places its one-sided styles for the document directio
     expect(padding('home')).toEqual({ left: '24px', right: '16px' })
     expect(corners()).toEqual(endCornersRtl)
     expect(padding('drawer-layer').left).toBe('56px')
+  })
+})
+
+// react-native-web merges styles by key name. In LTR the library writes the
+// logical key, so a consumer style with the same key replaces it. A physical
+// `paddingLeft` would stay inline and win over the consumer's class.
+describe('a consumer style replaces a one-sided key of the same name in LTR', () => {
+  const consumer = StyleSheet.create({
+    item: { paddingStart: 4 },
+    sheet: { borderTopStartRadius: 4 },
+  })
+  const zeroInsets = {
+    insets: { top: 0, right: 0, bottom: 0, left: 0 },
+    frame: { x: 0, y: 0, width: 874, height: 402 },
+  }
+
+  it('lets an item paddingStart replace the drawer item padding', () => {
+    renderWeb(
+      <SafeAreaProvider initialMetrics={zeroInsets}>
+        <PortalHost>
+          <NavigationDrawer visible onDismiss={() => {}}>
+            <NavigationDrawer.Item
+              value="home"
+              label="Home"
+              testID="home"
+              style={consumer.item}
+            />
+          </NavigationDrawer>
+        </PortalHost>
+      </SafeAreaProvider>,
+    )
+    const { style } = screen.getByTestId('home')
+    expect({ left: style.paddingLeft, right: style.paddingRight }).toEqual({
+      left: '',
+      right: '24px',
+    })
+  })
+
+  it('lets a borderTopStartRadius replace the sheet corner', () => {
+    renderWeb(
+      <SafeAreaProvider initialMetrics={zeroInsets}>
+        <PortalHost>
+          <SideSheet
+            visible
+            onDismiss={() => {}}
+            testID="sheet"
+            style={consumer.sheet}
+          >
+            <Text>Sheet</Text>
+          </SideSheet>
+        </PortalHost>
+      </SafeAreaProvider>,
+    )
+    const { style } = screen.getByTestId('sheet')
+    expect({
+      topLeft: style.borderTopLeftRadius,
+      bottomLeft: style.borderBottomLeftRadius,
+    }).toEqual({ topLeft: '', bottomLeft: '16px' })
   })
 })
