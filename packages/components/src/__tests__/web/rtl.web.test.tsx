@@ -31,6 +31,11 @@
  * direction sign, or the physical key that reaches the element.
  */
 import {
+  ThemeProvider,
+  defaultTopAppBarTokens,
+  lightTheme,
+} from '@rootnative/core'
+import {
   isRTLDirection,
   resolveLogical,
   resolveLogicalKey,
@@ -42,6 +47,7 @@ import { createRef, useEffect } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
+import { BottomAppBar } from '../../bottom-app-bar'
 import { Button } from '../../button'
 import { ButtonGroup } from '../../button-group'
 import { Carousel } from '../../carousel'
@@ -50,6 +56,7 @@ import { buildStrategy } from '../../carousel/strategy'
 import { Chip } from '../../chip'
 import { Dialog } from '../../dialog'
 import { FAB } from '../../fab'
+import { resolveAnimatedInsetKey } from '../../internal/resolveAnimatedInsetKey'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
 import { ListHeadline, ListItem } from '../../list'
@@ -1552,5 +1559,114 @@ describe('Snackbar places its one-sided styles for the document direction', () =
     const surface = screen.getByRole('alert')
     expect(padding(surface)).toEqual({ left: '8px', right: '16px' })
     expect(gap(surface).right).toBe('8px')
+  })
+})
+
+// An element's nearest ancestor (or itself) with an inline side padding.
+function paddedAncestor(element: HTMLElement) {
+  let node: HTMLElement | null = element
+  while (node && !node.style.paddingLeft && !node.style.paddingRight)
+    node = node.parentElement
+  if (!node) throw new Error('no ancestor with a side padding')
+  return node
+}
+
+// The expanded title of a medium bar pads `titleStartInset` plus
+// `horizontalPadding` at the start and 16dp at the end. Both are 16dp with the
+// default tokens, so the case uses a theme with a 20dp `titleStartInset`.
+describe('AppBar places its one-sided styles for the document direction', () => {
+  const sides = (node: HTMLElement) => ({
+    left: node.style.paddingLeft,
+    right: node.style.paddingRight,
+  })
+
+  it('pads the expanded title for the document direction', () => {
+    const theme = {
+      ...lightTheme,
+      topAppBar: { ...defaultTopAppBarTokens, titleStartInset: 20 },
+    }
+    const bar = () => (
+      <ThemeProvider theme={theme}>
+        <AppBar variant="medium" title="Settings" />
+      </ThemeProvider>
+    )
+    const title = () => paddedAncestor(screen.getByText('Settings'))
+    const ltr = renderWeb(bar())
+    expect(sides(title())).toEqual({ left: '24px', right: '16px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(bar())
+    expect(sides(title())).toEqual({ left: '16px', right: '24px' })
+  })
+
+  // The overlay keeps both insets, so jsdom shows the swap on a re-render.
+  it('follows a change of the document dir on the next render', () => {
+    const bar = () => <AppBar title="Inbox" />
+    const view = renderWeb(bar())
+    const layer = () => screen.getByText('Inbox').parentElement as HTMLElement
+    const { left, right } = layer().style
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(bar())
+    expect([layer().style.left, layer().style.right]).toEqual([right, left])
+  })
+
+  // Reanimated writes each animated frame to `element.style` through
+  // `createReactDOMStyle`, which drops a logical key, so the collapse
+  // animation of a medium or large bar needs physical keys in LTR too.
+  it('gives the collapse animation physical keys in both directions', () => {
+    expect([
+      resolveAnimatedInsetKey('start'),
+      resolveAnimatedInsetKey('end'),
+    ]).toEqual(['left', 'right'])
+    document.documentElement.setAttribute('dir', 'rtl')
+    expect([
+      resolveAnimatedInsetKey('start'),
+      resolveAnimatedInsetKey('end'),
+    ]).toEqual(['right', 'left'])
+  })
+})
+
+// A bottom app bar keeps 4dp before its first icon button and 16dp between
+// the FAB and the end edge. In RTL both stayed on their LTR sides.
+describe('BottomAppBar places its one-sided styles for the document direction', () => {
+  const bar = () => (
+    <SafeAreaProvider
+      initialMetrics={{
+        insets: { top: 0, right: 0, bottom: 0, left: 0 },
+        frame: { x: 0, y: 0, width: 412, height: 900 },
+      }}
+    >
+      <BottomAppBar
+        actions={[{ icon: 'magnify', accessibilityLabel: 'Search' }]}
+        fab={{ icon: 'plus', accessibilityLabel: 'New' }}
+      />
+    </SafeAreaProvider>
+  )
+  const fabFrame = () => paddedAncestor(screen.getByLabelText('New'))
+  const row = () => fabFrame().parentElement as HTMLElement
+
+  it('pads the row start 4dp and the FAB end 16dp', () => {
+    const ltr = renderWeb(bar())
+    expect(fabFrame().style.paddingRight).toBe('16px')
+    expect(row().style.paddingLeft).toBe('4px')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(bar())
+    expect(fabFrame().style.paddingLeft).toBe('16px')
+    expect(fabFrame().style.paddingRight).toBe('')
+    expect(row().style.paddingRight).toBe('4px')
+    expect(row().style.paddingLeft).toBe('')
+  })
+
+  // jsdom 20 doesn't remove a padding key that React empties, so this reads
+  // only the new side.
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(bar())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(bar())
+    expect(fabFrame().style.paddingLeft).toBe('16px')
+    expect(row().style.paddingRight).toBe('4px')
   })
 })

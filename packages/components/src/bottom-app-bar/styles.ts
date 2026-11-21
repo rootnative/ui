@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 
 /**
  * MD3 bottom app bar metrics.
@@ -26,7 +27,6 @@ export function createStyles(theme: MaterialTheme, containerColor?: string) {
     },
     row: {
       height: BOTTOM_APP_BAR_HEIGHT,
-      paddingStart: BOTTOM_APP_BAR_HORIZONTAL_PADDING,
       flexDirection: 'row',
       alignItems: 'center',
     },
@@ -47,8 +47,20 @@ export function createStyles(theme: MaterialTheme, containerColor?: string) {
     spacer: {
       flex: 1,
     },
-    fabFrame: {
-      paddingEnd: BOTTOM_APP_BAR_FAB_END_PADDING,
-    },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/** The 4dp before the first icon button of the row. */
+export function rowInsetStyle(startKey: string): ViewStyle {
+  return { [startKey]: BOTTOM_APP_BAR_HORIZONTAL_PADDING }
+}
+
+/** The 16dp between the FAB and the end edge. */
+export function fabFrameStyle(endKey: string): ViewStyle {
+  return { [endKey]: BOTTOM_APP_BAR_FAB_END_PADDING }
 }

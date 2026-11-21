@@ -12,7 +12,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { resolveLogical, resolveLogicalKey, selectRTL } from '@rootnative/utils'
+import { resolveLogicalKey, selectRTL } from '@rootnative/utils'
 import { useCallback, useContext, useMemo, useState } from 'react'
 import type { ComponentProps, ReactElement, ReactNode } from 'react'
 import type { LayoutChangeEvent, ViewStyle } from 'react-native'
@@ -21,6 +21,7 @@ import { Button } from '../button'
 import { IconButton } from '../icon-button'
 import type { IconButtonProps } from '../icon-button'
 import { AppBarContentColorContext } from '../icon-button/context'
+import { resolveAnimatedInsetKey } from '../internal/resolveAnimatedInsetKey'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   barEdges,
@@ -207,12 +208,19 @@ export function AppBar({
       barWidth - titleStartInset - compactTitleEndInset - titleWidth,
     ),
   )
-  // Inline logical insets go through `resolveLogical`: react-native-web
-  // resolves them in JavaScript from a locale context that defaults to LTR,
-  // so a plain `{ start }` object sits at the left edge under `dir="rtl"`.
+  // One-sided insets take keys from `resolveLogicalKey`: react-native-web
+  // resolves a logical key from a locale context that defaults to LTR, so a
+  // plain `{ start }` object sits at the left edge under `dir="rtl"`. The keys
+  // resolve on each render, not in a memo, so the insets follow a runtime
+  // change of the document `dir`.
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const startKey = resolveLogicalKey('start')
+  const endKey = resolveLogicalKey('end')
   const centeredTitleOffsetStyle = useMemo<ViewStyle>(
-    () => resolveLogical('marginStart', centeredTitleOffset),
-    [centeredTitleOffset],
+    () => ({ [marginStartKey]: centeredTitleOffset }),
+    [marginStartKey, centeredTitleOffset],
   )
   const onBarLayout = useCallback((event: LayoutChangeEvent) => {
     setBarWidth(event.nativeEvent.layout.width)
@@ -225,15 +233,18 @@ export function AppBar({
   const expandedTitleStartInset =
     topAppBar.titleStartInset + topAppBar.horizontalPadding
   const expandedTitleInsetStyle = useMemo<ViewStyle>(
-    () => resolveLogical('paddingStart', expandedTitleStartInset),
-    [expandedTitleStartInset],
+    () => ({
+      [paddingStartKey]: expandedTitleStartInset,
+      [paddingEndKey]: theme.spacing.md,
+    }),
+    [paddingStartKey, paddingEndKey, expandedTitleStartInset, theme.spacing.md],
   )
   const overlayTitleInsetStyle = useMemo<ViewStyle>(
     () => ({
-      ...resolveLogical('start', titleStartInset),
-      ...resolveLogical('end', compactTitleEndInset),
+      [startKey]: titleStartInset,
+      [endKey]: compactTitleEndInset,
     }),
-    [compactTitleEndInset, titleStartInset],
+    [startKey, endKey, titleStartInset, compactTitleEndInset],
   )
 
   // MD3 collapse-on-scroll (medium/large only): the bar collapses to the
@@ -294,9 +305,10 @@ export function AppBar({
   })
   // Stays hand-rolled: `start` and `end` are logical (RTL-aware) insets,
   // which aren't among `useInterpolatedStyle`'s numeric keys. The keys are
-  // resolved outside the worklet, see `resolveLogical` above.
-  const collapseStartKey = resolveLogicalKey('start')
-  const collapseEndKey = resolveLogicalKey('end')
+  // resolved outside the worklet, and physical on the web: see
+  // `resolveAnimatedInsetKey`.
+  const collapseStartKey = resolveAnimatedInsetKey('start')
+  const collapseEndKey = resolveAnimatedInsetKey('end')
   const titleContainerCollapseStyle = useAnimatedStyle(() => {
     'worklet'
     return {

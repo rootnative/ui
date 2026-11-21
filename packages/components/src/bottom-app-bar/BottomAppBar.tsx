@@ -5,6 +5,7 @@ import {
   useMotionValue,
 } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AccessibilityInfo, Platform, View } from 'react-native'
 import type { LayoutChangeEvent, ViewProps } from 'react-native'
@@ -18,7 +19,12 @@ import {
   useSideInsetBleed,
 } from '../layout/edgesContext'
 import { SafeAreaView } from '../safe-area'
-import { BOTTOM_APP_BAR_HEIGHT, createStyles } from './styles'
+import {
+  BOTTOM_APP_BAR_HEIGHT,
+  createStyles,
+  fabFrameStyle,
+  rowInsetStyle,
+} from './styles'
 import type { BottomAppBarProps } from './types'
 
 type FocusEvent = Parameters<NonNullable<ViewProps['onFocus']>>[0]
@@ -78,6 +84,15 @@ export function BottomAppBar({
     () => createStyles(theme, containerColor),
     [theme, containerColor],
   )
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const rowStyle = useMemo(
+    () => [styles.row, rowInsetStyle(paddingStartKey)],
+    [styles.row, paddingStartKey],
+  )
+  const fabFrame = useMemo(() => fabFrameStyle(paddingEndKey), [paddingEndKey])
   const resolvedContentColor = contentColor ?? theme.colors.onSurfaceVariant
 
   // The bar moves by its measured height, so the bottom inset and a height
@@ -140,14 +155,14 @@ export function BottomAppBar({
   // The built-in buttons read their color from the context, not from
   // `iconColor`, so their hover and press layers derive from the slot color.
   const row = (
-    <View style={styles.row}>
+    <View style={rowStyle}>
       <AppBarContentColorContext.Provider value={resolvedContentColor}>
         <View style={styles.slot}>{leadingContent}</View>
       </AppBarContentColorContext.Provider>
       {fab ? (
         <>
           <View style={styles.spacer} />
-          <View style={styles.fabFrame}>
+          <View style={fabFrame}>
             <FAB
               icon={fab.icon}
               label={fab.label}

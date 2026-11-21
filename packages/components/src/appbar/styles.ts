@@ -128,7 +128,7 @@ export function createStyles(
       end: 0,
       justifyContent: 'flex-end',
       minWidth: 0,
-      paddingEnd: theme.spacing.md,
+      // The side padding is in `AppBar`, resolved against the document.
       pointerEvents: 'none',
     },
     topRowSpacer: {

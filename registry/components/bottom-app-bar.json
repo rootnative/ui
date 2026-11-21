@@ -10,7 +10,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["color", "elevation"],
+  "utils": ["color", "elevation", "rtl"],
   "componentDependencies": ["fab", "icon-button", "layout"],
   "dependencies": {
     "@rootnative/core": ">=0.0.0-alpha.37",
