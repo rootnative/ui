@@ -7,13 +7,12 @@ description: What Root Native promises to keep working and what it does not, sta
 
 This page states what Root Native promises to keep working, and what it doesn't.
 
-:::info Still a prerelease
+:::info From 0.0.1 on
 
-`@rootnative/*` has no stable version yet. The guarantees below describe the
-shape of the API as we freeze it, not a promise that is already in force. A
-prerelease can break anything. Read the
-[changelog](https://github.com/rootnative/ui/blob/main/CHANGELOG.md) in full
-when you upgrade.
+The promise on this page starts at `0.0.1`. It doesn't cover the
+`0.0.0-alpha` versions before it: any of them can break your code. When you
+upgrade from an alpha, read the
+[changelog](https://github.com/rootnative/ui/blob/main/CHANGELOG.md) in full.
 
 :::
 

@@ -2,9 +2,13 @@
 
 All `@rootnative/*` packages (`core`, `components`, `icons`, `cli`, `seo`,
 and the `rootnative` binary) release together with a synced version, so
-this is a single changelog for the repo. These are prereleases and they
-break things freely — assume every entry can require a change on upgrade,
-and read the whole release rather than scanning for a label.
+this is a single changelog for the repo.
+
+From `0.0.1` on, the releases follow the promise on the
+[API stability](https://rootnative.github.io/ui/api-stability/) page. The
+`0.0.0-alpha` releases before it had no promise and broke things freely. When
+you upgrade from an alpha, assume that each entry can require a change, and
+read the whole release, not only its labels.
 
 Prior history: these packages were published as `@onlynative/*` through
 `0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
