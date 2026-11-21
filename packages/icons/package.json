@@ -48,7 +48,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "peerDependencies": {
-    "@rootnative/core": ">=0.0.1",
+    "@rootnative/core": ">=0.0.1 <0.1.0",
     "lucide-react-native": ">=0.400.0",
     "phosphor-react-native": ">=2.0.0",
     "react": ">=19.3.0 <20.0.0",

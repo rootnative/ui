@@ -22,6 +22,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as prettier from 'prettier'
+import { corePeerRange } from './core-peer-range'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -445,7 +446,7 @@ function buildComponentEntry(componentDir: string): ComponentEntry {
   ]
 
   const dependencies: Record<string, string> = {
-    '@rootnative/core': `>=${VERSION}`,
+    '@rootnative/core': corePeerRange(VERSION),
   }
   // Empty today, and kept in the schema on purpose: an installed CLI reads this
   // field, so dropping it would break older clients. Nothing a scaffolded

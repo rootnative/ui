@@ -343,18 +343,10 @@ jobs:
             fi
           done
 
-          # Update @rootnative/core peer dep in any package that references it
-          for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
-            node -e "
-              const fs = require('fs');
-              const pkgPath = 'packages/$PKG_DIR/package.json';
-              const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-              if (pkg.peerDependencies?.['@rootnative/core']) {
-                pkg.peerDependencies['@rootnative/core'] = '>=$NEW_VERSION';
-                fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-              }
-            "
-          done
+          # Update @rootnative/core peer dep in any package that references it.
+          # The range stops before the next breaking core version. The script
+          # holds the rule, for release-manual.yml and build-registry.ts too.
+          npx tsx scripts/core-peer-range.ts "$NEW_VERSION" ${{ steps.packages.outputs.packages }}
 
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 

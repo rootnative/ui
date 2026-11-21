@@ -162,9 +162,13 @@ get different code. A version can't describe that, so `init` pins one.
 
 ## Peer dependency ranges
 
-A peer range can widen in any release. A narrower range is a breaking change,
-so it bumps the middle digit. `react-native` and `react` follow what the
-supported Expo SDKs ship.
+A peer range can widen in any release. A range that drops a published version
+is a breaking change, so it bumps the middle digit. `react-native` and `react`
+follow what the supported Expo SDKs ship.
+
+The `@rootnative/core` peer of `components` and `icons` starts at their own
+version and stops before the next breaking core version, for example
+`>=0.0.2 <0.1.0`.
 
 `@rootnative/inertia` is the one peer whose floor moves for correctness, until
 its `1.0.0`; see [Motion](./motion.md).

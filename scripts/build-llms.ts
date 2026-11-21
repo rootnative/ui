@@ -74,6 +74,7 @@ const peerOf = (pkg: string, dep: string): string => {
 const CORE_REACT: string = peerOf('core', 'react')
 const CORE_RN: string = peerOf('core', 'react-native')
 
+const COMPONENTS_CORE_PEER: string = peerOf('components', '@rootnative/core')
 const COMPONENTS_REACT: string = peerOf('components', 'react')
 const COMPONENTS_RN: string = peerOf('components', 'react-native')
 const COMPONENTS_SAFE_AREA: string = peerOf(
@@ -93,6 +94,7 @@ const COMPONENTS_VECTOR_ICONS: string = peerOf(
   '@react-native-vector-icons/material-design-icons',
 )
 
+const ICONS_CORE_PEER: string = peerOf('icons', '@rootnative/core')
 const ICONS_REACT: string = peerOf('icons', 'react')
 const ICONS_RN: string = peerOf('icons', 'react-native')
 
@@ -3431,7 +3433,7 @@ function generateComponentsLlms(): string {
   return `# @rootnative/components — MD3 UI Components for React Native
 
 > Version: ${COMPONENTS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
+> Peer deps: @rootnative/core ${COMPONENTS_CORE_PEER}, @rootnative/inertia ${COMPONENTS_INERTIA_PEER} (required — every animation runs on it), react ${COMPONENTS_REACT}, react-native ${COMPONENTS_RN}, react-native-safe-area-context ${COMPONENTS_SAFE_AREA}, react-native-reanimated ${COMPONENTS_REANIMATED}, react-native-worklets ${COMPONENTS_WORKLETS} (Expo SDK ${EXPO_SDK} configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
 > Optional peer: @react-native-vector-icons/material-design-icons ${COMPONENTS_VECTOR_ICONS} (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver does not install it
 > Do not use @expo/vector-icons: Expo is retiring it, and it registers the same font, so the glyphs render as ?. Use @react-native-vector-icons/* (see Icons)
 
@@ -3485,7 +3487,7 @@ function generateIconsLlms(): string {
   return `# @rootnative/icons — Icon Library Adapters for Root Native UI
 
 > Version: ${ICONS_VERSION}
-> Peer deps: @rootnative/core >=${CORE_VERSION}, react ${ICONS_REACT}, react-native ${ICONS_RN}
+> Peer deps: @rootnative/core ${ICONS_CORE_PEER}, react ${ICONS_REACT}, react-native ${ICONS_RN}
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
 > Do not use @expo/vector-icons: Expo is retiring it, and its sets do not type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 

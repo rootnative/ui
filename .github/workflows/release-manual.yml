@@ -366,19 +366,11 @@ jobs:
             if [ "$PKG_DIR" = "core" ]; then CORE_BUMPED=true; break; fi
           done
 
+          # The range stops before the next breaking core version. The script
+          # holds the rule, for release.yml and build-registry.ts too.
           if [ "$CORE_BUMPED" = true ]; then
             CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
-            for PKG_DIR in ${{ steps.packages.outputs.packages }}; do
-              node -e "
-                const fs = require('fs');
-                const pkgPath = 'packages/$PKG_DIR/package.json';
-                const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-                if (pkg.peerDependencies?.['@rootnative/core']) {
-                  pkg.peerDependencies['@rootnative/core'] = '>=$CORE_VERSION';
-                  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-                }
-              "
-            done
+            npx tsx scripts/core-peer-range.ts "$CORE_VERSION" ${{ steps.packages.outputs.packages }}
           fi
 
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
