@@ -1,4 +1,5 @@
 import { Animated } from '@rootnative/inertia/reanimated'
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
@@ -7,7 +8,7 @@ import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
-import { createListItemStyles } from './styles'
+import { contentGapStyle, createListItemStyles, sideInsetStyle } from './styles'
 import type { ListItemLines, ListItemProps } from './types'
 
 function getLines(
@@ -52,6 +53,24 @@ export function ListItem({
     () => createListItemStyles(theme, lines, containerColor, contentColor),
     [theme, lines, containerColor, contentColor],
   )
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const inset = useMemo(
+    () => sideInsetStyle(theme, paddingStartKey, paddingEndKey),
+    [theme, paddingStartKey, paddingEndKey],
+  )
+  const leadingGap = useMemo(
+    () => contentGapStyle(theme, marginEndKey),
+    [theme, marginEndKey],
+  )
+  const trailingBlockStyle = useMemo(
+    () => [styles.trailingBlock, contentGapStyle(theme, marginStartKey)],
+    [styles.trailingBlock, theme, marginStartKey],
+  )
 
   // State-layer crossfade (rest → focus → hover → press, press wins) with
   // keyboard-only focus gating, driven by the shared MD3 state-layer hook.
@@ -71,7 +90,7 @@ export function ListItem({
   const content = (
     <>
       {leadingContent != null && (
-        <View style={styles.leadingContent}>{leadingContent}</View>
+        <View style={leadingGap}>{leadingContent}</View>
       )}
       <View style={styles.textBlock}>
         {overlineText != null && (
@@ -95,7 +114,7 @@ export function ListItem({
         )}
       </View>
       {(trailingContent != null || trailingSupportingText != null) && (
-        <View style={styles.trailingBlock}>
+        <View style={trailingBlockStyle}>
           {trailingSupportingText != null && (
             <Text style={styles.trailingSupportingText} numberOfLines={1}>
               {trailingSupportingText}
@@ -109,7 +128,7 @@ export function ListItem({
 
   if (!isInteractive) {
     return (
-      <View {...props} style={[styles.container, style]}>
+      <View {...props} style={[styles.container, inset, style]}>
         {content}
       </View>
     )
@@ -128,6 +147,7 @@ export function ListItem({
       {...composeHandlers(handlers, props)}
       style={[
         styles.container,
+        inset,
         webOutlineReset,
         styles.interactiveContainer,
         // The gesture-layer style owns backgroundColor (rest included) and

@@ -1,5 +1,6 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import type { ListItemLines } from './types'
 
 const ITEM_PADDING_VERTICAL = 12
@@ -21,8 +22,6 @@ export function createListStyles(theme: MaterialTheme) {
     headline: {
       ...theme.typography.titleSmall,
       color: theme.colors.onSurfaceVariant,
-      paddingStart: theme.spacing.md,
-      paddingEnd: theme.spacing.lg,
       paddingVertical: theme.spacing.sm,
     },
   })
@@ -61,9 +60,7 @@ export function createListItemStyles(
       flexDirection: 'row',
       alignItems: lines === 3 ? 'flex-start' : 'center',
       minHeight: MIN_HEIGHT[lines],
-      // MD3 list item padding: 16dp leading / 24dp trailing.
-      paddingStart: theme.spacing.md,
-      paddingEnd: theme.spacing.lg,
+      // `sideInsetStyle` gives the side padding.
       paddingVertical: ITEM_PADDING_VERTICAL,
       backgroundColor: colors.backgroundColor,
     },
@@ -88,9 +85,6 @@ export function createListItemStyles(
       flex: 1,
       opacity: theme.stateLayer.disabledOpacity,
     },
-    leadingContent: {
-      marginEnd: theme.spacing.md,
-    },
     textBlock: {
       flex: 1,
     },
@@ -107,7 +101,6 @@ export function createListItemStyles(
       color: theme.colors.onSurfaceVariant,
     },
     trailingBlock: {
-      marginStart: theme.spacing.md,
       alignItems: 'flex-end',
     },
     trailingSupportingText: {
@@ -115,4 +108,33 @@ export function createListItemStyles(
       color: theme.colors.onSurfaceVariant,
     },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/**
+ * The side padding of a headline and of an item. MD3 list item padding: 16dp
+ * leading, 24dp trailing. A `StyleSheet` style, as before, so a consumer
+ * `style` keeps its precedence on the web: react-native-web puts an inline key
+ * above each of its classes.
+ */
+export function sideInsetStyle(
+  theme: MaterialTheme,
+  startKey: string,
+  endKey: string,
+): ViewStyle {
+  return StyleSheet.create({
+    inset: { [startKey]: theme.spacing.md, [endKey]: theme.spacing.lg },
+  }).inset
+}
+
+/** The 16dp gap between the text and the leading or trailing content. */
+export function contentGapStyle(
+  theme: MaterialTheme,
+  textSideKey: string,
+): ViewStyle {
+  return { [textSideKey]: theme.spacing.md }
 }

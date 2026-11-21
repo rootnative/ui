@@ -51,6 +51,7 @@ import { Chip } from '../../chip'
 import { FAB } from '../../fab'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
+import { ListHeadline, ListItem } from '../../list'
 import { Menu } from '../../menu'
 import { NavigationDrawer } from '../../navigation-drawer'
 import { PortalHost } from '../../portal/PortalHost'
@@ -1336,5 +1337,65 @@ describe('Chip places its one-sided styles for the document direction', () => {
     view.rerender(assist())
     expect(padding()).toEqual({ left: '16px', right: '8px' })
     expect(margins(screen.getByText('star').parentElement).left).toBe('8px')
+  })
+})
+
+// MD3 pads a list item and a list headline 16dp at the start and 24dp at the
+// end, and keeps 16dp between the text and the leading or trailing content.
+// In RTL each stayed on its LTR side. The padding is a `StyleSheet` class, read
+// with `getComputedStyle`.
+describe('List places its one-sided styles for the document direction', () => {
+  const list = () => (
+    <>
+      <ListHeadline testID="headline">Mail</ListHeadline>
+      <ListItem
+        headlineText="Inbox"
+        leadingContent={<Text>L</Text>}
+        trailingSupportingText="24"
+        testID="item"
+      />
+    </>
+  )
+  const padding = (testID: string) => {
+    const computed = getComputedStyle(screen.getByTestId(testID))
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
+  const margins = (text: string) => {
+    const { style } = screen.getByText(text).parentElement as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('pads an item and a headline 16dp at the start and 24dp at the end', () => {
+    const ltr = renderWeb(list())
+    expect(padding('item')).toEqual({ left: '16px', right: '24px' })
+    expect(padding('headline')).toEqual({ left: '16px', right: '24px' })
+    expect(screen.getByTestId('item').style.paddingLeft).toBe('')
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(list())
+    expect(padding('item')).toEqual({ left: '24px', right: '16px' })
+    expect(padding('headline')).toEqual({ left: '24px', right: '16px' })
+  })
+
+  it('keeps the content gaps on the side of the text', () => {
+    const ltr = renderWeb(list())
+    expect(margins('L')).toEqual({ left: '', right: '16px' })
+    expect(margins('24')).toEqual({ left: '16px', right: '' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(list())
+    expect(margins('L')).toEqual({ left: '16px', right: '' })
+    expect(margins('24')).toEqual({ left: '', right: '16px' })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(list())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(list())
+    expect(padding('item')).toEqual({ left: '24px', right: '16px' })
+    expect(padding('headline')).toEqual({ left: '24px', right: '16px' })
+    expect(margins('L').left).toBe('16px')
   })
 })

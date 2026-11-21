@@ -1,7 +1,8 @@
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Text } from 'react-native'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
-import { createListStyles } from './styles'
+import { createListStyles, sideInsetStyle } from './styles'
 import type { ListHeadlineProps } from './types'
 
 export function ListHeadline({
@@ -12,9 +13,17 @@ export function ListHeadline({
 }: ListHeadlineProps) {
   const theme = useMaterialTheme()
   const styles = useMemo(() => createListStyles(theme), [theme])
+  // Keys resolved on each render, not in a memo, so the padding follows a
+  // runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('paddingStart')
+  const endKey = resolveLogicalKey('paddingEnd')
+  const inset = useMemo(
+    () => sideInsetStyle(theme, startKey, endKey),
+    [theme, startKey, endKey],
+  )
   const resolvedStyle = useMemo(
-    () => [styles.headline, style],
-    [styles.headline, style],
+    () => [styles.headline, inset, style],
+    [styles.headline, inset, style],
   )
 
   return (
