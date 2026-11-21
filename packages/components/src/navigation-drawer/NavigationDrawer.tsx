@@ -1,8 +1,9 @@
 import { Motion, Presence } from '@rootnative/inertia'
-import { isRTLDirection } from '@rootnative/utils'
+import { isRTLDirection, resolveLogicalKey } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
+import { resolveLogicalCornerKey } from '../internal/resolveLogicalCornerKey'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -18,7 +19,9 @@ import { NavigationDrawerSection } from './NavigationDrawerSection'
 import {
   DRAWER_WIDTH,
   createNavigationDrawerStyles,
+  endCornerStyle,
   getNavigationDrawerColors,
+  scrimGapStyle,
 } from './styles'
 import type { NavigationDrawerProps } from './types'
 
@@ -95,6 +98,27 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     return result
   }, [insetTop, insetBottom, insetSides, isModal, isRTL])
 
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const endKey = resolveLogicalKey('paddingEnd')
+  const topEndCornerKey = resolveLogicalCornerKey('borderTopEndRadius')
+  const bottomEndCornerKey = resolveLogicalCornerKey('borderBottomEndRadius')
+  const cornerStyle = useMemo(
+    () =>
+      isModal
+        ? endCornerStyle(theme, topEndCornerKey, bottomEndCornerKey)
+        : null,
+    [isModal, theme, topEndCornerKey, bottomEndCornerKey],
+  )
+  const surfaceStyle = useMemo(
+    () => [styles.surface, cornerStyle, style],
+    [styles.surface, cornerStyle, style],
+  )
+  const sheetLayerStyle = useMemo(
+    () => [styles.sheetLayer, scrimGapStyle(endKey), pointerEvents.boxNone],
+    [styles.sheetLayer, endKey],
+  )
+
   const open = isModal && visible === true
 
   // Web keyboard containment: focus enters the drawer on open, Tab cycles
@@ -121,7 +145,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
         <View
           {...rest}
           testID={testID}
-          style={[styles.surface, style]}
+          style={surfaceStyle}
           role={role ?? 'navigation'}
           accessibilityLabel={accessibilityLabel}
         >
@@ -165,7 +189,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
               <Motion.View
                 key="sheet"
                 testID={testID === undefined ? undefined : `${testID}-layer`}
-                style={[styles.sheetLayer, pointerEvents.boxNone]}
+                style={sheetLayerStyle}
                 initial={{ translateX: hiddenOffset }}
                 animate={{ translateX: 0 }}
                 exit={{ translateX: hiddenOffset }}
@@ -175,7 +199,7 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
                   {...rest}
                   ref={surfaceRef}
                   testID={testID}
-                  style={[styles.surface, style]}
+                  style={surfaceStyle}
                   role={role ?? 'dialog'}
                   aria-modal
                   accessibilityViewIsModal

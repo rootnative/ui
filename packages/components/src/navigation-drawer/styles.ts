@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import type { NavigationDrawerVariant } from './types'
 
 /**
@@ -92,20 +93,16 @@ export function createNavigationDrawerStyles(
     scrimPressArea: {
       ...StyleSheet.absoluteFill,
     },
-    // Start-anchors the surface. The end padding keeps a strip of scrim
-    // visible on a window narrower than the sheet plus that strip.
+    // Start-anchors the surface. `scrimGapStyle` pads the end.
     sheetLayer: {
       ...StyleSheet.absoluteFill,
       alignItems: 'flex-start',
-      paddingEnd: DRAWER_MIN_SCRIM_WIDTH,
     },
     surface: isModal
       ? {
           width: '100%',
           maxWidth: DRAWER_WIDTH,
           height: '100%',
-          borderTopEndRadius: theme.shape.cornerLarge,
-          borderBottomEndRadius: theme.shape.cornerLarge,
           backgroundColor: surfaceColor,
           ...elevationStyle(theme.elevation.level1),
         }
@@ -127,6 +124,36 @@ export function createNavigationDrawerStyles(
   })
 }
 
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingEnd`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/** The strip of scrim at the end, which stays on a narrow window. */
+export function scrimGapStyle(endKey: string): ViewStyle {
+  return { [endKey]: DRAWER_MIN_SCRIM_WIDTH }
+}
+
+/** The rounded end corners of a modal drawer. */
+export function endCornerStyle(
+  theme: MaterialTheme,
+  topEndKey: string,
+  bottomEndKey: string,
+): ViewStyle {
+  return {
+    [topEndKey]: theme.shape.cornerLarge,
+    [bottomEndKey]: theme.shape.cornerLarge,
+  }
+}
+
+/** The side padding of an item: 16dp at the start, 24dp at the end. */
+export function itemInsetStyle(startKey: string, endKey: string): ViewStyle {
+  return {
+    [startKey]: DRAWER_ITEM_PADDING_START,
+    [endKey]: DRAWER_ITEM_PADDING_END,
+  }
+}
+
 export function createNavigationDrawerItemStyles(
   theme: MaterialTheme,
   selected: boolean,
@@ -139,8 +166,6 @@ export function createNavigationDrawerItemStyles(
       flexDirection: 'row',
       alignItems: 'center',
       height: DRAWER_ITEM_HEIGHT,
-      paddingStart: DRAWER_ITEM_PADDING_START,
-      paddingEnd: DRAWER_ITEM_PADDING_END,
       gap: DRAWER_ITEM_GAP,
       borderRadius: theme.shape.cornerFull,
     },

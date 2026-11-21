@@ -888,3 +888,91 @@ describe('TextField places its one-sided styles for the document direction', () 
     expect(margins(leadingIcon())).toEqual({ left: '16px', right: '-4px' })
   })
 })
+
+// The modal drawer sits at the start edge, so its scrim gap and its rounded
+// corners are at the end, and an item pads 16dp at the start and 24dp at the
+// end. Each one stayed on its LTR side under `dir="rtl"`.
+describe('NavigationDrawer places its one-sided styles for the document direction', () => {
+  const drawer = () => (
+    <SafeAreaProvider
+      initialMetrics={{
+        insets: { top: 0, right: 0, bottom: 0, left: 0 },
+        frame: { x: 0, y: 0, width: 874, height: 402 },
+      }}
+    >
+      <PortalHost>
+        <NavigationDrawer visible onDismiss={() => {}} testID="drawer">
+          <NavigationDrawer.Item value="home" label="Home" testID="home" />
+        </NavigationDrawer>
+      </PortalHost>
+    </SafeAreaProvider>
+  )
+  const padding = (testID: string) => {
+    const { style } = screen.getByTestId(testID)
+    return { left: style.paddingLeft, right: style.paddingRight }
+  }
+  const corners = () => {
+    const { style } = screen.getByTestId('drawer')
+    return {
+      topLeft: style.borderTopLeftRadius,
+      bottomLeft: style.borderBottomLeftRadius,
+      topRight: style.borderTopRightRadius,
+      bottomRight: style.borderBottomRightRadius,
+    }
+  }
+  const endCorners = {
+    topLeft: '',
+    bottomLeft: '',
+    topRight: '16px',
+    bottomRight: '16px',
+  }
+  const endCornersRtl = {
+    topLeft: '16px',
+    bottomLeft: '16px',
+    topRight: '',
+    bottomRight: '',
+  }
+
+  it('keeps the scrim gap at the end', () => {
+    const ltr = renderWeb(drawer())
+    expect(padding('drawer-layer')).toEqual({ left: '', right: '56px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(drawer())
+    expect(padding('drawer-layer')).toEqual({ left: '56px', right: '' })
+  })
+
+  it('rounds the end corners', () => {
+    const ltr = renderWeb(drawer())
+    expect(corners()).toEqual(endCorners)
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(drawer())
+    expect(corners()).toEqual(endCornersRtl)
+  })
+
+  it('pads an item 16dp at the start and 24dp at the end', () => {
+    const ltr = renderWeb(drawer())
+    expect(padding('home')).toEqual({ left: '16px', right: '24px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(drawer())
+    expect(padding('home')).toEqual({ left: '24px', right: '16px' })
+  })
+
+  // jsdom 20 doesn't remove a padding key that React empties, so this reads
+  // the item padding (both keys stay) and the corners (a radius key clears).
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(drawer())
+    expect(padding('home')).toEqual({ left: '16px', right: '24px' })
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(drawer())
+    expect(padding('home')).toEqual({ left: '24px', right: '16px' })
+    expect(corners()).toEqual(endCornersRtl)
+    expect(padding('drawer-layer').left).toBe('56px')
+  })
+})

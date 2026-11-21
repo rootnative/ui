@@ -1,7 +1,7 @@
 import { useIconResolver } from '@rootnative/core'
 import { useInterpolatedStyle } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
-import { renderIcon } from '@rootnative/utils'
+import { renderIcon, resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -12,7 +12,11 @@ import { useBooleanProgress } from '../internal/useBooleanProgress'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import { useNavigationDrawerContext } from './context'
-import { DRAWER_ICON_SIZE, createNavigationDrawerItemStyles } from './styles'
+import {
+  DRAWER_ICON_SIZE,
+  createNavigationDrawerItemStyles,
+  itemInsetStyle,
+} from './styles'
 import type { NavigationDrawerItemProps } from './types'
 
 /**
@@ -78,14 +82,19 @@ export function NavigationDrawerItem({
     resolver,
   )
 
+  // Keys resolved on each render, so the padding follows a runtime change of
+  // the document `dir` on the web (see `itemInsetStyle`).
+  const startKey = resolveLogicalKey('paddingStart')
+  const endKey = resolveLogicalKey('paddingEnd')
   const containerStyle = useMemo(
     () => [
       styles.container,
+      itemInsetStyle(startKey, endKey),
       webOutlineReset,
       disabled ? styles.disabledContainer : styles.interactiveContainer,
       style,
     ],
-    [styles, disabled, style],
+    [styles, startKey, endKey, disabled, style],
   )
   const contentStyle = useMemo(
     () => (disabled ? styles.disabledContent : undefined),
