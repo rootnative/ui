@@ -1,7 +1,7 @@
 # Root Native UI — Full API Reference
 
 > React Native components on a design-system agnostic theme engine. Material Design 3 out of the box.
-> Versions: `@rootnative/core` 0.0.0-alpha.37 · `@rootnative/components` 0.0.0-alpha.37 · `@rootnative/icons` 0.0.0-alpha.37 · `@rootnative/seo` 0.0.0-alpha.37 · `@rootnative/cli` 0.0.0-alpha.37
+> Versions: `@rootnative/core` 0.0.1 · `@rootnative/components` 0.0.1 · `@rootnative/icons` 0.0.1 · `@rootnative/seo` 0.0.1 · `@rootnative/cli` 0.0.1
 > Requirements: react-native >=0.88.0 <0.89.0, react >=19.3.0 <20.0.0, Expo SDK 58
 > Platforms: iOS, Android, and web through `react-native-web` (web also needs `react-dom`). Web without Expo (Vite, webpack, Electron) needs the config in the "Web without Expo" section below. Electron, macOS, Windows, and other React Native hosts are not tested.
 > Peer deps: `react-native-safe-area-context >=4.0.0`, `react-native-reanimated >=4.7.0 <4.8.0`, `react-native-worklets >=0.13.0 <0.14.0` (Reanimated 4 runtime — Expo SDK 58 configures its Babel plugin automatically; on bare React Native add `react-native-worklets/plugin` last in `babel.config.js`)
@@ -297,7 +297,7 @@ Creates `rootnative.json`:
   "$schema": "https://rootnative.github.io/ui/schema.json",
   "aliases": { "components": "@/components/ui", "lib": "@/lib" },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "v0.0.0-alpha.37"
+  "registryVersion": "v0.0.1"
 }
 ```
 
@@ -418,14 +418,15 @@ Ask this first. Every path below ends in the same `<ThemeProvider theme={...}>`.
 | A full MD3 palette from one brand color | `createMaterialTheme(seed)` from `@rootnative/core/create-theme` |
 | MD3 with a few token overrides | Spread over `lightTheme` / `darkTheme` (see the custom-theme example under ThemeProvider) |
 | MD3 with sharper or rounder corners | The `roundness` option on `createMaterialTheme`, or `applyRoundness()` on an existing theme |
-| A fully custom design system (your own tokens) | `defineTheme<MyTheme>()` + `useTheme<MyTheme>()` |
+| MD3 components plus your own tokens | Spread `lightTheme` in `defineTheme<AppTheme>()` and add a token group on the theme root |
+| Your own role names, for your own components only (the library components need the MD3 roles) | `defineTheme<MyTheme>()` + `useTheme<MyTheme>()` |
 | Light/dark switching and persistence | The `{ light, dark }` pair + `useThemeMode()`; add `storage` to persist |
 | One part of the app with its own colors | A nested `ThemeProvider` with its own pair (see Nested providers) |
 | No light flash for dark readers of a static web export | `schemeGuardScript` + `schemeGuardCss` from `@rootnative/core/static-export` in the HTML shell |
 
 ### ThemeProvider
 
-Wrap your app root to supply the theme to all components. Works with any design system — Material Design 3 or custom themes. Defaults to the MD3 light theme when no theme is provided.
+Wrap your app root to supply the theme to all components. Takes an MD3 theme, or a theme with your own role names for your own components. The components of `@rootnative/components` read the MD3 color and typography roles, so they need a theme that keeps them. Defaults to the MD3 light theme when no theme is provided.
 
 ```tsx
 import { ThemeProvider, darkTheme } from '@rootnative/core'
@@ -560,7 +561,7 @@ const theme = useTheme<MyTheme>()
 
 ### defineTheme(theme)
 
-Identity function that validates a custom theme object against `BaseTheme`. Provides type-checking and autocompletion.
+Identity function that validates a custom theme object against `BaseTheme`. Provides type-checking and autocompletion. The theme below has its own role names, so it is for your own components. `BaseTheme` needs only `colors` and `typography`; the other token groups of such a theme are your own. For the library components, spread `lightTheme` and add your tokens beside the MD3 roles.
 
 ```tsx
 import { defineTheme } from '@rootnative/core'
@@ -568,7 +569,7 @@ import type { BaseTheme, TypographyToken } from '@rootnative/core'
 
 interface MyColors { [key: string]: string; brand: string; background: string; text: string }
 interface MyTypography { [key: string]: TypographyToken; heading: TypographyToken; body: TypographyToken }
-interface MyTheme extends BaseTheme { colors: MyColors; typography: MyTypography }
+interface MyTheme extends BaseTheme { colors: MyColors; typography: MyTypography; radius: { control: number; card: number } }
 
 const myTheme = defineTheme<MyTheme>({
   colors: { brand: '#FF6B00', background: '#FFFFFF', text: '#1A1A1A' },
@@ -576,11 +577,7 @@ const myTheme = defineTheme<MyTheme>({
     heading: { fontFamily: 'Inter', fontSize: 24, fontWeight: '700', lineHeight: 32, letterSpacing: 0 },
     body: { fontFamily: 'Inter', fontSize: 16, fontWeight: '400', lineHeight: 24, letterSpacing: 0.5 },
   },
-  shape: { roundness: 1, cornerNone: 0, cornerExtraSmall: 4, cornerSmall: 8, cornerMedium: 12, cornerLarge: 16, cornerExtraLarge: 28, cornerFull: 999 },
-  spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
-  stateLayer: { pressedOpacity: 0.1, focusedOpacity: 0.1, hoveredOpacity: 0.08, draggedOpacity: 0.16, disabledOpacity: 0.38, disabledContainerOpacity: 0.12 },
-  elevation: { ... },
-  motion: { ... },
+  radius: { control: 8, card: 16 },
 })
 ```
 
@@ -702,8 +699,8 @@ material.defaultTopAppBarTokens
 
 ### Theme type hierarchy
 
-- `BaseTheme` — Generic base interface. All design systems extend this. Has `colors: Record<string, string>`, `typography: Record<string, TypographyToken>`, plus shape, spacing, stateLayer, elevation, motion.
-- `Theme` — Material Design 3 theme. Extends `BaseTheme` with 49 MD3 color roles, 30 typography variants (15 base + 15 emphasized), and optional `topAppBar` tokens. `MaterialTheme` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
+- `BaseTheme` — Generic base interface. All design systems extend this. Has `colors: Record<string, string>`, `typography: Record<string, TypographyToken>`, and an index signature for token groups of your own. It has no MD3 group.
+- `Theme` — Material Design 3 theme. Extends `BaseTheme` with 49 MD3 color roles, 30 typography variants (15 base + 15 emphasized), the `shape`, `spacing`, `stateLayer`, `elevation` and `motion` groups, and optional `topAppBar` tokens. `MaterialTheme` is an identical alias (same type) — use it to disambiguate in multi-design-system codebases.
 
 ### Theme structure
 
@@ -711,16 +708,17 @@ material.defaultTopAppBarTokens
 BaseTheme {
   colors: Record<string, string>
   typography: Record<string, TypographyToken>
-  shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
-  spacing: Spacing       — xs, sm, md, lg, xl
-  elevation: Elevation   — level0..level5 (shadow properties)
-  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, draggedOpacity, disabledOpacity, disabledContainerOpacity
-  motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
+  [key: string]: unknown — token groups of your own
 }
 
 Theme extends BaseTheme {
   colors: Colors         — 49 MD3 color roles
   typography: Typography — 30 type scale variants: 15 base (displayLarge..labelSmall) + 15 MD3 Expressive emphasized (displayLargeEmphasized..labelSmallEmphasized)
+  shape: Shape           — roundness, cornerNone, cornerExtraSmall, cornerSmall, cornerMedium, cornerLarge, cornerExtraLarge, cornerFull
+  spacing: Spacing       — xs, sm, md, lg, xl
+  elevation: Elevation   — level0..level5 (shadow properties)
+  stateLayer: StateLayer — pressedOpacity, focusedOpacity, hoveredOpacity, draggedOpacity, disabledOpacity, disabledContainerOpacity
+  motion: Motion         — duration, easing, and MD3 Expressive spring tokens (springFastSpatial, springDefaultSpatial, springSlowSpatial, springFastEffects, springDefaultEffects, springSlowEffects — each { tension, friction, mass })
   topAppBar?: TopAppBarTokens — horizontalPadding, titleStartInset, smallContainerHeight, mediumContainerHeight, largeContainerHeight, topRowHeight, sideSlotMinHeight, iconFrameSize, mediumTitleBottomPadding, largeTitleBottomPadding (AppBar geometry in dp)
 }
 ```
@@ -1558,7 +1556,7 @@ Props:
 - `immersive?: boolean` — Default: `false`. When `true`, removes all safe area insets for full-screen layout.
 - `edges?: Edge[]` — Default: `['left', 'right', 'bottom']`. Explicit set of safe-area edges to apply. Overrides `immersive` when provided. The top edge is left out by default, because `AppBar` usually owns the top inset — pass `['top', 'left', 'right', 'bottom']` on a screen with no AppBar, or a title placed under the status bar will be clipped. The side edges are in the default: they are 0 in portrait, and in landscape they keep the content clear of the notch or the Dynamic Island.
 - `style?: StyleProp<ViewStyle>` — Additional styles applied to the SafeAreaView container. `Layout` always paints `theme.colors.background` and drops `backgroundColor` from this style. To draw a different background, nest a `Box` or a `View` inside it.
-- Inherits `PropsWithChildren`
+- Inherits `ViewProps`
 
 #### Box
 
@@ -2967,7 +2965,7 @@ Per-call elements/functions always take precedence over the resolver. Only `@roo
 
 **Do not use `@expo/vector-icons`.** Expo is retiring it (https://expo.dev/blog/moving-away-from-expo-vector-icons). Use the `@react-native-vector-icons/*` package of the same icon family, and run `npx @react-native-vector-icons/codemod` to rewrite app code that imports the old package. Do not keep both installed: they register the same font, and the glyphs render as `?`. An `@expo/vector-icons` set also fails to type-check as the `IconSet` of `createVectorIconsResolver` (TS2322), because the set is a class.
 
-### `@rootnative/icons` adapter package (v0.0.0-alpha.37)
+### `@rootnative/icons` adapter package (v0.0.1)
 
 Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes the `@react-native-vector-icons/*` set you pass, so the package declares no peer for it.
 
@@ -3076,7 +3074,7 @@ Reach for the adapter package when you want `mdiCompat`, `onMissing` warning beh
 
 ---
 
-## SEO for the web export (`@rootnative/seo` v0.0.0-alpha.37)
+## SEO for the web export (`@rootnative/seo` v0.0.1)
 
 A React Native web export starts as one empty page. `@rootnative/seo` holds the parts of the fix that do not depend on the app's data: the head of a page as tag records, the JSON-LD builders, the heading role, the HTML shell, the sitemap, the robots file and the manifest. The app keeps the mapping from its data to the meta. Docs: https://rootnative.github.io/ui/seo/why
 
