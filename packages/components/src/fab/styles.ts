@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import { focusRingBox, focusRingOutset } from '../internal/focusRing'
 import type { FABSize, FABVariant } from './types'
 
@@ -168,14 +169,6 @@ export function createStyles(theme: MaterialTheme) {
       paddingHorizontal: 20,
       borderRadius: theme.shape.cornerLarge,
     },
-    extendedWithIcon: {
-      // MD3 spec: 16dp icon-side, 20dp text-side.
-      paddingStart: theme.spacing.md,
-      paddingEnd: 20,
-    },
-    extendedIcon: {
-      marginEnd: theme.spacing.sm + theme.spacing.xs,
-    },
     label: {
       fontFamily: labelStyle.fontFamily,
       fontSize: labelStyle.fontSize,
@@ -201,4 +194,33 @@ export function createStyles(theme: MaterialTheme) {
       borderRadius: theme.shape.cornerExtraLarge + ringOutset,
     },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/**
+ * The side padding of an extended FAB with an icon. MD3 spec: 16dp on the
+ * icon side, 20dp on the text side. A `StyleSheet` style, as before, so a
+ * consumer `style` keeps its precedence on the web: react-native-web puts an
+ * inline key above each of its classes.
+ */
+export function extendedIconInsetStyle(
+  theme: MaterialTheme,
+  startKey: string,
+  endKey: string,
+): ViewStyle {
+  return StyleSheet.create({
+    inset: { [startKey]: theme.spacing.md, [endKey]: 20 },
+  }).inset
+}
+
+/** The 12dp gap between the icon and the label of an extended FAB. */
+export function extendedIconGapStyle(
+  theme: MaterialTheme,
+  labelSideKey: string,
+): ViewStyle {
+  return { [labelSideKey]: theme.spacing.sm + theme.spacing.xs }
 }

@@ -7,7 +7,11 @@ import {
   interpolateColor,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { renderIcon, resolveColorFromStyle } from '@rootnative/utils'
+import {
+  renderIcon,
+  resolveColorFromStyle,
+  resolveLogicalKey,
+} from '@rootnative/utils'
 import { useCallback, useMemo, useState, type ReactElement } from 'react'
 import {
   Platform,
@@ -27,6 +31,7 @@ import {
   getItemCornerRadii,
   getResolvedItemColors,
   getSizeTokens,
+  iconGapStyle,
 } from './styles'
 import type {
   ButtonGroupItem,
@@ -245,6 +250,18 @@ function ButtonGroupItemImpl({
   const itemStyles = useMemo(
     () => createItemStyles(theme, size, activeColors),
     [theme, size, activeColors],
+  )
+  // Keys resolved on each render, not in a memo, so the icon gaps follow a
+  // runtime change of the document `dir` on the web.
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const leadingIconGap = useMemo(
+    () => iconGapStyle(size, marginEndKey),
+    [size, marginEndKey],
+  )
+  const trailingIconGap = useMemo(
+    () => iconGapStyle(size, marginStartKey),
+    [size, marginStartKey],
   )
 
   const unselectedRadii = useMemo(
@@ -472,7 +489,7 @@ function ButtonGroupItemImpl({
         ]}
       >
         {item.leadingIcon ? (
-          <View aria-hidden style={itemStyles.leadingIcon}>
+          <View aria-hidden style={leadingIconGap}>
             {renderIcon(item.leadingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}
@@ -480,7 +497,7 @@ function ButtonGroupItemImpl({
           <Text style={computedLabelStyle}>{item.label}</Text>
         ) : null}
         {item.trailingIcon ? (
-          <View aria-hidden style={itemStyles.trailingIcon}>
+          <View aria-hidden style={trailingIconGap}>
             {renderIcon(item.trailingIcon, iconRenderProps, iconResolver)}
           </View>
         ) : null}

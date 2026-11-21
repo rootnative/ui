@@ -1,6 +1,7 @@
 import type { MaterialTheme, TypographyToken } from '@rootnative/core'
 import { alphaColor, blendColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import type { ButtonGroupSize, ButtonGroupVariant } from './types'
 
 export const BUTTON_GROUP_FOCUS_RING_OFFSET = 2
@@ -303,14 +304,21 @@ export function createItemStyles(
       letterSpacing: labelStyle.letterSpacing,
       color: colors.textColor,
     },
-    leadingIcon: {
-      marginEnd: tokens.iconGap,
-    },
-    trailingIcon: {
-      marginStart: tokens.iconGap,
-    },
     disabledLabel: {
       color: colors.disabledTextColor,
     },
   })
+}
+
+// The icon gap takes a style key that the caller resolves against the layout
+// direction on each render. react-native-web resolves a logical key, such as
+// `marginEnd`, as LTR under `<html dir="rtl">`, also in a `StyleSheet.create`
+// style.
+
+/** The gap between an icon and the label, on the side of the label. */
+export function iconGapStyle(
+  size: ButtonGroupSize,
+  labelSideKey: string,
+): ViewStyle {
+  return { [labelSideKey]: getSizeTokens(size).iconGap }
 }

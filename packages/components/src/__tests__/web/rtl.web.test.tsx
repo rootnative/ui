@@ -43,9 +43,11 @@ import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
 import { Button } from '../../button'
+import { ButtonGroup } from '../../button-group'
 import { Carousel } from '../../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
+import { FAB } from '../../fab'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
 import { Menu } from '../../menu'
@@ -1150,5 +1152,95 @@ describe('Button places its one-sided styles for the document direction', () => 
 
     renderWeb(button(consumer.logical))
     expect(padding().left).toBe('5px')
+  })
+})
+
+// A ButtonGroup item keeps 8dp between an icon and its label (size small). In
+// RTL the gap stayed on the LTR side, away from the label.
+describe('ButtonGroup puts the icon gap on the side of the label', () => {
+  const group = () => (
+    <ButtonGroup
+      items={[
+        { value: 'day', label: 'Day', leadingIcon: 'calendar' },
+        { value: 'week', label: 'Week', trailingIcon: 'chevron-down' },
+      ]}
+    />
+  )
+  const margins = (icon: string) => {
+    const { style } = screen.getByText(icon).parentElement as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('in LTR and under dir="rtl"', () => {
+    const ltr = renderWeb(group())
+    expect(margins('calendar')).toEqual({ left: '', right: '8px' })
+    expect(margins('chevron-down')).toEqual({ left: '8px', right: '' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(group())
+    expect(margins('calendar')).toEqual({ left: '8px', right: '' })
+    expect(margins('chevron-down')).toEqual({ left: '', right: '8px' })
+  })
+
+  // jsdom 20 doesn't remove a margin key that React empties, so this reads
+  // only the new side.
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(group())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(group())
+    expect(margins('calendar').left).toBe('8px')
+    expect(margins('chevron-down').right).toBe('8px')
+  })
+})
+
+// An extended FAB with an icon pads 16dp on the icon side and 20dp on the text
+// side, with 12dp between the icon and the label. In RTL both stayed on their
+// LTR sides. The padding is a `StyleSheet` class, read with
+// `getComputedStyle`.
+describe('FAB places its one-sided styles for the document direction', () => {
+  const fab = () => <FAB icon="pencil" label="Compose" testID="fab" />
+  const padding = () => {
+    const computed = getComputedStyle(screen.getByTestId('fab'))
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
+  const iconGap = () => {
+    const { style } = screen.getByText('pencil').parentElement as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('pads the icon side 16dp and the text side 20dp', () => {
+    const ltr = renderWeb(fab())
+    expect(padding()).toEqual({ left: '16px', right: '20px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(fab())
+    expect(padding()).toEqual({ left: '20px', right: '16px' })
+  })
+
+  // A class, as before, so a consumer `style` keeps its precedence: an inline
+  // key would beat a consumer `paddingLeft` class.
+  it('keeps the padding out of the inline style', () => {
+    renderWeb(fab())
+    expect(screen.getByTestId('fab').style.paddingLeft).toBe('')
+  })
+
+  it('puts the icon gap on the side of the label', () => {
+    const ltr = renderWeb(fab())
+    expect(iconGap()).toEqual({ left: '', right: '12px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(fab())
+    expect(iconGap()).toEqual({ left: '12px', right: '' })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(fab())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(fab())
+    expect(padding()).toEqual({ left: '20px', right: '16px' })
+    expect(iconGap().left).toBe('12px')
   })
 })

@@ -1,7 +1,7 @@
 import { useIconResolver } from '@rootnative/core'
 import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
-import { renderIcon } from '@rootnative/utils'
+import { renderIcon, resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import { Text, View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
@@ -14,6 +14,8 @@ import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
 import {
   createStyles,
+  extendedIconGapStyle,
+  extendedIconInsetStyle,
   getFABIconPixelSize,
   getFABSizeStyle,
   getResolvedFABColors,
@@ -72,6 +74,20 @@ export function FAB({
   const colors = useMemo(
     () => getResolvedFABColors(theme, variant, containerColor, contentColor),
     [theme, variant, containerColor, contentColor],
+  )
+
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const extendedIconInset = useMemo(
+    () => extendedIconInsetStyle(theme, paddingStartKey, paddingEndKey),
+    [theme, paddingStartKey, paddingEndKey],
+  )
+  const extendedIconGap = useMemo(
+    () => extendedIconGapStyle(theme, marginEndKey),
+    [theme, marginEndKey],
   )
 
   const resolvedContentColor = isDisabled
@@ -174,7 +190,7 @@ export function FAB({
             styles.container,
             webOutlineReset,
             isExtended
-              ? [styles.extended, icon ? styles.extendedWithIcon : undefined]
+              ? [styles.extended, icon ? extendedIconInset : undefined]
               : getFABSizeStyle(styles, size),
             // The gesture-layer style owns backgroundColor, also while
             // disabled: removing an animated style leaves its last value on
@@ -191,10 +207,7 @@ export function FAB({
           ]}
         >
           {icon ? (
-            <View
-              aria-hidden
-              style={isExtended ? styles.extendedIcon : undefined}
-            >
+            <View aria-hidden style={isExtended ? extendedIconGap : undefined}>
               {renderIcon(
                 icon,
                 { size: iconPixelSize, color: resolvedContentColor },
