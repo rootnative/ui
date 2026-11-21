@@ -7,6 +7,17 @@ this is a single changelog for the repo.
 Versions follow modified semver: a breaking change bumps the middle digit
 (`0.1.0`), and fixes and additions bump the last digit (`0.0.2`).
 
+## 0.0.2 — 2026-11-21
+
+**One fix: the `@rootnative/core` peer range has an upper bound.** No
+component, theme or CLI code changes.
+
+- **Fix: the `@rootnative/core` peer of `components` and `icons` stops
+  before the next breaking core version.** It's `>=0.0.2 <0.1.0` now.
+  Before, it was `>=0.0.1` with no end, so a breaking core `0.1.0` satisfied
+  the peer of a `0.0.x` package. The registry entries that `rootnative add`
+  reads have the same range. Nothing changes in your app.
+
 ## 0.0.1 — 2026-11-21
 
 **The first release with a stability promise, and one breaking type
