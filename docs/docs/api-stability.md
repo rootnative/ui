@@ -7,14 +7,8 @@ description: What Root Native promises to keep working and what it does not, sta
 
 This page states what Root Native promises to keep working, and what it doesn't.
 
-:::info From 0.0.1 on
-
-The promise on this page starts at `0.0.1`. It doesn't cover the
-`0.0.0-alpha` versions before it: any of them can break your code. When you
-upgrade from an alpha, read the
-[changelog](https://github.com/rootnative/ui/blob/main/CHANGELOG.md) in full.
-
-:::
+Versions follow modified semver: a breaking change bumps the middle digit
+(`0.1.0`), and fixes and additions bump the last digit (`0.0.2`).
 
 ## What carries the semver promise
 
@@ -163,14 +157,14 @@ A pinned project doesn't get new component source on its own. That's the
 point. `rootnative upgrade` moves the pin forward, and it does so before it
 fetches any component file again.
 
-Earlier prereleases defaulted to `main`. Two people who ran
-`rootnative add button` a week apart got different code. Semver can't describe
-that, so we changed it.
+Without a pin, two people who ran `rootnative add button` a week apart would
+get different code. A version can't describe that, so `init` pins one.
 
 ## Peer dependency ranges
 
-A peer range widens in a minor, and narrows only in a major. `react-native`
-and `react` follow what the supported Expo SDKs ship.
+A peer range can widen in any release. A narrower range is a breaking change,
+so it bumps the middle digit. `react-native` and `react` follow what the
+supported Expo SDKs ship.
 
-`@rootnative/inertia` is the one peer whose floor moves for correctness while
-it is pre-1.0; see [Motion](./motion.md).
+`@rootnative/inertia` is the one peer whose floor moves for correctness, until
+its `1.0.0`; see [Motion](./motion.md).

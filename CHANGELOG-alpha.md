@@ -1,0 +1,3854 @@
+# Changelog of the alphas
+
+The release notes of the `0.0.0-alpha` versions of the `@rootnative/*`
+packages. The CHANGELOG starts at `0.0.1`. This file goes away later.
+
+Prior history: these packages were published as `@onlynative/*` through
+`0.0.0-alpha.8`. The `@rootnative` line below starts over at `0.0.0-alpha.0`.
+
+## 0.0.0-alpha.37 — 2026-11-14
+
+**No breaking change, and one fix that matters for every app.** From
+alpha.33 to alpha.36, a screen with a `CircularProgress` aborted the app on
+native, and a `Button` with `loading` crashed the page on the Expo web dev
+server. This release fixes both, so an app that stayed on alpha.32 can
+upgrade. New in this release: the MD3 Expressive vertical menu with
+`Menu.Group`, a selected and a checked state on `Menu.Item`, and
+`insetSides="start"` or `"end"` on `AppBar`. One keyboard behavior changes:
+on the web, Tab moves between the two thumbs of a range `Slider`, and Enter
+and Space don't switch the thumb. No peer range moves. The
+`@rootnative/inertia` floor stays at `0.0.26`; inertia `0.0.29` is inside
+the range and this release needs nothing from it.
+
+- **Fix: `CircularProgress` doesn't abort the app.** The build renamed one
+  import of a Reanimated hook to `useAnimatedProps2`, and the Worklets Babel
+  plugin doesn't recognize a hook under another name. So the three callbacks
+  of `CircularProgress` shipped as plain functions. On native, the error on
+  the UI thread aborted the app. It was seen in Expo Go on iOS. On the Expo
+  web dev server, Reanimated threw, so each screen with a
+  `CircularProgress` crashed, and a `Button` with `loading` too. A
+  production web export didn't crash. Each Reanimated hook callback in
+  `@rootnative/components` now starts with a `'worklet'` directive, so it's
+  a worklet under any import name.
+
+- **New: the MD3 Expressive vertical menu.** Pass `variant="vertical"` to
+  `Menu`. The container takes `surfaceContainerLow` and a 16dp corner. Each
+  item sits 4dp in from the sides, with a 44dp minimum height, a `bodyLarge`
+  label and 20dp icons. The first and the last item take 12dp outer corners.
+  A selected or checked item takes `tertiaryContainer` with
+  `onTertiaryContainer` content, and its corners morph to 12dp. Reduced
+  motion cuts the morph. The default, `'baseline'`, is the menu as before,
+  with no change. The menu sets the corners of an item that is a direct
+  child, in an array, or in a fragment. The Menu page has the full table.
+  New type: `MenuVariant`.
+
+- **New: `Menu.Group` for a vertical menu.** A group takes an optional
+  `label`. With two or more groups, each group draws its own surface, 2dp
+  apart, and the menu surface is a clear column. The first group has 16dp
+  top corners, the last group has 16dp bottom corners, and the other corners
+  are 8dp. Children outside a `Menu.Group` form a group of their own. The
+  menu `containerColor` colors each group. On web, a group reports
+  `role="group"` with the label as its name. On native, a screen reader
+  reads the label before the items. The label follows the layout direction.
+  The MD3 baseline menu has no groups, so a baseline menu renders the
+  children of a group with no label, and warns in development. New exports:
+  `MenuGroup` and the `MenuGroupProps` type.
+
+- **New: `selected` and `checked` on `Menu.Item`.** Use `selected` for one
+  choice of a group, such as a sort order, and `checked` for an on/off
+  setting. The type rejects both together. In a baseline menu the item takes
+  `secondaryContainer` with `onSecondaryContainer` content. Both props are
+  controlled only: the items unmount when the menu closes, so keep the state
+  and change it in `onPress`. Pass `closeOnPress={false}` to keep the menu
+  open. A screen reader gets the state through `aria-checked`. On web, a
+  `selected` item is a `menuitemradio` and a `checked` item is a
+  `menuitemcheckbox`. Before, a menu had no way to show the current choice,
+  and a screen reader didn't hear it.
+
+- **New: `insetSides` on `AppBar` takes `'start'` or `'end'`.** In
+  landscape, a bar inside a `Layout` pulls its background out to both screen
+  edges. A bar beside a `NavigationRail` touches the screen at its end edge
+  only, so its background covered the rail, and `insetSides={false}` turned
+  off both sides. Pass `insetSides="end"`: the bar then pads and bleeds on
+  that side only. Start and end follow the layout direction. `BottomAppBar`
+  and `NavigationBar` keep a boolean.
+
+- **A range `Slider` gives each thumb its own control.** A screen reader got
+  one control for the two thumbs, and its increment and decrement actions
+  moved the low thumb only. So a TalkBack or VoiceOver user couldn't set the
+  upper bound. Each thumb is now its own adjustable control, with its own
+  value. The thumbs read "Minimum" and "Maximum". Change them with the new
+  `startThumbAccessibilityLabel` and `endThumbAccessibilityLabel` props.
+  With `accessibilityLabel`, a thumb reads both, for example "Runtime,
+  Shortest". What to check: on the web, each thumb is a tab stop now, and
+  Enter and Space don't switch the thumb that the arrow keys move.
+
+- **The `square` shape of `Button` and `IconButton` reads the corners of the
+  theme.** The square corner was a fixed number (12, 16 or 28), so
+  `roundness` and your own corner tokens didn't reach a square button. The
+  corner now comes from `theme.shape`: `cornerMedium` at `extraSmall` and
+  `small`, `cornerLarge` at `medium`, and `cornerExtraLarge` at `large` and
+  `extraLarge`. The pressed corner, and the corner of a selected round
+  `IconButton`, come from the theme too. The default MD3 theme gives the
+  same values as before. What to check: with a theme that changes
+  `roundness` or the corner tokens, a square button now follows it.
+
+- **Docs: a grouped sidebar and the name Root Native.** The sidebar has two
+  groups, Guides and Reference. The docs and the package READMEs write the
+  name as two words. The package names and the imports don't change.
+
+## 0.0.0-alpha.36 — 2026-11-09
+
+**No breaking change.** No export and no prop is removed. Some defaults
+change, and they can move a screen. In landscape, `Layout`, the three bars,
+and a modal `NavigationDrawer` or `SideSheet` now pad the side safe-area
+insets. In portrait those insets are 0, so nothing moves there. An outlined
+`Button` and `IconButton` take the Expressive outline colors, and a tall
+`BottomSheet` stops below the status bar. Each of these entries ends with
+what to check. New in this release: a toggle on `Button`, and `insetSides`
+on five components. No peer range moves. The `@rootnative/inertia` floor
+stays at `0.0.26`. inertia `0.0.28` is inside the range and fixes
+`useHideOnScroll`, which `BottomAppBar` uses for `scrollOffset`: when the
+`scrollOffset` changes to another list, as on a tab screen, the bar shows
+and counts from the position of the new list. Upgrade inertia in the app to
+get it.
+
+- **New: a toggle on `Button`.** Pass `selected` with `onSelectedChange`
+  for a controlled toggle. Pass `defaultSelected` for an uncontrolled one:
+  the button flips its own state on press and reports the new state through
+  `onSelectedChange`. `onPress` still fires. A selected toggle takes the MD3
+  selected colors of its variant, and its shape inverts: a `round` button
+  turns square, and a `square` button turns round. The `filled`, `tonal`,
+  `outlined` and `elevated` variants have a toggle. MD3 has no text toggle,
+  so a `text` button ignores these props and warns in development. A screen
+  reader gets the state: `aria-pressed` on web, and the selected state on
+  native. `containerColor` and `contentColor` apply in both states. To color
+  the two states differently, control the toggle and pass a color for each
+  state.
+
+- **`Layout` pads the left and right safe-area insets by default.** The
+  default `edges` are now `['left', 'right', 'bottom']`, not `['bottom']`.
+  In landscape the notch or the Dynamic Island moves to one side, and the
+  content of a `Layout` went under it. The side insets are 0 in portrait,
+  so an app that doesn't rotate sees no change. What to check: a screen
+  that pads the side insets itself gets them twice in landscape. Remove
+  your own padding, or pass `edges={['bottom']}` to keep the old default.
+
+- **New: `insetSides` on `AppBar`, `NavigationBar` and `BottomAppBar`, on
+  by default.** Each bar pads its content by the left and right insets, so
+  in landscape the title, the actions and the destinations stay clear of
+  the notch. Inside a `Layout` that pads the sides, the bar also pulls its
+  background back out through that padding, so the bar still reaches the
+  screen edges. What to check: a bar nested inside content, such as a card,
+  in landscape. Pass `insetSides={false}` there, or its background shows
+  past its container. `rootnative add appbar`, `add navigation-bar` and
+  `add bottom-app-bar` now also install `layout`.
+
+- **New: `insetSides` on `NavigationDrawer` and `SideSheet`.** It pads the
+  inset of the screen edge that the surface sits on: the start edge for a
+  drawer (the left in LTR, the right in RTL), and the edge that `edge`
+  picks for a sheet. It's on by default for the `modal` variant and off for
+  `standard`, the same as `insetTop` and `insetBottom`, because a standard
+  surface renders inside a `Layout` that owns the edges. What to check: a
+  modal drawer or sheet in landscape, with the notch on its side, has its
+  items one inset further in.
+
+- **The side safe-area insets go on the correct side in RTL on iOS and
+  Android.** The insets are physical, but in RTL React Native applies
+  `paddingLeft` and `marginLeft` to the right side. So in landscape the
+  components padded the side without the notch, and left the side with the
+  notch bare. react-native-web doesn't swap the sides, so web was correct.
+
+- **A `Menu`, a `Tooltip` and a `layout="docked"` `SearchView` open at
+  their anchor in RTL on iOS and Android.** Each one takes its position as
+  a distance from the left edge of the window. In RTL React Native applies
+  `left` to the right side, so the overlay opened at the mirrored position,
+  away from its anchor. Web was correct.
+
+- **A `Menu` and a `Tooltip` stay inside the safe-area insets.** On an
+  edge-to-edge window the root `PortalHost` starts under the status bar. A
+  menu that opened above an anchor near the top stopped 8 dp
+  (`screenMargin`) from the window top, under the status bar, and one near
+  the bottom went under the navigation bar. `screenMargin` now counts from
+  the edges of the safe area. The insets come from the nearest
+  `SafeAreaProvider`. With no provider, the window edges still apply. A host
+  that is already inside the safe area, such as one below an app bar, does
+  not move again. `rootnative add menu` and `add tooltip` now also install
+  `react-native-safe-area-context`.
+
+- **An outlined `Button` and an outlined `IconButton` take the Expressive
+  outline colors.** The border is `outlineVariant`, not `outline`, and the
+  label of a `Button` is `onSurfaceVariant`, not `primary`. These are the
+  MD3 Expressive tokens. The old values came from the baseline spec. What
+  to check: an outlined button that needs a primary label. Pass
+  `contentColor` to keep it.
+
+- **A tall `BottomSheet` stops below the status bar.** A percentage snap
+  point resolved against the whole height of the portal host, so a sheet at
+  `'100%'`, or one that sized to tall content, went under the status bar
+  and the Dynamic Island. A percentage now resolves against the height of
+  the host below the status bar, and a sheet that sizes to its content
+  stops there too. The scrim still covers the status bar. A named host that
+  starts below the status bar, such as one below an app bar, keeps its
+  whole height. What to check: with the root host, a `'90%'` sheet is now
+  90% of a slightly smaller height.
+
+- **The title of a `center-aligned` `AppBar` is at the centre on a wide
+  bar.** The title row kept `justifyContent: 'center'` from its container.
+  That added half the free space of the row to the start margin that
+  centres the title on the screen. So on a wide bar, such as a tablet or a
+  phone in landscape, the title sat off the centre.
+
+- **The back and close buttons of a `SideSheet` are standard icon
+  buttons.** They used the `IconButton` default, `filled`, so each one had a
+  filled container. MD3 draws them with no container.
+
+- **A `ListItem` with `supportingTextNumberOfLines={0}` uses the
+  three-line template.** `0` removes the line limit, so the supporting text
+  can wrap to any length, but the item kept the two-line template. The
+  leading and the trailing content stayed at the centre of a tall item.
+  MD3 puts them at the top of a three-line item. `0` now counts the same as
+  a limit above 1.
+
+- **On web, an overlay takes the focus with no scroll of the page.** The
+  focus trap of `BottomSheet`, `Dialog`, `Menu`, `NavigationDrawer`,
+  `SearchView` and `SideSheet` called `focus()` with no options. A surface
+  can take the focus while it's still outside the window: a sheet or a
+  drawer at the start of its slide in, or a `BottomSheet` that opens a
+  second time and starts below the window because it already knows its
+  height. A plain `focus()` then scrolled the whole document, and the page
+  behind the surface jumped. The trap now moves the focus with
+  `preventScroll`, when it enters and when it returns.
+
+- **`rootnative create` makes an app that rotates.** The `blank` and
+  `with-router` templates set `"orientation": "default"` in `app.json`, not
+  `"portrait"`. Set it back to `"portrait"` for an app that must not
+  rotate.
+
+- **Docs: an Orientation section on the Responsive page.** It says that an
+  Expo app with `"orientation": "portrait"` doesn't rotate, and it lists
+  the edges that each component pads, with the prop and its default.
+
+- **Docs: put the `PortalHost` outside `Layout`.** Each overlay pads its
+  own safe-area insets, so a host inside the `Layout` padding gets them
+  twice: the snackbar sits one inset too high, and a modal drawer one inset
+  too far in. The Portal page says this now.
+
+- **Docs: plainer wording.** The docs pages and the package READMEs use
+  shorter sentences. The API and the facts are the same.
+
+## 0.0.0-alpha.35 — 2026-11-06
+
+**No breaking change.** One new hook in `@rootnative/seo`, one new prop on
+`AppBar`, and doc fixes. No peer range moves. The `@rootnative/inertia`
+floor stays at `0.0.26`; inertia `0.0.27` is inside the range and this
+release needs nothing from it.
+
+- **New: `useBrowserThemeColor(color)` in `@rootnative/seo/react`.** The
+  `{ light, dark }` tags that `shellTags` writes follow the system
+  scheme, not a mode that the user picks in the app, so a dark mode on a
+  light system kept a light browser toolbar. Call the hook in one place
+  inside the theme provider, with the background of the theme that
+  renders. After hydration it sets the `content` of each `theme-color`
+  tag to that colour, and puts the old values back on unmount. With no
+  tag it adds one. `undefined` changes nothing, and the hook does nothing
+  on native. Keep the static tags of `shellTags`: they give the first
+  paint and a page with no JavaScript their colour.
+
+- **`AppBar` sends its tooltips to a named `PortalHost` with
+  `tooltipHostName`.** The tooltips of the navigation button and of the
+  icon actions rendered in the root host only. On iOS a `transparentModal`
+  route covers the root host, so a bar in one showed no tooltip on a long
+  press. Mount a named `PortalHost` inside the modal and pass its name.
+  The default is still the root host, and a `fullScreenModal` does not
+  need it.
+
+- **Docs: the `favicon` of `shellTags` and the Expo `favicon.ico`.** When
+  `app.json` sets `web.favicon`, the Expo export writes a second icon link
+  to a `favicon.ico` with 16, 32 and 48 px images, and Chrome picks that
+  file over an SVG `favicon`, in either order. To show the SVG, remove
+  `web.favicon`, or put your own `favicon.ico` in `public/`. The option
+  now says that it takes an `.ico`, `.png` or `.svg` URL.
+
+- **Docs: the Tabs "Following a pager" example compiles and causes no
+  Reanimated warning.** The example passed a dependency list to
+  `useHandler`, which Reanimated 4.7 reports on native, and typed the
+  `useEvent` payload as the top-level event, which does not type-check as
+  the `onPageScroll` prop of an animated `PagerView`. The example now
+  calls `useEvent` directly, with the `PagerViewOnPageScrollEvent` type
+  from `react-native-pager-view`.
+
+- **Dev pins:** the example, the templates and the package dev
+  dependencies move to Expo `58.0.23`, React Native `0.88.1`, Expo Router
+  `58.0.30` and `react-native-safe-area-context` `5.11.1`. The peer ranges
+  do not change.
+
+## 0.0.0-alpha.34 — 2026-11-03
+
+**No breaking change.** One new component, `Carousel`, in
+`@rootnative/components`, and fixes in `Button`, `Tooltip`, and the action
+rows of `AppBar`, `BottomAppBar`, `SearchBar` and `SearchView`. The
+`@rootnative/inertia` floor moves to `0.0.26`, so upgrade it in the app
+with this release.
+
+- **The `@rootnative/inertia` floor moves to `0.0.26`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.26 <0.1.0`, the dev,
+  example and template pins are `0.0.26` exact, and the registry's derived
+  floor follows. `Carousel` uses `useValueChange`, which is new in inertia
+  `0.0.26`. inertia `0.0.26` also measures `useInView` again after a
+  resize, stops a Reanimated strict-mode warning from `useHideOnScroll`,
+  and makes a `layoutId` FLIP read the `easing` and the `delay` of its
+  transition.
+
+- **New: `Carousel`.** The MD3 carousel, in four variants:
+  `'multi-browse'` (the default: large, medium and small items that change
+  size as they scroll), `'hero'` (one large item and a 56dp preview of the
+  next one), `'uncontained'` (items of one width that run past the edge)
+  and `'full-screen'` (vertical, one item per screen). Pass `items` and
+  `renderItem`. Each item is a container with the extra-large corner, and
+  it clips what `renderItem` draws. The scroll snaps so that one item
+  lands on the first large position. On web, the carousel does this with
+  CSS scroll snap, because react-native-web does not apply
+  `snapToOffsets`. `index`, `defaultIndex` and `onIndexChange` follow the
+  first large item, and `scrollToIndex` on the ref scrolls to an item.
+  `onItemPress` makes each item a button with the MD3 state layers and a
+  focus ring. Give `itemAccessibilityLabel` with it when the item has no
+  text. `renderItem` also gets `progress`, a shared value that is 0 at the
+  small size and 1 at the large size, so a label can fade out as its item
+  shrinks. Import it from `@rootnative/components/carousel`, or copy it
+  with `rootnative add carousel`.
+
+- **A `Button` with an icon is as tall as its size token on web.** The
+  icon slot had no size, and the glyph of an icon font is 1px taller than
+  its font size at 20px (`line-height: normal`). So an `extraSmall` or a
+  `small` button with an icon was 33 or 41 high, not 32 or 40. Now each
+  icon slot of `Button`, and the slot of the loading spinner, is a box of
+  the icon size with the icon in its center, as in `Icon`. The box is on
+  every platform: an icon node that is larger than `iconSize` now goes
+  past the box and does not make the button taller. Set `iconSize` to the
+  size of such an icon.
+
+- **A toggle action keeps its button when its icon or its label
+  changes.** `AppBar`, `BottomAppBar`, `SearchBar` and `SearchView` keyed
+  each action by its icon or its label. So an action that changed from
+  "Select all" to "Select none" on a press got a new button: on web the
+  keyboard focus went to the page, and an open tooltip closed. Now each
+  action is keyed by its position in the list.
+
+- **On web, a closing `Tooltip` stays at its anchor when the anchor opens
+  a `Menu`.** When a click on a tooltip anchor opened a `Menu`, the
+  closing tooltip moved to the top-left corner of the page and faded out
+  there, for about 300ms. react-native-web sent a second hover-in when the
+  menu covered the anchor, so the tooltip opened again with no position.
+  Now, on web, the tooltip follows the DOM `pointerenter` and
+  `pointerleave` of its anchor. The same change keeps a tooltip closed
+  when the pointer leaves the anchor after `duration` hid it. No change on
+  native.
+
+## 0.0.0-alpha.33 — 2026-11-02
+
+**No breaking change.** One new prop and new tooltips in
+`@rootnative/components`, three web fixes in `Tooltip`, and one new prop
+and page languages in `@rootnative/seo`. The `@rootnative/inertia` floor
+moves to `0.0.25`, so upgrade it in the app with this release. One audit
+check is new: `rootnative-seo audit` reports a page of a static export
+whose `<html lang>` is not the language of the page.
+
+- **The `@rootnative/inertia` floor moves to `0.0.25`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.25 <0.1.0`, the dev,
+  example and template pins are `0.0.25` exact, and the registry's derived
+  floor follows. inertia `0.0.25` fixes a `layoutId` swap in one render:
+  on a slow device, the new element showed at its final place with no
+  animation. This library does not use `layoutId`, so no component
+  changes.
+
+- **`AppBar` shows tooltips on its icon buttons.** Inside a `PortalHost`,
+  the navigation button shows its label, "Go back" or "Close", as a plain
+  tooltip, and each icon action shows its `accessibilityLabel`. A hover, a
+  keyboard focus or a long press shows the tooltip. Set `tooltip` on an
+  icon action to show a different text, or `tooltip: false` to show none.
+  A text action takes no tooltip, because its label is already on the
+  screen; the type rejects `tooltip` there. Without a `PortalHost`, the bar
+  shows no tooltips and gives no warning. `rootnative add appbar` now also
+  adds `portal` and `tooltip`, and `rootnative update appbar` adds them to
+  a project that copied the bar before.
+
+- **`LinearProgress` and `CircularProgress` take `wavy`.** `wavy` draws the
+  active indicator as a travelling wave, the MD3 Expressive form. The
+  inactive track stays flat. The wave is flat below 10% and above 95%, so
+  an indicator that is almost empty or almost full shows a plain bar, and
+  between those points the wave grows in with a spring. A wavy
+  `LinearProgress` is 6dp taller than its `thickness`, because the wave
+  goes 3dp above and below the track. A wavy `CircularProgress` keeps its
+  `size`: the ring radius is 2dp smaller, so the wave stays inside. Both
+  draw the wave with `react-native-svg`. When the OS reduce-motion setting
+  is on, the wave does not move, but the value still changes. The default
+  is `false`, so no existing indicator changes.
+
+- **On web, a slow mouse click on a `Tooltip` anchor presses it.** The
+  tooltip gave its anchor an `onLongPress`, and react-native-web starts
+  the long-press timer for a mouse too. A mouse press held for about half
+  a second showed the tooltip, and the click that followed did not call
+  `onPress`. Now, on web, the tooltip gives the anchor a long press only
+  on a device with no hover, or when the anchor has an `onLongPress` of
+  its own. No change on native.
+
+- **On web, a plain `Tooltip` hides when the pointer leaves the anchor.**
+  react-native-web keeps the hover-out handler of the render in which the
+  hover started, when the tooltip was still closed. So the hover out did
+  nothing, and the tooltip stayed up until `duration` took it down. Now it
+  hides on the hover out.
+
+- **On web, a `Tooltip` does not repeat the name of its anchor.** While a
+  tooltip was open, its anchor got the tooltip as its description
+  (`aria-describedby`). When the tooltip text was the anchor's label, as
+  on an MD3 icon button, a screen reader said the name two times. Now a
+  plain tooltip whose text is the `accessibilityLabel` or the `aria-label`
+  of the anchor adds no description.
+
+- **`Picture` takes `fetchPriority`.** `'high'`, `'low'` or `'auto'`: how
+  soon the browser starts to download the image. Give the hero image, the
+  one image the page is built around, `fetchPriority="high"` and
+  `loading="eager"`. The browser gives an image a low priority until it
+  has laid out the page, and that wait is part of the Largest Contentful
+  Paint. On web, `Picture` writes `fetchpriority`. On native, `expo-image`
+  gets the same value as `priority`, and `'auto'` keeps its default.
+
+- **`@rootnative/seo` sets the language of each page on `<html>`.** Expo
+  Router writes the `<html>` of `app/+html.tsx` on every page, so the
+  German page of an English site said `lang="en"`. The language of a page
+  is its `hreflang` link to itself, else its `locale`, else the `locale`
+  of the site. `PageHead` and `RouteHead` now set it on `<html>` while the
+  page is on, and put the old value back when the page goes. A page in the
+  language of the shell changes nothing: `en-US` on `en` is the same
+  language. In a static export, `rootnative-seo <outDir>` (`writeSeoFiles`)
+  also writes the language into each page file that needs it, and lists
+  those files. `--no-lang` (`lang: false`) skips that step. A server
+  export is not changed: there the page sets its language after
+  hydration. The new `pageLang(site, meta)` returns the language of a
+  page. `rootnative-seo audit` reports a static page whose `<html lang>`
+  is not its own language, so an export that skips
+  `rootnative-seo <outDir>` can now fail an audit that passed before.
+
+## 0.0.0-alpha.32 — 2026-10-31
+
+**No breaking change.** Two new components, one new prop and two fixes in
+`@rootnative/components`, two new props in `@rootnative/seo`, and one fix
+in the registry that `rootnative add` copies. The `@rootnative/inertia`
+floor moves to `0.0.24`, so upgrade it in the app with this release.
+
+- **The `@rootnative/inertia` floor moves to `0.0.24`.** The `core`,
+  `utils` and `components` peer ranges are now `>=0.0.24 <0.1.0`, the dev,
+  example and template pins are `0.0.24` exact, and the registry's derived
+  floor follows. inertia `0.0.23` adds `useHideOnScroll`: a 0 to 1 value
+  from the direction of a scroll, which hides a bar while the content
+  scrolls down and shows it again while the content scrolls up.
+  `BottomAppBar` uses it for `scrollOffset`, so an older inertia does not
+  work. inertia `0.0.24` fixes that hook on iOS: a fling to the end of the
+  content bounced past the end and back, and the bounce back showed a
+  hidden `BottomAppBar` again, in part or in full. Now the bar stays
+  hidden at the end. One limit stays on iOS: with
+  `contentInsetAdjustmentBehavior="automatic"`, the scroll event leaves
+  out the bottom safe-area inset, so the last stretch of the content
+  (about 34 pt) does not move the bar. Keep the default `'never'` and add
+  that inset as padding in `contentContainerStyle`. inertia `0.0.24` also
+  makes `useTouchDrag` spring an `elastic` overdrag back inside its bounds
+  on release. `BottomSheet` returns a release transition on every release,
+  so its behavior does not change. inertia `0.0.23` also fixes a native
+  crash in `@rootnative/inertia-svg`, which this library does not use.
+
+- **`Picture` takes `srcSet` and `sizes`.** `srcSet` lists more files of the
+  same image as `{ source, width }`, with the width of each file in pixels.
+  On web, `Picture` writes them as `srcset`, and `sizes` as `sizes`, so the
+  browser picks the file by the shown width and the pixel density before
+  any script runs. Before, the export held one `src` for every screen: a
+  file large enough for a high-density screen was too large for the rest,
+  and a script that picked a file after hydration made the browser
+  download the image two times. A relative `source` in the list resolves
+  as `source` does. On native, `expo-image` gets the files in place of
+  `source` and picks one by the view size and the screen scale. Pass
+  `sizes` with `srcSet`: without it the browser takes the full window
+  width. No change without `srcSet`.
+
+- **New `BottomAppBar`.** The MD3 bottom app bar: an 80dp bar on
+  `surfaceContainer` at elevation level 2, with up to four icon `actions`
+  at the start and a flat secondary `fab` at the end. `leading` replaces
+  `actions` for custom content, such as a `Menu` anchor; the type rejects
+  the two together. `insetBottom` adds the bottom safe-area inset, off by
+  default like `NavigationBar`. `containerColor` and `contentColor`
+  override the bar and the action icons. The bar is a `toolbar`; pass
+  `role` to replace it. `scrollOffset` takes the offset from inertia's
+  `useScroll()`: the bar moves down by its own height while the content
+  scrolls down, and comes back while the content scrolls up. Place the bar
+  over the content, because the content does not grow into the space.
+  While a screen reader is on (iOS and Android), the bar stays in place.
+  On web, focus on a control in the bar brings the bar back. Subpath
+  `@rootnative/components/bottom-app-bar`, CLI
+  `rootnative add bottom-app-bar`.
+- **New `SideSheet`.** The MD3 side sheet: a 256dp panel with a
+  `titleLarge` `headline`, a close button, content that scrolls, and an
+  optional row of `actions` at the bottom. The `'modal'` variant, the
+  default, renders through `Portal` and slides in from the end edge over a
+  32% scrim, on `surfaceContainerLow` at elevation level 1. The close
+  button, a scrim press, Android back and Escape call `onDismiss`.
+  `edge="start"` makes the sheet enter from the other edge, and RTL swaps
+  the two edges. The `'standard'` variant renders in place, beside the
+  main content, on `surface` with no elevation; there, `onDismiss` is
+  optional and only shows the close button. `onBack` adds a back button
+  before the headline, for a second level of content. `detached` adds a
+  16dp margin and rounds all four corners. `width` sets the width and the
+  slide distance. A modal sheet pads its content by the top and bottom
+  safe-area insets by default, the same as a modal `NavigationDrawer`.
+  Subpath `@rootnative/components/side-sheet`, CLI
+  `rootnative add side-sheet`.
+- **`FAB` takes `elevated`.** `elevated={false}` removes the shadow and the
+  lift on hover. The container color and the state layers do not change.
+  MD3 places a flat FAB in a bottom app bar. The default is `true`, so no
+  existing FAB changes.
+- **On web, Space presses a control whose role is `checkbox`, `switch`,
+  `radio` or `tab`.** react-native-web presses a `Pressable` on Space only
+  when its role is `button`. So Space did nothing on `Checkbox`, `Switch`,
+  `Radio`, a `ButtonGroup` with a selection mode, `Tabs`, `NavigationBar`,
+  `NavigationRail` and `NavigationDrawer.Item`, and Enter was the only key.
+  A role that you pass counts too, for example `role="checkbox"` on a
+  pressable `Card`, or `role="switch"` on a pressable `ListItem`. The
+  control presses on the key down, once for a held key, and the page does
+  not scroll. A key from a focused element inside the control does not
+  press it. When your `onKeyDown` calls `preventDefault`, Space does not
+  press, so an app that handles Space itself does not press twice. Remove
+  that handler when you upgrade. No change on native. A `rootnative update`
+  of these components adds `pressableKeyDown.ts` to the component folder.
+- **On web, the `Tabs` indicator follows a tab that moves and keeps its
+  size.** react-native-web reports a layout from a `ResizeObserver`, which
+  fires only when the size changes. So a tab that moved with the same
+  width sent no new position, and the indicator stayed at the old place:
+  after a new `edgePadding` on scrollable tabs, or after a longer label on
+  an earlier tab. Now `Tabs` places each tab at the start padding plus the
+  widths of the tabs before it, and in RTL it counts back from the width
+  of the row. The indicator shows when the active tab and every tab before
+  it are measured. No change on native, where the sum gives the same place
+  as before. A `rootnative update tabs` adds the `rtl` util.
+- **`rootnative add` copies every file that `Checkbox`, `Radio` and `Switch`
+  import.** The three components ship `internal/useHaloLayer.ts`, which
+  imports `useFocusRingStyle` from `./useStateLayer`. The registry did not
+  list `useStateLayer.ts` for them, because the generator followed only
+  `../internal/<name>` imports, not an import from one internal file to
+  another. So an installed `Checkbox`, `Radio` or `Switch` could not
+  resolve `./useStateLayer`, in every release since at least
+  `0.0.0-alpha.25`. The registry now lists the file, and
+  `pnpm run registry:check` reads the imports of the shipped files, so a
+  missing file fails the check. In a project that copied one of the three,
+  run `rootnative upgrade`: it moves the registry pin to this release and
+  updates the components, which adds the file. The npm packages do not
+  change.
+
+## 0.0.0-alpha.31 — 2026-10-29
+
+**No breaking change.** No export and no prop is removed. One change can
+move a screen: an outlined `Button` gets smaller, to the height and width
+of the other variants. Two fixes in `components` and one in `seo`. The
+`@rootnative/inertia` floor moves to `0.0.22`, so upgrade it in the app
+with this release.
+
+### `@rootnative/inertia` floor moves to `0.0.22`
+
+The `core`, `utils` and `components` peer ranges are now `>=0.0.22 <0.1.0`,
+the dev, example and template pins are `0.0.22` exact, and the registry's
+derived floor follows. inertia `0.0.21` stops a Reanimated 4.7 warning from
+`useSpring` and `useInView` on native. inertia `0.0.22` removes a
+`<Presence>` child that holds no `Motion.*` when it departs; before, that
+child stayed on screen. No component in this library needed either fix:
+none calls `useSpring` or `useInView`, and every `<Presence>` child is a
+`Motion.View`. The floor moves so that an app gets both fixes with this
+release.
+
+### An outlined `Button` has the same height and width as the other variants
+
+The outline came on top of the full token padding, so an outlined button
+was taller and wider than a `filled`, `tonal` or `elevated` button of the
+same size by two outline widths. A `small` outlined button was 42 high, not
+40. Now the padding gives up the outline width, and the outline sits inside
+the token container, as in MD3. An outlined button gets smaller in each
+direction: by 2 dp at `extraSmall`, `small` and `medium`, by 4 dp at
+`large`, and by 6 dp at `extraLarge`. The same applies on web. `IconButton`
+did not have this defect: it sets a fixed width and height.
+
+### `Button`, `IconButton`, `FAB` and `Chip` no longer widen the page on web with their focus ring
+
+The ring was a node 5 px outside the control, at opacity 0 until keyboard
+focus. On web an absolutely placed node adds to the scrollable overflow of
+the page even at opacity 0, so an `IconButton` at the end of a bar with the
+4 px MD3 gutter reached 1 px past the page edge, and every window width
+scrolled sideways by 1 px. On web the four controls now draw the ring as a
+CSS outline (3 px wide, 2 px out) on a node with the control's box. An
+outline is ink, not layout, and adds no overflow. The ring follows the
+corner radius and the shape morph as before. No change on native. The other
+controls keep the outset node; see "Focus rings on web" on the
+accessibility page.
+
+### A page head takes every page slot out of the server head, also the slots it leaves empty
+
+The Expo Router `PageHead` and `RouteHead` removed a server tag only from a
+slot the page wrote. A `noindex` page writes no canonical link and no share
+card, so on a route the static export did not write, the canonical link,
+the description and the `og:*` and `twitter:*` tags of the shell page
+stayed beside the `noindex`, and the canonical link pointed at the home
+page. Now the sweep covers every page slot: the description, the robots
+tag, the canonical link, the `hreflang` links, `og:*` and `twitter:*`. The
+charset, the viewport, the theme colour, the icons, the manifest, the
+preconnect links and a feed link stay. The `dom` adapter follows the same
+rule: it takes every page slot of a template or of a screen below out while
+its head is on, and puts them back when it goes. An `og:image` of a
+`generateMetadata` that the screen does not declare goes too; declare it on
+the `PageHead`.
+
+## 0.0.0-alpha.30 — 2026-10-26
+
+**No breaking change.** No export and no prop is removed, and no change
+moves a screen. One fix, two new `ListItem` props and one new `List` part in
+`components`, one fix in the `llms.txt` files, and one new docs section. The
+`@rootnative/inertia` floor stays at `0.0.20`. `@rootnative/inertia`
+`0.0.21` removes the same Reanimated warning from `useSpring` and
+`useInView`, so upgrade it with this release.
+
+### The Card page says how to load an image
+
+The library has no image component, and the Card page did not say so. A
+React Native `Image` in `Card.Media` has no loading state and no error
+state, so a slow or broken URL left the region empty. The new "Images"
+section says that `Card.Media` sizes the image and does not load it, and
+names `expo-image` with `placeholder`, `placeholderContentFit`,
+`transition` and `onError`. No code change.
+
+### `List.Headline` for a long list in a `FlatList`
+
+`List` renders all its children and does not scroll. A `FlatList` inside a
+`List` got no bounded height, so the end of a long list did not scroll into
+view, and the headline was not available on its own to move into the
+`FlatList`. The headline is now exported as `List.Headline`, and by name as
+`ListHeadline`. It takes `headingLevel` and `style`, and `List` renders its
+`headline` through it, so the two look the same. Put it in the
+`ListHeaderComponent` of a `FlatList` with `ListItem` rows. The List page
+has a "Long lists" section with the pattern.
+
+### `llms.txt` names the inherited props of 10 more components
+
+The generator dropped the "Inherits" line of a props type whose
+`extends Omit<…>` clause is longer than one line. That was the case for
+`Button`, `Checkbox`, `FAB`, `IconButton`, `Switch`, `TextField`, the
+`NavigationDrawer` props, `NavigationDrawer.Item`, `NavigationDrawer.Section`
+and the `SearchBar` props. Their entries now say which React Native props
+they take, for example "Inherits `PressableProps` (except `children`,
+`style`)".
+
+### `ListItem` takes a line limit for the headline and the overline
+
+`ListItem` cut the headline and the overline at one line, with no prop to
+change it, so a long headline in a narrow window lost its end. The new
+`headlineNumberOfLines` and `overlineNumberOfLines` props set the limit. The
+default is `1`, as before, and `0` removes the limit, the same as
+`supportingTextNumberOfLines`. The item grows to fit the lines. Unlike a
+multi-line `supportingText`, a wrapped headline or overline does not change
+the item to the three-line template, so a row whose text fits on one line
+keeps its height.
+
+### The progress family and `Slider` no longer cause a Reanimated warning on native
+
+On native, in development, Reanimated 4.7 logs "Dependencies should only be
+used on the web and are always ignored on native" when a worklet hook gets a
+dependency list. `LinearProgress`, `CircularProgress`, `LoadingIndicator`
+and `Slider` passed a list to `useAnimatedStyle` or `useAnimatedProps` in 10
+places, so an app that rendered one of them printed the warning and found no
+offending code in its own source. The 10 calls now pass no list, and
+Reanimated builds the list from the worklet closures on native and on the
+web. No change in a production build.
+
+## 0.0.0-alpha.29 — 2026-10-23
+
+The Expo SDK 58 release. **Breaking:** every package moves to the SDK 58
+runtime band and stops claiming SDK 57, so an app that stays on SDK 57 stays
+on `0.0.0-alpha.28`. One set of ranges cannot serve both bands. Three `ref`
+props of `components` take the React Native 0.88 instance types; that entry
+ends with what to check. The `@rootnative/inertia` floor moves to `0.0.20`.
+
+Also in this release: one fix in `core` and `components`, two new exports in
+`core`, one new prop on `Tabs`, one new function and one new command in
+`seo`, and one corrected `seo` audit message.
+
+### Breaking: the peer ranges move to the Expo SDK 58 band
+
+`core`, `components`, `icons` and `seo` declare `react >=19.3.0 <20.0.0` and
+`react-native >=0.88.0 <0.89.0`. `components` also moves
+`react-native-reanimated` to `>=4.7.0 <4.8.0` and `react-native-worklets` to
+`>=0.13.0 <0.14.0`.
+
+The band cannot be wider. React 19.2.3 does not pair with React Native 0.88,
+and Worklets 0.10 does not pair with Reanimated 4.7. A range that admits both
+SDK 57 and SDK 58 also admits pairs that cannot install, and a range promises
+every combination it permits. `@rootnative/inertia` `0.0.20` moved for the
+same reason.
+
+Migration: move the app to Expo SDK 58 — React `19.3.0`, React Native
+`0.88.0`, Reanimated `4.7.1`, Worklets `0.13.0` — and `@rootnative/inertia`
+to `0.0.20`. `npx expo install --fix` picks the SDK versions. An app on SDK 57
+stays on `0.0.0-alpha.28`:
+`npm install @rootnative/components@0.0.0-alpha.28`. The README and the
+installation page carry the table of SDK against version. The example app
+and both `rootnative create` templates pin the SDK 58 runtime.
+
+The release gate installs the `components` and `core` candidates into an Expo
+SDK 58 fixture app and bundles it for Android and the web, before the publish.
+It installs `core` from the same release: the registry still has `core`
+`0.0.0-alpha.28`, which declares the SDK 57 band.
+
+### Breaking: three `ref` props take the React Native 0.88 instance types
+
+The React Native 0.88 types declare `View`, `TextInput` and `ScrollView` as
+function components, so `TextInput` no longer names the host instance. The
+`ref` of `TextField`, `SearchBar` and `SearchView` is now
+`Ref<TextInputInstance>`, and the `anchor` of `SearchView` is
+`RefObject<ViewInstance | null>`. Both types come from `react-native`. The
+value at runtime does not change.
+
+**Check your app.** Type a ref that you pass to `TextField`, `SearchBar` or
+`SearchView` as `useRef<TextInputInstance>(null)`, and the `anchor` of
+`SearchView` as `useRef<ViewInstance>(null)`. On React Native 0.88,
+`useRef<TextInput>(null)` does not compile anyway.
+
+### `@rootnative/inertia` floor moves to `0.0.20`
+
+The `core` and `components` peer ranges are now `>=0.0.20 <0.1.0`, and the
+dev, example and template pins are `0.0.20` exact. `0.0.20` is the first
+`inertia` release on the SDK 58 band; `0.0.19` declares SDK 57. It also lets
+`useAnimation` take a start value, and `animate={{ translateY: 24 }}`
+compiles again on React Native 0.88.
+
+### `Tabs` follows a pager position
+
+Above a swipe pager, the indicator stayed on the old tab during the swipe
+and sprang to the new one only when the pager selected the page. The new
+`position` prop takes the page position as a Reanimated shared value: the
+page index plus the fraction of the swipe toward the next page, written on
+the UI thread. The indicator then moves with the finger between the rects of
+the two tabs on each side of the position, in `items` order, in a worklet.
+The rects are measured, so they are correct in either layout direction. A
+position past the last tab clamps to it, and a neighbour that is not
+measured yet falls back to the active tab for that frame. Reduced motion
+does not gate it: that is the swipe, not an animation. Without `position`,
+nothing changes. Keep `value` in sync from the pager's page-selected event:
+it still drives the active tab colors, and it scrolls a scrollable row to
+the selected tab when the swipe ends; the row does not scroll with the
+finger. The Tabs page shows the `react-native-pager-view` wiring with the
+Reanimated `onPageScroll` handler. Four tests.
+
+### An overlay carries the theme of the place it is written
+
+An overlay under a nested `ThemeProvider` mixed two themes. `Dialog`, `Menu`,
+`Tooltip`, `BottomSheet`, `SearchView`, the modal `NavigationDrawer` and the
+snackbar read the theme where the app writes them, so the overlay surface took
+the nested colors. Their `Portal` rendered the content at the `PortalHost`,
+which is usually above the nested provider, so a `Button` in a `Dialog` took
+the root colors, and a `useThemeMode()` call in the content set the mode of
+the root. The alpha.28 theming page documented two app-side fixes.
+
+Now `Portal` reads the theme, the mode, the icon resolver and the motion
+config at its call site, and provides them again around its content at the
+host. Every overlay in the library follows the provider it is written under,
+with no change in the app. A `ThemeProvider` inside the content inherits from
+the carried values the same way it inherits from a real parent. Two Portal
+tests; the first fails on the old `Portal`.
+
+The pair is public in `@rootnative/core`, for content an app renders at
+another place itself (`createPortal`, a third-party modal):
+`useThemeScope()` returns a `ThemeScope`, and `<ThemeScopeProvider scope>`
+provides it. Four `core` tests. The theming page and the Portal page describe
+it; the two app-side workarounds are gone from the theming page.
+
+**Check your app.** If you wrapped overlay content in a second nested
+provider, or gave `Menu`, `Tooltip`, `BottomSheet` or the drawer a named
+`PortalHost` only to carry the nested theme, you can remove that.
+
+### `seo` reads a server export of Expo SDK 58
+
+From Expo SDK 58, `web.output: 'server'` writes no page file: the server
+renders each page at request time. `writeSeoFiles`, `auditExport`,
+`browseExport` and `readExport` read the pages of a server export from
+`<outDir>/server`, so they found no page and stopped with "no .html file".
+
+The new `renderServerExport` in `@rootnative/seo/node` starts `expo serve`
+on the export, requests each route of `server/_expo/routes.json`, and writes
+the HTML to `<outDir>/rendered`. The other functions then read the pages from
+there. The server export does not run `generateStaticParams`, so pass the
+values of each dynamic route in `params`. The not-found route is written as
+`+not-found.html`. With `origin`, it requests a server that runs already,
+such as a preview deploy. An export from SDK 57 or earlier keeps its pages
+in `<outDir>/server`, and nothing changes for it. On a server export with no
+page, the "no .html file" error now names `renderServerExport`.
+
+The new `rootnative-seo render <outDir>` command runs it, with
+`--params <file>` for a JSON file of params and `--origin <url>`. Run it
+before the other commands. The README and the server output section of the
+checklist give the SDK 58 steps. Twelve tests; one starts a stand-in
+`expo serve` and checks that it stops.
+
+### The audit names the right fix for a not-found page
+
+On Expo SDK 58 a static export skips internal routes, so it never calls the
+`generateMetadata` of `+not-found`, and that page has no head. For this page
+`auditExport` told the user to export `generateMetadata`, which cannot work.
+It now says to write the head into the file after the export, with
+`headTagsHtml(toHeadTags(site, meta))`. A server export renders that head,
+so its message does not change. The checklist says the same. One test.
+
+## 0.0.0-alpha.28 — 2026-10-21
+
+**No breaking change.** No export and no prop is removed. One change can move
+a screen: a nested `ThemeProvider` with a `{ light, dark }` pair now follows
+the mode of its parent and uses the icon resolver of its parent. The entry
+ends with what to check. Three more changes. A new subpath,
+`@rootnative/core/static-export`, hides the light first paint of a static web
+export from a reader with a dark scheme. `@rootnative/seo` adds `toMetadata`
+for the `generateMetadata` export that Expo SDK 58 reads, and the Expo Router
+`PageHead` now writes its JSON-LD into the page body. Three `components`
+entry points export the types they used to hide.
+
+### A nested `ThemeProvider` takes the icon resolver and the mode of its parent
+
+A `ThemeProvider` inside another one did not inherit from it. With only
+`theme` set:
+
+1. It provided `iconResolver ?? null`, so every string icon below it drew
+   nothing and logged the "no icon resolver" warning.
+2. Its mode was its own state, which started at `'system'`. So the subtree
+   followed the OS, and a mode that the reader chose on the root provider did
+   not reach it.
+
+The `MotionConfig` in the provider already merged with its parent, so the two
+values followed a different rule than the named transitions.
+
+Now a nested provider with no `iconResolver` uses the resolver of its parent.
+A nested provider with a pair, below a parent with a pair, follows the mode of
+the parent when it gets none of `mode`, `defaultMode` and `storage`.
+`useThemeMode()` below it reports the mode, the scheme and `isReady` of the
+parent, and `setMode()` sets the mode of the parent and calls the
+`onModeChange` of both providers. A nested provider that gets any of the three
+props keeps a mode of its own, as before. 14 new tests; each of five faults
+put back into the provider fails at least one of them.
+
+The theming page has a new "Nested providers" section. It also states a limit
+that stays: an overlay renders its content at the `PortalHost`. The overlay
+surface takes the nested colors, but the components in the content take the
+theme of the provider above the host. The section gives two fixes.
+
+**Check your app.** If you passed `iconResolver`, `mode` and `onModeChange`
+to a nested provider only to carry the root values down, you can remove them.
+If a nested provider must follow the OS while the root has a pinned mode, pass
+`defaultMode="system"` to it.
+
+### `@rootnative/core/static-export` hides the light first paint
+
+The alpha.21 entry "`mode="system"` is safe in a static web export" said that
+a reader with a dark system setting sees "one light frame" first. That is
+wrong. react-native-web writes each theme color into the HTML as an inline
+style, and CSS in the HTML shell cannot change an inline style. So the page
+stays light until the script downloads and hydrates. Measured in Chromium with
+a dark color scheme, on a page with 2.6 MB of script: 1.3 s on a fast computer,
+and 5.5 s with a 4× CPU throttle and a 6.4 Mbit/s network. A mode that
+`storage` restores loads after hydration too, so a reader who chose dark sees
+the same light page. The theming page, the `ThemeProvider` JSDoc and the
+`llms` files now give that time.
+
+The new subpath hides the light page:
+
+- `schemeGuardScript()` returns an inline script for the `<head>` of the HTML
+  shell. Before the body paints, it reads the stored mode from `localStorage`,
+  then the OS scheme, and writes the scheme to `<html>` as
+  `data-rootnative-scheme`.
+- `schemeGuardCss({ background })` returns CSS that hides `#root` and paints
+  `background` for the dark scheme, until `<html>` has
+  `data-rootnative-theme-ready`. After 8 s the page shows anyway, for a script
+  that fails to load.
+- `ThemeProvider` writes `data-rootnative-theme-ready` on `<html>` on the
+  first render after hydration, with the stored mode loaded. It does nothing
+  on native.
+
+A reader with a light scheme sees no change, and without JavaScript nothing is
+hidden. A reader with a dark scheme sees content when hydration ends, so the
+Largest Contentful Paint is later for that reader. The example app uses the
+guard. In its export, with a 4× CPU throttle, the light page showed for 2.4 s
+without the guard, and for no frame with it.
+
+**Check your app.** Nothing changes until you add the script and the CSS to
+`app/+html.tsx`. The theming page has the full shell under "The first paint
+of a static export".
+
+### `@rootnative/seo` writes the head of an Expo SDK 58 static export
+
+On Expo SDK 58, `PageHead` and `RouteHead` wrote nothing into a static
+export: every page had no title, no canonical link and no Open Graph tag.
+`@expo/router-server` 58.0.12 (expo/expo#46526) renders the export with the
+streaming renderer. That renderer writes the head from the `generateMetadata`
+export of the route, and it does not read the `expo-router/head` tags. The
+`seo` peer range (`expo-router >=57.0.0`) claimed support for that version.
+Only `rootnative-seo audit` showed the defect.
+
+- `toMetadata(site, meta)` in `@rootnative/seo` returns the `Metadata` object
+  for `generateMetadata`. It applies the same rules as `toHeadTags`, from one
+  shared resolver. A new test runs the result through the Expo serializer and
+  compares the tags with `toHeadTags` for ten page shapes. The 57.0.9 and
+  58.0.15 serializers give the same tags.
+- The Expo Router `PageHead` and `RouteHead` write the JSON-LD as a script in
+  the page body, not in the head, on every SDK. `Metadata` has no field for
+  JSON-LD. On SDK 57 the script moves from the head to the body.
+- After hydration, the focused `PageHead`, and `RouteHead` when it writes,
+  remove each head tag in a slot they write that react-helmet-async did not
+  write. Without this, an SDK 58 page held two sets of tags after hydration,
+  because Helmet removes only its own tags, and the canonical link of the
+  first page stayed after a client navigation. A removed tag is not put back.
+- The `audit` messages for a missing title and a missing canonical link name
+  `generateMetadata`.
+
+Checked on a scratch Expo SDK 58 app (`expo` 58.0.16, `expo-router` 58.0.24,
+`@expo/router-server` 58.0.15) with the packed package: the static pages hold
+the title, the canonical link, the Open Graph and Twitter tags, and the JSON-LD
+in the body. `rootnative-seo audit` passes the title and canonical rules on
+those pages, and `rootnative-seo browse` loads every page with no error. The
+example app (SDK 57) passes `check:export`, with the browser run.
+
+**Check your app.** On SDK 58, export `generateMetadata` from each route and
+return `toMetadata(site, meta)` with the meta of its `PageHead`. In a static
+render the request is `undefined`, so build the meta from the route params.
+Keep the `PageHead`. `RouteHead` writes no static tag on SDK 58, and Expo
+Router reads `generateMetadata` from the route file only, so a route that
+`RouteHead` covers needs its own export. A custom `app/+html.tsx` must render
+`headNodes` and `bodyNodes` from `useServerDocumentContext()` in
+`expo-router/html`. Without them the page has no head tags, no CSS and no
+JavaScript. Step 3 and step 7 of the SEO checklist have the code.
+
+### Three `components` entry points export their hidden types
+
+`@rootnative/components/button` exported `ButtonProps` and `ButtonVariant`,
+but not `ButtonSize` and `ButtonShape`. An app that wraps `Button` had to
+copy the two unions or index into `ButtonProps`. A scan of every entry point
+found the same gap in two more:
+
+- `@rootnative/components/button`: `ButtonSize`, `ButtonShape`.
+- `@rootnative/components/icon-button`: `IconButtonWidth`, `IconButtonShape`.
+- `@rootnative/components/chip`: `AssistChipProps`, `FilterChipProps`,
+  `InputChipProps`, `SuggestionChipProps`, the four members of the
+  `ChipProps` union.
+
+The package root exports the same eight names. `api-surface.json` records
+them. No runtime code changes.
+
+## 0.0.0-alpha.27 — 2026-10-17
+
+**No breaking change.** No export and no prop is removed. The
+`@rootnative/inertia` floor moves to `0.0.19`, so upgrade it in the app with
+this release. Four changes can move a screen or fail a test:
+`LoadingIndicator` turns, the children of a sized `Card.Media` stack, a
+`Chip` label stays on one line, and `Picture` on the web follows the React
+Native layout rules. Each of these entries ends with what to check. The
+other fixes: a control that becomes disabled during a press shows the
+disabled color, `Dialog` finds its slots inside a fragment, and
+`rootnative-seo browse` names a base-path mismatch.
+
+### `LoadingIndicator` spins
+
+The indeterminate indicator did not turn. Only the shape change ran, one
+change every 650 ms, so on a short task the indicator looked still. The spin
+used `useAnimation(1, loop)`. `useAnimation` starts its value at the target,
+and Reanimated runs each turn of a loop from the value at the start of the
+loop, so each turn ran from 1 to 1.
+
+The spin now starts at 0 and runs to 1 through `useAnimator`. Reduced motion
+still stops it. A determinate indicator also ran an endless loop from 0 to
+0, and now it runs no loop. Three tests record the value that each loop
+starts from, and all three fail on the old code.
+
+**Check your app.** If you put the indicator in a `Motion.View` that turns
+it, remove that wrapper, or the indicator turns two times as fast.
+
+### A control that becomes disabled during a press shows the disabled color
+
+`Button`, `Card` with `onPress`, `Chip`, `FAB` and `IconButton` removed
+their animated state-layer style while disabled. A view keeps the last value
+that an animated style wrote. So a button that disabled itself in its own
+`onPress`, such as Next on the last page, kept the pressed tint after the
+press, and `Button` also kept the pressed corner.
+
+The animated styles now stay on the container while disabled. The state
+layer shows the disabled container color, also on the first frame of a
+control that mounts disabled. A press or a hover that the control did not
+release goes back to rest. A loading `Button` keeps its container color, as
+before. A test for each of the five components disables it during a press,
+and each case fails on the old code.
+
+**What does not change.** A disabled control shows the same colors as
+before.
+
+### Each child of a sized `Card.Media` fills the slot
+
+The docs said that a plain `Image` in a `Card.Media` with a `height` or an
+`aspectRatio` needs no style. A network `Image` was 0 high. The slot put its
+children in a column, which stretches a child across the width only, and a
+network image has no height of its own.
+
+Now each child of a sized slot gets `StyleSheet.absoluteFill` before its own
+style, so a plain `Image` fills the slot. A child's own `width` or `height`
+wins over the fill. A slot with no size does not change.
+
+**Check your cards.** The children of a sized slot now stack: a second child
+is an overlay on the first. If you put two children in a column in one slot,
+wrap them in one `View`. If you gave an image `flex: 1` only to fill the
+slot, you can remove it.
+
+### A `Chip` label stays on one line
+
+The label had no line limit. A long label wrapped, and the 32dp chip cut the
+second line in half. The label now has `numberOfLines={1}` and
+`flexShrink: 1`, so a label that does not fit ends with an ellipsis. MD3
+gives a chip one line of label.
+
+**Check your chips.** A label that wrapped now ends with an ellipsis. To show
+more of it, give the chip more width.
+
+### `Dialog` finds its slots inside a fragment
+
+`Dialog` read its slots from its direct children only. A `Dialog.Title`,
+`Dialog.Content` or `Dialog.Actions` inside a fragment, such as a conditional
+`<>…</>`, went to the body with no warning: no headline, no action row, and
+no accessible name. `Dialog` now collects the children of a fragment at each
+depth.
+
+### `Picture` lays out on the web as on native
+
+On native, `Picture` puts `width` and `height` before `style`, as a React
+Native box. On the web, it rendered a raw `<img>` with the style as inline
+CSS, and a raw element does not lay out as a react-native-web view:
+
+- A border width drew no border, because the element had no `border-style`.
+- A `flex: 1` picture in a shorter frame kept the height of its ratio and
+  went out of the frame, because the element had no `min-height: 0`.
+- A side that `style` set to `undefined` took its size from the `width` or
+  `height` attribute, so an `aspectRatio` did nothing. The picture on the
+  showcase page of the example measured 390 by 360 in a 390 px frame, in
+  place of 390 by 234.
+
+The web branch now puts the react-native-web view defaults before the box:
+`box-sizing: border-box`, a solid border of width 0, `flex-shrink: 0`,
+`min-width` and `min-height` of 0, and `position: relative`. A side that
+`style` sets to `undefined` is `auto`. Each case was measured in headless
+Chromium, before and after.
+
+**Check your pages.** A size in `style` wins over the box, on both
+platforms. To let `flex` or `aspectRatio` set a side, set that side to
+`undefined`: `{ flex: 1, width: undefined }` fills a frame, and
+`{ width: 112, height: undefined, aspectRatio: 2 / 3 }` keeps the ratio. A
+border now draws, and it is inside the box.
+
+### `browseExport` names a base-path mismatch
+
+An export whose scripts load from `/` and whose canonical link is under a
+path, or the reverse, failed on each script of each page.
+`rootnative-seo browse` printed one line for each failed request, and no
+line for the cause. `browseExport` now reads the script URLs of
+`index.html` before it starts Chrome. When they are not under the base path,
+it stops with one message that names both paths and the fix: set
+`experiments.baseUrl`, or pass `basePath`.
+
+### `@rootnative/inertia` floor moves to `0.0.19`
+
+On the web, a component with a state layer showed no focus indicator in one
+case: a click that focused nothing, then a focus that a script moved.
+Chromium matches `:focus-visible` there and draws its outline, but the
+components remove that outline. inertia `0.0.18` read only its own input
+tracker, which was in pointer modality, so the state layer stayed off.
+inertia `0.0.19` asks the focused element whether it matches
+`:focus-visible`. Its tracker also skips a ⌘, Ctrl or Alt chord now, so ⌘S
+in a form does not show a focus layer to a mouse user on the next focus.
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges
+are now `>=0.0.19 <0.1.0`, the dev, example and template pins are `0.0.19`
+exact, and the registry's derived floor follows. Upgrade
+`@rootnative/inertia` to `0.0.19` in the app with this release. Two web
+tests, the script focus after a click on nothing and the chord, fail on an
+older inertia.
+
+## 0.0.0-alpha.26 — 2026-10-16
+
+**No breaking change.** No export and no prop is removed. Two changes can
+move a screen or fail a test. On the web, `AppBar`, `NavigationBar` and
+`NavigationRail` render a landmark, and the tablist of `NavigationBar`
+moves to the row inside it. The layout keys in `style` place `Card` with
+`onPress` and `Switch` by their wrapper. Each of these entries ends with
+what to check. Most of this release is `@rootnative/seo`: `auditExport` and
+`browseExport` check every exported page, `RouteHead` writes the head of a
+screen that has no `PageHead`, `Picture` renders an image that a crawler
+sees, `PageHead` from `/dom` serves an app with no Expo Router,
+`alternates` writes `hreflang` links, and every command reads a server
+export. A release now pushes its tag before it publishes.
+
+### `rootnative-seo` reads a server export
+
+`web.output: 'server'` writes the pages to `dist/server`, next to
+`_expo/routes.json`, and the files that the server sends as they are to
+`dist/client`. `rootnative-seo dist` read `server/index.html` as the route
+`/server`, found no home page, and stopped. With `--site-url`, it wrote
+`sitemap.xml` into `dist`, and the server does not send that folder.
+
+Now each function in `@rootnative/seo/node` finds the layout first, by the
+rule that `expo serve` uses: a `server/_expo/routes.json` file and a
+`client/` folder. `readExport`, `auditExport` and `browseExport` read the
+pages from `server/`, and `writeSeoFiles` writes `sitemap.xml` and
+`robots.txt` into `client/`. `serveExport` sends a file from `client/`,
+then a page from `server/`, and never the route manifest. You pass `dist`
+for both outputs.
+
+The checklist has a server section, with three facts measured on the
+SDK 57 export:
+
+- The server sends `+not-found.html` with a 404 for an unknown path, on
+  any host.
+- The server sends a dynamic route template with a 200 for every slug,
+  also for a slug that has no page. So the `noindex` answer for an unknown
+  entry is the only signal that a crawler gets there.
+- The server matches each route from the root of its origin and ignores
+  `experiments.baseUrl`, which moves only the URLs of the files.
+
+The example exports itself a second time with `web.output: 'server'`, in
+CI. The audit and the content checks read that export, and `expo serve`
+must send the expected status for six routes.
+
+**Check your server app.** Pass `dist` to `rootnative-seo`, `audit` and
+`browse`, not `dist/server`. If the app sets `experiments.baseUrl`, remove
+it, or remove the base path before the request reaches the server. Answer
+an unknown entry of a dynamic route with `noindex`.
+
+### `hreflang` links name the language versions of a page
+
+`PageMeta` takes `alternates`: a list of `{ lang, url }` with every
+language version of the page, this page included. The new `PageAlternate`
+type is one entry. `toHeadTags` writes one
+`<link rel="alternate" hreflang>` for each entry after the canonical link,
+with the URL under the site. When the list has no `x-default` entry, it
+writes one more for `x-default`, with the URL of the first entry. A page
+with no `url` gets no `hreflang` link.
+
+Both `PageHead` components and `headTagsHtml` write the links. The `/dom`
+`PageHead` takes out every `hreflang` link of the head below as one set, so
+no language of the page below stays, and a link with no `hreflang`, such as
+a feed, stays. `rootnative-seo dist` writes the same links into the sitemap
+as `xhtml:link` entries, and `readExport` returns them as `alternates`.
+
+`auditExport` gains the `hreflang` rule. On each indexable page that has
+the links, it fails:
+
+- a code that is not a language code or `x-default`, and the region `UK`,
+  which is `GB`;
+- a relative link, or two links for one code;
+- a page that does not name itself;
+- a link to a page with `noindex` or with no file, and a linked page that
+  lists a different set;
+- a sitemap whose `xhtml:link` entries are not the links of the page.
+
+The example has one page in English and in German, `/i18n` and `/de/i18n`.
+The export check asserts both sets by value, because the audit passes a
+page that has no `hreflang` link at all.
+
+**Check your translated pages.** Pass the same `alternates` list to the
+`PageHead` of each version. Every version still has the `lang` of
+`app/+html.tsx`; [the limits page](https://rootnative.github.io/ui/seo/limits#the-page-language)
+says what that changes.
+
+### `PageHead` from `/dom`, for an app with no Expo Router
+
+An app on React Navigation with react-native-web, a Vite build, or an
+Electron renderer has no `expo-router/head`, so it had `toHeadTags` and no
+component to write the tags. `PageHead` in the new `@rootnative/seo/dom`
+entry takes the same `PageMeta` props as the Expo Router one and writes the
+same records to `document.head` in an effect, and takes them out on
+unmount. A test renders both adapters from one `PageMeta` and compares the
+heads.
+
+A tag of the same name, property or `rel` that was there before, from the
+template or from a screen below, is taken out while the head is on and put
+back when it goes, so a screen mounted over another wins and the one below
+gets its head back. `active={false}` takes the head out for a screen that
+stays mounted behind another; a React Navigation screen passes
+`useIsFocused()`. It needs no `react-helmet-async`: Expo Router vendors its
+own copy, and without a server renderer to collect its output a direct
+write gives the same result with no dependency and no provider.
+
+An effect never runs on a server, so such an app has a static head only at
+build time. `headTagsHtml(tags)` in the core writes the tags as escaped
+HTML for the template, one line each.
+
+### `Picture` renders an image a crawler sees
+
+`expo-image` mounts its image in an effect, and the React Native `Image`
+loads its source in one, so a static export held no `<img>` for either: a
+crawler that runs no script saw no image and no `alt`. The limits page
+said the React Native `Image` had no gap; it did.
+
+`Picture` in the new `@rootnative/seo/expo-image` entry, with `expo-image`
+as an optional peer, renders a plain `<img>` on the web with `src`, `alt`,
+`width`, `height`, `loading` and `object-fit` from `contentFit`, and
+`expo-image` on native with `alt` and `accessibilityLabel`. Its `source` is
+absolute or a path under the site URL, like `image` in `PageHead`: the web
+gets the path under the host, native the absolute URL. `style` is a React
+Native image style, flattened to CSS on the web. `alt=""` marks a
+decorative image.
+
+`auditExport` gains the `alt` rule: every `<img>` has an `alt` attribute.
+The example's showcase pages render a wireframe through `Picture`, from
+`public/`, and set the `og:image` fallback with it.
+
+**Check your pages.** An image a crawler must see goes through `Picture`.
+An `expo-image` that stays, for its cache or a transition, keeps the two
+fallbacks, `og:image` and the JSON-LD `image`.
+
+### The layouts are landmarks, and the audit checks `<main>` and `lang`
+
+A crawler and a screen reader read the page by its landmarks, and a
+React Native web export had none: every container was a `<div>`.
+react-native-web renders a landmark from `role`, so the layouts now set
+their own. `AppBar` is `banner`, which renders `<header>`; inside `<main>`
+it is a plain header, not a landmark, so a bar on a demo page changes
+nothing. `NavigationBar` and `NavigationRail` are `navigation`, which
+renders `<nav>`; the standard `NavigationDrawer` already was. The tablist
+of `NavigationBar` moves from the root to the row inside it, with the
+`accessibilityLabel`, and gets the `<testID>-tablist` test id. A `role` in
+the props replaces the default on every one of them.
+
+`auditExport` gains two rules. `main`: exactly one `<main>` per page.
+`lang`: a `lang` on `<html>`. The page content gets `<main>` from one
+`<View role="main">` around the navigator in the root layout, and the
+checklist shows it. The example and the landing site pass both rules.
+
+**Check your app.** A test that read `role="tablist"` on the root of a
+`NavigationBar` now finds `navigation` there; the tablist is the row inside.
+Add `<View role="main">` around the navigator, or `rootnative-seo audit`
+fails every page.
+
+### The docs give a Lighthouse gate for the live host
+
+The limits page said that Lighthouse and Search Console are the checks
+that count, and gave no way to run them. Lighthouse is now a gate in the
+deploy workflow of this site: after each deploy, one
+[script](https://github.com/rootnative/ui/blob/main/scripts/lighthouse-seo.mjs)
+runs the SEO audit on the deployed URLs and fails the workflow below 100.
+The docs link the script and the workflow. They also say what Lighthouse
+cannot see: it audits the page after the script ran, so a defect in the
+HTML file still scores 100, and `rootnative-seo audit` is the gate for the
+file. Search Console stays manual, and the docs give the sitemap URL to
+submit.
+
+**Check your deploy.** Run Lighthouse on the deployed URLs after each
+deploy, and fail below 100.
+
+### `browseExport` and `rootnative-seo browse` load every page in Chrome
+
+The audit reads the HTML. A hydration mismatch, a component that reads the
+browser during the hydrating render, or a bundle that fails to load leave
+the file correct and the page broken, and PageSpeed Insights reported
+exactly that on the docs home. `browseExport({ outDir })` in
+`@rootnative/seo/node` serves the export and loads every `.html` file in
+headless Chrome, and returns each error the browser reports: an uncaught
+exception, a `console.error`, or a log entry such as a request that
+failed. It drives Chrome over its debugging pipe, so the package adds no
+dependency; Chrome comes from `CHROME_PATH`, the usual names on `PATH`, or
+the usual install paths, and the GitHub `ubuntu-latest` runner has it.
+`rootnative-seo browse <outDir>` runs it from a script, prints each
+problem with its file and kind, and exits with 1. Full Chrome asks for
+`/favicon.ico` by itself when a page names no icon, and the headless shell
+does not. That request is not a problem, so the result is the same in both.
+
+`serveExport({ outDir })` is the server behind it, and it is public: it
+serves the folder as a static host serves an Expo Router export, under the
+base path of the canonical link, for Lighthouse or a browser test of your
+own.
+
+The example runs the browser pass after the audit. On a machine with no
+Chrome, `check-export.mjs --no-browser` skips it and says so.
+
+**Check your CI.** Add `rootnative-seo browse dist` after
+`rootnative-seo audit dist`. A page that fails here renders twice for a
+crawler that runs the script, and the HTML gate cannot tell.
+
+### `RouteHead` writes the head of a screen that has no `PageHead`
+
+A screen with no `PageHead` was a page with no title, and nothing said so
+until the audit above. `RouteHead` in `@rootnative/seo/expo-router` closes
+the gap. It takes `defaults`, a function from the pathname to a `PageMeta`,
+and writes that head for the current route when no focused screen on it
+renders a `PageHead`. `undefined` writes nothing. On native it renders
+`null`.
+
+A `PageHead` wins the whole page, not one tag at a time. The head renderer
+merges tags one by one, last one wins, so a `noindex` screen with no `url`
+would have kept the canonical link the defaults gave the route. Instead,
+`PageHead` claims its route during render, and `RouteHead` writes nothing
+for a claimed route. The claim is made in render and not in an effect,
+because the static export runs no effect.
+
+That gives `RouteHead` one placement rule: after the navigator in the root
+layout. The screen then renders first, and `RouteHead` reads its claim in
+the same pass. Before the navigator, the static export holds both heads; the
+client corrects itself after the first render, and the component warns in
+development.
+
+The example's component screens no longer render a `PageHead`: `RouteHead`
+builds the same head from the catalog, the home and not-found screens keep
+their own, and the export gate checks that the not-found page gets no
+canonical link from the defaults.
+
+**Check your root layout.** Add `<RouteHead defaults={fn} />` after the
+navigator, with `fn` returning the title, the description and the `url` of
+each route your app can show, and `undefined` for the rest.
+
+### `auditExport` and `rootnative-seo audit` check every exported page
+
+The docs told each app to write its own export check, and the example's
+script checked two pages of thirty-eight. The other thirty-six could lose
+their title and no gate would fail. On its first run over the whole example,
+the new audit found two pages that had: the `+not-found` page had an empty
+`<title>`, no canonical link and no `<h1>`, and the `AppBar` demo page had
+thirty-seven `<h1>` tags, one per demo bar, because the bar title is level 1
+by default.
+
+`auditExport({ outDir, siteUrl?, ignore? })` in `@rootnative/seo/node` reads
+every `.html` file under `outDir` and returns each rule a page fails:
+
+- `title`: one `<title>`, with text.
+- `canonical`: an absolute canonical link, or `noindex`.
+- `h1`: exactly one `<h1>`.
+- `sitemap`: `sitemap.xml` exists, every `<loc>` is the canonical link of a
+  page, and every page `writeSeoFiles` would list is in it.
+
+It returns `{ pages, problems: { file, rule, message }[] }` and throws only
+when the folder is missing or holds no HTML file. `rootnative-seo audit
+<outDir>` runs it from a `package.json` script, prints each problem with its
+file and rule, exits with 1 when there is one, and writes nothing. `--ignore
+<rule>` skips a rule.
+
+The example now runs the audit over its whole export and keeps its
+per-page content check. It also gains a dynamic route, `showcase/[slug]`,
+with one page per entry of a seeded list through `generateStaticParams`,
+so the audit and the sitemap see the shape every data-driven app has. The
+checklist shows the pattern, including the `noindex` answer for the route
+template Expo writes next to the pages. Its `+not-found` screen has a title, `noindex`, and the
+`AppBar` heading, and the demo bars on the `AppBar` page pass
+`titleLevel={3}`.
+
+**Check your deploy.** Add `rootnative-seo audit dist` after
+`rootnative-seo dist` in the CI step that exports the web app. A demo or a
+list page that renders more than one `AppBar` needs `titleLevel` on every
+bar but the page bar.
+
+### A release pushes its commit and its tag before it publishes
+
+The release workflows published each package and pushed the commit and the
+tags last. On alpha.23, the `seo` publish failed after the other five
+packages were on npm, so the push did not run. No `v0.0.0-alpha.23` tag
+existed, and `rootnative init`, which pins the component registry to the
+tag of the `@rootnative/core` version, used `main` and showed a warning.
+Both workflows now push first and then publish, and they share one
+`concurrency: release` group, so two releases never run at the same time.
+`release-manual.yml` also runs the format check, as `release.yml` and CI
+do.
+
+**What changes.** Nothing in the packages. If a publish fails now, the tag
+exists for a version that npm does not have, and the release is finished
+by hand.
+
+### Layout keys in `style` place `Card` with `onPress` and `Switch`
+
+alpha.24 sent the layout keys in `style` to the wrapper of `Button`,
+`IconButton`, `FAB` and `Chip`. `Card` with `onPress` and `Switch` have the
+same kind of wrapper: it holds the focus ring, and on `Card` also the shadow.
+Their `style` still went to the node inside the wrapper, and three things
+broke:
+
+- `flex: 1` in a row did not grow a `Card` with `onPress`. The card stayed at
+  the width of its content. A `Card` without `onPress` has no wrapper and did
+  grow, so the two forms did not agree.
+- A margin moved the card or the switch track away from its own focus ring
+  and shadow.
+- `alignSelf` and `position` placed the inner node in the wrapper, not the
+  component in its parent.
+
+Now the same keys go to the wrapper: `alignSelf`, `flex`, `flexGrow`,
+`flexShrink`, `flexBasis`, `width`, the margins, `position`, the insets and
+`zIndex`. `minWidth` and `maxWidth` go with a `width`. Every other key styles
+the surface or the track, as before.
+
+- **`Card`.** When `flex` or `flexGrow` is above 0, or `alignSelf` is
+  `'stretch'`, the surface fills the wrapper. A `Card` without `onPress` does
+  not change.
+- **`Switch`.** The track keeps its MD3 size of 52 by 32 at the start edge of
+  the wrapper, because the thumb travel is fixed. Before, a `width` in `style`
+  made the track wider, and the thumb stopped before the end. Now the `width`
+  sizes the wrapper, and the track does not change.
+
+A web test reads the wrapper and the inner node of each component from the
+DOM, and 8 of its 12 new cases fail on the old code.
+
+**Check your layout.** A `flex`, an `alignSelf` or a `position` that you set
+on these components now takes effect. A margin moves the component as before,
+and now the focus ring and the shadow move with it. If you added a wrapper
+`View` only to give a `Card` with `onPress` a `flex`, you can remove it.
+
+### The docs say not to use `@expo/vector-icons`
+
+The `VectorIconSet` JSDoc, the Icons page and the `llms` files said that an
+`@expo/vector-icons` set works as the `IconSet` of
+`createVectorIconsResolver`. It does not type-check: TypeScript reports
+TS2322. An `@expo/vector-icons` set is a class, and TypeScript compares the
+`props` of a class covariantly, so its glyph union does not match
+`name: never`. A `@react-native-vector-icons/*` set is a function component,
+and it matches.
+
+Expo is retiring `@expo/vector-icons`, so the library does not add support
+for it. The JSDoc, the Icons page and every `llms` file now say: do not use
+it, use the `@react-native-vector-icons/*` package of the same icon family,
+and run `npx @react-native-vector-icons/codemod` on the app code. The `llms`
+files also said that `@expo/vector-icons` and `@react-native-vector-icons/*`
+are optional peers of `@rootnative/icons`. They are not. The package declares
+Lucide and Phosphor only.
+
+**What changes.** Nothing at run time and nothing in the types. An app that
+passes an `@expo/vector-icons` set with a cast still works. Move it to the
+`@react-native-vector-icons/*` package.
+
+## 0.0.0-alpha.25 — 2026-10-11
+
+**No breaking change.** No export and no prop is removed. Five changes can
+move or change a screen. `Button`, `IconButton`, `FAB` and `Chip` follow the
+parent `alignItems`. A `Menu` on native is as wide as its widest item. A
+standard `IconButton` in an `AppBar` slot takes the slot color. A
+`Checkbox`, `Radio` or `Switch` with no handler lets its row take the press,
+and is not announced. On the web, a focused control shows one focus ring,
+not two. Each of these entries ends with what to check. New in this
+release: `loading` on `Button`, a `headline` on `List`, and the
+`useAppBarContentColor` hook. `rootnative add button` now also installs
+`progress`. Text with an expression renders in `Dialog.Content` and
+`Tooltip`. The docs now cover the `topAppBar` tokens and how to theme a
+navigator.
+
+### `Button`, `IconButton`, `FAB` and `Chip` follow the parent `alignItems`
+
+The wrapper around the pressable set `alignSelf: 'flex-start'`, so that the
+component did not stretch across a column. But an `alignSelf` also overrides
+every other `alignItems` of the parent. In a `View` with
+`alignItems: 'center'`, a `Button` stayed at the start edge, and in a centered
+row it sat at the top. A `width` in `style` stayed on the pressable and
+resolved against the wrapper, which is only as wide as the button. So
+`width: '50%'` did not give half of the parent: on native the result changed
+with the label, and on the web it was half of the button's own width.
+
+Now the pressable, the focus ring and the shadow are in a frame, and the frame
+is in an outer view that the parent lays out:
+
+- The outer view sets no `alignSelf`, so the parent's `alignItems` places the
+  component. `center` and `flex-end` work in a column and in a row.
+- The outer view sets `alignItems: 'flex-start'`. A parent that stretches its
+  children, as a plain `View` does, makes the outer view wide, and the button
+  keeps its own width at the start edge, as before.
+- `width` goes to the outer view, so a percentage resolves against the parent.
+  `minWidth` and `maxWidth` go with a `width`, so `width: '100%'` with
+  `maxWidth: 360` works. Alone, they stay on the container, as before.
+- With `flex` or `flexGrow` above 0, or with `alignSelf: 'stretch'`, the frame
+  and the container fill the outer view.
+
+The rule was checked on the Yoga that React Native 0.86.3 ships, compiled with
+its default layout conformance, and in headless Chromium with the
+react-native-web base styles. The test was 126 layouts: 9 parents, 7 `style`
+shapes, a `Button` and an `IconButton`. With the old tree, the focus ring was
+not on the button in 37 layouts on native and in 49 on the web. Now it is on
+the button in every layout on the web, and in all but 6 on native. In those 6,
+`flex: 1` in a column with no height makes the outer view 0 high, as it does
+for any `View`, and the old tree fails the same 6. Not checked on a device.
+
+**What changes.**
+
+- A button in a parent with `alignItems: 'center'` or `'flex-end'` moves
+  there. In a centered row, a button beside a taller item moves from the top
+  to the middle. If you added a `Row`, a `View` or an `alignSelf` only to place
+  a button, you can remove it.
+- `flex: 1` in a column makes the button full width, as for any `View`. Before,
+  the button was only as wide as its label.
+- On the web, `flex: 1` in a row that stretches makes the button as tall as
+  the row. Native already did this.
+- Each of these components renders one more `View`, with layout styles only.
+
+**Not changed.** On the web, a percentage `minWidth` or `maxWidth` with no
+`width` still resolves against the frame. Native resolves it against the
+parent.
+
+### A `Menu` is as wide as its widest item on native
+
+A `Menu` with one short item opened 280dp wide on iOS and Android. The item
+label and its content row had `flexGrow: 1`. The default layout conformance
+of React Native keeps a legacy Yoga rule (`StretchFlexBasis`): in a row that
+is as wide as its content, a `flexGrow` child grows to all the width it can
+get. So the menu reached its 280dp maximum every time. The web did not have
+the defect.
+
+Now no node in an item grows. The item is a column, so its content row
+stretches to the menu width only after the menu has its width. The first
+trailing element (the trailing text, or else the trailing icon) takes the free
+space with an auto start margin, so it stays at the end edge. On the Yoga that
+React Native 0.86.3 ships, a menu with one short item is 112dp wide (the
+minimum). A menu with mixed items is as wide as its widest item, with the
+trailing text at the end edge. A long label still stops at 280dp. The web
+layout does not change. Not checked on a device.
+
+**What changes.** On native, a menu with short items is narrower. A `width`
+in the `Menu` `style` still sets the width. `Menu.Item` lays out its content
+in a column now, so a `flexDirection` or an `alignItems` in an item `style`
+acts on a different layout than before.
+
+### A standard `IconButton` in an `AppBar` slot takes the slot color
+
+`AppBar` gave its content color to its built-in buttons only. Custom content
+in `leading` or `trailing` got no color. So on a `primary` bar, a `Menu`
+anchor in `trailing` was a dark icon on the dark bar, while the title was
+`onPrimary`. The consumer had to read the theme and set `iconColor` by hand,
+and a change of `colorScheme` broke it.
+
+Each slot now gives its icon color through a context. A standard
+`IconButton` with no `iconColor` and no `contentColor` takes it, and its
+hover and press layers derive from it. The colors follow the Compose
+`AppBarTokens` (`VERSION 14_0_0`): `leading` gets the title color
+(`LeadingIconColor`), and `trailing` gets `onSurfaceVariant` on the six
+surface schemes (`TrailingIconColor`). On `primary` and `primaryContainer`,
+both slots get the title color. The bar's `contentColor` replaces both. A
+selected toggle keeps `primary`, and a disabled button keeps the MD3 disabled
+color. Other custom content reads the slot color with the new
+`useAppBarContentColor()` hook, from `@rootnative/components/appbar` or the
+package root. The hook returns `undefined` outside the two slots. Content
+that a `Portal` renders, such as an open menu, does not get the color.
+
+**What changes.**
+
+- On the surface schemes, the built-in icon actions change from `onSurface`
+  to `onSurfaceVariant`, as the MD3 tokens give them. Text actions and the
+  navigation button keep `onSurface`.
+- The built-in buttons read the same context. Their hover and press layers
+  now derive from the slot color, not from `onSurfaceVariant`. So on the
+  `primary` and `primaryContainer` schemes, the layer matches the icon.
+- A standard `IconButton` that you put in `leading` with no color changes
+  from `onSurfaceVariant` to the title color. In `trailing` on a surface
+  scheme it keeps `onSurfaceVariant`. On `primary` and `primaryContainer` it
+  changes to the title color in both slots.
+
+`check:singletons` now also guards the new context and the
+`NavigationDrawer` context, which it did not list before.
+
+### The `Layout` `style` docs say that `backgroundColor` is dropped
+
+`Layout` always paints `theme.colors.background` and drops a
+`backgroundColor` from `style`. The Layout page said so, but the `style`
+JSDoc, and with it the `llms` files, did not. The JSDoc now gives the rule
+and the fix: nest a `Box` or a `View` to draw a different background. No
+behavior changes.
+
+### Text with an expression renders in `Dialog.Content` and `Tooltip`
+
+JSX text with an expression, such as `You guessed in {tries} tries`,
+compiles to an array of parts, not to one string. `Dialog.Content` and
+`Tooltip` put their children in the supporting-text `Text` only when the
+children were one string or one number, so the array went into a `View`. On
+native, the body was empty and React Native logged `Text strings must be
+rendered within a <Text> component`. On the web, react-native-web logged
+`Unexpected text node` and showed the text without the supporting-text
+style. A template string was the only workaround.
+
+Both now wrap the children when every child is a string or a number. The
+same rule names the dialog: a `Dialog.Title` such as `Delete {name}?` is now
+the accessible name of the dialog, and before, that dialog had no name. One
+internal helper does the check in the three places. A unit test covers the
+helper, and a test for each place uses text with an expression.
+
+**What does not change.** Text beside an element, such as
+`Delete <Text>{name}</Text>?`, is not wrapped. Put it in your own `Text`.
+
+### On the web, a focused control shows one focus ring
+
+On the web, a control that draws its own MD3 focus ring also showed the
+browser's focus outline inside that ring, in the system focus color: two
+rings in two colors on each keyboard focus. Only `TextField`, `SearchBar` and
+`SearchView` removed the browser outline.
+
+These now remove it too, from one shared reset: `Avatar`, `Button`,
+`ButtonGroup` items, `Card`, `Checkbox`, `Chip`, `FAB`, `IconButton`,
+`ListItem`, `Menu.Item`, the `NavigationBar`, `NavigationRail` and
+`NavigationDrawer` items, `Radio`, `Slider`, `Switch` and `Tabs`. The close
+button of an input `Chip` has no ring of its own, so it keeps the browser
+outline. A web test per component asserts the reset, and a second test
+asserts that the close button keeps the outline.
+
+**What changes.** Keyboard focus shows the MD3 ring only. Mouse focus shows
+nothing, as before. One case differs from Chromium: after a click that
+focuses nothing, Chromium shows its outline when a script then moves focus,
+but the ring follows the input modality and stays off. So that focus has no
+indicator now. Keyboard input always shows the ring. The next entry closes
+this case.
+
+The modality tracker that `Slider` reads now starts in keyboard modality on
+the web, as the tracker of the other rings does. A slider that a script
+focuses before any user input shows its ring.
+
+**Check your own styles.** Where `style` reaches the focusable node, a
+`style` that sets `outlineStyle` still wins, because the component applies
+the reset before your `style`. On `Slider`, `Tabs`, the navigation items and
+the `ButtonGroup` items, `style` does not reach that node.
+
+### On the web, a focus ring follows the browser's `:focus-visible`
+
+The rings followed the input modality only: keyboard after a key press,
+pointer after a pointer press. After a click that focuses nothing, Chromium
+marks the next focus that a script moves as `:focus-visible` and draws its
+outline there. The ring stayed off, and with the outline removed, that focus
+had no indicator.
+
+`Slider` now asks the focused element whether it matches `:focus-visible`,
+so its ring shows where the browser would draw the outline. The
+`isFocusVisible` function of `@rootnative/utils` takes the focus event for
+this. Pass the event, and the browser decides for a focused target. With no
+event, for a focus event that a script dispatches, and in a browser without
+`:focus-visible`, the function reads the modality, as before.
+
+The other rings come from `@rootnative/inertia`. They follow the same rule
+after the `@rootnative/inertia` pin moves to the release that carries it. A
+web test pins that gap until then.
+
+**What changes.** In jsdom, `:focus-visible` matches every focused element.
+A test that calls `element.focus()` on a `Slider` now always sees the ring.
+`fireEvent.focus` moves no focus, so it still reads the modality.
+
+### The `topAppBar` theme tokens are documented
+
+The `topAppBar` tokens had no docs, and their geometry is not obvious:
+`horizontalPadding` counts twice for the title and once for the actions. To
+align a bar with a 32dp page gutter, an app set `horizontalPadding: 32` and
+`titleStartInset: 0`. The actions moved to 32dp, and the title moved to
+64dp.
+
+Each `TopAppBarTokens` field now has a JSDoc line. The AppBar page has a new
+section, "Align with a Page Gutter", with the geometry and the recipe: keep
+the tokens and pad the bar with `style`. The theming page and the `llms`
+files list the fields. No behavior changes.
+
+### The `Button` `iconSize` docs use the MD3 size names
+
+alpha.24 removed the old size names, but the `iconSize` prop of `Button`
+still gave its default with them: "20 for `xs`/`s`, 24 `m`, 32 `l`, 40 `xl`".
+TypeScript rejects each of those names, and a JavaScript app that passes one
+to `Button` throws. The text now reads "20 for `extraSmall` and `small`, 24
+for `medium`, 32 for `large`, 40 for `extraLarge`", in the JSDoc, the `llms`
+files and the prop table of the Button page. The values are unchanged. Five
+internal comments that used the old names use the new ones too.
+
+### A `Checkbox`, `Radio` or `Switch` with no handler lets a row take the press
+
+A common list row puts `onPress` on the `ListItem` and shows the state in a
+control: `<Checkbox value={on} />` with no `onValueChange`. A tap on the row
+worked. A tap on the control did nothing, and nothing was logged. The control
+always rendered a pressable, so it became the touch responder, and its press
+handler had nothing to call. On the web, the control also stopped the click
+and added a second tab stop in the row.
+
+Now a control with `value`, no `onValueChange` and no `disabled` only shows
+the state. Compose has the same rule for `Checkbox(checked,
+onCheckedChange = null)`. The control:
+
+- lets the press go through to its parent, on native and on the web,
+- leaves the tab order on the web,
+- is hidden from assistive technology.
+
+So the row must carry the state. Give it `role` and `aria-checked`:
+
+```tsx
+<ListItem
+  headlineText="Wi-Fi"
+  role="switch"
+  aria-checked={on}
+  onPress={() => setOn(!on)}
+  trailingContent={<Switch value={on} />}
+/>
+```
+
+The List page has a new section, "Selection controls in a row", and the
+Checkbox, Radio and Switch pages link to it. The `onValueChange` JSDoc and the
+`llms` files give the rule.
+
+**What changes.**
+
+- A controlled control with no `onValueChange` is no longer announced. If you
+  show one outside a pressable row, as a read-only indicator, give it an
+  `onValueChange`, or put `disabled` on it. A disabled control is never
+  hidden.
+- Such a control no longer shows a hover, focus or press state layer.
+
+### `Button` takes `loading`
+
+A button that starts an action had no way to show that the action runs. A
+`leadingIcon` render function with a `CircularProgress` worked, but each app
+had to find it and choose the size, the stroke and the colors.
+
+`Button` now takes `loading`. The button shows an indeterminate
+`CircularProgress` in place of `leadingIcon`, at the icon size and in the
+label color, with no track. While it loads, the button:
+
+- ignores `onPress` and `onLongPress`,
+- shows no hover or press state layer, and no press morph,
+- sets `aria-busy`, and hides the spinner from assistive technology,
+- keeps its colors and its focus. It is not disabled, so a keyboard user
+  stays on it. Pass `disabled` as well if it must also look disabled.
+
+MD3 has no loading button, so this is a library addition. With no
+`leadingIcon`, the spinner adds the icon and its gap, so the button gets wider
+while it loads. A `width` in `style` keeps the size. The Button page has a new
+section, "Loading".
+
+**What changes.** The CLI `button` entry now depends on `progress`, so
+`rootnative add button` also installs `progress` and `react-native-svg`. The
+same applies to `appbar` and `snackbar`, which depend on `button`. The npm
+package already requires `react-native-svg`, so an npm install does not
+change.
+
+### `List` takes a `headline`
+
+A list with a section title had to put a `Typography` above it and choose the
+variant, the color, the padding and the heading level again on each screen.
+`List` now takes `headline`, in the same form as `NavigationDrawer.Section`:
+`titleSmall` in `onSurfaceVariant`, with the start and end padding of
+`ListItem`. On the web it renders as `<h2>`, and `headingLevel` changes the
+level. `headlineStyle` styles the text. A list with no `headline` does not
+change.
+
+### The theming docs show how to theme a navigator
+
+A navigator draws its screen container, and can draw a header, a drawer sheet
+and a tab bar, from its own navigation theme. With no navigation theme, a dark
+Root Native theme showed a light screen behind content that paints no
+background. No docs page said how to connect the two.
+
+The theming page has a new section, "With Expo Router and React Navigation".
+It gives two ways: `contentStyle` in the `Stack` `screenOptions`, or a
+navigation theme mapped from `useTheme()` for an app that keeps a navigator
+header, drawer or tab bar. It also gives the rules for the mapping and where
+the `dark` flag comes from. The NavigationDrawer page has a new section, "In a
+navigator drawer", for `drawerContent`. No behavior changes.
+
+## 0.0.0-alpha.24 — 2026-10-08
+
+**Breaking.** `Button`, `IconButton` and `Avatar` no longer accept the old
+size names, so rename each `size` first. Four changes can move or change a
+screen: the layout keys in `style` now place `Button`, `IconButton`, `FAB`
+and `Chip` by their wrapper, a `Chip` with no action is a label, an
+emphasized display or headline is a header on native, and `hrefAttrs` is
+declared on `ViewProps`. Each entry below ends with what to check. New in
+this release: a subtitle on `AppBar`, the `rootnative-seo` command that
+writes the sitemap and `robots.txt` from the export, a light and a dark
+theme colour in `shellTags`, and a Vite recipe that runs `vite dev`.
+
+### Breaking: the old size names are removed
+
+alpha.22 gave `Button`, `IconButton` and `Avatar` the MD3 size names and
+kept the old names as aliases for one release, with a warning. The aliases
+are now removed:
+
+| Component | Removed | Use |
+| --- | --- | --- |
+| `Button`, `IconButton` | `'xs'`, `'s'`, `'m'`, `'l'`, `'xl'` | `'extraSmall'`, `'small'`, `'medium'`, `'large'`, `'extraLarge'` |
+| `Avatar` | `'xSmall'`, `'xLarge'` | `'extraSmall'`, `'extraLarge'` |
+
+TypeScript rejects an old name. No runtime check reads the name, so a
+JavaScript app gets no warning: `Button` and `IconButton` throw
+`Cannot read properties of undefined (reading 'iconSize')`, and `Avatar`
+renders at the `medium` size with unstyled initials. The development warning,
+`resolveSize`, and the `size-aliases` tests are removed. A new test holds a
+`@ts-expect-error` for each removed name, so the typecheck fails if a props
+type accepts one again.
+
+The `IconButton` page listed its sizes with the old names, and the
+accessibility page named `xs`. Both now use the MD3 names.
+
+**Check your app.** If the development console showed
+`uses an old size name`, rename each `size` that the warning named.
+
+### `AppBar` takes a subtitle
+
+The MD3 Expressive app bar shows one line of supporting text under the title.
+`AppBar` had only `title`, so an app built a page header by hand from a `View`
+and two `Typography` elements.
+
+`AppBar` now takes `subtitle` and `subtitleStyle`. The subtitle color is
+`onSurfaceVariant`, and on the `primary` and `primaryContainer` schemes it is
+the scheme's content color. `contentColor` does not change it. The type role
+follows the variant: `labelMedium` on `small` and `center-aligned`,
+`labelLarge` on `medium`, and `titleMedium` on `large`. The values are from
+the Compose Material 3 tokens.
+
+A `small` or `center-aligned` bar keeps its 64dp height. The spec gives a
+subtitle only to the flexible medium and large bars, which also use a larger
+title. The `medium` and `large` bars here keep their baseline title, take the
+flexible subtitle, and grow by the same amount as the flexible bars: `medium`
+from 112 to 136dp, `large` from 152 to 184dp. With `scrollOffset`, the
+subtitle collapses to `labelMedium` with the title, and the scroll distance
+grows by the same amount. An empty string adds no line and no height.
+
+The subtitle is not a heading. On the web the `<h1>` holds the title only.
+Sixteen new tests cover it: 14 native and 2 web. Seven faults put into the
+source on purpose each made at least one of them fail. Measured in Chromium
+on a web export of the example app at 390px: every bar has the heights and
+positions above, and a medium bar scrolled 36px is 100dp high with a 13px
+subtitle, halfway through its 72px collapse. Not checked on iOS or Android.
+
+### Web without Expo: the Vite config now runs `vite dev`
+
+The Vite config on the "Web without Expo" page worked for `vite build` only.
+`vite dev` pre-bundles `node_modules` in a separate Rolldown pass, and that
+pass reads neither the `plugins` list nor `resolve.extensions`. With the
+config as written, the dev server stopped at start with
+`Flow is not supported` in `react-native/Libraries/...`, because the
+pre-bundle took the native files of Reanimated, the safe-area package and
+`react-native-svg`. With the extensions alone, the page was blank and
+Reanimated threw `useAnimatedStyle was used without a dependency array or
+Babel plugin`.
+
+The config now gives `optimizeDeps.rolldownOptions` its own copy of the
+worklets plugin and of the extensions. A new section, "The Vite dev server",
+explains why, and the symptoms table has a row for each failure. The `llms`
+files say the same. Checked with Vite 8.3.2: the config from the page, copied
+as written, starts the dev server and renders with no error, and the
+pre-bundle holds no raw `'worklet'` directive. `vite build` output does not
+change. The webpack config needs nothing new.
+
+### A `Button` link: the docs give the recipe, and `hrefAttrs` is typed
+
+A landing page that linked out with `Button` and `Linking.openURL` exported
+no `<a>` element at all, so a crawler found no link from the page. The SEO
+checklist named `router.push` as the trap, but not `Linking.openURL`, and the
+`Button` page did not say how to make a button a link.
+
+The `Button` page has a new section, "A button as a link": put the button
+inside Expo Router's `<Link asChild>`, and the web renders an `<a href>`. The
+SEO checklist and the "Why" page name `Linking.openURL` next to
+`router.push`, and the `llms` files carry the same rule.
+
+On the web, `Link` opens an external URL in the same tab, and
+`<Link target="_blank">` does not help under `asChild`: `Link` gives `target`
+to the child as a plain prop, and react-native-web drops it. The fix is
+`hrefAttrs={{ target: '_blank', rel: 'noopener' }}` on the button, which
+react-native-web writes onto the `<a>`. The React Native types do not declare
+`hrefAttrs`, so `@rootnative/components` now declares it on `ViewProps`, as it
+does for `aria-invalid` on `TextInputProps`. A web test pins the target and
+the rel on the anchor.
+
+**Check your own augmentation.** If your app declares `hrefAttrs` on
+`ViewProps`, remove that declaration, or make its type exactly
+`{ target?: string; rel?: string; download?: boolean | string }`. A different
+type fails with TS2717, "Subsequent property declarations must have the same
+type".
+
+### A `Chip` with no action is a label, not a button
+
+An assist, suggestion or input chip with no `onPress` rendered a focusable
+`<button>` that did nothing. Three static chips in a page hero gave a keyboard
+user three dead tab stops, and a screen reader announced three buttons.
+
+`Chip` now follows the `Card` rule. With no `onPress`, no `onLongPress` and
+no `href`, an assist, suggestion or input chip renders a plain view: no button
+role, no tab stop, no hover or press layer, and the default cursor. It keeps
+its colours, its outline, its elevation at rest, and an input chip keeps its
+close button. A filter chip is always a button, because a press toggles it.
+An `href` counts as an action, because on the web Expo Router's
+`<Link asChild>` gives the chip an `href` and an `onClick`, not an `onPress`.
+Nine new tests cover the rule, and five of them fail on the old code.
+
+**Check your tests.** A test that finds an action-less chip with
+`getByRole('button')` now finds nothing. Give the chip an `onPress`, or query
+it by its text.
+
+### An emphasized headline is a header on native
+
+On iOS and Android, `Typography` gives a display or headline variant with no
+`level` the header role. It read the variants from a list of the six plain
+names, so the 6 `display*Emphasized` and `headline*Emphasized` variants got no
+role, and a screen reader did not announce an emphasized page title as a
+header. The docs said that every display and headline variant is a header.
+
+`Typography` now reads the role from the variant name: a name that starts
+with `display` or `headline` is a heading, with or without `Emphasized`.
+`title*` and the other roles stay plain text. The web does not change: with
+no `level`, no variant gets the role there. New native tests cover four
+emphasized headings and two emphasized non-headings, and a web test pins
+`<h1>` for an emphasized headline with `level={1}`.
+
+### Layout keys in `style` place `Button`, `IconButton`, `FAB` and `Chip`
+
+These four components wrap their pressable in a `View` that holds the focus
+ring and the shadow. The wrapper sets `alignSelf: 'flex-start'`, so it hugs
+the button and does not stretch across a column. The consumer `style` went to
+the pressable inside the wrapper, and three things broke:
+
+- `alignSelf` did nothing. A `Button` in `<Column align="center">` stayed at
+  the start edge next to centred text.
+- A margin moved the button away from its own focus ring and shadow.
+- `flex: 1` in a row did not grow the button, and `position: 'absolute'`
+  placed the button against a wrapper of no size.
+
+Now the keys that place a component in its parent go to the wrapper:
+`alignSelf`, `flex`, `flexGrow`, `flexShrink`, `flexBasis`, the margins,
+`position`, the insets and `zIndex`. When `flex` or `flexGrow` moves, the
+pressable fills the wrapper. Every other key styles the container, as before.
+A Reanimated animated style stays on the pressable whole, because Reanimated
+finds it by identity. A web test per component reads the wrapper and the
+button from the DOM, and 16 of its 20 cases fail on the old code.
+
+**Check your layout.** An `alignSelf`, a `flex` or a `position` that you set on
+one of these components now takes effect. A margin moves the button as before,
+and now the focus ring and the shadow move with it. If you added a `Row` or a
+wrapper `View` only to centre a button, you can remove it.
+
+### `rootnative-seo` writes the sitemap and `robots.txt` from the export
+
+Every app wrote the same deploy script: list the exported HTML files, drop
+the `+not-found` page, turn each file name into a route, and pass the list to
+`writeSitemap` and `writeRobots`. That script had two faults. It listed a
+page by its file name, not by the address the page declares, so a page with
+a query in its canonical link got the wrong URL. And it did not read the
+page, so an overlay with `noindex` went into the sitemap.
+
+`writeSeoFiles({ outDir })` in `@rootnative/seo/node` now does the step. It
+reads every `.html` file under `outDir`, nested folders too, and lists a page
+with its canonical link when that link is under the site and the page has no
+`noindex`. It leaves out a special route (a `+` or `_` segment, or a root
+`404.html`), a dynamic route template such as `[id].html`, a page with no
+canonical link, a canonical link outside the site, and a second page with the
+same link, and it returns each page it leaves out with the reason. The site
+URL comes from the canonical link of `index.html`, or from `siteUrl`. It
+writes `robots.txt` too, unless you pass `robots: false`. It throws when no
+page can go in the sitemap, because an empty sitemap on a live host fails
+with no other signal.
+
+The new `rootnative-seo` command runs it from a `package.json` script:
+`rootnative-seo dist`, with `--site-url`, `--sitemap` (once per sitemap URL)
+and `--no-robots`. It prints each page it leaves out, with the reason.
+`readExport(outDir)` returns the canonical link and the `noindex` rule of
+each page, for a URL list of your own.
+
+The example app uses it. Its sitemap lists the same 37 URLs as before.
+
+**Check your deploy script.** If it builds the sitemap from the file names,
+replace it with `rootnative-seo dist` and read the list of pages it leaves
+out. A page that must be in the sitemap needs a canonical link: pass `url` to
+its `PageHead`. Each sitemap entry holds `<loc>` only, so a script that set
+`changefreq` or `priority` loses them; Google ignores both.
+
+### `PageHead` needs no `SeoProvider` on native
+
+`PageHead` read the site before it checked the platform. On iOS and Android
+it renders nothing, but it still threw with no `SeoProvider` above it. So
+every native test that rendered a screen with a `PageHead` had to wrap the
+screen in a provider, for a component that draws nothing there.
+
+On native, `PageHead` now returns `null` before it reads the site. A native
+tree and a native test need no provider. The web does not change: with no
+provider and no `site` prop, `PageHead` throws, and the static export fails
+on the first page that has the fault. A native test pins the new rule, and
+the web test for the throw stays.
+
+**Check your test setup.** If you added `SeoProvider` to a native test
+wrapper only for `PageHead`, you can remove it. Keep the provider at the
+root of the app.
+
+### `shellTags` takes a light and a dark theme colour
+
+`themeColor` took one string, and `shellTags` wrote one `theme-color` tag
+with no `media`. A browser uses the first `theme-color` tag whose media
+matches, so on a site with a light and a dark theme the browser toolbar
+stayed light over the dark page. The site had to write the two tags by hand.
+
+`themeColor` now also takes `{ light, dark }`. The object form writes one tag
+for each `prefers-color-scheme`, light first. A scheme with an empty colour
+gets no tag. The string form does not change. The tags follow the system
+scheme, not a mode that the user picks in the app. `writeManifest` still
+takes one string, because the manifest has one theme colour. Four new tests;
+a fault put into the media, the order, the empty-colour rule or the keys
+makes one of them fail.
+
+**Check your `+html.tsx`.** If it writes two `theme-color` tags next to
+`shellTags`, remove them and pass `themeColor: { light, dark }`.
+
+### The docs give the charset position on an Expo Router export
+
+Expo Router writes the `PageHead` tags at the start of `<head>`, before the
+children of `+html.tsx`. So the `<meta charset>` that `shellTags` writes is
+after byte 1024 on a page with a full head, and the HTML spec requires it in
+the first 1024 bytes. `shellTags` cannot change that order. The `shellTags`
+JSDoc, the SEO checklist, a new "The charset position" section on the Limits
+page, and the `llms` files now say that the host must send
+`Content-Type: text/html; charset=utf-8`. GitHub Pages does.
+
+### `rootnative create` pins `@rootnative/inertia` `0.0.18`
+
+The two templates pinned `0.0.17`. In inertia `0.0.18`, the config keys of a
+mixed transition map, such as
+`{ type: 'spring', tension: 120, opacity: { type: 'timing' } }`, are the
+default for every key with no entry. Before, those keys got the default
+spring, and a dev build logged `Unknown transition name "spring"`. The dev
+and example pins move to `0.0.18` too.
+
+The peer range stays `>=0.0.17 <0.1.0`. No component uses an inertia API
+that is newer than `0.0.17`, and no component passes a mixed map, so the
+components animate the same on both versions.
+
+## 0.0.0-alpha.23 — 2026-10-06
+
+**No breaking change.** This release is the structural audit of the whole
+catalog plus three device passes: iOS simulator, web, and Android emulator.
+The new `@rootnative/seo` package ships here with `Container`, a `level` on
+`Typography`, and a clean hydration of the static export. Every overlay has
+one back handler and one scrim, Dialog scrolls and respects the safe area,
+Snackbar speaks on iOS and pauses under a pointer, and Tooltip opens from the
+keyboard. Toggle `IconButton` and filter `Chip` work uncontrolled, toggles
+announce their state, filled and tonal buttons rise on hover, and
+`containerColor` takes any colour React Native accepts. Inline logical
+insets mirror on web now through `resolveLogical`, and the app bar,
+Switch and Slider hold their geometry in RTL on every platform.
+
+### Defects seen in the web pass
+
+- **Inline logical insets sat at the wrong edge in RTL on web.** A style from
+  `StyleSheet.create` mirrors through CSS, but react-native-web resolves the
+  logical keys of an inline style object in JavaScript, from a locale context
+  that defaults to LTR and that `dir="rtl"` never updates. The small app bar
+  title drew over the trailing actions, the text field label sat over the
+  trailing icon, the Switch halo left the thumb, and `Box` one-sided insets
+  (`ps`, `pe`, `ms`, `me`) went to the left. The new `resolveLogical` helper
+  in `@rootnative/utils` writes the physical key for the document direction
+  on web and the logical key on native.
+- **Slider arrow, Home, End and Page keys also scrolled the page.** The
+  handled keys are claimed with `preventDefault` now.
+- **Slider reported a rounded `aria-valuenow`.** A 0 to 1 slider at 0.4 said
+  `0`, which a screen reader reads as "0 percent". The value is unrounded on
+  every platform.
+- **Tooltip never opened from the keyboard.** On web, focus on the anchor
+  shows the tooltip, blur hides a plain one, and Escape hides either. The
+  key stops at the anchor, so an enclosing dialog does not close too.
+- **Filled TextField indicator did not change on hover.** The indicator
+  colour cascade has the hover step the outlined border already had.
+- **Snackbar timer ran on under the pointer.** The clock pauses while a
+  pointer is over the surface and continues from where it stopped.
+- **NavigationDrawer section headlines rendered as `<h1>` on web.** Each
+  section headline is `<h2>` now, with a `headingLevel` prop to fit the page
+  outline.
+- **NavigationRail put its `accessibilityLabel` on a plain view.** It names
+  the tablist now, the same as NavigationBar, so the rail has an accessible
+  name on web.
+
+### Three defects seen on the iOS simulator
+
+- **Medium and large app bars clipped the title.** The title sat in a row
+  under the 64dp top row, and a 32dp headline plus its 24dp bottom padding
+  does not fit in the 48dp a 112dp medium bar leaves there, so the
+  descenders were cut off. The title has its own layer over the whole
+  container now and sits at the Compose geometry.
+- **A centre-aligned app bar truncated its title next to two actions.** The
+  title was centred inside a symmetric inset equal to the wider of the two
+  slots, which left 144dp on a 400dp phone. It now keeps the whole width
+  between the slots, sits at the screen's centre while it fits there, and
+  shifts off centre instead of truncating when it does not, the same as
+  Compose `TopAppBarLayout`.
+- **The Switch thumb left the track in RTL.** The thumb rests at the start
+  edge and moved by a physical `translateX`, so in RTL it slid off the right
+  end and the halo stayed behind. The travel follows the layout direction now.
+- **The Slider filled from the wrong side in RTL.** The slots position with
+  `left`, which React Native already mirrors in RTL, and the slider mirrored
+  the value once more, so the fill came back to the left. Native now leaves
+  the mirroring to the platform and the web keeps its own. The `increment`
+  and `decrement` accessibility actions also stop reversing in RTL: a larger
+  value is a larger value in every writing direction.
+
+### Every elevated surface has an elevation test
+
+The native and web elevation tables covered the four components that move
+their shadow on hover. The seven that take a static elevation had no witness:
+Menu (level 2), Dialog (3), Snackbar (3), the rich Tooltip (2), BottomSheet
+(1), the modal NavigationDrawer (1) and NavigationBar (2). All seven are in
+both tables now and pass the same two invariants: one shadow node that does
+not clip, and no `boxShadow` beside the native keys.
+
+### The agent-facing docs tell the truth again
+
+`docs/static/llms.txt` is the file an AI agent is told to trust over the
+hosted docs, and it was wrong in four places. It named 29 components (there
+are 35), it told the agent to install `@expo/vector-icons` and
+`@material/material-color-utilities` (the library uses the first only behind
+the `/mdi` subpath through a different package, and bundles the second), it
+gave `@rootnative/inertia >=0.0.11` as the floor (it is `>=0.0.17`), and it
+listed `Layout` as having no animated value (`Grid` animates). The generated
+core `llms.txt` also said `cornerFull` is 9999; the token is 999. The public
+doc example on `elevationShadowConfig` drove `useShadow` from `useSpring`,
+which the library bans because it is not gated on reduced motion; it uses
+`useAnimation` now.
+
+### Filled and tonal buttons, filled and outlined cards rise on hover
+
+MD3 raises a filled or tonal button from level 0 to level 1 on hover, and a
+filled or outlined card the same way. The library applied the hover rise to
+the elevated variants only. Every interactive card and every filled or tonal
+button now carries the same shadow carrier the elevated ones had, resting at
+level 0 so nothing changes at rest. Outlined and text buttons stay flat.
+
+### One back handler, one halo, one focus ring
+
+Three pieces of code that every overlay or selection control copied by hand
+now live once under `internal/`:
+
+- `useBackHandlerDismiss` replaces the six copies of the Android back-button
+  effect in Dialog, Menu, Tooltip, BottomSheet, NavigationDrawer and
+  SearchView. A new table test drives every one of them on Android and checks
+  that a closed, locked, or plain surface does not swallow the back press.
+- `useHaloLayer` replaces the three identical state-layer halo blocks in
+  Switch, Checkbox and Radio.
+- `useStateLayer` and `useHaloLayer` return the focus-ring opacity style, so
+  the twelve components that derived it by hand no longer do.
+
+No visible behaviour changes from the three extractions.
+
+### Toggle `IconButton` and filter `Chip` work uncontrolled
+
+Both had `selected` and nothing else, so a consumer who forgot to flip
+`selected` in `onPress` got a control that never toggled. Both now follow the
+Checkbox idiom: `selected` with `onSelectedChange` is the controlled form,
+and `defaultSelected` is the uncontrolled form, where the control flips its
+own state and reports the new state through `onSelectedChange`. `onPress`
+still fires either way.
+
+### Disabled is not overridable, for every component
+
+`useStateLayer` fell back to the consumer's `containerColor` while disabled
+when a component passed no `disabledContainerColor`. ListItem, Menu.Item,
+Avatar and SearchBar kept the override colour in their disabled state. The
+disabled layer now rests on the variant's own colour.
+
+### Dead colour derivation removed from six style files
+
+Button, Chip, FAB, IconButton, Card and ListItem each computed hover, focus
+and press colours in `styles.ts` that nothing read, because `useStateLayer`
+derives the layers itself. About 200 lines are gone, and the one place the
+layers are derived is the only place now.
+
+### Test tables cover more of the catalog
+
+NavigationRail and NavigationDrawer join the reduced-motion table, the
+pressable Avatar joins the touch-target table, and the SearchBar trigger joins
+the web cursor table. The Avatar also reads its hit slop from the shared
+helper instead of its own copy.
+
+### Consumer handlers and `hitSlop` survive the props spread
+
+Every `Pressable`-based component spreads its state-layer handlers after the
+consumer's props, so a consumer `onPressIn`, `onPressOut`, `onHoverIn`,
+`onHoverOut`, `onFocus` or `onBlur` type-checked and then never ran. Avatar,
+Button, Card, Checkbox, Chip, FAB, IconButton, ListItem, NavigationDrawer.Item,
+Radio and Switch now merge the two through one internal helper: the
+consumer's handler runs first, then the component's.
+
+`hitSlop` had the same problem on Button, Chip, Switch, Checkbox and Radio. A
+consumer value wins now, as it already did on IconButton and FAB. Checkbox and
+Radio also drop their default slop of 4dp: their container is already 48dp,
+and slop on a control that clears the floor only overlaps its neighbours.
+
+### Toggles announce their state
+
+A toggle `IconButton` and a filter `Chip` set `aria-selected` on a `button`,
+and a single-select `ButtonGroup` set it on a `radio`. ARIA defines neither,
+so a web screen reader announced no state. The web now gets `aria-pressed` on
+the two buttons and `aria-checked` on the radio. Native keeps
+`accessibilityState.selected` for the buttons, which is what TalkBack and
+VoiceOver read for a toggle, and moves the radio to
+`accessibilityState.checked`.
+
+### Four components read the disabled opacity tokens now
+
+Switch, Checkbox, Radio and Slider wrote `0.38` and `0.12` as literals. They
+read `theme.stateLayer.disabledOpacity` and `disabledContainerOpacity` now,
+like every other component, so a theme that changes the disabled treatment
+reaches them.
+
+### `containerColor` accepts every colour React Native accepts
+
+`blendColor` and `alphaColor` in `@rootnative/utils` read 6 and 8 digit hex
+only. Any other form, `#f00`, `rgb()`, `hsl()` or a named colour, fell back
+to the overlay at its alpha, so a filled component with
+`containerColor="red"` lost its container under the hover and press layers
+and showed a 10% tint of its content colour instead. Both functions now parse
+through React Native's `processColor`, which reads every colour form the
+platform does, on native and on the web. A base that is not opaque still
+returns the overlay at its alpha, because the colour behind it is unknown.
+
+### SearchBar: the trigger no longer nests buttons
+
+With `onPress` the whole bar was one `Pressable` with the `button` role, and
+it wrapped the clear button and the trailing actions. On the web that is a
+`<button>` inside a `<button>`, which the test run logged as invalid DOM and
+which a screen reader reads unreliably. The trigger is now a sibling behind
+the content, the same shape the `Chip` close target uses. The bar is still
+one tab stop, the input is still read-only and hidden, and the clear button
+and the actions are still buttons of their own. A consumer `role` now names
+the bar, so `<Link asChild>` can make it a link.
+
+### Three props a consumer passed were thrown away
+
+- `TextField` wrote `accessibilityLabel`, `accessibilityHint` and
+  `accessibilityState` after the rest spread, so a consumer value never
+  reached the input. A field with no visible label had no accessible name
+  even when the consumer gave it one. The consumer value wins now, and
+  `aria-label` is read as a name too. The visible `label` stays the default.
+- `LinearProgress` replaced a consumer `onLayout` with its own width
+  measurement. Both run now.
+- A rich `Tooltip` closed on hover out, which is before a mouse can reach its
+  actions. A rich tooltip is persistent and now stays up until the outside
+  press, an action, or the Android back button. A plain tooltip still hides on
+  hover out.
+
+### Snackbar: VoiceOver hears it now
+
+The surface carried `role="alert"` and `accessibilityLiveRegion="polite"`,
+and the docs said screen readers announce the message. TalkBack and web
+readers did. VoiceOver did not: iOS has no live region, and nothing asked it
+to speak. The snackbar now calls `AccessibilityInfo.announceForAccessibility`
+on iOS when it mounts and when a replacement arrives. Android and web are
+unchanged, so nothing is announced twice.
+
+### Dialog: one scrim, a scrolling body, and a safe area
+
+Three defects in `Dialog`, each one visible on a device.
+
+- **The scrim was twice as dark as the token.** The press target inside the
+  scrim layer carried the same 32% `scrim` colour as the layer itself, and
+  the two composited to about 54%. The press target is transparent now, which
+  is the same fix `BottomSheet` carries. A test pins the layer at 32% and the
+  press target at no colour.
+- **A basic dialog grew past the screen.** The surface had no height cap and
+  the content did not scroll, so long supporting content pushed the actions
+  off screen. With `dismissable={false}` that trapped the user. The surface
+  now stops at the screen height and `Dialog.Content` scrolls under a fixed
+  headline and above fixed actions.
+- **The full-screen dialog sat under the status bar.** The surface filled the
+  portal layer from the top edge of the screen. It now pads itself by the
+  safe-area insets on every edge, the same way `BottomSheet` and `Snackbar`
+  do.
+
+### `Container`: one content column for every screen
+
+A screen on a wide window had no way to cap its content width except a
+hand-written `maxWidth` on each screen. The example app had 23 copies of
+that rule with three different numbers, and nothing in the library said
+which one was right.
+
+`Container` is a centred `Column` with a maximum width. The `width` prop
+names a breakpoint band, and the Container stops growing at the lower bound
+of that band: `medium` (the default) is 600dp, `expanded` 840, `large` 1200,
+and `extraLarge` 1600. Below that width it fills its parent, so a phone sees
+no change. The limit includes the padding. Put it as the one child of a
+`ScrollView` with the screen padding on it, and every screen shares one
+column. It ships from the `layout` subpath and the package root.
+
+The example app uses it on every screen: `medium` on the component screens
+and `large` on the home page.
+
+### The example app hydrates clean on the web
+
+Lighthouse reported React error #418 on the docs home. Two things in the
+example read the browser during the hydrating render: the `?embed=1` flag
+that the docs iframe passes, and the copy button that checks for the
+clipboard API. Four screens also drew `MaterialDesignIcons` directly, past
+the hydration guard the `mdi` resolver added in the last release, so every
+component route had a glyph that the server wrote and the client did not.
+All of them now wait for hydration or go through the resolver.
+
+The home page also kept its hero pinned instead of its toolbar: the
+`PageHead` element counted as the first child of the `ScrollView` and moved
+the sticky index. The head now sits outside the `ScrollView`.
+
+### `Typography` takes a `level`, and the `AppBar` title is a real `<h1>`
+
+The static export of the example app showed every `display*` and `headline*`
+`Typography` as an `<h1>` on the web, and the `AppBar` title as one more. The
+library gave them the header role with no level, and react-native-web writes
+a level-less header as `<h1>`. A page with a hero, a title bar and a display
+glyph had three `<h1>`, and a crawler read no outline.
+
+`Typography` now takes `level` (1 to 6). It sets the header role and
+`aria-level`, so the web renders `<h1>` to `<h6>`. **A display or headline
+variant with no `level` announces a header on native only.** On the web it
+renders a plain element, because a level-less header there is always `<h1>`.
+An explicit `accessibilityRole` still wins. Pass `level` on every heading
+your page has, and nothing on decorative display text.
+
+`AppBar` takes `titleLevel`, default `1`, and renders the title with it. Pass
+`2` when a heading above the bar is the page heading. On native nothing
+changes: the title still announces a header.
+
+`Heading` from `@rootnative/seo/react` keeps working with `as={Typography}`;
+it passes the same role and level.
+
+### New package: `@rootnative/seo`
+
+A React Native app that exports to the web starts as one empty page, and
+every app wrote the same fix by hand. `@rootnative/seo` holds the parts that
+do not depend on the app's data. The app keeps the mapping from its data to
+the meta.
+
+Five entries. The core and `/schema` have no dependency and run in Node and
+in a browser. `/react` and `/expo-router` need React Native. `/node` runs in
+Node only.
+
+- `defineSite` and `toHeadTags` turn a `PageMeta` into tag records any head
+  renderer can write. The tab title uses the site template and the Open Graph
+  title does not. A page with no `url` gets no canonical link and no share
+  card. `og:image:width` and `og:image:height` are written only with an
+  image. Each tag is written once.
+- The JSON-LD builders under `/schema` cover `WebSite`, `BreadcrumbList`,
+  `Organization`, `Article`, `Product`, `Movie`, `Person`, `Event` and
+  `FAQPage`. An empty field is left out at every depth, a rating with no
+  votes is left out, and a duration of `0` is left out. The script text
+  escapes `<`, so a `</script>` in a title cannot end the tag.
+- `SeoProvider`, `Heading` and `imageLabel` under `/react`. `Heading` renders
+  `<h1>` to `<h6>` on the web through the text component you pass in `as`.
+- `PageHead` and `shellTags` under `/expo-router`. `PageHead` writes the head
+  through `expo-router/head` and renders nothing on native. `shellTags`
+  writes the head of `+html.tsx` and prefixes every relative `href` with the
+  base path of a subpath host.
+- `writeSitemap`, `writeRobots` and `writeManifest` under `/node`, for the
+  deploy step. Each has a pure sibling that returns the text.
+
+The example app is the first consumer: a static export, a `PageHead` on every
+screen, `shellTags` in the shell, and `sitemap.xml` and
+`manifest.webmanifest` written after the export. A new CI step exports the
+app and reads two pages, which is the test that catches a head renderer
+change in Expo Router. It found that the vendored `react-helmet-async` drops
+a script that uses `dangerouslySetInnerHTML`; `renderHeadTag` writes the text
+as a string child instead.
+
+The export also showed that the `AppBar` title and every `display*` or
+`headline*` `Typography` render as `<h1>` on the web, because the library
+gave them the header role with no level. The entry above fixes that:
+`Typography` takes `level`, and `AppBar` takes `titleLevel`.
+
+A new docs section, "SEO for the web export", carries the blockers, the
+checklist, the API reference and the limits. The API page is generated from
+the same source as the package `llms.txt`.
+
+### `mdiResolver` no longer breaks hydration on a static export
+
+A static web export with `iconResolver={mdiResolver}` logged React error #418
+on every load. React then discarded the static HTML and rendered the whole
+page again on the client. `@react-native-vector-icons/common` 13 draws the
+glyph on the export server, where it loads no fonts. On the client, its first
+render is an empty string until `expo-font` loads the font, so the text did
+not match.
+
+While the page hydrates, `mdiResolver` now renders the icon with no name.
+The icon set draws an empty string on both sides, and it starts the font load
+during hydration. The next render passes the name, and the glyph shows when
+the font loads. In a static export the icons are empty in the HTML. Native
+and a single-page web build do not change. A web test in
+`hydration.web.test.tsx` models the font state of the icon set and fails on
+the old resolver.
+
+If you copied the four-line resolver from the CLI page into a static export,
+render the icon without a name while the page hydrates, as `mdiResolver`
+does. An icon that the app renders directly from the icon package has the
+same mismatch. Render it through `Icon` from `@rootnative/components/icon`,
+which uses the theme's resolver.
+
+## 0.0.0-alpha.22 — 2026-10-03
+
+**One breaking change: a string icon name now needs an `iconResolver` on
+`ThemeProvider`.** Pass `mdiResolver` from `@rootnative/components/mdi` to
+keep the Material Design Icons, now from
+`@react-native-vector-icons/material-design-icons`. Three new components: `NavigationRail`,
+`NavigationDrawer` and `Icon`. The components that apply safe-area insets no
+longer throw on web without a `SafeAreaProvider`. `SearchBar` takes a
+`density`. Every component now uses one size vocabulary, and the old names
+warn. The `@rootnative/inertia` floor moves to `0.0.17`, so a dialog or a
+sheet that holds a progress indicator or a skeleton plays its exit. A new
+docs page covers web without Expo.
+
+### The MDI default moved behind `@rootnative/components/mdi`, on `@react-native-vector-icons`
+
+**Breaking.** The shared icon code imported
+`@expo/vector-icons/MaterialCommunityIcons` with a static import, so every
+bundle had to resolve it, even in an app with its own `iconResolver` that
+never rendered an MDI glyph. A Vite app without Expo failed to resolve the
+package, because it needs `expo-font`, and the only way out was an alias to
+an empty module.
+
+The resolver now lives behind its own subpath, and nothing else imports an
+icon font. The font comes from `@react-native-vector-icons/material-design-icons`,
+the package Expo recommends in place of `@expo/vector-icons`
+(https://expo.dev/blog/moving-away-from-expo-vector-icons). The glyph names
+are the same MDI set, so no icon name changes:
+
+```tsx
+import { mdiResolver } from '@rootnative/components/mdi'
+
+<ThemeProvider iconResolver={mdiResolver}>{children}</ThemeProvider>
+```
+
+To upgrade an app that uses string icon names:
+
+1. Install `@react-native-vector-icons/material-design-icons`, and
+   `expo-font` on Expo: `npx expo install
+   @react-native-vector-icons/material-design-icons expo-font`.
+2. Remove `@expo/vector-icons` from `package.json`, and run
+   `npx @react-native-vector-icons/codemod` if the app imports it directly.
+3. Pass `iconResolver={mdiResolver}` to `ThemeProvider`, as above.
+4. On a bundler without Metro, delete the `@expo/vector-icons` alias stub
+   from the bundler config.
+5. In a Jest suite that renders the library with its own wrapper, pass the
+   same resolver, or use `renderWithTheme` from `@rootnative/utils/test`,
+   which installs it.
+
+An app that already passes its own `iconResolver` changes nothing, and can
+now uninstall `@expo/vector-icons`.
+
+What changes on upgrade, in detail:
+
+- **Every app that passes string icon names and no `iconResolver` adds the
+  prop above.** Without it a string name renders nothing and the library
+  logs one warning per process, in development and in production, that
+  names the subpath. The example app and both `rootnative create` templates
+  pass it.
+- `@react-native-vector-icons/material-design-icons` replaces
+  `@expo/vector-icons` as the icon peer of `@rootnative/components`, and it
+  is **optional**. On Expo it needs `expo-font`, which loads the font at run
+  time in Expo Go, in a development build and on web. An app with its own
+  resolver installs neither, and the alias stub in the Web without Expo page
+  is gone.
+- **Remove `@expo/vector-icons` from the app.** Both packages register the
+  same font, and the glyphs then render as `?` or as empty squares.
+  `npx @react-native-vector-icons/codemod` rewrites the app's own imports;
+  `npx expo doctor` reports a leftover. The example app and both templates
+  made that move.
+- `createVectorIconsResolver` from `@rootnative/icons` accepts any
+  `@react-native-vector-icons/*` set, including the MDI `/static` export for
+  a development build that embeds the font. Its `VectorIconSet` type now
+  takes a set whose `name` is a glyph union, which every generated set is.
+  An `@expo/vector-icons` set still fits, and `@rootnative/icons` no longer
+  lists that package as a peer.
+- `getMaterialCommunityIcons` is removed from the CLI registry, with the
+  `icon` util file. `render-icon` no longer declares an icon dependency. A
+  CLI project that wants the MDI default writes the resolver itself; it is
+  the function above, four lines around `MaterialDesignIcons`.
+- `renderWithTheme` from `@rootnative/utils/test` installs the MDI resolver
+  by default, so the suite renders string icons the way an Expo app does.
+  Pass `iconResolver: null` to render without one.
+
+Not a lazy load and not an auto-registration. A lazy `require()` does not
+survive tsup's ESM splitting, and Metro cannot see it. A side-effect import
+that registers a default would be dropped by a bundler that honours
+`sideEffects: false`. An explicit prop is what every bundler keeps.
+
+### `NavigationRail`, `NavigationDrawer` and `Icon`
+
+The library had `NavigationBar` for a compact window and nothing for a wider
+one, so a desktop sidebar was built by hand from `Pressable` and
+`Typography`. Both MD3 side forms now ship.
+
+`NavigationRail` is the 80dp rail: the same `items` array as `NavigationBar`,
+the same 56×32dp `secondaryContainer` pill, and a `header` slot for the menu
+button and the FAB. `align` places the destinations at the top, the centre,
+or the bottom. `labelVisibility="never"` grows the indicator to a 56dp
+circle. Controlled and uncontrolled, like the bar.
+
+`NavigationDrawer` is the 360dp drawer, composed from
+`NavigationDrawer.Section`, `NavigationDrawer.Item` and
+`NavigationDrawer.Divider`. The `'modal'` variant renders through `Portal`
+behind a 32% scrim, slides in from the start edge, traps focus on web,
+closes on Android back, and closes after a destination press
+(`dismissOnSelect`). The `'standard'` variant renders in place for an
+expanded window. A modal drawer takes `visible` and `onDismiss`; the type
+rejects them on a standard one. Items are 56dp rows with an optional icon, a
+`labelLarge` label, and a trailing `badge` text, on a full-corner
+`secondaryContainer` indicator while active.
+
+`Icon` renders an `IconSource` through the theme's `iconResolver`, so a
+custom control draws the same icon set and color as the library. Default
+24dp and `onSurface`. Without `accessibilityLabel` it is decorative and
+hidden; with one it is an image with that name.
+
+```tsx
+<NavigationRail items={items} value={route} onValueChange={go} header={<FAB icon="plus" />} />
+
+<NavigationDrawer visible={open} onDismiss={close} value={route} onValueChange={go}>
+  <NavigationDrawer.Section headline="Mail">
+    <NavigationDrawer.Item value="inbox" label="Inbox" icon="inbox" badge={24} />
+  </NavigationDrawer.Section>
+</NavigationDrawer>
+
+<Icon source="star" size={32} color={theme.colors.primary} />
+```
+
+`rootnative add navigation-rail`, `rootnative add navigation-drawer` and
+`rootnative add icon` install them. The rail pulls in `navigation-bar`, whose
+destination it reuses; the drawer pulls in `divider` and `portal`.
+
+### One size vocabulary
+
+`Button`, `IconButton` and `Avatar` now take the MD3 size names that
+`ButtonGroup`, `FAB`, `Badge` and `AppBar` already used: `'extraSmall' |
+'small' | 'medium' | 'large' | 'extraLarge'`. Before, a toolbar with a
+`Button size="xs"` next to a `ButtonGroup size="extraSmall"` needed two
+names for one size, and `Avatar` had a third pair, `'xSmall'` and
+`'xLarge'`.
+
+The old names still work in this release. `'xs' | 's' | 'm' | 'l' | 'xl'`
+on `Button` and `IconButton`, and `'xSmall' | 'xLarge'` on `Avatar`, map to
+the new names and log one development warning per component and name that
+states the new name. **The next release removes them.** The defaults are
+unchanged: `Button` and `IconButton` are `'small'`, `Avatar` is `'medium'`.
+
+```tsx
+<Button size="extraSmall">Save</Button>
+<IconButton icon="star" size="medium" accessibilityLabel="Star" />
+<Avatar size="extraLarge" label="AB" />
+```
+
+### `SearchBar` density
+
+`density` takes a step on the Material density scale, `0` to `-4`. Each
+step removes 4dp from the 56dp container, so `-4` is a 40dp bar for a
+desktop toolbar. The icon buttons keep their 40dp frame and the text keeps
+`bodyLarge`, so `-4` is the floor. `style={{ height }}` never did this: the
+`style` prop goes to the root view and the pill kept its own height.
+
+```tsx
+<SearchBar placeholder="Search" density={-4} />
+```
+
+### Web without a `SafeAreaProvider`
+
+On web, `react-native-safe-area-context` resolves `SafeAreaView.web`, which
+reads `useSafeAreaInsets()` and throws `No safe area value available` when
+no provider is mounted. The documented root (`ThemeProvider` > `PortalHost`
+> `SnackbarProvider`) therefore rendered a blank page on web, because the
+snackbar layer applies insets. `AppBar`, `Layout`, `NavigationBar`,
+`BottomSheet` and the snackbar layer now render a plain `View` with zero
+insets on web when the context is `null`. Native keeps the package view.
+The web Jest mock of the package now throws without a provider, as the real
+module does, so a test cannot pass by mounting an inset component outside a
+provider.
+
+### `@rootnative/inertia` floor moves to `0.0.17`
+
+A closed `Dialog` disappeared at once, with no exit animation, when it held a
+`LinearProgress`, a `CircularProgress` or a `Skeleton`. The same was true of
+the other overlays that take content and animate out through `<Presence>`:
+`BottomSheet`, `Menu`, `NavigationDrawer`, `SearchView` and `Tooltip`. The
+three content components each render a `Motion.*` with no `exit`. Before
+inertia `0.0.17`, the first `Motion.*` in an exiting child that finished its
+exit removed the whole child. inertia `0.0.17` removes the child only when
+every `Motion.*` in it has finished its exit.
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges
+are now `>=0.0.17 <0.1.0`, the dev, example and template pins are `0.0.17`
+exact, and the registry's derived floor follows. Upgrade
+`@rootnative/inertia` to `0.0.17` in the app with this release. A `Dialog`
+test now holds each of the three components and fails on an older inertia.
+
+### Docs
+
+- **Web without Expo.** A new page with a Vite config and a webpack config
+  for a bundler without Metro: the `react-native-web` alias, the `.web.*`
+  extensions, the globals, the worklets Babel plugin on `@rootnative`,
+  `react-native-reanimated` and `react-native-worklets` inside
+  `node_modules`, and the icon set choice. Without the plugin on those
+  three packages the build passes and nothing animates. The page also lists
+  the Electron facts: relative asset paths, `'unsafe-inline'` in
+  `style-src`, and the `global` define in a sandboxed renderer. The
+  `llms-full.txt` carries the same section.
+- **`@expo/vector-icons` in the `llms` files.** Both files disagreed on
+  whether the peer is optional. It is, and both files, the installation page
+  and the icons page now say where the one import of it lives.
+- **Theme mode on web.** `storage={localStorage}` works as is: the provider
+  catches a `getItem` or `setItem` that throws. The theming page now says so
+  and shows the guard for a static export.
+
+## 0.0.0-alpha.21 — 2026-09-30
+
+No breaking changes. A new `SearchView` component. `ThemeProvider` follows
+a dark system setting in a static web export. The divider of a scrollable
+`Tabs` row spans the whole row.
+
+### `SearchView`
+
+`SearchView` from `@rootnative/components/search-view` is the MD3 search
+view: the panel that opens from a `SearchBar` and shows suggestions or
+results. It renders through `Portal` on the `dialog` layer.
+
+```tsx
+<SearchView
+  visible={open}
+  onDismiss={() => setOpen(false)}
+  anchor={barRef}
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => runSearch(text)}
+>
+  <List>{suggestions}</List>
+</SearchView>
+```
+
+- The header is 72dp and holds a back button, the input, a clear button
+  while the input holds text, and `actions`. `children` fills the rest.
+- `layout="auto"` is full screen on a compact window and docked on a wider
+  one. A docked view has the extra-large corner, is 240dp tall at least and
+  two thirds of the window at most, and closes on a press outside it. Pass
+  the bar's `View` as `anchor`, and the docked view opens over the bar.
+- The view asks to close through `onDismiss`: the back button, the Android
+  back button, Escape on web, and a press outside a docked view.
+- On web, focus moves to the input on open, Tab stays inside the view, and
+  focus returns to the trigger on close. On native, the input takes focus on
+  open and `accessibilityViewIsModal` keeps the screen reader inside.
+- `value` and `onChangeText` control the query, `defaultValue` starts an
+  uncontrolled one, `ref` reaches the `TextInput`, and `inputProps` passes
+  the rest of its props.
+
+`SearchBar` gains `onPress` for this. With it, the bar is a button that opens
+the view: one tab stop with the `button` role, a read-only input that still
+shows `value`, and the clear button and actions as buttons of their own. Open
+the view from `onPress`, not from `onFocus`: the view returns focus to the
+bar when it closes, and a bar that opens on focus reopens it at that moment.
+
+### `mode="system"` is safe in a static web export
+
+`ThemeProvider` read the system scheme with the `react-native`
+`useColorScheme`. The export server has no `matchMedia`, so react-native-web
+reports `'light'` there, and the HTML ships the light theme. The client
+reads the real scheme on its hydration render, and React 19 keeps the
+server's light styles with no error. So in a dark browser the page stayed
+light until the reader changed the mode.
+
+`ThemeProvider` now resolves `'system'` to light on the server and while the
+client hydrates, and then to the OS scheme on the next render. It reads the
+same hydration flag as `useWindowDimensions`, so a scheme and a window size
+switch on the same render. On native and on a single-page web build, the
+provider reads the OS scheme from the first render. A reader with a dark
+system setting sees one light frame first on a static export. The server
+cannot know the scheme, so that frame is the first paint. If you wrote your
+own hydration gate around `mode`, remove it.
+
+### The divider of a scrollable `Tabs` row spans the edge padding
+
+A scrollable row put `edgePadding` on the scroll content, and drew its 1dp
+divider inside the tabs. So the divider started after the padding and
+stopped before it: at 390dp wide with `edgePadding={16}`, it ran from x 16,
+not from the screen edge. A row whose tabs did not fill the width drew the
+divider under the tabs only.
+
+The padding is now on the row, and the row fills the scroll view. The
+divider spans the tabs and the edge padding on both sides, and it still
+scrolls with the tabs, as Compose's `ScrollableTabRow` does. The same change
+fixes the scroll position: a selected tab scrolled into view now sits at the
+center of the row. It was `edgePadding` off center. If you set
+`showDivider={false}` and drew a full-width `Divider` under the row, remove
+both.
+
+## 0.0.0-alpha.20 — 2026-09-29
+
+No breaking changes. A new `SearchBar` component. An anchored `Badge` sits at
+the correct corner on iOS and Android. `rootnative create` pins
+`@rootnative/inertia` `0.0.14`.
+
+### `SearchBar`
+
+`SearchBar` from `@rootnative/components/search-bar` is the MD3 search bar: a
+56dp pill with a leading icon, a text input, and a trailing slot. It takes
+every `TextInputProps` except `editable` and `style`, so you control it with
+`value` and `onChangeText` as you do a `TextInput`.
+
+```tsx
+const [query, setQuery] = useState('')
+<SearchBar
+  placeholder="Search mail"
+  value={query}
+  onChangeText={setQuery}
+  onSearch={(text) => runSearch(text)}
+/>
+```
+
+- The keyboard shows a **Search** key, and `onSearch` receives the query
+  when the user presses it.
+- A clear button shows while the bar holds text. It calls
+  `onChangeText('')`, then `onClear`, and moves focus back to the input.
+  `showClearButton={false}` removes it.
+- The leading icon is a decorative `magnify` by default. `onLeadingIconPress`
+  makes it a button, such as a menu or a back arrow. Name it with
+  `leadingIconAccessibilityLabel`. In development, the component warns when
+  that label is missing.
+- The trailing slot takes `actions`, a list of icon buttons such as a voice
+  action, or `trailing`, custom content such as an `Avatar`. The two fill
+  the same slot, so the type rejects both together.
+- `ref` reaches the inner `TextInput`, for `focus()`, `blur()` and `clear()`.
+- `disabled` disables the input and every button in the bar.
+  `containerColor` and `contentColor` change the two colors.
+
+The bar is 720dp wide at most. Set `style={{ maxWidth }}` to change it. MD3
+also sets a minimum width of 360dp, which the component does not apply,
+because a bar that wide overflows a narrow phone screen.
+
+On the web, the bar is a `search` landmark and the input has the `searchbox`
+role. The placeholder is the accessible name of the input unless you set
+`accessibilityLabel`. The bar costs a keyboard user one tab stop, plus one
+for the clear button while it shows.
+
+MD3 Search has a second part, the search view that opens from the bar and
+shows suggestions. The library does not have it yet.
+
+`rootnative add search-bar` installs it, with `icon-button` as a dependency.
+
+### An anchored `Badge` sits at its anchor's corner on native
+
+In alpha.19, a `Badge` that wrapped an anchor was in the wrong position on
+iOS and Android. In the 56dp `NavigationBar` pill, the badge was 32dp to the
+right of its 24dp icon. A `999+` label on a 24dp anchor showed as `99…`. The
+web build was correct.
+
+React Native runs Yoga with its classic errata. The badge used
+`start: '100%'`, and Yoga resolved that percentage against the width the
+parent offers, not the final width of the wrapper. Yoga also limited the
+badge to the width of its 24dp containing block, and that cut the label.
+
+The wrapper now puts the badge in a zero-size row at the top-end corner of
+the anchor, and the badge takes a negative `start` equal to the MD3 offset.
+The position on the web does not change. If you moved the badge with a
+`style` offset to correct it on native, remove the offset.
+
+### `rootnative create` pins `@rootnative/inertia` `0.0.14`
+
+The two templates pinned `0.0.13`. inertia `0.0.14` fixes a `layoutId`
+transition that did not run when its source element stayed mounted and did
+not move. That is the usual case for a list card that opens a detail screen.
+The peer range stays `>=0.0.11 <0.1.0`, because no component uses an inertia
+API that is newer than `0.0.11`.
+
+## 0.0.0-alpha.19 — 2026-09-28
+
+No breaking changes. A new `Badge` component, which a `NavigationBar` item
+can show on its icon. A selected filter chip reads its pill from the theme. A
+`Card` inside a `Link` renders as a link on the web. `core` exports a
+`useWindowDimensions` that is safe in a static web export.
+
+### `Badge`
+
+`Badge` from `@rootnative/components/badge` is the MD3 badge. With no
+`label`, it is a 6dp dot. With a `label`, it is a 16dp pill that holds a
+count or a short word. A number above `max` shows as `{max}+`, and `max` is
+999 by default. Wrap the anchor, usually a 24dp icon, and the badge sits at
+its top-end corner with the MD3 offsets. With no children, the badge renders
+inline. `visible={false}` removes the badge and keeps the anchor, so the
+layout does not move when the badge comes back. The fill is `error` and the
+label is `onError`, and `containerColor` and `contentColor` change them.
+
+```tsx
+<Badge label={3} accessibilityLabel="3 unread messages">
+  <MaterialCommunityIcons name="email-outline" size={24} />
+</Badge>
+```
+
+A small badge has no text, so a screen reader does not announce it unless you
+give it an `accessibilityLabel`.
+
+A `NavigationBarItem` takes a new `badge` field. `true` shows a dot, and a
+number or a string shows a large badge. The badge in the bar is decorative,
+so put the count in the item's `accessibilityLabel`.
+
+`rootnative add badge` installs it, and `rootnative add navigation-bar` now
+installs `badge` as a dependency.
+
+### `useWindowDimensions` from `@rootnative/core`
+
+`useBreakpoint` was safe in a static web export, but a layout that needs the
+raw width had only the `react-native` hook. On the export server that hook
+measures a 0 by 0 window, and React 19 keeps the server's style when the
+client hydrates, with no error. So on a 1440 wide screen, a carousel slot
+sized from the width drew -128 wide, and a hero set as a fraction of the
+width drew 0 high, until the reader resized the window.
+
+`useWindowDimensions` from `@rootnative/core` returns the same `ScaledSize`
+as the `react-native` hook. While the client hydrates, it returns the
+server's 0 by 0 window, and then the measured window on the next render. On
+native and on a single-page web build, it returns the measured window from
+the first render. `useBreakpoint` now reads this hook, so a breakpoint and a
+raw width cannot disagree during hydration. Its behaviour does not change.
+If you wrote your own guarded copy of the hook, import this one and remove
+the copy.
+
+### A `role` you pass to `Card` replaces `button`
+
+An interactive `Card` set `role="button"` after it spread your props, so the
+role you passed was lost with no warning. Expo Router's `<Link href asChild>`
+passes `role="link"` and `href` to its child. The card then rendered
+`<button href>` on the web, which a crawler does not follow and a middle click
+does not open. The card now uses your `role` and
+falls back to `button`, so react-native-web renders an `<a>`. With no `role`,
+the card is a `<button>` as before. `Chip`, `Button`, `IconButton`, `FAB`,
+`ListItem` and `Avatar` already let your `role` win, because they set the
+older `accessibilityRole` and `role` takes precedence over it. If you put a
+`Pressable` between a `Link` and a `Card` to get an anchor, remove it: the
+`Card` gets its state layer and focus ring back.
+
+### A selected filter `Chip` respects `roundness`
+
+The selected rest radius was a constant, half the chip height, while the
+unselected radius read `theme.shape.cornerMedium`. Under `applyRoundness(0)`
+every surface was square except a selected filter chip, which morphed into a
+16dp pill and could not be themed out of it. The selected radius now reads
+`theme.shape.cornerLarge`, which is 16dp at the default roundness and scales
+with it, capped at half the chip height so a rounder theme still draws a true
+pill. The default look is unchanged.
+
+## 0.0.0-alpha.18 — 2026-09-27
+
+No breaking changes. `TextField` gains a `ref` prop. Every component that
+applies a safe-area inset reads it from `SafeAreaProvider` when one is
+mounted. The snackbar fits a phone screen on native. Each entry names the
+workaround you can now remove.
+
+### `TextField` forwards a ref to its `TextInput`
+
+`TextField` took every `TextInputProps` but no `ref`, so a screen could not
+call `focus()`, `blur()` or `setSelection()` on it. `TextFieldProps` now
+declares `ref?: Ref<TextInput>`, and the component merges it with the ref it
+uses for its own press-to-focus.
+
+```tsx
+const ref = useRef<TextInput>(null)
+<TextField ref={ref} label="Search" />
+ref.current?.focus()
+```
+
+React 19 passes `ref` as a prop, so the component is not wrapped in
+`forwardRef`. If you drew a plain `TextInput` to get a programmatic focus,
+you can use `TextField` again.
+
+### Safe-area insets come from the provider on the first paint
+
+`AppBar insetTop`, `Layout`, `NavigationBar insetBottom`, `BottomSheet` and
+the snackbar layer all wrapped their content in the native `SafeAreaView`
+from `react-native-safe-area-context`. That view measures its own inset on
+the native side, and on a `transparentModal` route from
+`react-native-screens` the first measurement is 0. The bar sat under the
+status bar until something re-rendered it, such as a theme change.
+
+The shared wrapper now reads `SafeAreaInsetsContext`. Inside a
+`SafeAreaProvider` it renders a plain `View` and adds each requested edge's
+inset to the padding the style carries, the same additive maths as the
+package's own web `SafeAreaView`. That value is correct on the first render.
+Without a provider the context is `null`, and the wrapper renders the native
+`SafeAreaView` as before.
+
+**Expo Router mounts a `SafeAreaProvider` at its root**, so every Expo Router
+app takes the new path with no change. If you dropped `insetTop` and padded
+an `AppBar` from `useSafeAreaInsets` yourself, put `insetTop` back and remove
+the padding. Do not keep both, or the bar gets a double inset on a phone.
+
+### The snackbar fits a phone screen on iOS and Android
+
+On native, the snackbar surface was 600dp wide on a 402dp phone, and the
+layer centred it 99dp off the left edge. The reader saw the tail of the
+message and no action label. The surface set `width: '100%'` and
+`maxWidth: 600`, but its parent, the entrance `Motion.View`, had no width. In
+Yoga a percentage width does not resolve against a grandparent, so the
+surface took its maximum. A browser resolves it, which is why the web build
+was correct.
+
+The entrance view now carries `width: '100%'` and `maxWidth: 600`, and the
+surface no longer sets `maxWidth`. The surface still fills the 16dp-margined
+layer up to 600dp, so a tablet layout does not change. If you passed a
+numeric `width` through the provider `style` as a workaround, remove it.
+
+## 0.0.0-alpha.17 — 2026-09-26
+
+No breaking changes. `AppBar` gains one prop and one exported type,
+`AppBarNavigationIcon`, and its layout moves to the MD3 geometry, so every bar
+shifts by a few dp. On iOS, the shadow of a non-interactive elevated `Card`
+is softer. The rest is a lint and internal-hygiene pass. One dev-only behaviour changes,
+and `rootnative add` copies one more file.
+
+### `AppBar` centres an `IconButton` in `leading` and `trailing`
+
+An `IconButton` passed to `leading` or `trailing` sat 4pt above the title. The
+`IconButton` root sets `alignSelf: 'flex-start'`, so that the button does not
+stretch in a column. In the row of the side slot, the same rule acts on the
+vertical axis and overrides the slot's `alignItems: 'center'`. The built-in
+back button and the `actions` escaped the defect only because each one sits in
+a centred 48×48 frame.
+
+Custom slot content is now wrapped in a row that the slot centres. The row
+keeps a fragment of several buttons side by side, and it is at least 48dp
+wide, so a custom `IconButton` takes the same space as the built-in one. If
+you wrapped an `IconButton` in your own centred `View` to correct the offset,
+you can remove the wrapper. It is not necessary, and it does no harm.
+
+### `AppBar` layout matches the MD3 geometry
+
+The reference is the Compose Material 3 `TopAppBarLayout`, measured on the
+web export of the example app. **Every bar moves by a few dp:**
+
+| Position, in dp from the bar edge | Before | Now |
+| --- | --- | --- |
+| Navigation button | 4–44 | 8–48 |
+| Last action, from the end edge | 12 | 8 |
+| Title, after a navigation button | 52 | 56 |
+| Title, after a custom `leading` `IconButton` | 44 | 56 |
+| Medium or large title, with a navigation button | 52 | 16 |
+
+- The built-in buttons had the same `flex-start` defect on the horizontal
+  axis: each sat 4dp to the start of its 48dp frame.
+- The title had no padding of its own. MD3 gives it 4dp on each side, the
+  same as each side slot.
+- MD3 puts the expanded title of a medium or large bar under the navigation
+  button, not after it. On scroll, the title now moves from 16dp to the
+  small-bar position while it collapses.
+
+No theme token changes. `horizontalPadding: 4` and `titleStartInset: 12`
+already had the MD3 values; the formulas that read them were wrong.
+
+### `AppBar` has a close button for a modal
+
+`navigationIcon="close"` changes the icon that `canGoBack` renders from a back
+arrow to a cross. The button keeps the built-in size, colour, and frame, so a
+modal no longer needs a custom `leading`. The accessibility label follows the
+icon: the cross announces "Close", and the arrow still announces "Go back".
+`onBackPress` fires for both. The default is `'back'`, so an existing bar does
+not change.
+
+```tsx
+<AppBar title="About" canGoBack navigationIcon="close" onBackPress={dismiss} />
+```
+
+### An elevated `Card` has the correct shadow blur on iOS
+
+This change applies only to an elevated `Card` with no `onPress`, on iOS. That
+card paints its shadow through `boxShadow`, because iOS clips the `shadow*`
+keys of a view that clips its children. Fabric halves the blur of a
+`boxShadow` on iOS (`React/Fabric/Utils/RCTBoxShadow.mm`), so the card had a
+blur radius of 1 instead of the level-1 value of 2. The card now doubles the
+blur before Fabric halves it, and its shadow is the same as the level-1 shadow
+on every other surface.
+
+**The shadow is softer than in alpha.16.** Android and web do not change, and
+an interactive `Card` does not change.
+
+### The React Compiler lint rules are on
+
+`eslint-plugin-react-hooks` moves from `4.6.2` to `7.1.1`, which brings the
+React Compiler rule set. The build does not run the React Compiler, so these
+rules are advisory here: each one reports a pattern the compiler cannot
+optimize, or one a future concurrent re-render could break.
+
+Three places wrote a ref during render and now write it in an effect:
+`BottomSheet`, `useFocusTrap` and `ThemeProvider`. Every one of those refs is
+read from a callback — a PanResponder handler, a keydown listener, or an async
+loader — and a callback cannot run before the commit that produced the value it
+reads. **The behaviour is the same.** `react-hooks/refs` forbids the
+render-time write because a render that never commits must not leave its value
+behind.
+
+`react-hooks/immutability` is off for the whole repo. A Reanimated
+`SharedValue` is mutated through `.value`, and that write is the entire API of
+the type. It never triggers a render, so the hazard the rule describes cannot
+happen, and no refactor satisfies the rule. `inertia`, `impulse` and
+`rootnative` turn off the same single rule and nothing else from the compiler
+set.
+
+The compiler rules are also off in tests. A test harness assigns a hook's
+result to a module-level `let` on purpose, so the test body can reach it. None
+of that ships.
+
+### A misuse warning prints once, not once per instance
+
+Five misuses print a dev-only error: `<Grid.Cell>` outside a `<Grid>`,
+`<Portal>` outside a `<PortalHost>`, a named `<PortalHost>` acting as the root,
+an uncontrolled `<Menu>` with an invalid `anchor`, and a plain `<Tooltip>`
+carrying `subhead` or `actions`.
+
+Each component held its own `useRef` latch, so the error repeated once per
+mounted instance. A list of 100 misused cells printed 100 identical errors. A
+shared `warnOnce` helper now keys the guard by the misuse, so each message
+prints once for the lifetime of the module. Keying it rather than using one
+boolean keeps two different misuses from silencing each other.
+
+The warnings stay dev-only, and production is unaffected.
+
+**`rootnative add` copies one more file.** The `layout`, `menu`, `portal` and
+`tooltip` entries gain `internal/warnOnce.ts`. A component you scaffolded
+before this release carries its own latch and still works, so there is nothing
+to redo.
+
+**`rootnative create` pins `@rootnative/inertia` `0.0.13`.** The two templates
+pinned `0.0.11`. The peer range stays `>=0.0.11 <0.1.0`, because no component
+uses an inertia API that is newer than `0.0.11`.
+
+## 0.0.0-alpha.16 — 2026-09-13
+
+No breaking changes. One silent correctness fix that reaches every static
+export, two helpers promoted out of `internal/`, and two layout and keyboard
+traps closed.
+
+### `useBreakpointValue` is hydration-safe by construction
+
+A static export renders on a server with no DOM, where react-native-web pins
+`Dimensions` to `width: 0`. Every breakpoint resolved to `compact`, and that is
+what shipped in the HTML — while the client measured the real width on its very
+first render. **React does not repair that disagreement.** Measured against
+React 19.2.3: a `style` mismatch is adopted from the server DOM, left on
+screen, and reported through *zero* recoverable errors. A tablet got the phone
+layout, permanently, with no console signal.
+
+`useBreakpoint` now reads a `useSyncExternalStore` whose only job is to report
+*when* React is reading it. React calls `getServerSnapshot` during server
+rendering and through the hydration pass, then `getSnapshot` for every render
+after, so the hook returns `compact` for exactly as long as the client is
+reproducing the server's markup and switches to the measured breakpoint on the
+re-render React schedules once hydration finishes. That correction is an
+ordinary update, which *does* patch the DOM.
+
+The visible consequence is that a breakpoint-dependent layout starts compact
+and widens a frame later. The server cannot know the viewport, so make the
+compact variant an honest first paint rather than a placeholder.
+
+**Consumers can delete their own `useHydrated` gates.** So can any code that
+hands a breakpoint map to `Grid` (`columns`) or `Grid.Cell` (`span`): those
+resolve the map internally, which put the trap somewhere a consumer's gate
+could not reach.
+
+It costs nothing where there is no hydration. On native, and on a single-page
+web build, `getServerSnapshot` is never called, so the measured breakpoint is
+returned from the first render with no extra pass.
+
+### `elevationShadowConfig` and `elevationBoxShadow` are public
+
+Both are exported from `@rootnative/components`. They convert a
+`theme.elevation.level*` token into the surface each platform actually renders:
+web gets a CSS `boxShadow` string, native gets the classic
+`shadow*` / `elevation` keys.
+
+Reach for `elevationShadowConfig` whenever an elevation is **animated**.
+`useShadow` accepts the classic keys, and on web they animate nothing —
+react-native-web 0.21 deprecated those props and the per-frame values never
+reach CSS, so a hover lift stays visibly flat with a single deprecation warning
+as the only signal. Passing `theme.elevation.level*` straight to `useShadow`
+does not work either: those tokens are built from the `shadow*` keys and carry
+no `boxShadow` field.
+
+**Nothing about the helpers changed** — `Button`, `Card`, `Chip` and `FAB` have
+used them since alpha.5. They simply lived in `packages/components/src/internal/`,
+so a consumer who hit the web tween problem had to rebuild the conversion by
+hand and had no way to know one already shipped. This is an access change, not
+a new shape.
+
+**Do not flatten the platform split and emit both keys.** RN 0.76+ on the new
+architecture renders `boxShadow` natively too, so a config carrying both
+applies two shadow systems to one view and whichever resolves last wins. That
+is also why `ElevationLevel` carries no `boxShadow` field: a token holding both
+shapes at once cannot be handed to `useShadow` on any platform.
+
+### `<Stagger>` works inside `<Grid>`
+
+A `<Stagger>` wrapping N cards used to collapse into a single grid cell, so the
+whole cascade landed in one column.
+
+`Grid` wraps every child that is not a `Grid.Cell` in a cell of its own, and
+`React.Children.map` does not descend into a fragment — `Stagger` renders a
+fragment of context providers and no host view, so N cards arrived as *one*
+child. `Grid` now looks through a `Stagger` element: it cell-wraps the
+stagger's children and keeps the `Stagger` element itself, so each cell still
+sits under its own delay provider.
+
+The fix had to live in `Grid`. `Stagger` already assigns its delays per child
+rather than per parent slot, so the cascade was never what broke — only the
+layout — and nothing `Stagger` could do would help, because the collapse
+happens before it renders.
+
+### `TextField` no longer adds a second tab stop per field
+
+The container `Pressable` widens the press target and catches hover. It is not
+a control, and it carried `accessible={false}` and `focusable={false}` to say
+so — but **neither prop removes the tab stop on web.** Measured in jsdom
+against react-native-web 0.21.2: an enabled `Pressable` renders `tabindex="0"`
+and keeps it with both props set. Every field therefore cost a keyboard user
+two stops, and the first one only forwarded focus to the second.
+
+It now carries `tabIndex={-1}`, the same way `Tooltip` blocks the same stop.
+Two web tests pin the attribute — reading the rendered DOM, not the props,
+because the props are exactly what mislead here.
+
+### Developed against `@rootnative/inertia` `0.0.12`
+
+The dev pin moves from `0.0.11` to `0.0.12`. **The peer range is unchanged at
+`>=0.0.11 <0.1.0`** — no package here calls a `0.0.12` API, so nothing forces a
+consumer to upgrade. `0.0.12` adds `useInView`, a static-export entrance guard,
+a `pointerHandlers` bag on `useGesture`, and a widened `useMotionValue`; all
+four serve a page rather than a component library.
+
+### Documentation
+
+`Column` gains a page section on alignment and on when a wrapper collapses to
+its content, which is the shape behind most "my centred block is the wrong
+width" reports.
+
+The responsive page replaces its server-rendering note. It used to tell you to
+"treat the first render as `compact` and let the client correct it" — advice
+the first entry above makes unnecessary — and now states what the hook
+guarantees, what it costs, and that `Grid` inherits the same safety for its
+`columns` map.
+
+## 0.0.0-alpha.15 — 2026-09-09
+
+The Expo SDK 57 release. Every package moves to the SDK 57 runtime band and
+stops claiming SDK 54, so an app that stays on SDK 54 stays on
+`0.0.0-alpha.14`. No one set of ranges serves both bands.
+
+### Breaking: the peer ranges are narrowed to the Expo SDK 57 band
+
+`core`, `components` and `icons` declare `react >=19.2.3 <20.0.0` and
+`react-native >=0.83.0 <0.87.0`. `components` also narrows
+`react-native-reanimated` to `>=4.5.0 <4.6.0` and `react-native-worklets` to
+`>=0.10.0 <0.11.0`. The floors they replace — `react >=18.0.0`,
+`react-native >=0.72.0`, `react-native-reanimated >=4.0.0` and
+`react-native-worklets >=0.5.0` — were never installable: `components` depends
+on `@rootnative/inertia`, whose own floor was already `react >=19.0.0` with
+`react-native >=0.81.0`, so npm rejected the advertised floor with `ERESOLVE`.
+
+The band cannot be wider. Each peer range resolves on its own, so any set that
+admits both SDK 54 (`react-native 0.81` with Reanimated `4.1`) and SDK 57
+(`react-native 0.86` with Reanimated `4.5`) also admits `react-native 0.81`
+with Reanimated `4.6`, which cannot install. A range promises every combination
+it permits, not only the combinations that were tested. `@rootnative/inertia`
+`0.0.11` narrowed its own ranges for that reason, and this release tracks it so
+the two cannot disagree.
+
+Migration: move the app to Expo SDK 57 — React `19.2.3`, React Native
+`0.86.3`, Reanimated `4.5.1`, Worklets `0.10.1`. A project on SDK 54 stays on
+`0.0.0-alpha.14`. A project that runs Jest also needs
+`@react-native/jest-preset` at the version that matches its `react-native`:
+React Native `0.86` moved the preset into that package and left a shim that
+declares it as an optional peer, which no package manager installs.
+
+The claim is gated rather than reviewed. `compat.yml` packs the `components`
+tarball and installs it into every Expo SDK fixture in `rootnative/sdk-compat`
+with `enforce-range: true`, on every push to `main` and every pull request that
+touches `packages/**`. The test suite in this repository says nothing about
+what a consumer can install, and that gap is what let the old floors ship.
+
+### `@rootnative/inertia` floor moves to `0.0.11`
+
+Every pin moves together: the `core`, `utils` and `components` peer ranges are
+now `>=0.0.11 <0.1.0`, the dev, example and template pins are `0.0.11` exact,
+and the registry's derived floor follows. `0.0.11` is the release whose own
+peer ranges match the SDK 57 band. `0.0.10` declares `react-native >=0.81.0`
+and `react-native-reanimated >=4.0.0`, which a fresh install can reject.
+
+`0.0.11` also fixes a crash and exports three style types. The crash was a
+keyframe array — `animate={{ translateY: [0, -8, 0] }}` — taking the whole
+render down under reduced motion. The types are `ColorStyle`, `TranslateStyle`
+and `ShadowStyle`. This library writes no keyframe array and names none of the
+three: every call of `useColorTransition`, `useColorCascade` and `useShadow`
+spreads the style into a `style` array, where inference is enough. So the
+raised floor is a requirement of the SDK band rather than of anything the
+library consumes.
+
+### `@expo/vector-icons` and `react-native-safe-area-context` are required peers
+
+Both were marked optional in `peerDependenciesMeta`, and no package manager
+installs an optional peer. The library imports both **statically**, so no
+runtime fallback exists to make them skippable: Metro builds its module graph
+by scanning for literal import calls and fails with `Unable to resolve module`
+before any fallback could run. The comment in `src/safe-area.tsx` records why
+the lazy `require()` shape does not survive the build. The flags are gone, so
+npm and pnpm now install both. `react-native-svg` was already required, and the
+installation page states the status of every peer in one column. Yarn classic
+installs no peers at all, so a Yarn project still adds the list by hand.
+
+### `pointerEvents` moved from a prop to a style
+
+Every component that marked a decorative overlay non-interactive — focus rings,
+state layers, elevation carriers, the Tabs indicator, the Menu / Tooltip /
+BottomSheet / Snackbar overlay layers — passed `pointerEvents` as a prop.
+react-native-web deprecated that spelling: `createDOMProps` warns
+`props.pointerEvents is deprecated. Use style.pointerEvents`. The warning is
+`warnOnce`-guarded, so it appeared exactly once, unattributed, in the console of
+every web app that rendered any of these — 69 call sites across 24 components.
+
+Nothing renders differently. react-native-web's own implementation translated
+the prop into the identical style object and appended it after the caller's
+`style`, so the components now write it themselves, last in the style array,
+which is where it already landed. React Native has read the key from `style`
+since 0.71, so native is unchanged too. `cursor.web.test.tsx`, which reads the
+real DOM, was green before and after.
+
+No public API change: `pointerEvents` was never part of any component's props.
+A consumer passing it to a component that forwards `ViewProps` still works, and
+still warns — that call site should move it into `style` as well.
+
+`react/forbid-component-props` now fails the build on the prop form. It is a
+lint rule rather than a test because the warning is `warnOnce`-guarded: only the
+first offender in a process is observable, so a per-component test passes for
+every component rendered after it. Fault injection confirmed that directly —
+putting the prop back on `Button` left the web suite green, and fails lint.
+
+### One shared `AnimatedPressable`, and six worklets fold into `useInterpolatedStyle`
+
+Thirteen components each declared their own
+`const AnimatedPressable = Animated.createAnimatedComponent(Pressable)`.
+`createAnimatedComponent` builds a new wrapper class per call, so the package
+shipped thirteen distinct classes for one base component. They now share
+`internal/AnimatedPressable.ts`, and the built bundle carries one definition in
+one chunk.
+
+**The npm package is what gains here; a CLI-installed project is unchanged.**
+The installer flattens `../internal/*` into each consuming component's own
+directory, so `rootnative add button chip switch` still writes one
+`AnimatedPressable.ts` per component. That self-containment is the point of the
+copy-paste path, not an oversight. What does change for a CLI consumer is the
+file list: those thirteen components each ship one more file, and `rootnative
+update` rewrites the component that imports it.
+
+Separately, six `useAnimatedStyle` blocks driven by a *single* progress value
+move to `useInterpolatedStyle` — Button's elevation radius, three plain-opacity
+styles in Switch, TextField's hover layer, and the Slider thumb. Nothing renders
+differently. Twenty-seven hand-rolled worklets remain, each of which either
+mixes two or more driving values or needs a key `useInterpolatedStyle` cannot
+express.
+
+**The Slider thumb needed `extrapolate: 'extend'`, and without it this would
+have been a silent regression.** `useInterpolatedStyle` defaults to `'clamp'`;
+a hand-rolled `interpolate` defaults to `'extend'`. `pressed` rides
+`spring-fast-spatial`, which is underdamped by design and overshoots both ends,
+and `evalEdge` extrapolates that same value unclamped for the track segments and
+the stop indicators. A clamped thumb would have drifted out of step with its own
+track for the length of every settle.
+
+`Slider.test.tsx` pins the option rather than the arithmetic, and the reason is
+worth knowing before writing any similar test: `@rootnative/inertia/jest-setup`
+stubs `interpolate` as `value >= 1 ? last : first`. That is a binary step which
+ignores the input range and the extrapolation config, so a measured width reads
+identically under `'extend'` and `'clamp'` and an assertion on one would pass
+against either. Validated by fault injection — dropping the option fails the
+case, and only that case.
+
+No public API change: `internal/` is not exported and `api:check` is unchanged.
+
+### Both templates ship Expo SDK 57
+
+`rootnative create` now scaffolds on `expo ~57.0.20` with React Native
+`0.86.3`, Reanimated `4.5.1`, Worklets `0.10.1` and inertia `0.0.11`. SDK 57
+removed the legacy top-level `splash` key from `app.json`, so both templates
+declare the splash screen through the `expo-splash-screen` plugin, and
+`newArchEnabled` / `edgeToEdgeEnabled` are gone because the SDK defaults
+them. Android's predictive back gesture is switched off explicitly with
+`predictiveBackGestureEnabled: false`. `babel.config.js` is gone as well — it
+held nothing but `babel-preset-expo`. The blank template's entry point is
+`index.ts`.
+
+The icon, adaptive icon, favicon and splash mark in both templates now carry
+the Root Native mark. `scripts/build-brand.mjs` renders them into the template
+asset directories as well as the example app, from one source, so a scaffolded
+project cannot drift from the example it is modelled on.
+
+### Two guards the release path was missing
+
+`pnpm run check:template-pins` compares every template pin against the
+installed Expo SDK and the `components` peer ranges. The templates are not
+workspace members, so no install, typecheck or test run ever reads their pins:
+they sat a whole Expo SDK behind the library while every gate stayed green.
+
+`pnpm run registry:check` regenerates the registry and fails on drift.
+`check:inertia-pins` reads the registry but compares only the inertia floor in
+each entry, so the `files` lists were unguarded — 21 of 29 were missing
+`internal/pointerEvents.ts` after the import was added without re-running the
+generator. The registry is what `rootnative add` copies into a consumer
+project, so a stale list hands them a component with a missing import.
+
+Both guards run in `ci.yml` and in `release.yml`.
+
+## 0.0.0-alpha.14 — 2026-08-22
+
+### `Grid` takes a breakpoint map for `columns`
+
+`columns` now accepts a map of [window size
+classes](https://rootnative.github.io/ui/responsive) as well as a number, so
+`<Grid columns={{ compact: 1, medium: 2, expanded: 4 }}>` replaces a
+`useBreakpointValue` call at the call site. A map cascades down to the nearest
+smaller breakpoint, and the required `compact` key makes a missing width a
+compile error rather than an `undefined` reaching `flexBasis`.
+
+The numeric form is unchanged, but `Grid` now reads the window width for every
+consumer. A constant `columns` resolves to a stable value, so the cell style
+keeps its object identity and nothing re-renders that did not before.
+
+### `Grid.Cell` spans more than one column
+
+A plain `Grid` child always fills one column, so an asymmetric layout meant
+dropping to `Row` with a hand-written `flexBasis`. `Grid.Cell` spans a
+`span` count of columns instead:
+
+```tsx
+<Grid columns={12} gap="sm">
+  <Grid.Cell span={8}>{/* main */}</Grid.Cell>
+  <Grid.Cell span={4}>{/* sidebar */}</Grid.Cell>
+</Grid>
+```
+
+`span` takes a breakpoint map too, and clamps to the parent's column count — an
+oversized span fills the row instead of overflowing it. Plain children keep
+today's behaviour and still read as `span={1}`, so the two forms mix in one
+grid.
+
+`Grid` passes the column count and gutter to a cell through `cloneElement`, and
+detects a cell by element type rather than by `displayName`, which a minifier
+rewrites. That keeps the geometry a private contract between the two components:
+it adds no React context, and the injected fields stay off `GridCellProps`. A
+`Grid.Cell` rendered outside a `Grid` warns once in development and renders
+full-width.
+
+New exports: `GridCell` and `GridCellProps`.
+
+### `Grid` is now tested against the DOM
+
+`Grid` had no web test, so every assertion about it lived in the native
+project — which asserts on the React prop and is structurally blind to what
+react-native-web emits. Two things were unproven for the component's whole life:
+that the percentage `flexBasis` survives the `as unknown as number` cast into a
+real `flex-basis: 50%`, and that the row's negative margin stays the exact
+negation of the cell padding, which is what keeps a grid from adding a
+horizontal scrollbar.
+
+`grid.web.test.tsx` pins both. One finding is worth recording, because it
+contradicts what the elevation notes imply: react-native-web resolves *inline*
+logical properties to physical ones at render time, so the DOM shows
+`padding-left`, never `padding-inline-start`. Logical-property emission applies
+to `StyleSheet`-class styles, and `Grid`'s cell styles are dynamic `useMemo`
+objects. The gutter is direction-correct on web because it is symmetric, so the
+web suite pins that symmetry and the native suite keeps asserting the logical
+source keys.
+
+## 0.0.0-alpha.13 — 2026-08-16
+
+### Skeleton, a pulsing loading placeholder
+
+New component: `Skeleton` renders a pulsing placeholder block that matches the
+shape of the content it stands in for. It ships as the 29th component, with its
+own subpath export (`@rootnative/components/skeleton`), a registry entry for
+`rootnative add skeleton`, and an example screen.
+
+### `@rootnative/inertia` moves to `0.0.8`
+
+Every pin moves together: the `core` / `utils` / `components` peer ranges are
+now `>=0.0.8 <0.1.0`, the dev, example, and template pins are `0.0.8` exact,
+and the registry's derived floor is `>=0.0.8`. Nothing in the library consumes
+the `0.0.8` additions yet — `<Stagger>` is a consumer-app feature, and the
+`buildReleaseAnimation` settle callback is not reachable through `useTouchDrag`
+(the one drag surface this library uses) until inertia exposes it there.
+
+### Documentation
+
+The CLI reference documents command usage in full, the theming page explains
+which package owns the `createMaterialTheme` dependency, the Portal docs
+clarify where `PortalHost` must sit, and the API reference and component pages
+got a clarity pass. All of it is covered by `docs:check`, which verifies every
+JSX prop in every example against the real props types.
+
+## 0.0.0-alpha.12 — 2026-08-14
+
+### Every animated component died on mount on native — `components` now ships ESM
+
+On `alpha.10` and `alpha.11`, mounting any animated component on iOS or
+Android — a single `<IconButton />` was enough — crashed the app with:
+
+```
+TypeError: updater is not a function (it is Object)
+```
+
+The source was never wrong, and every test was green. The build format broke
+it: under `format: 'cjs'` + `splitting: true`, esbuild emits a cross-chunk hook
+call as `_reanimated.useAnimatedStyle.call(void 0, cb)`. The Reanimated Babel
+plugin auto-workletizes a callback **by callee name**, which resolves to
+`call`, never matches, and the callback ships un-workletized — the UI thread
+receives a plain object instead of a worklet and the component dies on mount.
+`alpha.9` worked because CJS *without* splitting emits
+`(0, import_reanimated.useAnimatedStyle)(cb)`, which the plugin does match;
+`alpha.10` added `splitting: true` to fix the PortalContext duplication and
+silently flipped all 30 hook calls into the broken shape.
+
+The two constraints are coupled, and ESM is what satisfies both at once: bare
+`useAnimatedStyle(cb)` calls for the Babel plugin, and one definition per
+singleton for the overlays. `@rootnative/components` now builds
+`format: 'esm'` with `"type": "module"`; `outExtension` pins the emitted files
+back to `.js`, so every `exports` path, `typesVersions` entry, and consumer
+import is unchanged. The fix was confirmed on an Android emulator, not just in
+the build output.
+
+Two new guards keep both constraints honest, because nothing else in CI can
+see either failure (the tests import from `src/`, and the public API surface
+is identical either way):
+
+- `pnpm run check:worklets` asserts the emitted call shape in the built
+  bundles — the only place the regression is observable.
+- `pnpm run check:singletons` (existing) still asserts one definition per
+  React context.
+
+### The release path now runs the guards it was supposed to enforce
+
+`alpha.10` and `alpha.11` shipped **through a release workflow that ran none of
+the five build guards** — the worklet check existed in CI, but the publishing
+path never ran it, so a green CI on main said nothing about the artifact. Both
+release workflows now run the same gate list as `ci.yml` (docs check, inertia
+pin check, API surface, singleton check, worklet check) and regenerate the
+component registry, which had shipped two releases stale — still claiming a
+`@rootnative/core` floor of `>=0.0.0-alpha.9` — because only `llms.txt` was
+regenerated at release time.
+
+## 0.0.0-alpha.11 — 2026-08-14
+
+### Every icon threw, and safe-area insets were silently dropped
+
+`IconButton`, and anything else rendering a string icon name, failed at runtime
+under Metro with:
+
+```
+Requiring unknown module "@expo/vector-icons/MaterialCommunityIcons"
+```
+
+followed by the library's own `@expo/vector-icons is required for icon support`
+error. `Layout` and `AppBar` hit the same fault one step quieter: they warned
+that `react-native-safe-area-context` was not installed and rendered a plain
+`View`, so every screen lost its insets. **Both packages were installed and
+resolvable in every case.** Reported against `0.0.0-alpha.10` from a consumer
+app; the icon path has been broken for far longer.
+
+The source was never wrong. Both peers were loaded the way an optional
+dependency normally is — a literal `require()` inside a `try`/`catch` — and
+the build broke it. `splitting: true` makes esbuild compile through an ESM
+intermediate, where `require` does not exist, so each call was rewritten to
+esbuild's own shim and emitted as `__require.call(void 0, '…')`. Metro builds
+its module graph by scanning for **literal** `require('…')` and `import`
+statements, so an indirect call through an aliased binding is invisible to it:
+the module never entered the graph, the call threw, and the `catch` blamed the
+consumer for a package that was sitting in `node_modules`.
+
+Listing both in tsup's `external` does not help — the shim breaks the call
+before externalization is reached. Nor can `splitting` be dropped to avoid it;
+that is what keeps `PortalContext` and friends single instances, and
+`check:singletons` exists to defend it.
+
+So both are now **static imports**, in `packages/utils/src/icon.ts` and
+`packages/components/src/safe-area.tsx`. That is a form esbuild leaves intact
+and Metro can see, and it keeps both packages external rather than inlined.
+
+**Behavior change worth reading before you upgrade.** These two peers are now
+resolved when the module loads, not when an icon first renders. Both are already
+declared peer dependencies and both ship in any Expo app, so this should reach
+nobody — but a consumer who genuinely omitted one now fails at import time
+instead of at first icon. The old `try`/`catch` never actually bought that
+tolerance: the only reason it ever ran was this bug.
+
+Nothing changed in the public API — `api:check` reports no drift, and all 957
+tests pass.
+
+## 0.0.0-alpha.10 — 2026-08-14
+
+Closes the last open item from the developer-experience audit, and the docs
+guard that audit asked for.
+
+### `@rootnative/inertia` floor moves to `0.0.7`
+
+Peer range is now `>=0.0.7 <0.1.0` across `core`, `utils` and `components`.
+`0.0.7` adds `Motion.FlatList` and fixes `gesture={{ pressed }}` on web for
+non-`Pressable` primitives. **This library uses neither**, so the raised floor is
+a judgment call rather than a technical requirement — upgrading is only forced if
+you consume `@rootnative/ui`'s peer range directly.
+
+### Snackbar bottom offset is computed, not guessed
+
+`SnackbarProvider`'s `bottomOffset` was a raw number the consumer had to work
+out and keep in sync by hand, and the documented value for a standard FAB was
+**wrong**. `88` assumed the offset had to include the snackbar's own 16dp
+margin; the layer already adds that margin *and* the safe-area inset, so `88`
+produced 104dp of padding and pushed the snackbar 32dp above the FAB it was
+supposed to clear. Measured against the rendered layer, not inferred.
+
+Three additions, all exported from the root and from their subpaths:
+
+- **`FAB_SIZES`** / **`FAB_ICON_SIZES`** (`@rootnative/components/fab`) — the MD3
+  container and icon heights per FAB size, plus `extended` (56dp, whatever the
+  `size` prop says). They were previously literals inside `createStyles`, so a
+  consumer computing clearance had nothing to read.
+- **`snackbarOffsetFor(height)`** (`@rootnative/components/snackbar`) — the
+  offset that clears an element of `height` at the bottom edge.
+  `snackbarOffsetFor(FAB_SIZES.medium)` is `72`. It takes a raw height rather
+  than a `FABSize` so `snackbar` does not gain `fab` as a component dependency —
+  `rootnative add snackbar` should not copy in the whole FAB for four numbers —
+  and so it also covers a bottom bar.
+- **`useSnackbarOffset(offset)`** — raises the offset while the calling component
+  is mounted, so the constant lives next to the FAB that determines it instead of
+  in the app root two files away. A mounted caller wins over the provider's prop.
+  With several mounted (a navigation transition, where the outgoing screen has
+  not unmounted yet) the largest applies. A pushed `0` is an override, not an
+  absence.
+
+`bottomOffset` is unchanged and still correct for an app whose screens all carry
+the same bottom furniture. **On upgrade, re-check any hard-coded value**: it was
+almost certainly copied from the old docs and is 16dp too large.
+
+### ButtonGroup's props were missing from `llms.txt` entirely
+
+Not a missing prop — the whole block. `ButtonGroupProps` is a union over
+interfaces named `ButtonGroupBaseProps`, and the `llms.txt` generator admits a
+local interface only when the name ends in `CommonProps`, so all four were
+skipped and the generic branch found nothing to document. The section shipped
+with an example and no prop list in every release to date.
+
+Renamed to `ButtonGroupCommonProps` and gave the generator a ButtonGroup branch
+that describes the three `selectionMode` arms, the same shape the AppBar branch
+uses. That recovers 13 common props plus `selectionMode`, `value`,
+`defaultValue`, `onValueChange` and `onItemPress`. No API change — the renamed
+interface was never exported.
+
+### `pnpm run docs:check` now verifies documentation coverage
+
+A fifth check group, `props-coverage`. The existing checks are one-directional:
+they prove a documented prop is real, never that a real prop is documented, so a
+prop absent from the docs left nothing to scan. `Box.justify` was implemented,
+typed and undocumented for the library's whole life with every gate green, and
+ButtonGroup above is the same failure one level up.
+
+It asserts that every prop the library declares appears in
+`packages/components/llms.txt`. Scoped to props declared in the same directory as
+their props type, so React Native's inherited `ViewProps` are not demanded and a
+`declare module 'react-native'` augmentation is not mistaken for a library prop.
+Runs in CI inside the existing Docs check step.
+
+Its limit is documented in the source: it reads `llms.txt` as one flat set, so it
+catches a prop documented nowhere, not one documented for a different component.
+
+## 0.0.0-alpha.6 — 2026-08-10
+
+_Note: `0.0.0-alpha.7`, `-alpha.8` and `-alpha.9` published to npm without
+entries here, and `-alpha.6` above was never published. Their user-facing work —
+`Card` region slots, `Typography` Emphasized variants, and `rootnative create`
+scaffolding into the current directory — is recorded only in the commit history.
+The gap is left as-is rather than reconstructed after the fact._
+
+The web pass. `0.0.0-alpha.5` covered Android; this one is react-native-web,
+and it is mostly test coverage over behaviour that was already correct — the
+web test project went from 53 to 125 tests. One real fix, plus the tail of the
+Android audit.
+
+### Fixed
+
+- **Layout direction is now read from the browser on web.** Every RTL branch in
+  the library asked `I18nManager`, which react-native-web ships as a hardcoded
+  stub (`isRTL` is always `false`). So on an RTL page the *layout* mirrored
+  correctly — react-native-web emits CSS logical properties and the browser
+  resolves them — while the JavaScript still answered "LTR": the `AppBar` back
+  arrow pointed the wrong way, `Menu`/`Tooltip` resolved `align="start"` to the
+  wrong edge, and `Slider` ran its drag maths backwards. `selectRTL` and
+  `transformOrigin` now read the document's resolved `direction` on web and keep
+  using `I18nManager` on native. Native behaviour is unchanged.
+- **Decorative icons no longer leak their glyph into the accessible name.** All
+  22 `renderIcon` sites sit under `aria-hidden` on a `View`, so screen readers
+  stop announcing private-use-area characters alongside a control's label.
+- **Touch targets meet the 48dp floor.** `Button` (`xs` is 32dp tall), `Switch`
+  (a 32dp track), `Avatar`, `ButtonGroup` and the other small controls size
+  their `hitSlop` from their own height instead of a flat 4dp. Web is excluded
+  because react-native-web does not implement `hitSlop`.
+- **`rootnative add` resolves utility file names and import aliases correctly.**
+  Two independent CLI bugs found by installing into a fresh project.
+
+### Added
+
+- `isRTLDirection()` in the shared utilities, for the places that need the
+  boolean rather than a choice between two values (`Slider` threads it through
+  track geometry and keyboard handling). Also added to the component registry,
+  so a CLI-installed `Slider` gets it.
+- `pnpm run check:inertia-pins` — fails when any `@rootnative/inertia` pin
+  disagrees with the components peer range. The template pins were previously
+  silent: nothing failed locally when one lagged.
+
+### Notes
+
+- A modifier chord (⌘R, Ctrl+C) still flips input modality to keyboard, so the
+  next mouse click paints a focus ring. The cause is upstream in
+  `@rootnative/inertia`, whose focus-visible tracker has no modifier guard; it
+  is pinned as a known-failing test here and fixes itself once inertia ships the
+  guard.
+
+## 0.0.0-alpha.5 — 2026-08-07
+
+### Changed
+
+- **`Progress`: `containerColor` is now the track and `contentColor` the
+  indicator; `trackColor` is gone.** It was the other way round —
+  `containerColor` painted the active indicator — which contradicted the
+  library-wide contract where `containerColor` is the container. This is the one
+  change in this release the compiler cannot catch: `containerColor` still
+  exists and only changed meaning, so old call sites render inverted.
+
+  ```diff
+  - <LinearProgress containerColor="#2E7D32" trackColor="#C8E6C9" />
+  + <LinearProgress containerColor="#C8E6C9" contentColor="#2E7D32" />
+  ```
+
+- `LoadingIndicator`: `indicatorColor` → `contentColor`. `containerColor` is
+  unchanged (the contained variant's circle fill), so the three progress-family
+  components now share one `containerColor` / `contentColor` pair. `Tabs` and
+  `NavigationBar` keep their own `indicatorColor` — there the indicator is a
+  genuine third element alongside container and content.
+
+- `Divider`: `inset` → `insetStart`, so it pairs with `insetEnd`. `ListDivider`
+  takes the same props and changes with it.
+
+- `@rootnative/core`: `TextStyle` → `TypographyToken`. The old name shadowed
+  React Native's own `TextStyle` at every import site, and the two are
+  structurally different — core's has five required fields.
+
+- **`Colors` and `Typography` no longer have index signatures.**
+  `theme.colors.primry` is a compile error instead of a silently-typed `string`.
+  `BaseTheme` keeps its `[key: string]: unknown`, so custom tokens still ride on
+  the theme root — see the note in
+  [Theming](https://rootnative.github.io/ui/theming).
+
+  Both are now `type` aliases rather than `interface`s, which is what makes a
+  strict `Colors` assignable to `BaseTheme`'s `colors: Record<string, string>`
+  (TypeScript gives type aliases an implicit index signature; interfaces get
+  none). Consequence: they can no longer be extended by declaration merging — a
+  `declare module '@rootnative/core' { interface Colors { brandRed: string } }`
+  augmentation fails with `Duplicate identifier`. Put brand tokens on the theme
+  root, or define your own theme interface.
+
+- `IconResolverContext` is no longer exported from `@rootnative/core`. Use
+  `ThemeProvider`'s `iconResolver` prop to write it and `useIconResolver()` to
+  read it.
+
+- **Checkbox, Radio and Switch work uncontrolled.** They were controlled-only,
+  so `<Checkbox onValueChange={fn} />` fired the callback and never moved — a
+  silent no-op. They now self-manage when `value` is omitted, starting from a
+  new `defaultValue` prop, matching Tabs / NavigationBar / ButtonGroup /
+  Slider. Passing `value` still gives you full control. A `Radio` latches when
+  uncontrolled, since it is select-only.
+
+- **`rootnative init` pins `registryVersion`** to the release tag matching the
+  latest published `@rootnative/core`, instead of tracking `main`, so `add` and
+  `update` fetch reproducible component source. Falls back to `main` when npm
+  is unreachable or the tag has not been pushed yet. `rootnative upgrade` moves
+  the pin forward, before it re-fetches any component files. Existing
+  `rootnative.json` files are untouched until you run `upgrade`.
+
+- `@rootnative/inertia` peer range widened to `>=0.0.6 <0.1.0` for `core`,
+  `utils` and `components`. The floor moves past 0.0.2 for four releases of
+  upstream work: 0.0.3 is all correctness fixes (Presence exit ordering,
+  endless-repeat unmount, style resting), 0.0.4 is purely additive — animatable
+  `boxShadow`, plus `layoutId` shared-element transitions measured in window
+  coordinates with a style carry — 0.0.5 makes the 40 layout and text-metric
+  style keys animatable and rejects undriven keys at compile time, and 0.0.6
+  fixes two animations that never ran (`animate={{ boxShadow }}` under the
+  default spring, and any colour key resting at its `'transparent'` default).
+
+  No Root Native API change, and the floor is a correctness floor rather than a
+  feature one: nothing here animates a colour key or a `boxShadow` through
+  `animate`, and every colour this library moves goes through
+  `useColorTransition` / `useGestureLayer`, which interpolate rather than
+  spring and were never affected. 0.0.5's reduced-motion fix for
+  sequence-declared step types is the one upstream change this library
+  surfaced, from `LinearProgress` / `CircularProgress`.
+
+  0.0.6 also exports `TRANSPARENT`, the seed value for a colour shared value a
+  custom animated component drives itself. Unused here — `Switch` is the only
+  component that calls `resolveTransition` directly and it drives a numeric
+  press progress, not a colour.
+
+### Added
+
+- **Every component forwards React Native props to its root node.** The 11
+  newest components declared closed prop interfaces, so `<Tabs onLayout={fn} />`
+  was a type error while `<Card onLayout={fn} />` was not. They all extend
+  `ViewProps` now. `Portal` and `SnackbarProvider` deliberately don't — they
+  render no node of their own. See
+  [API stability](https://rootnative.github.io/ui/api-stability).
+
+- `IconSource` is now exported from `@rootnative/core`, next to
+  `IconResolver` / `IconRenderProps`. It was previously only exported from
+  `@rootnative/utils`, which is private and unpublished, so npm consumers had
+  no way to import it. `@rootnative/utils` re-exports it unchanged for
+  copy-pasted CLI installs.
+
+- `api-surface.json` at the repo root snapshots every exported name, generated
+  from the built `.d.ts` files and enforced by `pnpm run api:check`, so an
+  accidental widening of the public surface shows up as a diff.
+
+- New docs page: [API stability](https://rootnative.github.io/ui/api-stability)
+  — what the `exports` maps cover, the React Native prop passthrough rule, the
+  safe-area default asymmetry, and what is deliberately not covered
+  (copy-pasted source, the vendored internal hooks, registry pinning).
+
+### Fixed
+
+- **Accessibility state now reaches the DOM on web.** Every stateful
+  component passed `accessibilityState={{ ... }}`, which react-native-web
+  0.21 no longer reads — so on web no `aria-selected` reached Tabs or
+  NavigationBar, no `aria-checked` reached Checkbox / Radio / Switch / filter
+  Chips, and no `aria-valuenow` reached Slider or the progress indicators. A
+  screen reader on web could not tell which tab was active or whether a
+  checkbox was checked. Components now emit `aria-*`, which RNW consumes
+  directly and React Native normalizes back to `accessibilityState` for
+  native. **Native behavior is unchanged**; this only ever affected web.
+
+  Affected: Avatar, Button, ButtonGroup, Card, Checkbox, Chip, FAB,
+  IconButton, ListItem, LoadingIndicator, Menu.Item, NavigationBar, Radio,
+  Slider, Switch, Tabs, TextField, BottomSheet's drag handle, and both
+  progress indicators.
+- `LinearProgress` (indeterminate) no longer renders an empty track under
+  reduced motion — the sliding segment used to snap to its final keyframe
+  past the track's end and sit clipped. It now shows a static centered
+  segment, matching the paused-arc look of `CircularProgress`.
+- `CircularProgress` (indeterminate) no longer mounts its spin loop under
+  reduced motion; the arc renders statically. Both indicators are now covered
+  by the reduced-motion invariant suite.
+- `BottomSheet.tsx` contained a literal NUL byte (a `'\0'` separator written as
+  a raw `0x00`), which made `grep -r` skip the file entirely and would have
+  copied the byte into projects via `rootnative add`.
+
+## 0.0.0-alpha.4 — 2026-07-28
+
+The 1.0 catalog release: eight new components and the shared infrastructure
+they forced.
+
+### Added
+
+- **Dialog** — basic + fullscreen variants, compound slots (`Dialog.Icon` /
+  `Dialog.Title` / `Dialog.Content` / `Dialog.Actions`), scrim,
+  `dismissable`, Android back-button handling.
+- **Snackbar** — imperative-only API: `SnackbarProvider` + `useSnackbar()`,
+  FIFO queue with one visible at a time, `replace`, per-snackbar durations
+  (an action makes it indefinite), close button, safe-area bottom inset +
+  `bottomOffset` for FAB clearance.
+- **Menu** — self-managing via `anchor` or controlled via `visible` +
+  `onDismiss`, `Menu.Item` with leading/trailing icons and trailing text,
+  anchor-relative positioning with edge flipping, `maxHeight`, scroll past
+  the available height.
+- **Tabs** — primary + secondary variants, fixed or `scrollable`, bar-only
+  (`value` / `defaultValue` / `onValueChange`; deliberately not a navigator).
+- **NavigationBar** — 80dp bar, per-item indicator pill, `labelVisibility`
+  (`always | selected | never`), `selectedIcon` per item, `insetBottom`.
+- **BottomSheet** — modal (scrim) + standard variants, `snapPoints` (dp or
+  `%`) with velocity-based settle, drag handle, drag-to-dismiss, safe-area
+  aware, Android back-button dismiss.
+- **Tooltip** — plain (transient) + rich (persistent, subhead + actions)
+  variants; long-press on touch, hover on web.
+- **Divider** — standalone export promoted from `ListDivider` (which remains
+  as an alias), plus `orientation`, `inset` / `insetEnd`, `thickness`,
+  `containerColor`.
+- **Portal v2** — `priority` + `PORTAL_LAYERS` z-order contract
+  (sheet 100 / dialog 200 / snackbar 300 / menu 400 / tooltip 500) and named
+  hosts (`hostName` + `<PortalHost name>`) with fallback to the default host.
+  Existing `Portal` / `PortalHost` usage is unaffected.
+
+### Fixed
+
+- The CLI registry never shipped `safe-area.tsx`, so `rootnative add appbar`
+  / `layout` installed a dangling `../safe-area` import and never declared
+  `react-native-safe-area-context`. Shared root modules now ship flattened
+  into each consuming component, and the peer is declared optional.
+- Opening any overlay no longer re-renders the app tree under the
+  `PortalHost` (portal registry moved to an external store).
+
+## 0.0.0-alpha.3 — 2026-07-24
+
+The MD3 Expressive release. The library is expressive-by-default with no
+scheme knob.
+
+### Added
+
+- **LoadingIndicator** — expressive shape-morphing activity indicator.
+- Press shape-morphs for Button, FAB, IconButton, and Chip (`usePressMorph`
+  — containers morph squarer on press).
+- IconButton square shape option; toggle buttons invert shape when selected.
+- Expressive typography and motion token definitions on the theme.
+
+### Changed
+
+- **IconButton `size` values renamed**: `small` / `medium` / `large` →
+  `'xs' | 's' | 'm' | 'l' | 'xl'`, with no aliases for the old names. The
+  five sizes are the MD3 Expressive scale and drive container height, icon
+  size, and corner radius.
+- **Motion feel changed across all components**: spring tokens were replaced
+  with the Expressive motion values pinned from androidx
+  (`ExpressiveMotionTokens.kt`). Anything that read the old token values or
+  tuned around the old feel will look different.
+- `@rootnative/inertia` pinned to its first stable release (0.0.2).
+
+## 0.0.0-alpha.2 — 2026-07-21
+
+The animation-stack release.
+
+### Added
+
+- AppBar collapse-on-scroll behavior.
+- Focus-visible treatment across interactive components (keyboard focus
+  rings via `useFocusVisible`).
+- `rootnative doctor` checks for `@rootnative/inertia`.
+- LLM documentation surfaces: per-package `llms.txt`, `/llms-full.txt` on the
+  docs site, `CLAUDE.md` pointers in scaffolded templates.
+
+### Changed
+
+- **`@rootnative/inertia` became a required peer dependency** of `core` and
+  `components`. Every animation now routes through it — components no longer
+  import `react-native-reanimated` directly (it remains a transitive
+  requirement via inertia).
+- All components migrated from direct Reanimated usage to inertia's
+  declarative/value layer; state layers unified on `useStateLayer`.
+
+## 0.0.0-alpha.1 — 2026-07-18
+
+The MD3 compliance release — a full audit against androidx
+`compose.material3` token files, fixing every accidental deviation.
+
+### Changed
+
+- Theme token corrections (state-layer opacities, elevation levels 4–5,
+  palette, motion durations/easings) change rendered output anywhere the old
+  values leaked into snapshots or overrides.
+
+### Added
+
+- Checkbox `indeterminate` and error states.
+
+### Fixed
+
+- MD3 alignment for the button family (including an IconButton
+  disabled-override bug), selection controls, Card, Chip, List, progress
+  indicators, Avatar interaction parity, and TextField counter/caret/error
+  states.
+- `package.json` `exports` maps for better module resolution in all packages.
+
+## 0.0.0-alpha.0 — 2026-07-16
+
+Initial publish under the `@rootnative` scope — the rename from
+`@onlynative` (which had reached `0.0.0-alpha.8`). Carried over: the theme
+system (`core`), ~20 component exports, the icon adapter package (`icons`),
+and the scaffolding CLI (`cli` / `rootnative`).

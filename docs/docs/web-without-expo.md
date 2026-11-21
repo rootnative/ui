@@ -303,5 +303,5 @@ drag regions, keyboard focus, Reduce motion, and the packaged build.
 | `Unable to resolve @react-native-vector-icons/material-design-icons` | The app imports `@rootnative/components/mdi` | Step 5: install the package, or pass your own `iconResolver` and drop the import |
 | MDI glyphs render as `?` or as empty squares | `@expo/vector-icons` and `@react-native-vector-icons/*` both register the font | Remove `@expo/vector-icons`; run `npx @react-native-vector-icons/codemod` on app code that imports it |
 | A string icon renders nothing, and the console shows `no iconResolver is set` | `ThemeProvider` has no `iconResolver` | Step 5 |
-| `No safe area value available` on a blank page | A version before the web fallback | Update `@rootnative/components`; alpha.21 and earlier threw on web without a `SafeAreaProvider` |
+| `No safe area value available` on a blank page | A version before the web fallback | Update `@rootnative/components`: older versions threw on web without a `SafeAreaProvider` |
 | Native-only props such as `hitSlop` do nothing | Expected on `react-native-web` | See [Accessibility](./accessibility.md) for the web differences |
