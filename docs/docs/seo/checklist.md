@@ -349,6 +349,27 @@ const head = headTagsHtml(toHeadTags(site, { title: 'Trek', url: '/' }))
 const html = template.replace('</head>', `${head}</head>`)
 ```
 
+### An app that renders on a server
+
+An app with no Expo Router that renders its pages on a server, or prerenders
+them at build time, takes `PageHead` from `@rootnative/seo/web`. It has the
+same props. It renders the tags as elements, and React 19 moves them into
+`<head>` on the server and in the browser. So the HTML file has the head of
+the page, and you need no `headTagsHtml` step.
+
+```tsx
+import { PageHead } from '@rootnative/seo/web'
+
+export function MovieScreen() {
+  return <PageHead title={data.title} url={`/movies/${data.id}`} />
+}
+```
+
+React does not merge two heads. A screen that stays mounted behind another
+must pass `active={false}`, or the head holds the tags of both screens. The
+tags of your HTML template in the same slots are taken out while the page
+is on, and put back when it goes.
+
 ### Per-route `noindex`
 
 An overlay route, a filter sheet, or a per-device screen is a page the
