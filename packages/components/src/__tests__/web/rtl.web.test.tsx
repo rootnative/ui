@@ -38,7 +38,7 @@ import {
   transformOrigin,
 } from '@rootnative/utils'
 import { act, screen } from '@testing-library/react'
-import { createRef } from 'react'
+import { createRef, useEffect } from 'react'
 import { StyleSheet, Text } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../../appbar'
@@ -48,6 +48,7 @@ import { Carousel } from '../../carousel'
 import type { CarouselItemInfo, CarouselRef } from '../../carousel'
 import { buildStrategy } from '../../carousel/strategy'
 import { Chip } from '../../chip'
+import { Dialog } from '../../dialog'
 import { FAB } from '../../fab'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
 import { Layout } from '../../layout/Layout'
@@ -60,6 +61,7 @@ import { physicalLeftStyle } from '../../safe-area'
 import { SearchBar } from '../../search-bar'
 import { SearchView } from '../../search-view'
 import { SideSheet } from '../../side-sheet'
+import { SnackbarProvider, useSnackbar } from '../../snackbar'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
@@ -1445,5 +1447,110 @@ describe('Menu pushes the trailing content to the end of the row', () => {
       '4px',
       '12px',
     ])
+  })
+})
+
+// The full-screen dialog header pads 4dp before the close button and 16dp
+// after the actions. In RTL both stayed on their LTR sides.
+describe('Dialog places the full-screen header padding for the document direction', () => {
+  const dialog = () => (
+    <SafeAreaProvider
+      initialMetrics={{
+        insets: { top: 0, right: 0, bottom: 0, left: 0 },
+        frame: { x: 0, y: 0, width: 412, height: 900 },
+      }}
+    >
+      <PortalHost>
+        <Dialog visible onDismiss={() => {}} variant="fullscreen">
+          <Dialog.Title>Edit profile</Dialog.Title>
+          <Dialog.Content>
+            <Text>Body</Text>
+          </Dialog.Content>
+        </Dialog>
+      </PortalHost>
+    </SafeAreaProvider>
+  )
+  // The header is the nearest ancestor of the close button with side padding.
+  const padding = () => {
+    let element = screen.getByLabelText('Close') as HTMLElement | null
+    while (element && !element.style.paddingLeft && !element.style.paddingRight)
+      element = element.parentElement
+    const style = (element as HTMLElement).style
+    return { left: style.paddingLeft, right: style.paddingRight }
+  }
+
+  it('pads 4dp at the start and 16dp at the end', () => {
+    const ltr = renderWeb(dialog())
+    expect(padding()).toEqual({ left: '4px', right: '16px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(dialog())
+    expect(padding()).toEqual({ left: '16px', right: '4px' })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(dialog())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(dialog())
+    expect(padding()).toEqual({ left: '16px', right: '4px' })
+  })
+})
+
+// A snackbar pads 16dp at the start, 8dp at the end before an action, and keeps
+// 8dp between the message and the action. In RTL each stayed on its LTR side.
+// The surface padding is a `StyleSheet` class, read with `getComputedStyle`.
+describe('Snackbar places its one-sided styles for the document direction', () => {
+  function ShowOnMount() {
+    const snackbar = useSnackbar()
+    useEffect(() => {
+      snackbar.show({
+        message: 'Saved',
+        actionLabel: 'Undo',
+        duration: 'indefinite',
+      })
+    }, [snackbar])
+    return null
+  }
+  const snackbar = () => (
+    <PortalHost>
+      <SnackbarProvider>
+        <ShowOnMount />
+      </SnackbarProvider>
+    </PortalHost>
+  )
+  const padding = (surface: HTMLElement) => {
+    const computed = getComputedStyle(surface)
+    return { left: computed.paddingLeft, right: computed.paddingRight }
+  }
+  const gap = (surface: HTMLElement) => {
+    const { style } = surface.lastElementChild as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+
+  it('pads 16dp at the start and 8dp before the action', async () => {
+    const ltr = renderWeb(snackbar())
+    const ltrSurface = await screen.findByRole('alert')
+    expect(padding(ltrSurface)).toEqual({ left: '16px', right: '8px' })
+    expect(ltrSurface.style.paddingLeft).toBe('')
+    expect(gap(ltrSurface)).toEqual({ left: '8px', right: '' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(snackbar())
+    const rtlSurface = await screen.findByRole('alert')
+    expect(padding(rtlSurface)).toEqual({ left: '8px', right: '16px' })
+    expect(gap(rtlSurface)).toEqual({ left: '', right: '8px' })
+  })
+  // jsdom 20 doesn't remove a margin key that React empties, so the gap check
+  // reads only the new side. The padding is a class and switches cleanly.
+  it('follows a change of the document dir on the next render', async () => {
+    const view = renderWeb(snackbar())
+    await screen.findByRole('alert')
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(snackbar())
+    const surface = screen.getByRole('alert')
+    expect(padding(surface)).toEqual({ left: '8px', right: '16px' })
+    expect(gap(surface).right).toBe('8px')
   })
 })

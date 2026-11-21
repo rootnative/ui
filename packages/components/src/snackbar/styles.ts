@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 
 /**
  * MD3 snackbar metrics.
@@ -25,7 +26,6 @@ export const SNACKBAR_SLIDE = 24
 export function createSnackbarStyles(
   theme: MaterialTheme,
   bottomOffset: number,
-  hasTrailing: boolean,
   containerColor?: string,
   contentColor?: string,
   actionColor?: string,
@@ -62,8 +62,6 @@ export function createSnackbarStyles(
       minHeight: 48,
       borderRadius: theme.shape.cornerExtraSmall,
       backgroundColor: containerColor ?? theme.colors.inverseSurface,
-      paddingStart: SNACKBAR_MARGIN,
-      paddingEnd: hasTrailing ? theme.spacing.sm : SNACKBAR_MARGIN,
       ...elevationStyle(theme.elevation.level3),
     },
     message: {
@@ -72,16 +70,49 @@ export function createSnackbarStyles(
       flex: 1,
       paddingVertical: TEXT_PADDING_VERTICAL,
     },
+    // `trailingGapStyle` adds the gap to the message.
     trailing: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginStart: theme.spacing.sm,
     },
     actionLabel: {
       ...theme.typography.labelLarge,
       color: actionColor ?? theme.colors.inversePrimary,
     },
   })
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/**
+ * The side padding of the surface: 16dp at the start, and at the end 8dp
+ * before an action or a close button, 16dp otherwise. A `StyleSheet` style, as
+ * before, so a consumer `style` keeps its precedence on the web:
+ * react-native-web puts an inline key above each of its classes.
+ */
+export function containerInsetStyle(
+  theme: MaterialTheme,
+  startKey: string,
+  endKey: string,
+  hasTrailing: boolean,
+): ViewStyle {
+  return StyleSheet.create({
+    inset: {
+      [startKey]: SNACKBAR_MARGIN,
+      [endKey]: hasTrailing ? theme.spacing.sm : SNACKBAR_MARGIN,
+    },
+  }).inset
+}
+
+/** The 8dp gap between the message and the action or the close button. */
+export function trailingGapStyle(
+  theme: MaterialTheme,
+  messageSideKey: string,
+): ViewStyle {
+  return { [messageSideKey]: theme.spacing.sm }
 }
 
 /**

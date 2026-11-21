@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { alphaColor, elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import type { DialogVariant } from './types'
 
 /**
@@ -85,8 +86,6 @@ export function createDialogStyles(
       flexDirection: 'row',
       alignItems: 'center',
       minHeight: FULLSCREEN_HEADER_HEIGHT,
-      paddingStart: theme.spacing.xs,
-      paddingEnd: theme.spacing.md,
       gap: theme.spacing.md,
     },
     headerTitle: {
@@ -139,4 +138,19 @@ export function createDialogStyles(
       gap: ACTION_GAP,
     },
   })
+}
+
+/**
+ * The side padding of the full-screen header: 4dp before the close button,
+ * 16dp after the actions. The caller resolves the keys against the layout
+ * direction on each render: react-native-web resolves a logical key, such as
+ * `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+ * `StyleSheet.create` style.
+ */
+export function headerInsetStyle(
+  theme: MaterialTheme,
+  startKey: string,
+  endKey: string,
+): ViewStyle {
+  return { [startKey]: theme.spacing.xs, [endKey]: theme.spacing.md }
 }

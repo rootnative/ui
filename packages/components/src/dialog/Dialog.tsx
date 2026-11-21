@@ -1,4 +1,5 @@
 import { Motion, Presence } from '@rootnative/inertia'
+import { resolveLogicalKey } from '@rootnative/utils'
 import { Children, Fragment, isValidElement, useMemo } from 'react'
 import type { ComponentProps, ReactNode } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
@@ -22,7 +23,11 @@ import {
   DialogTitle,
   slotKindOf,
 } from './slots'
-import { FULLSCREEN_SLIDE, createDialogStyles } from './styles'
+import {
+  FULLSCREEN_SLIDE,
+  createDialogStyles,
+  headerInsetStyle,
+} from './styles'
 import type { DialogProps } from './types'
 
 const FULLSCREEN_EDGES: Edge[] = ['top', 'right', 'bottom', 'left']
@@ -129,6 +134,15 @@ function DialogFullscreen({
   onDismiss: () => void
   surfaceRef: NonNullable<ComponentProps<typeof View>['ref']>
 }) {
+  const theme = useMaterialTheme()
+  // Keys resolved on each render, not in a memo, so the header padding
+  // follows a runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('paddingStart')
+  const endKey = resolveLogicalKey('paddingEnd')
+  const headerStyle = useMemo(
+    () => [styles.header, headerInsetStyle(theme, startKey, endKey)],
+    [styles.header, theme, startKey, endKey],
+  )
   return (
     <SafeAreaView
       {...rest}
@@ -140,7 +154,7 @@ function DialogFullscreen({
       aria-modal
       accessibilityViewIsModal
     >
-      <View style={styles.header}>
+      <View style={headerStyle}>
         <IconButton
           variant="standard"
           icon={closeIcon ?? 'close'}

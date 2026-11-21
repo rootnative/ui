@@ -1,3 +1,4 @@
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useEffect, useMemo } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { AccessibilityInfo, Platform, Text, View } from 'react-native'
@@ -6,9 +7,11 @@ import { IconButton } from '../icon-button'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import type { SnackbarEntry } from './store'
 import {
+  containerInsetStyle,
   createSnackbarStyles,
   resolveActionColor,
   resolveContentColor,
+  trailingGapStyle,
 } from './styles'
 
 interface SnackbarSurfaceProps {
@@ -38,7 +41,6 @@ export function SnackbarSurface({
       createSnackbarStyles(
         theme,
         bottomOffset,
-        hasTrailing,
         entry.containerColor,
         entry.contentColor,
         entry.actionColor,
@@ -46,11 +48,35 @@ export function SnackbarSurface({
     [
       theme,
       bottomOffset,
-      hasTrailing,
       entry.containerColor,
       entry.contentColor,
       entry.actionColor,
     ],
+  )
+
+  // Keys resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const containerStyle = useMemo(
+    () => [
+      styles.container,
+      containerInsetStyle(theme, paddingStartKey, paddingEndKey, hasTrailing),
+      style,
+    ],
+    [
+      styles.container,
+      theme,
+      paddingStartKey,
+      paddingEndKey,
+      hasTrailing,
+      style,
+    ],
+  )
+  const trailingStyle = useMemo(
+    () => [styles.trailing, trailingGapStyle(theme, marginStartKey)],
+    [styles.trailing, theme, marginStartKey],
   )
 
   const actionColor = resolveActionColor(theme, entry.actionColor)
@@ -67,7 +93,7 @@ export function SnackbarSurface({
 
   return (
     <View
-      style={[styles.container, style]}
+      style={containerStyle}
       // Announced on mount without stealing focus, which is the whole point of
       // a snackbar — it informs, it does not interrupt.
       role="alert"
@@ -80,7 +106,7 @@ export function SnackbarSurface({
       </Text>
 
       {hasTrailing ? (
-        <View style={styles.trailing}>
+        <View style={trailingStyle}>
           {actionLabel !== undefined ? (
             <Button
               variant="text"

@@ -43,7 +43,7 @@ function SnackbarHost({ store, bottomOffset, style }: SnackbarHostProps) {
   const effectiveOffset = pushedOffset ?? bottomOffset
 
   const styles = useMemo(
-    () => createSnackbarStyles(theme, effectiveOffset, false),
+    () => createSnackbarStyles(theme, effectiveOffset),
     [theme, effectiveOffset],
   )
 
