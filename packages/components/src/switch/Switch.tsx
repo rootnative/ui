@@ -9,7 +9,7 @@ import {
   isRTLDirection,
   renderIcon,
   resolveColorFromStyle,
-  resolveLogical,
+  resolveLogicalKey,
 } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Platform, View } from 'react-native'
@@ -166,16 +166,17 @@ export function Switch({
   })
 
   // The halo sits on the thumb's center, so only the toggle progress moves
-  // it. The inset is an inline style, so it goes through `resolveLogical`.
+  // it. Its `start` key comes from `resolveLogicalKey` on each render, not in
+  // the memo, so it follows a runtime change of the document `dir` on the web.
+  const haloStartKey = resolveLogicalKey('start')
   const haloPositionStyle = useMemo(
-    () =>
-      resolveLogical(
-        'start',
+    () => ({
+      [haloStartKey]:
         THUMB_CENTER_OFF -
-          SWITCH_TRACK_BORDER_WIDTH -
-          SWITCH_STATE_LAYER_SIZE / 2,
-      ),
-    [],
+        SWITCH_TRACK_BORDER_WIDTH -
+        SWITCH_STATE_LAYER_SIZE / 2,
+    }),
+    [haloStartKey],
   )
 
   // The halo color crossfades with the toggle progress (same as the thumb).

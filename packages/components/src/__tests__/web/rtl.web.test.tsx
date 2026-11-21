@@ -60,6 +60,7 @@ import { Divider } from '../../divider'
 import { FAB } from '../../fab'
 import { resolveAnimatedInsetKey } from '../../internal/resolveAnimatedInsetKey'
 import { resolveAnchorPosition } from '../../internal/useAnchorPosition'
+import { Box } from '../../layout/Box'
 import { Layout } from '../../layout/Layout'
 import { ListHeadline, ListItem } from '../../list'
 import { Menu } from '../../menu'
@@ -71,6 +72,12 @@ import { SearchBar } from '../../search-bar'
 import { SearchView } from '../../search-view'
 import { SideSheet } from '../../side-sheet'
 import { SnackbarProvider, useSnackbar } from '../../snackbar'
+import { Switch } from '../../switch'
+import {
+  SWITCH_STATE_LAYER_SIZE,
+  SWITCH_TRACK_BORDER_WIDTH,
+  SWITCH_TRACK_HEIGHT,
+} from '../../switch/styles'
 import { Tabs } from '../../tabs'
 import { TextField } from '../../text-field'
 import { renderWeb } from './render-web'
@@ -1744,5 +1751,46 @@ describe('Badge sits on the top-end corner for the document direction', () => {
     view.rerender(badge('3'))
     expect(offset().right).toBe('-12px')
     expect(point().left).toBe('0px')
+  })
+})
+
+// `Box` and `Switch` resolved their one-sided keys inside a memo, so they kept
+// the direction of the first render after a runtime change of `dir`.
+describe('Box and Switch follow a change of the document dir', () => {
+  it('swaps the Box start and end padding on the next render', () => {
+    const box = () => <Box ps={16} pe={4} testID="box" />
+    const view = renderWeb(box())
+    const sides = () => {
+      const { style } = screen.getByTestId('box')
+      return { left: style.paddingLeft, right: style.paddingRight }
+    }
+    expect(sides()).toEqual({ left: '16px', right: '4px' })
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(box())
+    expect(sides()).toEqual({ left: '4px', right: '16px' })
+  })
+
+  // The halo is centred on the thumb: half the track height from the start
+  // edge, less the border and half the halo.
+  it('moves the Switch halo to the start edge on the next render', () => {
+    const halo = `${
+      SWITCH_TRACK_HEIGHT / 2 -
+      SWITCH_TRACK_BORDER_WIDTH -
+      SWITCH_STATE_LAYER_SIZE / 2
+    }px`
+    const toggle = () => <Switch value={false} />
+    // Only the switch is on the page, so the halo is the one node at that
+    // offset.
+    const haloNode = () =>
+      Array.from(document.body.querySelectorAll<HTMLElement>('*')).find(
+        (node) => node.style.left === halo || node.style.right === halo,
+      )
+    const view = renderWeb(toggle())
+    expect(haloNode()?.style.left).toBe(halo)
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(toggle())
+    expect(haloNode()?.style.right).toBe(halo)
   })
 })

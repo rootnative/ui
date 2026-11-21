@@ -1,4 +1,4 @@
-import { resolveLogical } from '@rootnative/utils'
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
 import type { ViewStyle } from 'react-native'
 import { View } from 'react-native'
@@ -33,9 +33,14 @@ export function Box({
 }: BoxProps) {
   const { spacing } = useMaterialTheme()
 
-  // The one-sided insets go through `resolveLogical`: this object is an
-  // inline style, and react-native-web resolves an inline `paddingStart` to
-  // the left edge under `dir="rtl"`. The two-sided ones are symmetric.
+  // The one-sided insets take keys from `resolveLogicalKey`: react-native-web
+  // resolves a `paddingStart` to the left edge under `dir="rtl"`. The keys
+  // resolve on each render, not in the memo, so the insets follow a runtime
+  // change of `dir`. The two-sided ones are symmetric.
+  const paddingStartKey = resolveLogicalKey('paddingStart')
+  const paddingEndKey = resolveLogicalKey('paddingEnd')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
   const layoutStyle = useMemo<ViewStyle>(() => {
     const s = (v: SpacingValue | undefined) => resolveSpacing(spacing, v)
     return {
@@ -50,8 +55,8 @@ export function Box({
       }),
       ...(pt !== undefined && { paddingTop: s(pt) }),
       ...(pb !== undefined && { paddingBottom: s(pb) }),
-      ...(ps !== undefined && resolveLogical('paddingStart', s(ps))),
-      ...(pe !== undefined && resolveLogical('paddingEnd', s(pe))),
+      ...(ps !== undefined && { [paddingStartKey]: s(ps) }),
+      ...(pe !== undefined && { [paddingEndKey]: s(pe) }),
       ...(m !== undefined && { margin: s(m) }),
       ...(mx !== undefined && {
         marginStart: s(mx),
@@ -63,8 +68,8 @@ export function Box({
       }),
       ...(mt !== undefined && { marginTop: s(mt) }),
       ...(mb !== undefined && { marginBottom: s(mb) }),
-      ...(ms !== undefined && resolveLogical('marginStart', s(ms))),
-      ...(me !== undefined && resolveLogical('marginEnd', s(me))),
+      ...(ms !== undefined && { [marginStartKey]: s(ms) }),
+      ...(me !== undefined && { [marginEndKey]: s(me) }),
       ...(gap !== undefined && { gap: s(gap) }),
       ...(rowGap !== undefined && { rowGap: s(rowGap) }),
       ...(columnGap !== undefined && { columnGap: s(columnGap) }),
@@ -75,6 +80,10 @@ export function Box({
     }
   }, [
     spacing,
+    paddingStartKey,
+    paddingEndKey,
+    marginStartKey,
+    marginEndKey,
     p,
     px,
     py,
