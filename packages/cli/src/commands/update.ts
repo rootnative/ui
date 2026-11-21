@@ -8,7 +8,7 @@ import type { FileDiff } from '../lib/diff'
 import { createSpinner, logger } from '../lib/logger'
 import { fetchFileContent, fetchUtilsRegistry } from '../lib/registry'
 import { getComponentNames, resolveComponents } from '../lib/resolver'
-import { generateUtilsBarrel, transformImports } from '../lib/transform'
+import { transformImports, utilsBarrelFor } from '../lib/transform'
 
 interface UpdateOptions {
   dryRun: boolean
@@ -145,14 +145,7 @@ export async function updateCommand(
   }
 
   // Check barrel file
-  const utilExports: Record<string, string[]> = {}
-  for (const utilName of resolution.utils) {
-    const utilEntry = utilsRegistry[utilName]
-    if (utilEntry) {
-      utilExports[utilName] = utilEntry.exports
-    }
-  }
-  const newBarrel = generateUtilsBarrel(resolution.utils, utilExports)
+  const newBarrel = utilsBarrelFor(resolution.utils, utilsRegistry)
   const barrelPath = path.join(libDir, 'rootnative-utils.ts')
   let oldBarrel = ''
   if (await fs.pathExists(barrelPath)) {

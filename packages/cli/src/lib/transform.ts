@@ -1,5 +1,5 @@
 import path from 'node:path'
-import type { RootNativeConfig } from './types'
+import type { RootNativeConfig, UtilsRegistry } from './types'
 
 interface TransformOptions {
   config: RootNativeConfig
@@ -173,4 +173,27 @@ export function generateUtilsBarrel(
   }
 
   return lines.join('\n') + '\n'
+}
+
+/**
+ * The utils barrel for a set of utils, with the value and the type exports
+ * that the registry lists for each one. `add` and `update` both write the
+ * barrel through this function, so the two can't drift: a barrel with no
+ * `export type { IconSource }` breaks each component that imports the type.
+ */
+export function utilsBarrelFor(
+  utilNames: string[],
+  utilsRegistry: UtilsRegistry,
+): string {
+  const utilExports: Record<string, string[]> = {}
+  const utilTypeExports: Record<string, string[]> = {}
+  for (const utilName of utilNames) {
+    const utilEntry = utilsRegistry[utilName]
+    if (!utilEntry) continue
+    utilExports[utilName] = utilEntry.exports
+    if (utilEntry.typeExports) {
+      utilTypeExports[utilName] = utilEntry.typeExports
+    }
+  }
+  return generateUtilsBarrel(utilNames, utilExports, utilTypeExports)
 }

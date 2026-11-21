@@ -6,7 +6,7 @@ import { getInstallCommand } from './detector'
 import { createSpinner, logger } from './logger'
 import { fetchFileContent, fetchUtilsRegistry } from './registry'
 import { getComponentNames } from './resolver'
-import { generateUtilsBarrel, transformImports } from './transform'
+import { transformImports, utilsBarrelFor } from './transform'
 import type {
   RootNativeConfig,
   PackageManager,
@@ -125,24 +125,7 @@ async function generateBarrel(
   utilsRegistry: UtilsRegistry,
   libDir: string,
 ): Promise<void> {
-  const utilExports: Record<string, string[]> = {}
-  const utilTypeExports: Record<string, string[]> = {}
-
-  for (const utilName of resolution.utils) {
-    const utilEntry = utilsRegistry[utilName]
-    if (utilEntry) {
-      utilExports[utilName] = utilEntry.exports
-      if (utilEntry.typeExports) {
-        utilTypeExports[utilName] = utilEntry.typeExports
-      }
-    }
-  }
-
-  const barrelContent = generateUtilsBarrel(
-    resolution.utils,
-    utilExports,
-    utilTypeExports,
-  )
+  const barrelContent = utilsBarrelFor(resolution.utils, utilsRegistry)
 
   await fs.writeFile(
     path.join(libDir, 'rootnative-utils.ts'),
