@@ -827,3 +827,64 @@ describe('SideSheet places its one-sided styles for the document direction', () 
     expect(layer().style.paddingRight).toBe('56px')
   })
 })
+
+// In a browser, the icons of a TextField in RTL sat 20px too far in (the
+// margins stayed on the LTR sides), so the resting label ran into the
+// leading icon.
+describe('TextField places its one-sided styles for the document direction', () => {
+  const field = () => (
+    <TextField
+      label="Name"
+      leadingIcon="magnify"
+      trailingIcon="close-circle"
+      maxLength={20}
+    />
+  )
+  const margins = (element: HTMLElement | null) => ({
+    left: element?.style.marginLeft,
+    right: element?.style.marginRight,
+  })
+  const leadingIcon = () => screen.getByText('magnify').parentElement
+  const trailingIcon = () => screen.getByText('close-circle').parentElement
+
+  it('keeps 12dp between each icon and the field edge', () => {
+    const ltr = renderWeb(field())
+    expect(margins(leadingIcon())).toEqual({ left: '-4px', right: '16px' })
+    expect(margins(trailingIcon())).toEqual({ left: '16px', right: '-4px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(field())
+    expect(margins(leadingIcon())).toEqual({ left: '16px', right: '-4px' })
+    expect(margins(trailingIcon())).toEqual({ left: '-4px', right: '16px' })
+  })
+
+  it('keeps the gap on the start side of the character counter', () => {
+    const ltr = renderWeb(field())
+    expect(margins(screen.getByText('0/20'))).toEqual({
+      left: '16px',
+      right: '',
+    })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(field())
+    expect(margins(screen.getByText('0/20'))).toEqual({
+      left: '',
+      right: '16px',
+    })
+  })
+
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(field())
+    const label = () => screen.getByText('Name').parentElement as HTMLElement
+    expect(label().style.left).toBe('52px')
+    expect(label().style.transformOrigin).toBe('left top')
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(field())
+    expect(label().style.right).toBe('52px')
+    expect(label().style.transformOrigin).toBe('right top')
+    expect(margins(leadingIcon())).toEqual({ left: '16px', right: '-4px' })
+  })
+})

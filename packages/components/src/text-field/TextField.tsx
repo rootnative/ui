@@ -11,7 +11,11 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { renderIcon, resolveLogical } from '@rootnative/utils'
+import {
+  renderIcon,
+  resolveLogicalKey,
+  transformOrigin,
+} from '@rootnative/utils'
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, TextInput, View } from 'react-native'
 import type {
@@ -22,7 +26,12 @@ import type {
 import { pointerEvents } from '../internal/pointerEvents'
 import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
-import { createStyles, labelPositions } from './styles'
+import {
+  counterGapStyle,
+  createStyles,
+  iconMarginStyle,
+  labelPositions,
+} from './styles'
 import type { TextFieldProps } from './types'
 
 // react-native-web forwards both of these to the DOM, but RN's
@@ -341,14 +350,33 @@ export function TextField({
     [styles.hoverLayer, animatedHoverLayerStyle],
   )
 
-  // An inline `start` resolves to the left edge on web in RTL, see
-  // `resolveLogical`.
+  // Keys and the origin resolved on each render, not in a memo, so the
+  // one-sided styles follow a runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('start')
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const marginEndKey = resolveLogicalKey('marginEnd')
+  const labelOrigin = transformOrigin('top')
   const labelStaticPos = useMemo(
     () => ({
       top: labelStaticTop,
-      ...resolveLogical('start', labelStart),
+      [startKey]: labelStart,
+      transformOrigin: labelOrigin,
     }),
-    [labelStaticTop, labelStart],
+    [labelStaticTop, startKey, labelStart, labelOrigin],
+  )
+  const leadingIconStyle = useMemo(
+    () => [
+      styles.leadingIcon,
+      iconMarginStyle(theme, 'leading', marginStartKey, marginEndKey),
+    ],
+    [styles.leadingIcon, theme, marginStartKey, marginEndKey],
+  )
+  const trailingIconStyle = useMemo(
+    () => [
+      styles.trailingIcon,
+      iconMarginStyle(theme, 'trailing', marginStartKey, marginEndKey),
+    ],
+    [styles.trailingIcon, theme, marginStartKey, marginEndKey],
   )
 
   const labelDisabledColor = useMemo(
@@ -416,10 +444,11 @@ export function TextField({
   const characterCounterStyleArr = useMemo(
     () => [
       styles.characterCounter,
+      counterGapStyle(theme, marginStartKey),
       isError ? styles.errorSupportingText : undefined,
       isDisabled ? styles.disabledSupportingText : undefined,
     ],
-    [styles, isError, isDisabled],
+    [styles, theme, marginStartKey, isError, isDisabled],
   )
 
   const rootStyle = useMemo(() => [styles.root, style], [styles, style])
@@ -455,7 +484,7 @@ export function TextField({
           ) : null}
 
           {leadingIcon ? (
-            <View aria-hidden style={styles.leadingIcon}>
+            <View aria-hidden style={leadingIconStyle}>
               {renderIcon(
                 leadingIcon,
                 { size: ICON_SIZE, color: leadingIconColor },
@@ -531,7 +560,7 @@ export function TextField({
               hitSlop={12}
               style={styles.trailingIconPressable}
             >
-              <View aria-hidden style={styles.trailingIcon}>
+              <View aria-hidden style={trailingIconStyle}>
                 {renderIcon(
                   trailingIcon,
                   { size: ICON_SIZE, color: trailingIconColor },

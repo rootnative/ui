@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
-import { alphaColor, transformOrigin } from '@rootnative/utils'
+import { alphaColor } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { TextStyle, ViewStyle } from 'react-native'
 import { webOutlineReset } from '../internal/focusOutline'
 import type { TextFieldVariant } from './types'
 
@@ -199,7 +200,6 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       labelWrapper: {
         position: 'absolute',
         zIndex: 1,
-        transformOrigin: transformOrigin('top'),
       },
       // Outlined floated label notches the border by sitting on top of it
       // with the surface color filling the slot. Padding extends the notch
@@ -233,10 +233,9 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       inputDisabled: {
         color: colors.disabledTextColor,
       },
+      // `iconMarginStyle` gives each icon its side margins.
       leadingIcon: {
         alignSelf: 'center',
-        marginStart: -4, // 16dp container padding → 12dp icon inset per M3
-        marginEnd: theme.spacing.md,
         width: ICON_SIZE,
         height: ICON_SIZE,
         alignItems: 'center',
@@ -244,8 +243,6 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       },
       trailingIcon: {
         alignSelf: 'center',
-        marginStart: theme.spacing.md,
-        marginEnd: -4, // 16dp container padding → 12dp icon inset per M3
         width: ICON_SIZE,
         height: ICON_SIZE,
         alignItems: 'center',
@@ -276,7 +273,6 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
         color: colors.disabledSupportingTextColor,
       },
       characterCounter: {
-        marginStart: theme.spacing.md,
         textAlign: 'right',
         fontFamily: bodySmall.fontFamily,
         fontSize: bodySmall.fontSize,
@@ -287,4 +283,32 @@ export function createStyles(theme: MaterialTheme, variant: TextFieldVariant) {
       },
     }),
   }
+}
+
+/** 16dp container padding → 12dp icon inset per M3. */
+const ICON_EDGE_MARGIN = -4
+
+// The one-sided margins take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `marginStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/** The side margins of an icon: 12dp from the field edge, 16dp to the input. */
+export function iconMarginStyle(
+  theme: MaterialTheme,
+  side: 'leading' | 'trailing',
+  startKey: string,
+  endKey: string,
+): ViewStyle {
+  return side === 'leading'
+    ? { [startKey]: ICON_EDGE_MARGIN, [endKey]: theme.spacing.md }
+    : { [startKey]: theme.spacing.md, [endKey]: ICON_EDGE_MARGIN }
+}
+
+/** The gap between the supporting text and the character counter. */
+export function counterGapStyle(
+  theme: MaterialTheme,
+  startKey: string,
+): TextStyle {
+  return { [startKey]: theme.spacing.md }
 }
