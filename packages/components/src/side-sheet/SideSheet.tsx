@@ -1,5 +1,5 @@
 import { Motion, Presence } from '@rootnative/inertia'
-import { isRTLDirection, selectRTL } from '@rootnative/utils'
+import { isRTLDirection, resolveLogicalKey, selectRTL } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
@@ -7,6 +7,7 @@ import type { EdgeInsets } from 'react-native-safe-area-context'
 import { Divider } from '../divider/Divider'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { resolveLogicalCornerKey } from '../internal/resolveLogicalCornerKey'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -16,8 +17,11 @@ import { SafeAreaView } from '../safe-area'
 import type { Edge } from '../safe-area'
 import {
   SIDE_SHEET_WIDTH,
+  contentCornerStyle,
   createSideSheetStyles,
   detachedMargin,
+  headerInsetStyle,
+  scrimGapStyle,
 } from './styles'
 import type { SideSheetProps } from './types'
 
@@ -102,23 +106,45 @@ export function SideSheet(props: SideSheetProps) {
         : null,
     [detached, styles.surface, style, safeArea, insetEdges],
   )
+  // A key resolved on each render, not in a memo, so the one-sided styles
+  // follow a runtime change of the document `dir` on the web.
+  const startKey = resolveLogicalKey('paddingStart')
+  const endKey = resolveLogicalKey('paddingEnd')
+  const topCornerKey = resolveLogicalCornerKey(
+    edge === 'end' ? 'borderTopStartRadius' : 'borderTopEndRadius',
+  )
+  const bottomCornerKey = resolveLogicalCornerKey(
+    edge === 'end' ? 'borderBottomStartRadius' : 'borderBottomEndRadius',
+  )
+  const cornerStyle = useMemo(
+    () =>
+      isModal && !detached
+        ? contentCornerStyle(theme, topCornerKey, bottomCornerKey)
+        : null,
+    [isModal, detached, theme, topCornerKey, bottomCornerKey],
+  )
   const surfaceStyle = useMemo(
-    () => [styles.surface, style, margin?.style],
-    [styles.surface, style, margin],
+    () => [styles.surface, cornerStyle, style, margin?.style],
+    [styles.surface, cornerStyle, style, margin],
+  )
+  const farSideKey = edge === 'end' ? startKey : endKey
+  const sheetLayerStyle = useMemo(
+    () => [styles.sheetLayer, scrimGapStyle(farSideKey), pointerEvents.boxNone],
+    [styles.sheetLayer, farSideKey],
   )
 
-  const hasHeader =
-    headline !== undefined || onBack !== undefined || onDismiss !== undefined
+  const hasBack = onBack !== undefined
+  const hasClose = onDismiss !== undefined
+  const hasHeader = headline !== undefined || hasBack || hasClose
   const hasActions =
     actions !== undefined && actions !== null && actions !== false
 
   const headerStyle = useMemo(
     () => [
       styles.header,
-      onBack !== undefined ? styles.headerWithBack : null,
-      onDismiss !== undefined ? styles.headerWithClose : null,
+      headerInsetStyle(startKey, endKey, hasBack, hasClose),
     ],
-    [styles, onBack, onDismiss],
+    [styles.header, startKey, endKey, hasBack, hasClose],
   )
   const resolvedHeadlineStyle = useMemo(
     () => [styles.headline, headlineStyle],
@@ -244,7 +270,7 @@ export function SideSheet(props: SideSheetProps) {
             <Motion.View
               key="sheet"
               testID={testID === undefined ? undefined : `${testID}-layer`}
-              style={[styles.sheetLayer, pointerEvents.boxNone]}
+              style={sheetLayerStyle}
               initial={{ translateX: hiddenOffset }}
               animate={{ translateX: 0 }}
               exit={{ translateX: hiddenOffset }}

@@ -49,34 +49,49 @@ const ACTION_GAP = 8
 interface SurfaceShape {
   margin?: number
   borderRadius?: number
-  borderTopStartRadius?: number
-  borderBottomStartRadius?: number
-  borderTopEndRadius?: number
-  borderBottomEndRadius?: number
 }
 
-function surfaceShape(
-  theme: MaterialTheme,
-  variant: SideSheetVariant,
-  edge: SideSheetEdge,
-  detached: boolean,
-): SurfaceShape {
-  if (detached) {
-    return {
-      margin: SIDE_SHEET_DETACHED_MARGIN,
-      borderRadius: theme.shape.cornerLarge,
-    }
+function surfaceShape(theme: MaterialTheme, detached: boolean): SurfaceShape {
+  if (!detached) return {}
+  return {
+    margin: SIDE_SHEET_DETACHED_MARGIN,
+    borderRadius: theme.shape.cornerLarge,
   }
-  if (variant === 'standard') return {}
-  return edge === 'end'
-    ? {
-        borderTopStartRadius: theme.shape.cornerLarge,
-        borderBottomStartRadius: theme.shape.cornerLarge,
-      }
-    : {
-        borderTopEndRadius: theme.shape.cornerLarge,
-        borderBottomEndRadius: theme.shape.cornerLarge,
-      }
+}
+
+// The one-sided styles take style keys that the caller resolves against the
+// layout direction on each render. react-native-web resolves a logical key,
+// such as `paddingStart`, as LTR under `<html dir="rtl">`, also in a
+// `StyleSheet.create` style.
+
+/** The strip of scrim on the far side, which stays on a narrow window. */
+export function scrimGapStyle(farSideKey: string): ViewStyle {
+  return { [farSideKey]: SIDE_SHEET_MIN_SCRIM_WIDTH }
+}
+
+/** The side padding of the header. A header button takes the smaller inset. */
+export function headerInsetStyle(
+  startKey: string,
+  endKey: string,
+  hasBack: boolean,
+  hasClose: boolean,
+): ViewStyle {
+  return {
+    [startKey]: hasBack ? HEADER_BUTTON_INSET : SIDE_SHEET_PADDING,
+    [endKey]: hasClose ? HEADER_BUTTON_INSET : SIDE_SHEET_PADDING,
+  }
+}
+
+/** The rounded corners of a docked modal sheet, on the side of the content. */
+export function contentCornerStyle(
+  theme: MaterialTheme,
+  topKey: string,
+  bottomKey: string,
+): ViewStyle {
+  return {
+    [topKey]: theme.shape.cornerLarge,
+    [bottomKey]: theme.shape.cornerLarge,
+  }
 }
 
 export interface DetachedMargin {
@@ -146,35 +161,25 @@ export function createSideSheetStyles(
       ...StyleSheet.absoluteFill,
     },
     // A row, so the surface stretches to the full height and its detached
-    // margin insets it on all four sides. The padding on the far side keeps a
-    // strip of scrim visible on a narrow window.
-    sheetLayer:
-      edge === 'end'
-        ? {
-            ...StyleSheet.absoluteFill,
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            paddingStart: SIDE_SHEET_MIN_SCRIM_WIDTH,
-          }
-        : {
-            ...StyleSheet.absoluteFill,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            paddingEnd: SIDE_SHEET_MIN_SCRIM_WIDTH,
-          },
+    // margin insets it on all four sides. `scrimGapStyle` pads the far side.
+    sheetLayer: {
+      ...StyleSheet.absoluteFill,
+      flexDirection: 'row',
+      justifyContent: edge === 'end' ? 'flex-end' : 'flex-start',
+    },
     surface: isModal
       ? {
           width,
           flexShrink: 1,
           backgroundColor: surfaceColor,
           ...elevationStyle(theme.elevation.level1),
-          ...surfaceShape(theme, variant, edge, detached),
+          ...surfaceShape(theme, detached),
         }
       : {
           width,
           alignSelf: 'stretch',
           backgroundColor: surfaceColor,
-          ...surfaceShape(theme, variant, edge, detached),
+          ...surfaceShape(theme, detached),
         },
     safeArea: {
       flexGrow: 1,
@@ -185,15 +190,7 @@ export function createSideSheetStyles(
       alignItems: 'center',
       minHeight: HEADER_MIN_HEIGHT,
       paddingVertical: HEADER_VERTICAL_PADDING,
-      paddingStart: SIDE_SHEET_PADDING,
-      paddingEnd: SIDE_SHEET_PADDING,
       gap: HEADER_GAP,
-    },
-    headerWithBack: {
-      paddingStart: HEADER_BUTTON_INSET,
-    },
-    headerWithClose: {
-      paddingEnd: HEADER_BUTTON_INSET,
     },
     headline: {
       ...theme.typography.titleLarge,

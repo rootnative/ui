@@ -717,3 +717,112 @@ describe('the modal drawer and sheet pad the inset of their own edge', () => {
     expect(safeAreaOf('sheet')).toEqual({ left: '0px', right: '0px' })
   })
 })
+
+// react-native-web resolves a logical key, such as `paddingStart`, as LTR under
+// `dir="rtl"`, also in a `StyleSheet.create` style. In a browser, a start-edge
+// sheet in RTL kept its 56dp scrim gap on the right, so it sat 56px in from the
+// right edge.
+describe('SideSheet places its one-sided styles for the document direction', () => {
+  function sheet(props: { edge?: 'start' | 'end' } = {}) {
+    return (
+      <SafeAreaProvider
+        initialMetrics={{
+          insets: { top: 0, right: 0, bottom: 0, left: 0 },
+          frame: { x: 0, y: 0, width: 874, height: 402 },
+        }}
+      >
+        <PortalHost>
+          <SideSheet
+            visible
+            onDismiss={() => {}}
+            headline="Filters"
+            testID="sheet"
+            {...props}
+          >
+            <Text>Sheet</Text>
+          </SideSheet>
+        </PortalHost>
+      </SafeAreaProvider>
+    )
+  }
+
+  function sides(element: HTMLElement, key: 'padding' | 'corners') {
+    const { style } = element
+    return key === 'padding'
+      ? { left: style.paddingLeft, right: style.paddingRight }
+      : {
+          topLeft: style.borderTopLeftRadius,
+          bottomLeft: style.borderBottomLeftRadius,
+          topRight: style.borderTopRightRadius,
+          bottomRight: style.borderBottomRightRadius,
+        }
+  }
+
+  const layer = () => screen.getByTestId('sheet-layer')
+  const header = () => screen.getByText('Filters').parentElement as HTMLElement
+
+  it('keeps the scrim gap on the far side of an end-edge sheet', () => {
+    const ltr = renderWeb(sheet())
+    expect(sides(layer(), 'padding')).toEqual({ left: '56px', right: '' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(sheet())
+    expect(sides(layer(), 'padding')).toEqual({ left: '', right: '56px' })
+  })
+
+  it('keeps the scrim gap on the left of a start-edge sheet under dir="rtl"', () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(sheet({ edge: 'start' }))
+    expect(sides(layer(), 'padding')).toEqual({ left: '56px', right: '' })
+  })
+
+  it('rounds the corners of a docked sheet on the side of the content', () => {
+    const ltr = renderWeb(sheet())
+    expect(sides(screen.getByTestId('sheet'), 'corners')).toEqual({
+      topLeft: '16px',
+      bottomLeft: '16px',
+      topRight: '',
+      bottomRight: '',
+    })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(sheet())
+    expect(sides(screen.getByTestId('sheet'), 'corners')).toEqual({
+      topLeft: '',
+      bottomLeft: '',
+      topRight: '16px',
+      bottomRight: '16px',
+    })
+  })
+
+  it('gives the close button the smaller header inset, at the end', () => {
+    const ltr = renderWeb(sheet())
+    expect(sides(header(), 'padding')).toEqual({ left: '24px', right: '16px' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(sheet())
+    expect(sides(header(), 'padding')).toEqual({ left: '16px', right: '24px' })
+  })
+
+  // jsdom 20 doesn't remove a padding key that React empties, so this reads
+  // the header (both keys stay) and the corners (a radius key clears). A
+  // browser removes the old scrim gap too.
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(sheet())
+    expect(sides(header(), 'padding')).toEqual({ left: '24px', right: '16px' })
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(sheet())
+    expect(sides(header(), 'padding')).toEqual({ left: '16px', right: '24px' })
+    expect(sides(screen.getByTestId('sheet'), 'corners')).toEqual({
+      topLeft: '',
+      bottomLeft: '',
+      topRight: '16px',
+      bottomRight: '16px',
+    })
+    expect(layer().style.paddingRight).toBe('56px')
+  })
+})

@@ -7,6 +7,7 @@
     "packages/components/src/side-sheet/styles.ts",
     "packages/components/src/side-sheet/types.ts",
     "packages/components/src/internal/pointerEvents.ts",
+    "packages/components/src/internal/resolveLogicalCornerKey.ts",
     "packages/components/src/internal/useBackHandlerDismiss.ts",
     "packages/components/src/internal/useFocusTrap.ts",
     "packages/components/src/internal/useMaterialTheme.ts",
