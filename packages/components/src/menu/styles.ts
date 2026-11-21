@@ -1,6 +1,7 @@
 import type { MaterialTheme } from '@rootnative/core'
 import { elevationStyle } from '@rootnative/utils'
 import { StyleSheet } from 'react-native'
+import type { ViewStyle } from 'react-native'
 import type { MenuVariant } from './types'
 
 /**
@@ -195,7 +196,7 @@ export function createMenuGroupStyles(
     // A row, as the item content is: react-native-web gives a text
     // `dir="auto"`, so a text that fills the width aligns by its own script,
     // not by the page. In a row it is as wide as its content, at the start.
-    // The side padding is in `MenuGroup`, through `resolveLogical`.
+    // The side padding is in `MenuGroup`, through `resolveLogicalKey`.
     labelRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -268,9 +269,6 @@ export function createMenuItemStyles(
         : theme.typography.labelLarge),
       color: contentColor ?? theme.colors.onSurfaceVariant,
     },
-    trailingStart: {
-      marginStart: 'auto',
-    },
     focusRing: {
       position: 'absolute',
       top: ITEM_FOCUS_RING_INSET,
@@ -282,4 +280,14 @@ export function createMenuItemStyles(
       borderRadius: theme.shape.cornerExtraSmall,
     },
   })
+}
+
+/**
+ * Pushes the trailing text, or the trailing icon with no text, to the end of
+ * the row. The caller resolves the key against the layout direction on each
+ * render: react-native-web resolves a logical key, such as `marginStart`, as
+ * LTR under `<html dir="rtl">`, also in a `StyleSheet.create` style.
+ */
+export function trailingStartStyle(marginStartKey: string): ViewStyle {
+  return { [marginStartKey]: 'auto' }
 }

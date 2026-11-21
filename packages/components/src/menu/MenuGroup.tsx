@@ -1,4 +1,4 @@
-import { resolveLogical } from '@rootnative/utils'
+import { resolveLogicalKey } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -33,19 +33,20 @@ export function MenuGroup({
     [place, styles, style],
   )
   // react-native-web writes a `paddingStart` to the left edge, also under
-  // `dir="rtl"`, so the one-sided insets resolve against the document.
+  // `dir="rtl"`, so the one-sided insets resolve against the document. The
+  // keys resolve on each render, not in the memo, so the insets follow a
+  // runtime change of `dir`.
+  const startKey = resolveLogicalKey('paddingStart')
+  const endKey = resolveLogicalKey('paddingEnd')
   const labelRowStyle = useMemo(
     () => [
       styles.labelRow,
       {
-        ...resolveLogical(
-          'paddingStart',
-          VERTICAL_MENU_GROUP_LABEL_PADDING_START,
-        ),
-        ...resolveLogical('paddingEnd', VERTICAL_MENU_GROUP_LABEL_PADDING_END),
+        [startKey]: VERTICAL_MENU_GROUP_LABEL_PADDING_START,
+        [endKey]: VERTICAL_MENU_GROUP_LABEL_PADDING_END,
       },
     ],
-    [styles],
+    [styles, startKey, endKey],
   )
 
   if (variant !== 'vertical') {

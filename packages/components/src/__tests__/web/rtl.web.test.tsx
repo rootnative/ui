@@ -1399,3 +1399,51 @@ describe('List places its one-sided styles for the document direction', () => {
     expect(margins('L').left).toBe('16px')
   })
 })
+
+// A menu item pushes its trailing text, or a trailing icon with no text, to
+// the end of the row with an auto start margin. In RTL the auto margin stayed
+// on the left, so the trailing content sat beside the label, not at the end.
+describe('Menu pushes the trailing content to the end of the row', () => {
+  const menu = () => (
+    <PortalHost>
+      <Menu anchor={null} visible onDismiss={() => {}} variant="vertical">
+        <Menu.Group label="Edit">
+          <Menu.Item label="Cut" trailingText="Ctrl+X" />
+          <Menu.Item label="Share" trailingIcon="chevron-right" />
+        </Menu.Group>
+      </Menu>
+    </PortalHost>
+  )
+  const margins = (element: Element | null) => {
+    const { style } = element as HTMLElement
+    return { left: style.marginLeft, right: style.marginRight }
+  }
+  const trailingText = () => screen.getByText('Ctrl+X')
+  const trailingIcon = () => screen.getByText('chevron-right').parentElement
+
+  it('in LTR and under dir="rtl"', () => {
+    const ltr = renderWeb(menu())
+    expect(margins(trailingText())).toEqual({ left: 'auto', right: '' })
+    expect(margins(trailingIcon())).toEqual({ left: 'auto', right: '' })
+    ltr.unmount()
+
+    document.documentElement.setAttribute('dir', 'rtl')
+    renderWeb(menu())
+    expect(margins(trailingText())).toEqual({ left: '', right: 'auto' })
+    expect(margins(trailingIcon())).toEqual({ left: '', right: 'auto' })
+  })
+
+  // jsdom 20 doesn't remove a margin key that React empties, so this reads
+  // only the new side of the trailing text. The group label keeps both keys.
+  it('follows a change of the document dir on the next render', () => {
+    const view = renderWeb(menu())
+    document.documentElement.setAttribute('dir', 'rtl')
+    view.rerender(menu())
+    expect(trailingText().style.marginRight).toBe('auto')
+    const row = screen.getByText('Edit').parentElement as HTMLElement
+    expect([row.style.paddingLeft, row.style.paddingRight]).toEqual([
+      '4px',
+      '12px',
+    ])
+  })
+})

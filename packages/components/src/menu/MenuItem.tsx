@@ -5,7 +5,7 @@ import {
   interpolate,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { alphaColor, renderIcon } from '@rootnative/utils'
+import { alphaColor, renderIcon, resolveLogicalKey } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import { Platform, Text, View } from 'react-native'
 import type { ViewProps } from 'react-native'
@@ -22,6 +22,7 @@ import {
   MENU_ITEM_ICON_SIZE,
   VERTICAL_MENU_ITEM_ICON_SIZE,
   createMenuItemStyles,
+  trailingStartStyle,
 } from './styles'
 import type { MenuItemProps } from './types'
 
@@ -201,9 +202,16 @@ export function MenuItem({
     () => [styles.label, labelStyle],
     [styles.label, labelStyle],
   )
+  // Resolved on each render, not in a memo, so the trailing content follows a
+  // runtime change of the document `dir` on the web.
+  const marginStartKey = resolveLogicalKey('marginStart')
+  const trailingStart = useMemo(
+    () => trailingStartStyle(marginStartKey),
+    [marginStartKey],
+  )
   const trailingTextStyle = useMemo(
-    () => [styles.trailingText, styles.trailingStart],
-    [styles.trailingText, styles.trailingStart],
+    () => [styles.trailingText, trailingStart],
+    [styles.trailingText, trailingStart],
   )
 
   return (
@@ -254,9 +262,7 @@ export function MenuItem({
         {trailing ? (
           <View
             aria-hidden
-            style={
-              trailingText === undefined ? styles.trailingStart : undefined
-            }
+            style={trailingText === undefined ? trailingStart : undefined}
           >
             {trailing}
           </View>
