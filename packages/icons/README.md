@@ -3,7 +3,7 @@
 
 # @rootnative/icons
 
-Icon-library adapters for [Root Native UI](https://github.com/rootnative/ui). Pre-built `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice: Lucide, Phosphor, any `@react-native-vector-icons/*` set, or your own resolver.
+Icon-library adapters for [Root Native UI](https://github.com/rootnative/ui). Built-in `iconResolver` factories that route string icon names (`leadingIcon="check"`) to the icon library of your choice: Lucide, Phosphor, any `@react-native-vector-icons/*` set, or your own resolver.
 
 ## Install
 

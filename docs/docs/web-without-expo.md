@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-description: Use Root Native UI on web with Vite or webpack and no Expo — the react-native-web alias, the worklets Babel plugin on node_modules, the globals, and the Electron notes.
+description: Use Root Native UI on the web with Vite or webpack and no Expo — the react-native-web alias, the worklets Babel plugin on node_modules, the globals, and the Electron notes.
 ---
 
 # Web without Expo
@@ -83,7 +83,7 @@ A string icon name needs an `iconResolver` on `ThemeProvider`. Only the
 choice is yours and no alias is needed:
 
 - **MaterialDesignIcons.** Install `@react-native-vector-icons/material-design-icons` and
-  `expo-font`. Both work on web without the rest of Expo; the package loads
+  `expo-font`. Both work on the web without the rest of Expo; the package loads
   its font through `expo-font` when `globalThis.expo` exists, and embeds it
   from its `/static` export otherwise. Pass `mdiResolver` from
   `@rootnative/components/mdi`.
@@ -247,7 +247,7 @@ module.exports = {
 
 ## The app root
 
-The root is the same as on Expo. No `SafeAreaProvider` is needed: on web
+The root is the same as on Expo. No `SafeAreaProvider` is needed: on the web
 without a provider the components that apply insets use zero insets. Add one
 only when your own code calls `useSafeAreaInsets`, or when the page needs the
 `env(safe-area-inset-*)` values of a notched device.
@@ -303,5 +303,5 @@ drag regions, keyboard focus, Reduce motion, and the packaged build.
 | `Unable to resolve @react-native-vector-icons/material-design-icons` | The app imports `@rootnative/components/mdi` | Step 5: install the package, or pass your own `iconResolver` and drop the import |
 | MDI glyphs render as `?` or as empty squares | `@expo/vector-icons` and `@react-native-vector-icons/*` both register the font | Remove `@expo/vector-icons`; run `npx @react-native-vector-icons/codemod` on app code that imports it |
 | A string icon renders nothing, and the console shows `no iconResolver is set` | `ThemeProvider` has no `iconResolver` | Step 5 |
-| `No safe area value available` on a blank page | A version before the web fallback | Update `@rootnative/components`: older versions threw on web without a `SafeAreaProvider` |
+| `No safe area value available` on a blank page | A version before the web fallback | Update `@rootnative/components`: older versions threw on the web without a `SafeAreaProvider` |
 | Native-only props such as `hitSlop` do nothing | Expected on `react-native-web` | See [Accessibility](./accessibility.md) for the web differences |

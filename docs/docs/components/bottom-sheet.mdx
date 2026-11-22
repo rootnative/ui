@@ -165,8 +165,8 @@ drag rubber-bands back to the lowest snap.
 
 The sheet slides in from the bottom edge on `springDefaultSpatial`. After a
 drag it settles on the same spring, seeded with the release velocity. The scrim
-fades on `springFastEffects`. Each of these collapses to a hard cut under
-reduced motion; see [Motion](../motion.md). The position *during* a drag
+fades on `springFastEffects`. Under reduced motion, each of these goes to its
+end value at once; see [Motion](../motion.md). The position *during* a drag
 follows the finger 1:1, and reduced motion doesn't change that.
 
 ## Tokens
@@ -191,8 +191,8 @@ follows the finger 1:1, and reduced motion doesn't change that.
 - The modal surface reports `role="dialog"`, `aria-modal`, and `accessibilityViewIsModal`, so assistive technology treats the content below as inert. The standard variant reports none of these.
 - The screen reader announces the scrim as a button labelled "Close sheet". Override the label with `scrimAccessibilityLabel`. The scrim leaves the accessibility tree when `dismissable={false}`.
 - The drag handle announces as adjustable ("Drag handle", override with `dragHandleAccessibilityLabel`), with its snap position as the value. The increment and decrement actions expand and collapse between snap points, and an escape action dismisses.
-- On web the handle is focusable: the arrow keys move between snap points, and Escape dismisses.
-- **On web**, the modal variant also keeps keyboard focus inside. Focus moves into the sheet when it opens, Tab cycles inside it, Escape dismisses a `dismissable` sheet from anywhere in it, and focus returns to the opening control on close. The standard variant does none of this, on purpose, because it keeps the content behind it usable. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web).
+- On the web the handle is focusable: the arrow keys move between snap points, and Escape dismisses.
+- **On the web**, the modal variant also keeps keyboard focus inside. Focus moves into the sheet when it opens, Tab cycles inside it, Escape dismisses a `dismissable` sheet from anywhere in it, and focus returns to the opening control on close. The standard variant does none of this, on purpose, because it keeps the content behind it usable. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-the-web).
 
 ## Props
 

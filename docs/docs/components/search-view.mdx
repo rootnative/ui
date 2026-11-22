@@ -73,7 +73,7 @@ MD3 Search has two parts: the **search bar** and the **search view**. [SearchBar
 
 The view opens when `visible` becomes `true`, and the input takes focus. The header holds a back button, the input, a clear button while the input holds text, and the `actions`. `children` fills the rest of the view. Put a scrollable list there when it can grow past the view.
 
-The view asks to close through `onDismiss`. It does so from the back button, from the Android back button, from Escape on web, and from a press outside a docked view. Set `visible` to `false` in response. The view does not close itself.
+The view asks to close through `onDismiss`. It does so from the back button, from the Android back button, from Escape on the web, and from a press outside a docked view. Set `visible` to `false` in response. The view does not close itself.
 
 The query is controlled with `value` and `onChangeText`, or uncontrolled with `defaultValue`. Share the state with the bar, as above, so the bar shows the query after the view closes.
 
@@ -127,8 +127,8 @@ Values are from Compose `SearchViewTokens` and `SearchBar.kt`. MD3 Expressive ad
 ## Accessibility
 
 - The surface is a modal `dialog`, named by the placeholder. Set `accessibilityLabel` to use a different name.
-- The header is a `search` landmark on web, and the input has the `searchbox` role.
-- On web, focus moves to the input on open, Tab stays inside the view, Escape closes it, and focus returns to the control that opened it on close.
+- The header is a `search` landmark on the web, and the input has the `searchbox` role.
+- On the web, focus moves to the input on open, Tab stays inside the view, Escape closes it, and focus returns to the control that opened it on close.
 - On native, `accessibilityViewIsModal` keeps the screen reader inside the view.
 - The back button, the clear button, and each action need a name. The defaults are `Back` and `Clear search`; `actions` entries require an `accessibilityLabel`.
 - The area outside a docked view is a button named `dismissAccessibilityLabel`, `Close search` by default.

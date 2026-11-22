@@ -10,8 +10,8 @@ size of the image, the avatar, or the text line it stands in for.
 
 The block is drawn in `surfaceContainerHighest`. It pulses its opacity on a
 repeating timing loop built from `theme.motion.durationExtraLong4` and
-`theme.motion.easingStandard`. Under reduced motion the pulse collapses to a
-static block. The component is hidden from the accessibility tree. Announce
+`theme.motion.easingStandard`. Under reduced motion, the block
+doesn't pulse. The component is hidden from the accessibility tree. Announce
 the loading state on the container instead (for example with `aria-busy`).
 
 ## Usage

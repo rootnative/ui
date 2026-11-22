@@ -245,7 +245,7 @@ label still gets something to see. A **secondary** indicator spans the whole tab
 
 The indicator stays unmounted until the active tab reports a layout, so it appears in place. It
 doesn't slide in from the leading edge of the row on the first render. After that, both its offset
-and its width ride `springDefaultSpatial`, and they collapse to a snap under reduced motion; see
+and its width ride `springDefaultSpatial`, and under reduced motion they go to their end values at once; see
 [Motion](../motion.md). With a pager [`position`](#following-a-pager), the indicator follows the
 finger instead, and reduced motion doesn't gate it: that is the swipe, not an animation.
 
@@ -292,7 +292,7 @@ Compose `Tab` still uses a legacy 72dp.
 - The screen-reader name of a tab falls back to its label. Set `accessibilityLabel` on the item
   for an icon-only tab.
 - A disabled tab exposes `accessibilityState.disabled` and stops responding.
-- On web, a tab shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible
+- On the web, a tab shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible
   state as the rest of the library.
 - Tabs owns no panels, so you add `aria-controls` yourself if you render panels that need it.
 

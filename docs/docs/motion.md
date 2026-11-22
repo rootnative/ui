@@ -10,7 +10,7 @@ Every animation in Root Native UI runs on [`@rootnative/inertia`](https://rootna
 Two things follow from that, and they're the whole page:
 
 1. **Motion tokens are theme tokens.** Change `theme.motion`, and the timing of every component changes with it.
-2. **Reduced motion works by default.** `ThemeProvider` opts the whole tree into the OS accessibility setting, and every animated component collapses to a hard cut when the setting is on.
+2. **Reduced motion works by default.** `ThemeProvider` opts the whole tree into the OS accessibility setting, and when the setting is on, every animated component goes to its end value at once.
 
 ## Setup
 

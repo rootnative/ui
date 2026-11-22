@@ -47,7 +47,7 @@ import { ThemeProvider } from '@rootnative/core'
 
 `@rootnative/components/mdi` is the only module in the library that imports `@react-native-vector-icons/material-design-icons`, and the root entry never loads it. So the package is an optional peer. An app that passes another resolver, or no string icon names, doesn't install it, and a bundler without Expo needs no alias for it.
 
-The package is the one Expo recommends in place of `@expo/vector-icons` ([Expo blog](https://expo.dev/blog/moving-away-from-expo-vector-icons)). The root import loads the font at run time through `expo-font`, which works in Expo Go, in a development build and on web. A development build can embed the font instead: pass the `/static` export to `createVectorIconsResolver` from `@rootnative/icons`, and add the package to the `plugins` array of `app.json`. Don't keep `@expo/vector-icons` installed next to it: both register the same font, and the glyphs render as `?` or as empty squares. `npx @react-native-vector-icons/codemod` rewrites app code that still imports the old package.
+The package is the one Expo recommends in place of `@expo/vector-icons` ([Expo blog](https://expo.dev/blog/moving-away-from-expo-vector-icons)). The root import loads the font at run time through `expo-font`, which works in Expo Go, in a development build and on the web. A development build can embed the font instead: pass the `/static` export to `createVectorIconsResolver` from `@rootnative/icons`, and add the package to the `plugins` array of `app.json`. Don't keep `@expo/vector-icons` installed next to it: both register the same font, and the glyphs render as `?` or as empty squares. `npx @react-native-vector-icons/codemod` rewrites app code that still imports the old package.
 
 ```tsx
 import { MaterialDesignIcons } from '@react-native-vector-icons/material-design-icons/static'
@@ -105,7 +105,7 @@ You have two paths:
 
 ### Library adapters: `@rootnative/icons`
 
-`@rootnative/icons` ships pre-built resolver factories, so you don't have to work out the resolver shape yourself:
+`@rootnative/icons` ships built-in resolver factories, so you don't have to work out the resolver shape yourself:
 
 ```bash
 npm install @rootnative/icons

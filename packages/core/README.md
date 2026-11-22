@@ -49,7 +49,7 @@ Provides the theme context to all child components. It takes an MD3 theme or a t
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `theme` | `BaseTheme` | `lightTheme` (MD3) | The theme object |
-| `iconResolver` | `IconResolver` | none | Resolves a string icon name (`leadingIcon="check"`) to an icon node. Set it once at the app root to use Lucide, SF Symbols, custom SVGs, and so on. Pre-built adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons). A nested provider without it uses the resolver of its parent |
+| `iconResolver` | `IconResolver` | none | Resolves a string icon name (`leadingIcon="check"`) to an icon node. Set it once at the app root to use Lucide, SF Symbols, custom SVGs, and so on. Built-in adapters: [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons). A nested provider without it uses the resolver of its parent |
 | `children` | `ReactNode` | — | The app content |
 
 ### useTheme()

@@ -86,7 +86,7 @@ or an account block goes straight in as a child.
 
 | Variant | Where it renders | Container | Dismissal |
 |---------|------------------|-----------|-----------|
-| `'modal'` (default) | Through `Portal`, over the content, from the start edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp end corners | Scrim press, Android back, Escape on web, and a destination press |
+| `'modal'` (default) | Through `Portal`, over the content, from the start edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp end corners | Scrim press, Android back, Escape on the web, and a destination press |
 | `'standard'` | In place, as a permanent panel at the start of a row | `surface`, elevation level 0, no rounding | None; it is always open |
 
 A modal drawer takes `visible` and `onDismiss`. A standard drawer takes neither, and the type
@@ -116,7 +116,7 @@ the user chooses a destination. Pass `dismissOnSelect={false}` to keep it open. 
   trailing text such as an unread count, per the MD3 drawer anatomy. A screen reader doesn't
   announce it, so add it to `accessibilityLabel`.
 - **`NavigationDrawer.Section`**: a group with an optional `headline` in `titleSmall`, 56dp tall
-  and inset 28dp from the sheet edge. On web the headline renders as `<h2>`. Set `headingLevel`
+  and inset 28dp from the sheet edge. On the web the headline renders as `<h2>`. Set `headingLevel`
   to fit the page outline.
 - **`NavigationDrawer.Divider`**: a `Divider` inset 28dp from both sheet edges, between sections.
 
@@ -188,7 +188,7 @@ its own `testID`, and its indicator carries `<testID>-indicator`.
 - The destinations form a `tablist`. Each item reports `role="tab"` with
   `accessibilityState.selected` and, when disabled, `accessibilityState.disabled`.
 - A section headline is a `heading`.
-- On web, a modal drawer keeps the keyboard focus inside: focus moves into it on open, Tab
+- On the web, a modal drawer keeps the keyboard focus inside: focus moves into it on open, Tab
   cycles inside it, Escape dismisses it when `dismissable`, and focus returns to the trigger on
   close.
 - On Android, the hardware back button dismisses a `dismissable` modal drawer.

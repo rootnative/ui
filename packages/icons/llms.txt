@@ -5,7 +5,7 @@
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
 > Do not use @expo/vector-icons: Expo is retiring it, and its sets don't type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 
-Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
+Built-in resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
 ```bash
 pnpm add @rootnative/icons
@@ -36,7 +36,7 @@ Per-call elements/functions always take precedence over the resolver. Only `@roo
 
 ### `@rootnative/icons` adapter package (v0.0.2)
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes the `@react-native-vector-icons/*` set you pass, so the package declares no peer for it.
+Built-in resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. `createVectorIconsResolver` takes the `@react-native-vector-icons/*` set you pass, so the package declares no peer for it.
 
 ```bash
 pnpm add @rootnative/icons

@@ -339,7 +339,7 @@ These are the baseline tokens. The [vertical menu](#vertical-menu) table gives t
 ## Motion
 
 The menu scales in from 80% and fades on `springFastSpatial`. It grows out of the corner nearest
-the anchor, through `transformOrigin`. Both collapse to a hard cut under reduced motion; see
+the anchor, through `transformOrigin`. Under reduced motion, both go to their end values at once; see
 [Motion](../motion.md).
 
 The surface stays invisible for the frame between the mount and the measurement. Its own size
@@ -348,17 +348,17 @@ decides which side it lands on, so the layout must run before the placement.
 ## Accessibility
 
 - The surface reports `role="menu"`, and each item reports `role="menuitem"`.
-- A `selected` or `checked` item reports its state through `aria-checked`. On web, a `selected`
+- A `selected` or `checked` item reports its state through `aria-checked`. On the web, a `selected`
   item is a `menuitemradio` and a `checked` item a `menuitemcheckbox`. Native keeps `menuitem`,
   and TalkBack and VoiceOver read the checked state from `aria-checked`.
 - An item exposes `accessibilityState.disabled`.
-- On web, a `Menu.Group` reports `role="group"`, and its `label` is the name of the group. The
+- On the web, a `Menu.Group` reports `role="group"`, and its `label` is the name of the group. The
   label text itself is hidden from the screen reader, so it isn't read twice. On native, the
   screen reader reads the label as text before the items of the group.
 - The anchor is annotated for you, in both the controlled and the uncontrolled form: `aria-haspopup="menu"` plus an `aria-expanded` that follows the menu. So a screen reader announces the trigger as a control that opens a menu, not as a plain button.
-- **On web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between the items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-web). The surface is *not* marked modal on native, on purpose. A modal mark would also take the dismiss region below out of the accessibility tree.
+- **On the web**, focus moves into the menu when it opens, Arrow Down/Up and Tab move between the items, Escape dismisses, and focus returns to the anchor on close. See [Accessibility](../accessibility.md#dialogs-menus-and-sheets-on-the-web). The surface is *not* marked modal on native, on purpose. A modal mark would also take the dismiss region below out of the accessibility tree.
 - The region that catches outside presses announces as a button labelled "Close menu". Override it with `dismissAccessibilityLabel`. An MD3 menu has no scrim, so this region is transparent. It exists to catch outside presses and to give a screen reader a way out.
-- On web, an item shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible state as the rest of the library.
+- On the web, an item shows a keyboard focus ring (`secondary`, 3dp), driven by the same focus-visible state as the rest of the library.
 
 ## Props
 

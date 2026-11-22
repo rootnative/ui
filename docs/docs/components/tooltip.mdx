@@ -72,9 +72,9 @@ needs its own `Text`.
 | Input | Behaviour |
 |-------|-----------|
 | Hover in | Shows the tooltip. Hover out hides a plain tooltip. A rich tooltip stays up, so the pointer can reach its actions |
-| Focus | Shows the tooltip on web, so a Tab stop reads the same as a hover. Blur hides a plain tooltip. A rich tooltip stays up, so Tab can reach its actions |
+| Focus | Shows the tooltip on the web, so a Tab stop reads the same as a hover. Blur hides a plain tooltip. A rich tooltip stays up, so Tab can reach its actions |
 | Escape | Hides the tooltip while the anchor has focus. The key stops there, so an enclosing dialog does not close on the same press |
-| Long press | Shows the tooltip. This is how touch devices reach it. On web, only on a device with no hover, or on an anchor with its own `onLongPress` |
+| Long press | Shows the tooltip. This is how touch devices reach it. On the web, only on a device with no hover, or on an anchor with its own `onLongPress` |
 | Press | Hides the tooltip. A tap is the control at work, not a request for help text |
 | Timeout | Hides a plain tooltip after `duration` (1500ms). Rich tooltips never time out |
 | Outside press / Android back | Hides a rich tooltip. A plain one has no dismiss region to press |
@@ -88,8 +88,8 @@ reads a `Text` with `onPress` or `onLongPress` as a link. The wrapper catches ho
 anchor, because every Root Native pressable drives its state layer from `onHoverIn`/`onHoverOut`
 and would overwrite an injected pair.
 
-On web, react-native-web cancels the click of a mouse press that is held for the long-press delay.
-So on web the tooltip adds the long press only when no input can hover, or when the anchor has an
+On the web, react-native-web cancels the click of a mouse press that is held for the long-press delay.
+So on the web the tooltip adds the long press only when no input can hover, or when the anchor has an
 `onLongPress` of its own. A slow mouse click on the anchor still presses it.
 
 MD3 takes a plain tooltip down 1.5s after it appears, whether or not the pointer is still on the
@@ -223,8 +223,8 @@ content behind. The actions are start-aligned, the opposite of the actions of a 
 
 ## Motion
 
-The tooltip fades in and out on `springFastEffects`, with no scale, unlike a menu. It collapses to
-a hard cut under reduced motion; see [Motion](../motion.md).
+The tooltip fades in and out on `springFastEffects`, with no scale, unlike a menu. Under reduced
+motion, it goes to its end value at once; see [Motion](../motion.md).
 
 The surface stays invisible for the frame between the mount and the measurement. Its own size
 decides which side it lands on, so it must be laid out before the component can place it.
@@ -235,7 +235,7 @@ decides which side it lands on, so it must be laid out before the component can 
 - The surface of a plain tooltip never takes touches, so it can't stand between the user and the
   control it describes. The surface of a rich tooltip does, and the region that catches outside
   presses is announced as a button labelled "Close tooltip". Override it with `dismissAccessibilityLabel`.
-- **On web**, the anchor carries an `aria-describedby` that points at the tooltip while it is
+- **On the web**, the anchor carries an `aria-describedby` that points at the tooltip while it is
   shown. That is the only thing that connects the two: the surface renders in a portal, far from
   the anchor in the DOM. React Native has no equivalent, so this is web-only. A plain tooltip
   whose text is the `accessibilityLabel` or the `aria-label` of the anchor adds no description,
@@ -244,7 +244,7 @@ decides which side it lands on, so it must be laid out before the component can 
   the anchor are the only things a screen reader sees. A tooltip is supplementary: an icon-only
   button still needs its `accessibilityLabel`. The tooltip text can be that label, as on an MD3
   icon button, or it can add to it.
-- **On web**, keyboard focus on the anchor shows the tooltip, and Escape hides it, so a keyboard
+- **On the web**, keyboard focus on the anchor shows the tooltip, and Escape hides it, so a keyboard
   user reaches the same text as a pointer. Focus inside the actions of a rich tooltip doesn't
   close it.
 - Hover, focus and long press are supplementary. Anything a user must read to operate the control

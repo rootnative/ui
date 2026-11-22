@@ -26,7 +26,7 @@ This matters when you override accessibility props yourself:
 // Reaches a screen reader on iOS, Android and web.
 <Pressable aria-selected={selected} role="tab" />
 
-// Works on native. On web the state never reaches the DOM.
+// Works on native. On the web, the state never reaches the DOM.
 <Pressable accessibilityState={{ selected }} accessibilityRole="tab" />
 ```
 
@@ -76,8 +76,8 @@ layout, so the small sizes stay usable.
 variant sit 2dp apart, so a horizontal slop would make the touch area of each
 item overlap its neighbour.
 
-**This does not apply on web.** react-native-web does not implement `hitSlop`,
-so on web these controls are exactly their token size. If you use
+**This does not apply on the web.** react-native-web does not implement `hitSlop`,
+so on the web these controls are exactly their token size. If you use
 `extraSmall` on a touch-capable web build, give them room yourself.
 
 ## What you have to supply
@@ -127,9 +127,9 @@ accessible name from `Dialog.Title` when the headline is a string. When you
 build the headline out of nodes, there is no single string to announce, so
 pass `accessibilityLabel` yourself.
 
-## Dialogs, menus and sheets on web
+## Dialogs, menus and sheets on the web
 
-A portal appends its surface at the end of the tree, so on web the tab order
+A portal appends its surface at the end of the tree, so on the web the tab order
 of the browser would walk straight past the surface into the content behind
 it. `aria-modal` tells assistive technology that a surface is modal. It is not
 a focus boundary. So `Dialog`, `Menu` and the modal `BottomSheet` keep the
@@ -173,10 +173,10 @@ user must resolve, not for every confirmation:
 ## Text fields
 
 `TextField` connects its own supporting text (the error message when there is
-one) to the input. On web that is an `aria-describedby` that points at the
+one) to the input. On the web that is an `aria-describedby` that points at the
 supporting-text node. Native has no equivalent, so there the same text becomes
 the `accessibilityHint` of the input. `errorText` (or `error`) also sets
-`aria-invalid` on web, so the field is announced as invalid, and not only
+`aria-invalid` on the web, so the field is announced as invalid, and not only
 described.
 
 Both come from props you already pass:
@@ -214,17 +214,17 @@ web-only. React Native has no concept of one view that describes another, and
 on touch a tooltip is a long-press control, not something a screen reader
 narrates.
 
-On web a tooltip also opens when its anchor takes keyboard focus, and closes
+On the web a tooltip also opens when its anchor takes keyboard focus, and closes
 on Escape, so a keyboard user reads the same text as a pointer user.
 
 ## Reduced motion
 
-The theme handles this, not you; see [Motion](./motion.md). Every animated
-component collapses to a hard cut when the OS setting is on.
+The theme handles this, not you; see [Motion](./motion.md). When the OS setting
+is on, every animated component goes to its end value at once.
 
-## Keys on web
+## Keys on the web
 
-On web, Enter presses each control. Space presses a control whose role is
+On the web, Enter presses each control. Space presses a control whose role is
 `button`, `checkbox`, `switch`, `radio` or `tab`, as the WAI-ARIA patterns
 say. A held key presses once, and Space does not scroll the page.
 
@@ -237,10 +237,10 @@ own `onKeyDown` calls `preventDefault`, Space does not press.
 react-native-web presses a `Pressable` on Space only for the `button` role.
 A `Pressable` of your own with one of the other roles answers Enter only.
 
-## Focus rings on web
+## Focus rings on the web
 
 `Button`, `IconButton`, `FAB` and `Chip` draw their MD3 focus ring as a CSS
-outline on web: 3 px wide, 2 px outside the control, on a node with the box
+outline on the web: 3 px wide, 2 px outside the control, on a node with the box
 of the control. An outline is ink, not layout, so the ring adds no scrollable
 overflow. A ring drawn as a box 5 px outside the control reached past the
 page edge in a bar with the 4 px MD3 gutter, and widened the page by 1 px,
@@ -268,16 +268,16 @@ We state these, because they affect what you can promise your own users:
   `importantForAccessibility="no-hide-descendants"` (Android) /
   `accessibilityElementsHidden` (iOS) while a modal surface is open.
 - **Nothing restores the screen-reader cursor on native.** When a `Dialog`,
-  `Menu` or modal `BottomSheet` closes, *keyboard* focus returns on web, but
+  `Menu` or modal `BottomSheet` closes, *keyboard* focus returns on the web, but
   the native reader cursor does not move back to the control that opened the
   surface. It falls back to wherever the platform puts it, usually the top of
-  the screen. On web, focus return works as described above.
+  the screen. On the web, focus return works as described above.
 - **`Menu` is not marked modal on native, on purpose.** A modal mark removes
   the siblings of the surface from the accessibility tree, and the dismiss
   region behind the menu is a sibling. It is the only exit that a
   screen-reader user has. To contain the screen reader here, the portal host
   must own the flag, which is a change we have not made.
-- **`role="menu"` items are Tab stops on web, not a roving-tabindex group.**
+- **`role="menu"` items are Tab stops on the web, not a roving-tabindex group.**
   The arrow keys work. The strict ARIA menu pattern would also make the item
   group a single tab stop.
 - **Touch targets are corrected only on native.** The `hitSlop` that lifts
@@ -290,6 +290,6 @@ them. Both are implementation gaps behind a settled API. A fix needs no change
 to any prop, so neither fix is a breaking change.
 
 Beyond these, we checked the screen-reader behaviour of the library by a
-source audit and by DOM-level tests on web. We have not run a full VoiceOver
+source audit and by DOM-level tests on the web. We have not run a full VoiceOver
 and TalkBack pass over the component catalog, so the announcement wording and
 the traversal order on native are less checked than the roles and the labels.

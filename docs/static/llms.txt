@@ -71,7 +71,7 @@ import { Button, Card } from '@rootnative/components'
 
 `react-native-reanimated` powers the state-layer transitions and the gesture-driven components (Slider, Switch). Every interactive component needs it. You can skip it only when you use Badge, Divider, Icon, KeyboardAvoidingWrapper, Portal and Typography and nothing else (the only components with no animated value; `Layout` is not on the list because `Grid` animates through `Stagger`). Expo SDK 58 bundles it, and it works in Expo Go.
 
-The components never import `react-native-reanimated` directly. They animate through `@rootnative/inertia`, which resolves the motion tokens of the theme by name and collapses every transition to a hard cut when the OS reduce-motion setting is on. `ThemeProvider` sets this up, so there is nothing to configure. Override it per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
+The components never import `react-native-reanimated` directly. They animate through `@rootnative/inertia`, which resolves the motion tokens of the theme by name and, when the OS reduce-motion setting is on, makes every transition go to its end value at once. `ThemeProvider` sets this up, so there is nothing to configure. Override it per subtree with `<MotionConfig reducedMotion="always" | "never">` from `@rootnative/inertia`.
 
 Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 58 bundles its Babel plugin, so there is nothing to configure. On bare React Native, add `'react-native-worklets/plugin'` as the last entry of the `plugins` in `babel.config.js`.
 
@@ -90,8 +90,8 @@ Reanimated 4 runs on `react-native-worklets` (installed above). Expo SDK 58 bund
 ## CLI
 
 ```bash
-npx rootnative create                    # Scaffold a new project (interactive)
-npx rootnative create my-app             # Scaffold with name
+npx rootnative create                    # Create a new project (interactive)
+npx rootnative create my-app             # Create a project with a name
 npx rootnative create my-app -y          # Non-interactive (defaults)
 npx rootnative create -t with-router     # Use router template
 npx rootnative init                      # Initialize existing project for CLI workflow

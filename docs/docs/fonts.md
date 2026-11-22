@@ -5,7 +5,7 @@ description: Replace the platform-default font stack with any custom font, and m
 
 # Fonts
 
-Root Native UI uses the platform-default fonts by default: Roboto on Android, System (San Francisco) on iOS, and the system font stack on web. You can replace these with any custom font.
+Root Native UI uses the platform-default fonts by default: Roboto on Android, System (San Francisco) on iOS, and the system font stack on the web. You can replace these with any custom font.
 
 ## Quick setup with createMaterialTheme
 

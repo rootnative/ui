@@ -161,7 +161,7 @@ Every icon prop (`leadingIcon`, `trailingIcon`, `icon`, …) accepts an `IconSou
 - **ReactElement** (`<Check size={18} color="#fff" />`): a one-off icon from any library. You control the size and the color.
 - **Render function** (`({ size, color }) => <Check ... />`): receives the resolved size and color of the component.
 
-To route string names to a different library across the app (Lucide, Phosphor, SF Symbols, custom SVGs), pass an `iconResolver` to `ThemeProvider`. The pre-built adapters live in [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons); see the [icons guide](https://rootnative.github.io/ui/icons).
+To route string names to a different library across the app (Lucide, Phosphor, SF Symbols, custom SVGs), pass an `iconResolver` to `ThemeProvider`. The built-in adapters live in [`@rootnative/icons`](https://www.npmjs.com/package/@rootnative/icons); see the [icons guide](https://rootnative.github.io/ui/icons).
 
 ## Docs
 

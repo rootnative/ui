@@ -132,8 +132,8 @@ The label stays required on the item in every mode. It is also the screen-reader
 ## The indicator
 
 The active indicator is a 56×32dp `secondaryContainer` pill behind the icon. On selection it
-fades in and expands from its centre on `springDefaultSpatial`. It collapses to a hard cut under
-reduced motion; see [Motion](../motion.md). The hover, press, and focus state layers paint
+fades in and expands from its centre on `springDefaultSpatial`. Under reduced motion, it goes to
+its end value at once; see [Motion](../motion.md). The hover, press, and focus state layers paint
 inside the same pill shape, on active and inactive destinations alike.
 
 ## Safe area
@@ -190,7 +190,7 @@ Compose.
 - The screen-reader name of a destination falls back to its label, also when `labelVisibility`
   hides the visible label. Set `accessibilityLabel` on the item to override it.
 - A disabled destination exposes `accessibilityState.disabled` and stops responding.
-- On web, a destination shows a keyboard focus ring (`secondary`, 3dp) around the indicator
+- On the web, a destination shows a keyboard focus ring (`secondary`, 3dp) around the indicator
   pill, driven by the same focus-visible state as the rest of the library.
 
 ## Props

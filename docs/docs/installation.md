@@ -78,7 +78,7 @@ What each package does, and which three you can leave out:
 
 If you pass **string icon names** (for example `leadingIcon="check"`), register a resolver on `ThemeProvider`. For [`MaterialDesignIcons`](https://pictogrammers.com/library/mdi/) from `@react-native-vector-icons/material-design-icons` (installed above), pass `mdiResolver` from `@rootnative/components/mdi`, as the setup below shows. Without a resolver, a string name renders nothing, and the library logs one warning. See the [Icons guide](./icons) for details.
 
-To use [Lucide](https://lucide.dev), [Phosphor](https://phosphoricons.com), or another vector-icon set as the default, install `@rootnative/icons`. It has the pre-built adapter helpers:
+To use [Lucide](https://lucide.dev), [Phosphor](https://phosphoricons.com), or another vector-icon set as the default, install `@rootnative/icons`. It has the built-in adapter helpers:
 
 <PackageManagerTabs cmd="npm install @rootnative/icons" />
 

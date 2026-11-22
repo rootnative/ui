@@ -1170,7 +1170,7 @@ import { Divider } from '@rootnative/components/divider'
   tooltip: `\`\`\`tsx
 import { Tooltip } from '@rootnative/components/tooltip'
 
-// Plain: hover on web, long press on touch, down again after 1.5s. The anchor
+// Plain: hover on the web, long press on touch, down again after 1.5s. The anchor
 // must accept \`onLongPress\` (every Root Native pressable does); its own
 // onLongPress still fires. A press on the anchor hides the tooltip.
 <Tooltip anchor={<IconButton icon="heart-outline" accessibilityLabel="Favourite" />}>
@@ -1509,7 +1509,7 @@ import { Skeleton } from '@rootnative/components/skeleton'
 The block reads \`surfaceContainerHighest\` and pulses with a repeating timing
 loop from \`theme.motion.durationExtraLong4\` + \`theme.motion.easingStandard\`.
 It is hidden from the accessibility tree — announce loading on the container.
-Under reduced motion the pulse collapses to a static block.`,
+Under reduced motion, the block doesn't pulse.`,
 }
 
 // ============================================================
@@ -2099,7 +2099,7 @@ import { Grid } from '@rootnative/components/layout'
         '- `visible: boolean` — **Modal only, required.** Whether the drawer ' +
         'is shown. Exit animations run before it unmounts.\n' +
         '- `onDismiss: () => void` — **Modal only, required.** Called on a ' +
-        'scrim press, Android back, Escape on web, or a destination press ' +
+        'scrim press, Android back, Escape on the web, or a destination press ' +
         'when `dismissOnSelect` is on. Set `visible` to `false` in response.\n' +
         '- `dismissable?: boolean` — Modal only. Default: `true`. Whether the ' +
         'scrim press, Android back, and Escape dismiss the drawer.\n' +
@@ -2174,7 +2174,7 @@ import { Grid } from '@rootnative/components/layout'
         '- `onDismiss: () => void` — **Required on a modal sheet, optional ' +
         'on a standard one.** Called by the close button, which shows only ' +
         'when `onDismiss` is set. On a modal sheet a scrim press, Android ' +
-        'back and Escape on web also call it.\n' +
+        'back and Escape on the web also call it.\n' +
         '- `dismissable?: boolean` — Modal only. Default: `true`. Whether the ' +
         'scrim press, Android back, and Escape dismiss the sheet. The close ' +
         'button always calls `onDismiss`.\n' +
@@ -2553,7 +2553,7 @@ That is the whole stack — three providers, and **no \`SafeAreaProvider\`**.
 apply insets (\`Layout\`, \`AppBar\`, \`NavigationBar\`, \`BottomSheet\`, \`Snackbar\`)
 work without one. Inside a provider they read the insets from its context. On
 native without a provider they use the package's native \`SafeAreaView\`, which
-measures its own insets. On web without a provider they apply zero insets,
+measures its own insets. On the web without a provider they apply zero insets,
 because a browser has no insets to measure there. Add a \`SafeAreaProvider\` on
 web when the page needs the \`env(safe-area-inset-*)\` values of a notched
 device, or when your own code calls \`useSafeAreaInsets\`.
@@ -3107,7 +3107,7 @@ npx rootnative create .          # Into the current directory, named after it
 npx rootnative create my-app -y  # Non-interactive, accept defaults
 \`\`\`
 
-Pass \`.\` to scaffold into the directory you are already in. The project name comes from that directory's name, and the directory is never deleted — the CLI lists any file the template would overwrite and asks first (with \`-y\` it stops and changes nothing). A named project goes into a new subdirectory, and the CLI asks before it deletes an existing one.
+Pass \`.\` to create the project in the directory you are already in. The project name comes from that directory's name, and the directory is never deleted — the CLI lists any file the template would overwrite and asks first (with \`-y\` it stops and changes nothing). A named project goes into a new subdirectory, and the CLI asks before it deletes an existing one.
 
 Options:
 - \`-y, --yes\` — Skip prompts and use defaults
@@ -3229,9 +3229,9 @@ import { alphaColor, blendColor, elevationStyle, renderIcon, transformOrigin, se
 
 ### Elevation
 
-- \`elevationStyle(level: ElevationLevel): ViewStyle\` — Converts an MD3 elevation level into platform-appropriate shadow styles. Uses \`boxShadow\` on web, \`shadow*\` + \`elevation\` on native.
+- \`elevationStyle(level: ElevationLevel): ViewStyle\` — Converts an MD3 elevation level into platform-appropriate shadow styles. Uses \`boxShadow\` on the web, \`shadow*\` + \`elevation\` on native.
 
-> **Gotcha:** the return shape differs by platform. Both are typed as \`ViewStyle\`, but spreading the result and overriding individual \`shadow*\` props silently no-ops on web — the shadow is baked into the \`boxShadow\` string. To customize, modify the \`ElevationLevel\` before calling, or branch on \`Platform.OS\`.
+> **Gotcha:** the return shape differs by platform. Both are typed as \`ViewStyle\`, but spreading the result and overriding individual \`shadow*\` props silently no-ops on the web — the shadow is baked into the \`boxShadow\` string. To customize, modify the \`ElevationLevel\` before calling, or branch on \`Platform.OS\`.
 
 ### RTL support
 
@@ -3282,7 +3282,7 @@ Per-call elements/functions always take precedence over the resolver. Only \`@ro
 
 ### \`@rootnative/icons\` adapter package (v${ICONS_VERSION})
 
-Pre-built resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. \`createVectorIconsResolver\` takes the \`@react-native-vector-icons/*\` set you pass, so the package declares no peer for it.
+Built-in resolver factories for the most common React Native icon libraries. Install only the icon library you actually use. Lucide and Phosphor are optional peer deps. \`createVectorIconsResolver\` takes the \`@react-native-vector-icons/*\` set you pass, so the package declares no peer for it.
 
 \`\`\`bash
 pnpm add @rootnative/icons
@@ -3491,7 +3491,7 @@ function generateIconsLlms(): string {
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
 > Do not use @expo/vector-icons: Expo is retiring it, and its sets don't type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 
-Pre-built resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
+Built-in resolver factories that plug into the theme's \`iconResolver\`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
 \`\`\`bash
 pnpm add @rootnative/icons
@@ -3679,7 +3679,7 @@ cd my-app
 npx expo start
 \`\`\`
 
-The \`create\` command scaffolds a ready-to-run Expo project with \`ThemeProvider\`, example components (Box, Column, Typography, Card), and all dependencies pre-configured. Two templates: \`blank\` (the default) and \`with-router\`, which adds Expo Router.
+The \`create\` command creates a ready-to-run Expo project with \`ThemeProvider\`, example components (Box, Column, Typography, Card), and all dependencies pre-configured. Two templates: \`blank\` (the default) and \`with-router\`, which adds Expo Router.
 
 Interactive prompts: template, project name, display name (shown on home screen), package manager (npm/yarn/pnpm/bun), install dependencies.
 

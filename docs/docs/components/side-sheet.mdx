@@ -93,7 +93,7 @@ sheet.
 
 | Variant | Where it renders | Container | Dismissal |
 |---------|------------------|-----------|-----------|
-| `'modal'` (default) | Through `Portal`, over the content, from the end edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp corners on the inner edge | Close button, scrim press, Android back, and Escape on web |
+| `'modal'` (default) | Through `Portal`, over the content, from the end edge behind a 32% scrim | `surfaceContainerLow`, elevation level 1, 16dp corners on the inner edge | Close button, scrim press, Android back, and Escape on the web |
 | `'standard'` | In place, beside the main content, which stays interactive | `surface`, elevation level 0, no corners | Close button, when you pass `onDismiss` |
 
 A modal sheet needs `visible` and `onDismiss`. On a standard sheet, `onDismiss` is optional and
@@ -124,7 +124,7 @@ The header holds three optional parts, in this order:
 - **Back button.** `onBack` shows it and calls it on a press. Use it when the sheet shows a
   second level of content. The icon is `arrow-left`, and `arrow-right` in RTL. `backIcon`
   replaces it.
-- **Headline.** `headline` is a `titleLarge` text. On web it renders as `<h2>`. Set
+- **Headline.** `headline` is a `titleLarge` text. On the web it renders as `<h2>`. Set
   `headingLevel` to fit the outline of the page.
 - **Close button.** `onDismiss` shows it. On a modal sheet it calls `onDismiss` also when
   `dismissable` is `false`, because it is an explicit control. `closeIcon` replaces the
@@ -207,13 +207,13 @@ When you pass `testID`, the sheet surface carries it. A modal sheet's scrim carr
 ## Accessibility
 
 - A modal sheet is a `dialog` with `aria-modal`. A standard sheet is a `complementary` region,
-  which renders as `<aside>` on web.
+  which renders as `<aside>` on the web.
 - The headline names the sheet. Pass `accessibilityLabel` when the sheet has no headline, or to
   give it a different name.
 - The headline is a `heading`.
 - The back and close buttons are named "Back" and "Close". `backAccessibilityLabel` and
   `closeAccessibilityLabel` change the names. The scrim is named "Close side sheet".
-- On web, a modal sheet traps keyboard focus: focus moves into it when it opens, Tab cycles
+- On the web, a modal sheet traps keyboard focus: focus moves into it when it opens, Tab cycles
   inside it, Escape dismisses it when `dismissable`, and focus goes back to the trigger when it
   closes.
 - On Android, the hardware back button dismisses a `dismissable` modal sheet.

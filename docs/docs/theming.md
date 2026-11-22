@@ -142,7 +142,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 </ThemeProvider>
 ```
 
-On web, pass `localStorage` itself. `localStorage` throws in `getItem` or
+On the web, pass `localStorage` itself. `localStorage` throws in `getItem` or
 `setItem` when site data is blocked, or in some private windows. The provider
 catches that and keeps `defaultMode`. You need no wrapper. Guard the access
 only for a static export, where the server has no `window`:
