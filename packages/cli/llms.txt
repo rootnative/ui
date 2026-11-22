@@ -2,7 +2,7 @@
 
 > Version: 0.0.2
 > Binary: `rootnative`
-> Requirements: Node >=18
+> Requirements: Node ^22.13.0 || ^24.3.0 || >=26.0.0
 
 ## CLI (`rootnative`)
 

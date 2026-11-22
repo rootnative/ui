@@ -28,7 +28,7 @@ The theme system (`@rootnative/core`) stays an npm dependency, so a theme update
 
 ## Requirements
 
-- Node.js >= 18
+- Node.js `^22.13.0`, `^24.3.0` or `>=26.0.0`, the range that React Native 0.88 requires
 - Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band that the published packages declare
 - A TypeScript project (recommended)
 
