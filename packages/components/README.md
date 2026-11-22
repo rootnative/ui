@@ -37,9 +37,8 @@ peers at all, so add them by hand there.
 pnpm add react-native-reanimated react-native-worklets
 ```
 
-Each release line supports one Expo SDK band: SDK 58 takes `0.0.0-alpha.29`
-and later, SDK 57 takes `0.0.0-alpha.16` to `0.0.0-alpha.28`
-(`npm install @rootnative/components@0.0.0-alpha.28`).
+Each release line supports one Expo SDK band. The current line supports Expo
+SDK 58.
 
 > These two power the state-layer transitions and the gesture-driven components
 > (Slider, Switch). The static components (Typography, Layout, Portal,

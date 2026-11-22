@@ -39,13 +39,6 @@ React Native 0.86 to 0.88, and React 19.2.3 does not pair with React Native
 old worklets, and that pair can't install. So a second SDK needs a second
 release line, not a wider range.
 
-Each release line supports one Expo SDK band. Install the line that matches the SDK of the app.
-
-| Expo SDK | `@rootnative/core`, `components`, `utils`, `icons`, `seo` | `@rootnative/inertia` |
-| --- | --- | --- |
-| 58 | `0.0.0-alpha.29` and later | `0.0.20` and later |
-| 57 | `0.0.0-alpha.16` to `0.0.0-alpha.28` (`npm install @rootnative/components@0.0.0-alpha.28`) | `0.0.11` to `0.0.19` |
-
 The example app and the templates pin the same SDK 58 runtime.
 
 ## Install packages

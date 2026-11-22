@@ -170,8 +170,8 @@ export default function App() {
 ```
 
 > [!IMPORTANT]
-> Each release line supports one Expo SDK band. An app on SDK 57 needs
-> `0.0.0-alpha.28`. See [Expo SDK compatibility](#-expo-sdk-compatibility).
+> Each release line supports one Expo SDK band. The current line supports
+> Expo SDK 58. See [Expo SDK compatibility](#-expo-sdk-compatibility).
 
 > [!TIP]
 > Import from a subpath, such as `@rootnative/components/button`. Then the
@@ -216,13 +216,8 @@ the [motion guide](https://rootnative.github.io/ui/motion/).
 
 ## 📅 Expo SDK compatibility
 
-Each release line supports one Expo SDK band. Install the line that matches the
-SDK of the app.
-
-| Expo SDK | `@rootnative/core`, `components`, `icons`, `seo` | `@rootnative/inertia` |
-| --- | --- | --- |
-| 58 | `0.0.0-alpha.29` and later | `0.0.20` and later |
-| 57 | `0.0.0-alpha.16` to `0.0.0-alpha.28` (`npm install @rootnative/components@0.0.0-alpha.28`) | `0.0.11` to `0.0.19` |
+Each release line supports one Expo SDK band. The current line supports Expo
+SDK 58. A later SDK gets a release line of its own.
 
 ## 🤖 Docs for AI agents
 
