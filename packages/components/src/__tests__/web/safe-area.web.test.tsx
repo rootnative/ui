@@ -76,6 +76,24 @@ describe('SafeAreaView on web', () => {
     expect(getComputedStyle(node).paddingBottom).toBe('34px')
   })
 
+  it('PortalHost adds no provider on web, also with initial metrics', () => {
+    const safeAreaContext = jest.requireMock<{ initialWindowMetrics: unknown }>(
+      'react-native-safe-area-context',
+    )
+    const replaced = jest.replaceProperty(
+      safeAreaContext,
+      'initialWindowMetrics',
+      { insets, frame: { x: 0, y: 0, width: 402, height: 874 } },
+    )
+    renderWeb(
+      <PortalHost>
+        <SafeAreaView testID="area" edges={['top']} style={{ paddingTop: 8 }} />
+      </PortalHost>,
+    )
+    replaced.restore()
+    expect(getComputedStyle(screen.getByTestId('area')).paddingTop).toBe('8px')
+  })
+
   it('the documented root mounts without a provider', () => {
     renderWeb(
       <PortalHost>

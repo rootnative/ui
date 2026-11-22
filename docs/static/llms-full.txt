@@ -64,13 +64,17 @@ export default function App() {
 }
 ```
 
-That is the whole stack — three providers, and **no `SafeAreaProvider`**.
-`react-native-safe-area-context` is a required peer dep, but the components that
-apply insets (`Layout`, `AppBar`, `NavigationBar`, `BottomSheet`, `Snackbar`)
-work without one. Inside a provider they read the insets from its context. On
-native without a provider they use the package's native `SafeAreaView`, which
-measures its own insets. On the web without a provider they apply zero insets,
-because a browser has no insets to measure there. Add a `SafeAreaProvider` on
+That is the whole stack — three providers, and **no `SafeAreaProvider` of your
+own**. `react-native-safe-area-context` is a required peer dep. On iOS and
+Android, `PortalHost` adds a `SafeAreaProvider` when the app has none (Expo
+Router adds one already). So the components that apply insets (`Layout`,
+`AppBar`, `NavigationBar`, `BottomSheet`, `Snackbar`) read the insets from its
+context, and in RTL each side inset lands on its own side. A component outside
+`PortalHost` and outside any provider falls back to the package's native
+`SafeAreaView`, and in RTL that puts the side insets on the wrong side, so it
+warns once in development. On the web, `PortalHost` adds no provider: without
+one the components apply zero insets, because a browser has no insets to
+measure there. Add a `SafeAreaProvider` on
 web when the page needs the `env(safe-area-inset-*)` values of a notched
 device, or when your own code calls `useSafeAreaInsets`.
 

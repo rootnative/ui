@@ -11,12 +11,14 @@
     "packages/components/src/portal/styles.ts",
     "packages/components/src/portal/types.ts",
     "packages/components/src/internal/pointerEvents.ts",
-    "packages/components/src/internal/warnOnce.ts"
+    "packages/components/src/internal/warnOnce.ts",
+    "packages/components/src/safe-area.tsx"
   ],
   "utils": [],
   "componentDependencies": [],
   "dependencies": {
-    "@rootnative/core": ">=0.0.2 <0.1.0"
+    "@rootnative/core": ">=0.0.2 <0.1.0",
+    "react-native-safe-area-context": ">=4.0.0"
   },
   "optionalDependencies": {}
 }

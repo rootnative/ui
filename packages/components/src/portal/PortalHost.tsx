@@ -9,6 +9,7 @@ import type { StyleProp, ViewProps, ViewStyle } from 'react-native'
 import { View } from 'react-native'
 import { pointerEvents } from '../internal/pointerEvents'
 import { warnOnce } from '../internal/warnOnce'
+import { SafeAreaRoot } from '../safe-area'
 import { PortalContext } from './context'
 import { DEFAULT_PORTAL_HOST } from './layers'
 import { PortalStore } from './store'
@@ -69,12 +70,14 @@ function RootPortalHost({ children, name, style, ...rest }: PortalHostProps) {
   }
 
   return (
-    <PortalContext.Provider value={store}>
-      <View {...rest} style={[styles.root, style]} collapsable={false}>
-        {children}
-        <PortalOutlet store={store} hostName={DEFAULT_PORTAL_HOST} />
-      </View>
-    </PortalContext.Provider>
+    <SafeAreaRoot>
+      <PortalContext.Provider value={store}>
+        <View {...rest} style={[styles.root, style]} collapsable={false}>
+          {children}
+          <PortalOutlet store={store} hostName={DEFAULT_PORTAL_HOST} />
+        </View>
+      </PortalContext.Provider>
+    </SafeAreaRoot>
   )
 }
 

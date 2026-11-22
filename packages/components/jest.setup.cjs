@@ -48,5 +48,8 @@ jest.mock('react-native-safe-area-context', () => {
       React.createElement('View', props, children),
     useSafeAreaInsets: () => React.useContext(SafeAreaInsetsContext) ?? ZERO,
     useSafeAreaFrame: () => ({ x: 0, y: 0, width: 320, height: 640 }),
+    // `null` keeps `PortalHost` from adding a provider, so the tests keep the
+    // native fallback. A test replaces it to cover the root provider.
+    initialWindowMetrics: null,
   }
 })

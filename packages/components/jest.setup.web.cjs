@@ -78,6 +78,8 @@ jest.mock('react-native-safe-area-context', () => {
     },
     useSafeAreaInsets,
     useSafeAreaFrame: () => ({ x: 0, y: 0, width: 320, height: 640 }),
+    // A test replaces it to prove that `PortalHost` adds no provider on web.
+    initialWindowMetrics: null,
   }
 })
 

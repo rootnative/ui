@@ -5,7 +5,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AppBar } from '../appbar/AppBar'
 import { Layout } from '../layout/Layout'
 import { NavigationBar } from '../navigation-bar/NavigationBar'
-import { SafeAreaView, physicalLeftStyle } from '../safe-area'
+import { PortalHost } from '../portal'
+import {
+  SafeAreaView,
+  __resetSafeAreaWarningForTests,
+  physicalLeftStyle,
+} from '../safe-area'
 import { childrenOf, rootOf } from '../test-support/rendered-node'
 
 const insets = { top: 47, right: 0, bottom: 34, left: 0 }
@@ -47,6 +52,34 @@ const NAV_ITEMS = [
 
 function flatStyle(testID: string) {
   return StyleSheet.flatten(screen.getByTestId(testID).props.style)
+}
+
+const original = {
+  isRTL: I18nManager.isRTL,
+  doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
+}
+
+function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
+  Object.defineProperty(I18nManager, 'isRTL', {
+    value: isRTL,
+    configurable: true,
+  })
+  Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+    value: doLeftAndRightSwapInRTL,
+    configurable: true,
+  })
+}
+
+// The mocked module object itself: `safe-area.tsx` reads its export at render
+// time, so a replaced property reaches the component.
+const safeAreaContext = jest.requireMock<{ initialWindowMetrics: unknown }>(
+  'react-native-safe-area-context',
+)
+
+// A one-sided cutout in landscape, as on an Android 15+ phone.
+const rootMetrics = {
+  insets: { top: 24, right: 0, bottom: 0, left: 48 },
+  frame: { x: 0, y: 0, width: 923, height: 411 },
 }
 
 describe('SafeAreaView', () => {
@@ -274,21 +307,6 @@ describe('SafeAreaView', () => {
   // left edge must go into `paddingRight` and `marginRight`.
   describe('in RTL with a cutout on one side', () => {
     const cutoutInsets = { top: 0, right: 0, bottom: 24, left: 54 }
-    const original = {
-      isRTL: I18nManager.isRTL,
-      doLeftAndRightSwapInRTL: I18nManager.doLeftAndRightSwapInRTL,
-    }
-
-    function setDirection(isRTL: boolean, doLeftAndRightSwapInRTL: boolean) {
-      Object.defineProperty(I18nManager, 'isRTL', {
-        value: isRTL,
-        configurable: true,
-      })
-      Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
-        value: doLeftAndRightSwapInRTL,
-        configurable: true,
-      })
-    }
 
     function withCutout(ui: React.ReactElement) {
       return (
@@ -385,5 +403,102 @@ describe('SafeAreaView', () => {
         marginRight: 0,
       })
     })
+  })
+})
+
+describe('the root PortalHost', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+    setDirection(original.isRTL, original.doLeftAndRightSwapInRTL)
+  })
+
+  it('adds a provider on native when the app has none', () => {
+    jest.replaceProperty(safeAreaContext, 'initialWindowMetrics', rootMetrics)
+    renderWithTheme(
+      <PortalHost>
+        <SafeAreaView testID="area" edges={['top', 'left']} />
+      </PortalHost>,
+    )
+    expect(screen.getByTestId('area').props.edges).toBeUndefined()
+    expect(flatStyle('area')).toMatchObject({ paddingTop: 24, paddingLeft: 48 })
+  })
+
+  it('keeps the provider that the app has', () => {
+    jest.replaceProperty(safeAreaContext, 'initialWindowMetrics', rootMetrics)
+    renderWithTheme(
+      withProvider(
+        <PortalHost>
+          <SafeAreaView testID="area" edges={['top']} />
+        </PortalHost>,
+      ),
+    )
+    expect(flatStyle('area')).toMatchObject({ paddingTop: 47 })
+  })
+
+  it('adds no provider when the window has no initial metrics', () => {
+    renderWithTheme(
+      <PortalHost>
+        <SafeAreaView testID="area" edges={['top']} />
+      </PortalHost>,
+    )
+    expect(screen.getByTestId('area').props.edges).toEqual(['top'])
+  })
+
+  it('puts the inset of a one-sided cutout on its side in RTL', () => {
+    setDirection(true, true)
+    jest.replaceProperty(safeAreaContext, 'initialWindowMetrics', rootMetrics)
+    renderWithTheme(
+      <PortalHost>
+        <Layout testID="layout" edges={['left', 'right', 'bottom']}>
+          {null}
+        </Layout>
+      </PortalHost>,
+    )
+    expect(flatStyle('layout')).toMatchObject({
+      paddingLeft: 0,
+      paddingRight: 48,
+    })
+  })
+})
+
+describe('a SafeAreaView with no provider', () => {
+  function warnings(spy: jest.SpyInstance) {
+    return spy.mock.calls.filter((call) =>
+      String(call[0]).includes('has no SafeAreaProvider'),
+    )
+  }
+
+  beforeEach(() => __resetSafeAreaWarningForTests())
+  afterEach(() => {
+    jest.restoreAllMocks()
+    setDirection(original.isRTL, original.doLeftAndRightSwapInRTL)
+  })
+
+  it('warns once in native RTL when it pads a side', () => {
+    setDirection(true, true)
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    renderWithTheme(
+      <>
+        <SafeAreaView edges={['left']} />
+        <SafeAreaView />
+      </>,
+    )
+    expect(warnings(spy)).toHaveLength(1)
+  })
+
+  it('stays quiet when it pads only the top and the bottom', () => {
+    setDirection(true, true)
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    renderWithTheme(<SafeAreaView edges={['top', 'bottom']} />)
+    expect(warnings(spy)).toHaveLength(0)
+  })
+
+  it('stays quiet in LTR and when the app turns the swap off', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    setDirection(false, true)
+    renderWithTheme(<SafeAreaView edges={['left']} />)
+    setDirection(true, false)
+    renderWithTheme(<SafeAreaView edges={['left']} />)
+    expect(warnings(spy)).toHaveLength(0)
   })
 })

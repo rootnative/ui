@@ -1,12 +1,16 @@
 import { useContext, useMemo } from 'react'
-import type { ComponentProps, ComponentType } from 'react'
+import type { ComponentProps, ComponentType, ReactNode } from 'react'
 import { I18nManager, Platform, StyleSheet, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import {
   SafeAreaInsetsContext,
+  SafeAreaProvider,
   SafeAreaView as SafeAreaViewImpl,
+  initialWindowMetrics,
 } from 'react-native-safe-area-context'
 import type { EdgeInsets } from 'react-native-safe-area-context'
+
+declare const __DEV__: boolean
 
 type Edge = 'top' | 'right' | 'bottom' | 'left'
 
@@ -101,6 +105,56 @@ function insetPaddingStyle(
   }
 }
 
+let warnedSidesWithoutProvider = false
+
+/** @internal — test-only hook to reset the warning below. */
+export function __resetSafeAreaWarningForTests(): void {
+  warnedSidesWithoutProvider = false
+}
+
+// The native `SafeAreaView` takes the padding of each side from the inset of
+// that side, and Fabric then moves a left padding to the right in RTL while
+// `doLeftAndRightSwapInRTL` is on. So outside a provider, the inset of a
+// cutout on one side pads the other side, whatever `edges` says. `PortalHost`
+// adds a provider at the app root (see `SafeAreaRoot`). This warns when a
+// `SafeAreaView` is outside it anyway. The guard mirrors `internal/warnOnce`:
+// this file is copied without `internal/` into each consuming component.
+function warnIfSidesLandWrong(edges: Edge[]) {
+  if (!__DEV__ || warnedSidesWithoutProvider) return
+  if (sideEdgesOfStyleKeys()[0] === 'left') return
+  if (!edges.includes('left') && !edges.includes('right')) return
+  warnedSidesWithoutProvider = true
+  console.error(
+    '[@rootnative/components] A SafeAreaView has no SafeAreaProvider above ' +
+      'it. In RTL, React Native puts its side insets on the wrong side. ' +
+      'Mount <PortalHost> at the app root, or wrap the app in a ' +
+      'SafeAreaProvider.',
+  )
+}
+
+/**
+ * Gives the app a `SafeAreaProvider` on iOS and Android when it has none, so
+ * that every `SafeAreaView` pads from context and puts each side inset on the
+ * correct side in RTL. `PortalHost` renders it at the app root. Expo Router
+ * adds a provider of its own, and then this adds nothing.
+ *
+ * Two cases keep the native fallback: the web, where the provider renders
+ * nothing until it measures, so a server-rendered page would be empty; and a
+ * native app with no initial metrics, where the provider would render nothing
+ * for one frame.
+ */
+export function SafeAreaRoot({ children }: { children?: ReactNode }) {
+  const insets = useContext(SafeAreaInsetsContext)
+  if (insets || Platform.OS === 'web' || !initialWindowMetrics) {
+    return <>{children}</>
+  }
+  return (
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      {children}
+    </SafeAreaProvider>
+  )
+}
+
 // Inside a `SafeAreaProvider`, the insets come from context and are correct on
 // the first render. The native `SafeAreaView` measures itself instead, and on
 // a `transparentModal` route from react-native-screens that measurement is 0
@@ -127,6 +181,7 @@ function SafeAreaView({ edges, style, ...rest }: SafeAreaViewProps) {
     if (Platform.OS === 'web') {
       return <View {...rest} style={style} />
     }
+    warnIfSidesLandWrong(edges ?? ALL_EDGES)
     return <NativeSafeAreaView edges={edges} style={style} {...rest} />
   }
 

@@ -11,6 +11,8 @@ Portal renders content into a shared overlay layer that sits above the rest of t
 
 Wrap your app root in `PortalHost` once. Every `<Portal>` anywhere in the tree below mounts into the overlay layer of this host.
 
+On iOS and Android, the root `PortalHost` also adds a `SafeAreaProvider` when the app has none, so the components that apply insets read them from its context. With a provider of your own, as below or from Expo Router, it adds nothing. On the web it adds none.
+
 Put the host outside `Layout`, not inside it. Each overlay pads its own safe-area insets, so a host inside the `Layout` padding gets them twice: the snackbar sits one inset too high, and a modal drawer one inset too far in.
 
 <SnackExample
