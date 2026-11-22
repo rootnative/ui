@@ -10,6 +10,7 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { selectRTL } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { catalogMetadata } from '../src/metadata'
@@ -280,7 +281,7 @@ function MenuScreenContent() {
                   <Menu.Item
                     label="Open recent"
                     leadingIcon="history"
-                    trailingIcon="chevron-right"
+                    trailingIcon={selectRTL('chevron-right', 'chevron-left')}
                   />
                   <Divider />
                   <Menu.Item

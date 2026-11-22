@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@rootnative/components'
 import { useTheme } from '@rootnative/core'
+import { selectRTL } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { catalogMetadata } from '../src/metadata'
@@ -237,7 +238,7 @@ export default function SideSheetScreen() {
             <Row>
               <Button
                 variant="tonal"
-                trailingIcon="chevron-right"
+                trailingIcon={selectRTL('chevron-right', 'chevron-left')}
                 onPress={() => setLevel('sort')}
               >
                 Sort order

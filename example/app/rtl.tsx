@@ -98,10 +98,10 @@ export default function RTLScreen() {
 
         <SectionTitle>Row — leading / trailing icons</SectionTitle>
         <Column gap="sm">
-          <Button variant="filled" trailingIcon="arrow-right">
+          <Button variant="filled" leadingIcon="arrow-right">
             Leading icon
           </Button>
-          <Button variant="outlined" leadingIcon="arrow-left">
+          <Button variant="outlined" trailingIcon="arrow-left">
             Trailing icon
           </Button>
         </Column>
