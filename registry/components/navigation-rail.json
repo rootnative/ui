@@ -12,7 +12,7 @@
   "utils": [],
   "componentDependencies": ["navigation-bar"],
   "dependencies": {
-    "@rootnative/core": ">=0.0.2 <0.1.0"
+    "@rootnative/core": ">=0.0.3 <0.1.0"
   },
   "optionalDependencies": {}
 }
