@@ -207,9 +207,10 @@ export interface ItemCornerRadii {
  */
 /**
  * The radii of an item, mirrored left for right. The connected corners are
- * physical keys. React Native swaps them in an RTL layout on native, and
- * react-native-web never does, so under an RTL document on the web the first
- * item, which sits at the right, needs the corners of the last.
+ * physical keys. React Native swaps them in an RTL layout on native, and so
+ * does a web runtime that swaps `left` and `right`. react-native-web never
+ * does, so under an RTL document there the first item, which sits at the
+ * right, needs the corners of the last.
  */
 export function mirrorItemCornerRadii(radii: ItemCornerRadii): ItemCornerRadii {
   return {

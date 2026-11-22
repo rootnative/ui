@@ -83,7 +83,40 @@ export function isRTLDirection(): boolean {
 }
 
 /**
- * The logical style keys that a style cannot carry on web under
+ * Whether the platform applies `left` to the right side, and `right` to the
+ * left side. React Native does that in an RTL layout while
+ * `I18nManager.doLeftAndRightSwapInRTL` is on (the default).
+ *
+ * On the web it depends on the runtime. react-native-web never swaps, and its
+ * `I18nManager` has no `doLeftAndRightSwapInRTL`. A web runtime that has the
+ * flag swaps as native does, under an RTL document.
+ *
+ * A view placed with `left` mirrors with the layout where this is true. A
+ * value that is physical does not: a `translateX`, a coordinate inside an SVG,
+ * or a position measured with `measureInWindow`. Use this to mirror such a
+ * value where the platform mirrors the rest.
+ */
+export function swapsLeftAndRight(): boolean {
+  if (Platform.OS !== 'web') {
+    return I18nManager.isRTL && I18nManager.doLeftAndRightSwapInRTL
+  }
+  // `=== true`, because the key is `undefined` on react-native-web.
+  return I18nManager.doLeftAndRightSwapInRTL === true && isRTL()
+}
+
+/**
+ * Whether the layout is RTL on the web while `left` and `right` stay on their
+ * physical sides, as on react-native-web. Only then does a component mirror a
+ * physical side by hand. Native, and a web runtime that swaps (see
+ * `swapsLeftAndRight`), mirror the side for it, so a second mirror by hand
+ * moves the side back.
+ */
+export function webKeepsPhysicalSides(): boolean {
+  return Platform.OS === 'web' && isRTL() && !swapsLeftAndRight()
+}
+
+/**
+ * The logical style keys that a style cannot carry on react-native-web under
  * `<html dir="rtl">`.
  */
 export type LogicalStyleKey =
@@ -125,13 +158,15 @@ const RTL_PHYSICAL_KEYS: Record<LogicalStyleKey, PhysicalStyleKey> = {
  *
  * So on web under an RTL document this returns the physical key. In each other
  * case it returns the logical key itself: native resolves it, and on web in
- * LTR react-native-web puts it on the correct side. The logical key keeps the
- * precedence of a later style that sets the same key. react-native-web merges
- * styles by key name, so a consumer `paddingStart` replaces a `paddingStart`
- * of the library, but not a `paddingLeft`.
+ * LTR react-native-web puts it on the correct side. A web runtime that swaps
+ * `left` and `right` follows native here too, and resolves the key from the
+ * layout direction. The logical key keeps the precedence of a later style
+ * that sets the same key. react-native-web merges styles by key name, so a
+ * consumer `paddingStart` replaces a `paddingStart` of the library, but not a
+ * `paddingLeft`.
  */
 export function resolveLogicalKey(key: LogicalStyleKey): string {
-  if (Platform.OS !== 'web' || !isRTL()) return key
+  if (!webKeepsPhysicalSides()) return key
   return RTL_PHYSICAL_KEYS[key]
 }
 

@@ -16,7 +16,7 @@
     "packages/components/src/internal/warnOnce.ts",
     "packages/components/src/safe-area.tsx"
   ],
-  "utils": ["color", "elevation", "render-icon"],
+  "utils": ["color", "elevation", "render-icon", "rtl"],
   "componentDependencies": ["badge", "layout"],
   "dependencies": {
     "@rootnative/core": ">=0.0.3 <0.1.0",

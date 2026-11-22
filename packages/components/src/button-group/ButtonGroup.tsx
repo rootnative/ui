@@ -8,10 +8,10 @@ import {
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
 import {
-  isRTLDirection,
   renderIcon,
   resolveColorFromStyle,
   resolveLogicalKey,
+  webKeepsPhysicalSides,
 } from '@rootnative/utils'
 import { useCallback, useMemo, useState, type ReactElement } from 'react'
 import {
@@ -268,7 +268,7 @@ function ButtonGroupItemImpl({
 
   // Read on each render, not in a memo, so the corners follow a runtime change
   // of the document `dir`. See `mirrorItemCornerRadii`.
-  const mirrorsOnWeb = Platform.OS === 'web' && isRTLDirection()
+  const mirrorsOnWeb = webKeepsPhysicalSides()
   const unselectedRadii = useMemo(() => {
     const radii = getItemCornerRadii(theme, variant, size, index, total, false)
     return mirrorsOnWeb ? mirrorItemCornerRadii(radii) : radii

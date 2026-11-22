@@ -9,12 +9,11 @@ import {
   useAnimatedProps,
   useAnimatedStyle,
 } from '@rootnative/inertia/reanimated'
-import { isRTLDirection } from '@rootnative/utils'
+import { swapsLeftAndRight, webKeepsPhysicalSides } from '@rootnative/utils'
 import { useMemo, useState } from 'react'
 import type { LayoutChangeEvent, ViewStyle } from 'react-native'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PROGRESS_LINEAR_INDETERMINATE_WAVELENGTH,
@@ -103,10 +102,11 @@ export function LinearProgress({
   const segmentWidth = Math.max(width * INDETERMINATE_SEGMENT_RATIO, 0)
 
   // In native RTL, React Native applies `left` to the right side, so the
-  // views mirror. react-native-web keeps `left` physical, so on the web in
-  // RTL each `left` below is mirrored here. A `translateX` and an SVG path are
-  // physical on both: the slide changes its sign, and each wave flips.
-  const mirrorsLeftOnWeb = Platform.OS === 'web' && isRTLDirection()
+  // views mirror. A web runtime that swaps does the same. react-native-web
+  // keeps `left` physical, so there each `left` below is mirrored here in RTL.
+  // A `translateX` and an SVG path are physical on all of them: the slide
+  // changes its sign, and each wave flips.
+  const mirrorsLeftOnWeb = webKeepsPhysicalSides()
   const mirrored = swapsLeftAndRight() || mirrorsLeftOnWeb
   const slideSign = mirrored ? -1 : 1
   const waveMirror = mirrored ? MIRRORED : undefined

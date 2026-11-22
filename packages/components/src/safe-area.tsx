@@ -1,6 +1,7 @@
+import { swapsLeftAndRight } from '@rootnative/utils'
 import { useContext, useMemo } from 'react'
 import type { ComponentProps, ComponentType, ReactNode } from 'react'
-import { I18nManager, Platform, StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import {
   SafeAreaInsetsContext,
@@ -51,15 +52,11 @@ const SWAPPED_SIDES: readonly [SideEdge, SideEdge] = ['right', 'left']
  * applies `paddingLeft` and `marginLeft` to the start edge, which is the
  * right side, while `I18nManager.doLeftAndRightSwapInRTL` is on (the default
  * on iOS and Android). With a cutout on one side only, as on Android, an
- * unswapped inset pads the side without the cutout. react-native-web never
- * swaps.
+ * unswapped inset pads the side without the cutout. On the web it depends on
+ * the runtime: see `swapsLeftAndRight`.
  */
 export function sideEdgesOfStyleKeys(): readonly [SideEdge, SideEdge] {
-  const swaps =
-    Platform.OS !== 'web' &&
-    I18nManager.isRTL &&
-    I18nManager.doLeftAndRightSwapInRTL
-  return swaps ? SWAPPED_SIDES : UNSWAPPED_SIDES
+  return swapsLeftAndRight() ? SWAPPED_SIDES : UNSWAPPED_SIDES
 }
 
 /**

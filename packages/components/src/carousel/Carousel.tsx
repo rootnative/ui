@@ -12,7 +12,7 @@ import {
   useAnimatedStyle,
   useDerivedValue,
 } from '@rootnative/inertia/reanimated'
-import { isRTLDirection } from '@rootnative/utils'
+import { isRTLDirection, webKeepsPhysicalSides } from '@rootnative/utils'
 import {
   useCallback,
   useEffect,
@@ -465,8 +465,9 @@ function WebSnapMarkers({
   vertical: boolean
 }) {
   // react-native-web writes an inline `start` as `left` whatever the document
-  // direction is, so the markers take the physical side.
-  const startSide = isRTLDirection() ? 'right' : 'left'
+  // direction is, so the markers take a physical side. A web runtime that
+  // swaps puts `left` at the start in RTL itself.
+  const startSide = webKeepsPhysicalSides() ? 'right' : 'left'
   const endSide = startSide === 'left' ? 'right' : 'left'
   const at = (offset: number): ViewStyle =>
     vertical ? { top: offset } : { [startSide]: offset }

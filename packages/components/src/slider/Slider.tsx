@@ -1,6 +1,11 @@
 import { useIconResolver } from '@rootnative/core'
 import { useAnimator, useMotionValue } from '@rootnative/inertia'
-import { isFocusVisible, isRTLDirection, renderIcon } from '@rootnative/utils'
+import {
+  isFocusVisible,
+  isRTLDirection,
+  renderIcon,
+  webKeepsPhysicalSides,
+} from '@rootnative/utils'
 import {
   Fragment,
   useCallback,
@@ -17,7 +22,7 @@ import type {
   PressableProps,
   TargetedEvent,
 } from 'react-native'
-import { PanResponder, Platform, Pressable, View } from 'react-native'
+import { PanResponder, Pressable, View } from 'react-native'
 // Sanctioned escape hatch: the slider's focus/label progress is routed
 // imperatively between two thumbs from one Pressable (`keyboardThumb`), a
 // shape inertia's gesture hooks don't express. `useAnimator` drives the raw
@@ -182,11 +187,13 @@ export function Slider({
   // Slots position with `left`. React Native swaps `left` to `start` in RTL
   // (`I18nManager.doLeftAndRightSwapInRTL`), so on native the platform
   // mirrors the rendered position and mirroring it here as well put the fill
-  // back on the left. react-native-web never swaps, so the web keeps the
-  // manual mirror. The segments follow the same rule: `computeSegments` puts
-  // the active side after the thumb only where this file mirrors. Gesture
-  // coordinates are physical on both, so `positionToValue` always mirrors.
-  const mirrorRenderedPosition = isRTL && Platform.OS === 'web'
+  // back on the left. A web runtime that swaps does the same. Only
+  // react-native-web keeps `left` physical, so only there does this file
+  // mirror. The segments follow the same rule: `computeSegments` puts the
+  // active side after the thumb only where this file mirrors. Gesture
+  // coordinates are physical on all of them, so `positionToValue` always
+  // mirrors.
+  const mirrorRenderedPosition = webKeepsPhysicalSides()
   const valueToPosition = useCallback(
     (v: number) => {
       const ratio = (v - minimumValue) / range

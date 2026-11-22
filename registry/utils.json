@@ -33,7 +33,9 @@
       "selectRTL",
       "isRTLDirection",
       "resolveLogicalKey",
-      "resolveLogical"
+      "resolveLogical",
+      "swapsLeftAndRight",
+      "webKeepsPhysicalSides"
     ],
     "dependencies": {},
     "typeExports": ["LogicalStyleKey"]

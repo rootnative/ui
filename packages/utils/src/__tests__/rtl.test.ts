@@ -3,7 +3,9 @@ import {
   resolveLogical,
   resolveLogicalKey,
   selectRTL,
+  swapsLeftAndRight,
   transformOrigin,
+  webKeepsPhysicalSides,
 } from '../rtl'
 
 function withRTL(isRTL: boolean, fn: () => void) {
@@ -91,6 +93,50 @@ describe('resolveLogical on native', () => {
     withRTL(true, () => {
       expect(resolveLogicalKey('end')).toBe('end')
       expect(resolveLogical('paddingEnd', 8)).toEqual({ paddingEnd: 8 })
+    })
+  })
+})
+
+describe('swapsLeftAndRight on native', () => {
+  function withSwapFlag(swap: boolean, fn: () => void) {
+    const original = I18nManager.doLeftAndRightSwapInRTL
+    Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+      configurable: true,
+      value: swap,
+    })
+    try {
+      fn()
+    } finally {
+      Object.defineProperty(I18nManager, 'doLeftAndRightSwapInRTL', {
+        configurable: true,
+        value: original,
+      })
+    }
+  }
+
+  it('swaps in RTL while the flag is on', () => {
+    withSwapFlag(true, () => {
+      withRTL(true, () => expect(swapsLeftAndRight()).toBe(true))
+    })
+  })
+
+  it('does not swap in RTL while the flag is off', () => {
+    withSwapFlag(false, () => {
+      withRTL(true, () => expect(swapsLeftAndRight()).toBe(false))
+    })
+  })
+
+  it('does not swap in LTR', () => {
+    withSwapFlag(true, () => {
+      withRTL(false, () => expect(swapsLeftAndRight()).toBe(false))
+    })
+  })
+
+  // The web half is in
+  // `packages/components/src/__tests__/web/rtl-swap.web.test.tsx`.
+  it('never asks for a mirror by hand', () => {
+    withSwapFlag(false, () => {
+      withRTL(true, () => expect(webKeepsPhysicalSides()).toBe(false))
     })
   })
 })

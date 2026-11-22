@@ -107,6 +107,8 @@ const UTIL_EXPORTS: Record<string, string[]> = {
     'isRTLDirection',
     'resolveLogicalKey',
     'resolveLogical',
+    'swapsLeftAndRight',
+    'webKeepsPhysicalSides',
   ],
 }
 

@@ -5,7 +5,7 @@ import {
 } from '@rootnative/inertia'
 import type { SharedValue } from '@rootnative/inertia'
 import { Animated, useAnimatedStyle } from '@rootnative/inertia/reanimated'
-import { isRTLDirection } from '@rootnative/utils'
+import { isRTLDirection, swapsLeftAndRight } from '@rootnative/utils'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   LayoutChangeEvent,
@@ -16,7 +16,6 @@ import type {
 import { Platform, ScrollView, View } from 'react-native'
 import { Divider } from '../divider'
 import { pointerEvents } from '../internal/pointerEvents'
-import { swapsLeftAndRight } from '../internal/swapsLeftAndRight'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import {
   PRIMARY_INDICATOR_MIN_WIDTH,
@@ -293,9 +292,10 @@ export function Tabs({
 
 /**
  * The style that puts an absolute view at the physical left edge of its
- * parent. In native RTL, React Native applies `left` to the right side, so
- * the left edge is `right: 0` there. A plain `left: 0` put the indicator at
- * the right edge, and its offset then moved it out of the row.
+ * parent. Where the platform applies `left` to the right side (native RTL, or
+ * a web runtime that swaps), the left edge is `right: 0`. A plain `left: 0`
+ * put the indicator at the right edge, and its offset then moved it out of
+ * the row.
  */
 function physicalLeftEdge(): ViewStyle {
   return swapsLeftAndRight() ? { right: 0 } : { left: 0 }

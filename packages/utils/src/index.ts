@@ -12,5 +12,7 @@ export {
   isRTLDirection,
   resolveLogical,
   resolveLogicalKey,
+  swapsLeftAndRight,
+  webKeepsPhysicalSides,
 } from './rtl'
 export type { LogicalStyleKey } from './rtl'
