@@ -82,8 +82,8 @@ export function LoadingIndicator({
   // Indeterminate: `morphStep` steps 0,1,2,… every MORPH_INTERVAL_MS (JS
   // state) and a spring chases it, easing the polygon from shape to shape.
   // Determinate: the position is progress * (shapeCount - 1), driven
-  // directly. `useAnimation` rather than `useSpring` so the morph collapses
-  // to a hard cut under reduced motion, like the spin below.
+  // directly. Under reduced motion, `useAnimation` collapses the morph to a
+  // hard cut, like the spin below.
   const [morphStep, setMorphStep] = useState(0)
   const determinateValue = indeterminate
     ? 0

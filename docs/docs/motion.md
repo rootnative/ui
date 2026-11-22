@@ -185,14 +185,16 @@ import { useAnimation } from '@rootnative/inertia'
 const progress = useAnimation(open ? 1 : 0, 'spring-default-spatial')
 ```
 
-**Use the hooks that gate on reduced motion.** inertia applies the gate inside `useAnimation`, `useAnimator`, `useGesture`, `useGestureLayer`, and the `Motion.*` primitives. On purpose, it does *not* gate `useSpring` / `useBooleanSpring`. Those are the raw mechanism, and a collapse there would strand a value in the middle of a drag at their gesture-smoothing call sites. So:
+**The animation hooks gate on reduced motion.** inertia applies the gate inside `useAnimation`, `useAnimator`, `useSpring`, `useBooleanSpring`, `useGesture`, `useGestureLayer`, and the `Motion.*` primitives. Under reduced motion, the value goes to its target at once.
+
+**Use `useAnimation` for a theme transition name.** It follows the type that the theme gives the name. `useSpring` and `useBooleanSpring` take spring names only. If an app maps the name to a timing transition, they warn in development and use the default spring:
 
 ```tsx
-// Gated — snaps under reduced motion.
+// Follows the type of the name, also after an app maps it to timing.
 const progress = useAnimation(selected ? 1 : 0, 'spring-fast-spatial')
 
-// NOT gated — animates even when the user asked for no motion.
-const progress = useBooleanSpring(selected)
+// Spring names only. A timing name falls back to the default spring.
+const progress = useBooleanSpring(selected, 'spring-fast-spatial')
 ```
 
 The pure interpolators (`useInterpolatedStyle`, `useColorTransition`, `useTransform`, `useShadow`) need no gate of their own. They inherit it from the progress value that drives them.
