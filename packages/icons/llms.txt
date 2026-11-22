@@ -3,7 +3,7 @@
 > Version: 0.0.2
 > Peer deps: @rootnative/core >=0.0.2 <0.1.0, react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0
 > Optional peer deps: lucide-react-native, phosphor-react-native; createVectorIconsResolver takes any @react-native-vector-icons/* set you install
-> Do not use @expo/vector-icons: Expo is retiring it, and its sets do not type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
+> Do not use @expo/vector-icons: Expo is retiring it, and its sets don't type-check as an IconSet. Use the @react-native-vector-icons/* package of the same icon family
 
 Pre-built resolver factories that plug into the theme's `iconResolver`. Install only the icon library you actually use — each is declared as an optional peer dep.
 
@@ -16,10 +16,10 @@ pnpm add @rootnative/icons
 Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/core'`) — one of three forms:
 
 1. **String name** — resolved through the theme's `iconResolver`. Pass `mdiResolver` from `@rootnative/components/mdi` for `MaterialDesignIcons` (browse names at https://pictogrammers.com/library/mdi/), or another resolver. Without a resolver a string name renders nothing and logs one warning.
-2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
+2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component doesn't override size/color.
 3. **Render function** — `(props: { size: number; color?: string }) => ReactNode`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. Only `@rootnative/components/mdi` imports `@react-native-vector-icons/material-design-icons`; the root entry and every other subpath do not. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
+Per-call elements/functions always take precedence over the resolver. Only `@rootnative/components/mdi` imports `@react-native-vector-icons/material-design-icons`; the root entry and every other subpath don't. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
 
 ### When to pick which
 

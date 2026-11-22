@@ -66,7 +66,7 @@ Creates `rootnative.json`:
 }
 ```
 
-`init` pins `registryVersion` to the `v<version>` git tag of the latest published release, so a project keeps fetching the same component sources until you run `rootnative upgrade` (which moves the pin forward). It falls back to `main` only when npm is unreachable or the tag has not been pushed yet.
+`init` pins `registryVersion` to the `v<version>` git tag of the latest published release, so a project keeps fetching the same component sources until you run `rootnative upgrade` (which moves the pin forward). It falls back to `main` only when npm is unreachable or when nobody pushed the tag yet.
 
 #### `rootnative add <components...>`
 
@@ -111,7 +111,7 @@ What it does:
 3. Compares peer dependencies between the installed and latest versions
 4. Shows a plan: version bump, new required peer deps, changed version ranges, removed deps
 5. Upgrades `@rootnative/core` and installs any new required peer dependencies in one step
-6. Reports optional peer deps that aren't installed (does not auto-install optional deps)
+6. Reports optional peer deps that aren't installed (doesn't auto-install optional deps)
 7. Lists peer deps that are no longer required so you can remove them manually
 8. Moves `registryVersion` forward to the new release tag, so later `add`/`update` calls fetch matching sources
 9. With `-a, --all`, also updates the installed component files

@@ -2,7 +2,7 @@
 
 > Version: 0.0.2
 > Peer deps: @rootnative/core >=0.0.2 <0.1.0, @rootnative/inertia >=0.0.26 <0.1.0 (required — every animation runs on it), react >=19.3.0 <20.0.0, react-native >=0.88.0 <0.89.0, react-native-safe-area-context >=4.0.0, react-native-reanimated >=4.7.0 <4.8.0, react-native-worklets >=0.13.0 <0.14.0 (Expo SDK 58 configures its Babel plugin automatically; on bare React Native add react-native-worklets/plugin last in babel.config.js)
-> Optional peer: @react-native-vector-icons/material-design-icons >=13.0.0 (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver does not install it
+> Optional peer: @react-native-vector-icons/material-design-icons >=13.0.0 (plus expo-font on Expo), imported only by the @rootnative/components/mdi subpath (mdiResolver, the MaterialDesignIcons resolver for string icon names). An app with its own iconResolver doesn't install it
 > Do not use @expo/vector-icons: Expo is retiring it, and it registers the same font, so the glyphs render as ?. Use @react-native-vector-icons/* (see Icons)
 
 ## App root setup
@@ -69,7 +69,7 @@ Why that order:
   reverts on unmount. Compute the number rather than hard-coding one — a literal
   `88` double-counts the 16dp margin the layer already added.
 
-**No gesture-handler setup is required.** `react-native-gesture-handler` is not a
+**No gesture-handler setup is required.** `react-native-gesture-handler` isn't a
 peer dependency of any `@rootnative/*` package, so there is no
 `GestureHandlerRootView` in the stack above. `BottomSheet` drag runs on
 `@rootnative/inertia/touch`, which is built on React Native's own `PanResponder`
@@ -88,7 +88,7 @@ two things to load them, and the second one is the step people miss.
 module.exports = {
   preset: require.resolve('@rootnative/inertia/jest-preset'),
   transform: {
-    // The preset's parent matches .js/.ts/.tsx only — .mjs needs its own entry.
+    // The parent preset matches only .js, .ts and .tsx, so .mjs needs its own entry.
     '^.+\\.mjs$': 'babel-jest',
   },
   transformIgnorePatterns: [
@@ -97,17 +97,17 @@ module.exports = {
 }
 ```
 
-**`transformIgnorePatterns` alone is not enough, and that is the trap.** The two
+**`transformIgnorePatterns` alone isn't enough, and that is the trap.** The two
 settings do different jobs, and only one of them is widely known:
 
 - `transformIgnorePatterns` says a file is *allowed* to be transformed.
 - `transform` says a file *matches a transformer*.
 
 A file that matches no transformer is never transformed — allowed or not. The
-`react-native` preset transforms `^.+\.(js|ts|tsx)$`, which does not include
+`react-native` preset transforms `^.+\.(js|ts|tsx)$`, which doesn't include
 `.mjs`, and `@rootnative/inertia` ships `.mjs` in its `dist/`. So widening only
 `transformIgnorePatterns` leaves the import failing with a syntax error on
-`export` — inside `node_modules`, in a package the reader did not write, which
+`export` — inside `node_modules`, in a package the reader didn't write, which
 is why it reads as a broken package rather than a missing config line.
 
 **The transform entry needs a Babel config that transpiles ESM, and both halves
@@ -141,7 +141,7 @@ repeating the providers in every file.
 
 Every animation runs on `@rootnative/inertia`, which ships its own reference at
 `node_modules/@rootnative/inertia/llms.txt`. Read it when an example here uses a
-symbol this file does not define — `Motion.*`, `useScroll`, `Presence`,
+symbol this file doesn't define — `Motion.*`, `useScroll`, `Presence`,
 `MotionConfig` and the value-layer hooks are all documented there, not here.
 
 `Motion` and the hooks are exported from the **package root**:
@@ -187,7 +187,7 @@ All interactive components follow a 3-tier override system. Merge order: theme d
 Standard override props on interactive components:
 - `containerColor?: string` — Root container background. Hover/press state-layer colors auto-derived.
 - `contentColor?: string` — Content (label + icons) color. State-layer colors auto-derived.
-- `labelStyle?: StyleProp<TextStyle>` — Text-specific overrides (does not affect icons).
+- `labelStyle?: StyleProp<TextStyle>` — Text-specific overrides (doesn't affect icons).
 - `style` — Root container style.
 
 Disabled state always uses standard MD3 disabled treatment (38% onSurface) regardless of overrides.
@@ -284,7 +284,7 @@ import { ButtonGroup } from '@rootnative/components/button-group'
   ]}
 />
 
-// Action-only group — no selection state.
+// Action-only group: no selection state.
 <ButtonGroup
   selectionMode="none"
   onItemPress={handleAction}
@@ -388,14 +388,14 @@ Props:
 ```tsx
 import { FAB } from '@rootnative/components/fab'
 
-// Icon-only — accessibilityLabel required
+// Icon-only: accessibilityLabel is required
 <FAB icon="plus" accessibilityLabel="Add" onPress={handleAdd} />
 <FAB icon="plus" size="large" variant="tertiary" accessibilityLabel="Add" onPress={handleAdd} />
 
-// Extended — label doubles as the accessible name
+// Extended: the label is also the accessible name
 <FAB icon="pencil-outline" label="Edit" variant="surface" onPress={handleEdit} />
 
-// Flat — no shadow and no lift on hover, as MD3 places it in a bottom app bar
+// Flat: no shadow and no lift on hover, as MD3 places it in a bottom app bar
 <FAB icon="plus" variant="secondary" elevated={false} accessibilityLabel="Add" onPress={handleAdd} />
 ```
 
@@ -435,7 +435,7 @@ import { AppBar, useAppBarContentColor } from '@rootnative/components/appbar'
 // and press layers derive from it. leading: the title color. trailing:
 // onSurfaceVariant on the surface schemes, the title color on primary and
 // primaryContainer. contentColor replaces both. A selected toggle keeps
-// primary. Content that a Portal renders, such as the open menu, does not.
+// primary. Content that a Portal renders, such as the open menu, doesn't.
 <AppBar title="Notes" colorScheme="primary" trailing={
   <Menu align="end" anchor={
     <IconButton icon="dots-vertical" variant="standard" accessibilityLabel="More options" />
@@ -472,7 +472,7 @@ Props:
 - `titleLevel?: 1 | 2 | 3 | 4 | 5 | 6` — Default: `1`. The outline level of the title. The bar title is the page heading, so the web renders it as `<h1>`. Pass `2` when a heading above the bar is the page heading.
 - `style?: StyleProp<ViewStyle>` — Custom style applied to the root container.
 - `actions?: AppBarAction[]` — Array of actions rendered in the trailing slot. Each entry is either an icon action (`{ icon }`) or a text action (`{ label }`, e.g. "Save"). Inside a `PortalHost`, an icon action shows a plain tooltip with its `accessibilityLabel`; `tooltip: string` replaces the text and `tooltip: false` removes it. Mutually exclusive with `trailing`.
-- `trailing?: ReactNode` — Custom trailing content. Use instead of `actions` when the slot needs something `actions` cannot build, such as a `Menu` anchor. A standard `IconButton` in the slot takes the trailing icon color (see `colorScheme`); other content reads it with `useAppBarContentColor()`. Mutually exclusive with `actions` — the type rejects both together.
+- `trailing?: ReactNode` — Custom trailing content. Use instead of `actions` when the slot needs something `actions` can't build, such as a `Menu` anchor. A standard `IconButton` in the slot takes the trailing icon color (see `colorScheme`); other content reads it with `useAppBarContentColor()`. Mutually exclusive with `actions` — the type rejects both together.
 - Inherits `ViewProps` (except `children`)
 
 ---
@@ -496,14 +496,14 @@ import { BottomAppBar } from '@rootnative/components/bottom-app-bar'
 // An extended FAB from `label`, and a FAB variant other than secondary.
 <BottomAppBar fab={{ icon: 'pencil-outline', label: 'Compose', variant: 'tertiary', onPress: compose }} />
 
-// `leading` replaces `actions` for content they cannot build, such as a Menu
+// `leading` replaces `actions` for content they can't build, such as a Menu
 // anchor. A standard IconButton there takes the action color; other content
 // reads it with useAppBarContentColor().
 <BottomAppBar leading={<Menu anchor={<IconButton icon="dots-vertical" accessibilityLabel="More" />}>...</Menu>} />
 
 // Hide on scroll: pass the offset from inertia's useScroll(). The bar moves
 // down by its height while the content scrolls down, and back while it scrolls
-// up. The content does not grow into the space, so place the bar over the
+// up. The content doesn't grow into the space, so place the bar over the
 // content and pad the end of the content by the bar height.
 const { scrollY, onScroll } = useScroll() // from '@rootnative/inertia'
 <Motion.ScrollView onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 80 }}>...</Motion.ScrollView>
@@ -523,7 +523,7 @@ Props:
 - `contentColor?: string` — Default: `onSurfaceVariant`. Override the icon color of the actions. It reaches each standard `IconButton` in `leading` too. The FAB keeps the colors of its variant.
 - `style?: StyleProp<ViewStyle>` — Style applied to the bar container.
 - `actions?: BottomAppBarAction[]` — Icon actions rendered at the start of the bar. MD3 recommends up to four. Mutually exclusive with `leading`.
-- `leading?: ReactNode` — Custom start content. Use instead of `actions` when the slot needs something `actions` cannot build, such as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in the slot takes the action color; other content reads it with `useAppBarContentColor()`. Mutually exclusive with `actions` — the type rejects both together.
+- `leading?: ReactNode` — Custom start content. Use instead of `actions` when the slot needs something `actions` can't build, such as a `Menu` anchor or a `Tooltip`. A standard `IconButton` in the slot takes the action color; other content reads it with `useAppBarContentColor()`. Mutually exclusive with `actions` — the type rejects both together.
 - Inherits `ViewProps` (except `children`)
 
 #### BottomAppBarAction
@@ -568,7 +568,7 @@ import { Card } from '@rootnative/components/card'
   </Card.Actions>
 </Card>
 
-// Raw children still work and stay unpadded — you own the spacing.
+// Raw children still work and stay unpadded. You own the spacing.
 <Card variant="outlined" onPress={handlePress}>{children}</Card>
 ```
 
@@ -813,7 +813,7 @@ Props:
 - `ref?: Ref<TextInputInstance>` — Ref to the inner `TextInput`, for imperative `focus()`, `blur()` and `clear()` calls.
 - Inherits `TextInputProps` (except `editable`, `style`)
 - `actions?: SearchBarAction[]` — Icon buttons rendered in the trailing slot, such as a voice action. Mutually exclusive with `trailing`.
-- `trailing?: ReactNode` — Custom trailing content, such as an `Avatar`. Mutually exclusive with `actions` — the type rejects both together. The clear button is not part of the slot: it shows before either one while the bar holds text.
+- `trailing?: ReactNode` — Custom trailing content, such as an `Avatar`. Mutually exclusive with `actions` — the type rejects both together. The clear button isn't part of the slot: it shows before either one while the bar holds text.
 - Inherits `TextInputProps` (except `editable`, `style`)
 
 SearchBarAction:
@@ -1028,11 +1028,11 @@ import { Divider } from '@rootnative/components/divider'
 // Full-bleed 1dp rule
 <Divider />
 
-// Leading inset — `true` is the MD3 list inset (56dp), or pass dp
+// Leading inset: `true` is the MD3 list inset (56dp), or pass dp
 <Divider insetStart />
 <Divider insetStart={16} insetEnd={16} />
 
-// Vertical — stretches to the height of its row
+// Vertical: stretches to the height of its row
 <Row>
   <Text>Left</Text>
   <Divider orientation="vertical" />
@@ -1151,7 +1151,7 @@ import { Portal, PortalHost, PORTAL_LAYERS } from '@rootnative/components/portal
   <App />
 </PortalHost>
 
-// Anywhere below it — renders into the host's overlay layer
+// Anywhere below it: renders into the host's overlay layer
 {open ? (
   <Portal priority={PORTAL_LAYERS.dialog}>
     <MyDialog onDismiss={close} />
@@ -1216,7 +1216,7 @@ import { Button } from '@rootnative/components/button'
   </Dialog.Actions>
 </Dialog>
 
-// Must be resolved by an action — scrim + Android back stop dismissing
+// Only an action closes it. The scrim and Android back don't dismiss it.
 <Dialog visible={open} onDismiss={close} dismissable={false}>…</Dialog>
 
 // Full-screen: Dialog builds the header (close button + title + actions)
@@ -1296,8 +1296,8 @@ import { BottomSheet } from '@rootnative/components/bottom-sheet'
 
 // Snap points: dp numbers or percentages of the portal host's height.
 // Indices are ascending by resolved height; below the lowest one, a
-// release dismisses. Scrollable content brings its own ScrollView — the
-// drag gesture lives on the handle, so the two never fight.
+// release dismisses. Scrollable content brings its own ScrollView. The
+// drag gesture is on the handle, so the two never conflict.
 <BottomSheet
   visible={open}
   onDismiss={close}
@@ -1310,7 +1310,7 @@ import { BottomSheet } from '@rootnative/components/bottom-sheet'
 // Standard sheet: no scrim, screen behind stays interactive
 <BottomSheet visible={open} onDismiss={close} variant="standard">…</BottomSheet>
 
-// Must be resolved by an action — drags rubber-band back, scrim inert
+// Only an action closes it. A drag springs back, and the scrim does nothing.
 <BottomSheet visible={open} onDismiss={close} dismissable={false}>…</BottomSheet>
 ```
 
@@ -1427,9 +1427,9 @@ import {
 import { FAB_SIZES } from '@rootnative/components/fab'
 
 // Mount once, inside <ThemeProvider> and inside <PortalHost>.
-// `bottomOffset` is the app-wide default — use it when every screen has the
-// same bottom furniture. The layer already adds its own 16dp margin and the
-// safe-area inset, so do not include either in the number.
+// `bottomOffset` is the app-wide default. Use it when every screen has the
+// same bars at the bottom. The layer already adds its own 16dp margin and the
+// safe-area inset, so don't include either in the number.
 <PortalHost>
   <SnackbarProvider bottomOffset={0}>
     <App />
@@ -1444,7 +1444,7 @@ function ComposeScreen() {
   return <FAB icon="plus" accessibilityLabel="Compose" onPress={compose} />
 }
 
-// Imperative only — there is no <Snackbar visible> component.
+// Imperative only: there is no <Snackbar visible> component.
 const snackbar = useSnackbar()
 
 snackbar.show({ message: 'Photo saved' })                      // 4s
@@ -1549,7 +1549,7 @@ import { Divider } from '@rootnative/components/divider'
 
 // Placement is a preference: a menu that doesn't fit flips to the roomier side,
 // shifts back inside the screen margin horizontally, and scrolls when capped.
-// `align` is logical — 'start' is the left edge in LTR, the right edge in RTL.
+// `align` is logical: 'start' is the left edge in LTR and the right edge in RTL.
 <Menu side="top" align="center" offset={8} anchor={anchor}>…</Menu>
 
 // Item anatomy
@@ -2137,7 +2137,7 @@ import { Slider } from '@rootnative/components/slider'
   maximumValue={100}
 />
 
-// Centered — active track fills from midpoint to thumb
+// Centered: the active track fills from the midpoint to the thumb
 <Slider value={balance} onValueChange={setBalance} minimumValue={-50} maximumValue={50} centered />
 
 // With start/end icon decorations
@@ -2289,10 +2289,10 @@ Props:
 Every icon prop accepts an `IconSource` (`import type { IconSource } from '@rootnative/core'`) — one of three forms:
 
 1. **String name** — resolved through the theme's `iconResolver`. Pass `mdiResolver` from `@rootnative/components/mdi` for `MaterialDesignIcons` (browse names at https://pictogrammers.com/library/mdi/), or another resolver. Without a resolver a string name renders nothing and logs one warning.
-2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component does not override size/color.
+2. **ReactElement** — a pre-rendered icon (`leadingIcon={<Check size={18} color="#fff" />}`). The component doesn't override size/color.
 3. **Render function** — `(props: { size: number; color?: string }) => ReactNode`. Receives the component's resolved icon size and color, so the icon stays consistent with theme/variant state.
 
-Per-call elements/functions always take precedence over the resolver. Only `@rootnative/components/mdi` imports `@react-native-vector-icons/material-design-icons`; the root entry and every other subpath do not. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
+Per-call elements/functions always take precedence over the resolver. Only `@rootnative/components/mdi` imports `@react-native-vector-icons/material-design-icons`; the root entry and every other subpath don't. An app with its own resolver never installs the package, and a bundler without Expo needs no alias (docs page: Web without Expo).
 
 ### When to pick which
 
