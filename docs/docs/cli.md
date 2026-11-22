@@ -25,7 +25,7 @@ The theme system (`@rootnative/core`) stays an npm dependency, so a theme update
 
 ## Prerequisites
 
-- Node.js >= 18
+- Node.js `^22.13.0`, `^24.3.0` or `>=26.0.0`, the range that React Native 0.88 requires
 - Expo SDK 58: React Native `>=0.88.0 <0.89.0` and React `>=19.3.0 <20.0.0`, the band that the published packages declare
 - A TypeScript project with path aliases (for example `@/*` → `src/*`)
 
@@ -174,7 +174,7 @@ npx rootnative add card chip text-field
 npx rootnative add appbar
 ```
 
-**Automatic dependency resolution.** If a component depends on other components, the CLI adds them too. For example, `appbar` depends on `button`, `icon-button`, `portal`, `tooltip` and `typography`, so the CLI adds all six together.
+**Automatic dependency resolution.** If a component depends on other components, the CLI adds them too. For example, `appbar` depends on `button`, `icon-button`, `layout`, `portal`, `tooltip` and `typography`, and `button` depends on `progress`, so the CLI adds all eight together.
 
 **Options:**
 
@@ -328,7 +328,7 @@ Then `aliases.components` of `@/components/ui` maps to `src/components/ui/` on d
 
 ## Project structure
 
-After `npx rootnative add appbar`, your project looks like this. `appbar` pulls in five components, so the CLI installs all six:
+After `npx rootnative add appbar`, your project looks like this. `appbar` pulls in seven components (six directly, and `progress` through `button`), so the CLI installs eight. Each auto-added directory holds its own files and the shared files that it imports, in the same way as `appbar/`:
 
 ```
 src/
@@ -336,53 +336,20 @@ src/
 │   └── ui/
 │       ├── appbar/
 │       │   ├── AppBar.tsx
-│       │   ├── types.ts
-│       │   ├── styles.ts
 │       │   ├── index.ts
-│       │   └── safe-area.tsx        ← shared file, flattened in
-│       ├── button/                  ← auto-added (appbar dependency)
-│       │   ├── Button.tsx
-│       │   ├── types.ts
 │       │   ├── styles.ts
-│       │   ├── index.ts
-│       │   ├── elevationShadow.ts   ← shared file, flattened in
-│       │   ├── usePressMorph.ts     ← shared file, flattened in
-│       │   └── useStateLayer.ts     ← shared file, flattened in
-│       ├── icon-button/             ← auto-added (appbar dependency)
-│       │   ├── IconButton.tsx
 │       │   ├── types.ts
-│       │   ├── styles.ts
-│       │   ├── index.ts
-│       │   ├── useBooleanProgress.ts
-│       │   ├── usePressMorph.ts
-│       │   └── useStateLayer.ts
-│       ├── portal/                  ← auto-added (appbar dependency)
-│       │   ├── Portal.tsx
-│       │   ├── PortalHost.tsx
-│       │   ├── context.ts
-│       │   ├── layers.ts
-│       │   ├── store.ts
-│       │   ├── types.ts
-│       │   ├── styles.ts
-│       │   ├── index.ts
-│       │   ├── pointerEvents.ts     ← shared file, flattened in
-│       │   └── warnOnce.ts          ← shared file, flattened in
-│       ├── tooltip/                 ← auto-added (appbar dependency)
-│       │   ├── Tooltip.tsx
-│       │   ├── types.ts
-│       │   ├── styles.ts
-│       │   ├── index.ts
-│       │   ├── plainText.ts
-│       │   ├── pointerEvents.ts
-│       │   ├── pressableKeyDown.ts
-│       │   ├── useAnchorPosition.ts
-│       │   ├── useBackHandlerDismiss.ts
-│       │   └── warnOnce.ts
-│       └── typography/              ← auto-added (appbar dependency)
-│           ├── Typography.tsx
-│           ├── types.ts
-│           ├── styles.ts
-│           └── index.ts
+│       │   ├── resolveAnimatedInsetKey.ts  ← shared file, flattened in
+│       │   ├── safe-area.tsx               ← shared file, flattened in
+│       │   ├── useMaterialTheme.ts         ← shared file, flattened in
+│       │   └── warnOnce.ts                 ← shared file, flattened in
+│       ├── button/          ← auto-added (appbar dependency)
+│       ├── icon-button/     ← auto-added (appbar dependency)
+│       ├── layout/          ← auto-added (appbar dependency)
+│       ├── portal/          ← auto-added (appbar dependency)
+│       ├── progress/        ← auto-added (button dependency)
+│       ├── tooltip/         ← auto-added (appbar dependency)
+│       └── typography/      ← auto-added (appbar dependency)
 └── lib/
     ├── color.ts                     ← alphaColor, blendColor
     ├── elevation.ts                 ← shadow/elevation helpers
@@ -429,7 +396,7 @@ The CLI rewrites the imports in the copied component files, so they work in your
 
 ## Available components
 
-All 37, with the components that each one pulls in. The descriptions match
+Every component, with the components that each one pulls in. The descriptions match
 what `npx rootnative list` prints, because both read the same registry.
 
 | Component | Dependencies | Description |

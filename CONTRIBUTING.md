@@ -6,7 +6,7 @@ Thanks for your help. This project is a `pnpm` monorepo with shared packages and
 
 | Tool | Version |
 | --- | --- |
-| Node.js | >= 18 |
+| Node.js | 24 (the version in `.nvmrc`) |
 | pnpm | 10.x |
 | Expo SDK | 58 |
 | React Native | 0.88.1 |

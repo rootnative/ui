@@ -104,7 +104,7 @@ Adds one or more components to your project.
 ```bash
 npx rootnative add button
 npx rootnative add card chip text-field
-npx rootnative add appbar  # auto-adds button + icon-button + typography dependencies
+npx rootnative add appbar  # also adds the components that appbar depends on
 ```
 
 Options:
@@ -117,7 +117,7 @@ Options:
 
 The `add` command does this:
 
-1. Resolves the full dependency graph (for example, `appbar` requires `button`, `icon-button` and `typography`).
+1. Resolves the full dependency graph (for example, `appbar` requires `button`, `icon-button`, `layout`, `portal`, `tooltip` and `typography`, and `button` requires `progress`).
 2. Shows a plan of the components, the utilities, and the npm packages to install.
 3. Copies the component files, with the import paths rewritten to match your project.
 4. Generates a utility barrel file (`rootnative-utils.ts`).
@@ -199,6 +199,7 @@ The checks include:
 - The React Native version is compatible
 - The installed component files are complete
 - `@rootnative/inertia` is installed (a hard failure when it is missing, because every animated component needs it)
+- `react-native-svg` is installed (a hard failure when it is missing, because the `@rootnative/components` barrel requires it at load time)
 - The optional peer dependencies (`react-native-safe-area-context`, and `@react-native-vector-icons/material-design-icons` for `mdiResolver`), reported as warnings
 
 ## Configuration
@@ -226,39 +227,28 @@ The checks include:
 
 ## Output structure
 
-After `npx rootnative add button appbar`:
+After `npx rootnative add button appbar`, the CLI installs eight directories: the two that you asked for, and the six components that they depend on. Each directory holds its own files and the shared internal files that it imports, in the same way as `appbar/`:
 
 ```
 src/
   components/
     ui/
-      button/
-        Button.tsx
-        types.ts
-        styles.ts
-        index.ts
-        elevationShadow.ts  # shared internal, flattened per component
-        usePressMorph.ts
-        useStateLayer.ts
-      icon-button/          # auto-added (appbar dependency)
-        IconButton.tsx
-        types.ts
-        styles.ts
-        index.ts
-        useBooleanProgress.ts
-        usePressMorph.ts
-        useStateLayer.ts
-      typography/           # auto-added (appbar dependency)
-        Typography.tsx
-        types.ts
-        styles.ts
-        index.ts
       appbar/
         AppBar.tsx
-        types.ts
-        styles.ts
         index.ts
+        styles.ts
+        types.ts
+        resolveAnimatedInsetKey.ts  # shared internal, flattened per component
         safe-area.tsx
+        useMaterialTheme.ts
+        warnOnce.ts
+      button/
+      icon-button/          # auto-added (appbar dependency)
+      layout/               # auto-added (appbar dependency)
+      portal/               # auto-added (appbar dependency)
+      progress/             # auto-added (button dependency)
+      tooltip/              # auto-added (appbar dependency)
+      typography/           # auto-added (appbar dependency)
   lib/
     color.ts
     elevation.ts
@@ -274,36 +264,48 @@ each installed component stays self-contained.
 
 ## Available components
 
+The descriptions match what `npx rootnative list` prints, because both read the same registry.
+
 | Component | Description |
 |-----------|-------------|
-| `typography` | Text component with 15 MD3 type scale variants |
-| `button` | 5 variants (filled, elevated, outlined, text, tonal) with icon support |
-| `button-group` | Standard and connected button groups with single or multi-select toggle behavior |
-| `icon-button` | 4 variants (filled, tonal, outlined, standard) with toggle support |
-| `fab` | Floating action button with 4 color variants, 3 sizes, and optional extended label |
-| `appbar` | Top app bar with 4 variants and SafeAreaView support |
-| `avatar` | Circular avatar with image, icon, or text initials and 5 sizes |
-| `card` | 3 variants (elevated, filled, outlined) with optional press handler |
-| `chip` | 4 variants (assist, filter, input, suggestion) with icon/avatar support |
-| `checkbox` | Binary selection control |
-| `radio` | Single-choice selection control |
-| `switch` | Toggle control with optional icons |
-| `slider` | Single-thumb or range slider with continuous and discrete modes |
-| `progress` | Linear and circular progress indicators (determinate and indeterminate) |
-| `text-field` | Text input with animated floating label, 2 variants (filled, outlined) |
-| `layout` | Layout primitives: Box, Row, Column, Grid with responsive columns and spanning cells, and SafeAreaView wrapper |
-| `list` | List container with interactive items and dividers |
-| `divider` | Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides. |
-| `loading-indicator` | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
-| `portal` | Render children into a host elsewhere in the tree (overlays, dialogs, sheets) |
-| `dialog` | Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling. |
-| `snackbar` | Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement. |
-| `menu` | Anchored dropdown menu (Menu + Menu.Item) that flips and shifts to stay on screen, with self-managing or controlled visibility. |
-| `tooltip` | Plain and rich tooltips anchored to a control, shown on hover or a long press |
+| `appbar` | Top app bar with 4 variants (small, center-aligned, medium, large) and SafeAreaView support. |
+| `avatar` | Circular avatar with image, icon, or text initials and 5 sizes (extraSmall to extraLarge). |
+| `badge` | Small 6dp dot or 16dp count badge anchored to an icon, with max cap and NavigationBar support. |
+| `bottom-app-bar` | MD3 bottom app bar — 80dp bar with up to four icon actions at the start and a flat FAB at the end |
 | `bottom-sheet` | MD3 bottom sheet — modal (scrim) and standard variants, drag handle, velocity-based snap points, drag-to-dismiss. |
-| `tabs` | Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator |
+| `button` | MD3 button with 5 variants (filled, elevated, outlined, text, tonal) and icon support. |
+| `button-group` | Standard and connected button groups with single or multi-select toggle behavior; replaces the deprecated MD3 segmented button. |
+| `card` | Surface container with 3 variants (elevated, filled, outlined), optional press handler, and Media / Content / Actions region slots. |
+| `carousel` | Multi-browse, hero, uncontained and full-screen carousels with MD3 keyline masking, snapping, and pressable items. |
+| `checkbox` | Binary selection control with checked/unchecked states and customizable colors. |
+| `chip` | Input chip with 4 variants (assist, filter, input, suggestion) and icon/avatar support. |
+| `dialog` | Basic and full-screen modal dialogs with Icon / Title / Content / Actions slots, scrim, and Android back handling. |
+| `divider` | Horizontal or vertical 1dp rule with optional leading/trailing insets and thickness/color overrides. |
+| `fab` | Floating action button with 4 color variants (primary, secondary, tertiary, surface), 3 sizes (small, medium, large), and optional extended label. |
+| `icon` | Any IconSource (name, element, or render function) rendered through the theme's iconResolver, decorative or labelled. |
+| `icon-button` | Icon-only button with 4 variants (filled, tonal, outlined, standard) and toggle support. |
+| `keyboard-avoiding-wrapper` | Zero-config keyboard-aware wrapper with platform-specific behavior for form layouts. |
+| `layout` | Layout primitives: Box, Row, Column, Container (a centred column with a maximum width), Grid with responsive columns and spanning cells, and Layout (SafeAreaView wrapper). |
+| `list` | List container with interactive items, supporting headline/trailing text and dividers. |
+| `loading-indicator` | MD3 Expressive shape-morphing loading spinner (contained + uncontained, determinate + indeterminate) |
+| `menu` | Anchored dropdown menu (Menu, Menu.Item, Menu.Group) that flips and shifts to stay on screen, with self-managing or controlled visibility. |
 | `navigation-bar` | MD3 navigation bar — 80dp bottom destination bar with an animated indicator pill |
-| `keyboard-avoiding-wrapper` | Zero-config keyboard-aware wrapper for form layouts |
+| `navigation-drawer` | MD3 navigation drawer — modal (scrim, slide from the start edge) and standard variants with sections, headlines, badges, and dividers. |
+| `navigation-rail` | MD3 navigation rail — 80dp side rail of destinations with an optional header, three alignments, and the NavigationBar indicator pill. |
+| `portal` | Render children into a host elsewhere in the tree (Portal + PortalHost) for overlays like dialogs, sheets, and tooltips. |
+| `progress` | Linear and circular progress indicators with determinate and indeterminate modes. |
+| `radio` | Single-choice selection control with selected/unselected states. |
+| `search-bar` | MD3 search bar — 56dp pill with a leading search or navigation icon, a clear button, and trailing icon actions or an avatar |
+| `search-view` | MD3 search view — the panel that opens from a search bar, full screen on a compact window and docked on a wider one, with a focus trap and Android back handling |
+| `side-sheet` | MD3 side sheet — modal (scrim, slide from the end edge) and standard variants with a headline, back and close buttons, scrolling content, and an action row |
+| `skeleton` | Pulsing loading placeholder block that matches the shape of the content it stands in for |
+| `slider` | Single-thumb or range slider with continuous and discrete (stepped) modes and optional centered origin. |
+| `snackbar` | Imperative snackbar queue — SnackbarProvider plus useSnackbar() with actions, durations, and safe-area aware placement. |
+| `switch` | Toggle control with optional icons and customizable thumb/track colors. |
+| `tabs` | Primary and secondary tab rows, fixed or scrollable, with a sliding active indicator |
+| `text-field` | Text input with animated floating label, 2 variants (filled, outlined), and icon support. |
+| `tooltip` | Plain and rich tooltips anchored to a control, shown on hover or a long press |
+| `typography` | Text component using the MD3 type scale — 15 base variants (displayLarge to labelSmall) plus their Expressive *Emphasized counterparts. |
 
 ## Import rewriting
 

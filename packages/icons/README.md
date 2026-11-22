@@ -91,7 +91,7 @@ The adapter forwards a name that you don't alias to the icon set as is.
 
 ## MDI compatibility
 
-`mdiCompat: true` enables a curated alias map, so legacy [MaterialCommunityIcons](https://pictogrammers.com/library/mdi/) names keep working after a switch of libraries (`magnify` → `search`, `delete` → `trash-2`, `dots-vertical` → `more-vertical`, …). Pass an object to extend or remove entries:
+`mdiCompat: true` enables a curated alias map, so [MDI](https://pictogrammers.com/library/mdi/) names keep working after a switch of libraries (`magnify` → `search`, `delete` → `trash-2`, `dots-vertical` → `more-vertical`, …). Pass an object to extend or remove entries:
 
 ```tsx
 mdiCompat: { magnify: 'binoculars', pencil: null }

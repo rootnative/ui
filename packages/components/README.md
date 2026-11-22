@@ -74,22 +74,27 @@ import { Button, Card } from '@rootnative/components'
 | Component | Subpath | Variants |
 |-----------|---------|----------|
 | Typography | `./typography` | displayLarge..labelSmall (15 MD3 type scale roles) |
+| Icon | `./icon` | name, element, or render function · through the theme's `iconResolver` · decorative or labelled |
 | Button | `./button` | filled, elevated, outlined, text, tonal |
 | IconButton | `./icon-button` | filled, tonal, outlined, standard |
 | FAB | `./fab` | primary, secondary, tertiary, surface · small, medium, large · optional extended label |
 | ButtonGroup | `./button-group` | standard, connected · single or multi-select toggle |
 | AppBar | `./appbar` | small, center-aligned, medium, large |
 | Card | `./card` | elevated, filled, outlined |
+| Carousel | `./carousel` | multi-browse, hero, uncontained, full-screen · keyline masking · snapping |
 | Chip | `./chip` | assist, filter, input, suggestion |
 | Avatar | `./avatar` | image, icon, or text initials · 5 sizes (extraSmall..extraLarge) |
+| Badge | `./badge` | small (6dp dot), large (16dp count) · max cap |
 | Checkbox | `./checkbox` | — |
 | Radio | `./radio` | — |
 | Switch | `./switch` | — |
 | Slider | `./slider` | continuous, discrete (stepped), range, centered origin |
 | Progress | `./progress` | linear, circular · determinate, indeterminate |
 | LoadingIndicator | `./loading-indicator` | contained, uncontained · determinate, indeterminate |
+| Skeleton | `./skeleton` | rounded, circle, rectangle · pulsing placeholder |
 | TextField | `./text-field` | filled, outlined |
 | SearchBar | `./search-bar` | MD3 search bar · clear button · trailing actions or avatar |
+| SearchView | `./search-view` | auto, fullscreen, docked · opens from a search bar · focus trap |
 | Layout | `./layout` | Layout, Box, Row, Column, Container, Grid |
 | Dialog | `./dialog` | basic, fullscreen · Icon / Title / Content / Actions slots |
 | Divider | `./divider` | horizontal, vertical · optional leading/trailing insets |
@@ -102,6 +107,8 @@ import { Button, Card } from '@rootnative/components'
 | SideSheet | `./side-sheet` | modal, standard · headline, back and close buttons · actions · start or end edge · detached |
 | Tabs | `./tabs` | primary, secondary · fixed or scrollable · sliding active indicator |
 | NavigationBar | `./navigation-bar` | 3–5 destinations · label visibility always / selected / never |
+| NavigationRail | `./navigation-rail` | top, center, bottom alignment · optional header · indicator pill |
+| NavigationDrawer | `./navigation-drawer` | modal, standard · sections, headlines, badges, dividers |
 | BottomAppBar | `./bottom-app-bar` | up to 4 icon actions · flat secondary FAB · insetBottom |
 | KeyboardAvoidingWrapper | `./keyboard-avoiding-wrapper` | — |
 
