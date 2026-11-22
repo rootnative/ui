@@ -7,6 +7,43 @@ this is a single changelog for the repo.
 Versions follow modified semver: a breaking change bumps the middle digit
 (`0.1.0`), and fixes and additions bump the last digit (`0.0.2`).
 
+## 0.0.3 — 2026-11-22
+
+**A fix for right-to-left apps that have no `SafeAreaProvider`, and the
+Node range of the CLI.** No API changes, and no peer range moves. The
+`@rootnative/inertia` floor stays at `0.0.26`.
+
+- **Fix: in RTL, each side inset lands on its own side when the app has no
+  `SafeAreaProvider`.** On iOS and Android, the root `PortalHost` now adds a
+  `SafeAreaProvider` when the app has none. So `Layout`, `AppBar` and the
+  other components that apply insets read the insets from its context.
+  Before, they used the native `SafeAreaView` of
+  `react-native-safe-area-context`, and in RTL React Native moved its left
+  inset to the right. With a cutout on one side, as in landscape on Android
+  15 and later, the inset padded the side without the cutout, and the
+  content sat under the cutout. Expo Router adds a provider of its own, so
+  its apps had no problem, and for them nothing changes. `PortalHost` adds
+  no provider on the web. In development, a `SafeAreaView` outside any
+  provider now warns one time in native RTL. `rootnative add portal` also
+  copies `safe-area.tsx` now, and needs `react-native-safe-area-context`,
+  which is already a required peer. What to check: if your app has no
+  `SafeAreaProvider` and no Expo Router, look at a `Layout` or an `AppBar`
+  that doesn't start at a screen edge. It now pads by the insets of the
+  window, as it already did in an app with a provider.
+
+- **Fix: `@rootnative/cli` declares the Node range that React Native 0.88
+  needs.** The `engines` field is `^22.13.0 || ^24.3.0 || >=26.0.0` now. It
+  was `>=18`, but an Expo SDK 58 project already needs Node 22.13 or later
+  for React Native and Expo. Nothing changes in a project that runs today.
+
+- **Docs: two wrong facts are fixed.** `llms.txt` gave the optional peers
+  of SDK 57. It now gives `react-native-reanimated >=4.7.0 <4.8.0` and
+  `react-native-worklets >=0.13.0 <0.14.0`, the ranges that
+  `@rootnative/components` declares. The Motion page said that `useSpring`
+  and `useBooleanSpring` ignore reduced motion. They honor it. Use
+  `useAnimation` for a theme transition name, because the spring hooks take
+  spring names only.
+
 ## 0.0.2 — 2026-11-21
 
 **One fix: the `@rootnative/core` peer range has an upper bound.** No
