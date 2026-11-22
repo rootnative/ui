@@ -214,7 +214,7 @@ The checks include:
     "lib": "@/lib"
   },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "v0.0.0-alpha.4"
+  "registryVersion": "v0.0.2"
 }
 ```
 

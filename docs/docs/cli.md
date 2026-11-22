@@ -290,7 +290,7 @@ do, so `doctor` runs and exits with zero on a project straight out of `create`.
     "lib": "@/lib"
   },
   "registryUrl": "https://raw.githubusercontent.com/rootnative/ui",
-  "registryVersion": "v0.0.0-alpha.4"
+  "registryVersion": "v0.0.2"
 }
 ```
 
