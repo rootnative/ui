@@ -22,7 +22,7 @@
     "@rootnative/inertia": "0.0.26",
     "@rootnative/seo": "workspace:*",
     "@rootnative/utils": "workspace:*",
-    "@rootnative/web-expo": "~0.0.3",
+    "@rootnative/web-expo": "~0.0.4",
     "expo": "~58.0.23",
     "expo-constants": "~58.0.15",
     "expo-font": "~58.0.11",
