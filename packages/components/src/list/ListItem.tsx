@@ -1,7 +1,7 @@
 import { Animated } from '@rootnative/inertia/reanimated'
 import { resolveLogicalKey } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Platform, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
@@ -141,7 +141,7 @@ export function ListItem({
       accessibilityRole="button"
       {...props}
       aria-disabled={isDisabled}
-      hitSlop={Platform.OS === 'web' ? undefined : 4}
+      hitSlop={4}
       disabled={isDisabled}
       onPress={onPress}
       {...composeHandlers(handlers, props)}

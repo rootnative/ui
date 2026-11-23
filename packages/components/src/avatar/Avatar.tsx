@@ -2,7 +2,7 @@ import { useIconResolver } from '@rootnative/core'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { renderIcon } from '@rootnative/utils'
 import { useMemo } from 'react'
-import { Image, Platform, Text, View } from 'react-native'
+import { Image, Text, View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
@@ -140,9 +140,9 @@ export function Avatar({
     )
   }
 
-  // Bring the touch target up to the 48dp minimum on native.
-  const hitSlop =
-    Platform.OS === 'web' ? undefined : getDefaultHitSlop(CONTAINER_PX[size])
+  // Bring the touch target up to the 48dp minimum. react-native-web drops
+  // the prop.
+  const hitSlop = getDefaultHitSlop(CONTAINER_PX[size])
 
   return (
     <AnimatedPressable

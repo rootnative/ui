@@ -1,7 +1,7 @@
 import { useShadow } from '@rootnative/inertia'
 import { Animated } from '@rootnative/inertia/reanimated'
 import { useMemo } from 'react'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -138,7 +138,7 @@ export function Card({
         // only when no `button` role replaces it.
         role={role ?? 'button'}
         aria-disabled={isDisabled}
-        hitSlop={Platform.OS === 'web' ? undefined : 4}
+        hitSlop={4}
         disabled={isDisabled}
         onPress={onPress}
         {...(isDisabled ? undefined : composeHandlers(handlers, props))}

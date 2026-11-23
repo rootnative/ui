@@ -12,7 +12,7 @@ import {
   resolveLogicalKey,
 } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform, View } from 'react-native'
+import { View } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
 import { webOutlineReset } from '../internal/focusOutline'
@@ -236,13 +236,10 @@ export function Switch({
           aria-checked={isSelected}
           hitSlop={
             // The track is the pressable, and MD3 makes it 32dp tall — a flat
-            // 4 left the control at 40dp, under the 48dp WCAG/MD3 floor. Web
-            // is excluded because react-native-web does not implement
-            // `hitSlop`.
-            hitSlop ??
-            (Platform.OS === 'web'
-              ? undefined
-              : getDefaultHitSlop(SWITCH_TRACK_HEIGHT))
+            // 4 left the control at 40dp, under the 48dp WCAG/MD3 floor. No
+            // web gate: react-native-web drops the prop, and a web runtime
+            // that has `hitSlop` gets the same touch area as native.
+            hitSlop ?? getDefaultHitSlop(SWITCH_TRACK_HEIGHT)
           }
           disabled={isDisabled || isPassive}
           onPress={handlePress}

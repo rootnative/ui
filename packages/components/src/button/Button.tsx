@@ -11,7 +11,7 @@ import {
   resolveLogicalKey,
 } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
-import { Platform, Text, View, type GestureResponderEvent } from 'react-native'
+import { Text, View, type GestureResponderEvent } from 'react-native'
 import { elevationShadowConfig } from '../elevation-shadow'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { composeHandlers } from '../internal/composeHandlers'
@@ -337,12 +337,9 @@ export function Button({
           hitSlop={
             // Sized per token, not a flat 4: `extraSmall` is 32dp tall, so a
             // constant slop left it at 40dp — under the 48dp WCAG/MD3 floor.
-            // Web is excluded because react-native-web does not implement
-            // `hitSlop`.
-            hitSlop ??
-            (Platform.OS === 'web'
-              ? undefined
-              : getDefaultHitSlop(sizeTokens.height))
+            // No web gate: react-native-web drops the prop, and a web runtime
+            // that has `hitSlop` gets the same touch area as native.
+            hitSlop ?? getDefaultHitSlop(sizeTokens.height)
           }
           disabled={isDisabled}
           onPress={isLoading ? undefined : handlePress}

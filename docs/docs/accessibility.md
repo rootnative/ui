@@ -76,9 +76,11 @@ layout, so the small sizes stay usable.
 variant sit 2dp apart, so a horizontal slop would make the touch area of each
 item overlap its neighbour.
 
-**This does not apply on the web.** react-native-web does not implement `hitSlop`,
-so on the web these controls are exactly their token size. If you use
-`extraSmall` on a touch-capable web build, give them room yourself.
+**This does not apply under react-native-web.** It does not implement
+`hitSlop`, so there these controls are exactly their token size. If you use
+`extraSmall` on a touch-capable web build, give them room yourself. The
+components pass the same `hitSlop` on the web, so a web runtime that
+implements the prop gets the 48dp touch area.
 
 ## What you have to supply
 
@@ -280,8 +282,8 @@ We state these, because they affect what you can promise your own users:
 - **`role="menu"` items are Tab stops on the web, not a roving-tabindex group.**
   The arrow keys work. The strict ARIA menu pattern would also make the item
   group a single tab stop.
-- **Touch targets are corrected only on native.** The `hitSlop` that lifts
-  the smallest size tokens to 48dp is a no-op under react-native-web, so a
+- **Touch targets are not corrected under react-native-web.** The `hitSlop`
+  that lifts the smallest size tokens to 48dp is a no-op there, so a
   touch-capable web build gets the token size. See "Touch targets" above.
 
 The first two are pinned as failing tests in
