@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const { getDefaultConfig } = require('expo/metro-config')
+const { withRootNative } = require('@rootnative/web-expo/metro.cjs')
 
 const config = getDefaultConfig(__dirname)
 const workspaceRoot = path.resolve(__dirname, '..')
@@ -73,4 +74,8 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return context.resolveRequest(context, moduleName, platform)
 }
 
-module.exports = config
+// On the web, send each `react-native` and react-native-web import to
+// `@rootnative/web-expo`, so the example runs on the Root Native web runtime.
+// react-native-web stays in the root tree for the web Jest projects, and this
+// wrap keeps Metro away from it.
+module.exports = withRootNative(config)

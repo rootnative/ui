@@ -21,10 +21,10 @@ import { catalogMeta } from '../src/metadata'
 import { site } from '../src/site'
 
 // Restore the persisted RTL preference on web before the first render.
-// react-native-web ships `I18nManager` as a stub, so the document `dir`
-// attribute is the one switch the browser and the library both read. The
-// bundle runs after the HTML is parsed, so the attribute is in place before
-// React mounts.
+// The document `dir` attribute is the one switch that the browser, the web
+// runtime, and the library all read. react-native-web ships `I18nManager` as
+// a stub, so `forceRTL` can't be the switch there. The bundle runs after the
+// HTML is parsed, so the attribute is in place before React mounts.
 if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
   try {
     const stored = localStorage.getItem('forceRTL')
