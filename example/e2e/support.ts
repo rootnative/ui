@@ -74,3 +74,27 @@ export async function box(locator: Locator) {
   if (rect === null) throw new Error('The element has no box.')
   return rect
 }
+
+/**
+ * The web runtime of the export. A few APIs differ by design: `Alert.alert`
+ * opens a dialog on `@rootnative/web` and does nothing on react-native-web.
+ */
+export async function runtime(page: Page) {
+  const usesRootNative = await page.evaluate(
+    () => document.querySelector('[class~="rn-view"]') !== null,
+  )
+  return usesRootNative ? 'rootnative' : 'react-native-web'
+}
+
+/**
+ * After a press that calls `Alert.alert(title)`: the dialog shows the title
+ * and its button closes it, on the runtime that has a dialog.
+ */
+export async function expectAlert(page: Page, title: string) {
+  if ((await runtime(page)) !== 'rootnative') return
+  const alert = page.getByRole('alertdialog')
+  await expect(alert).toBeVisible()
+  await expect(alert).toContainText(title)
+  await alert.getByRole('button').last().click()
+  await expect(alert).toBeHidden()
+}
