@@ -92,6 +92,14 @@ test.describe('SearchView', () => {
     await expect(page.getByText(/^Last search: "/)).toBeVisible()
   })
 
+  test('the header of the view is a search landmark', async ({ page }) => {
+    await open(page, 'search-view')
+    await page.getByRole('button', { name: 'Search trails' }).click()
+    const view = page.getByTestId('search-view')
+    await expect(view.getByRole('search')).toBeVisible()
+    await expect(view.getByRole('search').getByRole('searchbox')).toBeFocused()
+  })
+
   test('a click outside the docked view closes it', async ({ page }) => {
     await open(page, 'search-view')
     await page.getByRole('button', { name: 'Search trails' }).click()

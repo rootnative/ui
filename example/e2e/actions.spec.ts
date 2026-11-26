@@ -165,6 +165,12 @@ test.describe('SearchBar', () => {
     ).toHaveAttribute('placeholder', 'Search mail')
   })
 
+  test('the bar is a search landmark around its input', async ({ page }) => {
+    await open(page, 'search-bar')
+    const landmark = page.getByRole('search').first()
+    await expect(landmark.getByPlaceholder('Search mail')).toBeVisible()
+  })
+
   test('a disabled bar takes no input', async ({ page }) => {
     await open(page, 'search-bar')
     await expect(page.locator('input[aria-disabled="true"]')).toBeDisabled()

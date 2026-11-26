@@ -11,6 +11,7 @@ import type {
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
 import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
+import { searchLandmarkProps } from '../internal/searchLandmark'
 import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -240,9 +241,7 @@ export function SearchView({
   )
 
   const header = (
-    // `accessibilityRole`, not `role`: RN's `Role` union has no `search`
-    // landmark, and react-native-web renders this one as `role="search"`.
-    <View accessibilityRole="search" style={styles.header}>
+    <View {...searchLandmarkProps()} style={styles.header}>
       <View style={styles.slot}>
         <IconButton
           icon={backIcon ?? selectRTL('arrow-left', 'arrow-right')}

@@ -494,9 +494,9 @@ describe('a consumer role reaches the DOM', () => {
 })
 
 /**
- * RN's `Role` union has no `search`, so the landmark is set through
- * `accessibilityRole`. Only the DOM can show that react-native-web turns it
- * into `role="search"` rather than dropping it.
+ * RN's `Role` union has no `search`, so the landmark is a `role` that the
+ * types do not have. Only the DOM can show that react-native-web writes it as
+ * `role="search"` rather than dropping it.
  */
 describe('SearchBar roles reach the DOM', () => {
   it('wraps a searchbox in a search landmark', () => {

@@ -78,8 +78,7 @@ export function createStyles(theme: MaterialTheme, containerColor?: string) {
         backgroundColor: colors.container,
         overflow: 'hidden',
       },
-      // `accessibilityRole="search"` on the header, so the row is a `search`
-      // landmark on web, the same as the bar.
+      // The header is a `search` landmark on the web, the same as the bar.
       header: {
         height: SEARCH_VIEW_HEADER_HEIGHT,
         flexDirection: 'row',
