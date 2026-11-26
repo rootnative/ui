@@ -6,7 +6,7 @@ import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
 import type { EdgeInsets } from 'react-native-safe-area-context'
 import { Divider } from '../divider/Divider'
 import { IconButton } from '../icon-button'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
 import { resolveLogicalCornerKey } from '../internal/resolveLogicalCornerKey'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -124,12 +124,18 @@ export function SideSheet(props: SideSheetProps) {
     [isModal, detached, theme, topCornerKey, bottomCornerKey],
   )
   const surfaceStyle = useMemo(
-    () => [styles.surface, cornerStyle, style, margin?.style],
+    () => [
+      styles.surface,
+      cornerStyle,
+      style,
+      margin?.style,
+      pointerEvents.auto,
+    ],
     [styles.surface, cornerStyle, style, margin],
   )
   const farSideKey = edge === 'end' ? startKey : endKey
   const sheetLayerStyle = useMemo(
-    () => [styles.sheetLayer, scrimGapStyle(farSideKey), pointerEvents.boxNone],
+    () => [styles.sheetLayer, scrimGapStyle(farSideKey), animatedBoxNone],
     [styles.sheetLayer, farSideKey],
   )
 

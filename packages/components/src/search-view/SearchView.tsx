@@ -10,7 +10,7 @@ import type {
 } from 'react-native'
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
 import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -211,7 +211,7 @@ export function SearchView({
     [windowHeight],
   )
   const dockedSurfaceStyle = useMemo(
-    () => [styles.dockedSurface, dockedMaxHeight, style],
+    () => [styles.dockedSurface, dockedMaxHeight, style, pointerEvents.auto],
     [styles.dockedSurface, dockedMaxHeight, style],
   )
   const fullscreenSurfaceStyle = useMemo(
@@ -231,7 +231,7 @@ export function SearchView({
     [frame],
   )
   const dockedLayerStyle = useMemo(
-    () => [styles.dockedLayer, pointerEvents.boxNone],
+    () => [styles.dockedLayer, animatedBoxNone],
     [styles.dockedLayer],
   )
   const fullscreenDismissStyle = useMemo(

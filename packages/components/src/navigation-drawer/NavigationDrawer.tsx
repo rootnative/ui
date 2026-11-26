@@ -2,7 +2,7 @@ import { Motion, Presence } from '@rootnative/inertia'
 import { isRTLDirection, resolveLogicalKey } from '@rootnative/utils'
 import { useCallback, useMemo, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
 import { resolveLogicalCornerKey } from '../internal/resolveLogicalCornerKey'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -111,11 +111,11 @@ export function NavigationDrawer(props: NavigationDrawerProps) {
     [isModal, theme, topEndCornerKey, bottomEndCornerKey],
   )
   const surfaceStyle = useMemo(
-    () => [styles.surface, cornerStyle, style],
+    () => [styles.surface, cornerStyle, style, pointerEvents.auto],
     [styles.surface, cornerStyle, style],
   )
   const sheetLayerStyle = useMemo(
-    () => [styles.sheetLayer, scrimGapStyle(endKey), pointerEvents.boxNone],
+    () => [styles.sheetLayer, scrimGapStyle(endKey), animatedBoxNone],
     [styles.sheetLayer, endKey],
   )
 

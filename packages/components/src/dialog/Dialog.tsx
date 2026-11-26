@@ -6,7 +6,7 @@ import { Pressable, ScrollView, View } from 'react-native'
 import type { ViewProps } from 'react-native'
 import { IconButton } from '../icon-button'
 import { plainTextOf } from '../internal/plainText'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -98,7 +98,7 @@ function DialogBasic({
       {...rest}
       ref={surfaceRef}
       testID={testID}
-      style={[styles.container, style]}
+      style={[styles.container, style, pointerEvents.auto]}
       // MD3 dialogs are plain dialogs. `alertdialog` is opt-in because
       // assistive technology treats it as an interruption.
       role={role ?? 'dialog'}
@@ -149,7 +149,7 @@ function DialogFullscreen({
       ref={surfaceRef}
       edges={FULLSCREEN_EDGES}
       testID={testID}
-      style={[styles.fullscreenContainer, style]}
+      style={[styles.fullscreenContainer, style, pointerEvents.auto]}
       role={role ?? 'dialog'}
       aria-modal
       accessibilityViewIsModal
@@ -258,7 +258,7 @@ export function Dialog({
               testID={testID === undefined ? undefined : `${testID}-layer`}
               style={[
                 isFullscreen ? styles.fullscreenLayer : styles.centerLayer,
-                pointerEvents.boxNone,
+                animatedBoxNone,
               ]}
               // MD3 enters a basic dialog with a scale-up + fade; the
               // fullscreen variant slides up. A true full-height slide would

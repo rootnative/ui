@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 /**
  * `pointerEvents` as a style rather than a prop.
@@ -24,3 +24,16 @@ export const pointerEvents = StyleSheet.create({
   boxOnly: { pointerEvents: 'box-only' },
   none: { pointerEvents: 'none' },
 })
+
+/**
+ * `box-none` for a Reanimated node. The child that takes the pointer needs
+ * `pointerEvents.auto`.
+ *
+ * On the web, Reanimated writes the style of its node inline. CSS has no
+ * `box-none` value, so the browser drops it, and a full-size layer then takes
+ * each press over the scrim below it. `none` is valid CSS, and a child with
+ * `auto` takes the pointer again. On native, `none` on a parent also stops
+ * its children, so native keeps `box-none`.
+ */
+export const animatedBoxNone =
+  Platform.OS === 'web' ? pointerEvents.none : pointerEvents.boxNone
