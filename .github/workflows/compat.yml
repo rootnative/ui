@@ -1,7 +1,8 @@
 name: SDK Compatibility
 
-# Checks the packed release candidate against every Expo SDK fixture in
-# rootnative/sdk-compat, before it is published rather than after.
+# Checks the packed release candidate against every fixture in
+# rootnative/sdk-compat that it claims (an Expo app for each SDK, and a React
+# Native CLI app with no Expo), before it is published rather than after.
 #
 # components is the reason. It once advertised `react >=18.0.0` and
 # `react-native >=0.72.0` while it depended on @rootnative/inertia, whose floor
