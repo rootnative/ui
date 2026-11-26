@@ -20,6 +20,7 @@ import { ScrollView, StyleSheet } from 'react-native'
 import { catalogMetadata } from '../src/metadata'
 import { ScreenIntro } from '../src/ScreenIntro'
 import { ScreenNavFooter } from '../src/ScreenNavFooter'
+import { useHydrated } from '../src/use-hydrated'
 
 function SectionTitle({ children }: { children: string }) {
   const { colors } = useTheme()
@@ -58,7 +59,9 @@ export function generateMetadata() {
 
 export default function RTLScreen() {
   const { colors } = useTheme()
-  const direction = isRTLDirection() ? 'RTL' : 'LTR'
+  // The export server renders LTR, so the hydration render must do the same.
+  const hydrated = useHydrated()
+  const direction = hydrated && isRTLDirection() ? 'RTL' : 'LTR'
 
   return (
     <ScrollView style={styles.container}>

@@ -46,6 +46,9 @@ test.describe('App shell', () => {
     await page.getByRole('button', { name: 'Switch to RTL layout' }).click()
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
     await expect.poll(async () => (await box(back)).x).toBeGreaterThan(640)
+    await expect(
+      page.getByRole('button', { name: 'Switch to LTR layout' }),
+    ).toBeVisible()
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Button')
   })
 
