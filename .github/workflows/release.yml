@@ -261,6 +261,7 @@ jobs:
         runtime: [rootnative-web, react-native-web]
     env:
       EXAMPLE_WEB_RUNTIME: ${{ matrix.runtime }}
+      E2E_BROWSERS: chromium,firefox,webkit
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -284,8 +285,8 @@ jobs:
       - name: Export the example
         run: pnpm --filter example export:web
 
-      - name: Install Chromium
-        run: pnpm --filter example exec playwright install --with-deps chromium
+      - name: Install the browsers
+        run: pnpm --filter example exec playwright install --with-deps chromium firefox webkit
 
       - name: Browser tests
         run: pnpm --filter example e2e
