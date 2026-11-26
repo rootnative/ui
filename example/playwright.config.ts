@@ -15,6 +15,8 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
+  // A test that passes only on the retry shows as flaky in the report.
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     // The export is built for this path (`experiments.baseUrl` in app.json).

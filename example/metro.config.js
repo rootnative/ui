@@ -78,4 +78,11 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 // `@rootnative/web-expo`, so the example runs on the Root Native web runtime.
 // react-native-web stays in the root tree for the web Jest projects, and this
 // wrap keeps Metro away from it.
-module.exports = withRootNative(config)
+//
+// `EXAMPLE_WEB_RUNTIME=react-native-web` skips the wrap, so Expo's default
+// runtime serves the web. CI exports the example both ways for the browser
+// tests, because the components must work on both runtimes.
+module.exports =
+  process.env.EXAMPLE_WEB_RUNTIME === 'react-native-web'
+    ? config
+    : withRootNative(config)

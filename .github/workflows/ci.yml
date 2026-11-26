@@ -121,3 +121,61 @@ jobs:
       # pages as above, so the browser pass is not repeated.
       - name: Server export check
         run: pnpm --filter example check:export:server
+
+  # Presses, types, and drags on the static web export of the example in a
+  # real browser, and reads the result from the DOM. The unit tests run in
+  # jsdom with a Reanimated mock, so they cannot see what the browser does
+  # with a style: a scrim that took no press passed each of them.
+  #
+  # The components must work on both web runtimes, so the same tree is
+  # exported two times. `EXAMPLE_WEB_RUNTIME` picks the runtime in
+  # `example/metro.config.js`.
+  browser-tests:
+    name: Browser tests (${{ matrix.runtime }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [rootnative-web, react-native-web]
+    env:
+      EXAMPLE_WEB_RUNTIME: ${{ matrix.runtime }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The export reads the built `core` and `seo` packages.
+      - name: Build
+        run: pnpm run build
+
+      - name: Export the example
+        run: pnpm --filter example export:web
+
+      - name: Install Chromium
+        run: pnpm --filter example exec playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: pnpm --filter example e2e
+
+      # The report holds a trace of each failed test.
+      - name: Upload the report
+        if: ${{ !cancelled() && failure() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: browser-tests-${{ matrix.runtime }}
+          path: |
+            example/playwright-report
+            example/test-results
+          retention-days: 7

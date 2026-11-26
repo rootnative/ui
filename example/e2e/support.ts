@@ -1,4 +1,5 @@
 import { expect, test as base, type Locator, type Page } from '@playwright/test'
+import manifest from '../package.json'
 
 /**
  * `page` fails its test on an uncaught exception or a `console.error`, the
@@ -97,4 +98,9 @@ export async function expectAlert(page: Page, title: string) {
   await expect(alert).toContainText(title)
   await alert.getByRole('button').last().click()
   await expect(alert).toBeHidden()
+}
+
+/** The `@rootnative/web-expo` range of the example, such as `~0.0.8`. */
+export function webRuntimeRange(): string {
+  return manifest.dependencies['@rootnative/web-expo']
 }
