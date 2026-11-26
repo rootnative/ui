@@ -1,12 +1,4 @@
-import {
-  expect,
-  expectAlert,
-  open,
-  pressKeyOn,
-  runtime,
-  test,
-  webRuntimeRange,
-} from './support'
+import { expect, expectAlert, open, pressKeyOn, test } from './support'
 
 test.describe('ButtonGroup', () => {
   test('a single-select group moves the selection', async ({ page }) => {
@@ -168,12 +160,6 @@ test.describe('SearchBar', () => {
 
   test('the input has the searchbox role', async ({ page }) => {
     await open(page, 'search-bar')
-    // `@rootnative/web` 0.0.8 drops the `role` of a `TextInput`. The skip
-    // ends with the bump of the example to the next version.
-    test.skip(
-      (await runtime(page)) === 'rootnative' && webRuntimeRange() === '~0.0.8',
-      '@rootnative/web 0.0.8 drops the role of a TextInput',
-    )
     await expect(
       page.getByRole('searchbox', { name: 'Search mail' }),
     ).toHaveAttribute('placeholder', 'Search mail')
