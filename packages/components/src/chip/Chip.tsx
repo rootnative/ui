@@ -15,7 +15,6 @@ import {
 import type { IconSource } from '@rootnative/utils'
 import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import {
-  Platform,
   Text,
   View,
   type GestureResponderEvent,
@@ -445,7 +444,7 @@ export function Chip(props: ChipProps) {
             aria-disabled={isDisabled}
             {...(variant === 'filter' ? pressedState(isSelected) : undefined)}
             // Bring the touch target to the WCAG/MD3 minimum of 48dp (chip is 32dp tall).
-            hitSlop={hitSlop ?? (Platform.OS === 'web' ? undefined : 8)}
+            hitSlop={hitSlop ?? 8}
             disabled={isDisabled}
             onPress={handlePress}
             {...(isDisabled

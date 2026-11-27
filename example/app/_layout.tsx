@@ -19,12 +19,13 @@ import { findEntry } from '../src/catalog'
 import { JumpMenu } from '../src/JumpMenu'
 import { catalogMeta } from '../src/metadata'
 import { site } from '../src/site'
+import { useHydrated } from '../src/use-hydrated'
 
 // Restore the persisted RTL preference on web before the first render.
-// react-native-web ships `I18nManager` as a stub, so the document `dir`
-// attribute is the one switch the browser and the library both read. The
-// bundle runs after the HTML is parsed, so the attribute is in place before
-// React mounts.
+// The document `dir` attribute is the one switch that the browser, the web
+// runtime, and the library all read. react-native-web ships `I18nManager` as
+// a stub, so `forceRTL` can't be the switch there. The bundle runs after the
+// HTML is parsed, so the attribute is in place before React mounts.
 if (Platform.OS === 'web' && typeof localStorage !== 'undefined') {
   try {
     const stored = localStorage.getItem('forceRTL')
@@ -124,6 +125,9 @@ function RootLayoutContent() {
   const title = useMemo(() => resolveTitle(routeName), [routeName])
   const canGoBack = routeName !== 'index'
   const isDarkTheme = scheme === 'dark'
+  // The export server renders LTR, so the hydration render must do the same.
+  const hydrated = useHydrated()
+  const isRTL = hydrated && isRTLDirection()
   const statusBarStyle = isDarkTheme ? 'light' : 'dark'
   // Native screens render an opaque background of their own, so the themed
   // one from <Layout> can't show through — push it onto the screen instead.
@@ -146,14 +150,12 @@ function RootLayoutContent() {
         <View style={styles.iconFrame}>
           <IconButton
             icon={
-              isRTLDirection()
-                ? 'format-pilcrow-arrow-left'
-                : 'format-pilcrow-arrow-right'
+              isRTL ? 'format-pilcrow-arrow-left' : 'format-pilcrow-arrow-right'
             }
             size="small"
             variant="standard"
             accessibilityLabel={
-              isRTLDirection() ? 'Switch to LTR layout' : 'Switch to RTL layout'
+              isRTL ? 'Switch to LTR layout' : 'Switch to RTL layout'
             }
             onPress={toggleRTL}
           />
@@ -171,7 +173,7 @@ function RootLayoutContent() {
         </View>
       </View>
     ),
-    [isDarkTheme, setMode],
+    [isDarkTheme, isRTL, setMode],
   )
 
   return (

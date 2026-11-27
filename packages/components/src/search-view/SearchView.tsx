@@ -10,7 +10,8 @@ import type {
 } from 'react-native'
 import { Divider } from '../divider'
 import { IconButton } from '../icon-button'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
+import { searchLandmarkProps } from '../internal/searchLandmark'
 import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
@@ -211,7 +212,7 @@ export function SearchView({
     [windowHeight],
   )
   const dockedSurfaceStyle = useMemo(
-    () => [styles.dockedSurface, dockedMaxHeight, style],
+    () => [styles.dockedSurface, dockedMaxHeight, style, pointerEvents.auto],
     [styles.dockedSurface, dockedMaxHeight, style],
   )
   const fullscreenSurfaceStyle = useMemo(
@@ -231,7 +232,7 @@ export function SearchView({
     [frame],
   )
   const dockedLayerStyle = useMemo(
-    () => [styles.dockedLayer, pointerEvents.boxNone],
+    () => [styles.dockedLayer, animatedBoxNone],
     [styles.dockedLayer],
   )
   const fullscreenDismissStyle = useMemo(
@@ -240,9 +241,7 @@ export function SearchView({
   )
 
   const header = (
-    // `accessibilityRole`, not `role`: RN's `Role` union has no `search`
-    // landmark, and react-native-web renders this one as `role="search"`.
-    <View accessibilityRole="search" style={styles.header}>
+    <View {...searchLandmarkProps()} style={styles.header}>
       <View style={styles.slot}>
         <IconButton
           icon={backIcon ?? selectRTL('arrow-left', 'arrow-right')}

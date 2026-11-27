@@ -21,14 +21,23 @@ both before it's published.
 | --- | --- |
 | iOS | Supported |
 | Android | Supported |
-| Web | Supported through `react-native-web` 0.21. Without Expo, see [Web without Expo](./web-without-expo.md) |
+| Web | Supported on [`@rootnative/web`](https://rootnative.github.io/web/) `>=0.0.9 <0.1.0`, which we recommend, and on `react-native-web` 0.21. Without Expo, see [Web without Expo](./web-without-expo.md), which uses `react-native-web` |
 | Electron, macOS, Windows, other hosts | Not tested. An Electron renderer runs the [Web without Expo](./web-without-expo.md#electron) recipe; that page lists the remaining checks |
 
-For the web, also install `react-dom` and `react-native-web`:
-`npx expo install react-dom react-native-web`. Some behavior is different on
-the web. For example, `hitSlop` has no effect, and dialogs, menus and sheets
-keep the keyboard focus inside. See [Accessibility](./accessibility.md) for the
-full list.
+For the web, install `react-dom` and one of the two web runtimes:
+
+- `@rootnative/web`, which we recommend: install `react-dom` and
+  `@rootnative/web-expo`, then wrap your Metro config with `withRootNative`.
+  The [Expo page](https://rootnative.github.io/web/expo) of `@rootnative/web`
+  has the steps.
+- `react-native-web`, the default of Expo:
+  `npx expo install react-dom react-native-web`.
+
+You can change the runtime later. Your component code stays the same.
+
+Some behavior is different on the web. For example, dialogs, menus and sheets
+keep the keyboard focus inside, and `hitSlop` has no effect on
+`react-native-web`. See [Accessibility](./accessibility.md) for the full list.
 
 ## Supported runtime
 

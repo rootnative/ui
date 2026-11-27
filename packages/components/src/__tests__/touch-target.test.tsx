@@ -18,10 +18,11 @@
  * `narrow` at `xs` is 28x32dp, which a single height-derived slop would leave
  * 44dp wide.
  *
- * **Native only.** react-native-web does not implement `hitSlop`, so on web
- * these controls are their token size. That is a real platform gap rather than
- * something this file can assert away — see `Platform.OS === 'web'` at each
- * call site.
+ * **The web gets the same prop.** react-native-web does not implement
+ * `hitSlop` and drops it, so there these controls are their token size. A web
+ * runtime that has `hitSlop` grows the touch area as native does.
+ * `web/hit-slop.web.test.tsx` checks that react-native-web drops the prop with
+ * no DOM attribute and no warning.
  */
 import { renderWithTheme } from '@rootnative/utils/test'
 import { screen } from '@testing-library/react-native'

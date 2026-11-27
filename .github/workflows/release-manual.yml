@@ -51,9 +51,9 @@ jobs:
   # on the commit that this run releases, the release reuses the results:
   # running them again took about six of the eight minutes of a release. A
   # failed run stops the release. A missing run, or a matrix result older
-  # than a day, makes the release do that work itself in the `gates`, `pack`
-  # and `compat` jobs. Keep the `verify` step "Find the CI and matrix results"
-  # the same in release.yml.
+  # than a day, makes the release do that work itself in the `gates`,
+  # `browser-tests`, `pack` and `compat` jobs. Keep the `verify` step "Find
+  # the CI and matrix results" the same in release.yml.
   verify:
     name: Checks on this commit
     runs-on: ubuntu-latest
@@ -262,12 +262,71 @@ jobs:
       tarball-artifact: release-candidate-components
       enforce-range: true
 
+  # The browser tests of ci.yml, for a commit with no CI result on it to
+  # reuse. They press, type, and drag on the web export of the example, on
+  # both web runtimes. Keep the steps the same as in ci.yml.
+  browser-tests:
+    name: Browser tests (${{ matrix.runtime }})
+    needs: verify
+    if: needs.verify.outputs.ci != 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [rootnative-web, react-native-web]
+    env:
+      EXAMPLE_WEB_RUNTIME: ${{ matrix.runtime }}
+      E2E_BROWSERS: chromium,firefox,webkit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The export reads the built `core` and `seo` packages.
+      - name: Build
+        run: pnpm run build
+
+      - name: Export the example
+        run: pnpm --filter example export:web
+
+      - name: Install the browsers
+        run: pnpm --filter example exec playwright install --with-deps chromium firefox webkit
+
+      - name: Browser tests
+        run: pnpm --filter example e2e
+
+      # The report holds a trace of each failed test.
+      - name: Upload the report
+        if: ${{ !cancelled() && failure() }}
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: browser-tests-${{ matrix.runtime }}
+          path: |
+            example/playwright-report
+            example/test-results
+          retention-days: 7
+
   release:
     name: Release (Manual)
-    needs: [verify, gates, pack, compat]
-    # `gates`, `pack` and `compat` are skipped when the release reuses their
-    # results. always() lets this job start after a skipped job, and the rest
-    # of the condition still stops it after a failed or cancelled one.
+    needs: [verify, gates, browser-tests, pack, compat]
+    # `gates`, `browser-tests`, `pack` and `compat` are skipped when the
+    # release reuses their results. always() lets this job start after a
+    # skipped job, and the rest of the condition still stops it after a failed
+    # or cancelled one.
     if: >-
       always() && needs.verify.result == 'success' &&
       !contains(needs.*.result, 'failure') &&

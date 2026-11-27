@@ -14,13 +14,7 @@ import {
   webKeepsPhysicalSides,
 } from '@rootnative/utils'
 import { useCallback, useMemo, useState, type ReactElement } from 'react'
-import {
-  Platform,
-  Text,
-  View,
-  type StyleProp,
-  type TextStyle,
-} from 'react-native'
+import { Text, View, type StyleProp, type TextStyle } from 'react-native'
 import { AnimatedPressable } from '../internal/AnimatedPressable'
 import { webOutlineReset } from '../internal/focusOutline'
 import { pointerEvents } from '../internal/pointerEvents'
@@ -202,9 +196,8 @@ function ButtonGroupItemImpl({
   // `connected` variant sit 2dp apart, and 8dp of horizontal slop would make
   // each item's touch area swallow 6dp of its neighbour's. Height is the axis
   // that actually breaks the rule; widening it is what would break the group.
-  // Web is excluded because react-native-web does not implement `hitSlop`.
+  // No web gate: react-native-web drops the prop.
   const hitSlop = useMemo(() => {
-    if (Platform.OS === 'web') return undefined
     const vertical = getDefaultHitSlop(tokens.height)
     return { top: vertical, bottom: vertical, left: 0, right: 0 }
   }, [tokens.height])

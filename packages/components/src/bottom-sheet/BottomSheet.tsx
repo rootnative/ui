@@ -25,7 +25,7 @@ import type {
 } from 'react-native'
 import { Pressable, View } from 'react-native'
 import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
-import { pointerEvents } from '../internal/pointerEvents'
+import { animatedBoxNone, pointerEvents } from '../internal/pointerEvents'
 import { useBackHandlerDismiss } from '../internal/useBackHandlerDismiss'
 import { useFocusTrap } from '../internal/useFocusTrap'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
@@ -439,7 +439,7 @@ export function BottomSheet({
               // No handle of its own: this layer only animates on the way out.
               // The entrance is the spring on `dragY` below, which lands on the
               // surface that already carries the consumer's `testID`.
-              style={[styles.sheetLayer, pointerEvents.boxNone]}
+              style={[styles.sheetLayer, animatedBoxNone]}
               initial={{ translateY: 0 }}
               animate={{ translateY: 0 }}
               exit={{ translateY: exitDistance }}

@@ -8,7 +8,7 @@ description: React Native components on a design-system agnostic theme engine. M
 
 Root Native UI gives you Material Design 3 components for React Native, on a design-system agnostic theme engine. You restyle each component through the theme.
 
-It runs on iOS, Android, and the web (through `react-native-web`), on the Expo SDK 58 runtime. See [Installation](./installation#platforms) for the platform table.
+It runs on iOS, Android, and the web (on `@rootnative/web` or `react-native-web`), on the Expo SDK 58 runtime. See [Installation](./installation#platforms) for the platform table.
 
 ## Features
 

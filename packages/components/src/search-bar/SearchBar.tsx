@@ -11,6 +11,7 @@ import type {
 } from 'react-native'
 import { IconButton } from '../icon-button'
 import { pointerEvents } from '../internal/pointerEvents'
+import { searchLandmarkProps } from '../internal/searchLandmark'
 import { startTextAlignStyle } from '../internal/startTextAlign'
 import { useMaterialTheme } from '../internal/useMaterialTheme'
 import { useStateLayer } from '../internal/useStateLayer'
@@ -317,9 +318,7 @@ export function SearchBar({
   )
 
   return (
-    // `accessibilityRole`, not `role`: RN's `Role` union has no `search`
-    // landmark, and react-native-web renders this one as `role="search"`.
-    <View accessibilityRole="search" style={rootStyle}>
+    <View {...searchLandmarkProps()} style={rootStyle}>
       {isTrigger ? (
         // The trigger is a sibling behind the content, not a wrapper around
         // it. A wrapper with the `button` role renders the clear button and
