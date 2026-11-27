@@ -135,3 +135,19 @@ export function getInstallCommand(
       return `npm install ${pkgs}`
   }
 }
+
+/**
+ * The command that installs a native peer. `expo install` picks the version
+ * that matches the Expo SDK. A project without Expo has no `expo` CLI, so it
+ * gets the command of its package manager.
+ */
+export function getPeerInstallCommand(
+  project: Pick<ProjectInfo, 'type' | 'packageManager'>,
+  packages: string[],
+): string {
+  if (project.type === 'expo') {
+    return `npx expo install ${packages.join(' ')}`
+  }
+
+  return getInstallCommand(project.packageManager, packages)
+}

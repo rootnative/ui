@@ -11,6 +11,10 @@ description: Install Root Native UI into an existing app — peer dependencies, 
 - React Native `>=0.88.0 <0.89.0` (developed and tested against 0.88.1)
 - React `>=19.3.0 <20.0.0`
 
+The library works in an Expo app and in a bare React Native app with no Expo.
+Each release of `@rootnative/core` and `@rootnative/components` is bundled in
+both before it's published.
+
 ## Platforms
 
 | Platform | Status |

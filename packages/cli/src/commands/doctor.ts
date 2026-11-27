@@ -2,7 +2,7 @@ import path from 'node:path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import { configExists, readConfig, resolveAliasPath } from '../lib/config'
-import { detectProject } from '../lib/detector'
+import { detectProject, getPeerInstallCommand } from '../lib/detector'
 import { logger } from '../lib/logger'
 
 type Status = 'pass' | 'warn' | 'fail' | 'info'
@@ -223,7 +223,9 @@ export async function doctorCommand(cwd: string): Promise<void> {
     }
 
     logCheck('fail', `${peer.name} is not installed — ${peer.reason}.`)
-    console.log(`         Run: ${chalk.bold(`npx expo install ${peer.name}`)}`)
+    console.log(
+      `         Run: ${chalk.bold(getPeerInstallCommand(project, [peer.name]))}`,
+    )
     issues++
   }
 

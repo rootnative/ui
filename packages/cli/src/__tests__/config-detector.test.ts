@@ -9,7 +9,11 @@ import {
   resolveAliasPath,
   DEFAULT_CONFIG,
 } from '../lib/config'
-import { detectProject, getInstallCommand } from '../lib/detector'
+import {
+  detectProject,
+  getInstallCommand,
+  getPeerInstallCommand,
+} from '../lib/detector'
 
 // Create a temp directory for each test
 let tmpDir: string
@@ -244,6 +248,33 @@ describe('detector', () => {
           'react-native-safe-area-context',
         ]),
       ).toBe('npm install @rootnative/core react-native-safe-area-context')
+    })
+  })
+
+  describe('getPeerInstallCommand', () => {
+    it('uses expo install in an Expo project, whatever the package manager', () => {
+      expect(
+        getPeerInstallCommand({ type: 'expo', packageManager: 'pnpm' }, [
+          'react-native-svg',
+        ]),
+      ).toBe('npx expo install react-native-svg')
+    })
+
+    it('uses the package manager in a React Native project without Expo', () => {
+      expect(
+        getPeerInstallCommand(
+          { type: 'react-native', packageManager: 'yarn' },
+          ['react-native-svg'],
+        ),
+      ).toBe('yarn add react-native-svg')
+    })
+
+    it('uses the package manager when the project type is unknown', () => {
+      expect(
+        getPeerInstallCommand({ type: 'unknown', packageManager: 'npm' }, [
+          'react-native-svg',
+        ]),
+      ).toBe('npm install react-native-svg')
     })
   })
 })
