@@ -136,7 +136,11 @@ describe('templateFiles', () => {
       ]),
     )
     expect(templateFiles('with-router')).toEqual(
-      expect.arrayContaining(['app/_layout.tsx', 'app/index.tsx']),
+      expect.arrayContaining([
+        'app/_layout.tsx',
+        'app/index.tsx',
+        'metro.config.js',
+      ]),
     )
   })
 })
