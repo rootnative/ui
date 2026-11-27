@@ -8,6 +8,7 @@ export default defineConfig({
     'src/expo-router/index.ts',
     'src/expo-image/index.ts',
     'src/dom/index.ts',
+    'src/web/index.ts',
     'src/node/index.ts',
     'src/node/bin.ts',
   ],

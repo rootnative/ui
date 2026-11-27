@@ -347,7 +347,8 @@
       "./expo-router",
       "./node",
       "./react",
-      "./schema"
+      "./schema",
+      "./web"
     ],
     "exports": {
       ".": [
@@ -417,6 +418,10 @@
         "PictureProps"
       ],
       "./dom": [
+        "PageHead",
+        "PageHeadProps"
+      ],
+      "./web": [
         "PageHead",
         "PageHeadProps"
       ],
