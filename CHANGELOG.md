@@ -7,6 +7,56 @@ this is a single changelog for the repo.
 Versions follow modified semver: a breaking change bumps the middle digit
 (`0.1.0`), and fixes and additions bump the last digit (`0.0.2`).
 
+## 0.0.4 — 2026-11-27
+
+**The components work on `@rootnative/web`, and four web fixes.** On the
+web, you can now use `@rootnative/web` or `react-native-web`. No API
+changes, and no peer range moves. The `@rootnative/inertia` floor stays at
+`0.0.26`.
+
+- **The web runs on `@rootnative/web` too, and we recommend it.** The
+  components are tested in Chromium, Firefox and WebKit on
+  `@rootnative/web` `>=0.0.9 <0.1.0` and on `react-native-web` 0.21. Your
+  component code is the same on both, so you can change the runtime later.
+  The Installation page has the setup of each one.
+
+- **Fix: in RTL, a web runtime that swaps left and right mirrors each side
+  one time.** `Slider`, `LinearProgress`, `Tabs`, `ButtonGroup` and
+  `Carousel` mirror a physical side by hand on the web, because
+  `react-native-web` keeps the sides physical. A runtime that swaps `left`
+  and `right` itself then flipped them back: the `Slider` filled from the
+  wrong side. The components now read
+  `I18nManager.doLeftAndRightSwapInRTL` on the web, and mirror by hand only
+  when the runtime doesn't. On `react-native-web`, iOS and Android, nothing
+  changes.
+
+- **Fix: a click on the scrim closes the overlay on `react-native-web`.**
+  After the entrance ended, a click on the scrim didn't close a `Dialog`,
+  a `BottomSheet`, a `SideSheet` or a `NavigationDrawer`. A full-size
+  animated layer took the click. Escape worked. On iOS and Android, nothing
+  changes.
+
+- **Fix: `hitSlop` reaches the web.** `Button`, `Switch`, `ButtonGroup`,
+  `Chip`, `Avatar`, `ListItem` and `Card` turned their `hitSlop` off on the
+  web. They now pass it on each platform, so a web runtime that has the
+  prop gets the 48dp touch target. `react-native-web` drops the prop, so
+  nothing changes there.
+
+- **Fix: `SearchBar` and the `SearchView` header are a `search` landmark on
+  each web runtime.** A web runtime can render `accessibilityRole="search"`
+  as `role="searchbox"`, which is the role of the input inside. Both
+  components now set `role="search"` on the web. `rootnative add
+  search-bar` and `rootnative add search-view` also copy
+  `searchLandmark.ts` now.
+
+- **Fix: `rootnative doctor` prints an install command that works in a
+  project with no Expo.** For a missing peer, it printed `npx expo install
+  <package>`, also in a bare React Native project, which has no `expo`
+  CLI. It now prints the command of your package manager there.
+
+- **Docs: the library works in a bare React Native app with no Expo.** The
+  Installation page and `llms.txt` now say so.
+
 ## 0.0.3 — 2026-11-22
 
 **A fix for right-to-left apps that have no `SafeAreaProvider`, and the
