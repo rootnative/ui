@@ -80,6 +80,7 @@ const TEMPLATE_CONFIGS: Record<
       'package.json',
       'app.json',
       'tsconfig.json',
+      'metro.config.js',
       '.gitignore',
       'index.ts',
       'App.tsx',

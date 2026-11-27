@@ -131,6 +131,7 @@ describe('templateFiles', () => {
         'app.json',
         '.gitignore',
         'App.tsx',
+        'metro.config.js',
         'CLAUDE.md',
         'assets/icon.png',
       ]),
